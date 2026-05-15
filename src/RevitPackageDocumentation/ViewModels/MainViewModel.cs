@@ -82,6 +82,8 @@ internal class MainViewModel : BaseViewModel {
         AddComponentCommand = RelayCommand.Create(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
 
+        CreateComponentCommand = RelayCommand.Create<SheetComponentVM>(CreateComponent, CanCreateComponent);
+
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
@@ -93,6 +95,7 @@ internal class MainViewModel : BaseViewModel {
     public ICommand RemoveSheetCommand { get; }
     public ICommand AddComponentCommand { get; }
     public ICommand RemoveComponentCommand { get; }
+    public ICommand CreateComponentCommand { get; }
 
 
     /// <summary>
@@ -308,5 +311,15 @@ internal class MainViewModel : BaseViewModel {
 
     private void RemoveComponent(SheetComponentVM sheetComponent) {
         SelectedSheet.RemoveComponent(sheetComponent);
+    }
+
+
+    private void CreateComponent(SheetComponentVM sheetComponent) {
+        _messageBoxService.Show($"Creating {sheetComponent.ModuleName}", "Creating");
+    }
+
+    private bool CanCreateComponent(SheetComponentVM sheetComponent) {
+
+        return true;
     }
 }

@@ -1,3 +1,5 @@
+using System.Windows.Input;
+
 using dosymep.WPF.ViewModels;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
@@ -7,6 +9,8 @@ internal abstract class SheetComponentVM : BaseViewModel {
     private string _moduleComment;
     private string _moduleCode;
     private string _moduleErrors;
+
+    public ICommand CreateComponentCommand { get; set; }
 
     public bool IsModuleCheck {
         get => _isModuleCheck;
@@ -52,6 +56,7 @@ internal abstract class SheetComponentVM : BaseViewModel {
         return settings;
     }
 
-    public virtual void ValidateModule() { }
-    public virtual void Process() { }
+    public abstract void CreateComponent();
+    public abstract bool ValidateModule();
+    public abstract void Process();
 }

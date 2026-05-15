@@ -4,6 +4,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
@@ -11,17 +12,19 @@ using RevitPackageDocumentation.Models;
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class TypicalAnnotationVM : SheetComponentVM {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
 
     private List<AnnotationSymbolType> _annotationTypes;
     private Family _annotationFamily;
     private AnnotationSymbolType _annotationType;
 
-    public TypicalAnnotationVM(RevitRepository revitRepository) {
+    public TypicalAnnotationVM(RevitRepository revitRepository, ILocalizationService localizationService) {
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
 
         SelectAnnotationFamilyCommand = RelayCommand.Create(SelectAnnotationFamily);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
-
 
     public ICommand SelectAnnotationFamilyCommand { get; }
 
@@ -52,7 +55,22 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             ?.ToList();
     }
 
-    public override void ValidateModule() { }
+    public override void CreateComponent() { }
+
+    public override bool ValidateModule() {
+        if(AnnotationFamily is null) {
+            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.AnnotationFamilyIsNull");
+            return false;
+        }
+        if(AnnotationType is null) {
+            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.AnnotationTypeIsNull");
+            return false;
+        }
+
+        ModuleErrors = string.Empty;
+        return true;
+    }
+
     public override void Process() { }
 
     public void Place() { }

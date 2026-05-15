@@ -19,4 +19,20 @@
     <system:String x:Key="Type.TextNoteVM">Текст</system:String>
     <system:String x:Key="Type.TypicalAnnotationVM">Типовая аннотация</system:String>
     <system:String x:Key="Type.LegendViewVM">Легенда</system:String>
+    
+    
+    <system:String x:Key="MainWindow.ViewNameIsEmpty">Не заполнено имя вида</system:String>
+    <system:String x:Key="MainWindow.ReferenceViewNameIsEmpty">Не заполнено имя эталонной спецификации</system:String>
+    <system:String x:Key="MainWindow.TextIsEmpty">Не заполнено текст</system:String>
+    
+    <system:String x:Key="MainWindow.ViewFamilyTypeIsNull">Не выбран тип вида</system:String>
+    <system:String x:Key="MainWindow.ViewportTypeIsNull">Не выбран тип видового экрана</system:String>
+    <system:String x:Key="MainWindow.ViewTemplateIsNull">Не выбран шаблон вида</system:String>
+    <system:String x:Key="MainWindow.LegendViewIsNull">Не выбрана легенда для размещения</system:String>
+    <system:String x:Key="MainWindow.TextNoteTypeIsNull">Не выбран тип текстовой заметки</system:String>
+    <system:String x:Key="MainWindow.AnnotationFamilyIsNull">Не выбрано семейство типовой аннотации</system:String>
+    <system:String x:Key="MainWindow.AnnotationTypeIsNull">Не выбран тип типовой аннотации</system:String>
+    
+    <system:String x:Key="MainWindow.ViewCountIsNotCorrect">Число задано некорректно</system:String>
+    <system:String x:Key="MainWindow.ViewColumnIsNotCorrect">Номер столбца задан некорректно</system:String>
 </ResourceDictionary>

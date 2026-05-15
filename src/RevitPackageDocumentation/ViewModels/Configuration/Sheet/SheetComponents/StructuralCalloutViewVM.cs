@@ -1,13 +1,23 @@
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
+
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class StructuralCalloutViewVM : SheetComponentVM {
+    private readonly ILocalizationService _localizationService;
+
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
     private ElementType _viewportType;
     private ViewPlan _viewTemplate;
-    private int _viewCount;
+    private string _viewCount;
     private string _viewportNumber;
+
+    public StructuralCalloutViewVM(ILocalizationService localizationService) {
+        _localizationService = localizationService;
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+    }
 
     public string ViewName {
         get => _viewName;
@@ -29,7 +39,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewTemplate, value);
     }
 
-    public int ViewCount {
+    public string ViewCount {
         get => _viewCount;
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
@@ -39,7 +49,34 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewportNumber, value);
     }
 
-    public override void ValidateModule() { }
+    public override void CreateComponent() { }
+
+    public override bool ValidateModule() {
+        if(string.IsNullOrEmpty(ViewName)) {
+            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
+            return false;
+        }
+        if(ViewFamilyType is null) {
+            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewFamilyTypeIsNull");
+            return false;
+        }
+        if(ViewportType is null) {
+            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
+            return false;
+        }
+        if(ViewTemplate is null) {
+            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewTemplateIsNull");
+            return false;
+        }
+        if(!double.TryParse(ViewCount, out double viewCountAsDouble) || viewCountAsDouble < 1) {
+            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
+            return false;
+        }
+
+        ModuleErrors = string.Empty;
+        return true;
+    }
+
     public override void Process() { }
 
     public void Create() { }

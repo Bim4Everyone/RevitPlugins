@@ -3,6 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
@@ -18,9 +20,11 @@ internal interface ISheetSetVMFactory {
 
 internal class SheetSetVMFactory : ISheetSetVMFactory {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
 
-    public SheetSetVMFactory(RevitRepository revitRepository) {
+    public SheetSetVMFactory(RevitRepository revitRepository, ILocalizationService localizationService) {
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
     }
 
     public SheetSetVM CreateSheetSetVM(SheetSetData data) {
@@ -57,7 +61,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     public SheetComponentVM CreateComponentVM(SheetComponentData sheetComponentData) {
         return sheetComponentData switch {
-            StructuralPlanViewData data => new StructuralPlanViewVM {
+            StructuralPlanViewData data => new StructuralPlanViewVM(_localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -68,10 +72,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
                 ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
                 ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
-                ViewCount = data.ViewCount ?? 1,
+                ViewCount = data.ViewCount ?? "1",
             },
 
-            StructuralCalloutViewData data => new StructuralCalloutViewVM {
+            StructuralCalloutViewData data => new StructuralCalloutViewVM(_localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -82,10 +86,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
                 ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
                 ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
-                ViewCount = data.ViewCount ?? 1,
+                ViewCount = data.ViewCount ?? "1",
             },
 
-            SectionViewData data => new SectionViewVM {
+            SectionViewData data => new SectionViewVM(_localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -96,10 +100,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewFamilyType = _revitRepository.SectionViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
                 ViewTemplate = _revitRepository.SectionViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
                 ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
-                ViewCount = data.ViewCount ?? 1,
+                ViewCount = data.ViewCount ?? "1",
             },
 
-            ScheduleViewData data => new ScheduleViewVM {
+            ScheduleViewData data => new ScheduleViewVM(_localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -108,11 +112,11 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
                 ReferenceViewName = data.ReferenceViewName ?? string.Empty,
                 ViewName = data.ViewName ?? string.Empty,
-                ViewColumn = data.ViewColumn ?? 1,
-                ViewCount = data.ViewCount ?? 1,
+                ViewColumn = data.ViewColumn ?? "1",
+                ViewCount = data.ViewCount ?? "1",
             },
 
-            TextNoteData data => new TextNoteVM {
+            TextNoteData data => new TextNoteVM(_localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -125,7 +129,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             TypicalAnnotationData data => CreateTypicalAnnotationVM(data),
 
-            LegendViewData data => new LegendViewVM {
+            LegendViewData data => new LegendViewVM(_localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -153,7 +157,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         var annotationType = annotationTypes
                     ?.FirstOrDefault(v => v.Name.Equals(data.AnnotationTypeName));
 
-        var t = new TypicalAnnotationVM(_revitRepository) {
+        var t = new TypicalAnnotationVM(_revitRepository, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
