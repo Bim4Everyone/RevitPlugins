@@ -16,8 +16,8 @@
     <system:String x:Key="Type.SectionView">Section</system:String>
     <system:String x:Key="Type.ScheduleView">Schedule</system:String>
     
-    <system:String x:Key="Type.PlanViewVM">Structural plan</system:String>
-    <system:String x:Key="Type.CalloutViewVM">Fragment</system:String>
+    <system:String x:Key="Type.StructuralPlanViewVM">Structural plan</system:String>
+    <system:String x:Key="Type.StructuralCalloutViewVM">Fragment</system:String>
     <system:String x:Key="Type.SectionViewVM">Section</system:String>
     <system:String x:Key="Type.ScheduleViewVM">Schedule</system:String>
     <system:String x:Key="Type.TextNoteVM">Text note</system:String>

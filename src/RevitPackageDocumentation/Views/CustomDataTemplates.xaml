@@ -14,9 +14,9 @@
             Source="CustomStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <!--PlanView-->
+    <!--StructuralPlanView-->
     <DataTemplate
-        x:Key="PlanViewDerivedTemplate" >
+        x:Key="StructuralPlanViewDerivedTemplate" >
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -107,15 +107,15 @@
     </DataTemplate>
 
     <DataTemplate
-        DataType="{x:Type sc:PlanViewVM}">
+        DataType="{x:Type sc:StructuralPlanViewVM}">
         <controls:SheetComponentItemControl
-            DerivedTemplate="{StaticResource PlanViewDerivedTemplate}" />
+            DerivedTemplate="{StaticResource StructuralPlanViewDerivedTemplate}" />
     </DataTemplate>
 
 
-    <!--CalloutView-->
+    <!--StructuralCalloutView-->
     <DataTemplate
-        x:Key="CalloutViewDerivedTemplate" >
+        x:Key="StructuralCalloutViewDerivedTemplate" >
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -205,9 +205,9 @@
     </DataTemplate>
 
     <DataTemplate
-        DataType="{x:Type sc:CalloutViewVM}">
+        DataType="{x:Type sc:StructuralCalloutViewVM}">
         <controls:SheetComponentItemControl
-            DerivedTemplate="{StaticResource CalloutViewDerivedTemplate}" />
+            DerivedTemplate="{StaticResource StructuralCalloutViewDerivedTemplate}" />
     </DataTemplate>
 
     

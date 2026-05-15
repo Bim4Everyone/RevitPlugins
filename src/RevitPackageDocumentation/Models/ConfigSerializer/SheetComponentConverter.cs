@@ -10,13 +10,13 @@ namespace RevitPackageDocumentation.Models.ConfigSerializer;
 /// </summary>
 public class SheetComponentConverter : JsonConverter {
     private const string _componentTypeProperty = "ComponentType";
-    private const string _planViewType = "PlanView";
+    private const string _structuralPlanViewType = "StructuralPlanView";
+    private const string _structuralCalloutViewType = "StructuralCalloutView";
     private const string _sectionViewType = "SectionView";
     private const string _scheduleViewType = "ScheduleView";
     private const string _textNoteType = "TextNote";
     private const string _typicalAnnotationType = "TypicalAnnotation";
     private const string _legendViewType = "LegendView";
-    private const string _сalloutViewType = "CalloutView";
 
     public override bool CanConvert(Type objectType) {
         return objectType == typeof(SheetComponentData);
@@ -31,13 +31,13 @@ public class SheetComponentConverter : JsonConverter {
 
         try {
             return componentType switch {
-                _planViewType => jObject.ToObject<PlanViewData>(serializer),
+                _structuralPlanViewType => jObject.ToObject<StructuralPlanViewData>(serializer),
+                _structuralCalloutViewType => jObject.ToObject<StructuralCalloutViewData>(serializer),
                 _sectionViewType => jObject.ToObject<SectionViewData>(serializer),
                 _scheduleViewType => jObject.ToObject<ScheduleViewData>(serializer),
                 _textNoteType => jObject.ToObject<TextNoteData>(serializer),
                 _typicalAnnotationType => jObject.ToObject<TypicalAnnotationData>(serializer),
                 _legendViewType => jObject.ToObject<LegendViewData>(serializer),
-                _сalloutViewType => jObject.ToObject<CalloutViewData>(serializer),
                 _ => throw new NotSupportedException($"Unknown component type: {componentType}")
             };
         } catch(Exception ex) {

@@ -1,13 +1,12 @@
 using Autodesk.Revit.DB;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
-internal class CalloutViewVM : SheetComponentVM {
+internal class StructuralPlanViewVM : SheetComponentVM {
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
     private ElementType _viewportType;
     private ViewPlan _viewTemplate;
     private int _viewCount;
-    private string _viewportNumber;
 
     public string ViewName {
         get => _viewName;
@@ -32,11 +31,6 @@ internal class CalloutViewVM : SheetComponentVM {
     public int ViewCount {
         get => _viewCount;
         set => RaiseAndSetIfChanged(ref _viewCount, value);
-    }
-
-    public string ViewportNumber {
-        get => _viewportNumber;
-        set => RaiseAndSetIfChanged(ref _viewportNumber, value);
     }
 
     public override void ValidateModule() { }

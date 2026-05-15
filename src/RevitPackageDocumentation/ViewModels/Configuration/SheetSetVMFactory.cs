@@ -57,7 +57,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     public SheetComponentVM CreateComponentVM(SheetComponentData sheetComponentData) {
         return sheetComponentData switch {
-            PlanViewData data => new PlanViewVM {
+            StructuralPlanViewData data => new StructuralPlanViewVM {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -71,7 +71,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewCount = data.ViewCount ?? 1,
             },
 
-            CalloutViewData data => new CalloutViewVM {
+            StructuralCalloutViewData data => new StructuralCalloutViewVM {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,

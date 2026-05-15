@@ -12,8 +12,8 @@
     <system:String x:Key="MainWindow.AddSheet">Добавить лист</system:String>
     <system:String x:Key="MainWindow.AddSheetComponent">Добавить компонент листа</system:String>
     
-    <system:String x:Key="Type.PlanViewVM">Вид в плане</system:String>
-    <system:String x:Key="Type.CalloutViewVM">Фрагмент</system:String>
+    <system:String x:Key="Type.StructuralPlanViewVM">Вид в плане</system:String>
+    <system:String x:Key="Type.StructuralCalloutViewVM">Фрагмент</system:String>
     <system:String x:Key="Type.SectionViewVM">Сечение</system:String>
     <system:String x:Key="Type.ScheduleViewVM">Спецификация</system:String>
     <system:String x:Key="Type.TextNoteVM">Текст</system:String>
