@@ -31,7 +31,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         if(data == null)
             throw new ArgumentNullException(nameof(data));
 
-        var sheetSetVM = new SheetSetVM(_revitRepository) {
+        var sheetSetVM = new SheetSetVM(_revitRepository, _localizationService) {
             Name = data.Name
         };
 
@@ -56,8 +56,13 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
         var titleBlockType = titleBlockTypes?.FirstOrDefault(v => v.Name.Equals(data.TitleBlockTypeName));
 
-        var sheetVM = new SheetVM(_revitRepository) {
-            Name = data.Name ?? string.Empty,
+        var sheetVM = new SheetVM(_revitRepository, _localizationService) {
+            IsModuleCheck = data.IsModuleCheck ?? false,
+            ModuleName = data.ModuleName ?? string.Empty,
+            ModuleComment = data.ModuleComment ?? string.Empty,
+            ModuleCode = "123",
+
+            SheetName = data.SheetName ?? string.Empty,
             SheetSize = data.SheetSize ?? string.Empty,
             SheetCoefficient = data.SheetCoefficient ?? string.Empty,
 
@@ -81,7 +86,6 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "123",
-                ModuleErrors = string.Empty,
 
                 ViewName = data.ViewName ?? string.Empty,
                 ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
@@ -95,7 +99,6 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "05",
-                ModuleErrors = string.Empty,
 
                 ViewName = data.ViewName ?? string.Empty,
                 ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
@@ -109,7 +112,6 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "789",
-                ModuleErrors = string.Empty,
 
                 ViewName = data.ViewName ?? string.Empty,
                 ViewFamilyType = _revitRepository.SectionViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
@@ -123,7 +125,6 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "456",
-                ModuleErrors = string.Empty,
 
                 ReferenceViewName = data.ReferenceViewName ?? string.Empty,
                 ViewName = data.ViewName ?? string.Empty,
@@ -136,7 +137,6 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "01",
-                ModuleErrors = string.Empty,
 
                 Text = data.Text ?? string.Empty,
                 TextNoteType = _revitRepository.TextNoteTypes.FirstOrDefault(v => v.Name.Equals(data.TextNoteTypeName)),
@@ -149,7 +149,6 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "03",
-                ModuleErrors = string.Empty,
 
                 LegendView = _revitRepository.LegendsInProject.FirstOrDefault(v => v.Name.Equals(data.ViewName)),
             },
@@ -170,18 +169,15 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         var annotationType = annotationTypes
                     ?.FirstOrDefault(v => v.Name.Equals(data.AnnotationTypeName));
 
-        var t = new TypicalAnnotationVM(_revitRepository, _localizationService) {
+        return new TypicalAnnotationVM(_revitRepository, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
             ModuleCode = "02",
-            ModuleErrors = string.Empty,
 
             AnnotationTypes = annotationTypes,
             AnnotationFamily = annotationFamily,
             AnnotationType = annotationType
         };
-
-        return t;
     }
 }

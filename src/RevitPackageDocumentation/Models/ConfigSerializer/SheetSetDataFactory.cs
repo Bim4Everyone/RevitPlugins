@@ -30,7 +30,11 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             return new SheetData();
 
         return new SheetData {
-            Name = vm.Name,
+            IsModuleCheck = vm.IsModuleCheck,
+            ModuleName = vm.ModuleName,
+            ModuleComment = vm.ModuleComment,
+
+            SheetName = vm.SheetName,
             SheetSize = vm.SheetSize,
             SheetCoefficient = vm.SheetCoefficient,
             TitleBlockFamilyName = vm.TitleBlockFamily?.Name,

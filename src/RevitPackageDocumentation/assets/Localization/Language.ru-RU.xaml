@@ -32,7 +32,13 @@
     <system:String x:Key="MainWindow.TextNoteTypeIsNull">Не выбран тип текстовой заметки</system:String>
     <system:String x:Key="MainWindow.AnnotationFamilyIsNull">Не выбрано семейство типовой аннотации</system:String>
     <system:String x:Key="MainWindow.AnnotationTypeIsNull">Не выбран тип типовой аннотации</system:String>
+    <system:String x:Key="MainWindow.TitleBlockFamilyIsNull">Не выбрано семейство рамки листа</system:String>
+    <system:String x:Key="MainWindow.TitleBlockTypeIsNull">Не выбран тип рамки листа</system:String>
     
     <system:String x:Key="MainWindow.ViewCountIsNotCorrect">Число задано некорректно</system:String>
     <system:String x:Key="MainWindow.ViewColumnIsNotCorrect">Номер столбца задан некорректно</system:String>
+    <system:String x:Key="MainWindow.SheetSizeIsNotCorrect">Значение номера формата листа не корректно</system:String>
+    <system:String x:Key="MainWindow.SheetCoefficient">Значение коэффициента формата листа не корректно</system:String>
+    
+    <system:String x:Key="MainWindow.ErrorInSheetComponents">Исправлены не все ошибки в компонентах листа</system:String>
 </ResourceDictionary>

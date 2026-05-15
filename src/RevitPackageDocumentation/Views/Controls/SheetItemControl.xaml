@@ -25,17 +25,31 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <ui:TextBox
             Grid.Column="0"
             Margin="5"
-            Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            Text="{Binding Path=ModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             VerticalContentAlignment="Center"
             HorizontalAlignment="Stretch" />
 
-        <ui:Button
+        <CheckBox
             Grid.Column="1"
+            Margin="5"
+            IsChecked="{Binding Path=IsModuleCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            VerticalAlignment="Center" />
+
+        <ui:Button
+            Grid.Column="2"
+            Icon="{ui:SymbolIcon DeveloperBoardLightning20}"
+            Command="{Binding Path=CreateSheetCommand}">
+        </ui:Button>
+
+        <ui:Button
+            Grid.Column="3"
             Appearance="Danger"
             Content="✕"
             Command="{Binding 

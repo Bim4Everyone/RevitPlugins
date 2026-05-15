@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
@@ -8,13 +9,15 @@ using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 namespace RevitPackageDocumentation.ViewModels.Configuration;
 internal class SheetSetVM : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
 
     private string _name;
     private SheetSetPropsVM _properties;
     private ObservableCollection<SheetVM> _sheetList = [];
 
-    public SheetSetVM(RevitRepository revitRepository) {
+    public SheetSetVM(RevitRepository revitRepository, ILocalizationService localizationService) {
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
     }
 
     public string Name {
@@ -33,7 +36,7 @@ internal class SheetSetVM : BaseViewModel {
     }
 
     internal void AddSheet() {
-        SheetList.Add(new SheetVM(_revitRepository) { Name = "Новый лист" });
+        SheetList.Add(new SheetVM(_revitRepository, _localizationService) { SheetName = "Новый лист" });
     }
 
     internal void RemoveSheet(SheetVM sheet) {
