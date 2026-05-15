@@ -48,11 +48,13 @@
                     IsChecked="{Binding IsModuleCheck}" />
 
                 <ui:Button
-                    Icon="{ui:SymbolIcon DeveloperBoardLightning20}"
+                    Margin="5"
+                    Content="🗲"
                     Command="{Binding Path=CreateComponentCommand}">
                 </ui:Button>
 
                 <ui:Button
+                    Margin="5"
                     Content="✕"
                     Appearance="Danger"
                     Command="{Binding 

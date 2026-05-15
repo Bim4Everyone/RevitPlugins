@@ -22,6 +22,7 @@
     
     
     <system:String x:Key="MainWindow.ViewNameIsEmpty">Не заполнено имя вида</system:String>
+    <system:String x:Key="MainWindow.SheetNameIsEmpty">Не заполнено имя листа</system:String>
     <system:String x:Key="MainWindow.ReferenceViewNameIsEmpty">Не заполнено имя эталонной спецификации</system:String>
     <system:String x:Key="MainWindow.TextIsEmpty">Не заполнено текст</system:String>
     

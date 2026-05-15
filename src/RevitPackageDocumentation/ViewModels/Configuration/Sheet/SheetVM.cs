@@ -135,7 +135,7 @@ internal class SheetVM : BaseViewModel {
 
     public bool ValidateModule() {
         if(string.IsNullOrEmpty(SheetName)) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
+            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.SheetNameIsEmpty");
             return false;
         }
         if(!double.TryParse(SheetSize, out double sheetSizeAsDouble) || sheetSizeAsDouble < 1) {

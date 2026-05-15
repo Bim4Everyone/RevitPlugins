@@ -144,9 +144,9 @@
 
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -167,11 +167,19 @@
 
                     <ui:TextBox
                         Grid.Column="1"
-                        Grid.ColumnSpan="3"
+                        Grid.ColumnSpan="2"
                         Grid.Row="0"
                         Margin="5"
-                        Text="{Binding Path=SelectedSheet.SheetName}"/>
-                    
+                        Text="{Binding Path=SelectedSheet.SheetName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                    <ui:TextBlock
+                        Grid.Column="3"
+                        Grid.Row="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Text="{Binding Path=SelectedSheet.ModuleCode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
                     <ui:TextBlock
                         Grid.Column="0"
                         Grid.Row="1"
@@ -183,7 +191,7 @@
                         Grid.Column="1"
                         Grid.Row="1"
                         Margin="5"
-                        Text="{Binding Path=SelectedSheet.SheetSize}"/>
+                        Text="{Binding Path=SelectedSheet.SheetSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                     <ui:TextBlock
                         Grid.Column="2"
@@ -196,7 +204,7 @@
                         Grid.Column="3"
                         Grid.Row="1"
                         Margin="5"
-                        Text="{Binding Path=SelectedSheet.SheetCoefficient}"/>
+                        Text="{Binding Path=SelectedSheet.SheetCoefficient, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                     <ui:TextBlock
                         Grid.Column="0"
@@ -249,7 +257,7 @@
                         Grid.ColumnSpan="4"
                         Grid.Row="4"
                         Margin="5"
-                        Text="{Binding Path=SelectedSheet.ModuleComment}" />
+                        Text="{Binding Path=SelectedSheet.ModuleComment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
                     <ui:TextBlock
                         Grid.Column="0"

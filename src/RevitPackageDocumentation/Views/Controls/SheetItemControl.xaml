@@ -44,12 +44,14 @@
 
         <ui:Button
             Grid.Column="2"
-            Icon="{ui:SymbolIcon DeveloperBoardLightning20}"
+            Margin="5"
+            Content="🗲"
             Command="{Binding Path=CreateSheetCommand}">
         </ui:Button>
 
         <ui:Button
             Grid.Column="3"
+            Margin="5"
             Appearance="Danger"
             Content="✕"
             Command="{Binding 
