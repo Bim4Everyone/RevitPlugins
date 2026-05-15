@@ -1,10 +1,12 @@
+using Autodesk.Revit.DB;
+
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class LegendViewVM : SheetComponentVM {
-    private string _viewName;
+    private View _legendView;
 
-    public string ViewName {
-        get => _viewName;
-        set => RaiseAndSetIfChanged(ref _viewName, value);
+    public View LegendView {
+        get => _legendView;
+        set => RaiseAndSetIfChanged(ref _legendView, value);
     }
 
     public override void ValidateModule() { }

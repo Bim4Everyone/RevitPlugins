@@ -47,6 +47,7 @@ internal class MainViewModel : BaseViewModel {
     private List<ElementType> _viewportTypes;
     private List<TextNoteType> _textNoteTypes;
     private List<Family> _genericAnnotationFamilies;
+    private List<View> _legendsInProject;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -159,6 +160,11 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _genericAnnotationFamilies, value);
     }
 
+    public List<View> LegendsInProject {
+        get => _legendsInProject;
+        set => RaiseAndSetIfChanged(ref _legendsInProject, value);
+    }
+
 
     public List<ComponentTypeItem> ComponentTypes {
         get => _componentTypes;
@@ -198,6 +204,7 @@ internal class MainViewModel : BaseViewModel {
         ViewportTypes = _revitRepository.ViewportTypes;
         TextNoteTypes = _revitRepository.TextNoteTypes;
         GenericAnnotationFamilies = _revitRepository.GenericAnnotationFamilies;
+        LegendsInProject = _revitRepository.LegendsInProject;
     }
 
     private void ImportSheetSet() {
@@ -213,6 +220,9 @@ internal class MainViewModel : BaseViewModel {
 
     private void ExportSheetSet() {
         _sheetSetDataPath = _fileDialogService.SaveFileDialog();
+        if(string.IsNullOrEmpty(_sheetSetDataPath))
+            return;
+
         var currentSheetSetData = _sheetSetDataFactory.CreateSheetSetData(CurrentSheetSet);
         _sheetSetConfig.Export(currentSheetSetData, _sheetSetDataPath);
 

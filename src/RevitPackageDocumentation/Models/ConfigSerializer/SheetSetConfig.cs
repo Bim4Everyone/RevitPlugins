@@ -132,3 +132,12 @@ public class TypicalAnnotationData : SheetComponentData {
     public string AnnotationFamilyName { get; set; }
     public string AnnotationTypeName { get; set; }
 }
+
+/// <summary>
+/// DTO модуля легенды
+/// </summary>
+public class LegendViewData : SheetComponentData {
+    public override string ComponentType => "LegendView";
+
+    public string ViewName { get; set; }
+}

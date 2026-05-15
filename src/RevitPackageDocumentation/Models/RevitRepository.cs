@@ -34,6 +34,7 @@ internal class RevitRepository {
         ViewportTypes = GetViewportTypes();
         TextNoteTypes = GetTextNoteTypes();
         GenericAnnotationFamilies = GetGenericAnnotationFamilies();
+        LegendsInProject = GetLegendsInProject();
     }
 
     /// <summary>
@@ -65,6 +66,7 @@ internal class RevitRepository {
     public List<ElementType> ViewportTypes { get; }
     public List<TextNoteType> TextNoteTypes { get; }
     public List<Family> GenericAnnotationFamilies { get; }
+    public List<View> LegendsInProject { get; }
 
 
     /// <summary>
@@ -146,5 +148,15 @@ internal class RevitRepository {
         .OfType<Family>()
         .Where(f => f.FamilyCategory.GetBuiltInCategory() == BuiltInCategory.OST_GenericAnnotation)
         .OrderBy(a => a.Name)
+        .ToList();
+
+
+    /// <summary>
+    /// Возвращает список всех легенд, присутствующих в проекте
+    /// </summary>
+    public List<View> GetLegendsInProject() => new FilteredElementCollector(Document)
+        .OfClass(typeof(View))
+        .OfType<View>()
+        .Where(view => view.ViewType == ViewType.Legend)
         .ToList();
 }

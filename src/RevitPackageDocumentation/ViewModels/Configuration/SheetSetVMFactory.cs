@@ -111,6 +111,16 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             TypicalAnnotationData data => CreateTypicalAnnotationVM(data),
 
+            LegendViewData data => new LegendViewVM {
+                IsModuleCheck = data.IsModuleCheck ?? false,
+                ModuleName = data.ModuleName ?? string.Empty,
+                ModuleComment = data.ModuleComment ?? string.Empty,
+                ModuleCode = "03",
+                ModuleErrors = "Ошибка LegendView",
+
+                LegendView = _revitRepository.LegendsInProject.FirstOrDefault(v => v.Name.Equals(data.ViewName)),
+            },
+
             _ => throw new NotSupportedException($"Тип '{sheetComponentData?.GetType().Name}' не поддерживается")
         };
     }

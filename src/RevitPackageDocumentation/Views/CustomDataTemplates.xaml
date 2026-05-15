@@ -403,6 +403,42 @@
             DerivedTemplate="{StaticResource TypicalAnnotationDerivedTemplate}" />
     </DataTemplate>
 
+    <!--LegendView-->
+    <DataTemplate
+        x:Key="LegendViewDerivedTemplate">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="0"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Имя" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="0"
+                Margin="5"
+                ItemsSource="{Binding DataContext.LegendsInProject, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding LegendView, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate
+        DataType="{x:Type sc:LegendViewVM}">
+        <controls:SheetComponentItemControl
+            DerivedTemplate="{StaticResource LegendViewDerivedTemplate}" />
+    </DataTemplate>
+
     
     <DataTemplate
         DataType="{x:Type s:SheetVM}">

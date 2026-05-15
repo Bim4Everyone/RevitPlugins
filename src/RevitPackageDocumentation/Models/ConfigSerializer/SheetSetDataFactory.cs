@@ -90,6 +90,14 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 AnnotationTypeName = vm.AnnotationType?.Name,
             },
 
+            LegendViewVM vm => new LegendViewData {
+                IsModuleCheck = vm.IsModuleCheck,
+                ModuleName = vm.ModuleName,
+                ModuleComment = vm.ModuleComment,
+
+                ViewName = vm.LegendView?.Name,
+            },
+
             _ => throw new NotSupportedException($"Тип '{sheetComponentVM?.GetType().Name}' не поддерживается")
         };
     }
@@ -102,6 +110,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             Type t when t == typeof(ScheduleViewVM) => new ScheduleViewData(),
             Type t when t == typeof(TextNoteVM) => new TextNoteData(),
             Type t when t == typeof(TypicalAnnotationVM) => new TypicalAnnotationData(),
+            Type t when t == typeof(LegendViewVM) => new LegendViewData(),
 
             _ => throw new NotSupportedException($"Тип '{componentType?.GetType().Name}' не поддерживается")
         };
