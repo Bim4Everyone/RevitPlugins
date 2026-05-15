@@ -122,3 +122,13 @@ public class TextNoteData : SheetComponentData {
     public string Text { get; set; }
     public string TextNoteTypeName { get; set; }
 }
+
+/// <summary>
+/// DTO модуля типовой аннотации
+/// </summary>
+public class TypicalAnnotationData : SheetComponentData {
+    public override string ComponentType => "TypicalAnnotation";
+
+    public string AnnotationFamilyName { get; set; }
+    public string AnnotationTypeName { get; set; }
+}

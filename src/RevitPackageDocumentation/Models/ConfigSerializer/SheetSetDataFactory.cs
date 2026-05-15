@@ -11,6 +11,7 @@ internal interface ISheetSetDataFactory {
     SheetSetData CreateSheetSetData(SheetSetVM vm);
     SheetData CreateSheetData(SheetVM vm);
     SheetComponentData CreateComponentData(SheetComponentVM vm);
+    SheetComponentData CreateComponentData(Type componentType);
 }
 
 internal class SheetSetDataFactory : ISheetSetDataFactory {
@@ -80,7 +81,29 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 TextNoteTypeName = vm.TextNoteType?.Name,
             },
 
-            _ => throw new NotSupportedException()
+            TypicalAnnotationVM vm => new TypicalAnnotationData {
+                IsModuleCheck = vm.IsModuleCheck,
+                ModuleName = vm.ModuleName,
+                ModuleComment = vm.ModuleComment,
+
+                AnnotationFamilyName = vm.AnnotationFamily?.Name,
+                AnnotationTypeName = vm.AnnotationType?.Name,
+            },
+
+            _ => throw new NotSupportedException($"Тип '{sheetComponentVM?.GetType().Name}' не поддерживается")
+        };
+    }
+
+
+    public SheetComponentData CreateComponentData(Type componentType) {
+        return componentType switch {
+            Type t when t == typeof(PlanViewVM) => new PlanViewData(),
+            Type t when t == typeof(SectionViewVM) => new SectionViewData(),
+            Type t when t == typeof(ScheduleViewVM) => new ScheduleViewData(),
+            Type t when t == typeof(TextNoteVM) => new TextNoteData(),
+            Type t when t == typeof(TypicalAnnotationVM) => new TypicalAnnotationData(),
+
+            _ => throw new NotSupportedException($"Тип '{componentType?.GetType().Name}' не поддерживается")
         };
     }
 }

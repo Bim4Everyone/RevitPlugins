@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 
+using Autodesk.Revit.DB;
+
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
@@ -107,7 +109,38 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 TextNoteType = _revitRepository.TextNoteTypes.FirstOrDefault(v => v.Name.Equals(data.TextNoteTypeName)),
             },
 
+            TypicalAnnotationData data => CreateTypicalAnnotationVM(data),
+
             _ => throw new NotSupportedException($"Тип '{sheetComponentData?.GetType().Name}' не поддерживается")
         };
+    }
+
+    private TypicalAnnotationVM CreateTypicalAnnotationVM(TypicalAnnotationData data) {
+
+        var annotationFamilies = _revitRepository.GenericAnnotationFamilies;
+
+        var annotationFamily = annotationFamilies?.FirstOrDefault(v => v.Name.Equals(data.AnnotationFamilyName));
+
+        var annotationTypes = annotationFamily
+                    ?.GetFamilySymbolIds()
+                    ?.Select(id => _revitRepository.Document.GetElement(id) as AnnotationSymbolType)
+                    ?.ToList();
+
+        var annotationType = annotationTypes
+                    ?.FirstOrDefault(v => v.Name.Equals(data.AnnotationTypeName));
+
+        var t = new TypicalAnnotationVM(_revitRepository) {
+            IsModuleCheck = data.IsModuleCheck ?? false,
+            ModuleName = data.ModuleName ?? string.Empty,
+            ModuleComment = data.ModuleComment ?? string.Empty,
+            ModuleCode = "02",
+            ModuleErrors = "Ошибка TypicalAnnotation",
+
+            AnnotationTypes = annotationTypes,
+            AnnotationFamily = annotationFamily,
+            AnnotationType = annotationType
+        };
+
+        return t;
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -47,6 +46,7 @@ internal class MainViewModel : BaseViewModel {
     private List<ViewFamilyType> _structuralPlanViewFamilyTypes;
     private List<ElementType> _viewportTypes;
     private List<TextNoteType> _textNoteTypes;
+    private List<Family> _genericAnnotationFamilies;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -154,6 +154,11 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _textNoteTypes, value);
     }
 
+    public List<Family> GenericAnnotationFamilies {
+        get => _genericAnnotationFamilies;
+        set => RaiseAndSetIfChanged(ref _genericAnnotationFamilies, value);
+    }
+
 
     public List<ComponentTypeItem> ComponentTypes {
         get => _componentTypes;
@@ -168,9 +173,6 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
         GetSettingsForUI();
-
-
-        //var t = _revitRepository.GetAnnotationFamily();
 
 
         if(string.IsNullOrEmpty(_sheetSetDataPath) || !File.Exists(_sheetSetDataPath)) {
@@ -195,6 +197,7 @@ internal class MainViewModel : BaseViewModel {
         SectionViewTemplates = _revitRepository.SectionViewTemplates;
         ViewportTypes = _revitRepository.ViewportTypes;
         TextNoteTypes = _revitRepository.TextNoteTypes;
+        GenericAnnotationFamilies = _revitRepository.GenericAnnotationFamilies;
     }
 
     private void ImportSheetSet() {
@@ -276,12 +279,21 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AddComponent() {
-        if(SelectedComponentType != null && SelectedComponentType.ComponentType != null) {
-            if(Activator.CreateInstance(SelectedComponentType.ComponentType) is SheetComponentVM newComponent) {
-                SelectedSheet.SheetComponents.Add(newComponent);
-            }
-            SelectedComponentType = null;
+        if(SelectedComponentType?.ComponentType == null)
+            return;
+
+        try {
+            var componentData = _sheetSetDataFactory.CreateComponentData(SelectedComponentType.ComponentType);
+            if(componentData == null)
+                return;
+
+            var component = _sheetSetVMFactory.CreateComponentVM(componentData);
+            SelectedSheet.SheetComponents.Add(component);
+        } catch(System.Exception) {
+            _messageBoxService.Show("An error occurred while adding the component!", "Error");
         }
+
+        SelectedComponentType = null;
     }
 
     private void RemoveComponent(SheetComponentVM sheetComponent) {

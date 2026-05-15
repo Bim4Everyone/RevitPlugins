@@ -5,6 +5,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 namespace RevitPackageDocumentation.Models;
@@ -32,6 +33,7 @@ internal class RevitRepository {
         SectionViewTemplates = GetSectionViewTemplates();
         ViewportTypes = GetViewportTypes();
         TextNoteTypes = GetTextNoteTypes();
+        GenericAnnotationFamilies = GetGenericAnnotationFamilies();
     }
 
     /// <summary>
@@ -62,6 +64,7 @@ internal class RevitRepository {
     public List<ViewSection> SectionViewTemplates { get; }
     public List<ElementType> ViewportTypes { get; }
     public List<TextNoteType> TextNoteTypes { get; }
+    public List<Family> GenericAnnotationFamilies { get; }
 
 
     /// <summary>
@@ -135,13 +138,13 @@ internal class RevitRepository {
         .OrderBy(a => a.Name)
         .ToList();
 
-    ///// <summary>
-    ///// Возвращает список типовых аннотаций в проекте
-    ///// </summary>
-    //public List<Family> GetAnnotationFamily() => new FilteredElementCollector(Document)
-    //    .OfClass(typeof(Family))
-    //    .OfType<Family>()
-    //    .Where(f => f.FamilyCategory.BuiltInCategory == BuiltInCategory.OST_GenericAnnotation)
-    //    .OrderBy(a => a.Name)
-    //    .ToList();
+    /// <summary>
+    /// Возвращает список типовых аннотаций в проекте
+    /// </summary>
+    public List<Family> GetGenericAnnotationFamilies() => new FilteredElementCollector(Document)
+        .OfClass(typeof(Family))
+        .OfType<Family>()
+        .Where(f => f.FamilyCategory.GetBuiltInCategory() == BuiltInCategory.OST_GenericAnnotation)
+        .OrderBy(a => a.Name)
+        .ToList();
 }

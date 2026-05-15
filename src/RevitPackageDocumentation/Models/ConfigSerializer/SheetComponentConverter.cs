@@ -13,6 +13,8 @@ public class SheetComponentConverter : JsonConverter {
     private const string _planViewType = "PlanView";
     private const string _sectionViewType = "SectionView";
     private const string _scheduleViewType = "ScheduleView";
+    private const string _textNoteType = "TextNote";
+    private const string _typicalAnnotationType = "TypicalAnnotation";
 
     public override bool CanConvert(Type objectType) {
         return objectType == typeof(SheetComponentData);
@@ -30,6 +32,8 @@ public class SheetComponentConverter : JsonConverter {
                 _planViewType => jObject.ToObject<PlanViewData>(serializer),
                 _sectionViewType => jObject.ToObject<SectionViewData>(serializer),
                 _scheduleViewType => jObject.ToObject<ScheduleViewData>(serializer),
+                _textNoteType => jObject.ToObject<TextNoteData>(serializer),
+                _typicalAnnotationType => jObject.ToObject<TypicalAnnotationData>(serializer),
                 _ => throw new NotSupportedException($"Unknown component type: {componentType}")
             };
         } catch(Exception ex) {
