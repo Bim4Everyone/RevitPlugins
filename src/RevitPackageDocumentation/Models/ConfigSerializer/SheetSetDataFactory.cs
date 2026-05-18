@@ -4,6 +4,7 @@ using System.Linq;
 using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.Models.ConfigSerializer;
 
@@ -12,6 +13,8 @@ internal interface ISheetSetDataFactory {
     SheetData CreateSheetData(SheetVM vm);
     SheetComponentData CreateComponentData(SheetComponentVM vm);
     SheetComponentData CreateComponentData(Type componentType);
+    PluginParamData CreatePluginParamData(PluginParamVM vm);
+    PluginParamData CreatePluginParamData(Type paramType);
 }
 
 internal class SheetSetDataFactory : ISheetSetDataFactory {
@@ -21,7 +24,8 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
 
         return new SheetSetData {
             Name = vm.Name,
-            Sheets = vm.SheetList?.Select(CreateSheetData).ToList()
+            Sheets = vm.SheetList?.Select(CreateSheetData).ToList(),
+            Params = vm.Params?.Select(CreatePluginParamData).ToList()
         };
     }
 
@@ -39,7 +43,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             SheetCoefficient = vm.SheetCoefficient,
             TitleBlockFamilyName = vm.TitleBlockFamily?.Name,
             TitleBlockTypeName = vm.TitleBlockType?.Name,
-            Views = vm.SheetComponents?.Select(CreateComponentData).ToList()
+            Views = vm.SheetComponents?.Select(CreateComponentData).ToList(),
         };
     }
 
@@ -122,7 +126,6 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
         };
     }
 
-
     public SheetComponentData CreateComponentData(Type componentType) {
         return componentType switch {
             Type t when t == typeof(StructuralPlanViewVM) => new StructuralPlanViewData(),
@@ -132,8 +135,33 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             Type t when t == typeof(TextNoteVM) => new TextNoteData(),
             Type t when t == typeof(TypicalAnnotationVM) => new TypicalAnnotationData(),
             Type t when t == typeof(LegendViewVM) => new LegendViewData(),
+            _ => throw new NotSupportedException($"Тип '{componentType?.Name}' не поддерживается")
+        };
+    }
 
-            _ => throw new NotSupportedException($"Тип '{componentType?.GetType().Name}' не поддерживается")
+    public PluginParamData CreatePluginParamData(PluginParamVM vm) {
+        if(vm == null)
+            return null;
+
+        return vm switch {
+            StringParamVM stringVm => new StringParamData {
+                ParamName = stringVm.ParamName,
+                ParamComment = stringVm.ParamComment,
+                StringValue = stringVm.StringValue
+            },
+            SelectElemParamVM selectVm => new SelectElemParamData {
+                ParamName = selectVm.ParamName,
+                ParamComment = selectVm.ParamComment
+            },
+            _ => throw new NotSupportedException($"Тип параметра '{vm?.GetType().Name}' не поддерживается")
+        };
+    }
+
+    public PluginParamData CreatePluginParamData(Type paramType) {
+        return paramType switch {
+            Type t when t == typeof(StringParamVM) => new StringParamData(),
+            Type t when t == typeof(SelectElemParamVM) => new SelectElemParamData(),
+            _ => throw new NotSupportedException($"Тип параметра '{paramType?.Name}' не поддерживается")
         };
     }
 }

@@ -57,6 +57,7 @@ public class SheetSetConfig {
 public class SheetSetData {
     public string Name { get; set; } = "Новая конфигурация";
     public List<SheetData> Sheets { get; set; } = [];
+    public List<PluginParamData> Params { get; set; } = [];
 }
 
 /// <summary>
@@ -162,4 +163,24 @@ public class LegendViewData : SheetComponentData {
     public override string ComponentType => "LegendView";
 
     public string ViewName { get; set; }
+}
+
+
+/// <summary>
+/// DTO параметров
+/// </summary>
+public abstract class PluginParamData {
+    public abstract string PluginParamType { get; }
+    public string ParamName { get; set; }
+    public string ParamComment { get; set; }
+}
+
+public class StringParamData : PluginParamData {
+    public override string PluginParamType => "StringParam";
+
+    public string StringValue { get; set; }
+}
+
+public class SelectElemParamData : PluginParamData {
+    public override string PluginParamType => "SelectElem";
 }

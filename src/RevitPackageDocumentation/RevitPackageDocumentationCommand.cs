@@ -25,9 +25,6 @@ namespace RevitPackageDocumentation;
 /// <summary>
 /// Класс команды Revit плагина.
 /// </summary>
-/// <remarks>
-/// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
-/// </remarks>
 [Transaction(TransactionMode.Manual)]
 public class RevitPackageDocumentationCommand : BasePluginCommand {
     /// <summary>
@@ -41,10 +38,6 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
     /// Метод выполнения основного кода плагина.
     /// </summary>
     /// <param name="uiApplication">Интерфейс взаимодействия с Revit.</param>
-    /// <remarks>
-    /// В случаях, когда не используется конфигурация
-    /// или локализация требуется удалять их использование полностью во всем проекте.
-    /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
@@ -63,14 +56,21 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
             .To<JsonFileDialogService>()
             .InSingletonScope();
 
-        // JSON сериализатор
-        kernel.Bind<ISheetSetSerializer>()
-            .To<SheetSetSerializer>()
-            .InSingletonScope();
-
-        // JSON конвертер объектов
+        // Регистрация коллекции конвертеров JSON
         kernel.Bind<JsonConverter>()
             .To<SheetComponentConverter>()
+            .InSingletonScope();
+
+        kernel.Bind<JsonConverter>()
+            .To<PluginParamConverter>()
+            .InSingletonScope();
+
+        // JSON сериализатор с получением всех зарегистрированных конвертеров
+        kernel.Bind<ISheetSetSerializer>()
+            .ToMethod(ctx => {
+                var converters = ctx.Kernel.GetAll<JsonConverter>();
+                return new SheetSetSerializer(converters);
+            })
             .InSingletonScope();
 
         // Настройка конфигурации комплекта листов

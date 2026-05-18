@@ -1,10 +1,13 @@
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
+using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration;
 internal class SheetSetVM : BaseViewModel {
@@ -14,11 +17,16 @@ internal class SheetSetVM : BaseViewModel {
     private string _name;
     private SheetSetPropsVM _properties;
     private ObservableCollection<SheetVM> _sheetList = [];
+    private ObservableCollection<PluginParamVM> _params = [];
 
     public SheetSetVM(RevitRepository revitRepository, ILocalizationService localizationService) {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+
+        AddSheetSetParamCommand = RelayCommand.Create(AddSheetSetParam);
     }
+
+    public ICommand AddSheetSetParamCommand { get; }
 
     public string Name {
         get => _name;
@@ -35,6 +43,11 @@ internal class SheetSetVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _sheetList, value);
     }
 
+    public ObservableCollection<PluginParamVM> Params {
+        get => _params;
+        set => RaiseAndSetIfChanged(ref _params, value);
+    }
+
     internal void AddSheet() {
         SheetList.Add(new SheetVM(_revitRepository, _localizationService) { SheetName = "Новый лист" });
     }
@@ -42,6 +55,16 @@ internal class SheetSetVM : BaseViewModel {
     internal void RemoveSheet(SheetVM sheet) {
         if(sheet != null && SheetList.Contains(sheet)) {
             SheetList.Remove(sheet);
+        }
+    }
+
+    internal void AddSheetSetParam() {
+        Params.Add(new StringParamVM() { ParamName = "Новый параметр" });
+    }
+
+    internal void RemoveParam(PluginParamVM pluginParam) {
+        if(pluginParam != null && Params.Contains(pluginParam)) {
+            Params.Remove(pluginParam);
         }
     }
 }

@@ -9,6 +9,7 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration;
 
@@ -34,6 +35,11 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         var sheetSetVM = new SheetSetVM(_revitRepository, _localizationService) {
             Name = data.Name
         };
+
+        foreach(var paramData in data.Params) {
+            var paramVM = CreateParamVM(paramData);
+            sheetSetVM.Params.Add(paramVM);
+        }
 
         foreach(var sheetData in data.Sheets) {
             var sheetVM = CreateSheetVM(sheetData);
@@ -178,6 +184,23 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             AnnotationTypes = annotationTypes,
             AnnotationFamily = annotationFamily,
             AnnotationType = annotationType
+        };
+    }
+
+    public PluginParamVM CreateParamVM(PluginParamData paramData) {
+        return paramData switch {
+            StringParamData data => new StringParamVM() {
+                ParamName = data.ParamName ?? string.Empty,
+                ParamComment = data.ParamComment ?? string.Empty,
+                StringValue = data.StringValue ?? string.Empty,
+            },
+
+            SelectElemParamData data => new SelectElemParamVM() {
+                ParamName = data.ParamName ?? string.Empty,
+                ParamComment = data.ParamComment ?? string.Empty,
+            },
+
+            _ => throw new NotSupportedException($"Тип '{paramData?.GetType().Name}' не поддерживается")
         };
     }
 }

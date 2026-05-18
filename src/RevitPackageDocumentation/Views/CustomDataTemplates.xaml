@@ -8,7 +8,8 @@
     xmlns:local="clr-namespace:RevitPackageDocumentation.Views"
     xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
     xmlns:s="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
-    xmlns:sc="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents">
+    xmlns:sc="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents"
+    xmlns:pp="clr-namespace:RevitPackageDocumentation.ViewModels.Parameters">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="CustomStyles.xaml" />
@@ -540,5 +541,27 @@
     <DataTemplate
         DataType="{x:Type s:SheetVM}">
         <controls:SheetItemControl />
+    </DataTemplate>
+
+
+    <!--StringParam-->
+    <DataTemplate
+        x:Key="StringParamDerivedTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <ui:TextBox
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="{Binding Path=StringValue}" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate
+        DataType="{x:Type pp:StringParamVM}">
+        <controls:ParamItemControl
+            DerivedTemplate="{StaticResource StringParamDerivedTemplate}" />
     </DataTemplate>
 </ResourceDictionary>

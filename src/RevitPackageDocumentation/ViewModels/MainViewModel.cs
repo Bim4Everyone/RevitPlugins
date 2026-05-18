@@ -15,6 +15,7 @@ using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels;
 
@@ -83,6 +84,8 @@ internal class MainViewModel : BaseViewModel {
         AddComponentCommand = RelayCommand.Create(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
 
+        RemoveSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(RemoveSheetSetParam);
+
         CreateComponentCommand = RelayCommand.Create<SheetComponentVM>(CreateComponent, CanCreateComponent);
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -96,6 +99,7 @@ internal class MainViewModel : BaseViewModel {
     public ICommand RemoveSheetCommand { get; }
     public ICommand AddComponentCommand { get; }
     public ICommand RemoveComponentCommand { get; }
+    public ICommand RemoveSheetSetParamCommand { get; }
     public ICommand CreateComponentCommand { get; }
 
 
@@ -318,6 +322,10 @@ internal class MainViewModel : BaseViewModel {
 
     private void RemoveComponent(SheetComponentVM sheetComponent) {
         SelectedSheet.RemoveComponent(sheetComponent);
+    }
+
+    private void RemoveSheetSetParam(PluginParamVM pluginParam) {
+        CurrentSheetSet.RemoveParam(pluginParam);
     }
 
 
