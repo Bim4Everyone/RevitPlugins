@@ -128,7 +128,14 @@
                             ItemsSource="{Binding 
                                 Path=CurrentSheetSet.Params, 
                                 UpdateSourceTrigger=PropertyChanged, 
-                                Mode=TwoWay}" />
+                                Mode=TwoWay}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel
+                                        Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
                     </ScrollViewer>
 
                     <ComboBox

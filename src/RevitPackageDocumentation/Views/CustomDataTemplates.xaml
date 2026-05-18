@@ -553,7 +553,7 @@
             </Grid.ColumnDefinitions>
 
             <ui:TextBox
-                Margin="5"
+                Margin="2 0"
                 VerticalAlignment="Center"
                 Text="{Binding Path=StringValue}" />
         </Grid>
@@ -574,7 +574,7 @@
             </Grid.ColumnDefinitions>
 
             <Button
-                Margin="5"
+                Margin="2 0"
                 Content="Выбрать"/>
         </Grid>
     </DataTemplate>
