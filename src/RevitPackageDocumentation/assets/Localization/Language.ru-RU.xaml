@@ -11,6 +11,7 @@
     
     <system:String x:Key="MainWindow.AddSheet">Добавить лист</system:String>
     <system:String x:Key="MainWindow.AddSheetComponent">Добавить компонент листа</system:String>
+    <system:String x:Key="MainWindow.AddSheetSetParam">Добавить параметр</system:String>
     
     <system:String x:Key="Type.StructuralPlanViewVM">Вид в плане</system:String>
     <system:String x:Key="Type.StructuralCalloutViewVM">Фрагмент</system:String>
@@ -20,6 +21,8 @@
     <system:String x:Key="Type.TypicalAnnotationVM">Типовая аннотация</system:String>
     <system:String x:Key="Type.LegendViewVM">Легенда</system:String>
     
+    <system:String x:Key="Type.StringParamVM">Текстовый параметр</system:String>
+    <system:String x:Key="Type.SelectElemParamVM">Выбор элемента</system:String>
     
     <system:String x:Key="MainWindow.ViewNameIsEmpty">Не заполнено имя вида</system:String>
     <system:String x:Key="MainWindow.SheetNameIsEmpty">Не заполнено имя листа</system:String>

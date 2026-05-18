@@ -38,6 +38,8 @@ internal class MainViewModel : BaseViewModel {
     private string _errorText;
     private string _sheetSetDataPath;
 
+    private List<ComponentTypeItem> _sheetSetParamTypes;
+    private ComponentTypeItem _selectedSheetSetParamType;
     private List<ComponentTypeItem> _componentTypes;
     private ComponentTypeItem _selectedComponentType;
 
@@ -81,9 +83,11 @@ internal class MainViewModel : BaseViewModel {
 
         AddSheetCommand = RelayCommand.Create(AddSheet);
         RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
+
         AddComponentCommand = RelayCommand.Create(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
 
+        AddSheetSetParamCommand = RelayCommand.Create(AddSheetSetParam);
         RemoveSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(RemoveSheetSetParam);
 
         CreateComponentCommand = RelayCommand.Create<SheetComponentVM>(CreateComponent, CanCreateComponent);
@@ -97,9 +101,13 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand AddSheetCommand { get; }
     public ICommand RemoveSheetCommand { get; }
+
     public ICommand AddComponentCommand { get; }
     public ICommand RemoveComponentCommand { get; }
+
+    public ICommand AddSheetSetParamCommand { get; }
     public ICommand RemoveSheetSetParamCommand { get; }
+
     public ICommand CreateComponentCommand { get; }
 
 
@@ -189,6 +197,16 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedComponentType, value);
     }
 
+    public List<ComponentTypeItem> SheetSetParamTypes {
+        get => _sheetSetParamTypes;
+        set => RaiseAndSetIfChanged(ref _sheetSetParamTypes, value);
+    }
+
+    public ComponentTypeItem SelectedSheetSetParamType {
+        get => _selectedSheetSetParamType;
+        set => RaiseAndSetIfChanged(ref _selectedSheetSetParamType, value);
+    }
+
     private void LoadView() {
         LoadConfig();
         GetSettingsForUI();
@@ -209,6 +227,14 @@ internal class MainViewModel : BaseViewModel {
                 new ComponentTypeItem(t, _localizationService.GetLocalizedString($"Type.{t.Name}") ?? string.Empty))
             .ToList();
         SelectedComponentType = null;
+
+        SheetSetParamTypes = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(PluginParamVM)))
+            .Select(t =>
+                new ComponentTypeItem(t, _localizationService.GetLocalizedString($"Type.{t.Name}") ?? string.Empty))
+            .ToList();
+        SelectedSheetSetParamType = null;
 
         StructuralPlanViewFamilyTypes = _revitRepository.StructuralPlanViewTypes;
         SectionViewFamilyTypes = _revitRepository.SectionViewTypes;
@@ -322,6 +348,25 @@ internal class MainViewModel : BaseViewModel {
 
     private void RemoveComponent(SheetComponentVM sheetComponent) {
         SelectedSheet.RemoveComponent(sheetComponent);
+    }
+
+
+    private void AddSheetSetParam() {
+        if(SelectedSheetSetParamType?.ComponentType == null)
+            return;
+
+        try {
+            var paramData = _sheetSetDataFactory.CreatePluginParamData(SelectedSheetSetParamType.ComponentType);
+            if(paramData == null)
+                return;
+
+            var parameter = _sheetSetVMFactory.CreateParamVM(paramData);
+            CurrentSheetSet.Params.Add(parameter);
+        } catch(System.Exception) {
+            _messageBoxService.Show("An error occurred while adding the parameter!", "Error");
+        }
+
+        SelectedSheetSetParamType = null;
     }
 
     private void RemoveSheetSetParam(PluginParamVM pluginParam) {

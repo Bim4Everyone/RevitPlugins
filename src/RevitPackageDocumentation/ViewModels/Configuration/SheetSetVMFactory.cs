@@ -17,6 +17,7 @@ internal interface ISheetSetVMFactory {
     SheetSetVM CreateSheetSetVM(SheetSetData data);
     SheetVM CreateSheetVM(SheetData data);
     SheetComponentVM CreateComponentVM(SheetComponentData data);
+    PluginParamVM CreateParamVM(PluginParamData data);
 }
 
 internal class SheetSetVMFactory : ISheetSetVMFactory {

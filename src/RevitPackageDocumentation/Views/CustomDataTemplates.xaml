@@ -564,4 +564,24 @@
         <controls:ParamItemControl
             DerivedTemplate="{StaticResource StringParamDerivedTemplate}" />
     </DataTemplate>
+
+    <!--SelectElemParam-->
+    <DataTemplate
+        x:Key="SelectElemParamDerivedTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                Margin="5"
+                Content="Выбрать"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate
+        DataType="{x:Type pp:SelectElemParamVM}">
+        <controls:ParamItemControl
+            DerivedTemplate="{StaticResource SelectElemParamDerivedTemplate}" />
+    </DataTemplate>
 </ResourceDictionary>

@@ -48,9 +48,16 @@ public partial class MainWindow {
         DialogResult = false;
     }
 
-    private void ComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
+    private void ComponentTypesComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
         if(!ComponentTypesComboBox.IsDropDownOpen) {
             ComponentTypesComboBox.IsDropDownOpen = true;
+            e.Handled = true;
+        }
+    }
+
+    private void SheetSetParamTypesComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
+        if(!SheetSetParamTypesComboBox.IsDropDownOpen) {
+            SheetSetParamTypesComboBox.IsDropDownOpen = true;
             e.Handled = true;
         }
     }

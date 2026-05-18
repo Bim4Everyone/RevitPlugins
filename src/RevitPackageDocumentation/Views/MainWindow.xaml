@@ -130,13 +130,36 @@
                                 UpdateSourceTrigger=PropertyChanged, 
                                 Mode=TwoWay}" />
                     </ScrollViewer>
-                    
-                    <ui:Button
+
+                    <ComboBox
+                        x:Name="SheetSetParamTypesComboBox"
                         Grid.Row="1"
                         Grid.Column="1"
+                        Margin="10"
+                        MinWidth="170"
+                        HorizontalAlignment="Right"
+                        ItemsSource="{Binding Path=SheetSetParamTypes}"
+                        SelectedItem="{Binding Path=SelectedSheetSetParamType}"
+                        DisplayMemberPath="DisplayName"
+                        IsSynchronizedWithCurrentItem="True">
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="DropDownClosed">
+                                <i:InvokeCommandAction
+                                    Command="{Binding AddSheetSetParamCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ComboBox>
+
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="10 10 40 10"
                         VerticalAlignment="Center"
-                        Content="AddSheetSetParam"
-                        Command="{Binding Path=CurrentSheetSet.AddSheetSetParamCommand}" />
+                        HorizontalAlignment="Right"
+                        Text="{me:LocalizationSource MainWindow.AddSheetSetParam}"
+                        PreviewMouseDown="SheetSetParamTypesComboBox_PreviewMouseDown" />
                 </Grid>
             </Border>
 
@@ -351,7 +374,7 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Right"
                         Text="{me:LocalizationSource MainWindow.AddSheetComponent}"
-                        PreviewMouseDown="ComboBox_PreviewMouseDown" />
+                        PreviewMouseDown="ComponentTypesComboBox_PreviewMouseDown" />
                 </Grid>
             </Border>
         </Grid>
