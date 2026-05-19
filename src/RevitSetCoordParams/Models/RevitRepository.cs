@@ -341,6 +341,9 @@ internal class RevitRepository {
 
     // Метод получения BoundingBoxXYZ по вложенным семействам
     private BoundingBoxXYZ GetDependentBoundingBox(List<RevitElement> revitElements) {
+        if(!revitElements.Any()) {
+            return null;
+        }
         var bboxes = revitElements
             .Select(revitElement => revitElement.BoundingBoxXYZ)
             .Where(bbox => bbox is not null);
