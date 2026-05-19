@@ -23,6 +23,7 @@ public partial class MainWindow {
             languageService, localizationService,
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        SheetSetParamTypesComboBox.DropDownClosed += SheetSetParamTypesComboBox_DropDownClosed;
         ComponentTypesComboBox.DropDownClosed += ComponentTypesComboBox_DropDownClosed;
     }
 
@@ -50,16 +51,21 @@ public partial class MainWindow {
         DialogResult = false;
     }
 
-    private void ComponentTypesComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
-        if(!ComponentTypesComboBox.IsDropDownOpen) {
-            ComponentTypesComboBox.IsDropDownOpen = true;
-            e.Handled = true;
-        }
-    }
 
     private void SheetSetParamTypesComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
         if(!SheetSetParamTypesComboBox.IsDropDownOpen) {
             SheetSetParamTypesComboBox.IsDropDownOpen = true;
+            e.Handled = true;
+        }
+    }
+
+    private void SheetSetParamTypesComboBox_DropDownClosed(object sender, EventArgs e) {
+        SheetSetParamTypesComboBox.SelectedItem = null;
+    }
+
+    private void ComponentTypesComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
+        if(!ComponentTypesComboBox.IsDropDownOpen) {
+            ComponentTypesComboBox.IsDropDownOpen = true;
             e.Handled = true;
         }
     }

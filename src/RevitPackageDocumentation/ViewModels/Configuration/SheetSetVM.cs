@@ -40,7 +40,7 @@ internal class SheetSetVM : BaseViewModel {
         AddSheetCommand = RelayCommand.Create(AddSheet);
         RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
 
-        AddSheetSetParamCommand = RelayCommand.Create(AddSheetSetParam);
+        AddSheetSetParamCommand = RelayCommand.Create<ComponentTypeItem>(AddSheetSetParam);
     }
 
     public ICommand AddSheetCommand { get; }
@@ -92,8 +92,24 @@ internal class SheetSetVM : BaseViewModel {
         }
     }
 
-    internal void AddSheetSetParam() {
-        Params.Add(new StringParamVM() { ParamName = "Новый параметр" });
+    //internal void AddSheetSetParam() {
+    //    Params.Add(new StringParamVM() { ParamName = "Новый параметр" });
+    //}
+
+    private void AddSheetSetParam(ComponentTypeItem selectedSheetSetParamType) {
+        if(selectedSheetSetParamType?.ComponentType == null)
+            return;
+
+        try {
+            var paramData = _sheetSetDataFactory.CreatePluginParamData(selectedSheetSetParamType.ComponentType);
+            if(paramData == null)
+                return;
+
+            var parameter = _sheetSetVMFactory.CreateParamVM(paramData);
+            Params.Add(parameter);
+        } catch(System.Exception) {
+            _messageBoxService.Show("An error occurred while adding the parameter!", "Error");
+        }
     }
 
     internal void RemoveParam(PluginParamVM pluginParam) {

@@ -153,9 +153,10 @@
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger
-                                EventName="DropDownClosed">
+                                EventName="SelectionChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding AddSheetSetParamCommand}" />
+                                    Command="{Binding CurrentSheetSet.AddSheetSetParamCommand}"
+                                    CommandParameter="{Binding SelectedSheetSetParamType}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </ComboBox>
