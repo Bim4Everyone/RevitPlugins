@@ -51,9 +51,9 @@
                 Margin="2 0"
                 Content="✕"
                 Appearance="Danger"
-                Command="{Binding
-                    Path=DataContext.RemoveSheetSetParamCommand, 
-                    RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                Command="{Binding 
+                    Path=DataContext.CurrentSheetSet.RemoveSheetSetParamCommand, 
+                    RelativeSource={RelativeSource AncestorType=Window}}"
                 CommandParameter="{Binding}">
             </ui:Button>
         </Grid>

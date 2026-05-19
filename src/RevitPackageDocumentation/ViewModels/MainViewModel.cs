@@ -82,9 +82,6 @@ internal class MainViewModel : BaseViewModel {
         ImportCommand = RelayCommand.Create(ImportSheetSet);
         ExportCommand = RelayCommand.Create(ExportSheetSet);
 
-        //AddSheetSetParamCommand = RelayCommand.Create(AddSheetSetParam);
-        RemoveSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(RemoveSheetSetParam);
-
         CreateComponentCommand = RelayCommand.Create<SheetComponentVM>(CreateComponent, CanCreateComponent);
 
         LoadViewCommand = RelayCommand.Create<MainWindow>(LoadView);
@@ -96,11 +93,7 @@ internal class MainViewModel : BaseViewModel {
     public ICommand ImportCommand { get; }
     public ICommand ExportCommand { get; }
 
-    //public ICommand AddSheetSetParamCommand { get; }
-    public ICommand RemoveSheetSetParamCommand { get; }
-
     public ICommand CreateComponentCommand { get; }
-
 
     public ICommand SelectElemForParamCommand { get; }
 
@@ -333,9 +326,7 @@ internal class MainViewModel : BaseViewModel {
         SelectedSheetSetParamType = null;
     }
 
-    private void RemoveSheetSetParam(PluginParamVM pluginParam) {
-        CurrentSheetSet.RemoveParam(pluginParam);
-    }
+
 
 
     private void CreateComponent(SheetComponentVM sheetComponent) {

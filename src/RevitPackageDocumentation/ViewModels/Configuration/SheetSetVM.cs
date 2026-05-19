@@ -41,11 +41,13 @@ internal class SheetSetVM : BaseViewModel {
         RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
 
         AddSheetSetParamCommand = RelayCommand.Create<ComponentTypeItem>(AddSheetSetParam);
+        RemoveSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(RemoveSheetSetParam);
     }
 
     public ICommand AddSheetCommand { get; }
     public ICommand RemoveSheetCommand { get; }
     public ICommand AddSheetSetParamCommand { get; }
+    public ICommand RemoveSheetSetParamCommand { get; }
 
     public string Name {
         get => _name;
@@ -92,10 +94,6 @@ internal class SheetSetVM : BaseViewModel {
         }
     }
 
-    //internal void AddSheetSetParam() {
-    //    Params.Add(new StringParamVM() { ParamName = "Новый параметр" });
-    //}
-
     private void AddSheetSetParam(ComponentTypeItem selectedSheetSetParamType) {
         if(selectedSheetSetParamType?.ComponentType == null)
             return;
@@ -112,7 +110,7 @@ internal class SheetSetVM : BaseViewModel {
         }
     }
 
-    internal void RemoveParam(PluginParamVM pluginParam) {
+    private void RemoveSheetSetParam(PluginParamVM pluginParam) {
         if(pluginParam != null && Params.Contains(pluginParam)) {
             Params.Remove(pluginParam);
         }
