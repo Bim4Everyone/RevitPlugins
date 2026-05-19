@@ -13,7 +13,7 @@
     <system:String x:Key="MainWindow.SearchTextTypeModels">Search by name of common elements</system:String>
     <system:String x:Key="MainWindow.CheckedAllTypeModels">Select all types</system:String>
     <system:String x:Key="MainWindow.NotCheckedAllTypeModels">Clear type selection</system:String>
-    <system:String x:Key="MainWindow.Positions">Element position</system:String>
+    <system:String x:Key="MainWindow.Positions">Element position by height</system:String>
     <system:String x:Key="MainWindow.DependentProcessViewModels">Dependent Element Processing Mode</system:String>
     <system:String x:Key="MainWindow.DependentProcessViewModelsDescription">Determines how to process nested/dependent families</system:String>
     <system:String x:Key="MainWindow.PositionsDescription">Specifies relative position for element search</system:String>
