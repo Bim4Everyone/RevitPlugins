@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI.Selection;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -16,6 +17,7 @@ using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Parameters;
+using RevitPackageDocumentation.Views;
 
 namespace RevitPackageDocumentation.ViewModels;
 
@@ -52,6 +54,7 @@ internal class MainViewModel : BaseViewModel {
     private List<Family> _genericAnnotationFamilies;
     private List<View> _legendsInProject;
     private List<Family> _titleBlockFamilies;
+    private MainWindow _packageDocWindow;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -92,8 +95,10 @@ internal class MainViewModel : BaseViewModel {
 
         CreateComponentCommand = RelayCommand.Create<SheetComponentVM>(CreateComponent, CanCreateComponent);
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
+        LoadViewCommand = RelayCommand.Create<MainWindow>(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+
+        SelectElemForParamCommand = RelayCommand.Create<SelectElemParamVM>(SelectElemForParam);
     }
 
     public ICommand ImportCommand { get; }
@@ -111,6 +116,9 @@ internal class MainViewModel : BaseViewModel {
     public ICommand CreateComponentCommand { get; }
 
 
+    public ICommand SelectElemForParamCommand { get; }
+
+
     /// <summary>
     /// Команда загрузки главного окна.
     /// </summary>
@@ -121,6 +129,12 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
+
+
+    public MainWindow PackageDocWindow {
+        get => _packageDocWindow;
+        set => RaiseAndSetIfChanged(ref _packageDocWindow, value);
+    }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -207,7 +221,9 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedSheetSetParamType, value);
     }
 
-    private void LoadView() {
+
+    private void LoadView(MainWindow window) {
+        PackageDocWindow = window;
         LoadConfig();
         GetSettingsForUI();
 
@@ -381,5 +397,20 @@ internal class MainViewModel : BaseViewModel {
     private bool CanCreateComponent(SheetComponentVM sheetComponent) {
 
         return true;
+    }
+
+    /// <summary>
+    /// Метод команды по выбору элемента для параметра конфигурации
+    /// </summary>
+    private void SelectElemForParam(SelectElemParamVM vm) {
+        PackageDocWindow.Hide();
+
+        Reference reference = _revitRepository.ActiveUIDocument.Selection
+                        .PickObject(
+                            ObjectType.Element,
+                            _localizationService.GetLocalizedString("MainWindow.SelectElemForParam"));
+
+        vm.SelectedElem = _revitRepository.Document.GetElement(reference);
+        PackageDocWindow.ShowDialog();
     }
 }

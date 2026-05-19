@@ -45,4 +45,6 @@
     <system:String x:Key="MainWindow.SheetCoefficient">Значение коэффициента формата листа не корректно</system:String>
     
     <system:String x:Key="MainWindow.ErrorInSheetComponents">Исправлены не все ошибки в компонентах листа</system:String>
+    
+    <system:String x:Key="MainWindow.SelectElemForParam">Выберите один элемент</system:String>
 </ResourceDictionary>
