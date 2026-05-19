@@ -187,7 +187,7 @@
                     <ListBox
                         Grid.Row="0"
                         ItemsSource="{Binding Path=CurrentSheetSet.SheetList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        SelectedItem="{Binding Path=SelectedSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
                     <ui:Button
                         Grid.Row="1"
@@ -196,7 +196,7 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Right"
                         Content="{me:LocalizationSource MainWindow.AddSheet}"
-                        Command="{Binding AddSheetCommand}" />
+                        Command="{Binding CurrentSheetSet.AddSheetCommand}" />
                 </Grid>
             </Border>
 
@@ -234,7 +234,7 @@
                         Grid.ColumnSpan="2"
                         Grid.Row="0"
                         Margin="5"
-                        Text="{Binding Path=SelectedSheet.SheetName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                     <ui:TextBlock
                         Grid.Column="3"
@@ -242,7 +242,7 @@
                         Margin="5"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Right"
-                        Text="{Binding Path=SelectedSheet.ModuleCode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleCode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
                     <ui:TextBlock
                         Grid.Column="0"
@@ -255,7 +255,7 @@
                         Grid.Column="1"
                         Grid.Row="1"
                         Margin="5"
-                        Text="{Binding Path=SelectedSheet.SheetSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                     <ui:TextBlock
                         Grid.Column="2"
@@ -268,7 +268,7 @@
                         Grid.Column="3"
                         Grid.Row="1"
                         Margin="5"
-                        Text="{Binding Path=SelectedSheet.SheetCoefficient, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetCoefficient, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                     <ui:TextBlock
                         Grid.Column="0"
@@ -283,12 +283,12 @@
                         Margin="5"
                         ItemsSource="{Binding Path=TitleBlockFamilies, UpdateSourceTrigger=PropertyChanged}"
                         DisplayMemberPath="Name"
-                        SelectedItem="{Binding Path=SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger
                                 EventName="SelectionChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding SelectedSheet.SelectTitleBlockFamilyCommand}" />
+                                    Command="{Binding CurrentSheetSet.SelectedSheet.SelectTitleBlockFamilyCommand}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </ComboBox>
@@ -304,9 +304,9 @@
                         Grid.Column="3"
                         Grid.Row="2"
                         Margin="5"
-                        ItemsSource="{Binding Path=SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged}"
                         DisplayMemberPath="Name"
-                        SelectedItem="{Binding Path=SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
                     <ui:TextBlock
                         Grid.Column="0"
@@ -321,7 +321,7 @@
                         Grid.ColumnSpan="4"
                         Grid.Row="4"
                         Margin="5"
-                        Text="{Binding Path=SelectedSheet.ModuleComment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleComment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
                     <ui:TextBlock
                         Grid.Column="0"
@@ -330,7 +330,7 @@
                         Foreground="Orange"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="{Binding Path=SelectedSheet.ModuleErrors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleErrors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
             </Border>
 
@@ -353,7 +353,7 @@
 
                         <ItemsControl
                             HorizontalContentAlignment="Stretch"
-                            ItemsSource="{Binding Path=SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </ScrollViewer>
 
                     <ComboBox

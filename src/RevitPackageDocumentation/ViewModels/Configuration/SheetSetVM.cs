@@ -18,14 +18,20 @@ internal class SheetSetVM : BaseViewModel {
     private SheetSetPropsVM _properties;
     private ObservableCollection<SheetVM> _sheetList = [];
     private ObservableCollection<PluginParamVM> _params = [];
+    private SheetVM _selectedSheet;
 
     public SheetSetVM(RevitRepository revitRepository, ILocalizationService localizationService) {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
+        AddSheetCommand = RelayCommand.Create(AddSheet);
+        RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
+
         AddSheetSetParamCommand = RelayCommand.Create(AddSheetSetParam);
     }
 
+    public ICommand AddSheetCommand { get; }
+    public ICommand RemoveSheetCommand { get; }
     public ICommand AddSheetSetParamCommand { get; }
 
     public string Name {
@@ -48,12 +54,21 @@ internal class SheetSetVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _params, value);
     }
 
+    public SheetVM SelectedSheet {
+        get => _selectedSheet;
+        set => RaiseAndSetIfChanged(ref _selectedSheet, value);
+    }
+
+
     internal void AddSheet() {
-        SheetList.Add(new SheetVM(_revitRepository, _localizationService) { SheetName = "Новый лист" });
+        SheetList.Add(new SheetVM(_revitRepository, _localizationService) { ModuleName = "Новый лист" });
     }
 
     internal void RemoveSheet(SheetVM sheet) {
         if(sheet != null && SheetList.Contains(sheet)) {
+            if(SelectedSheet == sheet) {
+                SelectedSheet = null;
+            }
             SheetList.Remove(sheet);
         }
     }

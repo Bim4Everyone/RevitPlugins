@@ -14,7 +14,6 @@ using dosymep.WPF.ViewModels;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration;
-using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Parameters;
 using RevitPackageDocumentation.Views;
@@ -35,7 +34,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly SheetSetConfig _sheetSetConfig;
 
     private SheetSetVM _currentSheetSet;
-    private SheetVM _selectedSheet;
+    //private SheetVM _selectedSheet;
 
     private string _errorText;
     private string _sheetSetDataPath;
@@ -84,8 +83,8 @@ internal class MainViewModel : BaseViewModel {
         ImportCommand = RelayCommand.Create(ImportSheetSet);
         ExportCommand = RelayCommand.Create(ExportSheetSet);
 
-        AddSheetCommand = RelayCommand.Create(AddSheet);
-        RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
+        //AddSheetCommand = RelayCommand.Create(AddSheet);
+        //RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
 
         AddComponentCommand = RelayCommand.Create(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
@@ -104,8 +103,8 @@ internal class MainViewModel : BaseViewModel {
     public ICommand ImportCommand { get; }
     public ICommand ExportCommand { get; }
 
-    public ICommand AddSheetCommand { get; }
-    public ICommand RemoveSheetCommand { get; }
+    //public ICommand AddSheetCommand { get; }
+    //public ICommand RemoveSheetCommand { get; }
 
     public ICommand AddComponentCommand { get; }
     public ICommand RemoveComponentCommand { get; }
@@ -149,10 +148,10 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _currentSheetSet, value);
     }
 
-    public SheetVM SelectedSheet {
-        get => _selectedSheet;
-        set => RaiseAndSetIfChanged(ref _selectedSheet, value);
-    }
+    //public SheetVM SelectedSheet {
+    //    get => _selectedSheet;
+    //    set => RaiseAndSetIfChanged(ref _selectedSheet, value);
+    //}
 
 
     public List<ViewFamilyType> StructuralPlanViewFamilyTypes {
@@ -271,7 +270,7 @@ internal class MainViewModel : BaseViewModel {
     private void ImportSheetSet(string sheetSetDataPath) {
         var currentSheetSetData = _sheetSetConfig.Import(sheetSetDataPath);
         CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(currentSheetSetData);
-        SelectedSheet = CurrentSheetSet.SheetList.FirstOrDefault();
+        CurrentSheetSet.SelectedSheet = CurrentSheetSet.SheetList.FirstOrDefault();
     }
 
     private void ExportSheetSet() {
@@ -335,14 +334,14 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    private void AddSheet() {
-        CurrentSheetSet.AddSheet();
-    }
+    //private void AddSheet() {
+    //    CurrentSheetSet.AddSheet();
+    //}
 
-    private void RemoveSheet(SheetVM sheet) {
-        CurrentSheetSet.RemoveSheet(sheet);
-        SelectedSheet = null;
-    }
+    //private void RemoveSheet(SheetVM sheet) {
+    //    CurrentSheetSet.RemoveSheet(sheet);
+    //    CurrentSheetSet.SelectedSheet = null;
+    //}
 
     private void AddComponent() {
         if(SelectedComponentType?.ComponentType == null)
@@ -354,7 +353,7 @@ internal class MainViewModel : BaseViewModel {
                 return;
 
             var component = _sheetSetVMFactory.CreateComponentVM(componentData);
-            SelectedSheet.SheetComponents.Add(component);
+            CurrentSheetSet.SelectedSheet.SheetComponents.Add(component);
         } catch(System.Exception) {
             _messageBoxService.Show("An error occurred while adding the component!", "Error");
         }
@@ -363,7 +362,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void RemoveComponent(SheetComponentVM sheetComponent) {
-        SelectedSheet.RemoveComponent(sheetComponent);
+        CurrentSheetSet.SelectedSheet.RemoveComponent(sheetComponent);
     }
 
 
