@@ -23,17 +23,26 @@ internal interface ISheetSetVMFactory {
 internal class SheetSetVMFactory : ISheetSetVMFactory {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IMessageBoxService _messageBoxService;
+    private readonly ISheetSetDataFactory _sheetSetDataFactory;
 
-    public SheetSetVMFactory(RevitRepository revitRepository, ILocalizationService localizationService) {
+    public SheetSetVMFactory(
+        RevitRepository revitRepository,
+        ILocalizationService localizationService,
+        IMessageBoxService messageBoxService,
+        ISheetSetDataFactory sheetSetDataFactory) {
+
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
+        _sheetSetDataFactory = sheetSetDataFactory;
     }
 
     public SheetSetVM CreateSheetSetVM(SheetSetData data) {
         if(data == null)
             throw new ArgumentNullException(nameof(data));
 
-        var sheetSetVM = new SheetSetVM(_revitRepository, _localizationService) {
+        var sheetSetVM = new SheetSetVM(_revitRepository, _localizationService, _messageBoxService, this, _sheetSetDataFactory) {
             Name = data.Name
         };
 
@@ -63,7 +72,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
         var titleBlockType = titleBlockTypes?.FirstOrDefault(v => v.Name.Equals(data.TitleBlockTypeName));
 
-        var sheetVM = new SheetVM(_revitRepository, _localizationService) {
+        var sheetVM = new SheetVM(_revitRepository, _localizationService, _messageBoxService, this, _sheetSetDataFactory) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,

@@ -10,12 +10,16 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 internal class SheetVM : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IMessageBoxService _messageBoxService;
+    private readonly ISheetSetVMFactory _sheetSetVMFactory;
+    private readonly ISheetSetDataFactory _sheetSetDataFactory;
 
     private bool _isModuleCheck;
     private string _moduleName;
@@ -32,16 +36,31 @@ internal class SheetVM : BaseViewModel {
     private ObservableCollection<SheetComponentVM> _sheetComponents = [];
     private List<FamilySymbol> _titleBlockTypes;
 
-    public SheetVM(RevitRepository revitRepository, ILocalizationService localizationService) {
+    public SheetVM(
+        RevitRepository revitRepository,
+        ILocalizationService localizationService,
+        IMessageBoxService messageBoxService,
+        ISheetSetVMFactory sheetSetVMFactory,
+        ISheetSetDataFactory sheetSetDataFactory) {
+
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
+        _sheetSetVMFactory = sheetSetVMFactory;
+        _sheetSetDataFactory = sheetSetDataFactory;
 
         SelectTitleBlockFamilyCommand = RelayCommand.Create(SelectTitleBlockFamily);
         CreateSheetCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+
+        AddComponentCommand = RelayCommand.Create<ComponentTypeItem>(AddComponent);
+        RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
     }
 
     public ICommand SelectTitleBlockFamilyCommand { get; }
     public ICommand CreateSheetCommand { get; }
+
+    public ICommand AddComponentCommand { get; }
+    public ICommand RemoveComponentCommand { get; }
 
     public bool IsModuleCheck {
         get => _isModuleCheck;
@@ -161,5 +180,22 @@ internal class SheetVM : BaseViewModel {
 
         ModuleErrors = string.Empty;
         return true;
+    }
+
+
+    private void AddComponent(ComponentTypeItem selectedComponentType) {
+        if(selectedComponentType?.ComponentType == null)
+            return;
+
+        try {
+            var componentData = _sheetSetDataFactory.CreateComponentData(selectedComponentType.ComponentType);
+            if(componentData == null)
+                return;
+
+            var component = _sheetSetVMFactory.CreateComponentVM(componentData);
+            SheetComponents.Add(component);
+        } catch(System.Exception) {
+            _messageBoxService.Show("An error occurred while adding the component!", "Error");
+        }
     }
 }

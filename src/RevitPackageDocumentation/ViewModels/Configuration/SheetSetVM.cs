@@ -6,6 +6,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Parameters;
 
@@ -13,6 +14,9 @@ namespace RevitPackageDocumentation.ViewModels.Configuration;
 internal class SheetSetVM : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IMessageBoxService _messageBoxService;
+    private readonly ISheetSetVMFactory _sheetSetVMFactory;
+    private readonly ISheetSetDataFactory _sheetSetDataFactory;
 
     private string _name;
     private SheetSetPropsVM _properties;
@@ -20,9 +24,18 @@ internal class SheetSetVM : BaseViewModel {
     private ObservableCollection<PluginParamVM> _params = [];
     private SheetVM _selectedSheet;
 
-    public SheetSetVM(RevitRepository revitRepository, ILocalizationService localizationService) {
+    public SheetSetVM(
+        RevitRepository revitRepository,
+        ILocalizationService localizationService,
+        IMessageBoxService messageBoxService,
+        ISheetSetVMFactory sheetSetVMFactory,
+        ISheetSetDataFactory sheetSetDataFactory) {
+
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
+        _sheetSetVMFactory = sheetSetVMFactory;
+        _sheetSetDataFactory = sheetSetDataFactory;
 
         AddSheetCommand = RelayCommand.Create(AddSheet);
         RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
@@ -61,7 +74,13 @@ internal class SheetSetVM : BaseViewModel {
 
 
     internal void AddSheet() {
-        SheetList.Add(new SheetVM(_revitRepository, _localizationService) { ModuleName = "Новый лист" });
+        SheetList.Add(
+            new SheetVM(
+                _revitRepository,
+                _localizationService,
+                _messageBoxService,
+                _sheetSetVMFactory,
+                _sheetSetDataFactory) { ModuleName = "Новый лист" });
     }
 
     internal void RemoveSheet(SheetVM sheet) {

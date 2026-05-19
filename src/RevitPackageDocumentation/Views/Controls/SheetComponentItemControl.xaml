@@ -58,8 +58,8 @@
                     Content="✕"
                     Appearance="Danger"
                     Command="{Binding 
-                        Path=DataContext.RemoveComponentCommand, 
-                        RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        Path=DataContext.CurrentSheetSet.SelectedSheet.RemoveComponentCommand, 
+                        RelativeSource={RelativeSource AncestorType=Window}}"
                     CommandParameter="{Binding}">
                 </ui:Button>
 

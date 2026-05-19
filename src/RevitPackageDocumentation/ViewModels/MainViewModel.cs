@@ -34,7 +34,6 @@ internal class MainViewModel : BaseViewModel {
     private readonly SheetSetConfig _sheetSetConfig;
 
     private SheetSetVM _currentSheetSet;
-    //private SheetVM _selectedSheet;
 
     private string _errorText;
     private string _sheetSetDataPath;
@@ -83,12 +82,6 @@ internal class MainViewModel : BaseViewModel {
         ImportCommand = RelayCommand.Create(ImportSheetSet);
         ExportCommand = RelayCommand.Create(ExportSheetSet);
 
-        //AddSheetCommand = RelayCommand.Create(AddSheet);
-        //RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
-
-        AddComponentCommand = RelayCommand.Create(AddComponent);
-        RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
-
         AddSheetSetParamCommand = RelayCommand.Create(AddSheetSetParam);
         RemoveSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(RemoveSheetSetParam);
 
@@ -102,12 +95,6 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand ImportCommand { get; }
     public ICommand ExportCommand { get; }
-
-    //public ICommand AddSheetCommand { get; }
-    //public ICommand RemoveSheetCommand { get; }
-
-    public ICommand AddComponentCommand { get; }
-    public ICommand RemoveComponentCommand { get; }
 
     public ICommand AddSheetSetParamCommand { get; }
     public ICommand RemoveSheetSetParamCommand { get; }
@@ -147,12 +134,6 @@ internal class MainViewModel : BaseViewModel {
         get => _currentSheetSet;
         set => RaiseAndSetIfChanged(ref _currentSheetSet, value);
     }
-
-    //public SheetVM SelectedSheet {
-    //    get => _selectedSheet;
-    //    set => RaiseAndSetIfChanged(ref _selectedSheet, value);
-    //}
-
 
     public List<ViewFamilyType> StructuralPlanViewFamilyTypes {
         get => _structuralPlanViewFamilyTypes;
@@ -333,38 +314,6 @@ internal class MainViewModel : BaseViewModel {
         //ErrorText = null;
         return true;
     }
-
-    //private void AddSheet() {
-    //    CurrentSheetSet.AddSheet();
-    //}
-
-    //private void RemoveSheet(SheetVM sheet) {
-    //    CurrentSheetSet.RemoveSheet(sheet);
-    //    CurrentSheetSet.SelectedSheet = null;
-    //}
-
-    private void AddComponent() {
-        if(SelectedComponentType?.ComponentType == null)
-            return;
-
-        try {
-            var componentData = _sheetSetDataFactory.CreateComponentData(SelectedComponentType.ComponentType);
-            if(componentData == null)
-                return;
-
-            var component = _sheetSetVMFactory.CreateComponentVM(componentData);
-            CurrentSheetSet.SelectedSheet.SheetComponents.Add(component);
-        } catch(System.Exception) {
-            _messageBoxService.Show("An error occurred while adding the component!", "Error");
-        }
-
-        SelectedComponentType = null;
-    }
-
-    private void RemoveComponent(SheetComponentVM sheetComponent) {
-        CurrentSheetSet.SelectedSheet.RemoveComponent(sheetComponent);
-    }
-
 
     private void AddSheetSetParam() {
         if(SelectedSheetSetParamType?.ComponentType == null)

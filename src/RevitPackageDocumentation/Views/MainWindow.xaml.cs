@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Input;
 
@@ -22,6 +23,7 @@ public partial class MainWindow {
             languageService, localizationService,
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        ComponentTypesComboBox.DropDownClosed += ComponentTypesComboBox_DropDownClosed;
     }
 
     /// <summary>
@@ -60,5 +62,9 @@ public partial class MainWindow {
             SheetSetParamTypesComboBox.IsDropDownOpen = true;
             e.Handled = true;
         }
+    }
+
+    private void ComponentTypesComboBox_DropDownClosed(object sender, EventArgs e) {
+        ComponentTypesComboBox.SelectedItem = null;
     }
 }

@@ -369,9 +369,10 @@
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger
-                                EventName="DropDownClosed">
+                                EventName="SelectionChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding AddComponentCommand}" />
+                                    Command="{Binding CurrentSheetSet.SelectedSheet.AddComponentCommand}"
+                                    CommandParameter="{Binding SelectedComponentType}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </ComboBox>
