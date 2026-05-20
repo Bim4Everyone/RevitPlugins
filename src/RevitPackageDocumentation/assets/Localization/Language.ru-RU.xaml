@@ -46,5 +46,5 @@
     
     <system:String x:Key="MainWindow.ErrorInSheetComponents">Исправлены не все ошибки в компонентах листа</system:String>
     
-    <system:String x:Key="MainWindow.SelectElemForParam">Выберите один элемент</system:String>
+    <system:String x:Key="MainWindow.PickElement">Выберите один элемент</system:String>
 </ResourceDictionary>

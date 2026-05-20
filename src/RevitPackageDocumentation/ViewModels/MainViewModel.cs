@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI.Selection;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -31,6 +30,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly IFileDialogService _fileDialogService;
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
+    private readonly IRevitElementPickerService _revitElementPickerService;
     private readonly SheetSetConfig _sheetSetConfig;
 
     private SheetSetVM _currentSheetSet;
@@ -68,6 +68,7 @@ internal class MainViewModel : BaseViewModel {
         IFileDialogService fileDialogService,
         ISheetSetVMFactory sheetSetVMFactory,
         ISheetSetDataFactory sheetSetDataFactory,
+        IRevitElementPickerService revitElementPickerService,
         SheetSetConfig sheetSetConfig) {
 
         _pluginConfig = pluginConfig;
@@ -77,6 +78,7 @@ internal class MainViewModel : BaseViewModel {
         _fileDialogService = fileDialogService;
         _sheetSetVMFactory = sheetSetVMFactory;
         _sheetSetDataFactory = sheetSetDataFactory;
+        _revitElementPickerService = revitElementPickerService;
         _sheetSetConfig = sheetSetConfig;
 
         ImportCommand = RelayCommand.Create(ImportSheetSet);
@@ -308,27 +310,6 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    private void AddSheetSetParam() {
-        if(SelectedSheetSetParamType?.ComponentType == null)
-            return;
-
-        try {
-            var paramData = _sheetSetDataFactory.CreatePluginParamData(SelectedSheetSetParamType.ComponentType);
-            if(paramData == null)
-                return;
-
-            var parameter = _sheetSetVMFactory.CreateParamVM(paramData);
-            CurrentSheetSet.Params.Add(parameter);
-        } catch(System.Exception) {
-            _messageBoxService.Show("An error occurred while adding the parameter!", "Error");
-        }
-
-        SelectedSheetSetParamType = null;
-    }
-
-
-
-
     private void CreateComponent(SheetComponentVM sheetComponent) {
         _messageBoxService.Show($"Creating {sheetComponent.ModuleName}", "Creating");
     }
@@ -342,14 +323,8 @@ internal class MainViewModel : BaseViewModel {
     /// Метод команды по выбору элемента для параметра конфигурации
     /// </summary>
     private void SelectElemForParam(SelectElemParamVM vm) {
-        PackageDocWindow.Hide();
-
-        Reference reference = _revitRepository.ActiveUIDocument.Selection
-                        .PickObject(
-                            ObjectType.Element,
-                            _localizationService.GetLocalizedString("MainWindow.SelectElemForParam"));
-
-        vm.SelectedElem = _revitRepository.Document.GetElement(reference);
-        PackageDocWindow.ShowDialog();
+        _revitElementPickerService.PickElement(onSelected: (element) => {
+            vm.SelectedElem = element;
+        });
     }
 }

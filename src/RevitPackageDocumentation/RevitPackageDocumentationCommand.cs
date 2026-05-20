@@ -7,6 +7,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -50,6 +51,13 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+
+        kernel.Bind<IRevitElementPickerService>()
+            .ToMethod(c => RevitElementPickerService.GetRevitElementPickerService(
+                c.Kernel.Get<RevitRepository>(),
+                c.Kernel.Get<MainWindow>(),
+                c.Kernel.Get<ILocalizationService>()))
+            .InSingletonScope();
 
         // Сервис открытия диалогового окна сохранения/открытия файла JSON
         kernel.Bind<IFileDialogService>()
