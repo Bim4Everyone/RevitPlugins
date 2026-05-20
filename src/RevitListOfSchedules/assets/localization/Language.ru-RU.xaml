@@ -77,5 +77,5 @@
     <system:String
         x:Key="GroupValue.NoValue">Нет значения</system:String>
     <system:String
-        x:Key="InstancesAssembly.ApprovedLines">ведомость,спецификация,перечень,список</system:String>
+        x:Key="InstancesAssembly.ApprovedLines">ведомость,спецификация,перечень,список,экспликация</system:String>
 </ResourceDictionary>
