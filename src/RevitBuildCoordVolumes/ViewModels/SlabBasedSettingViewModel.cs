@@ -260,14 +260,15 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
             .Select(builderMode => new BuilderModeViewModel {
                 Name = _localizationService.GetLocalizedString($"SlabBasedSettingViewModel.{builderMode}"),
                 BuilderMode = builderMode
-            })
-            .OrderByDescending(vm => vm.BuilderMode == currentBuilderMode);
+            });
     }
 
     // Метод загрузки окна
     private void LoadView() {
         BuilderModes = new ObservableCollection<BuilderModeViewModel>(GetTypeBuilderModeViewModels());
-        SelectedBuilderMode = BuilderModes.FirstOrDefault();
+        SelectedBuilderMode = BuilderModes
+            .OrderByDescending(mode => mode.BuilderMode == _settings.BuilderMode)
+            .FirstOrDefault();
 
         Documents = new ObservableCollection<DocumentViewModel>(GetDocumentViewModels());
         FilteredDocuments = new ObservableCollection<DocumentViewModel>(Documents);
