@@ -10,7 +10,7 @@ internal class ScheduleViewVM : SheetComponentVM {
     private string _viewColumn;
     private string _viewCount;
 
-    public ScheduleViewVM(ILocalizationService localizationService) {
+    public ScheduleViewVM(SheetVM sheetVM, ILocalizationService localizationService) : base(sheetVM) {
         _localizationService = localizationService;
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }

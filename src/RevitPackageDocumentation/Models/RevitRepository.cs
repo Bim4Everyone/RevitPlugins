@@ -36,6 +36,7 @@ internal class RevitRepository {
         GenericAnnotationFamilies = GetGenericAnnotationFamilies();
         LegendsInProject = GetLegendsInProject();
         TitleBlockFamilies = GetTitleBlockFamilies();
+        Sheets = GetSheets();
     }
 
     /// <summary>
@@ -69,6 +70,7 @@ internal class RevitRepository {
     public List<Family> GenericAnnotationFamilies { get; }
     public List<View> LegendsInProject { get; }
     public List<Family> TitleBlockFamilies { get; }
+    public List<ViewSheet> Sheets { get; set; }
 
 
     /// <summary>
@@ -171,4 +173,14 @@ internal class RevitRepository {
         .Where(f => f.FamilyCategory.GetBuiltInCategory() == BuiltInCategory.OST_TitleBlocks)
         .OrderBy(a => a.Name)
         .ToList();
+
+    public List<ViewSheet> GetSheets() => new FilteredElementCollector(Document)
+        .OfClass(typeof(ViewSheet))
+        .OfType<ViewSheet>()
+        .ToList();
+
+    public ViewSheet GetSheetByName(string sheetName) {
+        return Sheets
+            .FirstOrDefault(o => o.Name.Equals(sheetName));
+    }
 }

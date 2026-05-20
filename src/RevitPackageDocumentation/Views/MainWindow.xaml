@@ -282,12 +282,12 @@
                         Grid.Column="1"
                         Grid.Row="2"
                         Margin="5"
-                        ItemsSource="{Binding Path=TitleBlockFamilies, UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding Path=TitleBlockFamilies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         DisplayMemberPath="Name"
                         SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger
-                                EventName="SelectionChanged">
+                                EventName="DropDownClosed">
                                 <i:InvokeCommandAction
                                     Command="{Binding CurrentSheetSet.SelectedSheet.SelectTitleBlockFamilyCommand}" />
                             </i:EventTrigger>
@@ -305,9 +305,10 @@
                         Grid.Column="3"
                         Grid.Row="2"
                         Margin="5"
-                        ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         DisplayMemberPath="Name"
-                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        IsSynchronizedWithCurrentItem="False" />
 
                     <ui:TextBlock
                         Grid.Column="0"

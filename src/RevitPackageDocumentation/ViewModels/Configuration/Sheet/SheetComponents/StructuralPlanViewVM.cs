@@ -13,7 +13,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     private ViewPlan _viewTemplate;
     private string _viewCount;
 
-    public StructuralPlanViewVM(ILocalizationService localizationService) {
+    public StructuralPlanViewVM(SheetVM sheetVM, ILocalizationService localizationService) : base(sheetVM) {
         _localizationService = localizationService;
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }

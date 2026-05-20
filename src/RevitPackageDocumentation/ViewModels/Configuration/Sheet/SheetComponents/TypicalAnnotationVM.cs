@@ -18,7 +18,11 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     private Family _annotationFamily;
     private AnnotationSymbolType _annotationType;
 
-    public TypicalAnnotationVM(RevitRepository revitRepository, ILocalizationService localizationService) {
+    public TypicalAnnotationVM(
+        SheetVM sheetVM,
+        RevitRepository revitRepository,
+        ILocalizationService localizationService)
+        : base(sheetVM) {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 

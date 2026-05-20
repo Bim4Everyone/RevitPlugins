@@ -9,6 +9,11 @@ internal abstract class SheetComponentVM : BaseViewModel {
     private string _moduleComment;
     private string _moduleCode;
     private string _moduleErrors;
+    private SheetVM _sheet;
+
+    protected SheetComponentVM(SheetVM sheetVM) {
+        Sheet = sheetVM;
+    }
 
     public ICommand CreateComponentCommand { get; set; }
 
@@ -37,6 +42,10 @@ internal abstract class SheetComponentVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _moduleErrors, value);
     }
 
+    public SheetVM Sheet {
+        get => _sheet;
+        set => RaiseAndSetIfChanged(ref _sheet, value);
+    }
 
     public T GetSettings<T>() where T : new() {
         var settings = new T();

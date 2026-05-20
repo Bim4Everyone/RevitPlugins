@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -21,28 +22,34 @@ internal class SheetVM : BaseViewModel {
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
 
+    private readonly string _sheetCoefficientParamName = "А";
+    private readonly string _sheetSizeParamName = "х";
+
     private bool _isModuleCheck;
     private string _moduleName;
     private string _moduleComment;
     private string _moduleCode;
     private string _moduleErrors;
 
+    private SheetSetVM _sheetSet;
     private string _sheetName;
     private string _sheetSize;
     private string _sheetCoefficient;
     private Family _titleBlockFamily;
     private FamilySymbol _titleBlockType;
-    private SheetPropsVM _properties;
     private ObservableCollection<SheetComponentVM> _sheetComponents = [];
     private List<FamilySymbol> _titleBlockTypes;
+    private bool _hasErrors;
 
     public SheetVM(
+        SheetSetVM sheetSetVM,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService,
         ISheetSetVMFactory sheetSetVMFactory,
         ISheetSetDataFactory sheetSetDataFactory) {
 
+        SheetSet = sheetSetVM;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _messageBoxService = messageBoxService;
@@ -87,6 +94,16 @@ internal class SheetVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _moduleErrors, value);
     }
 
+    public bool HasErrors {
+        get => _hasErrors;
+        set => RaiseAndSetIfChanged(ref _hasErrors, value);
+    }
+
+
+    public SheetSetVM SheetSet {
+        get => _sheetSet;
+        set => RaiseAndSetIfChanged(ref _sheetSet, value);
+    }
 
     public string SheetName {
         get => _sheetName;
@@ -119,11 +136,6 @@ internal class SheetVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _titleBlockType, value);
     }
 
-    public SheetPropsVM Properties {
-        get => _properties;
-        set => RaiseAndSetIfChanged(ref _properties, value);
-    }
-
     public ObservableCollection<SheetComponentVM> SheetComponents {
         get => _sheetComponents;
         set => RaiseAndSetIfChanged(ref _sheetComponents, value);
@@ -142,7 +154,6 @@ internal class SheetVM : BaseViewModel {
             ?.ToList();
     }
 
-
     internal void RemoveComponent(SheetComponentVM sheetComponent) {
         if(sheetComponent != null && SheetComponents.Contains(sheetComponent)) {
             SheetComponents.Remove(sheetComponent);
@@ -155,29 +166,36 @@ internal class SheetVM : BaseViewModel {
     public bool ValidateModule() {
         if(string.IsNullOrEmpty(SheetName)) {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.SheetNameIsEmpty");
+            HasErrors = true;
             return false;
         }
         if(!double.TryParse(SheetSize, out double sheetSizeAsDouble) || sheetSizeAsDouble < 1) {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.SheetSizeIsNotCorrect");
+            HasErrors = true;
             return false;
         }
         if(!double.TryParse(SheetCoefficient, out double sheetCoefficientAsDouble) || sheetCoefficientAsDouble < 1) {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.SheetCoefficientIsNotCorrect");
+            HasErrors = true;
             return false;
         }
         if(TitleBlockFamily is null) {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.TitleBlockFamilyIsNull");
+            HasErrors = true;
             return false;
         }
         if(TitleBlockType is null) {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.TitleBlockTypeIsNull");
+            HasErrors = true;
             return false;
         }
         if(SheetComponents.FirstOrDefault(c => c.ModuleErrors != string.Empty) != null) {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ErrorInSheetComponents");
+            HasErrors = true;
             return false;
         }
 
+        HasErrors = false;
         ModuleErrors = string.Empty;
         return true;
     }
@@ -192,10 +210,34 @@ internal class SheetVM : BaseViewModel {
             if(componentData == null)
                 return;
 
-            var component = _sheetSetVMFactory.CreateComponentVM(componentData);
+            var component = _sheetSetVMFactory.CreateComponentVM(this, componentData);
             SheetComponents.Add(component);
         } catch(System.Exception) {
             _messageBoxService.Show("An error occurred while adding the component!", "Error");
+        }
+    }
+
+    public void Process() {
+        var newSheet = _revitRepository.GetSheetByName(SheetName);
+
+        if(newSheet is null) {
+            try {
+                newSheet = ViewSheet.Create(_revitRepository.Document, TitleBlockType.Id);
+                newSheet.Name = SheetName;
+
+                var titleBlock = new FilteredElementCollector(_revitRepository.Document, newSheet.Id)
+                    .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                    .WhereElementIsNotElementType()
+                    .FirstOrDefault() as FamilyInstance;
+
+                double.TryParse(SheetSize, out double sheetSize);
+                titleBlock.LookupParameter(_sheetSizeParamName).Set(sheetSize);
+
+                double.TryParse(SheetCoefficient, out double sheetCoefficient);
+                titleBlock.LookupParameter(_sheetCoefficientParamName).Set(sheetCoefficient);
+
+                //Repository.Document.Regenerate();
+            } catch(Exception) { }
         }
     }
 }

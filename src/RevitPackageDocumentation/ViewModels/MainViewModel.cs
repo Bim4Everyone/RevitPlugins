@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -13,6 +14,7 @@ using dosymep.WPF.ViewModels;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration;
+using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Parameters;
 using RevitPackageDocumentation.Views;
@@ -290,6 +292,26 @@ internal class MainViewModel : BaseViewModel {
     /// </remarks>
     private void AcceptView() {
         SaveConfig();
+
+        using var transaction = _revitRepository.Document.StartTransaction(
+            _localizationService.GetLocalizedString("MainWindow.Title"));
+
+        var sheets = CurrentSheetSet.SheetList.Where(s => s.IsModuleCheck).ToList();
+
+        foreach(SheetVM sheet in sheets) {
+            sheet.Process();
+        }
+
+
+
+        //foreach(var component in CurrentSheetSet.SheetList
+        //    .Where(s => s.IsModuleCheck)
+        //    .SelectMany(s => s.SheetComponents)
+        //    .Where(c => c.IsModuleCheck)
+        //    .ToList()) {
+        //    component.Process();
+        //}
+        transaction.Commit();
     }
 
     /// <summary>

@@ -14,7 +14,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     private string _viewCount;
     private string _viewportNumber;
 
-    public StructuralCalloutViewVM(ILocalizationService localizationService) {
+    public StructuralCalloutViewVM(SheetVM sheetVM, ILocalizationService localizationService) : base(sheetVM) {
         _localizationService = localizationService;
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }

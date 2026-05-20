@@ -10,7 +10,7 @@ internal class TextNoteVM : SheetComponentVM {
     private string _text;
     private TextNoteType _textType;
 
-    public TextNoteVM(ILocalizationService localizationService) {
+    public TextNoteVM(SheetVM sheetVM, ILocalizationService localizationService) : base(sheetVM) {
         _localizationService = localizationService;
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }

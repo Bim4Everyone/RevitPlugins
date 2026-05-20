@@ -9,7 +9,7 @@ internal class LegendViewVM : SheetComponentVM {
 
     private View _legendView;
 
-    public LegendViewVM(ILocalizationService localizationService) {
+    public LegendViewVM(SheetVM sheetVM, ILocalizationService localizationService) : base(sheetVM) {
         _localizationService = localizationService;
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }

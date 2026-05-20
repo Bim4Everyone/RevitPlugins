@@ -19,7 +19,6 @@ internal class SheetSetVM : BaseViewModel {
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
 
     private string _name;
-    private SheetSetPropsVM _properties;
     private ObservableCollection<SheetVM> _sheetList = [];
     private ObservableCollection<PluginParamVM> _params = [];
     private SheetVM _selectedSheet;
@@ -54,11 +53,6 @@ internal class SheetSetVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _name, value);
     }
 
-    public SheetSetPropsVM Properties {
-        get => _properties;
-        set => RaiseAndSetIfChanged(ref _properties, value);
-    }
-
     public ObservableCollection<SheetVM> SheetList {
         get => _sheetList;
         set => RaiseAndSetIfChanged(ref _sheetList, value);
@@ -78,6 +72,7 @@ internal class SheetSetVM : BaseViewModel {
     internal void AddSheet() {
         SheetList.Add(
             new SheetVM(
+                this,
                 _revitRepository,
                 _localizationService,
                 _messageBoxService,

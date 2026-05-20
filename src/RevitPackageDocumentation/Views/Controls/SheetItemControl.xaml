@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitPackageDocumentation.Views.Controls"
     xmlns:sheet="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
     
     d:DataContext="{d:DesignInstance Type=sheet:SheetVM}"
     mc:Ignorable="d"
@@ -18,12 +19,15 @@
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:BoolToVisibilityConverter
+                x:Key="BoolToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
@@ -36,21 +40,31 @@
             VerticalContentAlignment="Center"
             HorizontalAlignment="Stretch" />
 
-        <CheckBox
+        <ui:TextBlock
             Grid.Column="1"
+            Margin="5"
+            Text="!"
+            FontSize="26"
+            Foreground="Orange"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right"
+            Visibility="{Binding Path=HasErrors, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+        <CheckBox
+            Grid.Column="2"
             Margin="5"
             IsChecked="{Binding Path=IsModuleCheck, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             VerticalAlignment="Center" />
 
         <ui:Button
-            Grid.Column="2"
+            Grid.Column="3"
             Margin="5"
             Content="🗲"
             Command="{Binding Path=CreateSheetCommand}">
         </ui:Button>
 
         <ui:Button
-            Grid.Column="3"
+            Grid.Column="4"
             Margin="5"
             Appearance="Danger"
             Content="✕"

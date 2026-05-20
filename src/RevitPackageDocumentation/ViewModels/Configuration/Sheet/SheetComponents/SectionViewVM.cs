@@ -13,7 +13,7 @@ internal class SectionViewVM : SheetComponentVM {
     private ViewSection _viewTemplate;
     private string _viewCount;
 
-    public SectionViewVM(ILocalizationService localizationService) {
+    public SectionViewVM(SheetVM sheetVM, ILocalizationService localizationService) : base(sheetVM) {
         _localizationService = localizationService;
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
