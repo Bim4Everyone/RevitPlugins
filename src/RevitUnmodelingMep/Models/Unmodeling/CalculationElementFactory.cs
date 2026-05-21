@@ -9,6 +9,8 @@ using Autodesk.Revit.DB.Plumbing;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
+
 
 using RevitUnmodelingMep.Models.Entities;
 
@@ -164,12 +166,67 @@ internal sealed class CalculationElementFactory {
         return calculationElement;
     }
 
+    private double GetFittingArea(Element element) {
+        double area = 0;
+
+        foreach(Solid solid in element.GetSolids())
+        foreach(Face face in solid.Faces) {
+            area += face.Area;
+        }
+
+        if(area <= 0) {
+            return area;
+        }
+
+        double connectorArea = 0;
+        foreach(Connector connector in GetConnectors(element)) {
+            if(connector.Shape == ConnectorProfileType.Rectangular) {
+                connectorArea += connector.Height * connector.Width;
+            }
+            if(connector.Shape == ConnectorProfileType.Round) {
+                connectorArea += Math.PI * Math.Pow(connector.Radius, 2);
+            }
+        }
+
+        return area - connectorArea;
+    }
+
+    private List<Connector> GetConnectors(Element element) {
+        if(element is not FamilyInstance instance || instance.MEPModel?.ConnectorManager == null) {
+            return new List<Connector>();
+        }
+
+        return instance.MEPModel.ConnectorManager.Connectors.Cast<Connector>().ToList();
+    }
+
     private CalculationElementBase CreateDuctInsulation(DuctInsulation ductIns) {
         CalculationElementDuctIns calculationElement = new CalculationElementDuctIns(ductIns) {
             ProjectStock = _projectStockProvider.Get(BuiltInCategory.OST_DuctInsulations)
         };
+        
+        calculationElement.SystemSharedName =
+            ductIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
+        
+        calculationElement.Length_mm = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+        
+        var insulationHost = _doc.GetElement(ductIns.HostElementId);
 
-        MEPCurve duct = (MEPCurve) _doc.GetElement(ductIns.HostElementId);
+        if(insulationHost.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
+            calculationElement.Area_m2 = GetFittingArea(insulationHost);
+            
+            calculationElement.SystemTypeName =
+                insulationHost.get_Parameter(BuiltInParameter.RBS_DUCT_SYSTEM_TYPE_PARAM).AsValueString();
+            
+            return calculationElement;
+        }
+        calculationElement.Area_m2 = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+        MEPCurve duct = insulationHost as MEPCurve;
+        if(duct == null) {
+            return calculationElement;
+        }
+        
+        calculationElement.SystemTypeName = duct.MEPSystem?.GetElementType()?.Name ?? string.Empty;
+        
         DuctType ductType = (DuctType) duct.GetElementType();
 
         if(ductType.Shape == ConnectorProfileType.Round) {
@@ -182,12 +239,6 @@ internal sealed class CalculationElementFactory {
             calculationElement.Height_mm = ductIns.Height;
             calculationElement.Perimeter_mm = ductIns.Width * 2 + ductIns.Height * 2;
         }
-
-        calculationElement.SystemSharedName =
-            ductIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
-        calculationElement.SystemTypeName = duct?.MEPSystem?.GetElementType()?.Name ?? string.Empty;
-        calculationElement.Area_m2 = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
-        calculationElement.Length_mm = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
 
         return calculationElement;
     }

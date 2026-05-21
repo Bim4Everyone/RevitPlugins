@@ -92,7 +92,8 @@ internal static class CollectionGenerator {
                     return false;
 
                 return host.Category.IsId(BuiltInCategory.OST_PipeCurves)
-                       || host.Category.IsId(BuiltInCategory.OST_DuctCurves);
+                       || host.Category.IsId(BuiltInCategory.OST_DuctCurves)
+                       || host.Category.IsId(BuiltInCategory.OST_DuctFitting);
             }
 
             elements = elements
