@@ -97,7 +97,7 @@
                 VerticalAlignment="Center"
                 Text="Количество" />
 
-            <TextBox
+            <ui:NumberBox
                 Grid.Column="1"
                 Grid.Row="4"
                 Margin="5"
@@ -196,7 +196,7 @@
                 VerticalAlignment="Center"
                 Text="Количество" />
 
-            <TextBox
+            <ui:NumberBox
                 Grid.Column="1"
                 Grid.Row="4"
                 Margin="5"
@@ -294,7 +294,7 @@
                 VerticalAlignment="Center"
                 Text="Количество" />
 
-            <TextBox
+            <ui:NumberBox
                 Grid.Column="1"
                 Grid.Row="4"
                 Margin="5"
@@ -371,7 +371,7 @@
                 VerticalAlignment="Center"
                 Text="Количество" />
 
-            <TextBox
+            <ui:NumberBox
                 Grid.Column="1"
                 Grid.Row="3"
                 Margin="5"
