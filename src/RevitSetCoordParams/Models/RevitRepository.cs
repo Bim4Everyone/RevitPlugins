@@ -215,23 +215,21 @@ internal class RevitRepository {
     /// Метод получения координаты элементы по центру
     /// </summary>
     public XYZ GetPositionCenter(RevitElement revitElement) {
-        return (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
+        return BoundingBoxExtensions.GetMidPoint(revitElement.BoundingBoxXYZ);
     }
 
     /// <summary>
     /// Метод получения координаты элементы по низу
     /// </summary>
     public XYZ GetPositionBottom(RevitElement revitElement) {
-        var center = (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
-        return new XYZ(center.X, center.Y, revitElement.BoundingBoxXYZ.Min.Z);
+        return BoundingBoxExtensions.GetMinPoint([revitElement.BoundingBoxXYZ]);
     }
 
     /// <summary>
     /// Метод получения координаты элементы по верху
     /// </summary>
     public XYZ GetPositionUp(RevitElement revitElement) {
-        var center = (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
-        return new XYZ(center.X, center.Y, revitElement.BoundingBoxXYZ.Max.Z);
+        return BoundingBoxExtensions.GetMaxPoint([revitElement.BoundingBoxXYZ]);
     }
 
     /// <summary>
@@ -348,22 +346,7 @@ internal class RevitRepository {
             .Select(revitElement => revitElement.BoundingBoxXYZ)
             .Where(bbox => bbox is not null);
 
-        if(!bboxes.Any()) {
-            return null;
-        }
-
-        double minX = bboxes.Min(b => b.Min.X);
-        double minY = bboxes.Min(b => b.Min.Y);
-        double minZ = bboxes.Min(b => b.Min.Z);
-
-        double maxX = bboxes.Max(b => b.Max.X);
-        double maxY = bboxes.Max(b => b.Max.Y);
-        double maxZ = bboxes.Max(b => b.Max.Z);
-
-        return new BoundingBoxXYZ {
-            Min = new XYZ(minX, minY, minZ),
-            Max = new XYZ(maxX, maxY, maxZ)
-        };
+        return !bboxes.Any() ? null : BoundingBoxExtensions.CreateUnitedBoundingBox([.. bboxes]);
     }
 
     // Метод получения BoundingBoxXYZ по Location
