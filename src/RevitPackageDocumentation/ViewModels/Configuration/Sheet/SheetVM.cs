@@ -40,6 +40,7 @@ internal class SheetVM : BaseViewModel {
     private ObservableCollection<SheetComponentVM> _sheetComponents = [];
     private List<FamilySymbol> _titleBlockTypes;
     private bool _hasErrors;
+    private ViewSheet _sheetInstance;
 
     public SheetVM(
         SheetSetVM sheetSetVM,
@@ -141,6 +142,10 @@ internal class SheetVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _sheetComponents, value);
     }
 
+    public ViewSheet SheetInstance {
+        get => _sheetInstance;
+        set => RaiseAndSetIfChanged(ref _sheetInstance, value);
+    }
 
     private void SelectTitleBlockFamily() {
         TitleBlockType = null;
@@ -218,17 +223,15 @@ internal class SheetVM : BaseViewModel {
     }
 
     public void Process() {
-        var newSheet = _revitRepository.GetSheetByName(SheetName);
+        SheetInstance = null;
+        SheetInstance = _revitRepository.GetSheetByName(SheetName);
 
-        if(newSheet is null) {
+        if(SheetInstance is null) {
             try {
-                newSheet = ViewSheet.Create(_revitRepository.Document, TitleBlockType.Id);
-                newSheet.Name = SheetName;
+                SheetInstance = ViewSheet.Create(_revitRepository.Document, TitleBlockType.Id);
+                SheetInstance.Name = SheetName;
 
-                var titleBlock = new FilteredElementCollector(_revitRepository.Document, newSheet.Id)
-                    .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                    .WhereElementIsNotElementType()
-                    .FirstOrDefault() as FamilyInstance;
+                var titleBlock = _revitRepository.GetTitleBlocks(SheetInstance);
 
                 double.TryParse(SheetSize, out double sheetSize);
                 titleBlock.LookupParameter(_sheetSizeParamName).Set(sheetSize);
@@ -236,8 +239,12 @@ internal class SheetVM : BaseViewModel {
                 double.TryParse(SheetCoefficient, out double sheetCoefficient);
                 titleBlock.LookupParameter(_sheetCoefficientParamName).Set(sheetCoefficient);
 
-                //Repository.Document.Regenerate();
+                _revitRepository.Document.Regenerate();
             } catch(Exception) { }
+        }
+
+        foreach(var component in SheetComponents.Where(c => c.IsModuleCheck).ToList()) {
+            component.Process();
         }
     }
 }

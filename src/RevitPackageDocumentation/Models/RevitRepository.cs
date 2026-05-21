@@ -37,6 +37,7 @@ internal class RevitRepository {
         LegendsInProject = GetLegendsInProject();
         TitleBlockFamilies = GetTitleBlockFamilies();
         Sheets = GetSheets();
+        Views = GetViews();
     }
 
     /// <summary>
@@ -71,6 +72,7 @@ internal class RevitRepository {
     public List<View> LegendsInProject { get; }
     public List<Family> TitleBlockFamilies { get; }
     public List<ViewSheet> Sheets { get; set; }
+    public List<ViewPlan> Views { get; set; }
 
 
     /// <summary>
@@ -179,8 +181,26 @@ internal class RevitRepository {
         .OfType<ViewSheet>()
         .ToList();
 
+    public List<ViewPlan> GetViews() => new FilteredElementCollector(Document)
+        .OfClass(typeof(ViewPlan))
+        .OfType<ViewPlan>()
+        .ToList();
+
+
     public ViewSheet GetSheetByName(string sheetName) {
         return Sheets
             .FirstOrDefault(o => o.Name.Equals(sheetName));
+    }
+
+    public ViewPlan GetViewByName(string viewName) {
+        return Views
+            .FirstOrDefault(o => o.Name.Equals(viewName));
+    }
+
+    public FamilyInstance GetTitleBlocks(ViewSheet viewSheet) {
+        return new FilteredElementCollector(Document, viewSheet.Id)
+            .OfCategory(BuiltInCategory.OST_TitleBlocks)
+            .WhereElementIsNotElementType()
+            .FirstOrDefault() as FamilyInstance;
     }
 }

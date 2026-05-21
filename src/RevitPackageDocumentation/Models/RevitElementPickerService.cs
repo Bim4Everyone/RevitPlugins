@@ -36,8 +36,10 @@ public class RevitElementPickerService : IRevitElementPickerService {
 
     public void PickElement(Action<Element> onSelected) {
         _mainWindow.Hide();
+        ISelectionFilter selectFilter = new FloorSelectionFilter();
         var reference = _revitRepository.ActiveUIDocument.Selection.PickObject(
             ObjectType.Element,
+            selectFilter,
             _localizationService.GetLocalizedString("MainWindow.PickElement"));
         var element = _revitRepository.Document.GetElement(reference);
         onSelected?.Invoke(element);

@@ -14,7 +14,6 @@ using dosymep.WPF.ViewModels;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration;
-using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Parameters;
 using RevitPackageDocumentation.Views;
@@ -298,7 +297,7 @@ internal class MainViewModel : BaseViewModel {
 
         var sheets = CurrentSheetSet.SheetList.Where(s => s.IsModuleCheck).ToList();
 
-        foreach(SheetVM sheet in sheets) {
+        foreach(var sheet in sheets) {
             sheet.Process();
         }
 

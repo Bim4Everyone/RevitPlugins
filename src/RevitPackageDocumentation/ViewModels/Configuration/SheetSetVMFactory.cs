@@ -97,7 +97,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     public SheetComponentVM CreateComponentVM(SheetVM sheetVM, SheetComponentData sheetComponentData) {
         return sheetComponentData switch {
-            StructuralPlanViewData data => new StructuralPlanViewVM(sheetVM, _localizationService) {
+            StructuralPlanViewData data => new StructuralPlanViewVM(sheetVM, _revitRepository, _localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
