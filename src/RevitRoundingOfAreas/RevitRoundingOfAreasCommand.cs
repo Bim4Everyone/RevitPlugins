@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -8,11 +7,8 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -34,7 +30,7 @@ public class RevitRoundingOfAreasCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitRoundingOfAreasCommand() {
-        PluginName = "RevitRoundingOfAreas";
+        PluginName = "Рассчитать площади (соц. объекты)";
     }
 
     /// <summary>
@@ -47,7 +43,7 @@ public class RevitRoundingOfAreasCommand : BasePluginCommand {
     /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
-        using IKernel kernel = uiApplication.CreatePlatformServices();
+        using var kernel = uiApplication.CreatePlatformServices();
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
