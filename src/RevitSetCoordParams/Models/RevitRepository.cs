@@ -70,9 +70,11 @@ internal class RevitRepository {
 
         var result = allElements
             .Where(_dependentService.IsRootElement)
-            .Select(e => {
-                var revitElement = CreateRevitElement(e);
-                revitElement.DependentElements = GetDependentElements(e, categorySet);
+            .Select(element => {
+                var revitElement = CreateRevitElement(element);
+                var dependentElements = GetDependentElements(element, categorySet);
+                revitElement.DependentElements = dependentElements;
+                revitElement.BoundingBoxXYZ ??= GetDependentBoundingBox(dependentElements);
                 return revitElement;
             })
             .ToList();
@@ -96,9 +98,11 @@ internal class RevitRepository {
 
         var result = allElements
             .Where(_dependentService.IsRootElement)
-            .Select(e => {
-                var revitElement = CreateRevitElement(e);
-                revitElement.DependentElements = GetDependentElements(e, categorySet);
+            .Select(element => {
+                var revitElement = CreateRevitElement(element);
+                var dependentElements = GetDependentElements(element, categorySet);
+                revitElement.DependentElements = dependentElements;
+                revitElement.BoundingBoxXYZ ??= GetDependentBoundingBox(dependentElements);
                 return revitElement;
             })
             .ToList();
@@ -124,7 +128,9 @@ internal class RevitRepository {
             .Select(group => group.First())
             .Select(element => {
                 var revitElement = CreateRevitElement(element);
-                revitElement.DependentElements = GetDependentElements(element, categorySet);
+                var dependentElements = GetDependentElements(element, categorySet);
+                revitElement.DependentElements = dependentElements;
+                revitElement.BoundingBoxXYZ ??= GetDependentBoundingBox(dependentElements);
                 return revitElement;
             })
             .ToList();
@@ -209,23 +215,21 @@ internal class RevitRepository {
     /// Метод получения координаты элементы по центру
     /// </summary>
     public XYZ GetPositionCenter(RevitElement revitElement) {
-        return (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
+        return BoundingBoxExtensions.GetMidPoint(revitElement.BoundingBoxXYZ);
     }
 
     /// <summary>
     /// Метод получения координаты элементы по низу
     /// </summary>
     public XYZ GetPositionBottom(RevitElement revitElement) {
-        var center = (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
-        return new XYZ(center.X, center.Y, revitElement.BoundingBoxXYZ.Min.Z);
+        return BoundingBoxExtensions.GetMinPoint([revitElement.BoundingBoxXYZ]);
     }
 
     /// <summary>
     /// Метод получения координаты элементы по верху
     /// </summary>
     public XYZ GetPositionUp(RevitElement revitElement) {
-        var center = (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
-        return new XYZ(center.X, center.Y, revitElement.BoundingBoxXYZ.Max.Z);
+        return BoundingBoxExtensions.GetMaxPoint([revitElement.BoundingBoxXYZ]);
     }
 
     /// <summary>
@@ -269,15 +273,19 @@ internal class RevitRepository {
 
     // Метод получения BoundingBoxXYZ
     private BoundingBoxXYZ GetBoundingBoxXYZ(Element element) {
-        return element is FlexPipe flexPipe
-            ? GetFlexElementBoundingBox(flexPipe.Points)
-            : element is FlexDuct flexDuct
-            ? GetFlexElementBoundingBox(flexDuct.Points)
-            : element is FamilyInstance familyInstance
-            ? GetFamilyInstanceBoundingBox(familyInstance)
-            : element is not FamilyInstance
-            ? GetElementBoundingBox(element)
-            : null;
+        if(element is FlexPipe flexPipe) {
+            return GetFlexElementBoundingBox(flexPipe.Points);
+        }
+        if(element is FlexDuct flexDuct) {
+            return GetFlexElementBoundingBox(flexDuct.Points);
+        }
+        if(element is FamilyInstance familyInstance) {
+            var bbox = GetFamilyInstanceBoundingBox(familyInstance);
+            bbox ??= GetElementBoundingBox(element);
+            bbox ??= GetLocationBoundingBox(familyInstance);
+            return bbox;
+        }
+        return GetElementBoundingBox(element);
     }
 
     // Метод получения BoundingBoxXYZ для гибких систем
@@ -327,6 +335,30 @@ internal class RevitRepository {
         var transformedBoundingBox = GetTransformedBoundingBox(boundingBox, _localTransform.Multiply(boundingBox.Transform));
 
         return transformedBoundingBox;
+    }
+
+    // Метод получения BoundingBoxXYZ по вложенным семействам
+    private BoundingBoxXYZ GetDependentBoundingBox(List<RevitElement> revitElements) {
+        if(!revitElements.Any()) {
+            return null;
+        }
+        var bboxes = revitElements
+            .Select(revitElement => revitElement.BoundingBoxXYZ)
+            .Where(bbox => bbox is not null);
+
+        return !bboxes.Any() ? null : BoundingBoxExtensions.CreateUnitedBoundingBox([.. bboxes]);
+    }
+
+    // Метод получения BoundingBoxXYZ по Location
+    private BoundingBoxXYZ GetLocationBoundingBox(FamilyInstance familyInstance) {
+        var locationPoint = familyInstance.Location as LocationPoint;
+        var point = locationPoint.Point;
+
+        return new BoundingBoxXYZ {
+            Min = point,
+            Max = point,
+            Transform = Transform.Identity.Multiply(_localTransform)
+        };
     }
 
     // Метод получения BoundingBoxXYZ системных семейств
