@@ -2,6 +2,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
@@ -19,20 +21,20 @@ internal class SectionViewVM : SheetComponentVM {
     private ViewSection _viewTemplate;
     private string _viewCount;
 
-    // Смещение по горизонтали в дюймах слева, для размещаемых компонентов листа требуемое, чтобы они попали на лист
-    private readonly double _titleBlockFrameLeftOffset = UnitUtilsHelper.ConvertToInternalValue(20);
+    // Расстояние до дальней секущей плоскости сечения
+    private readonly double _viewDepth = UnitUtilsHelper.ConvertToInternalValue(3000);
 
-    // Смещение по горизонтали в дюймах справа, для размещаемых компонентов листа требуемое, чтобы они попали на лист
-    private readonly double _titleBlockFrameRightOffset = UnitUtilsHelper.ConvertToInternalValue(20);
+    // Ширина подрезки вида
+    private readonly double _viewWidth = UnitUtilsHelper.ConvertToInternalValue(3000);
 
-    // Смещение по вертикали в дюймах сверху, для размещаемых компонентов листа требуемое, чтобы они попали на лист
-    private readonly double _titleBlockFrameTopOffset = UnitUtilsHelper.ConvertToInternalValue(15);
+    // Высота подрезки вида
+    private readonly double _viewHeight = UnitUtilsHelper.ConvertToInternalValue(1500);
 
-    // Смещение по вертикали в дюймах снизу, для размещаемых компонентов листа требуемое, чтобы они попали на лист
-    private readonly double _titleBlockFrameBottomOffset = UnitUtilsHelper.ConvertToInternalValue(15);
+    // Отступ между сечениями в модели
+    private readonly double _viewsOffset = UnitUtilsHelper.ConvertToInternalValue(1500);
 
-    // Отступ между видовыми экранами в дюймах, для корректного взаимного размещения 
-    private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(10);
+    // Отступ между видовыми экранами на листе
+    private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(150);
 
     public SectionViewVM(SheetVM sheetVM, RevitRepository revitRepository, ILocalizationService localizationService) : base(sheetVM) {
         _revitRepository = revitRepository;
@@ -84,7 +86,7 @@ internal class SectionViewVM : SheetComponentVM {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewTemplateIsNull");
             return false;
         }
-        if(!double.TryParse(ViewCount, out double viewCountAsDouble) || viewCountAsDouble < 1) {
+        if(!int.TryParse(ViewCount, out int viewCountAsInt) || viewCountAsInt < 1) {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
             return false;
         }
@@ -94,12 +96,17 @@ internal class SectionViewVM : SheetComponentVM {
     }
 
     public override void Process() {
-        var view = Create();
-        Place(view);
+        int.TryParse(ViewCount, out int viewCountAsInt);
+
+        for(int i = 1; i <= viewCountAsInt; i++) {
+            var view = Create(i);
+            Place(view, i);
+        }
     }
 
-    public ViewSection Create() {
-        var view = _revitRepository.GetViewByName(ViewName) as ViewSection;
+    public ViewSection Create(int number) {
+        var viewName = $"{ViewName}_{number}";
+        var view = _revitRepository.GetViewByName(viewName) as ViewSection;
 
         if(view != null) {
             return view;
@@ -109,46 +116,41 @@ internal class SectionViewVM : SheetComponentVM {
             if(Sheet.SheetSet.Params.FirstOrDefault(p => p.ParamName == "Опалубка") is not SelectElemParamVM fromworkParam) {
                 return null;
             }
-
             var selectedElem = fromworkParam.SelectedElem;
             var bbox = selectedElem.get_BoundingBox(null);
 
-            XYZ center = (bbox.Min + bbox.Max) / 2;
-            double widthX = bbox.Max.X - bbox.Min.X;   // размер по X
-            double widthY = bbox.Max.Y - bbox.Min.Y;   // размер по Y
-            double height = bbox.Max.Z - bbox.Min.Z;   // размер по Z
-
             // Ориентируем взгляд вдоль оси X (вправо вдоль Y, вверх вдоль Z)
             var t = Transform.Identity;
-            t.Origin = center;
+            t.Origin = (bbox.Min + bbox.Max) / 2 + new XYZ(_viewsOffset * (number - 1), 0, 0);
             t.BasisX = XYZ.BasisY;
             t.BasisY = XYZ.BasisZ;
             t.BasisZ = XYZ.BasisX;
 
-            double offset = 1;
-
-
-            double halfDepth = UnitUtilsHelper.ConvertToInternalValue(1000);
-
             var sectionBox = new BoundingBoxXYZ {
                 Transform = t,
-                Min = new XYZ(-halfDepth, -offset, -widthX / 2 - offset),
-                Max = new XYZ(halfDepth, height + offset, widthX / 2 + offset)
+                Min = new XYZ(
+                    -_viewWidth / 2,
+                    -_viewHeight / 2,
+                    0),
+                Max = new XYZ(
+                    _viewWidth / 2,
+                    _viewHeight / 2,
+                    _viewDepth)
             };
 
             view = ViewSection.CreateSection(_revitRepository.Document, ViewFamilyType.Id, sectionBox);
-            view.Name = ViewName;
+            view.Name = viewName;
             view.ViewTemplateId = ViewTemplate.Id;
+            view.SetParamValue(BuiltInParameter.SECTION_COARSER_SCALE_PULLDOWN_METRIC, 100);
 
             // Необходимо для перезагрузки габаритов видов перед их размещением, т.к. при назначении 
             // секущего диапазона, видимых категорий, шаблона вида могут изменяться габариты вида
             _revitRepository.Document.Regenerate();
-
         } catch(System.Exception) { }
         return view;
     }
 
-    public void Place(ViewSection view) {
+    public void Place(ViewSection view, int number) {
         var sheetInstance = Sheet.SheetInstance;
         if(sheetInstance != null
             && view != null
@@ -162,8 +164,8 @@ internal class SectionViewVM : SheetComponentVM {
             double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
             double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
 
-            double titleBlockMaxX = boundingBoxXYZ.Max.X;
-            double titleBlockMaxY = boundingBoxXYZ.Max.Y;
+            double titleBlockMinX = boundingBoxXYZ.Min.X;
+            double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
             // Получение габаритов видового экрана
             var viewPort = Viewport.Create(_revitRepository.Document, sheetInstance.Id, view.Id, new XYZ(0, 0, 0));
@@ -175,8 +177,8 @@ internal class SectionViewVM : SheetComponentVM {
             double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
 
             var correctPosition = new XYZ(
-                titleBlockMaxX - _titleBlockFrameRightOffset - viewportHalfWidth,
-                titleBlockMaxY - _titleBlockFrameTopOffset - viewportHalfHeight,
+                titleBlockMinX + viewportHalfWidth + _viewportOffset * (number - 1),
+                titleBlockMinY - viewportHalfHeight,
                 0);
 
             viewPort.SetBoxCenter(correctPosition);

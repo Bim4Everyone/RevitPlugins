@@ -27,12 +27,6 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     // Смещение по вертикали в дюймах сверху, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _titleBlockFrameTopOffset = UnitUtilsHelper.ConvertToInternalValue(15);
 
-    // Смещение по вертикали в дюймах снизу, для размещаемых компонентов листа требуемое, чтобы они попали на лист
-    private readonly double _titleBlockFrameBottomOffset = UnitUtilsHelper.ConvertToInternalValue(15);
-
-    // Отступ между видовыми экранами в дюймах, для корректного взаимного размещения 
-    private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(10);
-
     public StructuralPlanViewVM(SheetVM sheetVM, RevitRepository revitRepository, ILocalizationService localizationService)
         : base(sheetVM) {
         _revitRepository = revitRepository;
@@ -170,6 +164,11 @@ internal class StructuralPlanViewVM : SheetComponentVM {
                 0);
 
             viewPort.SetBoxCenter(correctPosition);
+
+            string viewportNumberAsStr = viewPort.GetParamValue<string>(BuiltInParameter.VIEWPORT_DETAIL_NUMBER);
+            if(int.TryParse(viewportNumberAsStr, out int viewportNumberAsInt)) {
+                viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, (100 + viewportNumberAsInt).ToString());
+            }
 
 #if REVIT_2022_OR_GREATER
             viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);
