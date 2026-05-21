@@ -99,7 +99,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     }
 
     public ViewPlan Create() {
-        var view = _revitRepository.GetViewByName(ViewName);
+        var view = _revitRepository.GetViewByName(ViewName) as ViewPlan;
 
         if(view is null) {
             try {

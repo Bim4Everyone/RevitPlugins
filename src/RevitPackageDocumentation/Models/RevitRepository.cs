@@ -72,7 +72,7 @@ internal class RevitRepository {
     public List<View> LegendsInProject { get; }
     public List<Family> TitleBlockFamilies { get; }
     public List<ViewSheet> Sheets { get; set; }
-    public List<ViewPlan> Views { get; set; }
+    public List<View> Views { get; set; }
 
 
     /// <summary>
@@ -181,9 +181,9 @@ internal class RevitRepository {
         .OfType<ViewSheet>()
         .ToList();
 
-    public List<ViewPlan> GetViews() => new FilteredElementCollector(Document)
-        .OfClass(typeof(ViewPlan))
-        .OfType<ViewPlan>()
+    public List<View> GetViews() => new FilteredElementCollector(Document)
+        .OfClass(typeof(View))
+        .OfType<View>()
         .ToList();
 
 
@@ -192,7 +192,7 @@ internal class RevitRepository {
             .FirstOrDefault(o => o.Name.Equals(sheetName));
     }
 
-    public ViewPlan GetViewByName(string viewName) {
+    public View GetViewByName(string viewName) {
         return Views
             .FirstOrDefault(o => o.Name.Equals(viewName));
     }
