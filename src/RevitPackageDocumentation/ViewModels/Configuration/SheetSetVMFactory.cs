@@ -142,7 +142,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "456",
 
-                ReferenceViewName = data.ReferenceViewName ?? string.Empty,
+                ReferenceSpec = _revitRepository.GetSpecByName(data.ReferenceViewName),
                 ViewName = data.ViewName ?? string.Empty,
                 ViewColumn = data.ViewColumn ?? "1",
                 ViewCount = data.ViewCount ?? "1",

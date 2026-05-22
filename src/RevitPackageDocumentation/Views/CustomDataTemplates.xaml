@@ -332,11 +332,13 @@
                 VerticalAlignment="Center"
                 Text="Имя исходной" />
 
-            <TextBox
+            <ComboBox
                 Grid.Column="1"
                 Grid.Row="0"
                 Margin="5"
-                Text="{Binding Path=ReferenceViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                ItemsSource="{Binding DataContext.SpecsInPj, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ReferenceSpec, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
             <TextBlock
                 Grid.Column="0"

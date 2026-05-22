@@ -10,10 +10,10 @@ internal class ScheduleViewVM : SheetComponentVM {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
-    private string _referenceViewName;
     private string _viewName;
     private string _viewColumn;
     private string _viewCount;
+    private ViewSchedule _referenceSpec;
 
     // Смещение по горизонтали в футах, для размещаемых на листе спецификациях требуемое, чтобы они попали на лист
     private readonly double _specViewportRightOffset = UnitUtilsHelper.ConvertToInternalValue(0.77);
@@ -27,9 +27,10 @@ internal class ScheduleViewVM : SheetComponentVM {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 
-    public string ReferenceViewName {
-        get => _referenceViewName;
-        set => RaiseAndSetIfChanged(ref _referenceViewName, value);
+
+    public ViewSchedule ReferenceSpec {
+        get => _referenceSpec;
+        set => RaiseAndSetIfChanged(ref _referenceSpec, value);
     }
 
     public string ViewName {
@@ -50,7 +51,7 @@ internal class ScheduleViewVM : SheetComponentVM {
     public override void CreateComponent() { }
 
     public override bool ValidateModule() {
-        if(string.IsNullOrEmpty(ReferenceViewName)) {
+        if(ReferenceSpec is null) {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ReferenceViewNameIsEmpty");
             return false;
         }
@@ -82,13 +83,12 @@ internal class ScheduleViewVM : SheetComponentVM {
             return view;
         }
 
-        var viewForDuplicate = _revitRepository.GetSpecByName(ReferenceViewName);
-        if(viewForDuplicate is null || !viewForDuplicate.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+        if(ReferenceSpec is null || !ReferenceSpec.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
             return null;
         }
 
         try {
-            var scheduleId = viewForDuplicate.Duplicate(ViewDuplicateOption.Duplicate);
+            var scheduleId = ReferenceSpec.Duplicate(ViewDuplicateOption.Duplicate);
             view = _revitRepository.Document.GetElement(scheduleId) as ViewSchedule;
             if(view != null) {
                 view.Name = ViewName;

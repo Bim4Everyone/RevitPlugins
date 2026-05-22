@@ -49,6 +49,7 @@ internal class MainViewModel : BaseViewModel {
     private List<ViewSection> _sectionViewTemplates;
     private List<ViewFamilyType> _structuralPlanViewFamilyTypes;
     private List<ElementType> _viewportTypes;
+    private List<ViewSchedule> _specsInPj;
     private List<TextNoteType> _textNoteTypes;
     private List<Family> _genericAnnotationFamilies;
     private List<View> _legendsInProject;
@@ -156,6 +157,11 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _viewportTypes, value);
     }
 
+    public List<ViewSchedule> SpecsInPj {
+        get => _specsInPj;
+        set => RaiseAndSetIfChanged(ref _specsInPj, value);
+    }
+
     public List<TextNoteType> TextNoteTypes {
         get => _textNoteTypes;
         set => RaiseAndSetIfChanged(ref _textNoteTypes, value);
@@ -233,6 +239,7 @@ internal class MainViewModel : BaseViewModel {
         PlanViewTemplates = _revitRepository.PlanViewTemplates;
         SectionViewTemplates = _revitRepository.SectionViewTemplates;
         ViewportTypes = _revitRepository.ViewportTypes;
+        SpecsInPj = _revitRepository.Specs;
         TextNoteTypes = _revitRepository.TextNoteTypes;
         GenericAnnotationFamilies = _revitRepository.GenericAnnotationFamilies;
         LegendsInProject = _revitRepository.LegendsInProject;

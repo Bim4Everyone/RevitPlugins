@@ -90,7 +90,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
 
-                ReferenceViewName = vm.ReferenceViewName,
+                ReferenceViewName = vm.ReferenceSpec.Name,
                 ViewName = vm.ViewName,
                 ViewColumn = vm.ViewColumn,
                 ViewCount = vm.ViewCount,
