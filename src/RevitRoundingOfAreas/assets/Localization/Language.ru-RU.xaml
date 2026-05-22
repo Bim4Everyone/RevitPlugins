@@ -2,10 +2,28 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+    <system:String x:Key="MainWindow.Title">Рассчитать площади (соц. объекты)</system:String>
+    <system:String x:Key="MainWindow.RangeElements">Диапазон обработки элементов модели</system:String>
+    <system:String x:Key="MainWindow.RangeElementsDescription">Выбор варианта обработки элементов модели</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.Stady">Стадия помещений</system:String>
+    <system:String x:Key="MainWindow.StadyDescription">Выбор стадии для обрабатываемых помещений</system:String>
+
+    <system:String x:Key="MainWindow.SourceArea">Параметр для чтения</system:String>
+    <system:String x:Key="MainWindow.SourceAreaDescription">Параметр, с которого будет считываться площадь</system:String>
+
+    <system:String x:Key="MainWindow.TargetArea">Параметр для записи</system:String>
+    <system:String x:Key="MainWindow.TargetAreaDescription">Параметр, в который будет записываться площадь</system:String>
+
+    <system:String x:Key="MainWindow.DigitCount">Количество знаков после запятой</system:String>
+    <system:String x:Key="MainWindow.DigitCountDescription">До которого будет происходить округление</system:String>
+
+    <system:String x:Key="MainWindow.Levels">Уровни помещений</system:String>
+    <system:String x:Key="MainWindow.LevelsDescription">Уровни помещений, которые будут обработаны</system:String>
+    <system:String x:Key="MainWindow.CheckedAllLevels">Выбрать все уровни</system:String>
+    <system:String x:Key="MainWindow.SearchTextLevels">Поиск по имени уровня</system:String>
+    <system:String x:Key="MainWindow.NotCheckedAllLevels">Сбросить выбор уровней</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">Рассчитать</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>

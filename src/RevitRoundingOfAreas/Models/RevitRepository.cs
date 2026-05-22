@@ -4,12 +4,6 @@ using Autodesk.Revit.UI;
 
 namespace RevitRoundingOfAreas.Models;
 
-/// <summary>
-/// Класс доступа к документу и приложению Revit.
-/// </summary>
-/// <remarks>
-/// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
-/// </remarks>
 internal class RevitRepository {
     /// <summary>
     /// Создает экземпляр репозитория.
@@ -23,19 +17,21 @@ internal class RevitRepository {
     /// Класс доступа к интерфейсу Revit.
     /// </summary>
     public UIApplication UIApplication { get; }
-    
+
     /// <summary>
     /// Класс доступа к интерфейсу документа Revit.
     /// </summary>
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    
+
     /// <summary>
     /// Класс доступа к приложению Revit.
     /// </summary>
     public Application Application => UIApplication.Application;
-    
+
     /// <summary>
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
+
+
 }

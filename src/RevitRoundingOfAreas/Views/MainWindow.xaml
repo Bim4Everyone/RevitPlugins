@@ -6,20 +6,22 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitRoundingOfAreas.Views"
+    xmlns:edits="clr-namespace:RevitRoundingOfAreas.Views.Edits"
     xmlns:vms="clr-namespace:RevitRoundingOfAreas.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:views="clr-namespace:RevitRoundingOfAreas.Views"
    
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="500"
-    Width="700"
+    Height="550"
+    Width="1315"
     
-    MinHeight="500"
-    MinWidth="700"
+    MinHeight="550"
+    MinWidth="1315"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -27,7 +29,7 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
         </i:EventTrigger>
-    </i:Interaction.Triggers>
+    </i:Interaction.Triggers>    
 
     <Grid>
         <Grid.RowDefinitions>
@@ -35,40 +37,175 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
-        <ui:TitleBar
-            Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="800"/>
+            <ColumnDefinition Width="500" />
+        </Grid.ColumnDefinitions>
+
+            <ui:TitleBar
+            Grid.Row="0"
+            Grid.ColumnSpan="2"
+            Icon="{ui:SymbolIcon animalCat24, FontSize=20}"
+            Title="{me:LocalizationSource MainWindow.Title}"
+            FontSize="14"
+            FontWeight="DemiBold" />
+
+        <ScrollViewer
+            Margin="10,0,0,0"
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon fullScreenMaximize24}"
+                    Header="{me:LocalizationSource MainWindow.RangeElements}"
+                    Description="{me:LocalizationSource MainWindow.RangeElementsDescription}">
+                    <ComboBox
+                        ItemsSource="{Binding RangeElements}"
+                        SelectedValue="{Binding SelectedRangeElements}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon slideArrowRight24}"
+                    Header="{me:LocalizationSource MainWindow.Stady}"
+                    Description="{me:LocalizationSource MainWindow.StadyDescription}">
+                    <ComboBox
+                        ItemsSource="{Binding Stady}"
+                        SelectedValue="{Binding SelectedStady}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon multiselectLtr24}"
+                    Header="{me:LocalizationSource MainWindow.SourceArea}"
+                    Description="{me:LocalizationSource MainWindow.SourceAreaDescription}">
+                    <ComboBox
+                        ItemsSource="{Binding SourceArea}"
+                        SelectedValue="{Binding SelectedSourceArea}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon multiselectRtl24}"
+                    Header="{me:LocalizationSource MainWindow.TargetArea}"
+                    Description="{me:LocalizationSource MainWindow.TargetAreaDescription}">
+                    <ComboBox
+                        ItemsSource="{Binding TargetArea}"
+                        SelectedValue="{Binding SelectedTargetArea}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon numberRow24}"
+                    Header="{me:LocalizationSource MainWindow.DigitCount}"
+                    Description="{me:LocalizationSource MainWindow.DigitCountDescription}">
+                    <ComboBox
+                        ItemsSource="{Binding DigitCount}"
+                        SelectedValue="{Binding SelectedDigitCount}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <ScrollViewer
+            VerticalAlignment="Top"
+            Height="500"
+            Grid.Row="1"
+            Grid.Column="1"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled">
+            <edits:CustomGroupEditControl                
+                VerticalAlignment="Top"
+                Icon="{ui:SymbolIcon tableResizeRow24}"
+                Header="{me:LocalizationSource MainWindow.Levels}"
+                Description="{me:LocalizationSource MainWindow.LevelsDescription}"
+                ExtraIconVisible="False">
+                <edits:CustomGroupEditControl.EditControl>
+                    <StackPanel>
+                        <Border
+                            Margin="5"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch"
+                            Background="{DynamicResource CardBackground}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            CornerRadius="{DynamicResource ControlCornerRadius}"
+                            BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
+                            <StackPanel
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                                <RadioButton
+                                    Margin="20,0,0,0"
+                                    GroupName="Choise"
+                                    Content="{me:LocalizationSource MainWindow.CheckedAllLevels}"
+                                    IsChecked="{Binding IsCheckedAllLevels, Mode=TwoWay}"
+                                    Command="{Binding CheckAllLevelsCommand}" />
+                                <RadioButton
+                                    Margin="20,0,0,0"
+                                    GroupName="Choise"
+                                    Content="{me:LocalizationSource MainWindow.NotCheckedAllLevels}"
+                                    Command="{Binding UncheckAllLevelsCommand}" />
+                            </StackPanel>
+                        </Border>
+                        <ui:AutoSuggestBox
+                            Margin="5,0,5,20"
+                            Icon="{ui:SymbolIcon Search24}"
+                            Text="{Binding SearchTextLevels, Mode=TwoWay}"
+                            PlaceholderText="{me:LocalizationSource MainWindow.SearchTextLevels}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger
+                                    EventName="TextChanged">
+                                    <i:InvokeCommandAction
+                                        Command="{Binding SearchLevelsCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ui:AutoSuggestBox>
+                        <ItemsControl
+                            ItemsSource="{Binding FilteredLevels}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate
+                                    DataType="{x:Type vms:LevelViewModel}">
+                                    <edits:ItemControl
+                                        ItemName="{Binding Name}"
+                                        IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                        HasWarning="False" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid
+                                        Columns="1" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </StackPanel>
+                </edits:CustomGroupEditControl.EditControl>
+            </edits:CustomGroupEditControl>
+        </ScrollViewer>
 
         <StackPanel
             Grid.Row="2"
+            Grid.ColumnSpan="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
-
+            
             <ui:TextBlock
                 Margin="10"
                 Foreground="Orange"
                 VerticalAlignment="Center"
-                Text="{Binding ErrorText}" />
-
+                Text="{Binding ErrorText}" />  
+            
             <ui:Button
-                Margin="10"
-                Width="80"
+                Margin="10,10,5,10"
+                Width="100"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
-                Margin="10"
-                Width="80"
+                Margin="10,10,5,10"
+                Width="100"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
