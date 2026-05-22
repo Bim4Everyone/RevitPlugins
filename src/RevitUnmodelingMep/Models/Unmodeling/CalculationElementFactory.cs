@@ -9,6 +9,8 @@ using Autodesk.Revit.DB.Plumbing;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
+
 
 using RevitUnmodelingMep.Models.Entities;
 
@@ -164,13 +166,105 @@ internal sealed class CalculationElementFactory {
         return calculationElement;
     }
 
-    private CalculationElementBase CreateDuctInsulation(DuctInsulation ductIns) {
-        CalculationElementDuctIns calculationElement = new CalculationElementDuctIns(ductIns) {
-            ProjectStock = _projectStockProvider.Get(BuiltInCategory.OST_DuctInsulations)
-        };
+    
+    private double GetFittingArea(Element element) {
+        double area = 0;
 
-        MEPCurve duct = (MEPCurve) _doc.GetElement(ductIns.HostElementId);
-        DuctType ductType = (DuctType) duct.GetElementType();
+        foreach(Solid solid in element.GetSolids()) {
+            foreach(Face face in solid.Faces) {
+                area += face.Area;
+            }
+        }
+
+        double areaM2 = ToRoundedSquareMeters(area);
+        if(areaM2 <= 0) {
+            return UnitUtils.ConvertToInternalUnits(areaM2, UnitTypeId.SquareMeters);
+        }
+
+        double connectorAreaM2 = 0;
+        foreach(Connector connector in GetConnectors(element)) {
+            if(connector.Shape == ConnectorProfileType.Rectangular) {
+                connectorAreaM2 += ToRoundedSquareMeters(connector.Height * connector.Width);
+            }
+            if(connector.Shape == ConnectorProfileType.Round) {
+                connectorAreaM2 += ToRoundedSquareMeters(connector.Radius * connector.Radius * Math.PI);
+            }
+        }
+
+        return UnitUtils.ConvertToInternalUnits(areaM2 - connectorAreaM2, UnitTypeId.SquareMeters);
+    }
+
+    private static double ToRoundedSquareMeters(double value) {
+        return Math.Round(UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.SquareMeters), 2);
+    }
+
+    private List<Connector> GetConnectors(Element element) {
+        if(element is not FamilyInstance instance || instance.MEPModel?.ConnectorManager == null) {
+            return new List<Connector>();
+        }
+
+        return instance.MEPModel.ConnectorManager.Connectors.Cast<Connector>().ToList();
+    }
+
+    private void SetDuctInsulationFittingGeometry(CalculationElementDuctIns calculationElement, Element fitting) {
+        List<Connector> connectors = GetConnectors(fitting);
+        if(connectors.Count == 0) {
+            SetEmptyDuctInsulationValues(calculationElement);
+            return;
+        }
+
+        Connector connector = connectors
+            .OrderByDescending(GetConnectorArea)
+            .First();
+        calculationElement.Length_mm = GetMaxConnectorDistance(connectors);
+
+        if(connector.Shape == ConnectorProfileType.Round) {
+            double diameter = connector.Radius * 2;
+
+            calculationElement.IsRound = true;
+            calculationElement.Diameter_mm = diameter;
+            calculationElement.Perimeter_mm = Math.PI * diameter;
+        } else if(connector.Shape == ConnectorProfileType.Rectangular) {
+            calculationElement.IsRound = false;
+            calculationElement.Width_mm = connector.Width;
+            calculationElement.Height_mm = connector.Height;
+            calculationElement.Perimeter_mm = connector.Width * 2 + connector.Height * 2;
+        }
+    }
+
+    private static double GetConnectorArea(Connector connector) {
+        if(connector.Shape == ConnectorProfileType.Rectangular) {
+            return connector.Height * connector.Width;
+        }
+        if(connector.Shape == ConnectorProfileType.Round) {
+            return connector.Radius * connector.Radius * Math.PI;
+        }
+
+        return 0;
+    }
+
+    private static double GetMaxConnectorDistance(IReadOnlyList<Connector> connectors) {
+        if(connectors.Count < 2) {
+            return 0;
+        }
+
+        double maxDistance = 0;
+        for(int i = 0; i < connectors.Count - 1; i++) {
+            for(int j = i + 1; j < connectors.Count; j++) {
+                double distance = connectors[i].Origin.DistanceTo(connectors[j].Origin);
+                if(distance > maxDistance) {
+                    maxDistance = distance;
+                }
+            }
+        }
+
+        return maxDistance;
+    }
+
+    private static void SetDuctInsulationCurveGeometry(
+        CalculationElementDuctIns calculationElement,
+        DuctInsulation ductIns,
+        DuctType ductType) {
 
         if(ductType.Shape == ConnectorProfileType.Round) {
             calculationElement.IsRound = true;
@@ -182,12 +276,61 @@ internal sealed class CalculationElementFactory {
             calculationElement.Height_mm = ductIns.Height;
             calculationElement.Perimeter_mm = ductIns.Width * 2 + ductIns.Height * 2;
         }
+    }
 
+    private static bool IsMultiPortFitting(Element element) {
+        return element is FamilyInstance { MEPModel: MechanicalFitting fitting }
+               && fitting.PartType == PartType.MultiPort;
+    }
+
+    private static void SetEmptyDuctInsulationValues(CalculationElementDuctIns calculationElement) {
+        calculationElement.SystemSharedName = string.Empty;
+        calculationElement.SystemTypeName = string.Empty;
+        calculationElement.IsRound = false;
+        calculationElement.Length_mm = 0;
+        calculationElement.Diameter_mm = 0;
+        calculationElement.Width_mm = 0;
+        calculationElement.Height_mm = 0;
+        calculationElement.Perimeter_mm = 0;
+        calculationElement.Area_m2 = 0;
+    }
+
+    private CalculationElementBase CreateDuctInsulation(DuctInsulation ductIns) {
+        CalculationElementDuctIns calculationElement = new CalculationElementDuctIns(ductIns) {
+            ProjectStock = _projectStockProvider.Get(BuiltInCategory.OST_DuctInsulations)
+        };
+
+        var insulationHost = _doc.GetElement(ductIns.HostElementId);
+        if(insulationHost.Category.IsId(BuiltInCategory.OST_DuctFitting) && IsMultiPortFitting(insulationHost)) {
+            SetEmptyDuctInsulationValues(calculationElement);
+            return calculationElement;
+        }
+        
         calculationElement.SystemSharedName =
             ductIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
-        calculationElement.SystemTypeName = duct?.MEPSystem?.GetElementType()?.Name ?? string.Empty;
-        calculationElement.Area_m2 = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+        
         calculationElement.Length_mm = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
+
+        if(insulationHost.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
+            calculationElement.Area_m2 = GetFittingArea(insulationHost);
+            
+            calculationElement.SystemTypeName =
+                insulationHost.get_Parameter(BuiltInParameter.RBS_DUCT_SYSTEM_TYPE_PARAM).AsValueString();
+
+            SetDuctInsulationFittingGeometry(calculationElement, insulationHost);
+            
+            return calculationElement;
+        }
+        calculationElement.Area_m2 = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.RBS_CURVE_SURFACE_AREA);
+        MEPCurve duct = insulationHost as MEPCurve;
+        if(duct == null) {
+            return calculationElement;
+        }
+        
+        calculationElement.SystemTypeName = duct.MEPSystem?.GetElementType()?.Name ?? string.Empty;
+        
+        DuctType ductType = (DuctType) duct.GetElementType();
+        SetDuctInsulationCurveGeometry(calculationElement, ductIns, ductType);
 
         return calculationElement;
     }

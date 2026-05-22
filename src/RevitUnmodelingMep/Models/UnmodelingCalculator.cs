@@ -54,19 +54,19 @@ internal class UnmodelingCalculator {
                 draftRow.CalculationElement ?? _calculationElementFactory.Create(draftRow.Element);
 
             draftRow.CalculationElement = calcElement;
-            draftRow.Number = _formulaEvaluator.Evaluate(config.Formula, calcElement);
+            draftRow.Number = Math.Round(_formulaEvaluator.Evaluate(config.Formula, calcElement), 2);
             draftRow.NoteValue = string.IsNullOrWhiteSpace(config.NoteValue)
                 ? 0
-                : _formulaEvaluator.Evaluate(config.NoteValue, calcElement);
+                : Math.Round(_formulaEvaluator.Evaluate(config.NoteValue, calcElement), 2);
             calculationElements.Add(calcElement);
         }
 
         NewRowElement baseRow = draftRows[0];
         double totalNumber = draftRows.Sum(r => r.Number);
         double totalNoteValue = draftRows.Sum(r => r.NoteValue);
-        totalNoteValue = Math.Round(totalNoteValue, 2, MidpointRounding.AwayFromZero);
 
-        totalNumber = Math.Round(totalNumber, 2, MidpointRounding.AwayFromZero);
+        totalNumber = Math.Round(totalNumber, 2);
+        totalNoteValue = Math.Round(totalNoteValue, 2);
         if(config.RoundUpTotal) {
             totalNumber = System.Math.Ceiling(totalNumber);
         }

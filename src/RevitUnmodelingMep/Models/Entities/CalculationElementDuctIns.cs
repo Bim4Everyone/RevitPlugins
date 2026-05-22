@@ -13,7 +13,7 @@ internal sealed class CalculationElementDuctIns : CalculationElementBase {
     public CalculationElementDuctIns(Element element) : base(element) {
     }
 
-    public bool IsRound { get; set; }
+    public bool? IsRound { get; set; }
 
     public double ProjectStock { get; set; }
 
