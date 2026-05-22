@@ -342,6 +342,7 @@
                 Grid.Column="0"
                 Grid.Row="1"
                 Margin="5"
+                VerticalAlignment="Center"
                 Text="Имя итоговой" />
 
             <TextBox
@@ -358,7 +359,7 @@
                 VerticalAlignment="Center"
                 Text="Ряд размещения" />
 
-            <TextBox
+            <ui:NumberBox
                 Grid.Column="1"
                 Grid.Row="2"
                 Margin="5"

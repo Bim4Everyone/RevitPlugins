@@ -48,7 +48,8 @@
             Foreground="Orange"
             VerticalAlignment="Center"
             HorizontalAlignment="Right"
-            Visibility="{Binding Path=HasErrors, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            Visibility="{Binding Path=HasErrors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, 
+                Converter={StaticResource BoolToVisibilityConverter}}"/>
 
         <CheckBox
             Grid.Column="2"

@@ -136,7 +136,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewCount = data.ViewCount ?? "1",
             },
 
-            ScheduleViewData data => new ScheduleViewVM(sheetVM, _localizationService) {
+            ScheduleViewData data => new ScheduleViewVM(sheetVM, _revitRepository, _localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,

@@ -38,6 +38,7 @@ internal class RevitRepository {
         TitleBlockFamilies = GetTitleBlockFamilies();
         Sheets = GetSheets();
         Views = GetViews();
+        Specs = GetSpecs();
     }
 
     /// <summary>
@@ -73,6 +74,7 @@ internal class RevitRepository {
     public List<Family> TitleBlockFamilies { get; }
     public List<ViewSheet> Sheets { get; set; }
     public List<View> Views { get; set; }
+    public List<ViewSchedule> Specs { get; set; }
 
 
     /// <summary>
@@ -186,6 +188,11 @@ internal class RevitRepository {
         .OfType<View>()
         .ToList();
 
+    public List<ViewSchedule> GetSpecs() => new FilteredElementCollector(Document)
+        .OfClass(typeof(ViewSchedule))
+        .OfType<ViewSchedule>()
+        .ToList();
+
 
     public ViewSheet GetSheetByName(string sheetName) {
         return Sheets
@@ -196,6 +203,12 @@ internal class RevitRepository {
         return Views
             .FirstOrDefault(o => o.Name.Equals(viewName));
     }
+
+    internal ViewSchedule GetSpecByName(string viewName) {
+        return Specs
+            .FirstOrDefault(o => o.Name.Equals(viewName));
+    }
+
 
     public FamilyInstance GetTitleBlocks(ViewSheet viewSheet) {
         return new FilteredElementCollector(Document, viewSheet.Id)
