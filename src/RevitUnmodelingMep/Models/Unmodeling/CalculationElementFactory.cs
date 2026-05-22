@@ -263,17 +263,38 @@ internal sealed class CalculationElementFactory {
         }
     }
 
+    private static bool IsMultiPortFitting(Element element) {
+        return element is FamilyInstance { MEPModel: MechanicalFitting fitting }
+               && fitting.PartType == PartType.MultiPort;
+    }
+
+    private static void SetEmptyDuctInsulationValues(CalculationElementDuctIns calculationElement) {
+        calculationElement.SystemSharedName = string.Empty;
+        calculationElement.SystemTypeName = string.Empty;
+        calculationElement.IsRound = false;
+        calculationElement.Length_mm = 0;
+        calculationElement.Diameter_mm = 0;
+        calculationElement.Width_mm = 0;
+        calculationElement.Height_mm = 0;
+        calculationElement.Perimeter_mm = 0;
+        calculationElement.Area_m2 = 0;
+    }
+
     private CalculationElementBase CreateDuctInsulation(DuctInsulation ductIns) {
         CalculationElementDuctIns calculationElement = new CalculationElementDuctIns(ductIns) {
             ProjectStock = _projectStockProvider.Get(BuiltInCategory.OST_DuctInsulations)
         };
+
+        var insulationHost = _doc.GetElement(ductIns.HostElementId);
+        if(insulationHost.Category.IsId(BuiltInCategory.OST_DuctFitting) && IsMultiPortFitting(insulationHost)) {
+            SetEmptyDuctInsulationValues(calculationElement);
+            return calculationElement;
+        }
         
         calculationElement.SystemSharedName =
             ductIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
         
         calculationElement.Length_mm = ductIns.GetParamValueOrDefault<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
-        
-        var insulationHost = _doc.GetElement(ductIns.HostElementId);
 
         if(insulationHost.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
             calculationElement.Area_m2 = GetFittingArea(insulationHost);
