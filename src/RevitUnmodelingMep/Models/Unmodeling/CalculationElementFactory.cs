@@ -208,10 +208,13 @@ internal sealed class CalculationElementFactory {
     private void SetDuctInsulationFittingGeometry(CalculationElementDuctIns calculationElement, Element fitting) {
         List<Connector> connectors = GetConnectors(fitting);
         if(connectors.Count == 0) {
+            SetEmptyDuctInsulationValues(calculationElement);
             return;
         }
 
-        Connector connector = connectors.First();
+        Connector connector = connectors
+            .OrderByDescending(GetConnectorArea)
+            .First();
         calculationElement.Length_mm = GetMaxConnectorDistance(connectors);
 
         if(connector.Shape == ConnectorProfileType.Round) {
@@ -226,6 +229,17 @@ internal sealed class CalculationElementFactory {
             calculationElement.Height_mm = connector.Height;
             calculationElement.Perimeter_mm = connector.Width * 2 + connector.Height * 2;
         }
+    }
+
+    private static double GetConnectorArea(Connector connector) {
+        if(connector.Shape == ConnectorProfileType.Rectangular) {
+            return connector.Height * connector.Width;
+        }
+        if(connector.Shape == ConnectorProfileType.Round) {
+            return connector.Radius * connector.Radius * 3.14;
+        }
+
+        return 0;
     }
 
     private static double GetMaxConnectorDistance(IReadOnlyList<Connector> connectors) {
