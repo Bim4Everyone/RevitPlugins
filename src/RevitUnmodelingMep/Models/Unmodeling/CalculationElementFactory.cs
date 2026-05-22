@@ -170,9 +170,10 @@ internal sealed class CalculationElementFactory {
     private double GetFittingArea(Element element) {
         double area = 0;
 
-        foreach(Solid solid in element.GetSolids())
-        foreach(Face face in solid.Faces) {
-            area += face.Area;
+        foreach(Solid solid in element.GetSolids()) {
+            foreach(Face face in solid.Faces) {
+                area += face.Area;
+            }
         }
 
         double areaM2 = ToRoundedSquareMeters(area);
@@ -186,7 +187,7 @@ internal sealed class CalculationElementFactory {
                 connectorAreaM2 += ToRoundedSquareMeters(connector.Height * connector.Width);
             }
             if(connector.Shape == ConnectorProfileType.Round) {
-                connectorAreaM2 += ToRoundedSquareMeters(connector.Radius * connector.Radius * 3.14);
+                connectorAreaM2 += ToRoundedSquareMeters(connector.Radius * connector.Radius * Math.PI);
             }
         }
 
@@ -236,7 +237,7 @@ internal sealed class CalculationElementFactory {
             return connector.Height * connector.Width;
         }
         if(connector.Shape == ConnectorProfileType.Round) {
-            return connector.Radius * connector.Radius * 3.14;
+            return connector.Radius * connector.Radius * Math.PI;
         }
 
         return 0;
