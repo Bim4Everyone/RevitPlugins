@@ -166,6 +166,7 @@ internal sealed class CalculationElementFactory {
         return calculationElement;
     }
 
+    
     private double GetFittingArea(Element element) {
         double area = 0;
 
@@ -174,21 +175,26 @@ internal sealed class CalculationElementFactory {
             area += face.Area;
         }
 
-        if(area <= 0) {
-            return area;
+        double areaM2 = ToRoundedSquareMeters(area);
+        if(areaM2 <= 0) {
+            return UnitUtils.ConvertToInternalUnits(areaM2, UnitTypeId.SquareMeters);
         }
 
-        double connectorArea = 0;
+        double connectorAreaM2 = 0;
         foreach(Connector connector in GetConnectors(element)) {
             if(connector.Shape == ConnectorProfileType.Rectangular) {
-                connectorArea += connector.Height * connector.Width;
+                connectorAreaM2 += ToRoundedSquareMeters(connector.Height * connector.Width);
             }
             if(connector.Shape == ConnectorProfileType.Round) {
-                connectorArea += Math.PI * Math.Pow(connector.Radius, 2);
+                connectorAreaM2 += ToRoundedSquareMeters(connector.Radius * connector.Radius * 3.14);
             }
         }
 
-        return area - connectorArea;
+        return UnitUtils.ConvertToInternalUnits(areaM2 - connectorAreaM2, UnitTypeId.SquareMeters);
+    }
+
+    private static double ToRoundedSquareMeters(double value) {
+        return Math.Round(UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.SquareMeters), 2);
     }
 
     private List<Connector> GetConnectors(Element element) {
@@ -197,6 +203,64 @@ internal sealed class CalculationElementFactory {
         }
 
         return instance.MEPModel.ConnectorManager.Connectors.Cast<Connector>().ToList();
+    }
+
+    private void SetDuctInsulationFittingGeometry(CalculationElementDuctIns calculationElement, Element fitting) {
+        List<Connector> connectors = GetConnectors(fitting);
+        if(connectors.Count == 0) {
+            return;
+        }
+
+        Connector connector = connectors.First();
+        calculationElement.Length_mm = GetMaxConnectorDistance(connectors);
+
+        if(connector.Shape == ConnectorProfileType.Round) {
+            double diameter = connector.Radius * 2;
+
+            calculationElement.IsRound = true;
+            calculationElement.Diameter_mm = diameter;
+            calculationElement.Perimeter_mm = Math.PI * diameter;
+        } else if(connector.Shape == ConnectorProfileType.Rectangular) {
+            calculationElement.IsRound = false;
+            calculationElement.Width_mm = connector.Width;
+            calculationElement.Height_mm = connector.Height;
+            calculationElement.Perimeter_mm = connector.Width * 2 + connector.Height * 2;
+        }
+    }
+
+    private static double GetMaxConnectorDistance(IReadOnlyList<Connector> connectors) {
+        if(connectors.Count < 2) {
+            return 0;
+        }
+
+        double maxDistance = 0;
+        for(int i = 0; i < connectors.Count - 1; i++) {
+            for(int j = i + 1; j < connectors.Count; j++) {
+                double distance = connectors[i].Origin.DistanceTo(connectors[j].Origin);
+                if(distance > maxDistance) {
+                    maxDistance = distance;
+                }
+            }
+        }
+
+        return maxDistance;
+    }
+
+    private static void SetDuctInsulationCurveGeometry(
+        CalculationElementDuctIns calculationElement,
+        DuctInsulation ductIns,
+        DuctType ductType) {
+
+        if(ductType.Shape == ConnectorProfileType.Round) {
+            calculationElement.IsRound = true;
+            calculationElement.Diameter_mm = ductIns.Diameter;
+            calculationElement.Perimeter_mm = Math.PI * ductIns.Diameter;
+        } else {
+            calculationElement.IsRound = false;
+            calculationElement.Width_mm = ductIns.Width;
+            calculationElement.Height_mm = ductIns.Height;
+            calculationElement.Perimeter_mm = ductIns.Width * 2 + ductIns.Height * 2;
+        }
     }
 
     private CalculationElementBase CreateDuctInsulation(DuctInsulation ductIns) {
@@ -216,6 +280,8 @@ internal sealed class CalculationElementFactory {
             
             calculationElement.SystemTypeName =
                 insulationHost.get_Parameter(BuiltInParameter.RBS_DUCT_SYSTEM_TYPE_PARAM).AsValueString();
+
+            SetDuctInsulationFittingGeometry(calculationElement, insulationHost);
             
             return calculationElement;
         }
@@ -228,17 +294,7 @@ internal sealed class CalculationElementFactory {
         calculationElement.SystemTypeName = duct.MEPSystem?.GetElementType()?.Name ?? string.Empty;
         
         DuctType ductType = (DuctType) duct.GetElementType();
-
-        if(ductType.Shape == ConnectorProfileType.Round) {
-            calculationElement.IsRound = true;
-            calculationElement.Diameter_mm = ductIns.Diameter;
-            calculationElement.Perimeter_mm = Math.PI * ductIns.Diameter;
-        } else {
-            calculationElement.IsRound = false;
-            calculationElement.Width_mm = ductIns.Width;
-            calculationElement.Height_mm = ductIns.Height;
-            calculationElement.Perimeter_mm = ductIns.Width * 2 + ductIns.Height * 2;
-        }
+        SetDuctInsulationCurveGeometry(calculationElement, ductIns, ductType);
 
         return calculationElement;
     }
