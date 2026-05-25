@@ -1,6 +1,6 @@
 using Autodesk.Revit.DB;
 
-namespace RevitPackageDocumentation.Models;
+namespace RevitPackageDocumentation.Models.ScheduleFilters;
 internal class ScheduleFieldInfo {
     public ScheduleFieldInfo(ScheduleField field) {
         Field = field;

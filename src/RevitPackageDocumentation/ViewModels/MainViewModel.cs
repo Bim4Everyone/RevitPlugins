@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
+using RevitPackageDocumentation.Models.ScheduleFilters;
 using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Parameters;
@@ -54,6 +56,7 @@ internal class MainViewModel : BaseViewModel {
     private List<Family> _genericAnnotationFamilies;
     private List<View> _legendsInProject;
     private List<Family> _titleBlockFamilies;
+    private IList<ScheduleTypeInfo> _filterTypes;
     private MainWindow _packageDocWindow;
 
     /// <summary>
@@ -182,6 +185,10 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _titleBlockFamilies, value);
     }
 
+    public IList<ScheduleTypeInfo> FilterTypes {
+        get => _filterTypes;
+        set => RaiseAndSetIfChanged(ref _filterTypes, value);
+    }
 
     public List<ComponentTypeItem> ComponentTypes {
         get => _componentTypes;
@@ -244,6 +251,16 @@ internal class MainViewModel : BaseViewModel {
         GenericAnnotationFamilies = _revitRepository.GenericAnnotationFamilies;
         LegendsInProject = _revitRepository.LegendsInProject;
         TitleBlockFamilies = _revitRepository.TitleBlockFamilies;
+
+        FilterTypes = Enum.GetValues(typeof(ScheduleFilterType))
+            .Cast<ScheduleFilterType>()
+            .Where(s => s != ScheduleFilterType.Invalid)
+            .Where(s => s != ScheduleFilterType.HasParameter)
+            .Where(s => s != ScheduleFilterType.IsAssociatedWithGlobalParameter)
+            .Where(s => s != ScheduleFilterType.IsNotAssociatedWithGlobalParameter)
+            .Select(s =>
+                new ScheduleTypeInfo(s, _localizationService.GetLocalizedString($"ScheduleFilterType.{s}") ?? s.ToString()))
+            .ToList();
     }
 
     private void ImportSheetSet() {

@@ -11,6 +11,21 @@
     <system:String x:Key="MainWindow.AddSheetComponent">Добавить компонент листа</system:String>
     <system:String x:Key="MainWindow.AddSheetSetParam">Добавить параметр</system:String>
     
+    <system:String x:Key="ScheduleFilterType.Equal">Равно</system:String>
+    <system:String x:Key="ScheduleFilterType.NotEqual">Не равно</system:String>
+    <system:String x:Key="ScheduleFilterType.GreaterThan">Больше</system:String>
+    <system:String x:Key="ScheduleFilterType.GreaterThanOrEqual">Больше или равно</system:String>
+    <system:String x:Key="ScheduleFilterType.LessThan">Меньше</system:String>
+    <system:String x:Key="ScheduleFilterType.LessThanOrEqual">Меньше или равно</system:String>
+    <system:String x:Key="ScheduleFilterType.Contains">Содержит</system:String>
+    <system:String x:Key="ScheduleFilterType.NotContains">Не содержит</system:String>
+    <system:String x:Key="ScheduleFilterType.BeginsWith">Начинается с</system:String>
+    <system:String x:Key="ScheduleFilterType.NotBeginsWith">Не начинается с</system:String>
+    <system:String x:Key="ScheduleFilterType.EndsWith">Заканчивается на</system:String>
+    <system:String x:Key="ScheduleFilterType.NotEndsWith">Не заканчивается на</system:String>
+    <system:String x:Key="ScheduleFilterType.HasValue">Имеет значение</system:String>
+    <system:String x:Key="ScheduleFilterType.HasNoValue">Не имеет значение</system:String>
+    
     <system:String x:Key="Type.StructuralPlanViewVM">Вид в плане</system:String>
     <system:String x:Key="Type.StructuralCalloutViewVM">Фрагмент</system:String>
     <system:String x:Key="Type.SectionViewVM">Сечение</system:String>

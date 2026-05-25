@@ -41,6 +41,7 @@
 
         <ComboBox
             Grid.Column="1"
+            Margin="5"
             DisplayMemberPath="FieldName"
             ItemsSource="{Binding SpecFields, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             SelectedItem="{Binding SelectedSpecField, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
@@ -55,11 +56,16 @@
 
         <ComboBox
             Grid.Column="2"
-            ItemsSource="{Binding FilterRules, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-            SelectedItem="{Binding SelectedFilterRules, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            Margin="5"
+            DisplayMemberPath="Name"
+            ItemsSource="{Binding 
+                Path=DataContext.FilterTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                RelativeSource={RelativeSource AncestorType=Window}}"
+            SelectedItem="{Binding SelectedFilterType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
         <ui:TextBox
             Grid.Column="3"
+            Margin="5"
             Text="{Binding FilterValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
     </Grid>
 </UserControl>
