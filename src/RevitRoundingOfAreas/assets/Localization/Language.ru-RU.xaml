@@ -6,14 +6,14 @@
     <system:String x:Key="MainWindow.RangeElements">Диапазон обработки элементов модели</system:String>
     <system:String x:Key="MainWindow.RangeElementsDescription">Выбор варианта обработки элементов модели</system:String>
 
-    <system:String x:Key="MainWindow.Stady">Стадия помещений</system:String>
-    <system:String x:Key="MainWindow.StadyDescription">Выбор стадии для обрабатываемых помещений</system:String>
+    <system:String x:Key="MainWindow.Phase">Стадия помещений</system:String>
+    <system:String x:Key="MainWindow.PhaseDescription">Выбор стадии для обрабатываемых помещений</system:String>
 
-    <system:String x:Key="MainWindow.SourceArea">Параметр для чтения</system:String>
-    <system:String x:Key="MainWindow.SourceAreaDescription">Параметр, с которого будет считываться площадь</system:String>
+    <system:String x:Key="MainWindow.SourceParam">Параметр для чтения</system:String>
+    <system:String x:Key="MainWindow.SourceParamDescription">Параметр, с которого будет считываться площадь</system:String>
 
-    <system:String x:Key="MainWindow.TargetArea">Параметр для записи</system:String>
-    <system:String x:Key="MainWindow.TargetAreaDescription">Параметр, в который будет записываться площадь</system:String>
+    <system:String x:Key="MainWindow.TargetParam">Параметр для записи</system:String>
+    <system:String x:Key="MainWindow.TargetParamDescription">Параметр, в который будет записываться площадь</system:String>
 
     <system:String x:Key="MainWindow.DigitCount">Количество знаков после запятой</system:String>
     <system:String x:Key="MainWindow.DigitCountDescription">До которого будет происходить округление</system:String>

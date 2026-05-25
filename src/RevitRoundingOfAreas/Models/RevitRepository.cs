@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+
+using System.Linq;
+
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -32,6 +36,27 @@ internal class RevitRepository {
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
+
+
+
+
+
+    public IEnumerable<PhaseModel> GetPhaseModels() {
+        var phases = Document.Phases;
+        return phases
+            .Cast<Phase>()
+            .Select(phase => new PhaseModel {
+                ElementId = phase.Id,
+                Name = phase.Name
+            });
+    }
+
+    public ElementId GetPhaseIdByName(string name) {
+        return GetPhaseModels()
+            .FirstOrDefault(phase => phase != null && phase.Name == name)
+            ?.ElementId
+            ?? ElementId.InvalidElementId;
+    }
 
 
 }

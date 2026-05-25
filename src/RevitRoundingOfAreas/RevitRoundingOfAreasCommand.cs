@@ -50,6 +50,11 @@ public class RevitRoundingOfAreasCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        // Создание класса с параметрами
+        kernel.Bind<ParamService>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));

@@ -64,33 +64,33 @@
                     <ComboBox
                         ItemsSource="{Binding RangeElements}"
                         SelectedValue="{Binding SelectedRangeElements}"
-                        DisplayMemberPath="Name" />
+                        DisplayMemberPath="Name" />                    
                 </edits:CustomEditControl>
                 <edits:CustomEditControl
                     Icon="{ui:SymbolIcon slideArrowRight24}"
-                    Header="{me:LocalizationSource MainWindow.Stady}"
-                    Description="{me:LocalizationSource MainWindow.StadyDescription}">
+                    Header="{me:LocalizationSource MainWindow.Phase}"
+                    Description="{me:LocalizationSource MainWindow.PhaseDescription}">
                     <ComboBox
-                        ItemsSource="{Binding Stady}"
-                        SelectedValue="{Binding SelectedStady}"
+                        ItemsSource="{Binding Phases}"
+                        SelectedValue="{Binding SelectedPhase}"
                         DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
                 <edits:CustomEditControl
                     Icon="{ui:SymbolIcon multiselectLtr24}"
-                    Header="{me:LocalizationSource MainWindow.SourceArea}"
-                    Description="{me:LocalizationSource MainWindow.SourceAreaDescription}">
+                    Header="{me:LocalizationSource MainWindow.SourceParam}"
+                    Description="{me:LocalizationSource MainWindow.SourceParamDescription}">
                     <ComboBox
-                        ItemsSource="{Binding SourceArea}"
-                        SelectedValue="{Binding SelectedSourceArea}"
+                        ItemsSource="{Binding SourceParams}"
+                        SelectedValue="{Binding SelectedSourceParam}"
                         DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
                 <edits:CustomEditControl
                     Icon="{ui:SymbolIcon multiselectRtl24}"
-                    Header="{me:LocalizationSource MainWindow.TargetArea}"
-                    Description="{me:LocalizationSource MainWindow.TargetAreaDescription}">
+                    Header="{me:LocalizationSource MainWindow.TargetParam}"
+                    Description="{me:LocalizationSource MainWindow.TargetParamDescription}">
                     <ComboBox
-                        ItemsSource="{Binding TargetArea}"
-                        SelectedValue="{Binding SelectedTargetArea}"
+                        ItemsSource="{Binding TargetParams}"
+                        SelectedValue="{Binding SelectedTargetParam}"
                         DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
                 <edits:CustomEditControl

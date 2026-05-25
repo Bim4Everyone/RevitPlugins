@@ -1,4 +1,9 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
+
+using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -13,12 +18,30 @@ namespace RevitRoundingOfAreas.ViewModels;
 /// </summary>
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
+    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly ParamService _paramService;
     private readonly ILocalizationService _localizationService;
 
+    private ConfigSettings _configSettings;
+
+    private ObservableCollection<PhaseViewModel> _phases;
+    private PhaseViewModel _selectedPhase;
+
+    private ObservableCollection<ParamViewModel> _sourceParams;
+    private ParamViewModel _selectedSourceParam;
+
+    private ObservableCollection<ParamViewModel> _targetParams;
+    private ParamViewModel _selectedTargetParam;
+
+    private ObservableCollection<DigitViewModel> _digitCount;
+    private DigitViewModel _selectedDigitCount;
+
+
+    private ObservableCollection<LevelViewModel> _levels;
+
     private string _errorText;
-    private string _saveProperty;
-    
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
@@ -27,11 +50,15 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(
         PluginConfig pluginConfig,
+        SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
+        ParamService paramService,
         ILocalizationService localizationService) {
-        
+
         _pluginConfig = pluginConfig;
+        _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
+        _paramService = paramService;
         _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -42,12 +69,58 @@ internal class MainViewModel : BaseViewModel {
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-    
+
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
+
+    public ObservableCollection<PhaseViewModel> Phases {
+        get => _phases;
+        set => RaiseAndSetIfChanged(ref _phases, value);
+    }
+
+    public PhaseViewModel SelectedPhase {
+        get => _selectedPhase;
+        set => RaiseAndSetIfChanged(ref _selectedPhase, value);
+    }
+
+    public ObservableCollection<ParamViewModel> SourceParams {
+        get => _sourceParams;
+        set => RaiseAndSetIfChanged(ref _sourceParams, value);
+    }
+
+    public ParamViewModel SelectedSourceParam {
+        get => _selectedSourceParam;
+        set => RaiseAndSetIfChanged(ref _selectedSourceParam, value);
+    }
+
+    public ObservableCollection<ParamViewModel> TargetParams {
+        get => _targetParams;
+        set => RaiseAndSetIfChanged(ref _targetParams, value);
+    }
+
+    public ParamViewModel SelectedTargetParam {
+        get => _selectedTargetParam;
+        set => RaiseAndSetIfChanged(ref _selectedTargetParam, value);
+    }
+
+    public ObservableCollection<DigitViewModel> DigitCount {
+        get => _digitCount;
+        set => RaiseAndSetIfChanged(ref _digitCount, value);
+    }
+
+    public DigitViewModel SelectedDigitCount {
+        get => _selectedDigitCount;
+        set => RaiseAndSetIfChanged(ref _selectedDigitCount, value);
+    }
+
+    public ObservableCollection<LevelViewModel> Levels {
+        get => _levels;
+        set => RaiseAndSetIfChanged(ref _levels, value);
+    }
+
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -57,20 +130,73 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
+
+    // Метод получения коллекции DigitViewModel для DigitCount
+    private IEnumerable<DigitViewModel> GetDigitViewModels() {
+        for(int i = 1; i <= 3; i++) {
+            yield return new DigitViewModel {
+                DigitCount = i,
+                Name = i.ToString(),
+            };
+        }
     }
 
+    // Метод получения коллекции ParamViewModel для TargetParams
+    private IEnumerable<ParamViewModel> GetTargetParamViewModels() {
+        return _paramService.AllRevitParams
+            .Select(param => new ParamViewModel {
+                Name = param.Name,
+                RevitParam = param
+            })
+            .Where(param => param.RevitParam.StorageType is StorageType.String);
+    }
+
+    // Метод получения коллекции ParamViewModel для SourceParams
+    private IEnumerable<ParamViewModel> GetSourceParamViewModels() {
+        return _paramService.AllRevitParams
+            .Select(param => new ParamViewModel {
+                Name = param.Name,
+                RevitParam = param
+            })
+            .Where(param => param.RevitParam.StorageType is StorageType.Double);
+    }
+
+    // Метод получения коллекции PhaseViewModel для Phases
+    private IEnumerable<PhaseViewModel> GetPhaseViewModels() {
+        return _revitRepository.GetPhaseModels()
+            .Select(phase => new PhaseViewModel {
+                Name = phase.Name,
+                ElementId = phase.ElementId
+            });
+    }
+
+
     /// <summary>
-    /// Метод загрузки главного окна.
+    /// Метод загрузки главного окна
     /// </summary>
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
         LoadConfig();
+
+        Phases = new ObservableCollection<PhaseViewModel>(GetPhaseViewModels());
+        SelectedPhase = Phases
+            .FirstOrDefault(phase => phase.ElementId == _configSettings.SelectedPhaseId)
+            ?? Phases.LastOrDefault();
+
+        SourceParams = new ObservableCollection<ParamViewModel>(GetSourceParamViewModels());
+        SelectedSourceParam = SourceParams
+            .FirstOrDefault(param => param.RevitParam.Id == _configSettings.SourceParam?.Id)
+            ?? SourceParams.FirstOrDefault();
+
+        TargetParams = new ObservableCollection<ParamViewModel>(GetTargetParamViewModels());
+        SelectedTargetParam = TargetParams
+            .FirstOrDefault(param => param.RevitParam.Id == _configSettings.TargetParam?.Id)
+            ?? TargetParams.FirstOrDefault();
+
+        DigitCount = new ObservableCollection<DigitViewModel>(GetDigitViewModels());
+        SelectedDigitCount = DigitCount
+            .FirstOrDefault(digit => digit.DigitCount == _configSettings.DigitCount)
+            ?? DigitCount.FirstOrDefault();
     }
 
     /// <summary>
@@ -92,11 +218,6 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-            return false;
-        }
-
         ErrorText = null;
         return true;
     }
@@ -105,19 +226,35 @@ internal class MainViewModel : BaseViewModel {
     /// Загрузка настроек плагина.
     /// </summary>
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        _configSettings = setting?.ConfigSettings ?? new ConfigSettings();
+        ApplyDefaultsConfig();
+    }
 
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+    // Метод применения дефолтных значений настроек.
+    private void ApplyDefaultsConfig() {
+        if(_configSettings.SelectedPhaseId is null || _configSettings.SelectedPhaseId == ElementId.InvalidElementId) {
+            var phaseId = _revitRepository.GetPhaseIdByName(_systemPluginConfig.DefaultPhaseName);
+
+            var sourceParam = _paramService.AllRevitParams
+                .FirstOrDefault();
+
+            _configSettings.SelectedPhaseId = phaseId;
+            _configSettings.SourceParam = sourceParam;
+        }
     }
 
     /// <summary>
     /// Сохранение настроек плагина.
     /// </summary>
     private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.SaveProperty = SaveProperty;
+        _configSettings.SelectedPhaseId = SelectedPhase.ElementId;
+        _configSettings.SourceParam = SelectedSourceParam.RevitParam;
+
+        setting.ConfigSettings = _configSettings;
         _pluginConfig.SaveProjectConfig();
     }
 }
