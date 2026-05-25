@@ -26,4 +26,13 @@
 
     <system:String x:Key="MainWindow.ButtonOk">Рассчитать</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String
+        x:Key="MainViewModel.AllElementsProvider">Все элементы</system:String>
+    <system:String
+        x:Key="MainViewModel.SelectedElementsProvider">Выделенные</system:String>
+    <system:String
+        x:Key="MainViewModel.CurrentViewProvider">Видимые на виде</system:String>
+    
+    
 </ResourceDictionary>

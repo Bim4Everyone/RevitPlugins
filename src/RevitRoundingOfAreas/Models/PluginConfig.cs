@@ -1,7 +1,12 @@
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SharedParams;
 
 using pyRevitLabs.Json;
+
+using RevitRoundingOfAreas.Models.Enums;
 
 namespace RevitRoundingOfAreas.Models;
 
@@ -53,10 +58,24 @@ internal class RevitSettings : ProjectSettings {
 
 internal class SystemPluginConfig {
 
+    // Режим выбора провайдера элементов по умолчанию
+    public ElementsProviderType DefaultProvider => ElementsProviderType.AllElementsProvider;
+
     // Название стадии по умолчанию
     public string DefaultPhaseName => "Основная планировка";
 
-    // Количество знаков по умолчанию
+    // Количество вариантов знаков по умолчанию
+    public int DefaultDigitCountRange => 3;
+
+    // Количество знаков по умолчанию 
     public int DefaultDigitCount => 1;
+
+    // Системный параметр площади помещений по умолчанию
+    public BuiltInParameter SystemRoomAreaParamId = BuiltInParameter.ROOM_AREA;
+
+    // Общий параметр площади помещений по умолчанию
+    public RevitParam RoomAreaParam = SharedParamsConfig.Instance.RoomArea;
+
+
 
 }

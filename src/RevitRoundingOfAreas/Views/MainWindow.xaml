@@ -11,17 +11,16 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    xmlns:views="clr-namespace:RevitRoundingOfAreas.Views"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"    
    
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="550"
-    Width="1315"
+    Height="540"
+    Width="950"
     
-    MinHeight="550"
-    MinWidth="1315"
+    MinHeight="540"
+    MinWidth="950"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -38,21 +37,15 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="800"/>
-            <ColumnDefinition Width="500" />
-        </Grid.ColumnDefinitions>
-
             <ui:TitleBar
             Grid.Row="0"
-            Grid.ColumnSpan="2"
             Icon="{ui:SymbolIcon animalCat24, FontSize=20}"
             Title="{me:LocalizationSource MainWindow.Title}"
             FontSize="14"
             FontWeight="DemiBold" />
 
         <ScrollViewer
-            Margin="10,0,0,0"
+            Margin="10,0,10,0"
             Grid.Row="1"
             VerticalScrollBarVisibility="Auto"
             HorizontalScrollBarVisibility="Disabled">
@@ -61,10 +54,10 @@
                     Icon="{ui:SymbolIcon fullScreenMaximize24}"
                     Header="{me:LocalizationSource MainWindow.RangeElements}"
                     Description="{me:LocalizationSource MainWindow.RangeElementsDescription}">
-                    <ComboBox
-                        ItemsSource="{Binding RangeElements}"
-                        SelectedValue="{Binding SelectedRangeElements}"
-                        DisplayMemberPath="Name" />                    
+                    <edits:ModeSwitcherControl                        
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding SelectedRange}"
+                        ItemsSource="{Binding Range}" />
                 </edits:CustomEditControl>
                 <edits:CustomEditControl
                     Icon="{ui:SymbolIcon slideArrowRight24}"
@@ -80,7 +73,7 @@
                     Header="{me:LocalizationSource MainWindow.SourceParam}"
                     Description="{me:LocalizationSource MainWindow.SourceParamDescription}">
                     <ComboBox
-                        ItemsSource="{Binding SourceParams}"
+                        ItemsSource="{Binding Params}"
                         SelectedValue="{Binding SelectedSourceParam}"
                         DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
@@ -89,7 +82,7 @@
                     Header="{me:LocalizationSource MainWindow.TargetParam}"
                     Description="{me:LocalizationSource MainWindow.TargetParamDescription}">
                     <ComboBox
-                        ItemsSource="{Binding TargetParams}"
+                        ItemsSource="{Binding Params}"
                         SelectedValue="{Binding SelectedTargetParam}"
                         DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
@@ -104,88 +97,10 @@
                 </edits:CustomEditControl>
 
             </StackPanel>
-        </ScrollViewer>
-
-        <ScrollViewer
-            VerticalAlignment="Top"
-            Height="500"
-            Grid.Row="1"
-            Grid.Column="1"
-            VerticalScrollBarVisibility="Auto"
-            HorizontalScrollBarVisibility="Disabled">
-            <edits:CustomGroupEditControl                
-                VerticalAlignment="Top"
-                Icon="{ui:SymbolIcon tableResizeRow24}"
-                Header="{me:LocalizationSource MainWindow.Levels}"
-                Description="{me:LocalizationSource MainWindow.LevelsDescription}"
-                ExtraIconVisible="False">
-                <edits:CustomGroupEditControl.EditControl>
-                    <StackPanel>
-                        <Border
-                            Margin="5"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Stretch"
-                            Background="{DynamicResource CardBackground}"
-                            BorderBrush="{DynamicResource CardBorderBrush}"
-                            CornerRadius="{DynamicResource ControlCornerRadius}"
-                            BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
-                            <StackPanel
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center">
-                                <RadioButton
-                                    Margin="20,0,0,0"
-                                    GroupName="Choise"
-                                    Content="{me:LocalizationSource MainWindow.CheckedAllLevels}"
-                                    IsChecked="{Binding IsCheckedAllLevels, Mode=TwoWay}"
-                                    Command="{Binding CheckAllLevelsCommand}" />
-                                <RadioButton
-                                    Margin="20,0,0,0"
-                                    GroupName="Choise"
-                                    Content="{me:LocalizationSource MainWindow.NotCheckedAllLevels}"
-                                    Command="{Binding UncheckAllLevelsCommand}" />
-                            </StackPanel>
-                        </Border>
-                        <ui:AutoSuggestBox
-                            Margin="5,0,5,20"
-                            Icon="{ui:SymbolIcon Search24}"
-                            Text="{Binding SearchTextLevels, Mode=TwoWay}"
-                            PlaceholderText="{me:LocalizationSource MainWindow.SearchTextLevels}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger
-                                    EventName="TextChanged">
-                                    <i:InvokeCommandAction
-                                        Command="{Binding SearchLevelsCommand}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ui:AutoSuggestBox>
-                        <ItemsControl
-                            ItemsSource="{Binding FilteredLevels}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate
-                                    DataType="{x:Type vms:LevelViewModel}">
-                                    <edits:ItemControl
-                                        ItemName="{Binding Name}"
-                                        IsChecked="{Binding IsChecked, Mode=TwoWay}"
-                                        HasWarning="False" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid
-                                        Columns="1" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </StackPanel>
-                </edits:CustomGroupEditControl.EditControl>
-            </edits:CustomGroupEditControl>
-        </ScrollViewer>
+        </ScrollViewer>       
 
         <StackPanel
             Grid.Row="2"
-            Grid.ColumnSpan="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             
@@ -198,7 +113,7 @@
             <ui:Button
                 Margin="10,10,5,10"
                 Width="100"
-                Appearance="Info"
+                Appearance="Primary"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
