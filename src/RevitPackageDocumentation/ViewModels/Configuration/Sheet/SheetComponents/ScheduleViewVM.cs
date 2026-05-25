@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -7,6 +6,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class ScheduleViewVM : SheetComponentVM {
@@ -17,8 +17,7 @@ internal class ScheduleViewVM : SheetComponentVM {
     private string _viewColumn;
     private string _viewCount;
     private ViewSchedule _referenceSpec;
-    private IList<ScheduleFilter> _filtersInReferenceSpec;
-    private IList<ScheduleFieldInfo> _fieldsInReferenceSpec;
+    private ScheduleFilterListVM _scheduleFilterList;
 
     // Смещение по горизонтали в футах, для размещаемых на листе спецификациях требуемое, чтобы они попали на лист
     private readonly double _specViewportRightOffset = UnitUtilsHelper.ConvertToInternalValue(0.77);
@@ -31,6 +30,8 @@ internal class ScheduleViewVM : SheetComponentVM {
         _localizationService = localizationService;
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
         SelectReferenceSpecCommand = RelayCommand.Create(SelectReferenceSpec);
+
+        ScheduleFilterList = new ScheduleFilterListVM(this);
     }
 
     public ICommand SelectReferenceSpecCommand { get; set; }
@@ -55,15 +56,11 @@ internal class ScheduleViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
 
-    public IList<ScheduleFilter> FiltersInReferenceSpec {
-        get => _filtersInReferenceSpec;
-        set => RaiseAndSetIfChanged(ref _filtersInReferenceSpec, value);
+    public ScheduleFilterListVM ScheduleFilterList {
+        get => _scheduleFilterList;
+        set => RaiseAndSetIfChanged(ref _scheduleFilterList, value);
     }
 
-    public IList<ScheduleFieldInfo> FieldsInReferenceSpec {
-        get => _fieldsInReferenceSpec;
-        set => RaiseAndSetIfChanged(ref _fieldsInReferenceSpec, value);
-    }
 
     public override void CreateComponent() { }
 
@@ -90,13 +87,7 @@ internal class ScheduleViewVM : SheetComponentVM {
     }
 
     private void SelectReferenceSpec() {
-        var scheduleDefinition = ReferenceSpec.Definition;
-        FiltersInReferenceSpec = scheduleDefinition.GetFilters();
-
-        FieldsInReferenceSpec = [];
-        foreach(ScheduleFieldId fieldId in scheduleDefinition.GetFieldOrder()) {
-            FieldsInReferenceSpec.Add(new ScheduleFieldInfo(scheduleDefinition.GetField(fieldId)));
-        }
+        ScheduleFilterList.SetSchedule(ReferenceSpec);
     }
 
     public override void Process() {

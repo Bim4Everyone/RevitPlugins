@@ -1,0 +1,65 @@
+﻿<UserControl
+    x:Class="RevitPackageDocumentation.Views.Controls.SpecFilterItemControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitPackageDocumentation.Views.Controls"
+    xmlns:sheet="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
+    xmlns:filters="clr-namespace:RevitPackageDocumentation.ViewModels.ScheduleFilters"
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    
+    d:DataContext="{d:DesignInstance Type=filters:ScheduleFilterRuleVM}"
+    mc:Ignorable="d"
+    d:DesignHeight="50"
+    d:DesignWidth="400">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <ui:Button
+            Grid.Column="0"
+            Appearance="Danger"
+            Content="✕"
+            Command="{Binding Path=ScheduleFilterList.RemoveFilterCommand}"
+            CommandParameter="{Binding}"/>
+
+        <ComboBox
+            Grid.Column="1"
+            DisplayMemberPath="FieldName"
+            ItemsSource="{Binding SpecFields, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            SelectedItem="{Binding SelectedSpecField, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger
+                    EventName="SelectionChanged">
+                    <i:InvokeCommandAction
+                        Command="{Binding SelectSpecFieldCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
+
+        <ComboBox
+            Grid.Column="2"
+            ItemsSource="{Binding FilterRules, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            SelectedItem="{Binding SelectedFilterRules, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+        <ui:TextBox
+            Grid.Column="3"
+            Text="{Binding FilterValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+    </Grid>
+</UserControl>

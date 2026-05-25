@@ -5,6 +5,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:c="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
+    xmlns:filters="clr-namespace:RevitPackageDocumentation.ViewModels.ScheduleFilters"
     xmlns:local="clr-namespace:RevitPackageDocumentation.Views"
     xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
     xmlns:s="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
@@ -320,6 +321,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             
             <Grid.ColumnDefinitions>
@@ -405,12 +407,18 @@
                 Margin="5"
                 ItemsSource="{Binding FiltersInReferenceSpec, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <ComboBox
-                Grid.Column="1"
+            <ItemsControl
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
                 Grid.Row="5"
-                Margin="5"
-                ItemsSource="{Binding FieldsInReferenceSpec, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                DisplayMemberPath="FieldName"/>
+                HorizontalContentAlignment="Stretch"
+                ItemsSource="{Binding Path=ScheduleFilterList.ScheduleFilterRules, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <ui:Button
+                Grid.Column="1"
+                Grid.Row="6"
+                Content="AddFilter"
+                Command="{Binding ScheduleFilterList.AddFilterCommand}"/>
         </Grid>
     </DataTemplate>
 
@@ -418,6 +426,11 @@
         DataType="{x:Type sc:ScheduleViewVM}">
         <controls:SheetComponentItemControl
             DerivedTemplate="{StaticResource ScheduleViewDerivedTemplate}" />
+    </DataTemplate>
+
+    <DataTemplate
+        DataType="{x:Type filters:ScheduleFilterRuleVM}">
+        <controls:SpecFilterItemControl />
     </DataTemplate>
 
 

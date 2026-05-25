@@ -181,16 +181,19 @@ internal class RevitRepository {
     public List<ViewSheet> GetSheets() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewSheet))
         .OfType<ViewSheet>()
+        .OrderBy(a => a.Name)
         .ToList();
 
     public List<View> GetViews() => new FilteredElementCollector(Document)
         .OfClass(typeof(View))
         .OfType<View>()
+        .OrderBy(a => a.Name)
         .ToList();
 
     public List<ViewSchedule> GetSpecs() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewSchedule))
         .OfType<ViewSchedule>()
+        .OrderBy(a => a.Name)
         .ToList();
 
 
