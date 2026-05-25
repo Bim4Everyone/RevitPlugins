@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Windows.Input;
+
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
@@ -14,6 +17,8 @@ internal class ScheduleViewVM : SheetComponentVM {
     private string _viewColumn;
     private string _viewCount;
     private ViewSchedule _referenceSpec;
+    private IList<ScheduleFilter> _filtersInReferenceSpec;
+    private IList<ScheduleFieldInfo> _fieldsInReferenceSpec;
 
     // Смещение по горизонтали в футах, для размещаемых на листе спецификациях требуемое, чтобы они попали на лист
     private readonly double _specViewportRightOffset = UnitUtilsHelper.ConvertToInternalValue(0.77);
@@ -25,8 +30,10 @@ internal class ScheduleViewVM : SheetComponentVM {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+        SelectReferenceSpecCommand = RelayCommand.Create(SelectReferenceSpec);
     }
 
+    public ICommand SelectReferenceSpecCommand { get; set; }
 
     public ViewSchedule ReferenceSpec {
         get => _referenceSpec;
@@ -46,6 +53,16 @@ internal class ScheduleViewVM : SheetComponentVM {
     public string ViewCount {
         get => _viewCount;
         set => RaiseAndSetIfChanged(ref _viewCount, value);
+    }
+
+    public IList<ScheduleFilter> FiltersInReferenceSpec {
+        get => _filtersInReferenceSpec;
+        set => RaiseAndSetIfChanged(ref _filtersInReferenceSpec, value);
+    }
+
+    public IList<ScheduleFieldInfo> FieldsInReferenceSpec {
+        get => _fieldsInReferenceSpec;
+        set => RaiseAndSetIfChanged(ref _fieldsInReferenceSpec, value);
     }
 
     public override void CreateComponent() { }
@@ -70,6 +87,16 @@ internal class ScheduleViewVM : SheetComponentVM {
 
         ModuleErrors = string.Empty;
         return true;
+    }
+
+    private void SelectReferenceSpec() {
+        var scheduleDefinition = ReferenceSpec.Definition;
+        FiltersInReferenceSpec = scheduleDefinition.GetFilters();
+
+        FieldsInReferenceSpec = [];
+        foreach(ScheduleFieldId fieldId in scheduleDefinition.GetFieldOrder()) {
+            FieldsInReferenceSpec.Add(new ScheduleFieldInfo(scheduleDefinition.GetField(fieldId)));
+        }
     }
 
     public override void Process() {

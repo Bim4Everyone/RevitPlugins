@@ -318,6 +318,8 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             
             <Grid.ColumnDefinitions>
@@ -338,7 +340,15 @@
                 Margin="5"
                 ItemsSource="{Binding DataContext.SpecsInPj, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="Name"
-                SelectedItem="{Binding ReferenceSpec, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                SelectedItem="{Binding ReferenceSpec, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger
+                        EventName="SelectionChanged">
+                        <i:InvokeCommandAction
+                            Command="{Binding SelectReferenceSpecCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
 
             <TextBlock
                 Grid.Column="0"
@@ -380,6 +390,27 @@
                 Margin="5"
                 Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 IsEnabled="False" />
+
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="4"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Фильтр" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="4"
+                Margin="5"
+                ItemsSource="{Binding FiltersInReferenceSpec, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="5"
+                Margin="5"
+                ItemsSource="{Binding FieldsInReferenceSpec, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                DisplayMemberPath="FieldName"/>
         </Grid>
     </DataTemplate>
 
