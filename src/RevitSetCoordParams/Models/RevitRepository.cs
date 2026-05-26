@@ -215,21 +215,23 @@ internal class RevitRepository {
     /// Метод получения координаты элементы по центру
     /// </summary>
     public XYZ GetPositionCenter(RevitElement revitElement) {
-        return BoundingBoxExtensions.GetMidPoint(revitElement.BoundingBoxXYZ);
+        return (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
     }
 
     /// <summary>
     /// Метод получения координаты элементы по низу
     /// </summary>
     public XYZ GetPositionBottom(RevitElement revitElement) {
-        return BoundingBoxExtensions.GetMinPoint([revitElement.BoundingBoxXYZ]);
+        var center = (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
+        return new XYZ(center.X, center.Y, revitElement.BoundingBoxXYZ.Min.Z);
     }
 
     /// <summary>
     /// Метод получения координаты элементы по верху
     /// </summary>
     public XYZ GetPositionUp(RevitElement revitElement) {
-        return BoundingBoxExtensions.GetMaxPoint([revitElement.BoundingBoxXYZ]);
+        var center = (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
+        return new XYZ(center.X, center.Y, revitElement.BoundingBoxXYZ.Max.Z);
     }
 
     /// <summary>
