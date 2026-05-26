@@ -4,6 +4,8 @@ using System.IO;
 
 using pyRevitLabs.Json;
 
+using RevitPackageDocumentation.Models.ScheduleFilters;
+
 namespace RevitPackageDocumentation.Models.ConfigSerializer;
 
 public class SheetSetConfig {
@@ -134,7 +136,9 @@ public class ScheduleViewData : SheetComponentData {
     public string ViewName { get; set; }
     public string ViewCount { get; set; }
     public string ViewColumn { get; set; }
+    public ScheduleFilterListData ScheduleFilterList { get; set; }
 }
+
 
 /// <summary>
 /// DTO модуля текста
@@ -163,6 +167,22 @@ public class LegendViewData : SheetComponentData {
     public override string ComponentType => "LegendView";
 
     public string ViewName { get; set; }
+}
+
+/// <summary>
+/// DTO списка фильтров спецификации
+/// </summary>
+public class ScheduleFilterListData {
+    public List<ScheduleFilterRuleData> ScheduleFilterRules { get; set; }
+}
+
+/// <summary>
+/// DTO фильтра спецификации
+/// </summary>
+public class ScheduleFilterRuleData {
+    public string FieldName { get; set; }
+    public ScheduleTypeInfo FilterType { get; set; }
+    public string FilterValue { get; set; }
 }
 
 

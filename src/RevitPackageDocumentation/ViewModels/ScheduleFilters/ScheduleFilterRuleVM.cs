@@ -37,6 +37,11 @@ internal class ScheduleFilterRuleVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedSpecField, value);
     }
 
+    public string SelectedSpecFieldName {
+        get => _selectedSpecFieldName;
+        set => RaiseAndSetIfChanged(ref _selectedSpecFieldName, value);
+    }
+
     public ScheduleTypeInfo SelectedFilterType {
         get => _selectedFilterType;
         set => RaiseAndSetIfChanged(ref _selectedFilterType, value);
@@ -49,17 +54,20 @@ internal class ScheduleFilterRuleVM : BaseViewModel {
 
     private void SelectSpecField() {
         if(SelectedSpecField != null) {
-            _selectedSpecFieldName = SelectedSpecField.FieldName;
+            SelectedSpecFieldName = SelectedSpecField.FieldName ?? string.Empty;
         }
     }
 
     public void SetSchedule(ViewSchedule viewSchedule) {
+        if(viewSchedule is null) {
+            return;
+        }
         var scheduleDefinition = viewSchedule.Definition;
 
         SpecFields.Clear();
         foreach(var fieldId in scheduleDefinition.GetFieldOrder()) {
             SpecFields.Add(new ScheduleFieldInfo(scheduleDefinition.GetField(fieldId)));
         }
-        SelectedSpecField = SpecFields.FirstOrDefault(f => f.FieldName == _selectedSpecFieldName);
+        SelectedSpecField = SpecFields.FirstOrDefault(f => f.FieldName == SelectedSpecFieldName);
     }
 }

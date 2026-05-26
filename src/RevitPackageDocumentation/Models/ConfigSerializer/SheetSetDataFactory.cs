@@ -94,6 +94,17 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewName = vm.ViewName,
                 ViewColumn = vm.ViewColumn,
                 ViewCount = vm.ViewCount,
+                ScheduleFilterList = new ScheduleFilterListData() {
+                    ScheduleFilterRules = vm
+                        .ScheduleFilterList
+                        .ScheduleFilterRules
+                        .Select(r => new ScheduleFilterRuleData() {
+                            FieldName = r.SelectedSpecFieldName,
+                            FilterType = r.SelectedFilterType,
+                            FilterValue = r.FilterValue
+                        })
+                        .ToList()
+                }
             },
 
             TextNoteVM vm => new TextNoteData {

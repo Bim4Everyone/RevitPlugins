@@ -10,6 +10,7 @@ using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Parameters;
+using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration;
 
@@ -136,17 +137,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewCount = data.ViewCount ?? "1",
             },
 
-            ScheduleViewData data => new ScheduleViewVM(sheetVM, _revitRepository, _localizationService) {
-                IsModuleCheck = data.IsModuleCheck ?? false,
-                ModuleName = data.ModuleName ?? string.Empty,
-                ModuleComment = data.ModuleComment ?? string.Empty,
-                ModuleCode = "456",
-
-                ReferenceSpec = _revitRepository.GetSpecByName(data.ReferenceViewName),
-                ViewName = data.ViewName ?? string.Empty,
-                ViewColumn = data.ViewColumn ?? "1",
-                ViewCount = data.ViewCount ?? "1",
-            },
+            ScheduleViewData data => CreateScheduleViewVM(sheetVM, data),
 
             TextNoteData data => new TextNoteVM(sheetVM, _localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
@@ -172,6 +163,39 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             _ => throw new NotSupportedException($"Тип '{sheetComponentData?.GetType().Name}' не поддерживается")
         };
     }
+
+
+    private ScheduleViewVM CreateScheduleViewVM(SheetVM sheetVM, ScheduleViewData data) {
+        var referenceSpec = _revitRepository.GetSpecByName(data.ReferenceViewName);
+
+        var scheduleViewVM = new ScheduleViewVM(sheetVM, _revitRepository, _localizationService) {
+            IsModuleCheck = data.IsModuleCheck ?? false,
+            ModuleName = data.ModuleName ?? string.Empty,
+            ModuleComment = data.ModuleComment ?? string.Empty,
+            ModuleCode = "456",
+
+            ReferenceSpec = referenceSpec,
+            ViewName = data.ViewName ?? string.Empty,
+            ViewColumn = data.ViewColumn ?? "1",
+            ViewCount = data.ViewCount ?? "1",
+        };
+
+        var scheduleFilterList = new ScheduleFilterListVM(scheduleViewVM);
+
+        foreach(var ruleData in data.ScheduleFilterList.ScheduleFilterRules) {
+            var ruleVM = new ScheduleFilterRuleVM(scheduleFilterList) {
+                SelectedSpecFieldName = ruleData.FieldName,
+                SelectedFilterType = ruleData.FilterType,
+                FilterValue = ruleData.FilterValue
+            };
+
+            ruleVM.SetSchedule(referenceSpec);
+            scheduleFilterList.ScheduleFilterRules.Add(ruleVM);
+        }
+        scheduleViewVM.ScheduleFilterList = scheduleFilterList;
+        return scheduleViewVM;
+    }
+
 
     private TypicalAnnotationVM CreateTypicalAnnotationVM(SheetVM sheetVM, TypicalAnnotationData data) {
 

@@ -1,7 +1,7 @@
 using Autodesk.Revit.DB;
 
 namespace RevitPackageDocumentation.Models.ScheduleFilters;
-internal class ScheduleTypeInfo {
+public class ScheduleTypeInfo {
     public ScheduleTypeInfo(ScheduleFilterType filterType, string name) {
         FilterType = filterType;
         Name = name;
