@@ -162,7 +162,7 @@ internal class RevitRepository {
                     ? _documentsService.GetTransformByName(document.GetUniqId())
                     : Transform.Identity;
 
-                var transform = linkTransform.Multiply(_localTransform);
+                var transform = _localTransform.Multiply(linkTransform);
 
                 var unitedSolid = GetUnitedSolid(element);
                 if(unitedSolid is null) {
