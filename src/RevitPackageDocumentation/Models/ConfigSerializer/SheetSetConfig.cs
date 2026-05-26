@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using pyRevitLabs.Json;
+using Autodesk.Revit.DB;
 
-using RevitPackageDocumentation.Models.ScheduleFilters;
+using pyRevitLabs.Json;
 
 namespace RevitPackageDocumentation.Models.ConfigSerializer;
 
@@ -181,7 +181,7 @@ public class ScheduleFilterListData {
 /// </summary>
 public class ScheduleFilterRuleData {
     public string FieldName { get; set; }
-    public ScheduleTypeInfo FilterType { get; set; }
+    public ScheduleFilterType FilterType { get; set; }
     public string FilterValue { get; set; }
 }
 

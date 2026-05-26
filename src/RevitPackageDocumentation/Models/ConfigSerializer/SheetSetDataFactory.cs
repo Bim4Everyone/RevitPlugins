@@ -100,7 +100,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                         .ScheduleFilterRules
                         .Select(r => new ScheduleFilterRuleData() {
                             FieldName = r.SelectedSpecFieldName,
-                            FilterType = r.SelectedFilterType,
+                            FilterType = r.SelectedFilterType.FilterType,
                             FilterValue = r.FilterValue
                         })
                         .ToList()

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -252,15 +251,7 @@ internal class MainViewModel : BaseViewModel {
         LegendsInProject = _revitRepository.LegendsInProject;
         TitleBlockFamilies = _revitRepository.TitleBlockFamilies;
 
-        FilterTypes = Enum.GetValues(typeof(ScheduleFilterType))
-            .Cast<ScheduleFilterType>()
-            .Where(s => s != ScheduleFilterType.Invalid)
-            .Where(s => s != ScheduleFilterType.HasParameter)
-            .Where(s => s != ScheduleFilterType.IsAssociatedWithGlobalParameter)
-            .Where(s => s != ScheduleFilterType.IsNotAssociatedWithGlobalParameter)
-            .Select(s =>
-                new ScheduleTypeInfo(s, _localizationService.GetLocalizedString($"ScheduleFilterType.{s}") ?? s.ToString()))
-            .ToList();
+        FilterTypes = _revitRepository.FilterTypes;
     }
 
     private void ImportSheetSet() {

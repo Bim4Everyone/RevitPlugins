@@ -185,8 +185,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         foreach(var ruleData in data.ScheduleFilterList.ScheduleFilterRules) {
             var ruleVM = new ScheduleFilterRuleVM(scheduleFilterList) {
                 SelectedSpecFieldName = ruleData.FieldName,
-                SelectedFilterType = ruleData.FilterType,
-                FilterValue = ruleData.FilterValue
+                FilterValue = ruleData.FilterValue,
+                SelectedFilterType = _revitRepository.FilterTypes.FirstOrDefault(t => t.FilterType == ruleData.FilterType)
             };
 
             ruleVM.SetSchedule(referenceSpec);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,6 +8,8 @@ using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
+
+using RevitPackageDocumentation.Models.ScheduleFilters;
 
 namespace RevitPackageDocumentation.Models;
 
@@ -18,14 +21,19 @@ namespace RevitPackageDocumentation.Models;
 /// </remarks>
 internal class RevitRepository {
     private readonly IMessageBoxService _messageBoxService;
+    private readonly ILocalizationService _localizationService;
 
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
     /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
-    public RevitRepository(UIApplication uiApplication, IMessageBoxService messageBoxService) {
+    public RevitRepository(
+        UIApplication uiApplication,
+        IMessageBoxService messageBoxService,
+        ILocalizationService localizationService) {
         UIApplication = uiApplication;
         _messageBoxService = messageBoxService;
+        _localizationService = localizationService;
 
         StructuralPlanViewTypes = GetStructuralPlanViewTypes();
         SectionViewTypes = GetSectionViewTypes();
@@ -39,6 +47,7 @@ internal class RevitRepository {
         Sheets = GetSheets();
         Views = GetViews();
         Specs = GetSpecs();
+        FilterTypes = GetFilterTypes();
     }
 
     /// <summary>
@@ -72,9 +81,10 @@ internal class RevitRepository {
     public List<Family> GenericAnnotationFamilies { get; }
     public List<View> LegendsInProject { get; }
     public List<Family> TitleBlockFamilies { get; }
-    public List<ViewSheet> Sheets { get; set; }
-    public List<View> Views { get; set; }
-    public List<ViewSchedule> Specs { get; set; }
+    public List<ViewSheet> Sheets { get; }
+    public List<View> Views { get; }
+    public List<ViewSchedule> Specs { get; }
+    public List<ScheduleTypeInfo> FilterTypes { get; }
 
 
     /// <summary>
@@ -196,6 +206,15 @@ internal class RevitRepository {
         .OrderBy(a => a.Name)
         .ToList();
 
+    public List<ScheduleTypeInfo> GetFilterTypes() => Enum.GetValues(typeof(ScheduleFilterType))
+            .Cast<ScheduleFilterType>()
+            .Where(s => s != ScheduleFilterType.Invalid)
+            .Where(s => s != ScheduleFilterType.HasParameter)
+            .Where(s => s != ScheduleFilterType.IsAssociatedWithGlobalParameter)
+            .Where(s => s != ScheduleFilterType.IsNotAssociatedWithGlobalParameter)
+            .Select(s =>
+                new ScheduleTypeInfo(s, _localizationService.GetLocalizedString($"ScheduleFilterType.{s}") ?? s.ToString()))
+            .ToList();
 
     public ViewSheet GetSheetByName(string sheetName) {
         return Sheets
