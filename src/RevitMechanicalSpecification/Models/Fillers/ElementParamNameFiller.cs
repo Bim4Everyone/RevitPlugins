@@ -45,7 +45,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         }
 
         protected override void PrepareValue(SpecificationElement specificationElement) {
-            specificationElement.ElementName = GetName(specificationElement);
+            specificationElement.ElementName = GetName(specificationElement).Trim();
         }
 
         public override void SetParamValue(SpecificationElement specificationElement) {
