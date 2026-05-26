@@ -61,6 +61,7 @@ internal class MainViewModel : BaseViewModel {
         RemoveConsumableTypeCommand = RelayCommand.Create<ConsumableTypeItem>(RemoveConsumableType, CanRemoveConsumableType);
         ImportConfigsCommand = RelayCommand.Create(ImportConfigs);
         ExportConfigsCommand = RelayCommand.Create(ExportConfigs);
+        RefreshConfigsCommand = RelayCommand.Create(RefreshConfigs);
         ResetConfigsCommand = RelayCommand.Create<Window>(ResetConfigs);
 
         ConsumableTypes = new ObservableCollection<ConsumableTypeItem>();
@@ -82,6 +83,8 @@ internal class MainViewModel : BaseViewModel {
     public ICommand ImportConfigsCommand { get; }
 
     public ICommand ExportConfigsCommand { get; }
+
+    public ICommand RefreshConfigsCommand { get; }
 
     public ICommand ResetConfigsCommand { get; }
 
@@ -232,6 +235,21 @@ internal class MainViewModel : BaseViewModel {
 
         UnmodelingSettingsDocument defaults = _revitRepository.VisSettingsStorage.GetDefaultSettings();
         LoadConsumableTypesFromSettings(defaults);
+    }
+
+    private void RefreshConfigs() {
+        string title = _localizationService.GetLocalizedString("MainWindow.Title");
+        string confirmMessage = _localizationService.GetLocalizedString("MainWindow.RefreshConfirmMessage");
+        if(MessageBoxService.Show(
+            confirmMessage,
+            title,
+            MessageBoxButton.OKCancel,
+            MessageBoxImage.Question) != MessageBoxResult.OK) {
+            return;
+        }
+
+        string placeholderMessage = _localizationService.GetLocalizedString("MainWindow.RefreshPlaceholderMessage");
+        MessageBoxService.Show(placeholderMessage, title, MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private void ImportConfigs() {

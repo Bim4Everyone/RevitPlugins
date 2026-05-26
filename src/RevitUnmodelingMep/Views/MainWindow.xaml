@@ -45,6 +45,10 @@
             <Setter Property="Margin" Value="0 6 0 2" />
         </Style>
 
+        <Style TargetType="ToolTip">
+            <Setter Property="MaxWidth" Value="500" />
+        </Style>
+
         <Style
             TargetType="ListBoxItem"
             x:Key="NavItemStyle">
@@ -282,12 +286,28 @@
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
 
-                                                <Expander Grid.Column="0" IsExpanded="False">
+                                                <Expander Grid.Column="0" IsExpanded="False" HorizontalContentAlignment="Stretch">
                                                     <Expander.Header>
-                                                        <TextBlock
-                                                            FontWeight="SemiBold"
-                                                            VerticalAlignment="Center"
-                                                            Text="{Binding ConsumableTypeName}" />
+                                                        <Grid HorizontalAlignment="Stretch">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock
+                                                                Grid.Column="0"
+                                                                FontWeight="SemiBold"
+                                                                VerticalAlignment="Center"
+                                                                Text="{Binding ConsumableTypeName}" />
+
+                                                            <TextBlock
+                                                                Grid.Column="1"
+                                                                Margin="8 0 8 0"
+                                                                VerticalAlignment="Center"
+                                                                Foreground="OrangeRed"
+                                                                FontSize="12"
+                                                                Text="{DynamicResource MainWindow.TemplateDifferenceText}" />
+                                                        </Grid>
                                                     </Expander.Header>
 
                                                     <Border Padding="5">
@@ -539,6 +559,11 @@
                     Width="100"
                     Content="{me:LocalizationSource MainWindow.ButtonExport}"
                     Command="{Binding ExportConfigsCommand}" />
+                <ui:Button
+                    Margin="0 0 8 0"
+                    Width="100"
+                    Content="{me:LocalizationSource MainWindow.ButtonRefresh}"
+                    Command="{Binding RefreshConfigsCommand}" />
                 <ui:Button
                     Width="100"
                     Content="{me:LocalizationSource MainWindow.ButtonDefault}"
