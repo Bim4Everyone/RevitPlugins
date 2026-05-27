@@ -139,7 +139,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             ScheduleViewData data => CreateScheduleViewVM(sheetVM, data),
 
-            TextNoteData data => new TextNoteVM(sheetVM, _localizationService) {
+            TextNoteData data => new TextNoteVM(sheetVM, _revitRepository, _localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,

@@ -3,14 +3,18 @@ using Autodesk.Revit.DB;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
+using RevitPackageDocumentation.Models;
+
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class TextNoteVM : SheetComponentVM {
+    private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
     private string _text;
     private TextNoteType _textType;
 
-    public TextNoteVM(SheetVM sheetVM, ILocalizationService localizationService) : base(sheetVM) {
+    public TextNoteVM(SheetVM sheetVM, RevitRepository revitRepository, ILocalizationService localizationService) : base(sheetVM) {
+        _revitRepository = revitRepository;
         _localizationService = localizationService;
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
@@ -41,7 +45,17 @@ internal class TextNoteVM : SheetComponentVM {
         return true;
     }
 
-    public override void Process() { }
+    public override void Process() {
+        Place();
+    }
 
-    public void Place() { }
+    public void Place() {
+        var sheetInstance = Sheet.SheetInstance;
+        var options = new TextNoteOptions(TextNoteType.Id);
+        var position = new XYZ(
+            UnitUtilsHelper.ConvertToInternalValue(-190),
+            UnitUtilsHelper.ConvertToInternalValue(120),
+            0);
+        TextNote.Create(_revitRepository.Document, sheetInstance.Id, position, Text, options);
+    }
 }
