@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using dosymep.Bim4Everyone.ProjectConfigs;
@@ -26,6 +27,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ISaveFileDialogService _saveFileDialogService;
     public IMessageBoxService MessageBoxService { get; }
     private readonly IConfigSerializer _configSerializer;
+    private readonly ConsumableTemplateManager _consumableTemplateManager;
 
     private string _errorText;
     private string _saveProperty;
@@ -54,6 +56,9 @@ internal class MainViewModel : BaseViewModel {
         MessageBoxService = messageBoxService;
         _configSerializer = configSerializer;
         _categoryOptions = CreateCategoryOptions();
+        _consumableTemplateManager = new ConsumableTemplateManager(
+            _revitRepository.VisSettingsStorage,
+            ResolveCategoryOption);
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -106,7 +111,10 @@ internal class MainViewModel : BaseViewModel {
 
     public ObservableCollection<ConsumableTypeItem> ConsumableTypes {
         get => _consumableTypes;
-        set => RaiseAndSetIfChanged(ref _consumableTypes, value);
+        set {
+            RaiseAndSetIfChanged(ref _consumableTypes, value);
+            _consumableTemplateManager?.Attach(_consumableTypes);
+        }
     }
 
     public ObservableCollection<CategoryAssignmentItem> CategoryAssignments {
@@ -248,8 +256,9 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
-        string placeholderMessage = _localizationService.GetLocalizedString("MainWindow.RefreshPlaceholderMessage");
-        MessageBoxService.Show(placeholderMessage, title, MessageBoxButton.OK, MessageBoxImage.Information);
+        _consumableTemplateManager.ApplyTemplatesToItems();
+        SyncLastConfigIndex();
+        UpdateTypesLists();
     }
 
     private void ImportConfigs() {
@@ -370,6 +379,18 @@ internal class MainViewModel : BaseViewModel {
     private string GetNextConfigKey() {
         _lastConfigIndex++;
         return $"config_{_lastConfigIndex:000}";
+    }
+
+    private void SyncLastConfigIndex() {
+        int lastConfigIndex = 0;
+        foreach(ConsumableTypeItem item in ConsumableTypes ?? Enumerable.Empty<ConsumableTypeItem>()) {
+            Match match = Regex.Match(item?.ConfigKey ?? string.Empty, @"config_(\d+)", RegexOptions.IgnoreCase);
+            if(match.Success && int.TryParse(match.Groups[1].Value, out int index) && index > lastConfigIndex) {
+                lastConfigIndex = index;
+            }
+        }
+
+        _lastConfigIndex = lastConfigIndex;
     }
 
     private void UpdateTypesLists() {

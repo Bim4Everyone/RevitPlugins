@@ -22,6 +22,7 @@ internal class ConsumableTypeItem : BaseViewModel {
     private string _note;
     private bool _roundUpTotal;
     private bool _roundUpNoteTotal;
+    private bool _isTemplateDifferenceVisible;
     private CategoryOption _selectedCategory;
 
     public string Title {
@@ -96,6 +97,11 @@ internal class ConsumableTypeItem : BaseViewModel {
     public bool RoundUpNoteTotal {
         get => _roundUpNoteTotal;
         set => RaiseAndSetIfChanged(ref _roundUpNoteTotal, value);
+    }
+
+    public bool IsTemplateDifferenceVisible {
+        get => _isTemplateDifferenceVisible;
+        set => RaiseAndSetIfChanged(ref _isTemplateDifferenceVisible, value);
     }
 
     public CategoryOption SelectedCategory {

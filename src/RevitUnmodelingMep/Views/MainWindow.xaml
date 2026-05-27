@@ -306,7 +306,18 @@
                                                                 VerticalAlignment="Center"
                                                                 Foreground="OrangeRed"
                                                                 FontSize="12"
-                                                                Text="{DynamicResource MainWindow.TemplateDifferenceText}" />
+                                                                Text="{DynamicResource MainWindow.TemplateDifferenceText}">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsTemplateDifferenceVisible}" Value="True">
+                                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
                                                         </Grid>
                                                     </Expander.Header>
 
