@@ -111,7 +111,7 @@
                 Text="{Binding ErrorText}" />  
             
             <ui:Button
-                Margin="10,10,5,10"
+                Margin="10,10,5,15"
                 Width="100"
                 Appearance="Primary"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
@@ -119,7 +119,7 @@
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
-                Margin="10,10,5,10"
+                Margin="10,5,15,15"
                 Width="100"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
