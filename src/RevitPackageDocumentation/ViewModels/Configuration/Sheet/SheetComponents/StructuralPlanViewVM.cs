@@ -20,6 +20,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     private ElementType _viewportType;
     private ViewPlan _viewTemplate;
     private string _viewCount;
+    private ViewPlan _viewInstance;
 
     // Смещение по горизонтали в дюймах слева, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _titleBlockFrameLeftOffset = UnitUtilsHelper.ConvertToInternalValue(20);
@@ -59,6 +60,11 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
 
+    public ViewPlan ViewInstance {
+        get => _viewInstance;
+        set => RaiseAndSetIfChanged(ref _viewInstance, value);
+    }
+
     public override void CreateComponent() { ViewName += "1"; }
 
     public override bool ValidateModule() {
@@ -88,8 +94,8 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     }
 
     public override void Process() {
-        var view = Create();
-        Place(view);
+        ViewInstance = Create();
+        Place(ViewInstance);
     }
 
     public ViewPlan Create() {

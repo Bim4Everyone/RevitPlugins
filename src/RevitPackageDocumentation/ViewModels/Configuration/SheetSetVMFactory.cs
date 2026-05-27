@@ -111,7 +111,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewCount = data.ViewCount ?? "1",
             },
 
-            StructuralCalloutViewData data => new StructuralCalloutViewVM(sheetVM, _localizationService) {
+            StructuralCalloutViewData data => new StructuralCalloutViewVM(sheetVM, _revitRepository, _localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
