@@ -325,14 +325,16 @@
                         Margin="5"
                         Text="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleComment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-                    <ui:TextBlock
+                    <ui:TextBox
                         Grid.Column="0"
                         Grid.ColumnSpan="4"
                         Grid.Row="5"
                         Foreground="Orange"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleErrors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleErrors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PlaceholderText="{me:LocalizationSource MainWindow.ErrorsNotFound}"
+                        IsEnabled="False" />
                 </Grid>
             </Border>
 
