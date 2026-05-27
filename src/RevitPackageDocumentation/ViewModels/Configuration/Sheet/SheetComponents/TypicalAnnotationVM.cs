@@ -75,7 +75,15 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         return true;
     }
 
-    public override void Process() { }
+    public override void Process() {
+        Place();
+    }
 
-    public void Place() { }
+    public void Place() {
+        var position = new XYZ(
+            UnitUtilsHelper.ConvertToInternalValue(-100),
+            UnitUtilsHelper.ConvertToInternalValue(250),
+            0);
+        _revitRepository.Document.Create.NewFamilyInstance(position, AnnotationType, Sheet.SheetInstance);
+    }
 }
