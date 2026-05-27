@@ -550,6 +550,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             
             <Grid.ColumnDefinitions>
@@ -571,6 +572,21 @@
                 ItemsSource="{Binding DataContext.LegendsInProject, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding LegendView, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="1"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Типоразмер видового экрана" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="1"
+                Margin="5"
+                ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="Name"
+                SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
         </Grid>
     </DataTemplate>
 

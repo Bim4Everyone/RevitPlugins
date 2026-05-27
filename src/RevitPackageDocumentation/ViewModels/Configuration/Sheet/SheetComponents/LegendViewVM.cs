@@ -3,13 +3,18 @@ using Autodesk.Revit.DB;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
+using RevitPackageDocumentation.Models;
+
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class LegendViewVM : SheetComponentVM {
+    private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
     private View _legendView;
+    private ElementType _viewportType;
 
-    public LegendViewVM(SheetVM sheetVM, ILocalizationService localizationService) : base(sheetVM) {
+    public LegendViewVM(SheetVM sheetVM, RevitRepository revitRepository, ILocalizationService localizationService) : base(sheetVM) {
+        _revitRepository = revitRepository;
         _localizationService = localizationService;
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
@@ -19,6 +24,11 @@ internal class LegendViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _legendView, value);
     }
 
+    public ElementType ViewportType {
+        get => _viewportType;
+        set => RaiseAndSetIfChanged(ref _viewportType, value);
+    }
+
     public override void CreateComponent() { }
 
     public override bool ValidateModule() {
@@ -26,12 +36,36 @@ internal class LegendViewVM : SheetComponentVM {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.LegendViewIsNull");
             return false;
         }
+        if(ViewportType is null) {
+            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
+            return false;
+        }
 
         ModuleErrors = string.Empty;
         return true;
     }
 
-    public override void Process() { }
+    public override void Process() {
+        Place();
+    }
 
-    public void Place() { }
+    public void Place() {
+        // Проверяем можем ли разместить на листе легенду
+        if(!Viewport.CanAddViewToSheet(_revitRepository.Document, Sheet.SheetInstance.Id, LegendView.Id)) {
+            return;
+        }
+
+        // Размещаем легенду на листе
+        var position = new XYZ(
+            UnitUtilsHelper.ConvertToInternalValue(-100),
+            UnitUtilsHelper.ConvertToInternalValue(350),
+            0);
+        var viewPort = Viewport.Create(_revitRepository.Document,
+                                       Sheet.SheetInstance.Id,
+                                       LegendView.Id,
+                                       position);
+
+        // Задание правильного типа видового экрана
+        viewPort.ChangeTypeId(ViewportType.Id);
+    }
 }

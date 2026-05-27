@@ -151,13 +151,14 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             TypicalAnnotationData data => CreateTypicalAnnotationVM(sheetVM, data),
 
-            LegendViewData data => new LegendViewVM(sheetVM, _localizationService) {
+            LegendViewData data => new LegendViewVM(sheetVM, _revitRepository, _localizationService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "03",
 
                 LegendView = _revitRepository.LegendsInProject.FirstOrDefault(v => v.Name.Equals(data.ViewName)),
+                ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
             },
 
             _ => throw new NotSupportedException($"Тип '{sheetComponentData?.GetType().Name}' не поддерживается")

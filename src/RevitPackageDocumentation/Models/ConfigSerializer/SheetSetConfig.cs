@@ -167,6 +167,7 @@ public class LegendViewData : SheetComponentData {
     public override string ComponentType => "LegendView";
 
     public string ViewName { get; set; }
+    public string ViewportTypeName { get; set; }
 }
 
 /// <summary>

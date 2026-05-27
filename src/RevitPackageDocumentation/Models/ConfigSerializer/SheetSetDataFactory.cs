@@ -131,6 +131,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleComment = vm.ModuleComment,
 
                 ViewName = vm.LegendView?.Name,
+                ViewportTypeName = vm.ViewportType.Name,
             },
 
             _ => throw new NotSupportedException($"Тип '{sheetComponentVM?.GetType().Name}' не поддерживается")
