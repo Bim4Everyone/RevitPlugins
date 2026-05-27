@@ -111,9 +111,36 @@ internal class ScheduleViewVM : SheetComponentVM {
             if(view != null) {
                 view.Name = ViewName;
             }
+
+            var definition = view.Definition;
+            // Удаляем каждый фильтр
+            for(int i = definition.GetFilters().Count - 1; i >= 0; i--) {
+                definition.RemoveFilter(i);
+            }
+            // Добавляем указанные пользователем фильтры
+            foreach(var rule in ScheduleFilterList.ScheduleFilterRules) {
+                ScheduleFilter filter = default;
+
+                var fieldId = rule.SelectedSpecField.Field.FieldId;
+                if(definition.CanFilterBySubstring(fieldId)) {
+                    filter = new ScheduleFilter(
+                        fieldId,
+                        rule.SelectedFilterType.FilterType,
+                        rule.FilterValue);
+                } else {
+                    if(int.TryParse(rule.FilterValue, out int value)) {
+                        filter = new ScheduleFilter(
+                            fieldId,
+                            rule.SelectedFilterType.FilterType,
+                            value);
+                    }
+                }
+                definition.AddFilter(filter);
+            }
         } catch(System.Exception) { }
         return view;
     }
+
 
     public void Place(ViewSchedule view) {
         var sheetInstance = Sheet.SheetInstance;

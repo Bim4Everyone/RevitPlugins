@@ -14,7 +14,7 @@ internal class ScheduleFilterRuleVM : BaseViewModel {
     private ObservableCollection<ScheduleFieldInfo> _specFields = [];
     private ScheduleFieldInfo _selectedSpecField;
     private ScheduleTypeInfo _selectedFilterType;
-    private string _filterValue;
+    private string _filterValue = "";
     private string _selectedSpecFieldName;
 
     public ScheduleFilterRuleVM(ScheduleFilterListVM scheduleFilterListVM) {
