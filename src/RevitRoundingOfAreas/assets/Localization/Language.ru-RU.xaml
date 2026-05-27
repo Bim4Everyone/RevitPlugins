@@ -33,6 +33,10 @@
         x:Key="MainViewModel.SelectedElementsProvider">Выделенные</system:String>
     <system:String
         x:Key="MainViewModel.CurrentViewProvider">Видимые на виде</system:String>
-    
-    
+
+    <system:String
+        x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
+    <system:String
+        x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+
 </ResourceDictionary>
