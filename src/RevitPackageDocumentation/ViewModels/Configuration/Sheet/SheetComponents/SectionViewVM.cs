@@ -34,7 +34,7 @@ internal class SectionViewVM : SheetComponentVM {
     private readonly double _viewsOffset = UnitUtilsHelper.ConvertToInternalValue(1500);
 
     // Отступ между видовыми экранами на листе
-    private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(150);
+    private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(200);
 
     public SectionViewVM(SheetVM sheetVM, RevitRepository revitRepository, ILocalizationService localizationService) : base(sheetVM) {
         _revitRepository = revitRepository;
@@ -113,10 +113,10 @@ internal class SectionViewVM : SheetComponentVM {
         }
 
         try {
-            if(Sheet.SheetSet.Params.FirstOrDefault(p => p.ParamName == "Опалубка") is not SelectElemParamVM fromworkParam) {
+            if(Sheet.SheetSet.Params.FirstOrDefault(p => p.ParamName == "Опалубка") is not SelectElemParamVM formworkParam) {
                 return null;
             }
-            var selectedElem = fromworkParam.SelectedElem;
+            var selectedElem = formworkParam.SelectedElem;
             var bbox = selectedElem.get_BoundingBox(null);
 
             // Ориентируем взгляд вдоль оси X (вправо вдоль Y, вверх вдоль Z)
@@ -168,7 +168,7 @@ internal class SectionViewVM : SheetComponentVM {
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
             // Получение габаритов видового экрана
-            var viewPort = Viewport.Create(_revitRepository.Document, sheetInstance.Id, view.Id, new XYZ(0, 0, 0));
+            var viewPort = Viewport.Create(_revitRepository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
             viewPort.ChangeTypeId(ViewportType.Id);
 
             var viewportCenter = viewPort.GetBoxCenter();

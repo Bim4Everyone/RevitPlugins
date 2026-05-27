@@ -1,9 +1,12 @@
+using System.Linq;
+
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class StructuralCalloutViewVM : SheetComponentVM {
@@ -20,7 +23,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     private readonly double _viewsOffset = UnitUtilsHelper.ConvertToInternalValue(5000);
 
     // Отступ между видовыми экранами на листе
-    private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(150);
+    private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(100);
 
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
@@ -98,7 +101,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
 
         for(int i = 1; i <= viewCountAsInt; i++) {
             var view = Create(i);
-            //Place(view, i);
+            Place(view, i);
         }
     }
 
@@ -126,13 +129,14 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
                 return null;
             }
 
-            parentView.ViewInstance.CropBoxActive = true;
-            var cropBox = parentView.ViewInstance.CropBox;
-            var parentViewMiddle = (cropBox.Max + cropBox.Min) / 2;
-            parentView.ViewInstance.CropBoxActive = false;
-            parentView.ViewInstance.CropBoxVisible = false;
+            // Рассчитываем точки размещения фрагмента относительно центра опалубки 
+            if(Sheet.SheetSet.Params.FirstOrDefault(p => p.ParamName == "Опалубка") is not SelectElemParamVM formworkParam) {
+                return null;
+            }
+            var selectedElem = formworkParam.SelectedElem;
+            var bbox = selectedElem.get_BoundingBox(null);
 
-            var calloutStart = parentViewMiddle + new XYZ(_viewsOffset * (number - 1), 0, 0);
+            var calloutStart = (bbox.Min + bbox.Max) / 2 + new XYZ(_viewsOffset * (number - 1), -_viewsOffset, 0);
             var calloutEnd = calloutStart + new XYZ(_calloutWidth, _calloutHeight, 0);
 
             view = ViewSection.CreateCallout(
@@ -151,5 +155,42 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         return view;
     }
 
-    public void Place() { }
+    public void Place(View view, int number) {
+        var sheetInstance = Sheet.SheetInstance;
+        if(sheetInstance != null
+            && view != null
+            && Viewport.CanAddViewToSheet(_revitRepository.Document, sheetInstance.Id, view.Id)) {
+
+            // Получение габаритов рамки листа
+            if(_revitRepository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
+                return;
+            }
+            var boundingBoxXYZ = titleBlock.get_BoundingBox(sheetInstance);
+            double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
+            double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
+
+            double titleBlockMinX = boundingBoxXYZ.Min.X;
+            double titleBlockMinY = boundingBoxXYZ.Min.Y;
+
+            // Получение габаритов видового экрана
+            var viewPort = Viewport.Create(_revitRepository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
+            viewPort.ChangeTypeId(ViewportType.Id);
+
+            var viewportCenter = viewPort.GetBoxCenter();
+            var viewportOutline = viewPort.GetBoxOutline();
+            double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
+            double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
+
+            var correctPosition = new XYZ(
+                titleBlockMinX + viewportHalfWidth + _viewportOffset * (number - 1),
+                titleBlockMinY - viewportHalfHeight - _viewportOffset,
+                0);
+
+            viewPort.SetBoxCenter(correctPosition);
+
+#if REVIT_2022_OR_GREATER
+            viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);
+#endif
+        }
+    }
 }
