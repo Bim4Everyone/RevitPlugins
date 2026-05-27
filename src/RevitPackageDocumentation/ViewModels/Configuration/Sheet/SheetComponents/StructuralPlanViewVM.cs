@@ -103,11 +103,11 @@ internal class StructuralPlanViewVM : SheetComponentVM {
 
         if(view is null) {
             try {
-                if(Sheet.SheetSet.Params.FirstOrDefault(p => p.ParamName == "Опалубка") is not SelectElemParamVM fromworkParam) {
+                if(Sheet.SheetSet.Params.FirstOrDefault(p => p.ParamName == "Опалубка") is not SelectElemParamVM formworkParam) {
                     return null;
                 }
 
-                var selectedElem = fromworkParam.SelectedElem;
+                var selectedElem = formworkParam.SelectedElem;
                 var levelId = selectedElem.LevelId;
                 if(levelId is null) {
                     return null;

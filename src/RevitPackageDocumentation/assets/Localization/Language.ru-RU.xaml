@@ -62,4 +62,6 @@
     <system:String x:Key="MainWindow.PickElement">Выберите один элемент</system:String>
     
     <system:String x:Key="MainWindow.ErrorsNotFound">Ошибки не найдены</system:String>
+
+    <system:String x:Key="MainWindow.Edit">Изменить</system:String>
 </ResourceDictionary>
