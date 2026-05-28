@@ -54,7 +54,14 @@ internal sealed class ConsumableTemplateManager {
     /// <summary>
     /// Приводит существующие шаблонные расходники к значениям из шаблона и добавляет отсутствующие шаблонные расходники.
     /// </summary>
-    public void ApplyTemplatesToItems() {
+    /// <summary>
+    /// Проверяет, есть ли в шаблоне расходники, которые отсутствуют в текущей коллекции.
+    /// </summary>
+    public bool HasMissingTemplateItems() {
+        return _items != null && _templateConfigs.Values.Any(template => !ContainsTemplateItem(template));
+    }
+
+    public void ApplyTemplatesToItems(bool addMissingItems) {
         if(_items == null) {
             return;
         }
@@ -77,6 +84,10 @@ internal sealed class ConsumableTemplateManager {
                 continue;
             }
 
+            if(!addMissingItems) {
+                continue;
+            }
+
             string configKey = GetUniqueConfigKey(template.ConfigKey, usedConfigKeys);
             usedConfigKeys.Add(configKey);
 
@@ -86,6 +97,17 @@ internal sealed class ConsumableTemplateManager {
         }
 
         RefreshWarnings();
+    }
+
+    /// <summary>
+    /// Проверяет, есть ли в текущей коллекции расходник с именем указанного шаблонного расходника.
+    /// </summary>
+    private bool ContainsTemplateItem(TemplateConsumable template) {
+        return _items.Any(item =>
+            string.Equals(
+                item?.ConsumableTypeName,
+                template.Config.ConfigName,
+                StringComparison.CurrentCultureIgnoreCase));
     }
 
     /// <summary>
