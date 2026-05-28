@@ -20,9 +20,8 @@
     <system:String x:Key="MainWindow.ButtonDefault">Сброс</system:String>
     <system:String x:Key="MainWindow.RefreshConfirmMessage">При обновлении все шаблонные расходники будут сброшены к виду по умолчанию. Продолжить?</system:String>
     <system:String x:Key="MainWindow.AddMissingTemplateConsumablesConfirmMessage">В шаблоне обнаружены расходные элементы, не существующие в проекте. Добавить их?</system:String>
-    <system:String x:Key="MainWindow.RefreshPlaceholderMessage">Обновление пока не реализовано.</system:String>
     <system:String x:Key="MainWindow.ResetConfirmMessage">Вы уверены что хотите сбросить до значений по умолчанию?</system:String>
-    <system:String x:Key="MainWindow.TemplateDifferenceText">Не соответствует шаблону. Выполните обновление или переименуйте.</system:String>
+    <system:String x:Key="MainWindow.TemplateDifferenceText">Не соответствует шаблону. Нажмите кнопку "Обновить" или переименуйте.</system:String>
     <system:String x:Key="MainWindow.CheckboxOnlyInstances">Только размещенные в проекте</system:String>
     <system:String x:Key="MainWindow.SelectAll">Выбрать все</system:String>
     

@@ -20,7 +20,6 @@
     <system:String x:Key="MainWindow.ButtonDefault">Reset</system:String>
     <system:String x:Key="MainWindow.RefreshConfirmMessage">Refreshing will reset all template consumables to the default view. Continue?</system:String>
     <system:String x:Key="MainWindow.AddMissingTemplateConsumablesConfirmMessage">The template contains consumable items that do not exist in the project. Add them?</system:String>
-    <system:String x:Key="MainWindow.RefreshPlaceholderMessage">Refresh is not implemented yet.</system:String>
     <system:String x:Key="MainWindow.ResetConfirmMessage">Are you sure you want to reset to default values?</system:String>
     <system:String x:Key="MainWindow.TemplateDifferenceText">Does not match the template. Refresh or rename.</system:String>
     <system:String x:Key="MainWindow.CheckboxOnlyInstances">Only placed in project</system:String>
