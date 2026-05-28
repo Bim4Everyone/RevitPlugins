@@ -251,7 +251,7 @@
                     Style="{StaticResource ContentTabControlStyle}"
                     Background="Transparent"
                     BorderThickness="0"
-                    SelectedIndex="0"
+                    SelectedIndex="1"
                      SelectionChanged="ContentTabs_OnSelectionChanged">
                      <TabItem Header="{me:LocalizationSource MainWindow.TabTypesName}">
                         <Grid>
