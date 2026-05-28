@@ -45,10 +45,6 @@
             <Setter Property="Margin" Value="0 6 0 2" />
         </Style>
 
-        <Style TargetType="ToolTip">
-            <Setter Property="MaxWidth" Value="500" />
-        </Style>
-
         <Style
             TargetType="ListBoxItem"
             x:Key="NavItemStyle">
