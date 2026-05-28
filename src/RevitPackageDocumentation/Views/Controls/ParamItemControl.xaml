@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:pp="clr-namespace:RevitPackageDocumentation.ViewModels.Parameters"
     xmlns:local="clr-namespace:RevitPackageDocumentation.Views.Controls"
@@ -20,6 +21,28 @@
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <Style
+                x:Key="ParamBorderStyle"
+                TargetType="Border"
+                BasedOn="{StaticResource CustomBorder}">
+                <Style.Triggers>
+                    <DataTrigger
+                        Binding="{Binding Path=ErrorInParamName}"
+                        Value="True">
+                        <Setter
+                            Property="Background"
+                            Value="Orange" />
+                    </DataTrigger>
+                    <DataTrigger
+                        Binding="{Binding Path=ErrorInParamValue}"
+                        Value="True">
+                        <Setter
+                            Property="Background"
+                            Value="Orange" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -33,7 +56,7 @@
 
     <Border
         Margin="5"
-        Style="{StaticResource CustomBorder}">
+        Style="{StaticResource ParamBorderStyle}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -59,7 +82,15 @@
                     Text="{Binding Path=ParamName, UpdateSourceTrigger=PropertyChanged}"
                     LostFocus="EditTextBox_LostFocus"
                     KeyDown="EditTextBox_KeyDown"
-                    Visibility="Collapsed" />
+                    Visibility="Collapsed">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="TextChanged">
+                            <i:InvokeCommandAction
+                                Command="{Binding ValidateParamNameCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ui:TextBox>
             </Grid>
 
             <ContentControl

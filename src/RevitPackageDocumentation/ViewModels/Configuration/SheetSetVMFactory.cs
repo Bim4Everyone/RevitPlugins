@@ -224,17 +224,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     public PluginParamVM CreateParamVM(PluginParamData paramData) {
         return paramData switch {
-            StringParamData data => new StringParamVM() {
-                ParamName = data.ParamName ?? string.Empty,
-                ParamComment = data.ParamComment ?? string.Empty,
-                StringValue = data.StringValue ?? string.Empty,
-            },
-
-            SelectElemParamData data => new SelectElemParamVM() {
-                ParamName = data.ParamName ?? string.Empty,
-                ParamComment = data.ParamComment ?? string.Empty,
-            },
-
+            StringParamData data => new StringParamVM(data.ParamName, data.ParamComment, data.StringValue),
+            SelectElemParamData data => new SelectElemParamVM(data.ParamName, data.ParamComment),
             _ => throw new NotSupportedException($"Тип '{paramData?.GetType().Name}' не поддерживается")
         };
     }

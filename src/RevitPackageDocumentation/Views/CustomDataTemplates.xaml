@@ -614,7 +614,15 @@
             <ui:TextBox
                 Margin="2 0"
                 VerticalAlignment="Center"
-                Text="{Binding Path=StringValue}" />
+                Text="{Binding Path=StringValue, UpdateSourceTrigger=PropertyChanged}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger
+                        EventName="TextChanged">
+                        <i:InvokeCommandAction
+                            Command="{Binding ValidateParamValueCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ui:TextBox>
         </Grid>
     </DataTemplate>
 
@@ -638,7 +646,7 @@
                 Command="{Binding 
                     Path=DataContext.SelectElemForParamCommand, 
                     RelativeSource={RelativeSource AncestorType=Window}}"
-                CommandParameter="{Binding}"/>
+                CommandParameter="{Binding}" />
         </Grid>
     </DataTemplate>
 
