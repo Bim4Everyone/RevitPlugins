@@ -337,12 +337,28 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        //if(string.IsNullOrEmpty(SaveProperty)) {
-        //    ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-        //    return false;
-        //}
+        if(CurrentSheetSet?.Params?.Any(p => p.ErrorInParamName) == true) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheetSetParamNames");
+            return false;
+        }
+        if(CurrentSheetSet?.Params?.Any(p => p.ErrorInParamValue) == true) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheetSetParamValues");
+            return false;
+        }
+        if(CurrentSheetSet?.SheetList?.Any(p => !string.IsNullOrEmpty(p.ModuleErrors)) == true) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheets");
+            return false;
+        }
+        if(CurrentSheetSet?.SheetList?.Count() == 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.SheetSetHasNotSheets");
+            return false;
+        }
+        if(CurrentSheetSet?.SheetList?.All(p => !p.IsModuleCheck) == true) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.NoSheetsSelected");
+            return false;
+        }
 
-        //ErrorText = null;
+        ErrorText = string.Empty;
         return true;
     }
 

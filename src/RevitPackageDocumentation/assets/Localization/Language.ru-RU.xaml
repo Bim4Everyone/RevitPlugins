@@ -55,8 +55,13 @@
     <system:String x:Key="MainWindow.ViewCountIsNotCorrect">Число задано некорректно</system:String>
     <system:String x:Key="MainWindow.ViewColumnIsNotCorrect">Номер столбца задан некорректно</system:String>
     <system:String x:Key="MainWindow.SheetSizeIsNotCorrect">Значение номера формата листа не корректно</system:String>
-    <system:String x:Key="MainWindow.SheetCoefficient">Значение коэффициента формата листа не корректно</system:String>
+    <system:String x:Key="MainWindow.SheetCoefficientIsNotCorrect">Значение коэффициента формата листа не корректно</system:String>
     
+    <system:String x:Key="MainWindow.ErrorInSheetSetParamNames">Исправлены не все имена параметров комплекта</system:String>
+    <system:String x:Key="MainWindow.ErrorInSheetSetParamValues">Исправлены не все значения параметров комплекта</system:String>
+    <system:String x:Key="MainWindow.ErrorInSheets">Исправлены не все ошибки в листах комплекта</system:String>
+    <system:String x:Key="MainWindow.SheetSetHasNotSheets">В комплект не добавлено ни одного листа</system:String>
+    <system:String x:Key="MainWindow.NoSheetsSelected">Не выбрано ни одного листа</system:String>
     <system:String x:Key="MainWindow.ErrorInSheetComponents">Исправлены не все ошибки в компонентах листа</system:String>
     
     <system:String x:Key="MainWindow.PickElement">Выберите один элемент</system:String>
