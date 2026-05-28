@@ -310,7 +310,7 @@ internal sealed class ConsumableTemplateManager {
     }
 
     /// <summary>
-    /// Приводит значение категории шаблона к тому же формату идентификатора, который используют редактируемые элементы.
+    /// Возвращает идентификатор категории шаблона в том виде, в котором он хранится у редактируемого расходника.
     /// </summary>
     private string ResolveTemplateCategory(string category) {
         return _resolveCategoryOption?.Invoke(category)?.Id.ToString() ?? category ?? string.Empty;
