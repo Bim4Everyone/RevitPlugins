@@ -14,5 +14,5 @@ internal interface IElementsProvider {
     /// <summary>
     /// Метод получения элементов модели по стадиям
     /// </summary>
-    List<SpatialElement> GetSpatialElements(ElementId phaseId);
+    List<SpatialModel> GetSpatialElements(ElementId phaseId);
 }

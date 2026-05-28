@@ -16,7 +16,7 @@ internal class ElementsProviderCurrentView : IElementsProvider {
 
     public ElementsProviderType Type => ElementsProviderType.CurrentViewProvider;
 
-    public List<SpatialElement> GetSpatialElements(ElementId phaseId) {
+    public List<SpatialModel> GetSpatialElements(ElementId phaseId) {
         throw new System.NotImplementedException();
     }
 }

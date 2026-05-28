@@ -4,7 +4,10 @@ using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
+
+using dosymep.Revit;
 
 namespace RevitRoundingOfAreas.Models;
 
@@ -37,9 +40,35 @@ internal class RevitRepository {
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
+    public bool HasSelectedRooms() {
+        var selected = GetSelectedElements();
+        return selected != null && selected.Count() != 0 && selected
+            .Any(element => element is Room);
+    }
 
+    public bool HasRoomsOnCurrentView() {
+        var viewId = Document.ActiveView.Id;
 
+        return new FilteredElementCollector(Document, viewId)
+            .OfCategory(BuiltInCategory.OST_Rooms)
+            .WhereElementIsNotElementType()
+            .Any();
+    }
 
+    /// <summary>
+    /// Метод выделения элементов в документе
+    /// </summary>
+    public void SetSelected(ElementId elementId) {
+        List<ElementId> listElements = [elementId];
+        ActiveUIDocument.SetSelectedElements(listElements);
+    }
+
+    /// <summary>
+    /// Метод получения всех выделенных элементов модели
+    /// </summary>    
+    public IEnumerable<Element> GetSelectedElements() {
+        return ActiveUIDocument.GetSelectedElements();
+    }
 
     public IEnumerable<PhaseModel> GetPhaseModels() {
         var phases = Document.Phases;
@@ -57,6 +86,4 @@ internal class RevitRepository {
             ?.ElementId
             ?? ElementId.InvalidElementId;
     }
-
-
 }

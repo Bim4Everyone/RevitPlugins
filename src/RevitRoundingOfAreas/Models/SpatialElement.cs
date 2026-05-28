@@ -1,7 +1,0 @@
-using Autodesk.Revit.DB.Architecture;
-
-namespace RevitRoundingOfAreas.Models;
-
-internal class SpatialElement {
-    public Room Room { get; set; }
-}

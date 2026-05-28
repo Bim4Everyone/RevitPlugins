@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using Autodesk.Revit.DB.Architecture;
+
 using dosymep.Revit;
 
 using RevitRoundingOfAreas.Models.Enums;
@@ -8,21 +10,22 @@ using RevitRoundingOfAreas.Models.Warnings;
 namespace RevitRoundingOfAreas.Models;
 internal class SpatialElementCheckService {
 
-    public IReadOnlyCollection<WarningElement> CheckSpatialElements(List<SpatialElement> spatialElements) {
-        if(spatialElements.Count == 0) {
+    public IReadOnlyCollection<WarningElement> CheckSpatialElements(List<SpatialModel> spatialModels) {
+        if(spatialModels.Count == 0) {
             return [];
         }
         List<WarningElement> warnings = [];
-        foreach(var spatialElement in spatialElements) {
-            if(spatialElement.Room.IsRedundant()) {
+        foreach(var spatialModel in spatialModels) {
+            var room = spatialModel.SpatialElement as Room;
+            if(room.IsRedundant()) {
                 warnings.Add(new WarningRedundantElement {
                     WarningType = WarningType.Redundant,
-                    SpatialElement = spatialElement
+                    SpatialModel = spatialModel
                 });
-            } else if(spatialElement.Room.IsNotEnclosed()) {
+            } else if(room.IsNotEnclosed()) {
                 warnings.Add(new WarningNotEnclosedElement {
                     WarningType = WarningType.NotEnclosed,
-                    SpatialElement = spatialElement
+                    SpatialModel = spatialModel
                 });
             }
         }

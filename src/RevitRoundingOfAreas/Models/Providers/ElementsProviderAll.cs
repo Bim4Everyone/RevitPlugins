@@ -16,7 +16,7 @@ internal class ElementsProviderAll : IElementsProvider {
 
     public ElementsProviderType Type => ElementsProviderType.AllElementsProvider;
 
-    public List<SpatialElement> GetSpatialElements(ElementId phaseId) {
+    public List<SpatialModel> GetSpatialElements(ElementId phaseId) {
         throw new System.NotImplementedException();
     }
 }

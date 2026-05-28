@@ -118,16 +118,6 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    // Метод получения коллекции RangeElementsViewModel для RangeElements
-    private IEnumerable<RangeViewModel> GetRangeViewModels() {
-        var providers = Enum.GetValues(typeof(ElementsProviderType)).Cast<ElementsProviderType>();
-        return providers
-            .Select(provider => new RangeViewModel {
-                Name = _localizationService.GetLocalizedString($"MainViewModel.{provider}"),
-                ElementsProvider = _providersFactory.GetElementsProvider(provider)
-            });
-    }
-
     // Метод получения коллекции DigitViewModel для DigitCount
     private IEnumerable<DigitViewModel> GetDigitViewModels() {
         for(int i = 1; i <= _systemPluginConfig.DefaultDigitCountRange; i++) {
@@ -147,7 +137,6 @@ internal class MainViewModel : BaseViewModel {
             });
     }
 
-
     // Метод получения коллекции PhaseViewModel для Phases
     private IEnumerable<PhaseViewModel> GetPhaseViewModels() {
         return _revitRepository.GetPhaseModels()
@@ -157,12 +146,21 @@ internal class MainViewModel : BaseViewModel {
             });
     }
 
+    // Метод получения коллекции RangeElementsViewModel для RangeElements
+    private IEnumerable<RangeViewModel> GetRangeViewModels() {
+        var providers = Enum.GetValues(typeof(ElementsProviderType)).Cast<ElementsProviderType>();
+        return providers
+            .Select(provider => new RangeViewModel {
+                Name = _localizationService.GetLocalizedString($"MainViewModel.{provider}"),
+                ElementsProvider = _providersFactory.GetElementsProvider(provider)
+            });
+    }
+
     private void LoadView() {
         LoadConfig();
 
         Range = new ObservableCollection<RangeViewModel>(GetRangeViewModels());
-        SelectedRange = Range.FirstOrDefault(range => range.ElementsProvider.Type == _configSettings.ElementsProviderType)
-            ?? Range.FirstOrDefault();
+        SelectedRange = ResolveDefaultRange() ?? Range.FirstOrDefault();
 
         Phases = new ObservableCollection<PhaseViewModel>(GetPhaseViewModels());
         SelectedPhase = Phases
@@ -183,15 +181,33 @@ internal class MainViewModel : BaseViewModel {
             ?? DigitCount.FirstOrDefault();
     }
 
+    private RangeViewModel ResolveDefaultRange() {
+        return _revitRepository.HasSelectedRooms()
+            ? Range.FirstOrDefault(x => x.ElementsProvider.Type == ElementsProviderType.SelectedElementsProvider)
+            : _revitRepository.HasRoomsOnCurrentView()
+            ? Range.FirstOrDefault(x => x.ElementsProvider.Type == ElementsProviderType.CurrentViewProvider)
+            : Range.FirstOrDefault(x => x.ElementsProvider.Type == ElementsProviderType.AllElementsProvider);
+    }
+
     private void AcceptView() {
         SaveConfig();
         var spatialElements = SelectedRange.ElementsProvider.GetSpatialElements(SelectedPhase.ElementId);
         var warnings = _spatialElementCheckService.CheckSpatialElements(spatialElements);
-
-
     }
 
     private bool CanAcceptView() {
+        if(SelectedRange != null) {
+            if(SelectedRange.ElementsProvider.Type == ElementsProviderType.SelectedElementsProvider
+                && !_revitRepository.HasSelectedRooms()) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSelection");
+                return false;
+            }
+            if(SelectedRange.ElementsProvider.Type == ElementsProviderType.CurrentViewProvider
+                && !_revitRepository.HasRoomsOnCurrentView()) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoRoomsOnView");
+                return false;
+            }
+        }
         ErrorText = null;
         return true;
     }
@@ -204,10 +220,6 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод применения дефолтных значений настроек.
     private void ApplyDefaultsConfig() {
-        if(_configSettings.ElementsProviderType == default) {
-            _configSettings.ElementsProviderType = _systemPluginConfig.DefaultProvider;
-        }
-
         if(_configSettings.SelectedPhaseId is null || _configSettings.SelectedPhaseId == ElementId.InvalidElementId) {
             _configSettings.SelectedPhaseId = _revitRepository.GetPhaseIdByName(_systemPluginConfig.DefaultPhaseName);
         }
@@ -225,7 +237,6 @@ internal class MainViewModel : BaseViewModel {
                       ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
         setting.ConfigSettings = new ConfigSettings {
-            ElementsProviderType = SelectedRange.ElementsProvider.Type,
             SelectedPhaseId = SelectedPhase?.ElementId ?? ElementId.InvalidElementId,
             SourceParam = SelectedSourceParam?.RevitParam,
             TargetParam = SelectedTargetParam?.RevitParam,
