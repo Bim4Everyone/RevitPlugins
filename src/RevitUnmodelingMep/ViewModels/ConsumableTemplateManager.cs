@@ -52,15 +52,15 @@ internal sealed class ConsumableTemplateManager {
     }
 
     /// <summary>
-    /// Приводит существующие шаблонные расходники к значениям из шаблона и добавляет отсутствующие шаблонные расходники.
-    /// </summary>
-    /// <summary>
     /// Проверяет, есть ли в шаблоне расходники, которые отсутствуют в текущей коллекции.
     /// </summary>
     public bool HasMissingTemplateItems() {
         return _items != null && _templateConfigs.Values.Any(template => !ContainsTemplateItem(template));
     }
 
+    /// <summary>
+    /// Приводит существующие шаблонные расходники к значениям из шаблона и при необходимости добавляет отсутствующие.
+    /// </summary>
     public void ApplyTemplatesToItems(bool addMissingItems) {
         if(_items == null) {
             return;
