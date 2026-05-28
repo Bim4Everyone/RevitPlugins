@@ -17,6 +17,6 @@ internal class ElementsProviderSelected : IElementsProvider {
     public ElementsProviderType Type => ElementsProviderType.SelectedElementsProvider;
 
     public List<SpatialModel> GetSpatialElements(ElementId phaseId) {
-        throw new System.NotImplementedException();
+        return _revitRepository.GetSelectedSpatialModels(phaseId);
     }
 }

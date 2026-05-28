@@ -16,17 +16,13 @@ internal class WarningElementViewModel : BaseViewModel {
 
     public WarningElementViewModel(SpatialModel spatialModel) {
         _spatialModel = spatialModel;
-        ElementId = _spatialModel.SpatialElement.Id;
         Name = _spatialModel.SpatialElement.Name;
         LevelName = _spatialModel.LevelName;
+        ElementId = _spatialModel.SpatialElement.Id;
     }
 
     public ICommand ShowElementCommand { get; set; }
 
-    public ElementId ElementId {
-        get => _elementId;
-        set => RaiseAndSetIfChanged(ref _elementId, value);
-    }
     public string Name {
         get => _name;
         set => RaiseAndSetIfChanged(ref _name, value);
@@ -34,5 +30,9 @@ internal class WarningElementViewModel : BaseViewModel {
     public string LevelName {
         get => _levelName;
         set => RaiseAndSetIfChanged(ref _levelName, value);
+    }
+    public ElementId ElementId {
+        get => _elementId;
+        set => RaiseAndSetIfChanged(ref _elementId, value);
     }
 }

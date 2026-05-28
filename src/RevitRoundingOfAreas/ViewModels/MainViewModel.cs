@@ -13,6 +13,7 @@ using dosymep.WPF.ViewModels;
 using RevitRoundingOfAreas.Models;
 using RevitRoundingOfAreas.Models.Enums;
 using RevitRoundingOfAreas.Models.Factories;
+using RevitRoundingOfAreas.Models.Interfaces;
 
 namespace RevitRoundingOfAreas.ViewModels;
 
@@ -23,6 +24,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ParamService _paramService;
     private readonly ProvidersFactory _providersFactory;
     private readonly SpatialElementCheckService _spatialElementCheckService;
+    private readonly IWindowService _windowService;
     private readonly ILocalizationService _localizationService;
 
     private ConfigSettings _configSettings;
@@ -49,6 +51,7 @@ internal class MainViewModel : BaseViewModel {
         ParamService paramService,
         ProvidersFactory providersFactory,
         ILocalizationService localizationService,
+        IWindowService windowService,
         SpatialElementCheckService spatialElementCheckService) {
 
         _pluginConfig = pluginConfig;
@@ -57,6 +60,7 @@ internal class MainViewModel : BaseViewModel {
         _paramService = paramService;
         _providersFactory = providersFactory;
         _localizationService = localizationService;
+        _windowService = windowService;
         _spatialElementCheckService = spatialElementCheckService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -193,6 +197,11 @@ internal class MainViewModel : BaseViewModel {
         SaveConfig();
         var spatialElements = SelectedRange.ElementsProvider.GetSpatialElements(SelectedPhase.ElementId);
         var warnings = _spatialElementCheckService.CheckSpatialElements(spatialElements);
+
+        if(warnings.Count != 0) {
+            _windowService.CloseMainWindow();
+            _windowService.ShowWarningWindow(warnings);
+        }
     }
 
     private bool CanAcceptView() {

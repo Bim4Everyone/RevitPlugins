@@ -17,6 +17,6 @@ internal class ElementsProviderAll : IElementsProvider {
     public ElementsProviderType Type => ElementsProviderType.AllElementsProvider;
 
     public List<SpatialModel> GetSpatialElements(ElementId phaseId) {
-        throw new System.NotImplementedException();
+        return _revitRepository.GetAllSpatialModels(phaseId);
     }
 }

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Windows;
 
+
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
@@ -16,7 +17,9 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitRoundingOfAreas.Models;
+using RevitRoundingOfAreas.Models.Interfaces;
 using RevitRoundingOfAreas.ViewModels;
+using RevitRoundingOfAreas.ViewModels.Warnings;
 using RevitRoundingOfAreas.Views;
 
 namespace RevitRoundingOfAreas;
@@ -68,16 +71,26 @@ public class RevitRoundingOfAreasCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        // Настройка доступа к сервису по управлению окнами
+        kernel.Bind<IWindowService>()
+            .To<WindowService>()
+            .InSingletonScope();
+
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
+        // Настройка сервиса окошек сообщений
+        kernel.UseWpfUIMessageBox<MainViewModel>();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+
+        // Настройка запуска окна предупреждений
+        kernel.BindOtherWindow<WarningsViewModel, WarningsWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст

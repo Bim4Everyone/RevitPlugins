@@ -53,4 +53,16 @@
     <system:String
         x:Key="MainViewModel.NoRoomsOnView">Нет помещений на виде</system:String>
 
+    <system:String
+        x:Key="RevitRepository.NoLevel"> - Нет уровня - </system:String>
+
+    <system:String
+        x:Key="WarningWindow.Title">Предупреждения</system:String>
+    <system:String
+        x:Key="WarningWindow.ElementIdHeader">ИД помещения</system:String>
+    <system:String
+        x:Key="WarningWindow.NameHeader">Имя помещения</system:String>
+    <system:String
+        x:Key="WarningWindow.LevelNameHeader">Уровень помещения</system:String>
+
 </ResourceDictionary>

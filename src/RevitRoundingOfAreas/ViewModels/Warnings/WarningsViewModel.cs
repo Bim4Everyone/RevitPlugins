@@ -43,7 +43,7 @@ internal class WarningsViewModel : BaseViewModel {
     /// </summary>
     public void LoadView() {
         WarningViewModels = new ObservableCollection<WarningGroupViewModel>(GetWarningGroupViewModels());
-        WarningQuantity = $"({WarningViewModels.Count})";
+        WarningQuantity = WarningViewModels.Count.ToString();
     }
 
     // Метод выделения элемента
@@ -60,7 +60,7 @@ internal class WarningsViewModel : BaseViewModel {
                     Caption = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}"),
                     Description = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}Description"),
                     WarningElements = group.ToList(),
-                    WarningQuantity = $"({group.Count()})",
+                    WarningQuantity = group.Count().ToString(),
                     ShowElementCommand = ShowElementCommand
                 };
                 vm.LoadView();

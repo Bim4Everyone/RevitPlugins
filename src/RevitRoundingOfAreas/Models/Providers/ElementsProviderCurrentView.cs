@@ -17,6 +17,6 @@ internal class ElementsProviderCurrentView : IElementsProvider {
     public ElementsProviderType Type => ElementsProviderType.CurrentViewProvider;
 
     public List<SpatialModel> GetSpatialElements(ElementId phaseId) {
-        throw new System.NotImplementedException();
+        return _revitRepository.GetActiveViewSpatialModels(phaseId);
     }
 }
