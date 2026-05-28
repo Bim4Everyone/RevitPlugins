@@ -22,6 +22,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ParamService _paramService;
     private readonly ProvidersFactory _providersFactory;
+    private readonly SpatialElementCheckService _spatialElementCheckService;
     private readonly ILocalizationService _localizationService;
 
     private ConfigSettings _configSettings;
@@ -47,7 +48,8 @@ internal class MainViewModel : BaseViewModel {
         RevitRepository revitRepository,
         ParamService paramService,
         ProvidersFactory providersFactory,
-        ILocalizationService localizationService) {
+        ILocalizationService localizationService,
+        SpatialElementCheckService spatialElementCheckService) {
 
         _pluginConfig = pluginConfig;
         _systemPluginConfig = systemPluginConfig;
@@ -55,6 +57,7 @@ internal class MainViewModel : BaseViewModel {
         _paramService = paramService;
         _providersFactory = providersFactory;
         _localizationService = localizationService;
+        _spatialElementCheckService = spatialElementCheckService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -182,6 +185,10 @@ internal class MainViewModel : BaseViewModel {
 
     private void AcceptView() {
         SaveConfig();
+        var spatialElements = SelectedRange.ElementsProvider.GetSpatialElements(SelectedPhase.ElementId);
+        var warnings = _spatialElementCheckService.CheckSpatialElements(spatialElements);
+
+
     }
 
     private bool CanAcceptView() {
