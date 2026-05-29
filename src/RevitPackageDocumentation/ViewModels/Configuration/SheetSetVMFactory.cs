@@ -183,7 +183,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
         var scheduleFilterList = new ScheduleFilterListVM(scheduleViewVM);
 
-        foreach(var ruleData in data.ScheduleFilterList.ScheduleFilterRules) {
+        foreach(var ruleData in data.ScheduleFilterList?.ScheduleFilterRules ?? []) {
             var ruleVM = new ScheduleFilterRuleVM(scheduleFilterList) {
                 SelectedSpecFieldName = ruleData.FieldName,
                 FilterValue = ruleData.FilterValue ?? string.Empty,
