@@ -13,7 +13,6 @@ using dosymep.WPF.ViewModels;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
-using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 internal class SheetVM : BaseViewModel {
@@ -198,6 +197,11 @@ internal class SheetVM : BaseViewModel {
         _stringParamSetService.Set(this, formulaPropertyName, SheetSet.Params);
     }
 
+    public void UpdatePropsBySheetSetParam() {
+        _stringParamSetService.SetAll(this, SheetSet.Params);
+    }
+
+
     public void CreateComponent() { }
 
     public bool ValidateModule() {
@@ -260,29 +264,6 @@ internal class SheetVM : BaseViewModel {
 
         foreach(var component in SheetComponents.Where(c => c.IsModuleCheck).ToList()) {
             component.Process();
-        }
-    }
-
-
-    public void UpdateSheetSetParam(PluginParamVM pluginParam) {
-        if(pluginParam is not StringParamVM stringParam) {
-            return;
-        }
-
-        // Отбираем свойства, которые string, имеют в имени "Formula" и содержат имя измененного параметра
-        var properties = this.GetType().GetProperties()
-            .Where(p => p.PropertyType == typeof(string) && p.CanWrite && p.Name.Contains("Formula"))
-            .Where(p => p.GetValue(this) is string currentValue && currentValue.Contains($"{{{stringParam.ParamName}}}"))
-            .ToList();
-
-        foreach(var formulaProperty in properties) {
-            var prop = this.GetType().GetProperty(formulaProperty.Name.Replace("Formula", ""));
-            if(prop is null) {
-                continue;
-            }
-            string valueWithFormula = formulaProperty.GetValue(this) as string;
-            string value = valueWithFormula?.Replace($"{{{stringParam.ParamName}}}", stringParam.StringValue);
-            prop.SetValue(this, value);
         }
     }
 }

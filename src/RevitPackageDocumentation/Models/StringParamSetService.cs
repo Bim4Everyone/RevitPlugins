@@ -6,6 +6,14 @@ using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.Models;
 internal class StringParamSetService {
+    public void SetAll(object instance, IEnumerable<PluginParamVM> sheetSetParams) {
+        // Отбираем свойства, которые string, имеют в имени "Formula" и запускаем обновления значения у всех
+        instance.GetType().GetProperties()
+            .Where(p => p.PropertyType == typeof(string) && p.CanWrite && p.Name.Contains("Formula"))
+            .ToList()
+            .ForEach(p => Set(instance, p.Name, sheetSetParams));
+    }
+
     public void Set(object instance, string formulaPropertyName, IEnumerable<PluginParamVM> sheetSetParams) {
         var propFormula = instance.GetType().GetProperty(formulaPropertyName);
         var prop = instance.GetType().GetProperty(formulaPropertyName.Replace("Formula", ""));
