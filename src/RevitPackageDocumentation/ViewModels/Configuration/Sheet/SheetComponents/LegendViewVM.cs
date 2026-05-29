@@ -7,15 +7,11 @@ using RevitPackageDocumentation.Models;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class LegendViewVM : SheetComponentVM {
-    private readonly RevitRepository _revitRepository;
-    private readonly ILocalizationService _localizationService;
-
     private View _legendView;
     private ElementType _viewportType;
 
-    public LegendViewVM(SheetVM sheetVM, RevitRepository revitRepository, ILocalizationService localizationService) : base(sheetVM) {
-        _revitRepository = revitRepository;
-        _localizationService = localizationService;
+    public LegendViewVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) 
+        : base(sheetVM, repository, localizationService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 
@@ -33,11 +29,11 @@ internal class LegendViewVM : SheetComponentVM {
 
     public override bool ValidateModule() {
         if(LegendView is null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.LegendViewIsNull");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.LegendViewIsNull");
             return false;
         }
         if(ViewportType is null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
             return false;
         }
 
@@ -51,7 +47,7 @@ internal class LegendViewVM : SheetComponentVM {
 
     public void Place() {
         // Проверяем можем ли разместить на листе легенду
-        if(!Viewport.CanAddViewToSheet(_revitRepository.Document, Sheet.SheetInstance.Id, LegendView.Id)) {
+        if(!Viewport.CanAddViewToSheet(Repository.Document, Sheet.SheetInstance.Id, LegendView.Id)) {
             return;
         }
 
@@ -60,7 +56,7 @@ internal class LegendViewVM : SheetComponentVM {
             UnitUtilsHelper.ConvertToInternalValue(-100),
             UnitUtilsHelper.ConvertToInternalValue(350),
             0);
-        var viewPort = Viewport.Create(_revitRepository.Document,
+        var viewPort = Viewport.Create(Repository.Document,
                                        Sheet.SheetInstance.Id,
                                        LegendView.Id,
                                        position);

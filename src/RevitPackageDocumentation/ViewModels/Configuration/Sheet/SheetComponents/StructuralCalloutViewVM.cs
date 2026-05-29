@@ -10,9 +10,6 @@ using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class StructuralCalloutViewVM : SheetComponentVM {
-    private readonly RevitRepository _revitRepository;
-    private readonly ILocalizationService _localizationService;
-
     // Ширина фрагмента
     private readonly double _calloutWidth = UnitUtilsHelper.ConvertToInternalValue(4000);
 
@@ -32,9 +29,8 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     private string _viewCount;
     private string _viewportNumber;
 
-    public StructuralCalloutViewVM(SheetVM sheetVM, RevitRepository revitRepository, ILocalizationService localizationService) : base(sheetVM) {
-        _revitRepository = revitRepository;
-        _localizationService = localizationService;
+    public StructuralCalloutViewVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) 
+        : base(sheetVM, repository, localizationService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 
@@ -72,23 +68,23 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
 
     public override bool ValidateModule() {
         if(string.IsNullOrEmpty(ViewName)) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
             return false;
         }
         if(ViewFamilyType is null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewFamilyTypeIsNull");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewFamilyTypeIsNull");
             return false;
         }
         if(ViewportType is null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
             return false;
         }
         if(ViewTemplate is null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewTemplateIsNull");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewTemplateIsNull");
             return false;
         }
         if(!double.TryParse(ViewCount, out double viewCountAsDouble) || viewCountAsDouble < 1) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
             return false;
         }
 
@@ -107,7 +103,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
 
     public View Create(int number) {
         var viewName = $"{ViewName}_{number}";
-        var view = _revitRepository.GetViewByName(viewName);
+        var view = Repository.GetViewByName(viewName);
 
         if(view != null) {
             return view;
@@ -140,7 +136,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
             var calloutEnd = calloutStart + new XYZ(_calloutWidth, _calloutHeight, 0);
 
             view = ViewSection.CreateCallout(
-                _revitRepository.Document,
+                Repository.Document,
                 parentView.ViewInstance.Id,
                 ViewFamilyType.Id,
                 calloutStart,
@@ -150,7 +146,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
 
             // Необходимо для перезагрузки габаритов видов перед их размещением, т.к. при назначении 
             // секущего диапазона, видимых категорий, шаблона вида могут изменяться габариты вида
-            _revitRepository.Document.Regenerate();
+            Repository.Document.Regenerate();
         } catch(System.Exception) { }
         return view;
     }
@@ -159,10 +155,10 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         var sheetInstance = Sheet.SheetInstance;
         if(sheetInstance != null
             && view != null
-            && Viewport.CanAddViewToSheet(_revitRepository.Document, sheetInstance.Id, view.Id)) {
+            && Viewport.CanAddViewToSheet(Repository.Document, sheetInstance.Id, view.Id)) {
 
             // Получение габаритов рамки листа
-            if(_revitRepository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
+            if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
                 return;
             }
             var boundingBoxXYZ = titleBlock.get_BoundingBox(sheetInstance);
@@ -173,7 +169,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
             // Получение габаритов видового экрана
-            var viewPort = Viewport.Create(_revitRepository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
+            var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
             viewPort.ChangeTypeId(ViewportType.Id);
 
             var viewportCenter = viewPort.GetBoxCenter();

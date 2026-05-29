@@ -1,6 +1,9 @@
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
+
+using RevitPackageDocumentation.Models;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal abstract class SheetComponentVM : BaseViewModel {
@@ -8,14 +11,22 @@ internal abstract class SheetComponentVM : BaseViewModel {
     private string _moduleName;
     private string _moduleComment;
     private string _moduleCode;
+    private string _moduleTypeName;
     private string _moduleErrors;
     private SheetVM _sheet;
 
-    protected SheetComponentVM(SheetVM sheetVM) {
+    protected SheetComponentVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) {
         Sheet = sheetVM;
+        Repository = repository;
+        LocalizationService = localizationService;
+        ModuleTypeName = LocalizationService.GetLocalizedString($"Type.{this.GetType().Name}");
     }
 
     public ICommand CreateComponentCommand { get; set; }
+
+    protected RevitRepository Repository { get; }
+    
+    protected ILocalizationService LocalizationService { get; }
 
     public bool IsModuleCheck {
         get => _isModuleCheck;
@@ -35,6 +46,11 @@ internal abstract class SheetComponentVM : BaseViewModel {
     public string ModuleCode {
         get => _moduleCode;
         set => RaiseAndSetIfChanged(ref _moduleCode, value);
+    }
+    
+    public string ModuleTypeName {
+        get => _moduleTypeName;
+        set => RaiseAndSetIfChanged(ref _moduleTypeName, value);
     }
 
     public string ModuleErrors {

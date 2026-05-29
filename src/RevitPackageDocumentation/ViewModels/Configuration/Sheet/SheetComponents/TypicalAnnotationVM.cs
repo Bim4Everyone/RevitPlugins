@@ -11,21 +11,12 @@ using RevitPackageDocumentation.Models;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class TypicalAnnotationVM : SheetComponentVM {
-    private readonly RevitRepository _revitRepository;
-    private readonly ILocalizationService _localizationService;
-
     private List<AnnotationSymbolType> _annotationTypes;
     private Family _annotationFamily;
     private AnnotationSymbolType _annotationType;
 
-    public TypicalAnnotationVM(
-        SheetVM sheetVM,
-        RevitRepository revitRepository,
-        ILocalizationService localizationService)
-        : base(sheetVM) {
-        _revitRepository = revitRepository;
-        _localizationService = localizationService;
-
+    public TypicalAnnotationVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService)
+        : base(sheetVM, repository, localizationService) {
         SelectAnnotationFamilyCommand = RelayCommand.Create(SelectAnnotationFamily);
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
@@ -55,7 +46,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     public void SetAnnotationTypes(Family annotationFamily) {
         AnnotationTypes = annotationFamily
             ?.GetFamilySymbolIds()
-            ?.Select(id => _revitRepository.Document.GetElement(id) as AnnotationSymbolType)
+            ?.Select(id => Repository.Document.GetElement(id) as AnnotationSymbolType)
             ?.ToList();
     }
 
@@ -63,11 +54,11 @@ internal class TypicalAnnotationVM : SheetComponentVM {
 
     public override bool ValidateModule() {
         if(AnnotationFamily is null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.AnnotationFamilyIsNull");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.AnnotationFamilyIsNull");
             return false;
         }
         if(AnnotationType is null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.AnnotationTypeIsNull");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.AnnotationTypeIsNull");
             return false;
         }
 
@@ -84,6 +75,6 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             UnitUtilsHelper.ConvertToInternalValue(-100),
             UnitUtilsHelper.ConvertToInternalValue(250),
             0);
-        _revitRepository.Document.Create.NewFamilyInstance(position, AnnotationType, Sheet.SheetInstance);
+        Repository.Document.Create.NewFamilyInstance(position, AnnotationType, Sheet.SheetInstance);
     }
 }

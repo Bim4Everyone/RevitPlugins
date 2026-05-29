@@ -7,15 +7,11 @@ using RevitPackageDocumentation.Models;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class TextNoteVM : SheetComponentVM {
-    private readonly RevitRepository _revitRepository;
-    private readonly ILocalizationService _localizationService;
-
     private string _text;
     private TextNoteType _textType;
 
-    public TextNoteVM(SheetVM sheetVM, RevitRepository revitRepository, ILocalizationService localizationService) : base(sheetVM) {
-        _revitRepository = revitRepository;
-        _localizationService = localizationService;
+    public TextNoteVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) 
+        : base(sheetVM, repository, localizationService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 
@@ -33,11 +29,11 @@ internal class TextNoteVM : SheetComponentVM {
 
     public override bool ValidateModule() {
         if(string.IsNullOrEmpty(Text)) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.TextIsEmpty");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextIsEmpty");
             return false;
         }
         if(TextNoteType is null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.TextNoteTypeIsNull");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextNoteTypeIsNull");
             return false;
         }
 
@@ -56,6 +52,6 @@ internal class TextNoteVM : SheetComponentVM {
             UnitUtilsHelper.ConvertToInternalValue(-190),
             UnitUtilsHelper.ConvertToInternalValue(120),
             0);
-        TextNote.Create(_revitRepository.Document, sheetInstance.Id, position, Text, options);
+        TextNote.Create(Repository.Document, sheetInstance.Id, position, Text, options);
     }
 }

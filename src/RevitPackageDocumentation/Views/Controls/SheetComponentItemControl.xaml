@@ -76,6 +76,12 @@
                 Grid.Row="0"
                 Orientation="Horizontal"
                 HorizontalAlignment="Right">
+                <ui:TextBox
+                    Margin="10 5"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    Text="{Binding Path=ModuleTypeName}" />                
+                
                 <ui:TextBlock
                     Margin="5"
                     VerticalAlignment="Center"
