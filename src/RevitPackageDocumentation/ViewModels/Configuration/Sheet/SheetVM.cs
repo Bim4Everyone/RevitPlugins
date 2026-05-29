@@ -13,6 +13,7 @@ using dosymep.WPF.ViewModels;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 internal class SheetVM : BaseViewModel {
@@ -197,8 +198,12 @@ internal class SheetVM : BaseViewModel {
         _stringParamSetService.Set(this, formulaPropertyName, SheetSet.Params);
     }
 
-    public void UpdatePropsBySheetSetParam() {
+    public void UpdateDueParamNameChange() {
         _stringParamSetService.SetAll(this, SheetSet.Params);
+    }
+
+    public void UpdateDueParamValueChange(StringParamVM stringParam) {
+        _stringParamSetService.SetAll(this, SheetSet.Params, stringParam);
     }
 
 

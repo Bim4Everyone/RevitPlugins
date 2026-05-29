@@ -19,16 +19,13 @@ internal abstract class PluginParamVM : BaseViewModel {
         ParamComment = paramComment ?? string.Empty;
 
         ParamNameChangeCommand = RelayCommand.Create<PluginParamVM>(ParamNameChange);
-
-        //ValidateParamNameCommand = RelayCommand.Create(ValidateParamName);
-        ValidateParamValueCommand = RelayCommand.Create(ValidateParamValue);
+        ParamValueChangeCommand = RelayCommand.Create<PluginParamVM>(ParamValueChange);
 
         ValidateParamName();
     }
 
     public ICommand ParamNameChangeCommand { get; }
-    //public ICommand ValidateParamNameCommand { get; }
-    public ICommand ValidateParamValueCommand { get; }
+    public ICommand ParamValueChangeCommand { get; }
 
     public SheetSetVM SheetSet => _sheetSet;
 
@@ -58,6 +55,14 @@ internal abstract class PluginParamVM : BaseViewModel {
             SheetSet.UpdateDueParamNameChange(pluginParam);
         }
     }
+
+    private void ParamValueChange(PluginParamVM pluginParam) {
+        ValidateParamValue();
+        if(!ErrorInParamValue) {
+            SheetSet.UpdateDueParamValueChange(pluginParam);
+        }
+    }
+
 
     public void ValidateParamName() {
         ErrorInParamName = string.IsNullOrEmpty(ParamName);

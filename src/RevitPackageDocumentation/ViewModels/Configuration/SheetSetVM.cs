@@ -122,7 +122,16 @@ internal class SheetSetVM : BaseViewModel {
             return;
         }
         foreach(var sheet in SheetList) {
-            sheet.UpdatePropsBySheetSetParam();
+            sheet.UpdateDueParamNameChange();
+        }
+    }
+
+    public void UpdateDueParamValueChange(PluginParamVM pluginParam) {
+        if(pluginParam is not StringParamVM stringParam) {
+            return;
+        }
+        foreach(var sheet in SheetList) {
+            sheet.UpdateDueParamValueChange(stringParam);
         }
     }
 }
