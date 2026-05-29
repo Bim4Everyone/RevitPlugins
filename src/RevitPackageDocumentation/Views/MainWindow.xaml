@@ -236,7 +236,7 @@
                         Grid.Row="0"
                         Margin="5"
                         Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        UpdateFormulaCommand="{Binding CurrentSheetSet.SelectedSheet.SheetNameFormulaUpdateCommand}" />
+                        UpdateFormulaCommand="{Binding CurrentSheetSet.SelectedSheet.PropUpdateByFormulaCommand}" />
 
                     <ui:TextBox
                         Grid.Column="2"

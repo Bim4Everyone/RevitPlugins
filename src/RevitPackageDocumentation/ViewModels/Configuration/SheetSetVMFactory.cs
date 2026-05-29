@@ -26,24 +26,33 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
     private readonly ILocalizationService _localizationService;
     private readonly IMessageBoxService _messageBoxService;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
+    private readonly StringParamSetService _stringParamSetService;
 
     public SheetSetVMFactory(
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService,
-        ISheetSetDataFactory sheetSetDataFactory) {
+        ISheetSetDataFactory sheetSetDataFactory,
+        StringParamSetService stringParamSetService) {
 
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _messageBoxService = messageBoxService;
         _sheetSetDataFactory = sheetSetDataFactory;
+        _stringParamSetService = stringParamSetService;
     }
 
     public SheetSetVM CreateSheetSetVM(SheetSetData data) {
         if(data == null)
             throw new ArgumentNullException(nameof(data));
 
-        var sheetSetVM = new SheetSetVM(_revitRepository, _localizationService, _messageBoxService, this, _sheetSetDataFactory) {
+        var sheetSetVM = new SheetSetVM(
+            _revitRepository,
+            _localizationService,
+            _messageBoxService,
+            this,
+            _sheetSetDataFactory,
+            _stringParamSetService) {
             Name = data.Name
         };
 
@@ -73,7 +82,15 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
         var titleBlockType = titleBlockTypes?.FirstOrDefault(v => v.Name.Equals(data.TitleBlockTypeName));
 
-        var sheetVM = new SheetVM(sheetSetVM, _revitRepository, _localizationService, _messageBoxService, this, _sheetSetDataFactory) {
+        var sheetVM = new SheetVM(
+            sheetSetVM,
+            _revitRepository,
+            _localizationService,
+            _messageBoxService,
+            this,
+            _sheetSetDataFactory,
+            _stringParamSetService) {
+
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,

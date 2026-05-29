@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -24,7 +22,7 @@ internal class SheetVM : BaseViewModel {
     private readonly IMessageBoxService _messageBoxService;
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
-
+    private readonly StringParamSetService _stringParamSetService;
     private readonly string _sheetCoefficientParamName = "А";
     private readonly string _sheetSizeParamName = "х";
 
@@ -52,7 +50,8 @@ internal class SheetVM : BaseViewModel {
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService,
         ISheetSetVMFactory sheetSetVMFactory,
-        ISheetSetDataFactory sheetSetDataFactory) {
+        ISheetSetDataFactory sheetSetDataFactory,
+        StringParamSetService stringParamSetService) {
 
         SheetSet = sheetSetVM;
         _revitRepository = revitRepository;
@@ -60,6 +59,7 @@ internal class SheetVM : BaseViewModel {
         _messageBoxService = messageBoxService;
         _sheetSetVMFactory = sheetSetVMFactory;
         _sheetSetDataFactory = sheetSetDataFactory;
+        _stringParamSetService = stringParamSetService;
 
         SelectTitleBlockFamilyCommand = RelayCommand.Create(SelectTitleBlockFamily);
         CreateSheetCommand = RelayCommand.Create(CreateComponent, ValidateModule);
@@ -67,7 +67,7 @@ internal class SheetVM : BaseViewModel {
         AddComponentCommand = RelayCommand.Create<ComponentTypeItem>(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
 
-        SheetNameFormulaUpdateCommand = RelayCommand.Create<string>(SheetNameFormulaUpdate);
+        PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
     }
 
     public ICommand SelectTitleBlockFamilyCommand { get; }
@@ -76,7 +76,7 @@ internal class SheetVM : BaseViewModel {
     public ICommand AddComponentCommand { get; }
     public ICommand RemoveComponentCommand { get; }
 
-    public ICommand SheetNameFormulaUpdateCommand { get; }
+    public ICommand PropUpdateByFormulaCommand { get; }
 
     public bool IsModuleCheck {
         get => _isModuleCheck;
@@ -178,6 +178,25 @@ internal class SheetVM : BaseViewModel {
         }
     }
 
+    private void AddComponent(ComponentTypeItem selectedComponentType) {
+        if(selectedComponentType?.ComponentType == null)
+            return;
+
+        try {
+            var componentData = _sheetSetDataFactory.CreateComponentData(selectedComponentType.ComponentType);
+            if(componentData == null)
+                return;
+
+            var component = _sheetSetVMFactory.CreateComponentVM(this, componentData);
+            SheetComponents.Add(component);
+        } catch(System.Exception) {
+            _messageBoxService.Show("An error occurred while adding the component!", "Error");
+        }
+    }
+
+    private void PropUpdateByFormula(string formulaPropertyName) {
+        _stringParamSetService.Set(this, formulaPropertyName, SheetSet.Params);
+    }
 
     public void CreateComponent() { }
 
@@ -218,23 +237,6 @@ internal class SheetVM : BaseViewModel {
         return true;
     }
 
-
-    private void AddComponent(ComponentTypeItem selectedComponentType) {
-        if(selectedComponentType?.ComponentType == null)
-            return;
-
-        try {
-            var componentData = _sheetSetDataFactory.CreateComponentData(selectedComponentType.ComponentType);
-            if(componentData == null)
-                return;
-
-            var component = _sheetSetVMFactory.CreateComponentVM(this, componentData);
-            SheetComponents.Add(component);
-        } catch(System.Exception) {
-            _messageBoxService.Show("An error occurred while adding the component!", "Error");
-        }
-    }
-
     public void Process() {
         SheetInstance = null;
         SheetInstance = _revitRepository.GetSheetByName(SheetNameFormula);
@@ -260,40 +262,6 @@ internal class SheetVM : BaseViewModel {
             component.Process();
         }
     }
-
-    private void SheetNameFormulaUpdate(string text) {
-        var propFormula = this.GetType().GetProperty(text);
-        var prop = this.GetType().GetProperty(text.Replace("Formula", ""));
-        if(prop is null) {
-            return;
-        }
-
-        string propFormulaValue = propFormula.GetValue(this) as string;
-
-        SetValue(propFormulaValue, prop);
-    }
-
-
-    public void SetValue(string formula, PropertyInfo propForSet) {
-        // префикс_{ФОП_Блок СМР}_суффикс1_{ФОП_Секция СМР}_суффикс2
-        string tempValue = formula;
-
-        var regex = new Regex(@"{([^\}]+)}");
-        MatchCollection matches = regex.Matches(formula);
-
-        Regex regexForParam;
-        foreach(Match match in matches) {
-            string paramName = match.Value.Replace("{", "").Replace("}", "");
-
-            if(SheetSet.Params.FirstOrDefault(p => p.ParamName == paramName) is not StringParamVM param) {
-                continue;
-            }
-            regexForParam = new Regex(match.Value);
-            tempValue = regexForParam.Replace(tempValue, param.StringValue, 1);
-        }
-        propForSet.SetValue(this, tempValue);
-    }
-
 
 
     public void UpdateSheetSetParam(PluginParamVM pluginParam) {

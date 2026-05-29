@@ -17,7 +17,7 @@ internal class SheetSetVM : BaseViewModel {
     private readonly IMessageBoxService _messageBoxService;
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
-
+    private readonly StringParamSetService _stringParamSetService;
     private string _name;
     private ObservableCollection<SheetVM> _sheetList = [];
     private ObservableCollection<PluginParamVM> _params = [];
@@ -28,13 +28,15 @@ internal class SheetSetVM : BaseViewModel {
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService,
         ISheetSetVMFactory sheetSetVMFactory,
-        ISheetSetDataFactory sheetSetDataFactory) {
+        ISheetSetDataFactory sheetSetDataFactory,
+        StringParamSetService stringParamSetService) {
 
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _messageBoxService = messageBoxService;
         _sheetSetVMFactory = sheetSetVMFactory;
         _sheetSetDataFactory = sheetSetDataFactory;
+        _stringParamSetService = stringParamSetService;
 
         AddSheetCommand = RelayCommand.Create(AddSheet);
         RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
@@ -80,7 +82,8 @@ internal class SheetSetVM : BaseViewModel {
                 _localizationService,
                 _messageBoxService,
                 _sheetSetVMFactory,
-                _sheetSetDataFactory) { ModuleName = "Новый лист" });
+                _sheetSetDataFactory,
+                _stringParamSetService) { ModuleName = "Новый лист" });
     }
 
     internal void RemoveSheet(SheetVM sheet) {

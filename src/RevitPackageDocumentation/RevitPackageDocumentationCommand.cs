@@ -96,6 +96,11 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
             .To<SheetSetDataFactory>()
             .InSingletonScope();
 
+        // Сервис обновления свойств по параметрам конфигурации
+        kernel.Bind<StringParamSetService>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Настройка сервиса окошек сообщений
         kernel.UseWpfUIMessageBox<MainViewModel>();
 

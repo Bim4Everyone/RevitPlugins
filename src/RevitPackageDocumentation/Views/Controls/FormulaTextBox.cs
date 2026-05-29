@@ -1,9 +1,14 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace RevitPackageDocumentation.Views.Controls;
+
 public class FormulaTextBox : TextBox {
+    private readonly DispatcherTimer _timer;
+
     public static readonly DependencyProperty UpdateFormulaCommandProperty =
         DependencyProperty.Register(
             nameof(UpdateFormulaCommand),
@@ -16,16 +21,20 @@ public class FormulaTextBox : TextBox {
         set => SetValue(UpdateFormulaCommandProperty, value);
     }
 
-    protected override void OnTextChanged(TextChangedEventArgs e) {
-        base.OnTextChanged(e);
+    public FormulaTextBox() {
+        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
+        _timer.Tick += (s, e) => { _timer.Stop(); UpdateFormula(); };
+    }
 
-        if(UpdateFormulaCommand != null) {
-            var bindingExpression = GetBindingExpression(TextProperty);
-            if(bindingExpression?.ResolvedSourcePropertyName is string propertyName) {
-                if(UpdateFormulaCommand.CanExecute(propertyName)) {
-                    UpdateFormulaCommand.Execute(propertyName);
-                }
-            }
+    protected override void OnTextChanged(TextChangedEventArgs e) {
+        _timer.Stop();
+        _timer.Start();
+    }
+
+    private void UpdateFormula() {
+        var propertyName = GetBindingExpression(TextProperty)?.ResolvedSourcePropertyName;
+        if(propertyName != null) {
+            UpdateFormulaCommand?.Execute(propertyName);
         }
     }
 }
