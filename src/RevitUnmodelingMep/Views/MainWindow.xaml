@@ -300,7 +300,7 @@
                                                                 Grid.Column="1"
                                                                 Margin="8 0 8 0"
                                                                 VerticalAlignment="Center"
-                                                                Foreground="OrangeRed"
+                                                                Foreground="Orange"
                                                                 FontSize="12"
                                                                 Text="{DynamicResource MainWindow.TemplateDifferenceText}">
                                                                 <TextBlock.Style>
