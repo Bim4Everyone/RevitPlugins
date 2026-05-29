@@ -5,6 +5,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitUnmodelingMep.Models;
 
 namespace RevitUnmodelingMep.ViewModels;
@@ -57,7 +59,7 @@ internal sealed class CategoryAssignmentBuilder {
                 new ObservableCollection<SystemTypeItem>(
                     types
                         .OfType<ElementType>()
-                        .Where(type => placedTypeIds == null || placedTypeIds.Contains(GetElementIdValue(type.Id)))
+                        .Where(type => placedTypeIds == null || placedTypeIds.Contains(unchecked((int) type.Id.GetIdValue())))
                         .OrderBy(type => type?.Name ?? string.Empty, StringComparer.CurrentCultureIgnoreCase)
                         .Select(type => CreateSystemTypeItem(type, configsForCategory)));
 
@@ -92,7 +94,7 @@ internal sealed class CategoryAssignmentBuilder {
                 continue;
             }
 
-            result.Add(GetElementIdValue(typeId));
+            result.Add(unchecked((int) typeId.GetIdValue()));
         }
 
         return result;
@@ -102,7 +104,7 @@ internal sealed class CategoryAssignmentBuilder {
     /// Создает элемент типа системы с назначениями всех расходников, подходящих для его категории.
     /// </summary>
     private static SystemTypeItem CreateSystemTypeItem(ElementType elementType, List<ConsumableTypeItem> configs) {
-        int typeId = GetElementIdValue(elementType.Id);
+        int typeId = unchecked((int) elementType.Id.GetIdValue());
 
         ObservableCollection<ConfigAssignmentItem> configAssignments =
             new ObservableCollection<ConfigAssignmentItem>(
@@ -113,18 +115,5 @@ internal sealed class CategoryAssignmentBuilder {
             Id = typeId,
             Configs = configAssignments
         };
-    }
-
-    /// <summary>
-    /// Возвращает числовое значение ElementId с учетом различий API Revit до и после 2024 версии.
-    /// </summary>
-    private static int GetElementIdValue(ElementId elementId) {
-        long value;
-#if REVIT_2024_OR_GREATER
-        value = elementId?.Value ?? 0;
-#else
-        value = elementId?.IntegerValue ?? 0;
-#endif
-        return unchecked((int) value);
     }
 }

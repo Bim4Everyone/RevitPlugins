@@ -4,6 +4,7 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 namespace RevitUnmodelingMep.ViewModels;
@@ -80,13 +81,7 @@ internal sealed class CategoryOptionsProvider {
     /// </summary>
     private CategoryOption CreateCategoryOption(string name, BuiltInCategory builtInCategory) {
         Category category = Category.GetCategory(_document, builtInCategory);
-
-        long idValue;
-#if REVIT_2024_OR_GREATER
-        idValue = category?.Id.Value ?? (long) (int) builtInCategory;
-#else
-        idValue = category?.Id.IntegerValue ?? (int) builtInCategory;
-#endif
+        long idValue = category?.Id?.GetIdValue() ?? (int) builtInCategory;
         int id = unchecked((int) idValue);
 
         return new CategoryOption {
