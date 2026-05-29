@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -65,7 +67,7 @@ internal class SheetVM : BaseViewModel {
         AddComponentCommand = RelayCommand.Create<ComponentTypeItem>(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
 
-        SheetNameFormulaUpdateCommand = RelayCommand.Create(SheetNameFormulaUpdate);
+        SheetNameFormulaUpdateCommand = RelayCommand.Create<string>(SheetNameFormulaUpdate);
     }
 
     public ICommand SelectTitleBlockFamilyCommand { get; }
@@ -235,12 +237,12 @@ internal class SheetVM : BaseViewModel {
 
     public void Process() {
         SheetInstance = null;
-        SheetInstance = _revitRepository.GetSheetByName(SheetName);
+        SheetInstance = _revitRepository.GetSheetByName(SheetNameFormula);
 
         if(SheetInstance is null) {
             try {
                 SheetInstance = ViewSheet.Create(_revitRepository.Document, TitleBlockType.Id);
-                SheetInstance.Name = SheetName;
+                SheetInstance.Name = SheetNameFormula;
 
                 var titleBlock = _revitRepository.GetTitleBlocks(SheetInstance);
 
@@ -259,8 +261,39 @@ internal class SheetVM : BaseViewModel {
         }
     }
 
-    private void SheetNameFormulaUpdate() {
+    private void SheetNameFormulaUpdate(string text) {
+        var propFormula = this.GetType().GetProperty(text);
+        var prop = this.GetType().GetProperty(text.Replace("Formula", ""));
+        if(prop is null) {
+            return;
+        }
+
+        string propFormulaValue = propFormula.GetValue(this) as string;
+
+        SetValue(propFormulaValue, prop);
     }
+
+
+    public void SetValue(string formula, PropertyInfo propForSet) {
+        // префикс_{ФОП_Блок СМР}_суффикс1_{ФОП_Секция СМР}_суффикс2
+        string tempValue = formula;
+
+        var regex = new Regex(@"{([^\}]+)}");
+        MatchCollection matches = regex.Matches(formula);
+
+        Regex regexForParam;
+        foreach(Match match in matches) {
+            string paramName = match.Value.Replace("{", "").Replace("}", "");
+
+            if(SheetSet.Params.FirstOrDefault(p => p.ParamName == paramName) is not StringParamVM param) {
+                continue;
+            }
+            regexForParam = new Regex(match.Value);
+            tempValue = regexForParam.Replace(tempValue, param.StringValue, 1);
+        }
+        propForSet.SetValue(this, tempValue);
+    }
+
 
 
     public void UpdateSheetSetParam(PluginParamVM pluginParam) {

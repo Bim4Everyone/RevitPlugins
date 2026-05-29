@@ -6,9 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     
     xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:local="clr-namespace:RevitPackageDocumentation.Views"
     xmlns:vms="clr-namespace:RevitPackageDocumentation.ViewModels"
     xmlns:sc="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents"
+    xmlns:local="clr-namespace:RevitPackageDocumentation.Views"
+    xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
     
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
@@ -230,20 +231,12 @@
                         VerticalAlignment="Center"
                         Text="Имя листа" />
 
-                    <ui:TextBox
+                    <controls:FormulaTextBox
                         Grid.Column="1"
                         Grid.Row="0"
                         Margin="5"
-                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger
-                                EventName="TextChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding CurrentSheetSet.SelectedSheet.SheetNameFormulaUpdateCommand}"
-                                    CommandParameter="{Binding}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </ui:TextBox>
+                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        UpdateFormulaCommand="{Binding CurrentSheetSet.SelectedSheet.SheetNameFormulaUpdateCommand}" />
 
                     <ui:TextBox
                         Grid.Column="2"

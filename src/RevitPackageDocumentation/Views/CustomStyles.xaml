@@ -23,6 +23,8 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBox/TextBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
     <Style
@@ -348,4 +350,8 @@
             Property="VerticalContentAlignment"
             Value="Center" />
     </Style>
+
+    <Style
+        TargetType="{x:Type controls:FormulaTextBox}"
+        BasedOn="{StaticResource DefaultTextBoxStyle}" />
 </ResourceDictionary>
