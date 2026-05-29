@@ -33,8 +33,8 @@ internal class SheetVM : BaseViewModel {
     private string _moduleErrors;
 
     private SheetSetVM _sheetSet;
+    private string _sheetNameFormula;
     private string _sheetName;
-    private string _demoSheetName;
     private string _sheetSize;
     private string _sheetCoefficient;
     private Family _titleBlockFamily;
@@ -64,6 +64,8 @@ internal class SheetVM : BaseViewModel {
 
         AddComponentCommand = RelayCommand.Create<ComponentTypeItem>(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
+
+        SheetNameFormulaUpdateCommand = RelayCommand.Create(SheetNameFormulaUpdate);
     }
 
     public ICommand SelectTitleBlockFamilyCommand { get; }
@@ -71,6 +73,8 @@ internal class SheetVM : BaseViewModel {
 
     public ICommand AddComponentCommand { get; }
     public ICommand RemoveComponentCommand { get; }
+
+    public ICommand SheetNameFormulaUpdateCommand { get; }
 
     public bool IsModuleCheck {
         get => _isModuleCheck;
@@ -108,14 +112,14 @@ internal class SheetVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _sheetSet, value);
     }
 
+    public string SheetNameFormula {
+        get => _sheetNameFormula;
+        set => RaiseAndSetIfChanged(ref _sheetNameFormula, value);
+    }
+
     public string SheetName {
         get => _sheetName;
         set => RaiseAndSetIfChanged(ref _sheetName, value);
-    }
-
-    public string DemoSheetName {
-        get => _demoSheetName;
-        set => RaiseAndSetIfChanged(ref _demoSheetName, value);
     }
 
     public string SheetSize {
@@ -176,7 +180,7 @@ internal class SheetVM : BaseViewModel {
     public void CreateComponent() { }
 
     public bool ValidateModule() {
-        if(string.IsNullOrEmpty(SheetName)) {
+        if(string.IsNullOrEmpty(SheetNameFormula)) {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.SheetNameIsEmpty");
             HasErrors = true;
             return false;
@@ -255,14 +259,29 @@ internal class SheetVM : BaseViewModel {
         }
     }
 
+    private void SheetNameFormulaUpdate() {
+    }
+
+
     public void UpdateSheetSetParam(PluginParamVM pluginParam) {
-        this.GetType()
-            .GetProperties()
-            .Where(p => p.PropertyType == typeof(string) && p.CanWrite && !p.Name.Contains("Demo"))
-            .Where(p => {
-                return p.GetValue(this) is string currentValue && currentValue.Contains($"{{{pluginParam.ParamName}}}");
-            })
-            .ToList()
-            .ForEach(p => p.SetValue(this, "Test"));
+        if(pluginParam is not StringParamVM stringParam) {
+            return;
+        }
+
+        // Отбираем свойства, которые string, имеют в имени "Formula" и содержат имя измененного параметра
+        var properties = this.GetType().GetProperties()
+            .Where(p => p.PropertyType == typeof(string) && p.CanWrite && p.Name.Contains("Formula"))
+            .Where(p => p.GetValue(this) is string currentValue && currentValue.Contains($"{{{stringParam.ParamName}}}"))
+            .ToList();
+
+        foreach(var formulaProperty in properties) {
+            var prop = this.GetType().GetProperty(formulaProperty.Name.Replace("Formula", ""));
+            if(prop is null) {
+                continue;
+            }
+            string valueWithFormula = formulaProperty.GetValue(this) as string;
+            string value = valueWithFormula?.Replace($"{{{stringParam.ParamName}}}", stringParam.StringValue);
+            prop.SetValue(this, value);
+        }
     }
 }

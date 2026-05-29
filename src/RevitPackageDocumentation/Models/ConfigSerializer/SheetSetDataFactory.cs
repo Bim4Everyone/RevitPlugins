@@ -38,7 +38,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             ModuleName = vm.ModuleName,
             ModuleComment = vm.ModuleComment,
 
-            SheetName = vm.SheetName,
+            SheetNameFormula = vm.SheetNameFormula,
             SheetSize = vm.SheetSize,
             SheetCoefficient = vm.SheetCoefficient,
             TitleBlockFamilyName = vm.TitleBlockFamily?.Name,

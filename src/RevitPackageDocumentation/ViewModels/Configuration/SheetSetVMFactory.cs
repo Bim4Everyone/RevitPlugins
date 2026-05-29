@@ -79,7 +79,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleComment = data.ModuleComment ?? string.Empty,
             ModuleCode = "123",
 
-            SheetName = data.SheetName ?? string.Empty,
+            SheetNameFormula = data.SheetNameFormula ?? string.Empty,
             SheetSize = data.SheetSize ?? string.Empty,
             SheetCoefficient = data.SheetCoefficient ?? string.Empty,
 

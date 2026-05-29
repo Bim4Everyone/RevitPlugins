@@ -70,7 +70,7 @@ public class SheetData {
     public string ModuleName { get; set; }
     public string ModuleComment { get; set; }
 
-    public string SheetName { get; set; }
+    public string SheetNameFormula { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
     public string TitleBlockFamilyName { get; set; }
