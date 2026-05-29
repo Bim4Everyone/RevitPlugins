@@ -18,7 +18,7 @@ internal interface ISheetSetVMFactory {
     SheetSetVM CreateSheetSetVM(SheetSetData data);
     SheetVM CreateSheetVM(SheetSetVM sheetSetVM, SheetData data);
     SheetComponentVM CreateComponentVM(SheetVM sheetVM, SheetComponentData data);
-    PluginParamVM CreateParamVM(PluginParamData data);
+    PluginParamVM CreateParamVM(SheetSetVM sheetSetVM, PluginParamData data);
 }
 
 internal class SheetSetVMFactory : ISheetSetVMFactory {
@@ -48,7 +48,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
 
         foreach(var paramData in data.Params) {
-            var paramVM = CreateParamVM(paramData);
+            var paramVM = CreateParamVM(sheetSetVM, paramData);
             sheetSetVM.Params.Add(paramVM);
         }
 
@@ -222,10 +222,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
     }
 
-    public PluginParamVM CreateParamVM(PluginParamData paramData) {
+    public PluginParamVM CreateParamVM(SheetSetVM sheetSetVM, PluginParamData paramData) {
         return paramData switch {
-            StringParamData data => new StringParamVM(data.ParamName, data.ParamComment, data.StringValue),
-            SelectElemParamData data => new SelectElemParamVM(data.ParamName, data.ParamComment),
+            StringParamData data => new StringParamVM(sheetSetVM, data.ParamName, data.ParamComment, data.StringValue),
+            SelectElemParamData data => new SelectElemParamVM(sheetSetVM, data.ParamName, data.ParamComment),
             _ => throw new NotSupportedException($"Тип '{paramData?.GetType().Name}' не поддерживается")
         };
     }

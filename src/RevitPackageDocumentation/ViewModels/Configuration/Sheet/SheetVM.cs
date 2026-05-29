@@ -13,6 +13,7 @@ using dosymep.WPF.ViewModels;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 internal class SheetVM : BaseViewModel {
@@ -33,6 +34,7 @@ internal class SheetVM : BaseViewModel {
 
     private SheetSetVM _sheetSet;
     private string _sheetName;
+    private string _demoSheetName;
     private string _sheetSize;
     private string _sheetCoefficient;
     private Family _titleBlockFamily;
@@ -109,6 +111,11 @@ internal class SheetVM : BaseViewModel {
     public string SheetName {
         get => _sheetName;
         set => RaiseAndSetIfChanged(ref _sheetName, value);
+    }
+
+    public string DemoSheetName {
+        get => _demoSheetName;
+        set => RaiseAndSetIfChanged(ref _demoSheetName, value);
     }
 
     public string SheetSize {
@@ -246,5 +253,16 @@ internal class SheetVM : BaseViewModel {
         foreach(var component in SheetComponents.Where(c => c.IsModuleCheck).ToList()) {
             component.Process();
         }
+    }
+
+    public void UpdateSheetSetParam(PluginParamVM pluginParam) {
+        this.GetType()
+            .GetProperties()
+            .Where(p => p.PropertyType == typeof(string) && p.CanWrite && !p.Name.Contains("Demo"))
+            .Where(p => {
+                return p.GetValue(this) is string currentValue && currentValue.Contains($"{{{pluginParam.ParamName}}}");
+            })
+            .ToList()
+            .ForEach(p => p.SetValue(this, "Test"));
     }
 }

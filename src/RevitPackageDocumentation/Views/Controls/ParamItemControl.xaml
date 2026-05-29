@@ -87,7 +87,8 @@
                         <i:EventTrigger
                             EventName="TextChanged">
                             <i:InvokeCommandAction
-                                Command="{Binding ValidateParamNameCommand}" />
+                                Command="{Binding ParamNameChangeCommand}"
+                                CommandParameter="{Binding}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ui:TextBox>

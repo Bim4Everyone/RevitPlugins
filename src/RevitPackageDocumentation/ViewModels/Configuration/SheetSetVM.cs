@@ -41,12 +41,15 @@ internal class SheetSetVM : BaseViewModel {
 
         AddSheetSetParamCommand = RelayCommand.Create<ComponentTypeItem>(AddSheetSetParam);
         RemoveSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(RemoveSheetSetParam);
+
+        //UpdateSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(UpdateSheetSetParam);
     }
 
     public ICommand AddSheetCommand { get; }
     public ICommand RemoveSheetCommand { get; }
     public ICommand AddSheetSetParamCommand { get; }
     public ICommand RemoveSheetSetParamCommand { get; }
+    //public ICommand UpdateSheetSetParamCommand { get; }
 
     public string Name {
         get => _name;
@@ -58,14 +61,14 @@ internal class SheetSetVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _sheetList, value);
     }
 
-    public ObservableCollection<PluginParamVM> Params {
-        get => _params;
-        set => RaiseAndSetIfChanged(ref _params, value);
-    }
-
     public SheetVM SelectedSheet {
         get => _selectedSheet;
         set => RaiseAndSetIfChanged(ref _selectedSheet, value);
+    }
+
+    public ObservableCollection<PluginParamVM> Params {
+        get => _params;
+        set => RaiseAndSetIfChanged(ref _params, value);
     }
 
 
@@ -98,7 +101,7 @@ internal class SheetSetVM : BaseViewModel {
             if(paramData == null)
                 return;
 
-            var parameter = _sheetSetVMFactory.CreateParamVM(paramData);
+            var parameter = _sheetSetVMFactory.CreateParamVM(this, paramData);
             Params.Add(parameter);
         } catch(System.Exception) {
             _messageBoxService.Show("An error occurred while adding the parameter!", "Error");
@@ -108,6 +111,12 @@ internal class SheetSetVM : BaseViewModel {
     private void RemoveSheetSetParam(PluginParamVM pluginParam) {
         if(pluginParam != null && Params.Contains(pluginParam)) {
             Params.Remove(pluginParam);
+        }
+    }
+
+    public void UpdateSheetSetParam(PluginParamVM pluginParam) {
+        foreach(var sheet in SheetList) {
+            sheet.UpdateSheetSetParam(pluginParam);
         }
     }
 }

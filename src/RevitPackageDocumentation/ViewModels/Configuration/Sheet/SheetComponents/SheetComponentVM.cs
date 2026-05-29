@@ -13,10 +13,10 @@ internal abstract class SheetComponentVM : BaseViewModel {
     private string _moduleCode;
     private string _moduleTypeName;
     private string _moduleErrors;
-    private SheetVM _sheet;
+    private readonly SheetVM _sheet;
 
     protected SheetComponentVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) {
-        Sheet = sheetVM;
+        _sheet = sheetVM;
         Repository = repository;
         LocalizationService = localizationService;
         ModuleTypeName = LocalizationService.GetLocalizedString($"Type.{this.GetType().Name}");
@@ -25,8 +25,10 @@ internal abstract class SheetComponentVM : BaseViewModel {
     public ICommand CreateComponentCommand { get; set; }
 
     protected RevitRepository Repository { get; }
-    
+
     protected ILocalizationService LocalizationService { get; }
+
+    public SheetVM Sheet => _sheet;
 
     public bool IsModuleCheck {
         get => _isModuleCheck;
@@ -47,7 +49,7 @@ internal abstract class SheetComponentVM : BaseViewModel {
         get => _moduleCode;
         set => RaiseAndSetIfChanged(ref _moduleCode, value);
     }
-    
+
     public string ModuleTypeName {
         get => _moduleTypeName;
         set => RaiseAndSetIfChanged(ref _moduleTypeName, value);
@@ -56,11 +58,6 @@ internal abstract class SheetComponentVM : BaseViewModel {
     public string ModuleErrors {
         get => _moduleErrors;
         set => RaiseAndSetIfChanged(ref _moduleErrors, value);
-    }
-
-    public SheetVM Sheet {
-        get => _sheet;
-        set => RaiseAndSetIfChanged(ref _sheet, value);
     }
 
     public T GetSettings<T>() where T : new() {
