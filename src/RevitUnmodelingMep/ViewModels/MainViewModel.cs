@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using dosymep.Bim4Everyone.ProjectConfigs;
@@ -11,7 +12,6 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using pyRevitLabs.Json;
-using Autodesk.Revit.DB;
 
 using RevitUnmodelingMep.Models;
 
@@ -26,6 +26,9 @@ internal class MainViewModel : BaseViewModel {
     private readonly ISaveFileDialogService _saveFileDialogService;
     public IMessageBoxService MessageBoxService { get; }
     private readonly IConfigSerializer _configSerializer;
+    private readonly ConsumableTemplateManager _consumableTemplateManager;
+    private readonly CategoryOptionsProvider _categoryOptionsProvider;
+    private readonly CategoryAssignmentBuilder _categoryAssignmentBuilder;
 
     private string _errorText;
     private string _saveProperty;
@@ -35,8 +38,7 @@ internal class MainViewModel : BaseViewModel {
     private int _lastConfigIndex;
     private readonly IReadOnlyList<CategoryOption> _categoryOptions;
     private bool _isViewLoaded;
-     
-
+    
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
@@ -53,7 +55,12 @@ internal class MainViewModel : BaseViewModel {
         _saveFileDialogService = saveFileDialogService;
         MessageBoxService = messageBoxService;
         _configSerializer = configSerializer;
-        _categoryOptions = CreateCategoryOptions();
+        _categoryOptionsProvider = new CategoryOptionsProvider(_revitRepository.Document, _localizationService);
+        _categoryAssignmentBuilder = new CategoryAssignmentBuilder(_revitRepository);
+        _categoryOptions = _categoryOptionsProvider.CreateCategoryOptions();
+        _consumableTemplateManager = new ConsumableTemplateManager(
+            _revitRepository.VisSettingsStorage,
+            ResolveCategoryOption);
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -61,6 +68,7 @@ internal class MainViewModel : BaseViewModel {
         RemoveConsumableTypeCommand = RelayCommand.Create<ConsumableTypeItem>(RemoveConsumableType, CanRemoveConsumableType);
         ImportConfigsCommand = RelayCommand.Create(ImportConfigs);
         ExportConfigsCommand = RelayCommand.Create(ExportConfigs);
+        RefreshConfigsCommand = RelayCommand.Create(RefreshConfigs);
         ResetConfigsCommand = RelayCommand.Create<Window>(ResetConfigs);
 
         ConsumableTypes = new ObservableCollection<ConsumableTypeItem>();
@@ -83,6 +91,8 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand ExportConfigsCommand { get; }
 
+    public ICommand RefreshConfigsCommand { get; }
+
     public ICommand ResetConfigsCommand { get; }
 
     public HintPanelViewModel Hint { get; }
@@ -90,22 +100,37 @@ internal class MainViewModel : BaseViewModel {
     public ISaveFileDialogService SaveFileDialogService => _saveFileDialogService;
 
 
+    /// <summary>
+    /// Хранит текст ошибки валидации, который показывается в нижней части окна.
+    /// </summary>
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
 
+    /// <summary>
+    /// Хранит имя параметра, в который сохраняется результат работы настроек.
+    /// </summary>
     public string SaveProperty {
         get => _saveProperty;
         set => RaiseAndSetIfChanged(ref _saveProperty, value);
     }
 
+    /// <summary>
+    /// Хранит редактируемый список расходников и переподключает к нему менеджер шаблонов при замене коллекции.
+    /// </summary>
     public ObservableCollection<ConsumableTypeItem> ConsumableTypes {
         get => _consumableTypes;
-        set => RaiseAndSetIfChanged(ref _consumableTypes, value);
+        set {
+            RaiseAndSetIfChanged(ref _consumableTypes, value);
+            _consumableTemplateManager?.Attach(_consumableTypes);
+        }
     }
 
+    /// <summary>
+    /// Хранит построенные группы назначений расходников на типы элементов Revit.
+    /// </summary>
     public ObservableCollection<CategoryAssignmentItem> CategoryAssignments {
         get => _categoryAssignments;
         set => RaiseAndSetIfChanged(ref _categoryAssignments, value);
@@ -114,6 +139,9 @@ internal class MainViewModel : BaseViewModel {
     public IReadOnlyList<CategoryOption> CategoryOptions => _categoryOptions;
     public bool IsViewLoaded => _isViewLoaded;
 
+    /// <summary>
+    /// Управляет режимом отображения только размещенных в проекте типов и пересобирает списки после изменения.
+    /// </summary>
     public bool OnlyPlacedInProject {
         get => _onlyPlacedInProject;
         set {
@@ -130,15 +158,24 @@ internal class MainViewModel : BaseViewModel {
     }
 
 
+    /// <summary>
+    /// Загружает данные окна после события Loaded.
+    /// </summary>
     private void LoadView() {
         LoadConfig();
     }
 
 
+    /// <summary>
+    /// Сохраняет настройки после подтверждения окна.
+    /// </summary>
     private void AcceptView() {
         SaveConfig();
     }
 
+    /// <summary>
+    /// Проверяет корректность формул и обязательных настроек перед сохранением окна.
+    /// </summary>
     private bool CanAcceptView() {
         bool isValid = FormulaValidator.ValidateFormulas(
             ConsumableTypes,
@@ -153,6 +190,9 @@ internal class MainViewModel : BaseViewModel {
     }
 
 
+    /// <summary>
+    /// Загружает проектные настройки, настройки расходников и начальные списки назначений.
+    /// </summary>
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
@@ -163,6 +203,9 @@ internal class MainViewModel : BaseViewModel {
         _isViewLoaded = true;
     }
 
+    /// <summary>
+    /// Сохраняет параметр результата, настройки расходников и проектный конфиг плагина.
+    /// </summary>
     private void SaveConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
@@ -172,6 +215,9 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig.SaveProjectConfig();
     }
 
+    /// <summary>
+    /// Обновляет списки назначений после изменений расходников, когда представление уже загружено.
+    /// </summary>
     public void RefreshAssignmentsFromConsumableTypes() {
         if(!_isViewLoaded) {
             return;
@@ -180,6 +226,9 @@ internal class MainViewModel : BaseViewModel {
         UpdateTypesLists();
     }
 
+    /// <summary>
+    /// Создает новый пользовательский расходник с новым ключом конфигурации и категорией по умолчанию.
+    /// </summary>
     private void AddConsumableType() {
         int index = ConsumableTypes.Count + 1;
         string configKey = GetNextConfigKey();
@@ -197,10 +246,16 @@ internal class MainViewModel : BaseViewModel {
         UpdateTypesLists();
     }
 
+    /// <summary>
+    /// Разрешает удаление расходника, если в коллекции есть хотя бы один элемент.
+    /// </summary>
     private bool CanRemoveConsumableType(ConsumableTypeItem item) {
         return ConsumableTypes?.Count > 0;
     }
 
+    /// <summary>
+    /// Удаляет расходник из коллекции и пересобирает списки назначений.
+    /// </summary>
     private void RemoveConsumableType(ConsumableTypeItem item) {
         if(ConsumableTypes == null || ConsumableTypes.Count == 0 || item == null) {
             return;
@@ -221,6 +276,9 @@ internal class MainViewModel : BaseViewModel {
         UpdateTypesLists();
     }
 
+    /// <summary>
+    /// После подтверждения заменяет текущие настройки расходников настройками из файла шаблона.
+    /// </summary>
     private void ResetConfigs(Window owner) {
         string message = _localizationService.GetLocalizedString("MainWindow.ResetConfirmMessage");
         string title = _localizationService.GetLocalizedString("MainWindow.Title");
@@ -234,6 +292,39 @@ internal class MainViewModel : BaseViewModel {
         LoadConsumableTypesFromSettings(defaults);
     }
 
+    /// <summary>
+    /// После подтверждения приводит шаблонные расходники к значениям шаблона и опционально добавляет отсутствующие.
+    /// </summary>
+    private void RefreshConfigs() {
+        string title = _localizationService.GetLocalizedString("MainWindow.Title");
+        string confirmMessage = _localizationService.GetLocalizedString("MainWindow.RefreshConfirmMessage");
+        if(MessageBoxService.Show(
+            confirmMessage,
+            title,
+            MessageBoxButton.OKCancel,
+            MessageBoxImage.Question) != MessageBoxResult.OK) {
+            return;
+        }
+
+        bool addMissingTemplateItems = true;
+        if(_consumableTemplateManager.HasMissingTemplateItems()) {
+            string addMissingMessage = _localizationService.GetLocalizedString(
+                "MainWindow.AddMissingTemplateConsumablesConfirmMessage");
+            addMissingTemplateItems = MessageBoxService.Show(
+                addMissingMessage,
+                title,
+                MessageBoxButton.OKCancel,
+                MessageBoxImage.Question) == MessageBoxResult.OK;
+        }
+
+        _consumableTemplateManager.ApplyTemplatesToItems(addMissingTemplateItems);
+        SyncLastConfigIndex();
+        UpdateTypesLists();
+    }
+
+    /// <summary>
+    /// Импортирует настройки расходников из JSON-файла и заменяет ими текущую коллекцию.
+    /// </summary>
     private void ImportConfigs() {
         _openFileDialogService.Filter = "JSON files | *.json";
         if(!_openFileDialogService.ShowDialog()) {
@@ -255,6 +346,9 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
+    /// <summary>
+    /// Экспортирует текущие настройки расходников и сопутствующие настройки в JSON-файл.
+    /// </summary>
     private void ExportConfigs() {
         _saveFileDialogService.AddExtension = true;
         _saveFileDialogService.Filter = "JSON files | *.json";
@@ -278,6 +372,9 @@ internal class MainViewModel : BaseViewModel {
             _configSerializer.Serialize(exported));
     }
 
+    /// <summary>
+    /// Применяет документ настроек к модели окна и заменяет коллекцию расходников отсортированными элементами.
+    /// </summary>
     private void LoadConsumableTypesFromSettings(UnmodelingSettingsDocument settings) {
         settings ??= new UnmodelingSettingsDocument();
         ApplySettings(settings);
@@ -292,6 +389,9 @@ internal class MainViewModel : BaseViewModel {
         UpdateTypesLists();
     }
 
+    /// <summary>
+    /// Загружает сохраненные в проекте настройки расходников из хранилища VISSettings.
+    /// </summary>
     private void LoadUnmodelingConfigs() {
         UnmodelingSettingsDocument settings = _revitRepository.VisSettingsStorage.GetUnmodelingSettings();
         ApplySettings(settings);
@@ -305,6 +405,9 @@ internal class MainViewModel : BaseViewModel {
         ConsumableTypes = CreateSortedConsumableTypes(consumableTypes);
     }
 
+    /// <summary>
+    /// Собирает текущие настройки расходников и сохраняет их в хранилище VISSettings.
+    /// </summary>
     private void SaveUnmodelingConfigs() {
         UnmodelingSettingsDocument settings = _revitRepository.VisSettingsStorage.GetUnmodelingSettings();
         settings ??= new UnmodelingSettingsDocument();
@@ -313,6 +416,9 @@ internal class MainViewModel : BaseViewModel {
         _revitRepository.VisSettingsStorage.SaveUnmodelingSettings(settings);
     }
 
+    /// <summary>
+    /// Преобразует редактируемые расходники окна в словарь конфигурации для хранения и экспорта.
+    /// </summary>
     private Dictionary<string, UnmodelingConfigItem> BuildUnmodelingConfigs() {
         var configs = new Dictionary<string, UnmodelingConfigItem>();
         if(ConsumableTypes == null) {
@@ -330,6 +436,9 @@ internal class MainViewModel : BaseViewModel {
         return configs;
     }
 
+    /// <summary>
+    /// Создает новую коллекцию расходников, отсортированную по ключу конфигурации.
+    /// </summary>
     private static ObservableCollection<ConsumableTypeItem> CreateSortedConsumableTypes(
         IEnumerable<ConsumableTypeItem> consumableTypes) {
         return new ObservableCollection<ConsumableTypeItem>(
@@ -337,119 +446,61 @@ internal class MainViewModel : BaseViewModel {
                 .OrderBy(item => item?.ConfigKey ?? string.Empty, StringComparer.CurrentCultureIgnoreCase));
     }
 
+    /// <summary>
+    /// Собирает дополнительные настройки раздела немоделируемых элементов.
+    /// </summary>
     private UnmodelingSettingsOptions BuildUnmodelingSettings() {
         return new UnmodelingSettingsOptions {
             OnlyProjectInstances = OnlyPlacedInProject
         };
     }
 
+    /// <summary>
+    /// Применяет дополнительные настройки документа к состоянию окна.
+    /// </summary>
     private void ApplySettings(UnmodelingSettingsDocument settings) {
         if(settings?.UnmodelingSettings != null) {
             OnlyPlacedInProject = settings.UnmodelingSettings.OnlyProjectInstances;
         }
     }
 
+    /// <summary>
+    /// Возвращает следующий ключ конфигурации вида config_NNN и продвигает внутренний счетчик.
+    /// </summary>
     private string GetNextConfigKey() {
         _lastConfigIndex++;
         return $"config_{_lastConfigIndex:000}";
     }
 
+    /// <summary>
+    /// Синхронизирует внутренний счетчик ключей после массового добавления или замены расходников.
+    /// </summary>
+    private void SyncLastConfigIndex() {
+        int lastConfigIndex = 0;
+        foreach(ConsumableTypeItem item in ConsumableTypes ?? Enumerable.Empty<ConsumableTypeItem>()) {
+            Match match = Regex.Match(item?.ConfigKey ?? string.Empty, @"config_(\d+)", RegexOptions.IgnoreCase);
+            if(match.Success && int.TryParse(match.Groups[1].Value, out int index) && index > lastConfigIndex) {
+                lastConfigIndex = index;
+            }
+        }
+
+        _lastConfigIndex = lastConfigIndex;
+    }
+
+    /// <summary>
+    /// Строит дерево назначений: категории Revit, типы систем и доступные для них конфигурации расходников.
+    /// </summary>
     private void UpdateTypesLists() {
-        List<BuiltInCategory> categories = new List<BuiltInCategory> {
-            BuiltInCategory.OST_PipeCurves,
-            BuiltInCategory.OST_DuctCurves,
-            BuiltInCategory.OST_PipeInsulations,
-            BuiltInCategory.OST_DuctInsulations,
-            BuiltInCategory.OST_DuctSystem,
-            BuiltInCategory.OST_PipingSystem
-        };
-
-        var assignments = new List<CategoryAssignmentItem>();
-
-        foreach(BuiltInCategory builtInCategory in categories) {
-            CategoryOption option = CategoryOptions.FirstOrDefault(o => o.BuiltInCategory == builtInCategory);
-            int optionCategoryId = option?.Id ?? (int) builtInCategory;
-            string categoryName = option?.Name ?? builtInCategory.ToString();
-
-            List<Element> types = CollectionGenerator.GetElementTypesByCategory(_revitRepository.Doc, builtInCategory) 
-                ?? new List<Element>();
-            if(types.Count == 0) {
-                continue;
-            }
-
-            List<ConsumableTypeItem> configsForCategory = ConsumableTypes?
-                .Where(c => TryGetCategoryId(c, out int cid) && cid == optionCategoryId)
-                .OrderBy(c => c?.ConsumableTypeName ?? string.Empty, StringComparer.CurrentCultureIgnoreCase)
-                .ToList() ?? new List<ConsumableTypeItem>();
-
-            HashSet<int> placedTypeIds = OnlyPlacedInProject ? GetPlacedTypeIds(builtInCategory) : null;
-
-            ObservableCollection<SystemTypeItem> systemTypes =
-                new ObservableCollection<SystemTypeItem>(
-                    types
-                        .OfType<ElementType>()
-                        .Where(type => placedTypeIds == null || placedTypeIds.Contains(GetElementIdValue(type.Id)))
-                        .OrderBy(type => type?.Name ?? string.Empty, StringComparer.CurrentCultureIgnoreCase)
-                        .Select(type => CreateSystemTypeItem(type, configsForCategory)));
-
-            if(systemTypes.Count == 0) {
-                continue;
-            }
-
-            assignments.Add(new CategoryAssignmentItem {
-                Name = categoryName,
-                Category = builtInCategory,
-                SystemTypes = systemTypes
-            });
-        }
-
-        CategoryAssignments = new ObservableCollection<CategoryAssignmentItem>(
-            assignments.OrderBy(a => a?.Name ?? string.Empty, StringComparer.CurrentCultureIgnoreCase));
+        CategoryAssignments = _categoryAssignmentBuilder.Build(
+            CategoryOptions,
+            ConsumableTypes,
+            OnlyPlacedInProject,
+            ResolveCategoryId);
     }
 
-    private HashSet<int> GetPlacedTypeIds(BuiltInCategory builtInCategory) {
-        var result = new HashSet<int>();
-
-        var collector = new FilteredElementCollector(_revitRepository.Doc)
-            .OfCategory(builtInCategory)
-            .WhereElementIsNotElementType();
-
-        foreach(Element element in collector) {
-            ElementId typeId = element.GetTypeId();
-            if(typeId == null || typeId == ElementId.InvalidElementId) {
-                continue;
-            }
-
-            result.Add(GetElementIdValue(typeId));
-        }
-
-        return result;
-    }
-
-    private SystemTypeItem CreateSystemTypeItem(ElementType elementType, List<ConsumableTypeItem> configs) {
-        int typeId = GetElementIdValue(elementType.Id);
-
-        ObservableCollection<ConfigAssignmentItem> configAssignments =
-            new ObservableCollection<ConfigAssignmentItem>(
-                configs.Select(config => new ConfigAssignmentItem(config, typeId)));
-
-        return new SystemTypeItem {
-            Name = elementType.Name,
-            Id = typeId,
-            Configs = configAssignments
-        };
-    }
-
-    private static int GetElementIdValue(ElementId elementId) {
-        long value;
-#if REVIT_2024_OR_GREATER
-        value = elementId?.Value ?? 0;
-#else
-        value = elementId?.IntegerValue ?? 0;
-#endif
-        return unchecked((int) value);
-    }
-
+    /// <summary>
+    /// Пытается получить числовой идентификатор категории из выбранной категории или сохраненного строкового значения.
+    /// </summary>
     private static bool TryGetCategoryId(ConsumableTypeItem item, out int categoryId) {
         if(item?.SelectedCategory != null) {
             categoryId = item.SelectedCategory.Id;
@@ -465,75 +516,17 @@ internal class MainViewModel : BaseViewModel {
         return false;
     }
 
+    /// <summary>
+    /// Возвращает nullable-идентификатор категории расходника для валидатора формул.
+    /// </summary>
     private int? ResolveCategoryId(ConsumableTypeItem item) {
         return TryGetCategoryId(item, out int cid) ? cid : (int?) null;
     }
 
-    private IReadOnlyList<CategoryOption> CreateCategoryOptions() {
-        List<CategoryOption> options = new List<CategoryOption> {
-            
-            CreateCategoryOption(
-                _localizationService.GetLocalizedString("MainViewModel.DuctsName"), 
-                BuiltInCategory.OST_DuctCurves),
-            CreateCategoryOption(
-                _localizationService.GetLocalizedString("MainViewModel.PipesName"), 
-                BuiltInCategory.OST_PipeCurves),
-            CreateCategoryOption(
-                _localizationService.GetLocalizedString("MainViewModel.PipeInsName"), 
-                BuiltInCategory.OST_PipeInsulations),
-            CreateCategoryOption(
-                _localizationService.GetLocalizedString("MainViewModel.DuctInsName"), 
-                BuiltInCategory.OST_DuctInsulations),
-            CreateCategoryOption(
-                _localizationService.GetLocalizedString("MainViewModel.DuctSysName"), 
-                BuiltInCategory.OST_DuctSystem),
-            CreateCategoryOption(
-                _localizationService.GetLocalizedString("MainViewModel.PipeSysName"), 
-                BuiltInCategory.OST_PipingSystem)
-        };
-
-        return options;
-    }
-
-    private CategoryOption CreateCategoryOption(string name, BuiltInCategory builtInCategory) {
-        Category category = Category.GetCategory(_revitRepository.Document, builtInCategory);
-
-        long idValue;
-#if REVIT_2024_OR_GREATER
-        idValue = category?.Id.Value ?? (long) (int) builtInCategory;
-#else
-        idValue = category?.Id.IntegerValue ?? (int) builtInCategory;
-#endif
-        int id = unchecked((int) idValue);
-
-        return new CategoryOption {
-            Name = name,
-            BuiltInCategory = builtInCategory,
-            Id = id
-        };
-    }
-
+    /// <summary>
+    /// Преобразует сохраненное значение категории в один из доступных вариантов выбора.
+    /// </summary>
     private CategoryOption ResolveCategoryOption(string categoryValue) {
-        if(string.IsNullOrWhiteSpace(categoryValue)) {
-            return CategoryOptions.FirstOrDefault();
-        }
-
-        if(int.TryParse(categoryValue, out int id)) {
-            return CategoryOptions.FirstOrDefault(o => o.Id == id);
-        }
-
-        string trimmed = categoryValue.Trim();
-        if(trimmed.StartsWith("BuiltInCategory.", StringComparison.OrdinalIgnoreCase)) {
-            string enumName = trimmed.Substring("BuiltInCategory.".Length);
-            CategoryOption byEnumName = CategoryOptions.FirstOrDefault(o =>
-                string.Equals(o.BuiltInCategory.ToString(), enumName, StringComparison.OrdinalIgnoreCase));
-            if(byEnumName != null) {
-                return byEnumName;
-            }
-        }
-
-        return CategoryOptions.FirstOrDefault(o =>
-            string.Equals(o.Name, categoryValue, StringComparison.OrdinalIgnoreCase))
-               ?? CategoryOptions.FirstOrDefault();
+        return _categoryOptionsProvider.ResolveCategoryOption(CategoryOptions, categoryValue);
     }
 }

@@ -247,7 +247,7 @@
                     Style="{StaticResource ContentTabControlStyle}"
                     Background="Transparent"
                     BorderThickness="0"
-                    SelectedIndex="0"
+                    SelectedIndex="1"
                      SelectionChanged="ContentTabs_OnSelectionChanged">
                      <TabItem Header="{me:LocalizationSource MainWindow.TabTypesName}">
                         <Grid>
@@ -282,12 +282,39 @@
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
 
-                                                <Expander Grid.Column="0" IsExpanded="False">
+                                                <Expander Grid.Column="0" IsExpanded="False" HorizontalContentAlignment="Stretch">
                                                     <Expander.Header>
-                                                        <TextBlock
-                                                            FontWeight="SemiBold"
-                                                            VerticalAlignment="Center"
-                                                            Text="{Binding ConsumableTypeName}" />
+                                                        <Grid HorizontalAlignment="Stretch">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock
+                                                                Grid.Column="0"
+                                                                FontWeight="SemiBold"
+                                                                VerticalAlignment="Center"
+                                                                Text="{Binding ConsumableTypeName}" />
+
+                                                            <TextBlock
+                                                                Grid.Column="1"
+                                                                Margin="8 0 8 0"
+                                                                VerticalAlignment="Center"
+                                                                Foreground="Orange"
+                                                                FontSize="12"
+                                                                Text="{DynamicResource MainWindow.TemplateDifferenceText}">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="TextBlock">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsTemplateDifferenceVisible}" Value="True">
+                                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </Grid>
                                                     </Expander.Header>
 
                                                     <Border Padding="5">
@@ -539,6 +566,11 @@
                     Width="100"
                     Content="{me:LocalizationSource MainWindow.ButtonExport}"
                     Command="{Binding ExportConfigsCommand}" />
+                <ui:Button
+                    Margin="0 0 8 0"
+                    Width="100"
+                    Content="{me:LocalizationSource MainWindow.ButtonRefresh}"
+                    Command="{Binding RefreshConfigsCommand}" />
                 <ui:Button
                     Width="100"
                     Content="{me:LocalizationSource MainWindow.ButtonDefault}"
