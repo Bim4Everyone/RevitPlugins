@@ -19,41 +19,38 @@ using RevitSetCoordParams.Models.Services;
 namespace RevitSetCoordParams.Models;
 
 internal class RevitRepository {
-    private readonly ILocalizationService _localizationService;
     private readonly IDocumentsService _documentsService;
     private readonly IDependentElementService _dependentService;
-    private readonly WorksetTable _worksetTable;
+    private readonly WorksetTable _workSetTable;
     private readonly string _defaultFamilyName;
     private readonly string _defaultTypeName;
     private readonly string _defaultLevelName;
     private readonly Options _geomOptions;
-    private readonly XYZ _basePointPosition;
     private readonly Transform _localTransform;
 
     public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
-        UIApplication = uiApplication;
-        _localizationService = localizationService;
+        UiApplication = uiApplication;
         _documentsService = new DocumentsService(Document);
         _dependentService = new DependentElementService(Document);
-        _worksetTable = Document.GetWorksetTable();
+        _workSetTable = Document.GetWorksetTable();
 
-        _defaultFamilyName = _localizationService.GetLocalizedString("RevitRepository.DefaultFamilyName");
-        _defaultTypeName = _localizationService.GetLocalizedString("RevitRepository.DefaultTypeName");
-        _defaultLevelName = _localizationService.GetLocalizedString("RevitRepository.DefaultLevelName");
+        _defaultFamilyName = localizationService.GetLocalizedString("RevitRepository.DefaultFamilyName");
+        _defaultTypeName = localizationService.GetLocalizedString("RevitRepository.DefaultTypeName");
+        _defaultLevelName = localizationService.GetLocalizedString("RevitRepository.DefaultLevelName");
 
         _geomOptions = new Options {
             ComputeReferences = true,
             IncludeNonVisibleObjects = false,
             DetailLevel = ViewDetailLevel.Fine
         };
-        _basePointPosition = GetBasePointPosition();
-        _localTransform = Transform.CreateTranslation(-_basePointPosition);
+        var basePointPosition = GetBasePointPosition();
+        _localTransform = Transform.CreateTranslation(-basePointPosition);
     }
 
-    public UIApplication UIApplication { get; }
-    public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    public Application Application => UIApplication.Application;
-    public Document Document => ActiveUIDocument.Document;
+    private UIApplication UiApplication { get; }
+    private UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
+    public Application Application => UiApplication.Application;
+    public Document Document => ActiveUiDocument.Document;
 
     /// <summary>
     /// Метод получения всех элементов модели по заданным категориям и рабочим наборам
@@ -115,13 +112,14 @@ internal class RevitRepository {
     /// </summary>
     public List<RevitElement> GetSelectedRevitElements(ICollection<BuiltInCategory> categories) {
         var selectedElements = GetSelectedElements();
-        if(selectedElements == null || selectedElements.Count() == 0) {
+        var enumerable = selectedElements.ToList();
+        if(enumerable.Count == 0) {
             return [];
         }
 
         var categorySet = new HashSet<BuiltInCategory>(categories);
 
-        var result = selectedElements
+        var result = enumerable
             .Where(element => element != null)
             .Where(element => ElementMatchesCategoryAndWorkSet(element, categorySet))
             .GroupBy(element => element.Id)
@@ -142,7 +140,7 @@ internal class RevitRepository {
     /// Метод получения всех выделенных элементов модели  по заданным категориям и рабочим наборам
     /// </summary>    
     public IEnumerable<Element> GetSelectedElements() {
-        return ActiveUIDocument.GetSelectedElements();
+        return ActiveUiDocument.GetSelectedElements();
     }
 
     /// <summary>
@@ -152,7 +150,6 @@ internal class RevitRepository {
         return new FilteredElementCollector(document)
             .OfCategory(RevitConstants.SourceVolumeCategory)
             .WhereElementIsNotElementType()
-            .Cast<Element>()
             .Where(instance => {
                 string value = instance.GetParamValueOrDefault<string>(RevitConstants.SourceVolumeParam);
                 return value != null && value.Equals(typeModel);
@@ -203,9 +200,10 @@ internal class RevitRepository {
             .OfCategory(RevitConstants.SourceVolumeCategory)
             .Cast<Element>();
 
-        return !collector.Any()
+        var enumerable = collector as Element[] ?? collector.ToArray();
+        return !enumerable.Any()
             ? []
-            : collector
+            : enumerable
                 .Select(sourceVolume => sourceVolume.GetParamValueOrDefault<string>(RevitConstants.SourceVolumeParam.Name))
                 .Where(s => !string.IsNullOrEmpty(s))
                 .Distinct();
@@ -219,7 +217,7 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Метод получения координаты элементы по низу
+    /// Метод получения координаты элементы по нижней точке
     /// </summary>
     public XYZ GetPositionBottom(RevitElement revitElement) {
         var center = (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
@@ -227,7 +225,7 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Метод получения координаты элементы по верху
+    /// Метод получения координаты элементы по верхней точке
     /// </summary>
     public XYZ GetPositionUp(RevitElement revitElement) {
         var center = (revitElement.BoundingBoxXYZ.Max + revitElement.BoundingBoxXYZ.Min) / 2;
@@ -252,21 +250,21 @@ internal class RevitRepository {
     /// Метод получения активного вида
     /// </summary>
     public View GetCurrentView() {
-        return ActiveUIDocument.ActiveGraphicalView;
+        return ActiveUiDocument.ActiveGraphicalView;
     }
 
     /// <summary>
     /// Метод выделения элементов в документе
     /// </summary>
     public void SetSelected(List<ElementId> elementIds) {
-        ActiveUIDocument.SetSelectedElements(elementIds);
+        ActiveUiDocument.SetSelectedElements(elementIds);
     }
 
     // Метод создания RevitElement
     private RevitElement CreateRevitElement(Element element) {
         return new RevitElement {
             Element = element,
-            BoundingBoxXYZ = GetBoundingBoxXYZ(element),
+            BoundingBoxXYZ = GetBoundingBoxXyz(element),
             FamilyName = GetFamilyName(element),
             TypeName = element.Name ?? _defaultTypeName,
             LevelName = GetLevelName(element)
@@ -274,20 +272,20 @@ internal class RevitRepository {
     }
 
     // Метод получения BoundingBoxXYZ
-    private BoundingBoxXYZ GetBoundingBoxXYZ(Element element) {
-        if(element is FlexPipe flexPipe) {
-            return GetFlexElementBoundingBox(flexPipe.Points);
+    private BoundingBoxXYZ GetBoundingBoxXyz(Element element) {
+        switch (element) {
+            case FlexPipe flexPipe:
+                return GetFlexElementBoundingBox(flexPipe.Points);
+            case FlexDuct flexDuct:
+                return GetFlexElementBoundingBox(flexDuct.Points);
         }
-        if(element is FlexDuct flexDuct) {
-            return GetFlexElementBoundingBox(flexDuct.Points);
+        if(element is not FamilyInstance familyInstance) {
+            return GetElementBoundingBox(element);
         }
-        if(element is FamilyInstance familyInstance) {
-            var bbox = GetFamilyInstanceBoundingBox(familyInstance);
-            bbox ??= GetElementBoundingBox(element);
-            bbox ??= GetLocationBoundingBox(familyInstance);
-            return bbox;
-        }
-        return GetElementBoundingBox(element);
+        var bbox = GetFamilyInstanceBoundingBox(familyInstance);
+        bbox ??= GetElementBoundingBox(element);
+        bbox ??= GetLocationBoundingBox(familyInstance);
+        return bbox;
     }
 
     // Метод получения BoundingBoxXYZ для гибких систем
@@ -340,7 +338,7 @@ internal class RevitRepository {
     }
 
     // Метод получения BoundingBoxXYZ по вложенным семействам
-    private BoundingBoxXYZ GetDependentBoundingBox(List<RevitElement> revitElements) {
+    private static BoundingBoxXYZ GetDependentBoundingBox(List<RevitElement> revitElements) {
         if(!revitElements.Any()) {
             return null;
         }
@@ -348,14 +346,16 @@ internal class RevitRepository {
             .Select(revitElement => revitElement.BoundingBoxXYZ)
             .Where(bbox => bbox is not null);
 
-        return !bboxes.Any() ? null : BoundingBoxExtensions.CreateUnitedBoundingBox([.. bboxes]);
+        var boundingBoxes = bboxes as BoundingBoxXYZ[] ?? bboxes.ToArray();
+        return !boundingBoxes.Any() ? null : BoundingBoxExtensions.CreateUnitedBoundingBox([.. boundingBoxes]);
     }
 
     // Метод получения BoundingBoxXYZ по Location
     private BoundingBoxXYZ GetLocationBoundingBox(FamilyInstance familyInstance) {
-        var locationPoint = familyInstance.Location as LocationPoint;
+        if(familyInstance.Location is not LocationPoint locationPoint) {
+            return null;
+        }
         var point = locationPoint.Point;
-
         return new BoundingBoxXYZ {
             Min = point,
             Max = point,
@@ -412,7 +412,7 @@ internal class RevitRepository {
     }
 
 
-    // Метод получения смещения базовой точки    
+    // Метод получения смещения базовой точки
     private XYZ GetBasePointPosition() {
         var basePoint = new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_ProjectBasePoint)
@@ -468,22 +468,23 @@ internal class RevitRepository {
     // Метод фильтрации элементов по рабочему набору и категориям
     private bool ElementMatchesCategoryAndWorkSet(Element element, HashSet<BuiltInCategory> categories) {
         var category = element.Category?.GetBuiltInCategory();
-        return category != null && categories.Contains(category.Value) && ElementOutWorkset(element);
+        return category != null && categories.Contains(category.Value) && ElementOutWorkSet(element);
     }
 
     // Метод фильтрации элементов по рабочему набору
-    private bool ElementOutWorkset(Element element) {
-        var workset = _worksetTable.GetWorkset(element.WorksetId);
-        return !workset.Name.Equals(RevitConstants.WorksetExcludeName);
+    private bool ElementOutWorkSet(Element element) {
+        var currentWorkSet = _workSetTable.GetWorkset(element.WorksetId);
+        return !currentWorkSet.Name.Equals(RevitConstants.WorksetExcludeName);
     }
 
     // Метод получения объединенного солида
     private Solid GetUnitedSolid(Element element) {
         var solids = element.GetSolids();
-        if(!solids.Any() || solids is null) {
+        var enumerable = solids as Solid[] ?? solids.ToArray();
+        if(!enumerable.Any()) {
             return null;
         }
-        var unitedSolids = SolidExtensions.CreateUnitedSolids([.. solids]);
+        var unitedSolids = SolidExtensions.CreateUnitedSolids([.. enumerable]);
         var validSolids = unitedSolids
             .Where(s => s != null && s.Faces.Size > 0 && s.Edges.Size > 0)
             .ToList();

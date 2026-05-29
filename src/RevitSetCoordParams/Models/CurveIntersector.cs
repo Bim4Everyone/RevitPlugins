@@ -67,7 +67,7 @@ internal class CurveIntersector {
 
         foundModelBySearch = SearchByCurves(position, GetSphereLine);
 
-        return foundModelBySearch is not null ? foundModelBySearch : null;
+        return foundModelBySearch;
     }
 
     private RevitElement SearchByCurves(XYZ position, Func<XYZ, double, List<Curve>> curvesFactory) {
@@ -104,7 +104,7 @@ internal class CurveIntersector {
         }
     }
 
-    // Метод отсеивания кандидатов-объёмных моделей путем пересечения BoundingBox и Outline    
+    // Метод отсеивания кандидатов-объёмных моделей путем пересечения BoundingBox и Outline
     private IEnumerable<RevitElement> GetIntersectCandidates(Outline sphereOutline) {
         foreach(var sourceModel in _sourceModels) {
             if(sourceModel.Outline.Intersects(sphereOutline, 0)) {
@@ -146,21 +146,16 @@ internal class CurveIntersector {
 
     // Метод пересечения сферы из линий с объемными элементами
     private RevitElement IntersectWithCurves(List<Curve> curves, IEnumerable<RevitElement> candidates) {
-        foreach(var curve in curves) {
-            var result = IntersectWithCurve(curve, candidates);
-            if(result is not null) {
-                return result;
-            }
-        }
-        return null;
+        return curves.Select(curve => IntersectWithCurve(curve, candidates))
+            .FirstOrDefault(result => result is not null);
     }
 
-    // Метод получения кривой для пересечения с объемным элементом        
+    // Метод получения кривой для пересечения с объемным элементом
     private Curve GetIntersectCurve(XYZ origin, XYZ offset) {
         return Line.CreateBound(origin, origin + offset);
     }
 
-    // Метод получения сферы из линий   
+    // Метод получения сферы из линий
     private List<Curve> GetSphereLine(XYZ origin, double diameter) {
         double r = diameter / 2.0;
         var top = new XYZ(origin.X, origin.Y, origin.Z + r);
@@ -180,7 +175,7 @@ internal class CurveIntersector {
         return curves;
     }
 
-    // Метод получения окружности из линий   
+    // Метод получения окружности из линий
     private List<Curve> GetCircleLine(XYZ origin, double diameter) {
         double r = diameter / 2.0;
         var right = new XYZ(origin.X + r, origin.Y, origin.Z);
