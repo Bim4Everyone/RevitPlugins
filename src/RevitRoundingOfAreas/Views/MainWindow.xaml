@@ -14,7 +14,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"    
    
     mc:Ignorable="d"
-    Title="{me:LocalizationSource MainWindow.Title}"
+    Title="{me:LocalizationSource WarningWindow.Title}"
     
     Height="540"
     Width="950"

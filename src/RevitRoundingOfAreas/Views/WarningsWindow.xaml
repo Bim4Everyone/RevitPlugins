@@ -16,6 +16,7 @@
     Width="1000"
     MinHeight="400"
     MinWidth="1000"
+    Title="{me:LocalizationSource MainWindow.Title}"
     d:DataContext="{d:DesignInstance vms:WarningsViewModel, IsDesignTimeCreatable=False}">
 
     <Window.Resources>
@@ -88,19 +89,19 @@
                                             <DataGridTemplateColumn.Header>
                                                 <!--В динамически-создаваемом UserControl работает только DynamicResource-->
                                                 <ui:TextBlock
-                                                    Text="{DynamicResource WarningWindow.ElementIdHeader}" />
+                                                    Text="{DynamicResource WarningWindow.ShowHeader}" />
                                             </DataGridTemplateColumn.Header>
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <ui:Button
-                                                        Padding="0"
-                                                        Width="150"
+                                                        Width="120"
                                                         Height="30"
+                                                        FontSize="24"   
+                                                        Padding="0"
                                                         Appearance="Primary"
                                                         Command="{Binding DataContext.ShowElementCommand,
                                                             RelativeSource={RelativeSource AncestorType=Window}}"
                                                         CommandParameter="{Binding ElementId}">
-
                                                         <ui:Button.Icon>
                                                             <ui:SymbolIcon
                                                                 Symbol="SearchInfo24"
@@ -114,7 +115,7 @@
                                         </DataGridTemplateColumn>
 
                                         <DataGridTextColumn
-                                            Width="250"
+                                            Width="200"                                            
                                             Binding="{Binding ElementId}">
                                             <DataGridTextColumn.Header>
                                                 <!--В динамически-создаваемом UserControl работает только DynamicResource-->
@@ -124,7 +125,7 @@
                                         </DataGridTextColumn>
 
                                         <DataGridTextColumn
-                                            Width="250"
+                                            Width="270"
                                             Binding="{Binding Name}">
                                             <DataGridTextColumn.Header>
                                                 <!--В динамически-создаваемом UserControl работает только DynamicResource-->
@@ -134,7 +135,7 @@
                                         </DataGridTextColumn>
 
                                         <DataGridTextColumn
-                                            Width="250"
+                                            Width="270"
                                             Binding="{Binding LevelName}">
                                             <DataGridTextColumn.Header>
                                                 <!--В динамически-создаваемом UserControl работает только DynamicResource-->

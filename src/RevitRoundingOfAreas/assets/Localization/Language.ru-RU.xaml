@@ -57,7 +57,9 @@
         x:Key="RevitRepository.NoLevel"> - Нет уровня - </system:String>
 
     <system:String
-        x:Key="WarningWindow.Title">Предупреждения</system:String>
+        x:Key="WarningWindow.Title">Рассчитать площади (соц. объекты) - предупреждения</system:String>
+    <system:String
+        x:Key="WarningWindow.ShowHeader">Выделить</system:String>
     <system:String
         x:Key="WarningWindow.ElementIdHeader">ИД помещения</system:String>
     <system:String
