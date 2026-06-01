@@ -7,6 +7,7 @@ using RevitPackageDocumentation.Models;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class TextNoteVM : SheetComponentVM {
+    private string _textFormula;
     private string _text;
     private TextNoteType _textType;
 
@@ -17,6 +18,11 @@ internal class TextNoteVM : SheetComponentVM {
         StringParamSetService stringParamSetService)
         : base(sheetVM, repository, localizationService, stringParamSetService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+    }
+
+    public string TextFormula {
+        get => _textFormula;
+        set => RaiseAndSetIfChanged(ref _textFormula, value);
     }
 
     public string Text {

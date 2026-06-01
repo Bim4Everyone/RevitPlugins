@@ -105,7 +105,7 @@ public class StructuralPlanViewData : SheetComponentData {
 public class StructuralCalloutViewData : SheetComponentData {
     public override string ComponentType => "StructuralCalloutView";
 
-    public string ViewName { get; set; }
+    public string ViewNameFormula { get; set; }
     public string ViewFamilyTypeName { get; set; }
     public string ViewTemplateName { get; set; }
     public string ViewportTypeName { get; set; }
@@ -119,7 +119,7 @@ public class StructuralCalloutViewData : SheetComponentData {
 public class SectionViewData : SheetComponentData {
     public override string ComponentType => "SectionView";
 
-    public string ViewName { get; set; }
+    public string ViewNameFormula { get; set; }
     public string ViewCount { get; set; }
     public string ViewFamilyTypeName { get; set; }
     public string ViewTemplateName { get; set; }
@@ -133,7 +133,7 @@ public class ScheduleViewData : SheetComponentData {
     public override string ComponentType => "ScheduleView";
 
     public string ReferenceViewName { get; set; }
-    public string ViewName { get; set; }
+    public string ViewNameFormula { get; set; }
     public string ViewCount { get; set; }
     public string ViewColumn { get; set; }
     public ScheduleFilterListData ScheduleFilterList { get; set; }
@@ -146,7 +146,7 @@ public class ScheduleViewData : SheetComponentData {
 public class TextNoteData : SheetComponentData {
     public override string ComponentType => "TextNote";
 
-    public string Text { get; set; }
+    public string TextFormula { get; set; }
     public string TextNoteTypeName { get; set; }
 }
 

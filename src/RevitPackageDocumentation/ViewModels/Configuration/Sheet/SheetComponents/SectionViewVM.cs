@@ -12,6 +12,7 @@ using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class SectionViewVM : SheetComponentVM {
+    private string _viewNameFormula;
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
     private ElementType _viewportType;
@@ -42,6 +43,11 @@ internal class SectionViewVM : SheetComponentVM {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 
+    public string ViewNameFormula {
+        get => _viewNameFormula;
+        set => RaiseAndSetIfChanged(ref _viewNameFormula, value);
+    }
+
     public string ViewName {
         get => _viewName;
         set => RaiseAndSetIfChanged(ref _viewName, value);
@@ -70,7 +76,7 @@ internal class SectionViewVM : SheetComponentVM {
     public override void CreateComponent() { }
 
     public override bool ValidateModule() {
-        if(string.IsNullOrEmpty(ViewName)) {
+        if(string.IsNullOrEmpty(ViewNameFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
             return false;
         }

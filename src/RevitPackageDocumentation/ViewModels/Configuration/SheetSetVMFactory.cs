@@ -136,7 +136,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "05",
 
-                ViewName = data.ViewName ?? string.Empty,
+                ViewNameFormula = data.ViewNameFormula ?? string.Empty,
                 ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
                 ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
                 ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
@@ -150,7 +150,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "789",
 
-                ViewName = data.ViewName ?? string.Empty,
+                ViewNameFormula = data.ViewNameFormula ?? string.Empty,
                 ViewFamilyType = _revitRepository.SectionViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
                 ViewTemplate = _revitRepository.SectionViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
                 ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
@@ -166,7 +166,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "01",
 
-                Text = data.Text ?? string.Empty,
+                TextFormula = data.TextFormula ?? string.Empty,
                 TextNoteType = _revitRepository.TextNoteTypes.FirstOrDefault(v => v.Name.Equals(data.TextNoteTypeName)),
             },
 
@@ -199,7 +199,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleCode = "456",
 
             ReferenceSpec = referenceSpec,
-            ViewName = data.ViewName ?? string.Empty,
+            ViewNameFormula = data.ViewNameFormula ?? string.Empty,
             ViewColumn = data.ViewColumn ?? "1",
             ViewCount = data.ViewCount ?? "1",
         };

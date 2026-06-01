@@ -66,7 +66,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
 
-                ViewName = vm.ViewName,
+                ViewNameFormula = vm.ViewNameFormula,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
                 ViewTemplateName = vm.ViewTemplate?.Name,
                 ViewportTypeName = vm.ViewportType?.Name,
@@ -78,7 +78,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
 
-                ViewName = vm.ViewName,
+                ViewNameFormula = vm.ViewNameFormula,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
                 ViewTemplateName = vm.ViewTemplate?.Name,
                 ViewportTypeName = vm.ViewportType?.Name,
@@ -91,7 +91,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleComment = vm.ModuleComment,
 
                 ReferenceViewName = vm.ReferenceSpec.Name,
-                ViewName = vm.ViewName,
+                ViewNameFormula = vm.ViewNameFormula,
                 ViewColumn = vm.ViewColumn,
                 ViewCount = vm.ViewCount,
                 ScheduleFilterList = new ScheduleFilterListData() {
@@ -112,7 +112,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
 
-                Text = vm.Text,
+                TextFormula = vm.TextFormula,
                 TextNoteTypeName = vm.TextNoteType?.Name,
             },
 

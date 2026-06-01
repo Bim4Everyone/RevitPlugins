@@ -10,6 +10,7 @@ using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class ScheduleViewVM : SheetComponentVM {
+    private string _viewNameFormula;
     private string _viewName;
     private string _viewColumn;
     private string _viewCount;
@@ -41,6 +42,11 @@ internal class ScheduleViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _referenceSpec, value);
     }
 
+    public string ViewNameFormula {
+        get => _viewNameFormula;
+        set => RaiseAndSetIfChanged(ref _viewNameFormula, value);
+    }
+
     public string ViewName {
         get => _viewName;
         set => RaiseAndSetIfChanged(ref _viewName, value);
@@ -69,7 +75,7 @@ internal class ScheduleViewVM : SheetComponentVM {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ReferenceViewNameIsEmpty");
             return false;
         }
-        if(string.IsNullOrEmpty(ViewName)) {
+        if(string.IsNullOrEmpty(ViewNameFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
             return false;
         }

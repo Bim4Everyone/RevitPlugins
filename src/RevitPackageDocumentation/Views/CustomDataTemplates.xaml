@@ -139,12 +139,13 @@
                 Margin="5"
                 VerticalAlignment="Center"
                 Text="Имя вида" />
-            
-            <TextBox
+
+            <controls:FormulaTextBoxControl
                 Grid.Column="1"
                 Grid.Row="0"
-                Margin="5"
-                Text="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
 
             <TextBlock
                 Grid.Column="0"
@@ -237,12 +238,13 @@
                 Margin="5"
                 VerticalAlignment="Center"
                 Text="Имя вида" />
-            
-            <TextBox
+
+            <controls:FormulaTextBoxControl
                 Grid.Column="1"
                 Grid.Row="0"
-                Margin="5"
-                Text="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
 
             <TextBlock
                 Grid.Column="0"
@@ -360,12 +362,12 @@
                 VerticalAlignment="Center"
                 Text="Имя итоговой" />
 
-            <TextBox
+            <controls:FormulaTextBoxControl
                 Grid.Column="1"
                 Grid.Row="1"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
 
             <TextBlock
                 Grid.Column="0"
@@ -469,12 +471,13 @@
                 VerticalAlignment="Center"
                 Text="Шаблон текста" />
 
-            <TextBox
+            <controls:FormulaTextBoxControl
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Grid.Row="2"
-                Margin="5"
-                Text="{Binding Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                PropFormula="{Binding Path=TextFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                PropResult="{Binding Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
         </Grid>
     </DataTemplate>
 

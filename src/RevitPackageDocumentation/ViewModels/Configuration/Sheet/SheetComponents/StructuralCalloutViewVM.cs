@@ -22,6 +22,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     // Отступ между видовыми экранами на листе
     private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(100);
 
+    private string _viewNameFormula;
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
     private ElementType _viewportType;
@@ -36,6 +37,11 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         StringParamSetService stringParamSetService)
         : base(sheetVM, repository, localizationService, stringParamSetService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+    }
+
+    public string ViewNameFormula {
+        get => _viewNameFormula;
+        set => RaiseAndSetIfChanged(ref _viewNameFormula, value);
     }
 
     public string ViewName {
