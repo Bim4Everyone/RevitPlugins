@@ -20,9 +20,9 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
     }
 
     public List<PolygonObject> DivideSpatialElement(
-        SpatialElement spatialElement,
-        BuildCoordVolumeSettings settings,
-        ProgressService progressService) {
+    SpatialElement spatialElement,
+    BuildCoordVolumeSettings settings,
+    ProgressService progressService) {
         double angleDeg = UnitUtils.ConvertToInternalUnits(settings.SquareAngleDeg, UnitTypeId.Degrees);
         double side = UnitUtils.ConvertToInternalUnits(settings.SquareSideMm, UnitTypeId.Millimeters);
         var contour = _contourService.GetOuterContour(spatialElement);
@@ -34,21 +34,42 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
             .Select(curve => curve.GetEndPoint(0))
             .ToList();
 
-        double minX = contourDots.Min(p => p.X);
-        double maxX = contourDots.Max(p => p.X);
-        double minY = contourDots.Min(p => p.Y);
-        double maxY = contourDots.Max(p => p.Y);
+        // Центр контура
+        var origin = new XYZ(
+            contourDots.Average(p => p.X),
+            contourDots.Average(p => p.Y),
+            0);
 
-        var origin = new XYZ((minX + maxX) / 2, (minY + maxY) / 2, 0);
-
+        // Повернутые оси
         var ux = new XYZ(Math.Cos(angleDeg), Math.Sin(angleDeg), 0);
         var uy = new XYZ(-Math.Sin(angleDeg), Math.Cos(angleDeg), 0);
 
-        double halfWidth = (maxX - minX) / 2;
-        double halfHeight = (maxY - minY) / 2;
+        // Габариты в локальной системе координат
+        var localXs = contourDots
+            .Select(p => (p - origin).DotProduct(ux))
+            .ToList();
 
-        int nx = (int) (halfWidth / side) + 1;
-        int ny = (int) (halfHeight / side) + 1;
+        var localYs = contourDots
+            .Select(p => (p - origin).DotProduct(uy))
+            .ToList();
+
+        double minLocalX = localXs.Min();
+        double maxLocalX = localXs.Max();
+
+        double minLocalY = localYs.Min();
+        double maxLocalY = localYs.Max();
+
+        // нужен запас минимум в диагональ квадрата,
+        // иначе при повороте угловые квадраты не попадут в диапазон
+        double extra = side * Math.Sqrt(2);
+
+        int nx = (int) Math.Ceiling(
+            (Math.Max(Math.Abs(minLocalX), Math.Abs(maxLocalX)) + extra)
+            / side);
+
+        int ny = (int) Math.Ceiling(
+            (Math.Max(Math.Abs(minLocalY), Math.Abs(maxLocalY)) + extra)
+            / side);
 
         progressService?.BeginStage(ProgressType.DivideSpatial);
         int total = (2 * nx + 1) * (2 * ny + 1);
@@ -59,13 +80,17 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
             for(int iy = -ny; iy <= ny; iy++) {
                 progressService?.CancellationToken.ThrowIfCancellationRequested();
 
-                var basePoint = origin + ux * (ix * side) + uy * (iy * side);
+                var basePoint =
+                    origin
+                    + ux * (ix * side)
+                    + uy * (iy * side);
 
                 var p1 = basePoint;
                 var p2 = basePoint + ux * side;
                 var p3 = basePoint + ux * side + uy * side;
                 var p4 = basePoint + uy * side;
 
+                // Проверяем все углы
                 if(!GeometryUtility.IsPointInsidePolygon(p1, contourDots)
                     || !GeometryUtility.IsPointInsidePolygon(p2, contourDots)
                     || !GeometryUtility.IsPointInsidePolygon(p3, contourDots)
@@ -74,10 +99,6 @@ internal class SpatialElementDividerService : ISpatialElementDividerService {
                 }
 
                 var center = (p1 + p3) / 2;
-
-                if(!GeometryUtility.IsPointInsidePolygon(center, contourDots)) {
-                    continue;
-                }
 
                 polygons.Add(new PolygonObject {
                     Center = center,
