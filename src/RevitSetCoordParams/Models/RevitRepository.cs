@@ -445,24 +445,42 @@ internal class RevitRepository {
         return (min, max);
     }
 
-    // Метод получения вложенных/зависимых RevitElement
     private List<RevitElement> GetDependentElements(Element element, HashSet<BuiltInCategory> categorySet) {
         var result = new List<RevitElement>();
-        if(!_dependentService.DependentMap.TryGetValue(element.Id, out var dependentIds)) {
-            return result;
-        }
-        foreach(var id in dependentIds) {
-            var depElement = Document.GetElement(id);
-            if(depElement == null) {
-                continue;
-            }
-            if(!ElementMatchesCategoryAndWorkSet(depElement, categorySet)) {
-                continue;
-            }
-            var revitElement = CreateRevitElement(depElement);
-            result.Add(revitElement);
-        }
+        var visited = new HashSet<ElementId>();
+
+        CollectDependentElements(element.Id, categorySet, result, visited);
+        
         return result;
+    }
+
+    private void CollectDependentElements(
+        ElementId parentId,
+        HashSet<BuiltInCategory> categorySet,
+        List<RevitElement> result,
+        HashSet<ElementId> visited) {
+
+        if(!visited.Add(parentId)) {
+            return;
+        }
+
+        if(!_dependentService.DependentMap.TryGetValue(parentId, out var dependentIds)) {
+            return;
+        }
+
+        foreach(var childId in dependentIds) {
+            var childElement = Document.GetElement(childId);
+
+            if(childElement == null) {
+                continue;
+            }
+
+            if(ElementMatchesCategoryAndWorkSet(childElement, categorySet)) {
+                result.Add(CreateRevitElement(childElement));
+            }
+
+            CollectDependentElements(childId, categorySet, result, visited);
+        }
     }
 
     // Метод фильтрации элементов по рабочему набору и категориям
