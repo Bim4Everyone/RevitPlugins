@@ -25,4 +25,15 @@ internal interface IDependentElementService {
     /// True - если элемент не вложен или независим, False - вложен или зависим.
     /// </returns>
     bool IsRootElement(Element element);
+    /// <summary>
+    /// Метод, который возвращает коневого родителя.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе возвращается самый главный родитель вложенного семейства.
+    /// </remarks>       
+    /// <param name="element">Элемент.</param>
+    /// <returns>
+    /// Element - самый главный родитель вложенного семейства.
+    /// </returns>
+    Element GetRootElement(Element element);
 }

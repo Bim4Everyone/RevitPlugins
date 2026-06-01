@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -58,27 +59,39 @@ internal class CurveIntersector {
             return null;
         }
 
-        double currentDiamSphere = _startDiamSphere;
-        List<RevitElement> candidates = null;
+        var foundModelBySearch = SearchByCurves(position, GetCircleLine);
 
-        while(currentDiamSphere < _maxDiamSphere) {
-            var sphereOutline = GetSphereOutline(position, currentDiamSphere);
-            candidates = GetIntersectCandidates(sphereOutline).ToList();
-
-            if(candidates.Count == 0) {
-                currentDiamSphere += _stepDiamSphere;
-                continue;
-            }
-
-            var curves = GetSphereLine(position, currentDiamSphere);
-            var foundModel = IntersectWithCurves(curves, candidates);
-
-            if(foundModel is not null) {
-                return foundModel;
-            }
-
-            currentDiamSphere += _stepDiamSphere;
+        if(foundModelBySearch is not null) {
+            return foundModelBySearch;
         }
+
+        foundModelBySearch = SearchByCurves(position, GetSphereLine);
+
+        return foundModelBySearch;
+    }
+
+    private RevitElement SearchByCurves(XYZ position, Func<XYZ, double, List<Curve>> curvesFactory) {
+
+        double currentDiameter = _startDiamSphere;
+
+        while(currentDiameter <= _maxDiamSphere) {
+            var outline = GetSphereOutline(position, currentDiameter);
+
+            var candidates = GetIntersectCandidates(outline).ToList();
+
+            if(candidates.Count > 0) {
+                var curves = curvesFactory(position, currentDiameter);
+
+                var foundModel = IntersectWithCurves(curves, candidates);
+
+                if(foundModel is not null) {
+                    return foundModel;
+                }
+            }
+
+            currentDiameter += _stepDiamSphere;
+        }
+
         return null;
     }
 
@@ -91,7 +104,7 @@ internal class CurveIntersector {
         }
     }
 
-    // Метод отсеивания кандидатов-объёмных моделей путем пересечения BoundingBox и Outline    
+    // Метод отсеивания кандидатов-объёмных моделей путем пересечения BoundingBox и Outline
     private IEnumerable<RevitElement> GetIntersectCandidates(Outline sphereOutline) {
         foreach(var sourceModel in _sourceModels) {
             if(sourceModel.Outline.Intersects(sphereOutline, 0)) {
@@ -133,21 +146,16 @@ internal class CurveIntersector {
 
     // Метод пересечения сферы из линий с объемными элементами
     private RevitElement IntersectWithCurves(List<Curve> curves, IEnumerable<RevitElement> candidates) {
-        foreach(var curve in curves) {
-            var result = IntersectWithCurve(curve, candidates);
-            if(result is not null) {
-                return result;
-            }
-        }
-        return null;
+        return curves.Select(curve => IntersectWithCurve(curve, candidates))
+            .FirstOrDefault(result => result is not null);
     }
 
-    // Метод получения кривой для пересечения с объемным элементом        
+    // Метод получения кривой для пересечения с объемным элементом
     private Curve GetIntersectCurve(XYZ origin, XYZ offset) {
         return Line.CreateBound(origin, origin + offset);
     }
 
-    // Метод получения сферы из линий   
+    // Метод получения сферы из линий
     private List<Curve> GetSphereLine(XYZ origin, double diameter) {
         double r = diameter / 2.0;
         var top = new XYZ(origin.X, origin.Y, origin.Z + r);
@@ -157,12 +165,26 @@ internal class CurveIntersector {
         var front = new XYZ(origin.X, origin.Y + r, origin.Z);
         var back = new XYZ(origin.X, origin.Y - r, origin.Z);
 
-        var curves = new List<Curve>(6);
+        var curves = new List<Curve>(4);
         {
             curves.Add(Arc.Create(bottom, top, right));
             curves.Add(Arc.Create(top, bottom, left));
             curves.Add(Arc.Create(bottom, top, front));
             curves.Add(Arc.Create(top, bottom, back));
+        }
+        return curves;
+    }
+
+    // Метод получения окружности из линий
+    private List<Curve> GetCircleLine(XYZ origin, double diameter) {
+        double r = diameter / 2.0;
+        var right = new XYZ(origin.X + r, origin.Y, origin.Z);
+        var left = new XYZ(origin.X - r, origin.Y, origin.Z);
+        var front = new XYZ(origin.X, origin.Y + r, origin.Z);
+        var back = new XYZ(origin.X, origin.Y - r, origin.Z);
+
+        var curves = new List<Curve>(2);
+        {
             curves.Add(Arc.Create(left, right, front));
             curves.Add(Arc.Create(right, left, back));
         }
