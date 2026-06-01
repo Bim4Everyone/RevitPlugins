@@ -65,7 +65,7 @@ internal class RevitRepository {
             .WhereElementIsNotElementType()
             .Where(element => ElementMatchesCategoryAndWorkSet(element, categorySet));
 
-        var result = allElements
+        return allElements
             .Where(_dependentService.IsRootElement)
             .Select(element => {
                 var revitElement = CreateRevitElement(element);
@@ -75,8 +75,6 @@ internal class RevitRepository {
                 return revitElement;
             })
             .ToList();
-
-        return result;
     }
 
     /// <summary>
@@ -89,51 +87,31 @@ internal class RevitRepository {
 
         var categorySet = new HashSet<BuiltInCategory>(categories);
 
-        var allElements = new FilteredElementCollector(Document, GetCurrentView().Id)
-           .WhereElementIsNotElementType()
-           .Where(element => ElementMatchesCategoryAndWorkSet(element, categorySet));
+        var elements = new FilteredElementCollector(Document, GetCurrentView().Id)
+            .WhereElementIsNotElementType()
+            .Where(element => ElementMatchesCategoryAndWorkSet(element, categorySet));
 
-        var result = allElements
-            .Where(_dependentService.IsRootElement)
-            .Select(element => {
-                var revitElement = CreateRevitElement(element);
-                var dependentElements = GetDependentElements(element, categorySet);
-                revitElement.DependentElements = dependentElements;
-                revitElement.BoundingBoxXYZ ??= GetDependentBoundingBox(dependentElements);
-                return revitElement;
-            })
-            .ToList();
-
-        return result;
+        return BuildRevitElements(elements);
     }
 
     /// <summary>
     /// Метод получения всех выделенных элементов модели по заданным категориям и рабочим наборам, включая только родительские семейства
     /// </summary>
     public List<RevitElement> GetSelectedRevitElements(ICollection<BuiltInCategory> categories) {
-        var selectedElements = GetSelectedElements();
-        var enumerable = selectedElements.ToList();
-        if(enumerable.Count == 0) {
+        var selectedElements = GetSelectedElements()
+            .Where(x => x != null).ToList();
+        if(selectedElements.Count == 0) {
             return [];
         }
 
         var categorySet = new HashSet<BuiltInCategory>(categories);
 
-        var result = enumerable
-            .Where(element => element != null)
+        var elements = selectedElements
             .Where(element => ElementMatchesCategoryAndWorkSet(element, categorySet))
-            .GroupBy(element => element.Id)
-            .Select(group => group.First())
-            .Select(element => {
-                var revitElement = CreateRevitElement(element);
-                var dependentElements = GetDependentElements(element, categorySet);
-                revitElement.DependentElements = dependentElements;
-                revitElement.BoundingBoxXYZ ??= GetDependentBoundingBox(dependentElements);
-                return revitElement;
-            })
-            .ToList();
+            .GroupBy(x => x.Id)
+            .Select(g => g.First());
 
-        return result;
+        return BuildRevitElements(elements);
     }
 
     /// <summary>
@@ -258,6 +236,36 @@ internal class RevitRepository {
     /// </summary>
     public void SetSelected(List<ElementId> elementIds) {
         ActiveUiDocument.SetSelectedElements(elementIds);
+    }
+    
+    // Метод построения RevitElement-ов из элементов Revit
+    private List<RevitElement> BuildRevitElements(IEnumerable<Element> elements) {
+        var groups = elements
+            .Where(x => x != null)
+            .Select(x => new {
+                Root = _dependentService.GetRootElement(x),
+                Element = x
+            })
+            .GroupBy(x => x.Root.Id);
+
+        var result = new List<RevitElement>();
+
+        foreach(var group in groups) {
+            var root = group.First().Root;
+
+            var revitElement = CreateRevitElement(root);
+
+            revitElement.DependentElements = group
+                .Where(x => x.Element.Id != root.Id)
+                .Select(x => CreateRevitElement(x.Element))
+                .ToList();
+
+            revitElement.BoundingBoxXYZ ??= GetDependentBoundingBox(revitElement.DependentElements);
+
+            result.Add(revitElement);
+        }
+
+        return result;
     }
 
     // Метод создания RevitElement
