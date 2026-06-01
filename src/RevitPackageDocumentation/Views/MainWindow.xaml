@@ -231,20 +231,12 @@
                         VerticalAlignment="Center"
                         Text="Имя листа" />
 
-                    <controls:FormulaTextBox
+                    <controls:FormulaTextBoxControl
                         Grid.Column="1"
                         Grid.Row="0"
-                        Margin="5"
-                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        UpdateFormulaCommand="{Binding CurrentSheetSet.SelectedSheet.PropUpdateByFormulaCommand}" />
-
-                    <ui:TextBox
-                        Grid.Column="2"
-                        Grid.ColumnSpan="2"
-                        Grid.Row="0"
-                        Margin="5"
-                        IsEnabled="False"
-                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        PropFormula="{Binding Path=CurrentSheetSet.SelectedSheet.SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PropResult="{Binding Path=CurrentSheetSet.SelectedSheet.SheetName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        UpdateCommand="{Binding CurrentSheetSet.SelectedSheet.PropUpdateByFormulaCommand}" />
 
                     <ui:TextBlock
                         Grid.Column="3"
@@ -261,7 +253,7 @@
                         VerticalAlignment="Center"
                         Text="Размер листа" />
 
-                    <ui:TextBox
+                    <ui:NumberBox
                         Grid.Column="1"
                         Grid.Row="1"
                         Margin="5"
@@ -274,7 +266,7 @@
                         VerticalAlignment="Center"
                         Text="Коэффициент листа" />
 
-                    <ui:TextBox
+                    <ui:NumberBox
                         Grid.Column="3"
                         Grid.Row="1"
                         Margin="5"
