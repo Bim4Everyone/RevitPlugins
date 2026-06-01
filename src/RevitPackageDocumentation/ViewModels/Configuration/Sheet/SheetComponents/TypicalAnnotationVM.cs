@@ -15,8 +15,12 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     private Family _annotationFamily;
     private AnnotationSymbolType _annotationType;
 
-    public TypicalAnnotationVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService)
-        : base(sheetVM, repository, localizationService) {
+    public TypicalAnnotationVM(
+        SheetVM sheetVM,
+        RevitRepository repository,
+        ILocalizationService localizationService,
+        StringParamSetService stringParamSetService)
+        : base(sheetVM, repository, localizationService, stringParamSetService) {
         SelectAnnotationFamilyCommand = RelayCommand.Create(SelectAnnotationFamily);
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }

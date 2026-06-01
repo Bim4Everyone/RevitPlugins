@@ -29,8 +29,12 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     private string _viewCount;
     private string _viewportNumber;
 
-    public StructuralCalloutViewVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) 
-        : base(sheetVM, repository, localizationService) {
+    public StructuralCalloutViewVM(
+        SheetVM sheetVM,
+        RevitRepository repository,
+        ILocalizationService localizationService,
+        StringParamSetService stringParamSetService)
+        : base(sheetVM, repository, localizationService, stringParamSetService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 

@@ -22,8 +22,12 @@ internal class ScheduleViewVM : SheetComponentVM {
     // Смещение по вертикали в футах, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _specViewportTopOffset = UnitUtilsHelper.ConvertToInternalValue(12);
 
-    public ScheduleViewVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) 
-        : base(sheetVM, repository, localizationService) {
+    public ScheduleViewVM(
+        SheetVM sheetVM,
+        RevitRepository repository,
+        ILocalizationService localizationService,
+        StringParamSetService stringParamSetService)
+        : base(sheetVM, repository, localizationService, stringParamSetService) {
         ScheduleFilterList = new ScheduleFilterListVM(this);
 
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);

@@ -54,7 +54,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
 
-                ViewName = vm.ViewName,
+                ViewNameFormula = vm.ViewNameFormula,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
                 ViewTemplateName = vm.ViewTemplate?.Name,
                 ViewportTypeName = vm.ViewportType?.Name,

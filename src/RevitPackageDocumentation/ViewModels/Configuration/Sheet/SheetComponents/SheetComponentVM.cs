@@ -1,9 +1,11 @@
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal abstract class SheetComponentVM : BaseViewModel {
@@ -15,18 +17,27 @@ internal abstract class SheetComponentVM : BaseViewModel {
     private string _moduleErrors;
     private readonly SheetVM _sheet;
 
-    protected SheetComponentVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) {
+    protected SheetComponentVM(
+        SheetVM sheetVM,
+        RevitRepository repository,
+        ILocalizationService localizationService,
+        StringParamSetService stringParamSetService) {
         _sheet = sheetVM;
         Repository = repository;
         LocalizationService = localizationService;
+        StrParamSetService = stringParamSetService;
         ModuleTypeName = LocalizationService.GetLocalizedString($"Type.{this.GetType().Name}");
+        PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
     }
 
     public ICommand CreateComponentCommand { get; set; }
+    public ICommand PropUpdateByFormulaCommand { get; }
+
 
     protected RevitRepository Repository { get; }
 
     protected ILocalizationService LocalizationService { get; }
+    protected StringParamSetService StrParamSetService { get; }
 
     public SheetVM Sheet => _sheet;
 
@@ -76,6 +87,14 @@ internal abstract class SheetComponentVM : BaseViewModel {
             }
         }
         return settings;
+    }
+
+    private void PropUpdateByFormula(string formulaPropertyName) {
+        StrParamSetService.Set(this, formulaPropertyName, Sheet.SheetSet.Params);
+    }
+
+    public void UpdateDueParamValueChange(StringParamVM stringParam) {
+        StrParamSetService.SetAll(this, Sheet.SheetSet.Params, stringParam);
     }
 
     public abstract void CreateComponent();

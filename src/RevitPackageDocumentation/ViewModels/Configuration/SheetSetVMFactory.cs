@@ -115,20 +115,22 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     public SheetComponentVM CreateComponentVM(SheetVM sheetVM, SheetComponentData sheetComponentData) {
         return sheetComponentData switch {
-            StructuralPlanViewData data => new StructuralPlanViewVM(sheetVM, _revitRepository, _localizationService) {
+            StructuralPlanViewData data => new StructuralPlanViewVM(
+                sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
                 ModuleCode = "123",
 
-                ViewName = data.ViewName ?? string.Empty,
+                ViewNameFormula = data.ViewNameFormula ?? string.Empty,
                 ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
                 ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
                 ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
                 ViewCount = data.ViewCount ?? "1",
             },
 
-            StructuralCalloutViewData data => new StructuralCalloutViewVM(sheetVM, _revitRepository, _localizationService) {
+            StructuralCalloutViewData data => new StructuralCalloutViewVM(
+                sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -141,7 +143,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewCount = data.ViewCount ?? "1",
             },
 
-            SectionViewData data => new SectionViewVM(sheetVM, _revitRepository, _localizationService) {
+            SectionViewData data => new SectionViewVM(
+                sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -156,7 +159,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             ScheduleViewData data => CreateScheduleViewVM(sheetVM, data),
 
-            TextNoteData data => new TextNoteVM(sheetVM, _revitRepository, _localizationService) {
+            TextNoteData data => new TextNoteVM(
+                sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -168,7 +172,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             TypicalAnnotationData data => CreateTypicalAnnotationVM(sheetVM, data),
 
-            LegendViewData data => new LegendViewVM(sheetVM, _revitRepository, _localizationService) {
+            LegendViewData data => new LegendViewVM(
+                sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
                 IsModuleCheck = data.IsModuleCheck ?? false,
                 ModuleName = data.ModuleName ?? string.Empty,
                 ModuleComment = data.ModuleComment ?? string.Empty,
@@ -186,7 +191,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
     private ScheduleViewVM CreateScheduleViewVM(SheetVM sheetVM, ScheduleViewData data) {
         var referenceSpec = _revitRepository.GetSpecByName(data.ReferenceViewName);
 
-        var scheduleViewVM = new ScheduleViewVM(sheetVM, _revitRepository, _localizationService) {
+        var scheduleViewVM = new ScheduleViewVM(
+            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -227,7 +233,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         var annotationType = annotationTypes
                     ?.FirstOrDefault(v => v.Name.Equals(data.AnnotationTypeName));
 
-        return new TypicalAnnotationVM(sheetVM, _revitRepository, _localizationService) {
+        return new TypicalAnnotationVM(
+            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,

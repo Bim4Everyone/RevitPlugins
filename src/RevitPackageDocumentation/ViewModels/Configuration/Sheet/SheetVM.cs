@@ -204,6 +204,9 @@ internal class SheetVM : BaseViewModel {
 
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
         _stringParamSetService.SetAll(this, SheetSet.Params, stringParam);
+        foreach(var sheetComponent in SheetComponents) {
+            sheetComponent.UpdateDueParamValueChange(stringParam);
+        }
     }
 
 
@@ -248,12 +251,12 @@ internal class SheetVM : BaseViewModel {
 
     public void Process() {
         SheetInstance = null;
-        SheetInstance = _revitRepository.GetSheetByName(SheetNameFormula);
+        SheetInstance = _revitRepository.GetSheetByName(SheetName);
 
         if(SheetInstance is null) {
             try {
                 SheetInstance = ViewSheet.Create(_revitRepository.Document, TitleBlockType.Id);
-                SheetInstance.Name = SheetNameFormula;
+                SheetInstance.Name = SheetName;
 
                 var titleBlock = _revitRepository.GetTitleBlocks(SheetInstance);
 

@@ -12,6 +12,7 @@ using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class StructuralPlanViewVM : SheetComponentVM {
+    private string _viewNameFormula;
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
     private ElementType _viewportType;
@@ -25,9 +26,18 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     // Смещение по вертикали в дюймах сверху, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _titleBlockFrameTopOffset = UnitUtilsHelper.ConvertToInternalValue(15);
 
-    public StructuralPlanViewVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService)
-        : base(sheetVM, repository, localizationService) {
+    public StructuralPlanViewVM(
+        SheetVM sheetVM,
+        RevitRepository repository,
+        ILocalizationService localizationService,
+        StringParamSetService stringParamSetService)
+        : base(sheetVM, repository, localizationService, stringParamSetService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+    }
+
+    public string ViewNameFormula {
+        get => _viewNameFormula;
+        set => RaiseAndSetIfChanged(ref _viewNameFormula, value);
     }
 
     public string ViewName {

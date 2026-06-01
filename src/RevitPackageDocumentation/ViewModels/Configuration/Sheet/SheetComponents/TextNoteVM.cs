@@ -10,8 +10,12 @@ internal class TextNoteVM : SheetComponentVM {
     private string _text;
     private TextNoteType _textType;
 
-    public TextNoteVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) 
-        : base(sheetVM, repository, localizationService) {
+    public TextNoteVM(
+        SheetVM sheetVM,
+        RevitRepository repository,
+        ILocalizationService localizationService,
+        StringParamSetService stringParamSetService)
+        : base(sheetVM, repository, localizationService, stringParamSetService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 

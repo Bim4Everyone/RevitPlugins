@@ -92,7 +92,7 @@ public abstract class SheetComponentData {
 public class StructuralPlanViewData : SheetComponentData {
     public override string ComponentType => "StructuralPlanView";
 
-    public string ViewName { get; set; }
+    public string ViewNameFormula { get; set; }
     public string ViewFamilyTypeName { get; set; }
     public string ViewTemplateName { get; set; }
     public string ViewportTypeName { get; set; }

@@ -33,8 +33,12 @@ internal class SectionViewVM : SheetComponentVM {
     // Отступ между видовыми экранами на листе
     private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(200);
 
-    public SectionViewVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) 
-        : base(sheetVM, repository, localizationService) {
+    public SectionViewVM(
+        SheetVM sheetVM,
+        RevitRepository repository,
+        ILocalizationService localizationService,
+        StringParamSetService stringParamSetService)
+        : base(sheetVM, repository, localizationService, stringParamSetService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 

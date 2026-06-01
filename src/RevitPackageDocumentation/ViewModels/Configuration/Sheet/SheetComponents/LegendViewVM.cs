@@ -10,8 +10,12 @@ internal class LegendViewVM : SheetComponentVM {
     private View _legendView;
     private ElementType _viewportType;
 
-    public LegendViewVM(SheetVM sheetVM, RevitRepository repository, ILocalizationService localizationService) 
-        : base(sheetVM, repository, localizationService) {
+    public LegendViewVM(
+        SheetVM sheetVM,
+        RevitRepository repository,
+        ILocalizationService localizationService,
+        StringParamSetService stringParamSetService)
+        : base(sheetVM, repository, localizationService, stringParamSetService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 
