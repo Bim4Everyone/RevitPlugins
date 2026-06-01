@@ -25,6 +25,8 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBox/TextBox.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBlock/TextBlock.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
     <Style
