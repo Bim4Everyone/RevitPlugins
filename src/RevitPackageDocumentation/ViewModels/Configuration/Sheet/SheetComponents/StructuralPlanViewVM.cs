@@ -73,7 +73,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     public override void CreateComponent() { ViewName += "1"; }
 
     public override bool ValidateModule() {
-        if(string.IsNullOrEmpty(ViewName)) {
+        if(string.IsNullOrEmpty(ViewNameFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
             return false;
         }
