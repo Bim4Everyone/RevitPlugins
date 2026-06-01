@@ -99,7 +99,9 @@ internal class RevitRepository {
     /// </summary>
     public List<RevitElement> GetSelectedRevitElements(ICollection<BuiltInCategory> categories) {
         var selectedElements = GetSelectedElements()
-            .Where(x => x != null).ToList();
+            .Where(x => x != null)
+            .ToList();
+        
         if(selectedElements.Count == 0) {
             return [];
         }
@@ -350,12 +352,14 @@ internal class RevitRepository {
         if(!revitElements.Any()) {
             return null;
         }
-        var bboxes = revitElements
+        var boundingBoxes = revitElements
             .Select(revitElement => revitElement.BoundingBoxXYZ)
-            .Where(bbox => bbox is not null);
-
-        var boundingBoxes = bboxes as BoundingBoxXYZ[] ?? bboxes.ToArray();
-        return !boundingBoxes.Any() ? null : BoundingBoxExtensions.CreateUnitedBoundingBox([.. boundingBoxes]);
+            .Where(bbox => bbox is not null)
+            .ToArray();
+        
+        return !boundingBoxes.Any() 
+            ? null 
+            : boundingBoxes.CreateUnitedBoundingBox();
     }
 
     // Метод получения BoundingBoxXYZ по Location
@@ -505,12 +509,12 @@ internal class RevitRepository {
 
     // Метод получения объединенного солида
     private Solid GetUnitedSolid(Element element) {
-        var solids = element.GetSolids();
-        var enumerable = solids as Solid[] ?? solids.ToArray();
-        if(!enumerable.Any()) {
+        var solids = element.GetSolids().ToArray();
+        if(!solids.Any()) {
             return null;
         }
-        var unitedSolids = SolidExtensions.CreateUnitedSolids([.. enumerable]);
+        var unitedSolids = SolidExtensions.CreateUnitedSolids(solids);
+        
         var validSolids = unitedSolids
             .Where(s => s != null && s.Faces.Size > 0 && s.Edges.Size > 0)
             .ToList();
