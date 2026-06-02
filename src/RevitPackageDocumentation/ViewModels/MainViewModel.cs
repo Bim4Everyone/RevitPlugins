@@ -17,7 +17,6 @@ using RevitPackageDocumentation.Models.ScheduleFilters;
 using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Parameters;
-using RevitPackageDocumentation.Views;
 
 namespace RevitPackageDocumentation.ViewModels;
 
@@ -56,7 +55,6 @@ internal class MainViewModel : BaseViewModel {
     private List<View> _legendsInProject;
     private List<Family> _titleBlockFamilies;
     private IList<ScheduleTypeInfo> _filterTypes;
-    private MainWindow _packageDocWindow;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -90,7 +88,7 @@ internal class MainViewModel : BaseViewModel {
 
         CreateComponentCommand = RelayCommand.Create<SheetComponentVM>(CreateComponent, CanCreateComponent);
 
-        LoadViewCommand = RelayCommand.Create<MainWindow>(LoadView);
+        LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
         SelectElemForParamCommand = RelayCommand.Create<SelectElemParamVM>(SelectElemForParam);
@@ -115,11 +113,6 @@ internal class MainViewModel : BaseViewModel {
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
 
-
-    public MainWindow PackageDocWindow {
-        get => _packageDocWindow;
-        set => RaiseAndSetIfChanged(ref _packageDocWindow, value);
-    }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -210,11 +203,9 @@ internal class MainViewModel : BaseViewModel {
     }
 
 
-    private void LoadView(MainWindow window) {
-        PackageDocWindow = window;
+    private void LoadView() {
         LoadConfig();
         GetSettingsForUI();
-
 
         if(string.IsNullOrEmpty(_sheetSetDataPath) || !File.Exists(_sheetSetDataPath)) {
             ImportSheetSet();
