@@ -203,6 +203,9 @@ internal class SheetVM : BaseViewModel {
     }
 
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
+        if(stringParam.StringValue is null) {
+            return;
+        }
         _stringParamSetService.SetAll(this, SheetSet.Params, stringParam);
         foreach(var sheetComponent in SheetComponents) {
             sheetComponent.UpdateDueParamValueChange(stringParam);
