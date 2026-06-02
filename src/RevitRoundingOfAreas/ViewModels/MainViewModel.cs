@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -26,22 +27,17 @@ internal class MainViewModel : BaseViewModel {
     private readonly SpatialElementCheckService _spatialElementCheckService;
     private readonly IWindowService _windowService;
     private readonly ILocalizationService _localizationService;
-
     private ConfigSettings _configSettings;
-
     private ObservableCollection<RangeViewModel> _range;
     private RangeViewModel _selectedRange;
-
     private ObservableCollection<PhaseViewModel> _phases;
     private PhaseViewModel _selectedPhase;
-
-    private ObservableCollection<ParamViewModel> _params;
+    private ObservableCollection<ParamViewModel> _sourceParams;
     private ParamViewModel _selectedSourceParam;
+    private ObservableCollection<ParamViewModel> _targetParams;
     private ParamViewModel _selectedTargetParam;
-
-    private ObservableCollection<DigitViewModel> _digitCount;
-    private DigitViewModel _selectedDigitCount;
-
+    private ObservableCollection<AccuracyViewModel> _accuracy;
+    private AccuracyViewModel _selectedAccuracy;
     private string _errorText;
 
     public MainViewModel(
@@ -68,7 +64,6 @@ internal class MainViewModel : BaseViewModel {
     }
 
     public ICommand LoadViewCommand { get; }
-
     public ICommand AcceptViewCommand { get; }
 
 
@@ -76,65 +71,78 @@ internal class MainViewModel : BaseViewModel {
         get => _range;
         set => RaiseAndSetIfChanged(ref _range, value);
     }
-
     public RangeViewModel SelectedRange {
         get => _selectedRange;
         set => RaiseAndSetIfChanged(ref _selectedRange, value);
     }
-
     public ObservableCollection<PhaseViewModel> Phases {
         get => _phases;
         set => RaiseAndSetIfChanged(ref _phases, value);
     }
-
     public PhaseViewModel SelectedPhase {
         get => _selectedPhase;
         set => RaiseAndSetIfChanged(ref _selectedPhase, value);
     }
-
-    public ObservableCollection<ParamViewModel> Params {
-        get => _params;
-        set => RaiseAndSetIfChanged(ref _params, value);
+    public ObservableCollection<ParamViewModel> SourceParams {
+        get => _sourceParams;
+        set => RaiseAndSetIfChanged(ref _sourceParams, value);
     }
-
     public ParamViewModel SelectedSourceParam {
         get => _selectedSourceParam;
         set => RaiseAndSetIfChanged(ref _selectedSourceParam, value);
     }
-
+    public ObservableCollection<ParamViewModel> TargetParams {
+        get => _targetParams;
+        set => RaiseAndSetIfChanged(ref _targetParams, value);
+    }
     public ParamViewModel SelectedTargetParam {
         get => _selectedTargetParam;
         set => RaiseAndSetIfChanged(ref _selectedTargetParam, value);
     }
-
-    public ObservableCollection<DigitViewModel> DigitCount {
-        get => _digitCount;
-        set => RaiseAndSetIfChanged(ref _digitCount, value);
+    public ObservableCollection<AccuracyViewModel> Accuracy {
+        get => _accuracy;
+        set => RaiseAndSetIfChanged(ref _accuracy, value);
     }
-
-    public DigitViewModel SelectedDigitCount {
-        get => _selectedDigitCount;
-        set => RaiseAndSetIfChanged(ref _selectedDigitCount, value);
+    public AccuracyViewModel SelectedAccuracy {
+        get => _selectedAccuracy;
+        set => RaiseAndSetIfChanged(ref _selectedAccuracy, value);
     }
-
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
     // Метод получения коллекции DigitViewModel для DigitCount
-    private IEnumerable<DigitViewModel> GetDigitViewModels() {
+    private IEnumerable<AccuracyViewModel> GetDigitViewModels() {
         for(int i = 1; i <= _systemPluginConfig.DefaultDigitCountRange; i++) {
-            yield return new DigitViewModel {
-                DigitCount = i,
+            yield return new AccuracyViewModel {
+                Accuracy = i,
                 Name = i.ToString(),
             };
         }
     }
 
-    // Метод получения коллекции ParamViewModel для Params
-    private IEnumerable<ParamViewModel> GetParamViewModels() {
+    // Метод получения коллекции ParamViewModel для SourceParams
+    private IEnumerable<ParamViewModel> GetSourceParamViewModels() {
         return _paramService.AllRevitParams
+            .Select(param => new ParamViewModel {
+                Name = param.Name,
+                RevitParam = param
+            });
+    }
+
+    // Метод получения коллекции ParamViewModel для TargetParams
+    private IEnumerable<ParamViewModel> GetTargetParamViewModels() {
+        return _paramService.AllRevitParams
+            .Where(revitParam => {
+                var spatialElements = _revitRepository.GetAllSpatialElements();
+                var randomSpatialElement = spatialElements.FirstOrDefault();
+                if(randomSpatialElement is null) {
+                    return false;
+                }
+                var param = revitParam.GetParam(randomSpatialElement);
+                return !param.IsReadOnly;
+            })
             .Select(param => new ParamViewModel {
                 Name = param.Name,
                 RevitParam = param
@@ -171,18 +179,20 @@ internal class MainViewModel : BaseViewModel {
             .FirstOrDefault(phase => phase.ElementId == _configSettings.SelectedPhaseId)
             ?? Phases.LastOrDefault();
 
-        Params = new ObservableCollection<ParamViewModel>(GetParamViewModels());
-        SelectedSourceParam = Params
+        SourceParams = new ObservableCollection<ParamViewModel>(GetSourceParamViewModels());
+        SelectedSourceParam = SourceParams
             .FirstOrDefault(param => param.RevitParam.Id == _configSettings.SourceParam?.Id)
-            ?? Params.FirstOrDefault();
-        SelectedTargetParam = Params
-            .FirstOrDefault(param => param.RevitParam.Id == _configSettings.TargetParam?.Id)
-            ?? Params.FirstOrDefault();
+            ?? SourceParams.FirstOrDefault();
 
-        DigitCount = new ObservableCollection<DigitViewModel>(GetDigitViewModels());
-        SelectedDigitCount = DigitCount
-            .FirstOrDefault(digit => digit.DigitCount == _configSettings.DigitCount)
-            ?? DigitCount.FirstOrDefault();
+        TargetParams = new ObservableCollection<ParamViewModel>(GetTargetParamViewModels());
+        SelectedTargetParam = TargetParams
+            .FirstOrDefault(param => param.RevitParam.Id == _configSettings.TargetParam?.Id)
+            ?? TargetParams.FirstOrDefault();
+
+        Accuracy = new ObservableCollection<AccuracyViewModel>(GetDigitViewModels());
+        SelectedAccuracy = Accuracy
+            .FirstOrDefault(accuracy => accuracy.Accuracy == _configSettings.Accuracy)
+            ?? Accuracy.FirstOrDefault();
     }
 
     private RangeViewModel ResolveDefaultRange() {
@@ -201,7 +211,18 @@ internal class MainViewModel : BaseViewModel {
         if(warnings.Count != 0) {
             _windowService.CloseMainWindow();
             _windowService.ShowWarningWindow(warnings);
+            return;
         }
+
+        string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
+        using var t = _revitRepository.Document.StartTransaction(transactionName);
+        _revitRepository.RoundingOfAreas(
+            spatialElements,
+            SelectedSourceParam.RevitParam,
+            SelectedTargetParam.RevitParam,
+            SelectedAccuracy.Accuracy
+        );
+        t.Commit();
     }
 
     private bool CanAcceptView() {
@@ -236,8 +257,8 @@ internal class MainViewModel : BaseViewModel {
         _configSettings.SourceParam ??= _paramService.DefaultSourceParam;
         _configSettings.TargetParam ??= _paramService.DefaultTargetParam;
 
-        if(_configSettings.DigitCount <= 0) {
-            _configSettings.DigitCount = _systemPluginConfig.DefaultDigitCount;
+        if(_configSettings.Accuracy <= 0) {
+            _configSettings.Accuracy = _systemPluginConfig.DefaultAccuracy;
         }
     }
 
@@ -249,7 +270,7 @@ internal class MainViewModel : BaseViewModel {
             SelectedPhaseId = SelectedPhase?.ElementId ?? ElementId.InvalidElementId,
             SourceParam = SelectedSourceParam?.RevitParam,
             TargetParam = SelectedTargetParam?.RevitParam,
-            DigitCount = SelectedDigitCount?.DigitCount ?? _systemPluginConfig.DefaultDigitCount
+            Accuracy = SelectedAccuracy?.Accuracy ?? _systemPluginConfig.DefaultAccuracy
         };
 
         _pluginConfig.SaveProjectConfig();

@@ -67,4 +67,7 @@
     <system:String
         x:Key="WarningWindow.LevelNameHeader">Уровень помещения</system:String>
 
+    <system:String
+        x:Key="MainViewModel.TransactionName">Расчёт площадей (соц. объекты)</system:String>
+
 </ResourceDictionary>

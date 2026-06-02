@@ -73,7 +73,7 @@
                     Header="{me:LocalizationSource MainWindow.SourceParam}"
                     Description="{me:LocalizationSource MainWindow.SourceParamDescription}">
                     <ComboBox
-                        ItemsSource="{Binding Params}"
+                        ItemsSource="{Binding SourceParams}"
                         SelectedValue="{Binding SelectedSourceParam}"
                         DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
@@ -82,7 +82,7 @@
                     Header="{me:LocalizationSource MainWindow.TargetParam}"
                     Description="{me:LocalizationSource MainWindow.TargetParamDescription}">
                     <ComboBox
-                        ItemsSource="{Binding Params}"
+                        ItemsSource="{Binding TargetParams}"
                         SelectedValue="{Binding SelectedTargetParam}"
                         DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
@@ -91,8 +91,8 @@
                     Header="{me:LocalizationSource MainWindow.DigitCount}"
                     Description="{me:LocalizationSource MainWindow.DigitCountDescription}">
                     <ComboBox
-                        ItemsSource="{Binding DigitCount}"
-                        SelectedValue="{Binding SelectedDigitCount}"
+                        ItemsSource="{Binding Accuracy}"
+                        SelectedValue="{Binding SelectedAccuracy}"
                         DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
 

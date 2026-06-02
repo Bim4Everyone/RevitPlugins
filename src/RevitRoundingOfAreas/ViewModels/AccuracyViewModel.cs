@@ -1,10 +1,10 @@
 using dosymep.WPF.ViewModels;
 
 namespace RevitRoundingOfAreas.ViewModels;
-internal class DigitViewModel : BaseViewModel {
+internal class AccuracyViewModel : BaseViewModel {
     private string _name;
 
-    public int DigitCount { get; set; }
+    public int Accuracy { get; set; }
 
     public string Name {
         get => _name;

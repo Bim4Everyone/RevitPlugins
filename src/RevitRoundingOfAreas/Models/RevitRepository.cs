@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using System.Linq;
@@ -7,6 +8,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
+using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
@@ -26,20 +28,49 @@ internal class RevitRepository {
     public Document Document => ActiveUIDocument.Document;
 
     /// <summary>
+    /// Основной метод округления площадей
+    /// </summary>
+    public void RoundingOfAreas(List<SpatialModel> spatialModels, RevitParam sourceParam, RevitParam targetParam, int accuracy) {
+        foreach(var spatialModel in spatialModels) {
+            double sourceValue = spatialModel.SpatialElement.GetParamValueOrDefault<double>(sourceParam);
+
+            if(sourceValue == default) {
+                continue;
+            }
+
+            double roundedValue = RoundWithAccuracy(sourceValue, accuracy);
+
+            if(roundedValue == 0) {
+                continue;
+            }
+
+            spatialModel.SpatialElement.SetParamValue(targetParam, ConvertValueToInternalUnits(roundedValue));
+        }
+    }
+
+    /// <summary>
     /// Метод получения всех помещений 
     /// </summary>
-    public List<SpatialModel> GetAllSpatialModels(ElementId phaseId) {
+    public List<SpatialElement> GetAllSpatialElements() {
         return new FilteredElementCollector(Document)
              .OfCategory(BuiltInCategory.OST_Rooms)
              .WhereElementIsNotElementType()
              .OfType<SpatialElement>()
+             .ToList();
+    }
+
+    /// <summary>
+    /// Метод получения всех помещений SpatialModel
+    /// </summary>
+    public List<SpatialModel> GetAllSpatialModels(ElementId phaseId) {
+        return GetAllSpatialElements()
              .Where(spatial => ValidatePhase(spatial, phaseId))
              .Select(CreateSpatialModel)
              .ToList();
     }
 
     /// <summary>
-    /// Метод получения всех помещений на активном виде
+    /// Метод получения всех помещений SpatialModel на активном виде
     /// </summary>
     public List<SpatialModel> GetActiveViewSpatialModels(ElementId phaseId) {
         return new FilteredElementCollector(Document, Document.ActiveView.Id)
@@ -52,7 +83,7 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Метод получения всех выделенных помещений 
+    /// Метод получения всех выделенных помещений SpatialModel
     /// </summary>
     public List<SpatialModel> GetSelectedSpatialModels(ElementId phaseId) {
         return !HasSelectedRooms()
@@ -124,7 +155,7 @@ internal class RevitRepository {
     }
 
     // Создания объекта SpatialModel
-    public SpatialModel CreateSpatialModel(SpatialElement spatialElement) {
+    private SpatialModel CreateSpatialModel(SpatialElement spatialElement) {
         return new SpatialModel {
             SpatialElement = spatialElement,
             LevelName = GetLevelName(spatialElement)
@@ -148,5 +179,25 @@ internal class RevitRepository {
     private bool ValidatePhase(SpatialElement spatialElement, ElementId phaseId) {
         var spatialPhaseId = spatialElement.get_Parameter(BuiltInParameter.ROOM_PHASE).AsElementId();
         return spatialPhaseId != ElementId.InvalidElementId && spatialPhaseId == phaseId;
+    }
+
+    // Метод округления числа с заданной точкой после запятой
+    private double RoundWithAccuracy(double? value, int accuracy) {
+        return value.HasValue
+            ? Math.Round(
+                ConvertValueFromInternalUnits(value.Value),
+                accuracy,
+                MidpointRounding.ToEven)
+            : 0;
+    }
+
+    // Метод конвертации в миллиметры
+    private double ConvertValueFromInternalUnits(double value) {
+        return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.SquareMeters);
+    }
+
+    // Метод конвертации в футы
+    private double ConvertValueToInternalUnits(double value) {
+        return UnitUtils.ConvertToInternalUnits(value, UnitTypeId.SquareMeters);
     }
 }
