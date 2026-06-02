@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 
+using Autodesk.Revit.DB;
+
 using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
@@ -102,8 +104,8 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                         .ScheduleFilterList
                         .ScheduleFilterRules
                         .Select(r => new ScheduleFilterRuleData() {
-                            FieldName = r.SelectedSpecFieldName,
-                            FilterType = r.SelectedFilterType.FilterType,
+                            FieldName = r.SelectedSpecFieldName ?? string.Empty,
+                            FilterType = r.SelectedFilterType?.FilterType ?? ScheduleFilterType.Equal,
                             FilterValue = r.FilterValue
                         })
                         .ToList()

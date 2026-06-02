@@ -87,6 +87,12 @@ internal class ScheduleViewVM : SheetComponentVM {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
             return false;
         }
+        foreach(var rule in ScheduleFilterList.ScheduleFilterRules) {
+            if(rule.SelectedSpecField is null || rule.SelectedFilterType is null) {
+                ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ScheduleFiltersIsNotCorrect");
+                return false;
+            }
+        }
 
         ModuleErrors = string.Empty;
         return true;

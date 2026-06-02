@@ -5,6 +5,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.ViewModels.Configuration.AdditionalParameters;
 using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
@@ -15,6 +16,7 @@ internal abstract class SheetComponentVM : BaseViewModel {
     private string _moduleCode;
     private string _moduleTypeName;
     private string _moduleErrors;
+    private AdditionalParametersListVM _additionalParamsList;
     private readonly SheetVM _sheet;
 
     protected SheetComponentVM(
@@ -71,23 +73,11 @@ internal abstract class SheetComponentVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _moduleErrors, value);
     }
 
-    public T GetSettings<T>() where T : new() {
-        var settings = new T();
-        var vmType = GetType();
-        var modelType = typeof(T);
-
-        foreach(var prop in modelType.GetProperties()) {
-            var vmProp = vmType.GetProperty(prop.Name);
-            if(vmProp != null
-               && vmProp.CanRead
-               && prop.CanWrite
-               && vmProp.PropertyType == prop.PropertyType) {
-                var value = vmProp.GetValue(this);
-                prop.SetValue(settings, value);
-            }
-        }
-        return settings;
+    public AdditionalParametersListVM AdditionalParamsList {
+        get => _additionalParamsList;
+        set => RaiseAndSetIfChanged(ref _additionalParamsList, value);
     }
+
 
     private void PropUpdateByFormula(string formulaPropertyName) {
         StrParamSetService.Set(this, formulaPropertyName, Sheet.SheetSet.Params);

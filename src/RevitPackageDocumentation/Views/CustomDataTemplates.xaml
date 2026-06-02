@@ -369,8 +369,6 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             
             <Grid.ColumnDefinitions>
@@ -442,28 +440,37 @@
                 Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 IsEnabled="False" />
 
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="4"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Фильтры" />
-
-            <ItemsControl
+            <Border
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
-                Grid.Row="5"
-                HorizontalContentAlignment="Stretch"
-                ItemsSource="{Binding Path=ScheduleFilterList.ScheduleFilterRules, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <ui:Button
-                Grid.Column="1"
-                Grid.Row="6"
+                Grid.Row="4"
                 Margin="5"
-                HorizontalAlignment="Right"
-                Content="AddFilter"
-                Command="{Binding ScheduleFilterList.AddFilterCommand}"/>
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Margin="5 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="Фильтры" />
+
+                    <ui:Button
+                        Grid.Row="0"
+                        HorizontalAlignment="Right"
+                        Content="+"
+                        Command="{Binding ScheduleFilterList.AddFilterCommand}" />
+
+                    <ItemsControl
+                        Grid.Row="1"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Path=ScheduleFilterList.ScheduleFilterRules, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </Border>
         </Grid>
     </DataTemplate>
 
