@@ -12,7 +12,6 @@ using dosymep.Revit;
 namespace RevitRoundingOfAreas.Models;
 
 internal class ParamService {
-
     private readonly RevitRepository _revitRepository;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly ICollection<ElementId> _allParamElementIds;

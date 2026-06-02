@@ -7,16 +7,10 @@ using RevitRoundingOfAreas.Models.Interfaces;
 
 namespace RevitRoundingOfAreas.Models.Providers;
 
-internal class ElementsProviderSelected : IElementsProvider {
-    private readonly RevitRepository _revitRepository;
-
-    public ElementsProviderSelected(RevitRepository revitRepository) {
-        _revitRepository = revitRepository;
-    }
-
+internal class ElementsProviderSelected(RevitRepository revitRepository) : IElementsProvider {
     public ElementsProviderType Type => ElementsProviderType.SelectedElementsProvider;
 
     public List<SpatialModel> GetSpatialElements(ElementId phaseId) {
-        return _revitRepository.GetSelectedSpatialModels(phaseId);
+        return revitRepository.GetSelectedSpatialModels(phaseId);
     }
 }

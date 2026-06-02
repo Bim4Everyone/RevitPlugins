@@ -112,9 +112,9 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    // Метод получения коллекции DigitViewModel для DigitCount
-    private IEnumerable<AccuracyViewModel> GetDigitViewModels() {
-        for(int i = 1; i <= _systemPluginConfig.DefaultDigitCountRange; i++) {
+    // Метод получения коллекции AccuracyViewModel для Accuracy
+    private IEnumerable<AccuracyViewModel> GetAccuracyViewModels() {
+        for(int i = 1; i <= _systemPluginConfig.DefaultAccuracyRange; i++) {
             yield return new AccuracyViewModel {
                 Accuracy = i,
                 Name = i.ToString(),
@@ -189,7 +189,7 @@ internal class MainViewModel : BaseViewModel {
             .FirstOrDefault(param => param.RevitParam.Id == _configSettings.TargetParam?.Id)
             ?? TargetParams.FirstOrDefault();
 
-        Accuracy = new ObservableCollection<AccuracyViewModel>(GetDigitViewModels());
+        Accuracy = new ObservableCollection<AccuracyViewModel>(GetAccuracyViewModels());
         SelectedAccuracy = Accuracy
             .FirstOrDefault(accuracy => accuracy.Accuracy == _configSettings.Accuracy)
             ?? Accuracy.FirstOrDefault();

@@ -1,3 +1,5 @@
+using System;
+
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
@@ -8,20 +10,11 @@ using pyRevitLabs.Json;
 
 namespace RevitRoundingOfAreas.Models;
 
-/// <summary>
-/// Класс конфигурации плагина.
-/// (Если не используется удалить)
-/// </summary>
 internal class PluginConfig : ProjectConfig<RevitSettings> {
-    /// <summary>
-    /// Системное свойство конфигурации. (Не трогать)
-    /// </summary>
+    
     [JsonIgnore]
     public override string ProjectConfigPath { get; set; }
-
-    /// <summary>
-    /// Системное свойство конфигурации. (Не трогать)
-    /// </summary>
+    
     [JsonIgnore]
     public override IConfigSerializer Serializer { get; set; }
 
@@ -59,15 +52,17 @@ internal class SystemPluginConfig {
     public string DefaultPhaseName => "Основная планировка";
 
     // Количество вариантов знаков по умолчанию
-    public int DefaultDigitCountRange => 3;
-
+    public int DefaultAccuracyRange => 3;
+    
     // Количество знаков по умолчанию 
     public int DefaultAccuracy => 1;
+    
+    // Сторона округления 
+    public MidpointRounding MidpointRounding  => MidpointRounding.AwayFromZero;
 
     // Системный параметр площади помещений по умолчанию
-    public BuiltInParameter SystemRoomAreaParamId = BuiltInParameter.ROOM_AREA;
+    public BuiltInParameter SystemRoomAreaParamId => BuiltInParameter.ROOM_AREA;
 
     // Общий параметр площади помещений по умолчанию
-    public RevitParam RoomAreaParam = SharedParamsConfig.Instance.RoomArea;
-
+    public RevitParam RoomAreaParam => SharedParamsConfig.Instance.RoomArea;
 }

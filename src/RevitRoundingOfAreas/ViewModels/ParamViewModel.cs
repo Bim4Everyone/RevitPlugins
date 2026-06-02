@@ -2,6 +2,7 @@ using dosymep.Bim4Everyone;
 using dosymep.WPF.ViewModels;
 
 namespace RevitRoundingOfAreas.ViewModels;
+
 internal class ParamViewModel : BaseViewModel {
     private string _name;
 

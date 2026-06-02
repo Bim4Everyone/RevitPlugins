@@ -1,6 +1,7 @@
 using dosymep.WPF.ViewModels;
 
 namespace RevitRoundingOfAreas.ViewModels;
+
 internal class AccuracyViewModel : BaseViewModel {
     private string _name;
 

@@ -10,24 +10,18 @@ using RevitRoundingOfAreas.Views;
 
 namespace RevitRoundingOfAreas.Models;
 
-internal class WindowService : IWindowService {
-    private readonly IResolutionRoot _resolutionRoot;
-
-    public WindowService(IResolutionRoot resolutionRoot) {
-        _resolutionRoot = resolutionRoot;
-    }
-
+internal class WindowService(IResolutionRoot resolutionRoot) : IWindowService {
     public void CloseMainWindow() {
-        var mainWindow = _resolutionRoot.Get<MainWindow>();
+        var mainWindow = resolutionRoot.Get<MainWindow>();
         mainWindow.Close();
     }
 
     public void ShowWarningWindow(IReadOnlyCollection<WarningElement> warningElements) {
-        var warningsVM = _resolutionRoot.Get<WarningsViewModel>();
-        warningsVM.WarningElementsCollection = warningElements;
-        var warningsWindow = _resolutionRoot.Get<WarningsWindow>();
-        warningsWindow.DataContext = warningsVM;
-        warningsVM.LoadView();
+        var warningViewModel = resolutionRoot.Get<WarningsViewModel>();
+        warningViewModel.WarningElementsCollection = warningElements;
+        var warningsWindow = resolutionRoot.Get<WarningsWindow>();
+        warningsWindow.DataContext = warningViewModel;
+        warningViewModel.LoadView();
         warningsWindow.Show();
     }
 }

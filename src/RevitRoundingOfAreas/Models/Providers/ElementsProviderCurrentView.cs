@@ -7,16 +7,10 @@ using RevitRoundingOfAreas.Models.Interfaces;
 
 namespace RevitRoundingOfAreas.Models.Providers;
 
-internal class ElementsProviderCurrentView : IElementsProvider {
-    private readonly RevitRepository _revitRepository;
-
-    public ElementsProviderCurrentView(RevitRepository revitRepository) {
-        _revitRepository = revitRepository;
-    }
-
+internal class ElementsProviderCurrentView(RevitRepository revitRepository) : IElementsProvider {
     public ElementsProviderType Type => ElementsProviderType.CurrentViewProvider;
 
     public List<SpatialModel> GetSpatialElements(ElementId phaseId) {
-        return _revitRepository.GetActiveViewSpatialModels(phaseId);
+        return revitRepository.GetActiveViewSpatialModels(phaseId);
     }
 }

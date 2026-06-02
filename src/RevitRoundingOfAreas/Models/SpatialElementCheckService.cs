@@ -8,6 +8,7 @@ using RevitRoundingOfAreas.Models.Enums;
 using RevitRoundingOfAreas.Models.Warnings;
 
 namespace RevitRoundingOfAreas.Models;
+
 internal class SpatialElementCheckService {
 
     public IReadOnlyCollection<WarningElement> CheckSpatialElements(List<SpatialModel> spatialModels) {

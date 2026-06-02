@@ -45,7 +45,7 @@ public class RevitRoundingOfAreasCommand : BasePluginCommand {
     /// <param name="uiApplication">Интерфейс взаимодействия с Revit.</param>
     /// <remarks>
     /// В случаях, когда не используется конфигурация
-    /// или локализация требуется удалять их использование полностью во всем проекте.
+    /// или локализация, требуется удалять их использование полностью во всем проекте.
     /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
@@ -106,7 +106,7 @@ public class RevitRoundingOfAreasCommand : BasePluginCommand {
         var localizationService = kernel.Get<ILocalizationService>();
         var systemPluginConfig = kernel.Get<SystemPluginConfig>();
 
-        // Загрузка параметров проекта        
+        // Загрузка параметров проекта
         bool isParamChecked = new CheckProjectParams(
             systemPluginConfig, uiApplication.Application, uiApplication.ActiveUIDocument.Document)
             .CopyProjectParams()

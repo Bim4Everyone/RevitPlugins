@@ -4,23 +4,16 @@ using RevitRoundingOfAreas.Models.Providers;
 
 namespace RevitRoundingOfAreas.Models.Factories;
 
-internal class ProvidersFactory {
-
-    private readonly RevitRepository _revitRepository;
-
-    public ProvidersFactory(RevitRepository revitRepository) {
-        _revitRepository = revitRepository;
-    }
-
+internal class ProvidersFactory(RevitRepository revitRepository) {
     /// <summary>
     /// Метод получения провайдера элементов по Enum
     /// </summary>
     public IElementsProvider GetElementsProvider(ElementsProviderType type) {
         return type switch {
-            ElementsProviderType.AllElementsProvider => new ElementsProviderAll(_revitRepository),
-            ElementsProviderType.CurrentViewProvider => new ElementsProviderCurrentView(_revitRepository),
-            ElementsProviderType.SelectedElementsProvider => new ElementsProviderSelected(_revitRepository),
-            _ => new ElementsProviderAll(_revitRepository)
+            ElementsProviderType.AllElementsProvider => new ElementsProviderAll(revitRepository),
+            ElementsProviderType.CurrentViewProvider => new ElementsProviderCurrentView(revitRepository),
+            ElementsProviderType.SelectedElementsProvider => new ElementsProviderSelected(revitRepository),
+            _ => new ElementsProviderAll(revitRepository)
         };
     }
 }

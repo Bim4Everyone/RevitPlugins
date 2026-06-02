@@ -9,16 +9,14 @@ using RevitRoundingOfAreas.Models;
 namespace RevitRoundingOfAreas.ViewModels.Warnings;
 
 internal class WarningElementViewModel : BaseViewModel {
-    private readonly SpatialModel _spatialModel;
     private ElementId _elementId;
     private string _name;
     private string _levelName;
 
     public WarningElementViewModel(SpatialModel spatialModel) {
-        _spatialModel = spatialModel;
-        Name = _spatialModel.SpatialElement.Name;
-        LevelName = _spatialModel.LevelName;
-        ElementId = _spatialModel.SpatialElement.Id;
+        Name = spatialModel.SpatialElement.Name;
+        LevelName = spatialModel.LevelName;
+        ElementId = spatialModel.SpatialElement.Id;
     }
 
     public ICommand ShowElementCommand { get; set; }

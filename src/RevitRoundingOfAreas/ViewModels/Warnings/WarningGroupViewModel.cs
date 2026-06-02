@@ -8,8 +8,8 @@ using dosymep.WPF.ViewModels;
 using RevitRoundingOfAreas.Models.Warnings;
 
 namespace RevitRoundingOfAreas.ViewModels.Warnings;
-internal class WarningGroupViewModel : BaseViewModel {
 
+internal class WarningGroupViewModel : BaseViewModel {
     private ObservableCollection<WarningElementViewModel> _warnings;
     private string _caption;
     private string _description;

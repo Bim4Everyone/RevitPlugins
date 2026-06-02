@@ -14,18 +14,14 @@ using dosymep.SimpleServices;
 
 namespace RevitRoundingOfAreas.Models;
 
-internal class RevitRepository {
-    private readonly ILocalizationService _localizationService;
-
-    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
-        UIApplication = uiApplication;
-        _localizationService = localizationService;
-    }
-
-    public UIApplication UIApplication { get; }
-    public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    public Application Application => UIApplication.Application;
-    public Document Document => ActiveUIDocument.Document;
+internal class RevitRepository(
+    UIApplication uiApplication, 
+    ILocalizationService localizationService, 
+    SystemPluginConfig systemPluginConfig) {
+    private UIApplication UiApplication { get; } = uiApplication;
+    private UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
+    public Application Application => UiApplication.Application;
+    public Document Document => ActiveUiDocument.Document;
 
     /// <summary>
     /// Основной метод округления площадей
@@ -34,16 +30,15 @@ internal class RevitRepository {
         foreach(var spatialModel in spatialModels) {
             double sourceValue = spatialModel.SpatialElement.GetParamValueOrDefault<double>(sourceParam);
 
-            if(sourceValue == default) {
+            if(sourceValue is 0) {
                 continue;
             }
 
             double roundedValue = RoundWithAccuracy(sourceValue, accuracy);
 
-            if(roundedValue == 0) {
+            if(roundedValue is 0) {
                 continue;
             }
-
             spatialModel.SpatialElement.SetParamValue(targetParam, ConvertValueToInternalUnits(roundedValue));
         }
     }
@@ -99,9 +94,9 @@ internal class RevitRepository {
     /// Метод проверки, есть ли выделенные помещения
     /// </summary>
     public bool HasSelectedRooms() {
-        var selected = GetSelectedElements();
-        return selected != null && selected.Count() != 0 && selected
-            .Any(element => element is Room);
+        var selected = GetSelectedElements().ToArray();
+        return selected.Count() != 0
+            && selected.Any(element => element is Room);
     }
 
     /// <summary>
@@ -117,18 +112,11 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Метод получения всех выделенных элементов модели
-    /// </summary>    
-    public IEnumerable<Element> GetSelectedElements() {
-        return ActiveUIDocument.GetSelectedElements();
-    }
-
-    /// <summary>
     /// Метод выделения элементов в документе
     /// </summary>
     public void SetSelected(ElementId elementId) {
         List<ElementId> listElements = [elementId];
-        ActiveUIDocument.SetSelectedElements(listElements);
+        ActiveUiDocument.SetSelectedElements(listElements);
     }
 
     /// <summary>
@@ -153,6 +141,11 @@ internal class RevitRepository {
             ?.ElementId
             ?? ElementId.InvalidElementId;
     }
+    
+    // Метод получения всех выделенных элементов модели
+    private IEnumerable<Element> GetSelectedElements() {
+        return ActiveUiDocument.GetSelectedElements();
+    }
 
     // Создания объекта SpatialModel
     private SpatialModel CreateSpatialModel(SpatialElement spatialElement) {
@@ -165,14 +158,14 @@ internal class RevitRepository {
     // Получение уровня помещения
     private string GetLevelName(SpatialElement spatialElement) {
         if(spatialElement is null) {
-            _localizationService.GetLocalizedString("RevitRepository.NoLevel");
+            localizationService.GetLocalizedString("RevitRepository.NoLevel");
         }
-        var levelId = spatialElement.LevelId;
-        if(levelId is null || levelId == ElementId.InvalidElementId) {
-            _localizationService.GetLocalizedString("RevitRepository.NoLevel");
+        var levelId = spatialElement?.LevelId;
+        if(levelId == ElementId.InvalidElementId) {
+            localizationService.GetLocalizedString("RevitRepository.NoLevel");
         }
         return Document.GetElement(levelId)?.Name
-            ?? _localizationService.GetLocalizedString("RevitRepository.NoLevel");
+            ?? localizationService.GetLocalizedString("RevitRepository.NoLevel");
     }
 
     // Метод валидации стадии
@@ -187,7 +180,7 @@ internal class RevitRepository {
             ? Math.Round(
                 ConvertValueFromInternalUnits(value.Value),
                 accuracy,
-                MidpointRounding.ToEven)
+                systemPluginConfig.MidpointRounding)
             : 0;
     }
 

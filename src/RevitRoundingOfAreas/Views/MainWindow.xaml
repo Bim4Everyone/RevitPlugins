@@ -88,8 +88,8 @@
                 </edits:CustomEditControl>
                 <edits:CustomEditControl
                     Icon="{ui:SymbolIcon numberRow24}"
-                    Header="{me:LocalizationSource MainWindow.DigitCount}"
-                    Description="{me:LocalizationSource MainWindow.DigitCountDescription}">
+                    Header="{me:LocalizationSource MainWindow.Accuracy}"
+                    Description="{me:LocalizationSource MainWindow.AccuracyDescription}">
                     <ComboBox
                         ItemsSource="{Binding Accuracy}"
                         SelectedValue="{Binding SelectedAccuracy}"
