@@ -263,7 +263,9 @@ internal class MainViewModel : BaseViewModel {
         var currentSheetSetData = _sheetSetConfig.Import(sheetSetDataPath);
         CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(currentSheetSetData);
         CurrentSheetSet.SelectedSheet = CurrentSheetSet.SheetList.FirstOrDefault();
+        CurrentSheetSet.ValidateAllSheets();
     }
+
 
     private void ExportSheetSet() {
         _sheetSetDataPath = _fileDialogService.SaveFileDialog();

@@ -84,6 +84,15 @@ internal class SheetSetVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
 
+    public void ValidateAllSheets() {
+        foreach(var sheet in SheetList) {
+            foreach(var component in sheet.SheetComponents) {
+                component.ValidateModule();
+            }
+            sheet.ValidateModule();
+        }
+    }
+
 
     internal void AddSheet() {
         SheetList.Add(
@@ -130,22 +139,29 @@ internal class SheetSetVM : BaseViewModel {
     }
 
     private void RemoveSheetSetParam(PluginParamVM pluginParam) {
-
+        // Удаляем из списка параметров выбора
         if(pluginParam != null && SelectElemParams.Contains(pluginParam) && pluginParam is SelectElemParamVM selectParam) {
+            // Проходимся по каждому компоненту, и если в них есть параметр SelectedSelectElemParam
+            // и его значение pluginParam, то ставим null (у не выбранных листов он сам не сбрасывает)
+            SheetList
+                .SelectMany(s => s.SheetComponents)
+                .Where(component => {
+                    var prop = component.GetType().GetProperty("SelectedSelectElemParam");
+                    return prop != null && prop.GetValue(component) == selectParam;
+                })
+                .ToList()
+                .ForEach(component => {
+                    var prop = component.GetType().GetProperty("SelectedSelectElemParam");
+                    prop?.SetValue(component, null);
+                });
+
             SelectElemParams.Remove(selectParam);
         }
-
-
+        // Удаляем из общего списка параметров
         if(pluginParam != null && Params.Contains(pluginParam)) {
             Params.Remove(pluginParam);
         }
-    }
-
-    public void UpdateDueParamsChange() {
-        SelectElemParams.Clear();
-        foreach(var param in Params.OfType<SelectElemParamVM>()) {
-            SelectElemParams.Add(param);
-        }
+        ValidateAllSheets();
     }
 
     public void UpdateDueParamNameChange(PluginParamVM pluginParam) {

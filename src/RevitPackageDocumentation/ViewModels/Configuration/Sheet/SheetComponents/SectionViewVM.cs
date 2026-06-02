@@ -10,7 +10,7 @@ using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class SectionViewVM : SheetComponentVM {
-    private string _viewNameFormula;
+    private string _viewNameFormula = string.Empty;
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
     private ElementType _viewportType;

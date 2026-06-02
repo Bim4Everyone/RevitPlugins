@@ -20,7 +20,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     // Отступ между видовыми экранами на листе
     private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(100);
 
-    private string _viewNameFormula;
+    private string _viewNameFormula = string.Empty;
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
     private ElementType _viewportType;
@@ -81,7 +81,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     public override void CreateComponent() { }
 
     public override bool ValidateModule() {
-        if(string.IsNullOrEmpty(ViewName)) {
+        if(string.IsNullOrEmpty(ViewNameFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
             return false;
         }

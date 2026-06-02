@@ -33,7 +33,7 @@ internal class SheetVM : BaseViewModel {
     private string _moduleErrors;
 
     private SheetSetVM _sheetSet;
-    private string _sheetNameFormula;
+    private string _sheetNameFormula = string.Empty;
     private string _sheetName;
     private string _sheetSize;
     private string _sheetCoefficient;

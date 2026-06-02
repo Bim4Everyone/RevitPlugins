@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -44,13 +43,6 @@ public partial class FormulaTextBoxControl : UserControl {
         _timer.Tick += (s, e) => { _timer.Stop(); UpdateFormula(); };
 
         FormulaInputTextBox.TextChanged += OnTextChanged;
-
-        // Подписываемся на изменения свойств PropFormula и PropResult
-        DependencyPropertyDescriptor.FromProperty(PropFormulaProperty, typeof(FormulaTextBoxControl))
-            .AddValueChanged(this, OnFormulaOrResultChanged);
-
-        DependencyPropertyDescriptor.FromProperty(PropResultProperty, typeof(FormulaTextBoxControl))
-            .AddValueChanged(this, OnFormulaOrResultChanged);
     }
 
     private void OnTextChanged(object sender, TextChangedEventArgs e) {
@@ -63,9 +55,7 @@ public partial class FormulaTextBoxControl : UserControl {
         if(propertyName != null) {
             UpdateCommand?.Execute(propertyName);
         }
-    }
 
-    private void OnFormulaOrResultChanged(object sender, EventArgs e) {
         // Если строки одинаковые - скрываем TextBlock, иначе показываем
         bool areEqual = string.Equals(PropFormula ?? string.Empty, PropResult ?? string.Empty);
         ResultTextBlock.Visibility = areEqual ? Visibility.Collapsed : Visibility.Visible;

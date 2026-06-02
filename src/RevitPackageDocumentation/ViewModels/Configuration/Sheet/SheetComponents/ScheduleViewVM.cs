@@ -10,7 +10,7 @@ using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class ScheduleViewVM : SheetComponentVM {
-    private string _viewNameFormula;
+    private string _viewNameFormula = string.Empty;
     private string _viewName;
     private string _viewColumn;
     private string _viewCount;

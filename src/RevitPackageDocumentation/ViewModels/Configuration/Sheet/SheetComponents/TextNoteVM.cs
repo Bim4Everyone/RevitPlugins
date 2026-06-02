@@ -7,7 +7,7 @@ using RevitPackageDocumentation.Models;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class TextNoteVM : SheetComponentVM {
-    private string _textFormula;
+    private string _textFormula = string.Empty;
     private string _text;
     private TextNoteType _textType;
 
@@ -38,7 +38,7 @@ internal class TextNoteVM : SheetComponentVM {
     public override void CreateComponent() { }
 
     public override bool ValidateModule() {
-        if(string.IsNullOrEmpty(Text)) {
+        if(string.IsNullOrEmpty(TextFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextIsEmpty");
             return false;
         }
