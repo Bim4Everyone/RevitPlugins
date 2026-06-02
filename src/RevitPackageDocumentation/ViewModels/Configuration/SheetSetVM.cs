@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -18,10 +19,13 @@ internal class SheetSetVM : BaseViewModel {
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
     private readonly StringParamSetService _stringParamSetService;
+
     private string _name;
     private ObservableCollection<SheetVM> _sheetList = [];
-    private ObservableCollection<PluginParamVM> _params = [];
     private SheetVM _selectedSheet;
+    private ObservableCollection<PluginParamVM> _params = [];
+    private ObservableCollection<SelectElemParamVM> _selectElemParams = [];
+    private SelectElemParamVM _selectedSelectElemParam;
 
     public SheetSetVM(
         RevitRepository revitRepository,
@@ -43,15 +47,12 @@ internal class SheetSetVM : BaseViewModel {
 
         AddSheetSetParamCommand = RelayCommand.Create<ComponentTypeItem>(AddSheetSetParam);
         RemoveSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(RemoveSheetSetParam);
-
-        //UpdateSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(UpdateSheetSetParam);
     }
 
     public ICommand AddSheetCommand { get; }
     public ICommand RemoveSheetCommand { get; }
     public ICommand AddSheetSetParamCommand { get; }
     public ICommand RemoveSheetSetParamCommand { get; }
-    //public ICommand UpdateSheetSetParamCommand { get; }
 
     public string Name {
         get => _name;
@@ -71,6 +72,16 @@ internal class SheetSetVM : BaseViewModel {
     public ObservableCollection<PluginParamVM> Params {
         get => _params;
         set => RaiseAndSetIfChanged(ref _params, value);
+    }
+
+    public ObservableCollection<SelectElemParamVM> SelectElemParams {
+        get => _selectElemParams;
+        set => RaiseAndSetIfChanged(ref _selectElemParams, value);
+    }
+
+    public SelectElemParamVM SelectedSelectElemParam {
+        get => _selectedSelectElemParam;
+        set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
 
 
@@ -104,16 +115,36 @@ internal class SheetSetVM : BaseViewModel {
             if(paramData == null)
                 return;
 
-            var parameter = _sheetSetVMFactory.CreateParamVM(this, paramData);
-            Params.Add(parameter);
+            AddSheetSetParam(paramData);
         } catch(System.Exception) {
             _messageBoxService.Show("An error occurred while adding the parameter!", "Error");
         }
     }
 
+    public void AddSheetSetParam(PluginParamData paramData) {
+        var parameter = _sheetSetVMFactory.CreateParamVM(this, paramData);
+        Params.Add(parameter);
+        if(parameter is SelectElemParamVM selectParam) {
+            SelectElemParams.Add(selectParam);
+        }
+    }
+
     private void RemoveSheetSetParam(PluginParamVM pluginParam) {
+
+        if(pluginParam != null && SelectElemParams.Contains(pluginParam) && pluginParam is SelectElemParamVM selectParam) {
+            SelectElemParams.Remove(selectParam);
+        }
+
+
         if(pluginParam != null && Params.Contains(pluginParam)) {
             Params.Remove(pluginParam);
+        }
+    }
+
+    public void UpdateDueParamsChange() {
+        SelectElemParams.Clear();
+        foreach(var param in Params.OfType<SelectElemParamVM>()) {
+            SelectElemParams.Add(param);
         }
     }
 

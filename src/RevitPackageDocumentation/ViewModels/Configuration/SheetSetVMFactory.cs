@@ -57,8 +57,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
 
         foreach(var paramData in data.Params) {
-            var paramVM = CreateParamVM(sheetSetVM, paramData);
-            sheetSetVM.Params.Add(paramVM);
+            sheetSetVM.AddSheetSetParam(paramData);
         }
 
         foreach(var sheetData in data.Sheets) {
@@ -127,6 +126,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
                 ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
                 ViewCount = data.ViewCount ?? "1",
+                SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
+                    .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
             },
 
             StructuralCalloutViewData data => new StructuralCalloutViewVM(
@@ -141,6 +142,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
                 ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
                 ViewCount = data.ViewCount ?? "1",
+                SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
+                    .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
             },
 
             SectionViewData data => new SectionViewVM(
@@ -155,6 +158,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 ViewTemplate = _revitRepository.SectionViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
                 ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
                 ViewCount = data.ViewCount ?? "1",
+                SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
+                    .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
             },
 
             ScheduleViewData data => CreateScheduleViewVM(sheetVM, data),

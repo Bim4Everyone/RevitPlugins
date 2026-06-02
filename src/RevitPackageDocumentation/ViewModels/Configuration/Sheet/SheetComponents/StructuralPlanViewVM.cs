@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -18,6 +17,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     private ElementType _viewportType;
     private ViewPlan _viewTemplate;
     private string _viewCount;
+    private SelectElemParamVM _selectedSelectElemParam;
     private ViewPlan _viewInstance;
 
     // Смещение по горизонтали в дюймах слева, для размещаемых компонентов листа требуемое, чтобы они попали на лист
@@ -65,6 +65,11 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
 
+    public SelectElemParamVM SelectedSelectElemParam {
+        get => _selectedSelectElemParam;
+        set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
+    }
+
     public ViewPlan ViewInstance {
         get => _viewInstance;
         set => RaiseAndSetIfChanged(ref _viewInstance, value);
@@ -93,6 +98,10 @@ internal class StructuralPlanViewVM : SheetComponentVM {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
             return false;
         }
+        if(SelectedSelectElemParam is null) {
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
+            return false;
+        }
 
         ModuleErrors = string.Empty;
         return true;
@@ -108,11 +117,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
 
         if(view is null) {
             try {
-                if(Sheet.SheetSet.Params.FirstOrDefault(p => p.ParamName == "Опалубка") is not SelectElemParamVM formworkParam) {
-                    return null;
-                }
-
-                var selectedElem = formworkParam.SelectedElem;
+                var selectedElem = SelectedSelectElemParam.SelectedElem;
                 var levelId = selectedElem.LevelId;
                 if(levelId is null) {
                     return null;

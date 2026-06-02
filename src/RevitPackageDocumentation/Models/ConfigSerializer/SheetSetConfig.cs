@@ -97,6 +97,7 @@ public class StructuralPlanViewData : SheetComponentData {
     public string ViewTemplateName { get; set; }
     public string ViewportTypeName { get; set; }
     public string ViewCount { get; set; }
+    public string SelectedSelectElemParamName { get; set; }
 }
 
 /// <summary>
@@ -110,6 +111,7 @@ public class StructuralCalloutViewData : SheetComponentData {
     public string ViewTemplateName { get; set; }
     public string ViewportTypeName { get; set; }
     public string ViewCount { get; set; }
+    public string SelectedSelectElemParamName { get; set; }
 }
 
 
@@ -124,6 +126,7 @@ public class SectionViewData : SheetComponentData {
     public string ViewFamilyTypeName { get; set; }
     public string ViewTemplateName { get; set; }
     public string ViewportTypeName { get; set; }
+    public string SelectedSelectElemParamName { get; set; }
 }
 
 /// <summary>

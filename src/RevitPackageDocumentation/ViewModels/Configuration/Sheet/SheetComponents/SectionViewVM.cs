@@ -1,5 +1,3 @@
-using System.Linq;
-
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
@@ -18,6 +16,7 @@ internal class SectionViewVM : SheetComponentVM {
     private ElementType _viewportType;
     private ViewSection _viewTemplate;
     private string _viewCount;
+    private SelectElemParamVM _selectedSelectElemParam;
 
     // Расстояние до дальней секущей плоскости сечения
     private readonly double _viewDepth = UnitUtilsHelper.ConvertToInternalValue(3000);
@@ -73,6 +72,11 @@ internal class SectionViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
 
+    public SelectElemParamVM SelectedSelectElemParam {
+        get => _selectedSelectElemParam;
+        set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
+    }
+
     public override void CreateComponent() { }
 
     public override bool ValidateModule() {
@@ -94,6 +98,10 @@ internal class SectionViewVM : SheetComponentVM {
         }
         if(!int.TryParse(ViewCount, out int viewCountAsInt) || viewCountAsInt < 1) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
+            return false;
+        }
+        if(SelectedSelectElemParam is null) {
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
             return false;
         }
 
@@ -119,10 +127,7 @@ internal class SectionViewVM : SheetComponentVM {
         }
 
         try {
-            if(Sheet.SheetSet.Params.FirstOrDefault(p => p.ParamName == "Опалубка") is not SelectElemParamVM formworkParam) {
-                return null;
-            }
-            var selectedElem = formworkParam.SelectedElem;
+            var selectedElem = SelectedSelectElemParam.SelectedElem;
             var bbox = selectedElem.get_BoundingBox(null);
 
             // Ориентируем взгляд вдоль оси X (вправо вдоль Y, вверх вдоль Z)

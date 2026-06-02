@@ -1,5 +1,3 @@
-using System.Linq;
-
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
@@ -29,6 +27,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     private ViewPlan _viewTemplate;
     private string _viewCount;
     private string _viewportNumber;
+    private SelectElemParamVM _selectedSelectElemParam;
 
     public StructuralCalloutViewVM(
         SheetVM sheetVM,
@@ -74,6 +73,11 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewportNumber, value);
     }
 
+    public SelectElemParamVM SelectedSelectElemParam {
+        get => _selectedSelectElemParam;
+        set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
+    }
+
     public override void CreateComponent() { }
 
     public override bool ValidateModule() {
@@ -95,6 +99,10 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         }
         if(!double.TryParse(ViewCount, out double viewCountAsDouble) || viewCountAsDouble < 1) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
+            return false;
+        }
+        if(SelectedSelectElemParam is null) {
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
             return false;
         }
 
@@ -136,10 +144,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
             }
 
             // Рассчитываем точки размещения фрагмента относительно центра опалубки 
-            if(Sheet.SheetSet.Params.FirstOrDefault(p => p.ParamName == "Опалубка") is not SelectElemParamVM formworkParam) {
-                return null;
-            }
-            var selectedElem = formworkParam.SelectedElem;
+            var selectedElem = SelectedSelectElemParam.SelectedElem;
             var bbox = selectedElem.get_BoundingBox(null);
 
             var calloutStart = (bbox.Min + bbox.Max) / 2 + new XYZ(_viewsOffset * (number - 1), -_viewsOffset, 0);

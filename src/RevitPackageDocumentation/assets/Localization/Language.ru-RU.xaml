@@ -51,6 +51,7 @@
     <system:String x:Key="MainWindow.AnnotationTypeIsNull">Не выбран тип типовой аннотации</system:String>
     <system:String x:Key="MainWindow.TitleBlockFamilyIsNull">Не выбрано семейство рамки листа</system:String>
     <system:String x:Key="MainWindow.TitleBlockTypeIsNull">Не выбран тип рамки листа</system:String>
+    <system:String x:Key="MainWindow.SelectedSelectElemParamIsNull">Не выбран параметр привязки к объекту</system:String>
     
     <system:String x:Key="MainWindow.ViewCountIsNotCorrect">Число задано некорректно</system:String>
     <system:String x:Key="MainWindow.ViewColumnIsNotCorrect">Номер столбца задан некорректно</system:String>

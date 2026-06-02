@@ -26,6 +26,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -105,7 +106,21 @@
                 Margin="5"
                 Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 IsEnabled="False"/>
-            
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="5"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Привязка к объекту" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="5"
+                Margin="5"
+                ItemsSource="{Binding DataContext.CurrentSheetSet.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="ParamName"
+                SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
         </Grid>
     </DataTemplate>
 
@@ -121,6 +136,7 @@
         x:Key="StructuralCalloutViewDerivedTemplate" >
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
@@ -204,7 +220,21 @@
                 Grid.Row="4"
                 Margin="5"
                 Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="5"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Привязка к объекту" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="5"
+                Margin="5"
+                ItemsSource="{Binding DataContext.CurrentSheetSet.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="ParamName"
+                SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
         </Grid>
     </DataTemplate>
 
@@ -220,6 +250,7 @@
         x:Key="SectionViewDerivedTemplate" >
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
@@ -302,7 +333,22 @@
                 Grid.Column="1"
                 Grid.Row="4"
                 Margin="5"
-                Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="5"
+                Margin="5"
+                VerticalAlignment="Center"
+                Text="Привязка к объекту" />
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="5"
+                Margin="5"
+                ItemsSource="{Binding DataContext.CurrentSheetSet.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                DisplayMemberPath="ParamName"
+                SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
         </Grid>
     </DataTemplate>
 
