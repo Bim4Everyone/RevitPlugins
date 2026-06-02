@@ -39,7 +39,7 @@
 
             <ui:TitleBar
             Grid.Row="0"
-            Icon="{ui:SymbolIcon animalCat24, FontSize=20}"
+            Icon="{ui:SymbolIcon arrowSyncCircle24, FontSize=20}"
             Title="{me:LocalizationSource MainWindow.Title}"
             FontSize="14"
             FontWeight="DemiBold" />

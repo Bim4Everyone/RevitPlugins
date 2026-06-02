@@ -15,59 +15,36 @@
     <system:String x:Key="MainWindow.TargetParam">Параметр для записи</system:String>
     <system:String x:Key="MainWindow.TargetParamDescription">Параметр, в который будет записываться площадь</system:String>
 
-    <system:String x:Key="MainWindow.DigitCount">Количество знаков после запятой</system:String>
-    <system:String x:Key="MainWindow.DigitCountDescription">До которого будет происходить округление</system:String>
-
-    <system:String x:Key="MainWindow.Levels">Уровни помещений</system:String>
-    <system:String x:Key="MainWindow.LevelsDescription">Уровни помещений, которые будут обработаны</system:String>
-    <system:String x:Key="MainWindow.CheckedAllLevels">Выбрать все уровни</system:String>
-    <system:String x:Key="MainWindow.SearchTextLevels">Поиск по имени уровня</system:String>
-    <system:String x:Key="MainWindow.NotCheckedAllLevels">Сбросить выбор уровней</system:String>
+    <system:String x:Key="MainWindow.Accuracy">Количество знаков после запятой</system:String>
+    <system:String x:Key="MainWindow.AccuracyDescription">До которого будет происходить округление</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">Рассчитать</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 
-    <system:String
-        x:Key="MainViewModel.AllElementsProvider">Все элементы</system:String>
-    <system:String
-        x:Key="MainViewModel.SelectedElementsProvider">Выделенные</system:String>
-    <system:String
-        x:Key="MainViewModel.CurrentViewProvider">Видимые на виде</system:String>
+    <system:String x:Key="MainViewModel.AllElementsProvider">Все элементы</system:String>
+    <system:String x:Key="MainViewModel.SelectedElementsProvider">Выделенные</system:String>
+    <system:String x:Key="MainViewModel.CurrentViewProvider">Видимые на виде</system:String>
+    
+    <system:String x:Key="MainViewModel.TransactionName">Расчёт площадей (соц. объекты)</system:String>
 
-    <system:String
-        x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
-    <system:String
-        x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+    <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
 
-    <system:String
-        x:Key="WarningsViewModel.Redundant">Избыточные зоны</system:String>
-    <system:String
-        x:Key="WarningsViewModel.RedundantDescription">Зоны, находящиеся в одной окруженной области</system:String>
-    <system:String
-        x:Key="WarningsViewModel.NotEnclosed">Не окруженные зоны / Не размещенные зоны</system:String>
-    <system:String
-        x:Key="WarningsViewModel.NotEnclosedDescription">Зоны, не имеющие границ или не размещенные на плане</system:String>
+    <system:String x:Key="WarningsViewModel.Redundant">Избыточные зоны</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Зоны, находящиеся в одной окруженной области</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Не окруженные зоны / Не размещенные зоны</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Зоны, не имеющие границ или не размещенные на плане</system:String>
 
-    <system:String
-        x:Key="MainViewModel.NoSelection">Не выделены помещения</system:String>
-    <system:String
-        x:Key="MainViewModel.NoRoomsOnView">Нет помещений на виде</system:String>
+    <system:String x:Key="MainViewModel.NoSelection">Не выделены помещения</system:String>
+    <system:String x:Key="MainViewModel.NoRoomsOnView">Нет помещений на виде</system:String>
 
-    <system:String
-        x:Key="RevitRepository.NoLevel"> - Нет уровня - </system:String>
+    <system:String x:Key="RevitRepository.NoLevel"> - Нет уровня - </system:String>
 
-    <system:String
-        x:Key="WarningWindow.Title">Рассчитать площади (соц. объекты) - предупреждения</system:String>
-    <system:String
-        x:Key="WarningWindow.ShowHeader">Выделить</system:String>
-    <system:String
-        x:Key="WarningWindow.ElementIdHeader">ИД помещения</system:String>
-    <system:String
-        x:Key="WarningWindow.NameHeader">Имя помещения</system:String>
-    <system:String
-        x:Key="WarningWindow.LevelNameHeader">Уровень помещения</system:String>
-
-    <system:String
-        x:Key="MainViewModel.TransactionName">Расчёт площадей (соц. объекты)</system:String>
-
+    <system:String x:Key="WarningWindow.Title">Рассчитать площади (соц. объекты) - предупреждения</system:String>
+    
+    <system:String x:Key="WarningWindow.ShowHeader">Выделить</system:String>
+    <system:String x:Key="WarningWindow.ElementIdHeader">ИД помещения</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Имя помещения</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Уровень помещения</system:String>
+    
 </ResourceDictionary>
