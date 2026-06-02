@@ -84,6 +84,7 @@ public abstract class SheetComponentData {
     public bool? IsModuleCheck { get; set; }
     public string ModuleName { get; set; }
     public string ModuleComment { get; set; }
+    public ScheduleFilterListData ScheduleFilterList { get; set; }
 }
 
 /// <summary>
@@ -139,7 +140,7 @@ public class ScheduleViewData : SheetComponentData {
     public string ViewNameFormula { get; set; }
     public string ViewCount { get; set; }
     public string ViewColumn { get; set; }
-    public ScheduleFilterListData ScheduleFilterList { get; set; }
+    public CustomParametersListData CustomParamsList { get; set; }
 }
 
 
@@ -187,6 +188,21 @@ public class ScheduleFilterRuleData {
     public string FieldName { get; set; }
     public ScheduleFilterType FilterType { get; set; }
     public string FilterValue { get; set; }
+}
+
+/// <summary>
+/// DTO списка дополнительных параметров
+/// </summary>
+public class CustomParametersListData {
+    public List<CustomParameterData> Params { get; set; }
+}
+
+/// <summary>
+/// DTO дополнительного параметра
+/// </summary>
+public class CustomParameterData {
+    public string ParamName { get; set; }
+    public string ParamValue { get; set; }
 }
 
 

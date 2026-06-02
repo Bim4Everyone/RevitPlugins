@@ -5,7 +5,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
-using RevitPackageDocumentation.ViewModels.Configuration.AdditionalParameters;
+using RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
 using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
@@ -16,7 +16,7 @@ internal abstract class SheetComponentVM : BaseViewModel {
     private string _moduleCode;
     private string _moduleTypeName;
     private string _moduleErrors;
-    private AdditionalParametersListVM _additionalParamsList;
+    private CustomParametersListVM _customParamsList;
     private readonly SheetVM _sheet;
 
     protected SheetComponentVM(
@@ -29,6 +29,8 @@ internal abstract class SheetComponentVM : BaseViewModel {
         LocalizationService = localizationService;
         StrParamSetService = stringParamSetService;
         ModuleTypeName = LocalizationService.GetLocalizedString($"Type.{this.GetType().Name}");
+        CustomParamsList = new CustomParametersListVM(this);
+
         PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
     }
 
@@ -73,9 +75,9 @@ internal abstract class SheetComponentVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _moduleErrors, value);
     }
 
-    public AdditionalParametersListVM AdditionalParamsList {
-        get => _additionalParamsList;
-        set => RaiseAndSetIfChanged(ref _additionalParamsList, value);
+    public CustomParametersListVM CustomParamsList {
+        get => _customParamsList;
+        set => RaiseAndSetIfChanged(ref _customParamsList, value);
     }
 
 

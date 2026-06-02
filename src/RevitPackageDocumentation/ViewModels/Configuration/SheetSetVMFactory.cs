@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -7,6 +8,7 @@ using dosymep.SimpleServices;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
+using RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Parameters;
@@ -209,8 +211,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ViewCount = data.ViewCount ?? "1",
         };
 
+        // Добавляем список фильтров
         var scheduleFilterList = new ScheduleFilterListVM(scheduleViewVM);
-
         foreach(var ruleData in data.ScheduleFilterList?.ScheduleFilterRules ?? []) {
             var ruleVM = new ScheduleFilterRuleVM(scheduleFilterList) {
                 SelectedSpecFieldName = ruleData.FieldName,
@@ -222,6 +224,18 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             scheduleFilterList.ScheduleFilterRules.Add(ruleVM);
         }
         scheduleViewVM.ScheduleFilterList = scheduleFilterList;
+
+        // Добавляем список дополнительных параметров
+        var customParamsList = new CustomParametersListVM(scheduleViewVM);
+        foreach(var paramData in data.CustomParamsList?.Params ?? []) {
+            var paramVM = new CustomParameterVM(customParamsList) {
+                ParamName = paramData.ParamName ?? string.Empty,
+                ParamValue = paramData.ParamValue ?? string.Empty,
+            };
+            customParamsList.Params.Add(paramVM);
+        }
+        scheduleViewVM.CustomParamsList = customParamsList;
+
         return scheduleViewVM;
     }
 

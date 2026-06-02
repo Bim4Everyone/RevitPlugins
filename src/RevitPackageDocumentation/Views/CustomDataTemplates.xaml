@@ -6,6 +6,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:c="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
     xmlns:filters="clr-namespace:RevitPackageDocumentation.ViewModels.ScheduleFilters"
+    xmlns:customParams="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.CustomParameters"
     xmlns:local="clr-namespace:RevitPackageDocumentation.Views"
     xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
     xmlns:s="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
@@ -369,6 +370,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             
             <Grid.ColumnDefinitions>
@@ -471,6 +473,38 @@
                         ItemsSource="{Binding Path=ScheduleFilterList.ScheduleFilterRules, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
             </Border>
+
+            <Border
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="5"
+                Margin="5"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Margin="5 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="Дополнительные параметры" />
+
+                    <ui:Button
+                        Grid.Row="0"
+                        HorizontalAlignment="Right"
+                        Content="+"
+                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                    <ItemsControl
+                        Grid.Row="1"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </Border>
         </Grid>
     </DataTemplate>
 
@@ -485,7 +519,7 @@
         <controls:SpecFilterItemControl />
     </DataTemplate>
 
-
+    
     <!--TextNote-->
     <DataTemplate
         x:Key="TextNoteDerivedTemplate">
@@ -712,5 +746,12 @@
         DataType="{x:Type pp:SelectElemParamVM}">
         <controls:ParamItemControl
             DerivedTemplate="{StaticResource SelectElemParamDerivedTemplate}" />
+    </DataTemplate>
+
+
+    <!--CustomParameter-->
+    <DataTemplate
+        DataType="{x:Type customParams:CustomParameterVM}">
+        <controls:CustomParamItemControl />
     </DataTemplate>
 </ResourceDictionary>

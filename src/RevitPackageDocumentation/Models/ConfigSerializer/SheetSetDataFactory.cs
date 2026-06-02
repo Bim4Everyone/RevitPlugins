@@ -94,6 +94,16 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
+                CustomParamsList = new CustomParametersListData() {
+                    Params = vm
+                        .CustomParamsList
+                        .Params
+                        .Select(r => new CustomParameterData() {
+                            ParamName = r.ParamName ?? string.Empty,
+                            ParamValue = r.ParamValue ?? string.Empty,
+                        })
+                        .ToList()
+                },
 
                 ReferenceViewName = vm.ReferenceSpec.Name,
                 ViewNameFormula = vm.ViewNameFormula,
@@ -109,7 +119,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                             FilterValue = r.FilterValue
                         })
                         .ToList()
-                }
+                },
             },
 
             TextNoteVM vm => new TextNoteData {

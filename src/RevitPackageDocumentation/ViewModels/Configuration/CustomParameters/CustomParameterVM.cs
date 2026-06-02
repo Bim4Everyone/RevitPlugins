@@ -1,15 +1,15 @@
 using dosymep.WPF.ViewModels;
 
-namespace RevitPackageDocumentation.ViewModels.Configuration.AdditionalParameters;
-internal class AdditionalParameterVM : BaseViewModel {
+namespace RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
+internal class CustomParameterVM : BaseViewModel {
     private string _paramName;
     private string _paramValue;
 
-    public AdditionalParameterVM(AdditionalParametersListVM additionalParamsList) {
-        AdditionalParamsList = additionalParamsList;
+    public CustomParameterVM(CustomParametersListVM customParamsList) {
+        CustomParamsList = customParamsList;
     }
 
-    public AdditionalParametersListVM AdditionalParamsList { get; }
+    public CustomParametersListVM CustomParamsList { get; }
 
     public string ParamName {
         get => _paramName;
