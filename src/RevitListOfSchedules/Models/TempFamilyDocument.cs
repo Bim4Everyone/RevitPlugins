@@ -10,7 +10,7 @@ using dosymep.SimpleServices;
 namespace RevitListOfSchedules.Models;
 internal class TempFamilyDocument {
     private const string _extension = ".rfa";
-    private const int _diameterArc = 5; // Диаметр окружности для семейства. Выбрано 5 чтобы его было видно на виде.
+    private const int _diameterArc = 5; // Диаметр окружности для семейства. Выбрано 5, чтобы его было видно на виде.
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly FamilyLoadOptions _familyLoadOptions;
@@ -25,30 +25,57 @@ internal class TempFamilyDocument {
         _familyLoadOptions = familyLoadOptions;
     }
 
-    public FamilySymbol GetFamilySymbol(string familyTemplatePath, string albumName) {
+    public FamilySymbol GetFamilySymbol(string familyTemplatePath, string albumName)
+    {
         string familyPath = _localizationService.GetLocalizedString(
             "TempFamilyDocument.FamilyName", _tempDirectory, albumName, _extension);
         try {
             CreateFile(familyTemplatePath, familyPath);
-            FamilySymbol familySymbol = null;
-            bool loadSuccess = _revitRepository.Document.LoadFamily(familyPath, _familyLoadOptions, out var family);
-            familySymbol = _revitRepository.GetFamilySymbol(family);
+            
+            bool success = LoadFamily(familyPath, out var family);
 
-            if(!loadSuccess || family == null) {
-                DeleteFile(familyPath);
-                return null;
-            }
-            if(familySymbol != null) {
-                if(!familySymbol.IsActive) {
-                    familySymbol.Activate();
+            if (!success) {
+                string famName = Path.GetFileNameWithoutExtension(familyPath);
+
+                var existingFamily = new FilteredElementCollector(_revitRepository.Document)
+                    .OfClass(typeof(Family))
+                    .Cast<Family>()
+                    .FirstOrDefault(f => f.Name.Equals(famName, StringComparison.OrdinalIgnoreCase));
+
+                if (existingFamily != null) {
+                    _revitRepository.Document.Delete(existingFamily.Id);
+                    success = LoadFamily(familyPath, out family);
                 }
             }
-            DeleteFile(familyPath);
-            return familySymbol;
 
-        } finally {
-            DeleteFile(familyPath);
+            if (!success)
+                throw new InvalidOperationException();
+
+            var familySymbol = _revitRepository.GetFamilySymbol(family);
+
+            if (familySymbol == null)
+                throw new InvalidOperationException();
+
+            if (!familySymbol.IsActive)
+                familySymbol.Activate();
+
+            return familySymbol;
         }
+        catch (Exception ex) {
+            throw new InvalidOperationException(
+                _localizationService.GetLocalizedString("TempFamilyDocument.ExceptionFamily", albumName), ex);
+        }
+        finally {
+            try {
+                DeleteFile(familyPath);
+            } catch {
+                // Не важное
+            }
+        }
+    }
+    
+    private bool LoadFamily(string familyPath, out Family family) {
+        return _revitRepository.Document.LoadFamily(familyPath, _familyLoadOptions, out family);
     }
 
     private void CreateFile(string familyTemplatePath, string familyPath) {
@@ -87,7 +114,8 @@ internal class TempFamilyDocument {
             if(File.Exists(familyPath)) {
                 File.Delete(familyPath);
             }
-        } catch(UnauthorizedAccessException) {
+        } catch {
+            // Не важное
         }
     }
 }

@@ -350,8 +350,19 @@ internal class MainViewModel : BaseViewModel {
         foreach(var album in albums) {
             string albumName = PathCharValidator.LegalizeString(album.Key);
             var viewDrafting = _revitRepository.GetViewDrafting(albumName);
-            var famSymbol = tempDoc.GetFamilySymbol(familyTemplatePath, albumName);
 
+            FamilySymbol famSymbol = null;
+            try {
+                famSymbol = tempDoc.GetFamilySymbol(familyTemplatePath, albumName);
+            } catch(Exception ex) {
+                MessageBoxService.Show(
+                    ex.Message,
+                    _localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Exclamation);
+                throw new OperationCanceledException();
+            }
+            
             instancesAssembly.DeleteFamilyInstances(viewDrafting);
 
             if(_isScheduleToSheetChecked) {

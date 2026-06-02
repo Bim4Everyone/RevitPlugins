@@ -53,6 +53,8 @@
     <system:String
         x:Key="TempFamilyDocument.TransactionName">Create circle</system:String>
     <system:String
+        x:Key="TempFamilyDocument.ExceptionFamily">Failed to create the schedule. Please rename the album: {0}</system:String>
+    <system:String
         x:Key="RevitRepository.ViewName">List_Of_Schedules_{0}</system:String>
     <system:String
         x:Key="MainViewModel.ErrorText">Select sheets to create a list of schedules</system:String>
@@ -70,6 +72,8 @@
         x:Key="Common.ParamErrorMessageBody">Error copying parameters</system:String>
     <system:String
         x:Key="Common.ConfigErrorMessageTitle">Plug-in configuration error</system:String>
+    <system:String
+        x:Key="Common.PluginErrorMessageTitle">Plugin Error</system:String>
     <system:String
         x:Key="Common.ConfigErrorNoFamily">Missing family template:  {0}  path:  {1}</system:String>
     <system:String
