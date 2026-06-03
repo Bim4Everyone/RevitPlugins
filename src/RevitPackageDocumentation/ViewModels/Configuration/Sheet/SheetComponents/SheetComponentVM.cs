@@ -99,14 +99,14 @@ internal abstract class SheetComponentVM : BaseViewModel {
             return;
         }
         foreach(var param in CustomParamsList.Params) {
-            // Если параметр существует на экземпляре
-            if(element.IsExistsParam(param.ParamName)) {
+            // Если параметр существует на экземпляре и он редактируемый
+            if(element.IsExistsParam(param.ParamName) && !element.GetParam(param.ParamName).IsReadOnly) {
                 element.SetParamValue(param.ParamName, param.ParamValue);
                 continue;
             }
-            // Если параметр существует на типе
+            // Если параметр существует на типе и он редактируемый
             var type = Repository.Document.GetElement(element.GetTypeId());
-            if(type != null && type.IsExistsParam(param.ParamName)) {
+            if(type != null && type.IsExistsParam(param.ParamName) && !element.GetParam(param.ParamName).IsReadOnly) {
                 type.SetParamValue(param.ParamName, param.ParamValue);
             }
         }
