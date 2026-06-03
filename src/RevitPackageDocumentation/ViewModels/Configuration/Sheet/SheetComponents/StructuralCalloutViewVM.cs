@@ -1,5 +1,6 @@
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
@@ -190,6 +191,8 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
+            int viewPortNumber = GetLastViewportNumber(0, 100) + 1;
+
             // Получение габаритов видового экрана
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
             viewPort.ChangeTypeId(ViewportType.Id);
@@ -205,6 +208,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
                 0);
 
             viewPort.SetBoxCenter(correctPosition);
+            viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, viewPortNumber.ToString());
 
 #if REVIT_2022_OR_GREATER
             viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);

@@ -185,7 +185,9 @@ internal class SectionViewVM : SheetComponentVM {
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
-            // Получение габаритов видового экрана
+            int viewPortNumber = GetLastViewportNumber(0, 100) + 1;
+
+            // Создание видового экрана
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
             viewPort.ChangeTypeId(ViewportType.Id);
 
@@ -200,6 +202,7 @@ internal class SectionViewVM : SheetComponentVM {
                 0);
 
             viewPort.SetBoxCenter(correctPosition);
+            viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, viewPortNumber.ToString());
 
 #if REVIT_2022_OR_GREATER
             viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);
