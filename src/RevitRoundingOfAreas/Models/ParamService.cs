@@ -4,24 +4,26 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Bim4Everyone.SharedParams;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SystemParams;
-using dosymep.Revit;
 
 namespace RevitRoundingOfAreas.Models;
 
 internal class ParamService {
     private readonly RevitRepository _revitRepository;
     private readonly SystemPluginConfig _systemPluginConfig;
+    private readonly IRevitParamFactory _revitParamFactory;
     private readonly ICollection<ElementId> _allParamElementIds;
 
     public ParamService(
         RevitRepository revitRepository,
-        SystemPluginConfig systemPluginConfig) {
+        SystemPluginConfig systemPluginConfig,
+        IRevitParamFactory revitParamFactory) {
 
         _revitRepository = revitRepository;
         _systemPluginConfig = systemPluginConfig;
+        _revitParamFactory = revitParamFactory;
 
         _allParamElementIds = GetAllParamElementIds();
 
@@ -62,7 +64,7 @@ internal class ParamService {
         List<RevitParam> parameters = [];
 
         foreach(var elementId in _allParamElementIds) {
-            var revitParam = CreateRevitParam(elementId);
+            var revitParam = _revitParamFactory.Create(_revitRepository.Document, elementId);
 
             if(revitParam is null) {
                 continue;
@@ -72,23 +74,7 @@ internal class ParamService {
                 parameters.Add(revitParam);
             }
         }
-
         return parameters;
-    }
-
-    private RevitParam CreateRevitParam(ElementId elementId) {
-        if(elementId.IsSystemId()) {
-            var builtInParameter = elementId.AsBuiltInParameter();
-            return SystemParamsConfig.Instance.CreateRevitParam(_revitRepository.Document, builtInParameter);
-        }
-
-        var element = _revitRepository.Document.GetElement(elementId);
-
-        return element is null
-            ? null
-            : element is SharedParameterElement
-            ? SharedParamsConfig.Instance.CreateRevitParam(_revitRepository.Document, element.Name)
-            : ProjectParamsConfig.Instance.CreateRevitParam(_revitRepository.Document, element.Name);
     }
 
     private static bool IsSupportedStorageType(RevitParam revitParam) {

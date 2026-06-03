@@ -170,7 +170,9 @@ internal class RevitRepository(
 
     // Метод валидации стадии
     private bool ValidatePhase(SpatialElement spatialElement, ElementId phaseId) {
-        var spatialPhaseId = spatialElement.get_Parameter(BuiltInParameter.ROOM_PHASE).AsElementId();
+        var spatialPhaseId = spatialElement.GetParamValueOrDefault(
+            BuiltInParameter.ROOM_PHASE, 
+            ElementId.InvalidElementId);
         return spatialPhaseId != ElementId.InvalidElementId && spatialPhaseId == phaseId;
     }
 
