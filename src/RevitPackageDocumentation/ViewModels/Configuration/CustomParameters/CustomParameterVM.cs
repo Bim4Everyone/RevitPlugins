@@ -8,9 +8,9 @@ using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
 internal class CustomParameterVM : BaseViewModel {
-    private string _paramNameFormula;
+    private string _paramNameFormula = string.Empty;
     private string _paramName;
-    private string _paramValue;
+    private string _paramValue = string.Empty;
 
     public CustomParameterVM(CustomParametersListVM customParamsList, StringParamSetService stringParamSetService) {
         CustomParamsList = customParamsList;

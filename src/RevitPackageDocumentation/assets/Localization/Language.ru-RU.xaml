@@ -58,6 +58,7 @@
     <system:String x:Key="MainWindow.SheetSizeIsNotCorrect">Значение номера формата листа не корректно</system:String>
     <system:String x:Key="MainWindow.SheetCoefficientIsNotCorrect">Значение коэффициента формата листа не корректно</system:String>
     <system:String x:Key="MainWindow.ScheduleFiltersIsNotCorrect">Фильтры спецификации не корректны</system:String>
+    <system:String x:Key="MainWindow.CustomParamsIsNotCorrect">Дополнительные параметры не корректны</system:String>
     
     <system:String x:Key="MainWindow.ErrorInSheetSetParamNames">Исправлены не все имена параметров комплекта</system:String>
     <system:String x:Key="MainWindow.ErrorInSheetSetParamValues">Исправлены не все значения параметров комплекта</system:String>

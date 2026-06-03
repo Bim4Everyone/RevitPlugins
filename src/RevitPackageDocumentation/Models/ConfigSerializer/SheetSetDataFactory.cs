@@ -55,6 +55,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
+                CustomParamsList = GetCustomParametersList(vm),
 
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
@@ -68,6 +69,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
+                CustomParamsList = GetCustomParametersList(vm),
 
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
@@ -81,6 +83,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
+                CustomParamsList = GetCustomParametersList(vm),
 
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
@@ -94,16 +97,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
-                CustomParamsList = new CustomParametersListData() {
-                    Params = vm
-                        .CustomParamsList
-                        .Params
-                        .Select(r => new CustomParameterData() {
-                            ParamName = r.ParamName ?? string.Empty,
-                            ParamValue = r.ParamValue ?? string.Empty,
-                        })
-                        .ToList()
-                },
+                CustomParamsList = GetCustomParametersList(vm),
 
                 ReferenceViewName = vm.ReferenceSpec.Name,
                 ViewNameFormula = vm.ViewNameFormula,
@@ -126,6 +120,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
+                CustomParamsList = GetCustomParametersList(vm),
 
                 TextFormula = vm.TextFormula,
                 TextNoteTypeName = vm.TextNoteType?.Name,
@@ -135,6 +130,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
+                CustomParamsList = GetCustomParametersList(vm),
 
                 AnnotationFamilyName = vm.AnnotationFamily?.Name,
                 AnnotationTypeName = vm.AnnotationType?.Name,
@@ -144,6 +140,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
+                CustomParamsList = GetCustomParametersList(vm),
 
                 ViewName = vm.LegendView?.Name,
                 ViewportTypeName = vm.ViewportType.Name,
@@ -152,6 +149,15 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             _ => throw new NotSupportedException($"Тип '{sheetComponentVM?.GetType().Name}' не поддерживается")
         };
     }
+
+    private CustomParametersListData GetCustomParametersList(SheetComponentVM vm) => new() {
+        Params = vm.CustomParamsList.Params
+            .Select(r => new CustomParameterData() {
+                ParamName = r.ParamName ?? string.Empty,
+                ParamValueFormula = r.ParamValueFormula ?? string.Empty,
+            })
+        .ToList()
+    };
 
     public SheetComponentData CreateComponentData(Type componentType) {
         return componentType switch {

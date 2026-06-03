@@ -116,84 +116,82 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     public SheetComponentVM CreateComponentVM(SheetVM sheetVM, SheetComponentData sheetComponentData) {
         return sheetComponentData switch {
-            StructuralPlanViewData data => new StructuralPlanViewVM(
-                sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
-                IsModuleCheck = data.IsModuleCheck ?? false,
-                ModuleName = data.ModuleName ?? string.Empty,
-                ModuleComment = data.ModuleComment ?? string.Empty,
-                ModuleCode = "123",
-
-                ViewNameFormula = data.ViewNameFormula ?? string.Empty,
-                ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
-                ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
-                ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
-                ViewCount = data.ViewCount ?? "1",
-                SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
-                    .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
-            },
-
-            StructuralCalloutViewData data => new StructuralCalloutViewVM(
-                sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
-                IsModuleCheck = data.IsModuleCheck ?? false,
-                ModuleName = data.ModuleName ?? string.Empty,
-                ModuleComment = data.ModuleComment ?? string.Empty,
-                ModuleCode = "05",
-
-                ViewNameFormula = data.ViewNameFormula ?? string.Empty,
-                ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
-                ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
-                ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
-                ViewCount = data.ViewCount ?? "1",
-                SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
-                    .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
-            },
-
-            SectionViewData data => new SectionViewVM(
-                sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
-                IsModuleCheck = data.IsModuleCheck ?? false,
-                ModuleName = data.ModuleName ?? string.Empty,
-                ModuleComment = data.ModuleComment ?? string.Empty,
-                ModuleCode = "789",
-
-                ViewNameFormula = data.ViewNameFormula ?? string.Empty,
-                ViewFamilyType = _revitRepository.SectionViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
-                ViewTemplate = _revitRepository.SectionViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
-                ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
-                ViewCount = data.ViewCount ?? "1",
-                SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
-                    .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
-            },
-
+            StructuralPlanViewData data => CreateStructuralPlanViewVM(sheetVM, data),
+            StructuralCalloutViewData data => CreateStructuralCalloutViewVM(sheetVM, data),
+            SectionViewData data => CreateSectionViewVM(sheetVM, data),
             ScheduleViewData data => CreateScheduleViewVM(sheetVM, data),
-
-            TextNoteData data => new TextNoteVM(
-                sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
-                IsModuleCheck = data.IsModuleCheck ?? false,
-                ModuleName = data.ModuleName ?? string.Empty,
-                ModuleComment = data.ModuleComment ?? string.Empty,
-                ModuleCode = "01",
-
-                TextFormula = data.TextFormula ?? string.Empty,
-                TextNoteType = _revitRepository.TextNoteTypes.FirstOrDefault(v => v.Name.Equals(data.TextNoteTypeName)),
-            },
-
+            TextNoteData data => CreateTextNoteVM(sheetVM, data),
             TypicalAnnotationData data => CreateTypicalAnnotationVM(sheetVM, data),
-
-            LegendViewData data => new LegendViewVM(
-                sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
-                IsModuleCheck = data.IsModuleCheck ?? false,
-                ModuleName = data.ModuleName ?? string.Empty,
-                ModuleComment = data.ModuleComment ?? string.Empty,
-                ModuleCode = "03",
-
-                LegendView = _revitRepository.LegendsInProject.FirstOrDefault(v => v.Name.Equals(data.ViewName)),
-                ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
-            },
-
+            LegendViewData data => CreateLegendViewVM(sheetVM, data),
             _ => throw new NotSupportedException($"Тип '{sheetComponentData?.GetType().Name}' не поддерживается")
         };
     }
 
+    private StructuralPlanViewVM CreateStructuralPlanViewVM(SheetVM sheetVM, StructuralPlanViewData data) {
+        var sheetComponentVM = new StructuralPlanViewVM(
+            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            IsModuleCheck = data.IsModuleCheck ?? false,
+            ModuleName = data.ModuleName ?? string.Empty,
+            ModuleComment = data.ModuleComment ?? string.Empty,
+            ModuleCode = "123",
+
+            ViewNameFormula = data.ViewNameFormula ?? string.Empty,
+            ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
+            ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
+            ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
+            ViewCount = data.ViewCount ?? "1",
+            SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
+                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
+        };
+
+        // Добавляем список дополнительных параметров
+        SetCustomParametersList(sheetComponentVM, data);
+        return sheetComponentVM;
+    }
+
+    private StructuralCalloutViewVM CreateStructuralCalloutViewVM(SheetVM sheetVM, StructuralCalloutViewData data) {
+        var sheetComponentVM = new StructuralCalloutViewVM(
+            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            IsModuleCheck = data.IsModuleCheck ?? false,
+            ModuleName = data.ModuleName ?? string.Empty,
+            ModuleComment = data.ModuleComment ?? string.Empty,
+            ModuleCode = "05",
+
+            ViewNameFormula = data.ViewNameFormula ?? string.Empty,
+            ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
+            ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
+            ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
+            ViewCount = data.ViewCount ?? "1",
+            SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
+                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
+        };
+
+        // Добавляем список дополнительных параметров
+        SetCustomParametersList(sheetComponentVM, data);
+        return sheetComponentVM;
+    }
+
+    private SectionViewVM CreateSectionViewVM(SheetVM sheetVM, SectionViewData data) {
+        var sheetComponentVM = new SectionViewVM(
+            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            IsModuleCheck = data.IsModuleCheck ?? false,
+            ModuleName = data.ModuleName ?? string.Empty,
+            ModuleComment = data.ModuleComment ?? string.Empty,
+            ModuleCode = "789",
+
+            ViewNameFormula = data.ViewNameFormula ?? string.Empty,
+            ViewFamilyType = _revitRepository.SectionViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
+            ViewTemplate = _revitRepository.SectionViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
+            ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
+            ViewCount = data.ViewCount ?? "1",
+            SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
+                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
+        };
+
+        // Добавляем список дополнительных параметров
+        SetCustomParametersList(sheetComponentVM, data);
+        return sheetComponentVM;
+    }
 
     private ScheduleViewVM CreateScheduleViewVM(SheetVM sheetVM, ScheduleViewData data) {
         var referenceSpec = _revitRepository.GetSpecByName(data.ReferenceViewName);
@@ -212,36 +210,31 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
 
         // Добавляем список фильтров
-        var scheduleFilterList = new ScheduleFilterListVM(scheduleViewVM);
-        foreach(var ruleData in data.ScheduleFilterList?.ScheduleFilterRules ?? []) {
-            var ruleVM = new ScheduleFilterRuleVM(scheduleFilterList) {
-                SelectedSpecFieldName = ruleData.FieldName,
-                FilterValue = ruleData.FilterValue ?? string.Empty,
-                SelectedFilterType = _revitRepository.FilterTypes.FirstOrDefault(t => t.FilterType == ruleData.FilterType)
-            };
-
-            ruleVM.SetSchedule(referenceSpec);
-            scheduleFilterList.ScheduleFilterRules.Add(ruleVM);
-        }
-        scheduleViewVM.ScheduleFilterList = scheduleFilterList;
+        SetScheduleFilterList(scheduleViewVM, data, referenceSpec);
 
         // Добавляем список дополнительных параметров
-        var customParamsList = new CustomParametersListVM(scheduleViewVM, _stringParamSetService);
-        foreach(var paramData in data.CustomParamsList?.Params ?? []) {
-            var paramVM = new CustomParameterVM(customParamsList, _stringParamSetService) {
-                ParamName = paramData.ParamName ?? string.Empty,
-                ParamValue = paramData.ParamValue ?? string.Empty,
-            };
-            customParamsList.Params.Add(paramVM);
-        }
-        scheduleViewVM.CustomParamsList = customParamsList;
-
+        SetCustomParametersList(scheduleViewVM, data);
         return scheduleViewVM;
     }
 
+    private TextNoteVM CreateTextNoteVM(SheetVM sheetVM, TextNoteData data) {
+        var sheetComponentVM = new TextNoteVM(
+            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            IsModuleCheck = data.IsModuleCheck ?? false,
+            ModuleName = data.ModuleName ?? string.Empty,
+            ModuleComment = data.ModuleComment ?? string.Empty,
+            ModuleCode = "01",
+
+            TextFormula = data.TextFormula ?? string.Empty,
+            TextNoteType = _revitRepository.TextNoteTypes.FirstOrDefault(v => v.Name.Equals(data.TextNoteTypeName)),
+        };
+
+        // Добавляем список дополнительных параметров
+        SetCustomParametersList(sheetComponentVM, data);
+        return sheetComponentVM;
+    }
 
     private TypicalAnnotationVM CreateTypicalAnnotationVM(SheetVM sheetVM, TypicalAnnotationData data) {
-
         var annotationFamily = _revitRepository.GenericAnnotationFamilies?.FirstOrDefault(v => v.Name.Equals(data.AnnotationFamilyName));
 
         var annotationTypes = annotationFamily
@@ -252,7 +245,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         var annotationType = annotationTypes
                     ?.FirstOrDefault(v => v.Name.Equals(data.AnnotationTypeName));
 
-        return new TypicalAnnotationVM(
+        var sheetComponentVM = new TypicalAnnotationVM(
             sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
@@ -263,6 +256,64 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             AnnotationFamily = annotationFamily,
             AnnotationType = annotationType
         };
+
+        // Добавляем список дополнительных параметров
+        SetCustomParametersList(sheetComponentVM, data);
+        return sheetComponentVM;
+    }
+
+    private LegendViewVM CreateLegendViewVM(SheetVM sheetVM, LegendViewData data) {
+        var sheetComponentVM = new LegendViewVM(
+            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            IsModuleCheck = data.IsModuleCheck ?? false,
+            ModuleName = data.ModuleName ?? string.Empty,
+            ModuleComment = data.ModuleComment ?? string.Empty,
+            ModuleCode = "03",
+
+            LegendView = _revitRepository.LegendsInProject.FirstOrDefault(v => v.Name.Equals(data.ViewName)),
+            ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
+        };
+
+        // Добавляем список дополнительных параметров
+        SetCustomParametersList(sheetComponentVM, data);
+        return sheetComponentVM;
+    }
+
+    /// <summary>
+    /// Добавляет список дополнительных параметров
+    /// </summary>
+    private void SetCustomParametersList(SheetComponentVM sheetComponentVM, SheetComponentData data) {
+        // Добавляем список дополнительных параметров
+        var customParamsList = new CustomParametersListVM(sheetComponentVM, _stringParamSetService);
+        foreach(var paramData in data.CustomParamsList?.Params ?? []) {
+            var paramVM = new CustomParameterVM(customParamsList, _stringParamSetService) {
+                ParamName = paramData.ParamName ?? string.Empty,
+                ParamValueFormula = paramData.ParamValueFormula ?? string.Empty,
+            };
+            customParamsList.Params.Add(paramVM);
+        }
+        sheetComponentVM.CustomParamsList = customParamsList;
+    }
+
+    /// <summary>
+    /// Добавляем список фильтров
+    /// </summary>
+    private void SetScheduleFilterList(SheetComponentVM sheetComponentVM, SheetComponentData data, ViewSchedule referenceSpec) {
+        // Метод предназначен только для модуля спецификаций
+        if(sheetComponentVM is not ScheduleViewVM scheduleViewVM || data is not ScheduleViewData scheduleViewData) { return; }
+
+        var scheduleFilterList = new ScheduleFilterListVM(scheduleViewVM);
+        foreach(var ruleData in scheduleViewData.ScheduleFilterList?.ScheduleFilterRules ?? []) {
+            var ruleVM = new ScheduleFilterRuleVM(scheduleFilterList) {
+                SelectedSpecFieldName = ruleData.FieldName,
+                FilterValue = ruleData.FilterValue ?? string.Empty,
+                SelectedFilterType = _revitRepository.FilterTypes.FirstOrDefault(t => t.FilterType == ruleData.FilterType)
+            };
+
+            ruleVM.SetSchedule(referenceSpec);
+            scheduleFilterList.ScheduleFilterRules.Add(ruleVM);
+        }
+        scheduleViewVM.ScheduleFilterList = scheduleFilterList;
     }
 
     public PluginParamVM CreateParamVM(SheetSetVM sheetSetVM, PluginParamData paramData) {

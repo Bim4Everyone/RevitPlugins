@@ -40,6 +40,12 @@ internal class LegendViewVM : SheetComponentVM {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
             return false;
         }
+        foreach(var param in CustomParamsList.Params) {
+            if(string.IsNullOrEmpty(param.ParamName)) {
+                ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
+                return false;
+            }
+        }
 
         ModuleErrors = string.Empty;
         return true;
