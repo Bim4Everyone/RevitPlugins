@@ -1,6 +1,9 @@
 using System.Linq;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -89,6 +92,24 @@ internal abstract class SheetComponentVM : BaseViewModel {
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
         StrParamSetService.SetAll(this, Sheet.SheetSet.Params, stringParam);
         CustomParamsList.Params.ToList().ForEach(p => p.UpdateDueParamValueChange(stringParam));
+    }
+
+    public void SetCustomParams(Element element) {
+        if(element is null) {
+            return;
+        }
+        foreach(var param in CustomParamsList.Params) {
+            // Если параметр существует на экземпляре
+            if(element.IsExistsParam(param.ParamName)) {
+                element.SetParamValue(param.ParamName, param.ParamValue);
+                continue;
+            }
+            // Если параметр существует на типе
+            var type = Repository.Document.GetElement(element.GetTypeId());
+            if(type != null && type.IsExistsParam(param.ParamName)) {
+                type.SetParamValue(param.ParamName, param.ParamValue);
+            }
+        }
     }
 
     public abstract void CreateComponent();

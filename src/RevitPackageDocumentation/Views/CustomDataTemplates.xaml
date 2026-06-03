@@ -28,6 +28,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -123,6 +124,40 @@
                 ItemsSource="{Binding DataContext.CurrentSheetSet.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="ParamName"
                 SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <Border
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="6"
+                Margin="5"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="*" />
+                        <RowDefinition
+                            Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Margin="5 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="Дополнительные параметры" />
+
+                    <ui:Button
+                        Grid.Row="0"
+                        HorizontalAlignment="Right"
+                        Content="+"
+                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                    <ItemsControl
+                        Grid.Row="1"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </Border>
         </Grid>
     </DataTemplate>
 
@@ -138,6 +173,7 @@
         x:Key="StructuralCalloutViewDerivedTemplate" >
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
@@ -238,6 +274,40 @@
                 ItemsSource="{Binding DataContext.CurrentSheetSet.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="ParamName"
                 SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <Border
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="6"
+                Margin="5"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="*" />
+                        <RowDefinition
+                            Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Margin="5 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="Дополнительные параметры" />
+
+                    <ui:Button
+                        Grid.Row="0"
+                        HorizontalAlignment="Right"
+                        Content="+"
+                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                    <ItemsControl
+                        Grid.Row="1"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </Border>
         </Grid>
     </DataTemplate>
 
@@ -253,6 +323,7 @@
         x:Key="SectionViewDerivedTemplate" >
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
@@ -353,6 +424,40 @@
                 ItemsSource="{Binding DataContext.CurrentSheetSet.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="ParamName"
                 SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <Border
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="6"
+                Margin="5"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="*" />
+                        <RowDefinition
+                            Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Margin="5 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="Дополнительные параметры" />
+
+                    <ui:Button
+                        Grid.Row="0"
+                        HorizontalAlignment="Right"
+                        Content="+"
+                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                    <ItemsControl
+                        Grid.Row="1"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </Border>
         </Grid>
     </DataTemplate>
 
@@ -532,6 +637,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             
             <Grid.ColumnDefinitions>
@@ -570,6 +676,40 @@
                 PropFormula="{Binding Path=TextFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 PropResult="{Binding Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
+
+            <Border
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="3"
+                Margin="5"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="*" />
+                        <RowDefinition
+                            Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Margin="5 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="Дополнительные параметры" />
+
+                    <ui:Button
+                        Grid.Row="0"
+                        HorizontalAlignment="Right"
+                        Content="+"
+                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                    <ItemsControl
+                        Grid.Row="1"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </Border>
         </Grid>
     </DataTemplate>
 
@@ -585,6 +725,7 @@
         x:Key="TypicalAnnotationDerivedTemplate">
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -631,6 +772,40 @@
                 ItemsSource="{Binding AnnotationTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding AnnotationType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <Border
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="2"
+                Margin="5"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="*" />
+                        <RowDefinition
+                            Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Margin="5 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="Дополнительные параметры" />
+
+                    <ui:Button
+                        Grid.Row="0"
+                        HorizontalAlignment="Right"
+                        Content="+"
+                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                    <ItemsControl
+                        Grid.Row="1"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </Border>
         </Grid>
     </DataTemplate>
 
@@ -645,6 +820,7 @@
         x:Key="LegendViewDerivedTemplate">
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -683,6 +859,40 @@
                 ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="Name"
                 SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <Border
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="2"
+                Margin="5"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition
+                            Height="*" />
+                        <RowDefinition
+                            Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Margin="5 0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Text="Дополнительные параметры" />
+
+                    <ui:Button
+                        Grid.Row="0"
+                        HorizontalAlignment="Right"
+                        Content="+"
+                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                    <ItemsControl
+                        Grid.Row="1"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </Border>
         </Grid>
     </DataTemplate>
 

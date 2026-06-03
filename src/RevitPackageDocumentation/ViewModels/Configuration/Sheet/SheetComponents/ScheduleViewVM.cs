@@ -104,7 +104,8 @@ internal class ScheduleViewVM : SheetComponentVM {
 
     public override void Process() {
         var view = Create();
-        Place(view);
+        var instance = Place(view);
+        SetCustomParams(view);
     }
 
     public ViewSchedule Create() {
@@ -154,17 +155,17 @@ internal class ScheduleViewVM : SheetComponentVM {
     }
 
 
-    public void Place(ViewSchedule view) {
+    public ScheduleSheetInstance Place(ViewSchedule view) {
         var sheetInstance = Sheet.SheetInstance;
         if(sheetInstance is null
             || view is null
             || Viewport.CanAddViewToSheet(Repository.Document, sheetInstance.Id, view.Id)) {
-            return;
+            return null;
         }
 
         // Получение габаритов рамки листа
         if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
-            return;
+            return null;
         }
         var titleBlockBB = titleBlock.get_BoundingBox(sheetInstance);
         double titleBlockWidth = titleBlockBB.Max.X - titleBlockBB.Min.X;
@@ -183,5 +184,6 @@ internal class ScheduleViewVM : SheetComponentVM {
             titleBlockHeight - _specViewportTopOffset,
             0);
         scheduleSheetInstance.Point = newCenter;
+        return scheduleSheetInstance;
     }
 }

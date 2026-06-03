@@ -52,16 +52,17 @@ internal class TextNoteVM : SheetComponentVM {
     }
 
     public override void Process() {
-        Place();
+        var textNote = Place();
+        SetCustomParams(textNote);
     }
 
-    public void Place() {
+    public TextNote Place() {
         var sheetInstance = Sheet.SheetInstance;
         var options = new TextNoteOptions(TextNoteType.Id);
         var position = new XYZ(
             UnitUtilsHelper.ConvertToInternalValue(-190),
             UnitUtilsHelper.ConvertToInternalValue(120),
             0);
-        TextNote.Create(Repository.Document, sheetInstance.Id, position, Text, options);
+        return TextNote.Create(Repository.Document, sheetInstance.Id, position, Text, options);
     }
 }

@@ -46,13 +46,14 @@ internal class LegendViewVM : SheetComponentVM {
     }
 
     public override void Process() {
-        Place();
+        var viewPort = Place();
+        SetCustomParams(viewPort);
     }
 
-    public void Place() {
+    public Viewport Place() {
         // Проверяем можем ли разместить на листе легенду
         if(!Viewport.CanAddViewToSheet(Repository.Document, Sheet.SheetInstance.Id, LegendView.Id)) {
-            return;
+            return null;
         }
 
         // Размещаем легенду на листе
@@ -67,5 +68,6 @@ internal class LegendViewVM : SheetComponentVM {
 
         // Задание правильного типа видового экрана
         viewPort.ChangeTypeId(ViewportType.Id);
+        return viewPort;
     }
 }

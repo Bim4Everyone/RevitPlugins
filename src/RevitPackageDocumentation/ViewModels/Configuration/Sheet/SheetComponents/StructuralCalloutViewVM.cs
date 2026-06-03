@@ -115,7 +115,8 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
 
         for(int i = 1; i <= viewCountAsInt; i++) {
             var view = Create(i);
-            Place(view, i);
+            var viewPort = Place(view, i);
+            SetCustomParams(viewPort);
         }
     }
 
@@ -166,7 +167,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         return view;
     }
 
-    public void Place(View view, int number) {
+    public Viewport Place(View view, int number) {
         var sheetInstance = Sheet.SheetInstance;
         if(sheetInstance != null
             && view != null
@@ -174,7 +175,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
 
             // Получение габаритов рамки листа
             if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
-                return;
+                return null;
             }
             var boundingBoxXYZ = titleBlock.get_BoundingBox(sheetInstance);
             double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
@@ -202,6 +203,8 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
 #if REVIT_2022_OR_GREATER
             viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);
 #endif
+            return viewPort;
         }
+        return null;
     }
 }

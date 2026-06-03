@@ -109,7 +109,8 @@ internal class StructuralPlanViewVM : SheetComponentVM {
 
     public override void Process() {
         ViewInstance = Create();
-        Place(ViewInstance);
+        var viewPort = Place(ViewInstance);
+        SetCustomParams(viewPort);
     }
 
     public ViewPlan Create() {
@@ -147,7 +148,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         return view;
     }
 
-    public void Place(ViewPlan view) {
+    public Viewport Place(ViewPlan view) {
         var sheetInstance = Sheet.SheetInstance;
         if(sheetInstance != null
             && view != null
@@ -155,7 +156,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
 
             // Получение габаритов рамки листа
             if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
-                return;
+                return null;
             }
             var boundingBoxXYZ = titleBlock.get_BoundingBox(sheetInstance);
             double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
@@ -189,6 +190,8 @@ internal class StructuralPlanViewVM : SheetComponentVM {
 #if REVIT_2022_OR_GREATER
             viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);
 #endif
+            return viewPort;
         }
+        return null;
     }
 }

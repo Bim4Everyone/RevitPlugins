@@ -71,14 +71,15 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     }
 
     public override void Process() {
-        Place();
+        var instance = Place();
+        SetCustomParams(instance);
     }
 
-    public void Place() {
+    public FamilyInstance Place() {
         var position = new XYZ(
             UnitUtilsHelper.ConvertToInternalValue(-100),
             UnitUtilsHelper.ConvertToInternalValue(250),
             0);
-        Repository.Document.Create.NewFamilyInstance(position, AnnotationType, Sheet.SheetInstance);
+        return Repository.Document.Create.NewFamilyInstance(position, AnnotationType, Sheet.SheetInstance);
     }
 }
