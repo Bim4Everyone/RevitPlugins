@@ -187,7 +187,7 @@ public class ScheduleFilterListData {
 public class ScheduleFilterRuleData {
     public string FieldName { get; set; }
     public ScheduleFilterType FilterType { get; set; }
-    public string FilterValue { get; set; }
+    public string FilterValueFormula { get; set; }
 }
 
 /// <summary>

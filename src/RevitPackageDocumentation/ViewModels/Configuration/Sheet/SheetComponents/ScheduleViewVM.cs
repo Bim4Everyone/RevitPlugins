@@ -29,7 +29,7 @@ internal class ScheduleViewVM : SheetComponentVM {
         ILocalizationService localizationService,
         StringParamSetService stringParamSetService)
         : base(sheetVM, repository, localizationService, stringParamSetService) {
-        ScheduleFilterList = new ScheduleFilterListVM(this);
+        ScheduleFilterList = new ScheduleFilterListVM(this, stringParamSetService);
 
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
         SelectReferenceSpecCommand = RelayCommand.Create(SelectReferenceSpec);

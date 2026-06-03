@@ -6,14 +6,16 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 
 namespace RevitPackageDocumentation.ViewModels.ScheduleFilters;
 internal class ScheduleFilterListVM : BaseViewModel {
     private ObservableCollection<ScheduleFilterRuleVM> _scheduleFilterRules = [];
 
-    public ScheduleFilterListVM(ScheduleViewVM scheduleViewVM) {
+    public ScheduleFilterListVM(ScheduleViewVM scheduleViewVM, StringParamSetService stringParamSetService) {
         ScheduleView = scheduleViewVM;
+        StrParamSetService = stringParamSetService;
 
         AddFilterCommand = RelayCommand.Create(AddFilter);
         RemoveFilterCommand = RelayCommand.Create<ScheduleFilterRuleVM>(RemoveFilter);
@@ -23,6 +25,7 @@ internal class ScheduleFilterListVM : BaseViewModel {
     public ICommand RemoveFilterCommand { get; }
 
     public ScheduleViewVM ScheduleView { get; }
+    public StringParamSetService StrParamSetService { get; }
 
     public ObservableCollection<ScheduleFilterRuleVM> ScheduleFilterRules {
         get => _scheduleFilterRules;
@@ -30,7 +33,7 @@ internal class ScheduleFilterListVM : BaseViewModel {
     }
 
     private void AddFilter() {
-        var rule = new ScheduleFilterRuleVM(this);
+        var rule = new ScheduleFilterRuleVM(this, StrParamSetService);
         rule.SetSchedule(ScheduleView.ReferenceSpec);
         ScheduleFilterRules.Add(rule);
     }

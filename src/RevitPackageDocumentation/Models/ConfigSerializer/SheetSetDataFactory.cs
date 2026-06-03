@@ -103,17 +103,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewColumn = vm.ViewColumn,
                 ViewCount = vm.ViewCount,
-                ScheduleFilterList = new ScheduleFilterListData() {
-                    ScheduleFilterRules = vm
-                        .ScheduleFilterList
-                        .ScheduleFilterRules
-                        .Select(r => new ScheduleFilterRuleData() {
-                            FieldName = r.SelectedSpecFieldName ?? string.Empty,
-                            FilterType = r.SelectedFilterType?.FilterType ?? ScheduleFilterType.Equal,
-                            FilterValue = r.FilterValue
-                        })
-                        .ToList()
-                },
+                ScheduleFilterList = GetScheduleFilterList(vm),
             },
 
             TextNoteVM vm => new TextNoteData {
@@ -155,6 +145,16 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             .Select(r => new CustomParameterData() {
                 ParamName = r.ParamName ?? string.Empty,
                 ParamValueFormula = r.ParamValueFormula ?? string.Empty,
+            })
+        .ToList()
+    };
+
+    private ScheduleFilterListData GetScheduleFilterList(ScheduleViewVM vm) => new() {
+        ScheduleFilterRules = vm.ScheduleFilterList.ScheduleFilterRules
+            .Select(r => new ScheduleFilterRuleData() {
+                FieldName = r.SelectedSpecFieldName ?? string.Empty,
+                FilterType = r.SelectedFilterType?.FilterType ?? ScheduleFilterType.Equal,
+                FilterValueFormula = r.FilterValueFormula
             })
         .ToList()
     };

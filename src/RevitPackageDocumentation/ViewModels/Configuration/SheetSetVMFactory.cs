@@ -302,12 +302,12 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         // Метод предназначен только для модуля спецификаций
         if(sheetComponentVM is not ScheduleViewVM scheduleViewVM || data is not ScheduleViewData scheduleViewData) { return; }
 
-        var scheduleFilterList = new ScheduleFilterListVM(scheduleViewVM);
+        var scheduleFilterList = new ScheduleFilterListVM(scheduleViewVM, _stringParamSetService);
         foreach(var ruleData in scheduleViewData.ScheduleFilterList?.ScheduleFilterRules ?? []) {
-            var ruleVM = new ScheduleFilterRuleVM(scheduleFilterList) {
+            var ruleVM = new ScheduleFilterRuleVM(scheduleFilterList, _stringParamSetService) {
                 SelectedSpecFieldName = ruleData.FieldName,
-                FilterValue = ruleData.FilterValue ?? string.Empty,
-                SelectedFilterType = _revitRepository.FilterTypes.FirstOrDefault(t => t.FilterType == ruleData.FilterType)
+                SelectedFilterType = _revitRepository.FilterTypes.FirstOrDefault(t => t.FilterType == ruleData.FilterType),
+                FilterValueFormula = ruleData.FilterValueFormula ?? string.Empty,
             };
 
             ruleVM.SetSchedule(referenceSpec);

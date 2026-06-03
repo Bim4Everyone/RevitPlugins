@@ -8,7 +8,7 @@ using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
 internal class CustomParameterVM : BaseViewModel {
-    private string _paramNameFormula = string.Empty;
+    private string _paramValueFormula = string.Empty;
     private string _paramName;
     private string _paramValue = string.Empty;
 
@@ -17,21 +17,21 @@ internal class CustomParameterVM : BaseViewModel {
         StrParamSetService = stringParamSetService;
         PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
     }
-    public ICommand PropUpdateByFormulaCommand { get; }
 
+    public ICommand PropUpdateByFormulaCommand { get; }
 
     public CustomParametersListVM CustomParamsList { get; }
     public StringParamSetService StrParamSetService { get; }
 
 
-    public string ParamValueFormula {
-        get => _paramNameFormula;
-        set => RaiseAndSetIfChanged(ref _paramNameFormula, value);
-    }
-
     public string ParamName {
         get => _paramName;
         set => RaiseAndSetIfChanged(ref _paramName, value);
+    }
+
+    public string ParamValueFormula {
+        get => _paramValueFormula;
+        set => RaiseAndSetIfChanged(ref _paramValueFormula, value);
     }
 
     public string ParamValue {

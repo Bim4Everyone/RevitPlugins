@@ -6,10 +6,10 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:RevitPackageDocumentation.Views.Controls"
     xmlns:sheet="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
     xmlns:filters="clr-namespace:RevitPackageDocumentation.ViewModels.ScheduleFilters"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
     
     d:DataContext="{d:DesignInstance Type=filters:ScheduleFilterRuleVM}"
     mc:Ignorable="d"
@@ -34,6 +34,8 @@
 
         <ui:Button
             Grid.Column="0"
+            Margin="0 7"
+            VerticalAlignment="Top"
             Appearance="Danger"
             Content="✕"
             Command="{Binding Path=ScheduleFilterList.RemoveFilterCommand}"
@@ -42,6 +44,7 @@
         <ComboBox
             Grid.Column="1"
             Margin="5"
+            VerticalAlignment="Top"
             DisplayMemberPath="FieldName"
             ItemsSource="{Binding SpecFields, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             SelectedItem="{Binding SelectedSpecField, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
@@ -57,15 +60,18 @@
         <ComboBox
             Grid.Column="2"
             Margin="5"
+            VerticalAlignment="Top"
             DisplayMemberPath="Name"
             ItemsSource="{Binding 
                 Path=DataContext.FilterTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                 RelativeSource={RelativeSource AncestorType=Window}}"
             SelectedItem="{Binding SelectedFilterType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-        <ui:TextBox
+        <controls:FormulaTextBoxControl
             Grid.Column="3"
-            Margin="5 5 0 5"
-            Text="{Binding FilterValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            Margin="0 5"
+            PropFormula="{Binding Path=FilterValueFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            PropResult="{Binding Path=FilterValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            UpdateCommand="{Binding Path=PropUpdateByFormulaCommand}" />
     </Grid>
 </UserControl>
