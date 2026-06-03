@@ -53,6 +53,8 @@
     <system:String
         x:Key="TempFamilyDocument.TransactionName">Создание окружности</system:String>
     <system:String
+        x:Key="TempFamilyDocument.ExceptionFamily">Не удалось создать ведомость спецификаций. Переименуйте альбом: {0}</system:String>
+    <system:String
         x:Key="RevitRepository.ViewName">Ведомость_Cпецификаций_{0}</system:String>
     <system:String
         x:Key="MainViewModel.ErrorText">Выберите листы для создания ведомости спецификаций</system:String>
@@ -70,6 +72,8 @@
         x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
     <system:String
         x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+    <system:String
+        x:Key="Common.PluginErrorMessageTitle">Ошибка работы плагина</system:String>
     <system:String
         x:Key="Common.ConfigErrorNoFamily">Отсутствует шаблон семейства:  {0}  по пути:  {1}</system:String>
     <system:String
