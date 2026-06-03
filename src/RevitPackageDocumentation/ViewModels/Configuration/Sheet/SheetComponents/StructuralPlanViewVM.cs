@@ -172,7 +172,8 @@ internal class StructuralPlanViewVM : SheetComponentVM {
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMaxY = boundingBoxXYZ.Max.Y;
 
-            // Получение габаритов видового экрана
+            // Создание видового экрана
+            int viewPortNumber = GetLastViewportNumber(100) + 1;
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, new XYZ(0, 0, 0));
             viewPort.ChangeTypeId(ViewportType.Id);
 
@@ -187,11 +188,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
                 0);
 
             viewPort.SetBoxCenter(correctPosition);
-
-            string viewportNumberAsStr = viewPort.GetParamValue<string>(BuiltInParameter.VIEWPORT_DETAIL_NUMBER);
-            if(int.TryParse(viewportNumberAsStr, out int viewportNumberAsInt)) {
-                viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, (100 + viewportNumberAsInt).ToString());
-            }
+            viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, viewPortNumber.ToString());
 
 #if REVIT_2022_OR_GREATER
             viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);

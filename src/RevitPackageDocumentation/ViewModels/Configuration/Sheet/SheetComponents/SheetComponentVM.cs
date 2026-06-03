@@ -112,6 +112,27 @@ internal abstract class SheetComponentVM : BaseViewModel {
         }
     }
 
+    /// <summary>
+    /// Получает следующий номер видового экрана на листе
+    /// </summary>
+    protected int GetLastViewportNumber(int startNumber) {
+        var viewports = Sheet.SheetInstance.GetAllViewports()
+            .Select(id => Repository.Document.GetElement(id) as Viewport)
+            .ToList();
+
+        int lastViewportNumber = startNumber;
+        foreach(var viewport in viewports) {
+            string viewportNumberAsStr = viewport.GetParamValue<string>(BuiltInParameter.VIEWPORT_DETAIL_NUMBER);
+            // Если не число, то не влияет, т.к. плагин будет ставить число
+            if(int.TryParse(viewportNumberAsStr, out int viewportNumberAsInt)) {
+                if(viewportNumberAsInt > lastViewportNumber) {
+                    lastViewportNumber = viewportNumberAsInt;
+                }
+            }
+        }
+        return lastViewportNumber;
+    }
+
     public abstract void CreateComponent();
     public abstract bool ValidateModule();
     public abstract void Process();
