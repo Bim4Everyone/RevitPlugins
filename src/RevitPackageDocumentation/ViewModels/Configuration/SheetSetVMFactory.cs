@@ -226,9 +226,9 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         scheduleViewVM.ScheduleFilterList = scheduleFilterList;
 
         // Добавляем список дополнительных параметров
-        var customParamsList = new CustomParametersListVM(scheduleViewVM);
+        var customParamsList = new CustomParametersListVM(scheduleViewVM, _stringParamSetService);
         foreach(var paramData in data.CustomParamsList?.Params ?? []) {
-            var paramVM = new CustomParameterVM(customParamsList) {
+            var paramVM = new CustomParameterVM(customParamsList, _stringParamSetService) {
                 ParamName = paramData.ParamName ?? string.Empty,
                 ParamValue = paramData.ParamValue ?? string.Empty,
             };

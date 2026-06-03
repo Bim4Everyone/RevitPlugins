@@ -227,13 +227,14 @@
                     <ui:TextBlock
                         Grid.Column="0"
                         Grid.Row="0"
-                        Margin="5"
-                        VerticalAlignment="Center"
+                        Margin="5 13"
+                        VerticalAlignment="Top"
                         Text="Имя листа" />
 
                     <controls:FormulaTextBoxControl
                         Grid.Column="1"
                         Grid.Row="0"
+                        Margin="5"
                         PropFormula="{Binding Path=CurrentSheetSet.SelectedSheet.SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         PropResult="{Binding Path=CurrentSheetSet.SelectedSheet.SheetName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         UpdateCommand="{Binding CurrentSheetSet.SelectedSheet.PropUpdateByFormulaCommand}" />

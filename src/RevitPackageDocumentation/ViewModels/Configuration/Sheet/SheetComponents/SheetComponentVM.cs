@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -29,7 +30,7 @@ internal abstract class SheetComponentVM : BaseViewModel {
         LocalizationService = localizationService;
         StrParamSetService = stringParamSetService;
         ModuleTypeName = LocalizationService.GetLocalizedString($"Type.{this.GetType().Name}");
-        CustomParamsList = new CustomParametersListVM(this);
+        CustomParamsList = new CustomParametersListVM(this, StrParamSetService);
 
         PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
     }
@@ -87,6 +88,7 @@ internal abstract class SheetComponentVM : BaseViewModel {
 
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
         StrParamSetService.SetAll(this, Sheet.SheetSet.Params, stringParam);
+        CustomParamsList.Params.ToList().ForEach(p => p.UpdateDueParamValueChange(stringParam));
     }
 
     public abstract void CreateComponent();

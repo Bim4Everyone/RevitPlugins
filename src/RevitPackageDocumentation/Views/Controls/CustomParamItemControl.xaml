@@ -11,6 +11,7 @@
     xmlns:sheet="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
     xmlns:filters="clr-namespace:RevitPackageDocumentation.ViewModels.ScheduleFilters"
     xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
     xmlns:customParams="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.CustomParameters"
     
     d:DataContext="{d:DesignInstance Type=customParams:CustomParameterVM}"
@@ -35,6 +36,8 @@
 
         <ui:Button
             Grid.Column="0"
+            Margin="0 7"
+            VerticalAlignment="Top"
             Appearance="Danger"
             Content="✕"
             Command="{Binding Path=CustomParamsList.RemoveCustomParameterCommand}"
@@ -43,11 +46,14 @@
         <ui:TextBox
             Grid.Column="1"
             Margin="5"
+            VerticalAlignment="Top"
             Text="{Binding Path=ParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-        <ui:TextBox
+        <controls:FormulaTextBoxControl
             Grid.Column="2"
-            Margin="5 5 0 5"
-            Text="{Binding Path=ParamValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            Margin="0 5"
+            PropFormula="{Binding Path=ParamValueFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            PropResult="{Binding Path=ParamValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            UpdateCommand="{Binding Path=PropUpdateByFormulaCommand}" />
     </Grid>
 </UserControl>

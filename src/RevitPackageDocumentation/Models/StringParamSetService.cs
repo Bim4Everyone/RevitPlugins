@@ -6,10 +6,12 @@ using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.Models;
 internal class StringParamSetService {
+    private readonly string _keyWord = "Formula";
+
     public void SetAll(object instance, IEnumerable<PluginParamVM> sheetSetParams) {
         // Отбираем свойства, которые string, имеют в имени "Formula" и запускаем обновления значения у всех
         instance.GetType().GetProperties()
-            .Where(p => p.PropertyType == typeof(string) && p.CanWrite && p.Name.Contains("Formula"))
+            .Where(p => p.PropertyType == typeof(string) && p.CanWrite && p.Name.Contains(_keyWord))
             .ToList()
             .ForEach(p => Set(instance, p.Name, sheetSetParams));
     }
@@ -17,7 +19,7 @@ internal class StringParamSetService {
     public void SetAll(object instance, IEnumerable<PluginParamVM> sheetSetParams, StringParamVM stringParam) {
         // Отбираем свойства, которые string, имеют в имени "Formula" и запускаем обновления значения у всех
         instance.GetType().GetProperties()
-            .Where(p => p.PropertyType == typeof(string) && p.CanWrite && p.Name.Contains("Formula"))
+            .Where(p => p.PropertyType == typeof(string) && p.CanWrite && p.Name.Contains(_keyWord))
             .Where(p => p.GetValue(instance) is string formula && formula.Contains($"{{{stringParam.ParamName}}}"))
             .ToList()
             .ForEach(p => Set(instance, p.Name, sheetSetParams));
@@ -25,7 +27,7 @@ internal class StringParamSetService {
 
     public void Set(object instance, string formulaPropertyName, IEnumerable<PluginParamVM> sheetSetParams) {
         var propFormula = instance.GetType().GetProperty(formulaPropertyName);
-        var prop = instance.GetType().GetProperty(formulaPropertyName.Replace("Formula", ""));
+        var prop = instance.GetType().GetProperty(formulaPropertyName.Replace(_keyWord, ""));
         if(prop is null) {
             return;
         }

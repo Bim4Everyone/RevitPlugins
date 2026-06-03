@@ -4,14 +4,16 @@ using System.Windows.Input;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
 internal class CustomParametersListVM : BaseViewModel {
     private ObservableCollection<CustomParameterVM> _params = [];
 
-    public CustomParametersListVM(SheetComponentVM sheetComponentVM) {
+    public CustomParametersListVM(SheetComponentVM sheetComponentVM, StringParamSetService stringParamSetService) {
         SheetComponent = sheetComponentVM;
+        StrParamSetService = stringParamSetService;
         AddCustomParameterCommand = RelayCommand.Create(AddCustomParameter);
         RemoveCustomParameterCommand = RelayCommand.Create<CustomParameterVM>(RemoveCustomParameter);
     }
@@ -20,6 +22,7 @@ internal class CustomParametersListVM : BaseViewModel {
     public ICommand RemoveCustomParameterCommand { get; }
 
     public SheetComponentVM SheetComponent { get; }
+    public StringParamSetService StrParamSetService { get; }
 
     public ObservableCollection<CustomParameterVM> Params {
         get => _params;
@@ -27,7 +30,7 @@ internal class CustomParametersListVM : BaseViewModel {
     }
 
     private void AddCustomParameter() {
-        var param = new CustomParameterVM(this);
+        var param = new CustomParameterVM(this, StrParamSetService);
         Params.Add(param);
     }
 
