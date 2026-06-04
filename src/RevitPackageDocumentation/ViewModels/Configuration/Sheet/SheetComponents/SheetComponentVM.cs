@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Windows.Input;
 
@@ -133,7 +134,8 @@ internal abstract class SheetComponentVM : BaseViewModel {
         return lastViewportNumber;
     }
 
-    protected Viewport GetLastViewport<TView>(bool isCallout = false) where TView : View {
+    protected Viewport GetLastViewport<TView>(Func<Viewport, bool> viewportFilter = null, bool isCallout = false)
+        where TView : View {
         return Repository.GetViewports(Sheet.SheetInstance)
             .Select(viewport => new {
                 Viewport = viewport,
@@ -142,6 +144,7 @@ internal abstract class SheetComponentVM : BaseViewModel {
             })
             .Where(x => x.View is TView)
             .Where(x => x.View.IsCallout == isCallout)
+            .Where(x => viewportFilter(x.Viewport))
             .OrderByDescending(x => x.Center.X)
             .FirstOrDefault()?.Viewport;
     }

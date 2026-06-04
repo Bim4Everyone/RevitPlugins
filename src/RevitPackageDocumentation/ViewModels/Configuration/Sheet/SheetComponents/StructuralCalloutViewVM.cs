@@ -192,7 +192,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
             int viewPortNumber = GetLastViewportNumber(0, 100) + 1;
-            var lastViewport = GetLastViewport<ViewPlan>(true);
+            var lastViewport = GetLastViewport<ViewPlan>(vp => vp.GetBoxCenter().Y < 0, true);
 
             // Получение габаритов видового экрана
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);

@@ -186,7 +186,7 @@ internal class SectionViewVM : SheetComponentVM {
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
             int viewPortNumber = GetLastViewportNumber(0, 100) + 1;
-            var lastViewport = GetLastViewport<ViewSection>();
+            var lastViewport = GetLastViewport<ViewSection>(vp => vp.GetBoxCenter().Y < 0);
 
             // Создание видового экрана
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);

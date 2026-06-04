@@ -173,7 +173,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
             double titleBlockMaxY = boundingBoxXYZ.Max.Y;
 
             int viewPortNumber = GetLastViewportNumber(100) + 1;
-            var lastViewport = GetLastViewport<ViewPlan>();
+            var lastViewportInTitleBlock = GetLastViewport<ViewPlan>(vp => vp.GetBoxCenter().Y < titleBlockMaxY);
 
             // Создание видового экрана
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, new XYZ(0, 0, 0));
@@ -184,9 +184,19 @@ internal class StructuralPlanViewVM : SheetComponentVM {
             double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
             double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
 
+            double correctPositionX = titleBlockMinX + _titleBlockFrameLeftOffset + viewportHalfWidth;
+            double correctPositionY = titleBlockMaxY - _titleBlockFrameTopOffset - viewportHalfHeight;
+            if(lastViewportInTitleBlock is not null) {
+                correctPositionY = titleBlockMaxY + viewportHalfHeight;
+
+                var lastViewportAboveTitleBlock = GetLastViewport<ViewPlan>(vp => vp.GetBoxCenter().Y > titleBlockMaxY);
+                if(lastViewportAboveTitleBlock is not null) {
+                    correctPositionX = lastViewportAboveTitleBlock.GetBoxOutline().MaximumPoint.X + viewportHalfWidth;
+                }
+            }
             var correctPosition = new XYZ(
-                titleBlockMinX + _titleBlockFrameLeftOffset + viewportHalfWidth,
-                titleBlockMaxY - _titleBlockFrameTopOffset - viewportHalfHeight,
+                correctPositionX,
+                correctPositionY,
                 0);
 
             viewPort.SetBoxCenter(correctPosition);
