@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -9,7 +10,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-
+using dosymep.Revit;
 using Ninject;
 
 using RevitPylonLoadAreas.Models;
@@ -66,6 +67,13 @@ public class RevitPylonLoadAreasCommand : BasePluginCommand {
             t.Start();
             var drawer = new DetailLineDrawer(repository.Document);
             drawer.Draw(activeView, result.SlabElevation, result.ByPylon.Values);
+            foreach(var pylonData in result.ByPylon) {
+                repository.Document.GetElement(pylonData.Key)
+                    .SetParamValue(
+                        BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
+                        UnitUtils.ConvertFromInternalUnits(pylonData.Value.TotalArea, UnitTypeId.SquareMeters)
+                            .ToString(CultureInfo.CurrentCulture));
+            }
             t.Commit();
         }
 
