@@ -57,7 +57,8 @@ public partial class FormulaTextBoxControl : UserControl {
         }
 
         // Если строки одинаковые - скрываем TextBlock, иначе показываем
-        bool areEqual = string.Equals(PropFormula ?? string.Empty, PropResult ?? string.Empty);
+        bool areEqual = false;
+        //bool areEqual = string.Equals(PropFormula ?? string.Empty, PropResult ?? string.Empty);
         ResultTextBlock.Visibility = areEqual ? Visibility.Collapsed : Visibility.Visible;
     }
 }

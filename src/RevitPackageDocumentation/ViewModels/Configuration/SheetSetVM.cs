@@ -164,6 +164,9 @@ internal class SheetSetVM : BaseViewModel {
         ValidateAllSheets();
     }
 
+    /// <summary>
+    /// В случае изменения имени параметра нужно обойти все листы и их компоненты, и обновить привязки
+    /// </summary>
     public void UpdateDueParamNameChange(PluginParamVM pluginParam) {
         if(pluginParam is not StringParamVM stringParam) {
             return;

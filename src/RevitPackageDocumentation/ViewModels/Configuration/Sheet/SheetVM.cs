@@ -198,8 +198,14 @@ internal class SheetVM : BaseViewModel {
         _stringParamSetService.Set(this, formulaPropertyName, SheetSet.Params);
     }
 
+    /// <summary>
+    /// В случае изменения имени параметра нужно обойти все листы и их компоненты, и обновить привязки
+    /// </summary>
     public void UpdateDueParamNameChange() {
         _stringParamSetService.SetAll(this, SheetSet.Params);
+        foreach(var sheetComponent in SheetComponents) {
+            sheetComponent.UpdateDueParamNameChange();
+        }
     }
 
     public void UpdateDueParamValueChange(StringParamVM stringParam) {

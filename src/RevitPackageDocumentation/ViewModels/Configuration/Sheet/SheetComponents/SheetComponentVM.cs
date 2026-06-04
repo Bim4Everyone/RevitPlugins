@@ -90,6 +90,15 @@ internal abstract class SheetComponentVM : BaseViewModel {
         StrParamSetService.Set(this, formulaPropertyName, Sheet.SheetSet.Params);
     }
 
+    /// <summary>
+    /// В случае изменения имени параметра конфигурации нужно обновить свойства компонента листа, а также 
+    /// его дополнительные параметры
+    /// </summary>
+    public void UpdateDueParamNameChange() {
+        StrParamSetService.SetAll(this, Sheet.SheetSet.Params);
+        CustomParamsList.Params.ToList().ForEach(p => p.UpdateDueParamNameChange());
+    }
+
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
         StrParamSetService.SetAll(this, Sheet.SheetSet.Params, stringParam);
         CustomParamsList.Params.ToList().ForEach(p => p.UpdateDueParamValueChange(stringParam));

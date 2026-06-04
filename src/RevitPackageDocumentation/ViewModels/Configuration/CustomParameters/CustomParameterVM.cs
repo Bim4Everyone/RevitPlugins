@@ -43,6 +43,13 @@ internal class CustomParameterVM : BaseViewModel {
         StrParamSetService.Set(this, formulaPropertyName, CustomParamsList.SheetComponent.Sheet.SheetSet.Params);
     }
 
+    /// <summary>
+    /// В случае изменения имени параметра конфигурации нужно обновить свойства дополнительного параметра
+    /// </summary>
+    public void UpdateDueParamNameChange() {
+        StrParamSetService.SetAll(this, CustomParamsList.SheetComponent.Sheet.SheetSet.Params);
+    }
+
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
         StrParamSetService.SetAll(this, CustomParamsList.SheetComponent.Sheet.SheetSet.Params, stringParam);
     }
