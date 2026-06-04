@@ -167,6 +167,9 @@
   <Project Path="src/RevitPylonDocumentation/RevitPylonDocumentation.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitPylonLoadAreas/RevitPylonLoadAreas.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitRefreshLinks/RevitRefreshLinks.csproj">
     <Platform Project="x64" />
   </Project>
