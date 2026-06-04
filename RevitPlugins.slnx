@@ -188,6 +188,9 @@
   <Project Path="src/RevitRoomTagPlacement/RevitRoomTagPlacement.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitRoundingOfAreas/RevitRoundingOfAreas.csproj">
+    <Platform Project="x64" />
+  </Project>
     <Project Path="src/RevitRsnManager/RevitRsnManager.csproj">
     <Platform Project="x64" />
   </Project>

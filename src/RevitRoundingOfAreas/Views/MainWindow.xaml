@@ -1,0 +1,129 @@
+<core:WpfUIPlatformWindow
+    x:Class="RevitRoundingOfAreas.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:base="clr-namespace:dosymep.WPF.Views"
+    xmlns:local="clr-namespace:RevitRoundingOfAreas.Views"
+    xmlns:edits="clr-namespace:RevitRoundingOfAreas.Views.Edits"
+    xmlns:vms="clr-namespace:RevitRoundingOfAreas.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"    
+   
+    mc:Ignorable="d"
+    Title="{me:LocalizationSource WarningWindow.Title}"
+    
+    Height="540"
+    Width="950"
+    
+    MinHeight="540"
+    MinWidth="950"
+   
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>    
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+            <ui:TitleBar
+            Grid.Row="0"
+            Icon="{ui:SymbolIcon arrowSyncCircle24, FontSize=20}"
+            Title="{me:LocalizationSource MainWindow.Title}"
+            FontSize="14"
+            FontWeight="DemiBold" />
+
+        <ScrollViewer
+            Margin="10,0,10,0"
+            Grid.Row="1"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon fullScreenMaximize24}"
+                    Header="{me:LocalizationSource MainWindow.RangeElements}"
+                    Description="{me:LocalizationSource MainWindow.RangeElementsDescription}">
+                    <edits:ModeSwitcherControl                        
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding SelectedRange}"
+                        ItemsSource="{Binding Range}" />
+                </edits:CustomEditControl>
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon slideArrowRight24}"
+                    Header="{me:LocalizationSource MainWindow.Phase}"
+                    Description="{me:LocalizationSource MainWindow.PhaseDescription}">
+                    <ComboBox
+                        ItemsSource="{Binding Phases}"
+                        SelectedValue="{Binding SelectedPhase}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon multiselectLtr24}"
+                    Header="{me:LocalizationSource MainWindow.SourceParam}"
+                    Description="{me:LocalizationSource MainWindow.SourceParamDescription}">
+                    <ComboBox
+                        ItemsSource="{Binding SourceParams}"
+                        SelectedValue="{Binding SelectedSourceParam}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon multiselectRtl24}"
+                    Header="{me:LocalizationSource MainWindow.TargetParam}"
+                    Description="{me:LocalizationSource MainWindow.TargetParamDescription}">
+                    <ComboBox
+                        ItemsSource="{Binding TargetParams}"
+                        SelectedValue="{Binding SelectedTargetParam}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon numberRow24}"
+                    Header="{me:LocalizationSource MainWindow.Accuracy}"
+                    Description="{me:LocalizationSource MainWindow.AccuracyDescription}">
+                    <ComboBox
+                        ItemsSource="{Binding Accuracy}"
+                        SelectedValue="{Binding SelectedAccuracy}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+
+            </StackPanel>
+        </ScrollViewer>       
+
+        <StackPanel
+            Grid.Row="2"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+            
+            <ui:TextBlock
+                Margin="10"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />  
+            
+            <ui:Button
+                Margin="10,10,5,15"
+                Width="100"
+                Appearance="Primary"
+                Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Click="ButtonOk_Click"
+                Command="{Binding AcceptViewCommand}" />
+
+            <ui:Button
+                Margin="10,5,15,15"
+                Width="100"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</core:WpfUIPlatformWindow>

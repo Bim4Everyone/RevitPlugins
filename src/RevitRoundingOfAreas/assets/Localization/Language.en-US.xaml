@@ -1,0 +1,50 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Calculate Areas (Social Facilities)</system:String>
+    <system:String x:Key="MainWindow.RangeElements">Model Element Processing Range</system:String>
+    <system:String x:Key="MainWindow.RangeElementsDescription">Select how to process model elements</system:String>
+    
+    <system:String x:Key="MainWindow.Phase">Room Phase</system:String>
+    <system:String x:Key="MainWindow.PhaseDescription">Select the phase for the rooms to be processed</system:String>
+    
+    <system:String x:Key="MainWindow.SourceParam">Read Parameter</system:String>
+    <system:String x:Key="MainWindow.SourceParamDescription">Parameter from which the area will be read</system:String>
+    
+    <system:String x:Key="MainWindow.TargetParam">Write Parameter</system:String>
+    <system:String x:Key="MainWindow.TargetParamDescription">Parameter to which the area will be written</system:String>
+    
+    <system:String x:Key="MainWindow.Accuracy">Number of Decimal Places</system:String>
+    <system:String x:Key="MainWindow.AccuracyDescription">Number of decimal places to round to</system:String>
+    
+    <system:String x:Key="MainWindow.ButtonOk">Calculate</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    
+    <system:String x:Key="MainViewModel.AllElementsProvider">All elements</system:String>
+    <system:String x:Key="MainViewModel.SelectedElementsProvider">Selected</system:String>
+    <system:String x:Key="MainViewModel.CurrentViewProvider">Visible in view</system:String>
+    
+    <system:String x:Key="MainViewModel.TransactionName">Area Calculation (Social Facilities)</system:String>
+    
+    <system:String x:Key="Common.ParamErrorMessageBody">Error loading parameters</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Plugin configuration error</system:String>
+    
+    <system:String x:Key="WarningsViewModel.Redundant">Redundant zones</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Zones located within the same enclosed area</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Unenclosed zones / Unplaced zones</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Zones that have no boundaries or are not placed on the plan</system:String>
+    
+    <system:String x:Key="MainViewModel.NoSelection">No rooms selected</system:String>
+    <system:String x:Key="MainViewModel.NoRoomsOnView">No rooms on the view</system:String>
+    
+    <system:String x:Key="RevitRepository.NoLevel">- No level -</system:String>
+    
+    <system:String x:Key="WarningWindow.Title">Calculate Areas (Social Facilities) - Warnings</system:String>
+    
+    <system:String x:Key="WarningWindow.ShowHeader">Highlight</system:String>
+    <system:String x:Key="WarningWindow.ElementIdHeader">Room ID</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Room name</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Room level</system:String>
+    
+</ResourceDictionary>
