@@ -6,9 +6,6 @@ using System.Windows.Threading;
 
 namespace RevitPackageDocumentation.Views.Controls;
 
-/// <summary>
-/// Логика взаимодействия для FormulaTextBoxControl.xaml
-/// </summary>
 public partial class FormulaTextBoxControl : UserControl {
     private readonly DispatcherTimer _timer;
 
@@ -16,7 +13,8 @@ public partial class FormulaTextBoxControl : UserControl {
         DependencyProperty.Register(nameof(PropFormula), typeof(string), typeof(FormulaTextBoxControl));
 
     public static readonly DependencyProperty PropResultProperty =
-        DependencyProperty.Register(nameof(PropResult), typeof(string), typeof(FormulaTextBoxControl));
+        DependencyProperty.Register(nameof(PropResult), typeof(string), typeof(FormulaTextBoxControl),
+            new FrameworkPropertyMetadata(OnPropResultChanged));
 
     public static readonly DependencyProperty UpdateCommandProperty =
         DependencyProperty.Register(nameof(UpdateCommand), typeof(ICommand), typeof(FormulaTextBoxControl));
@@ -36,6 +34,11 @@ public partial class FormulaTextBoxControl : UserControl {
         set => SetValue(UpdateCommandProperty, value);
     }
 
+    private static void OnPropResultChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+        var control = d as FormulaTextBoxControl;
+        control?.UpdateResultVisibility();
+    }
+
     public FormulaTextBoxControl() {
         InitializeComponent();
 
@@ -51,14 +54,15 @@ public partial class FormulaTextBoxControl : UserControl {
     }
 
     private void UpdateFormula() {
-        var propertyName = GetBindingExpression(PropFormulaProperty)?.ResolvedSourcePropertyName;
+        string propertyName = GetBindingExpression(PropFormulaProperty)?.ResolvedSourcePropertyName;
         if(propertyName != null) {
             UpdateCommand?.Execute(propertyName);
         }
+        UpdateResultVisibility();
+    }
 
-        // Если строки одинаковые - скрываем TextBlock, иначе показываем
-        bool areEqual = false;
-        //bool areEqual = string.Equals(PropFormula ?? string.Empty, PropResult ?? string.Empty);
+    private void UpdateResultVisibility() {
+        bool areEqual = string.Equals(PropFormula ?? string.Empty, PropResult ?? string.Empty);
         ResultTextBlock.Visibility = areEqual ? Visibility.Collapsed : Visibility.Visible;
     }
 }
