@@ -238,4 +238,10 @@ internal class RevitRepository {
             .WhereElementIsNotElementType()
             .FirstOrDefault() as FamilyInstance;
     }
+
+    public List<Viewport> GetViewports(ViewSheet viewSheet) {
+        return viewSheet.GetAllViewports()
+            .Select(id => Document.GetElement(id) as Viewport)
+            .ToList();
+    }
 }

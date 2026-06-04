@@ -186,6 +186,7 @@ internal class SectionViewVM : SheetComponentVM {
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
             int viewPortNumber = GetLastViewportNumber(0, 100) + 1;
+            var lastViewport = GetLastViewport<ViewSection>();
 
             // Создание видового экрана
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
@@ -196,8 +197,12 @@ internal class SectionViewVM : SheetComponentVM {
             double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
             double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
 
+            double correctPositionX = lastViewport is null
+                ? titleBlockMinX + viewportHalfWidth
+                : lastViewport.GetBoxOutline().MaximumPoint.X + viewportHalfWidth;
+
             var correctPosition = new XYZ(
-                titleBlockMinX + viewportHalfWidth + _viewportOffset * (number - 1),
+                correctPositionX,
                 titleBlockMinY - viewportHalfHeight,
                 0);
 

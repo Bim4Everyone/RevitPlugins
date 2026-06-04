@@ -173,6 +173,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
             double titleBlockMaxY = boundingBoxXYZ.Max.Y;
 
             int viewPortNumber = GetLastViewportNumber(100) + 1;
+            var lastViewport = GetLastViewport<ViewPlan>();
 
             // Создание видового экрана
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, new XYZ(0, 0, 0));

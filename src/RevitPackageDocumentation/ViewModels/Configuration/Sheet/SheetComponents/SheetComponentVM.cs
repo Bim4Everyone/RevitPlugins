@@ -133,6 +133,19 @@ internal abstract class SheetComponentVM : BaseViewModel {
         return lastViewportNumber;
     }
 
+    protected Viewport GetLastViewport<TView>(bool isCallout = false) where TView : View {
+        return Repository.GetViewports(Sheet.SheetInstance)
+            .Select(viewport => new {
+                Viewport = viewport,
+                View = Repository.Document.GetElement(viewport.ViewId) as View,
+                Center = viewport.GetBoxCenter()
+            })
+            .Where(x => x.View is TView)
+            .Where(x => x.View.IsCallout == isCallout)
+            .OrderByDescending(x => x.Center.X)
+            .FirstOrDefault()?.Viewport;
+    }
+
     public abstract void CreateComponent();
     public abstract bool ValidateModule();
     public abstract void Process();
