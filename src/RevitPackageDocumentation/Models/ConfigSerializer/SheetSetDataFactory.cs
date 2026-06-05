@@ -39,6 +39,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             IsModuleCheck = vm.IsModuleCheck,
             ModuleName = vm.ModuleName,
             ModuleComment = vm.ModuleComment,
+            CustomParamsList = GetCustomParametersList(vm),
 
             SheetNameFormula = vm.SheetNameFormula,
             SheetSize = vm.SheetSize,
@@ -140,7 +141,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
         };
     }
 
-    private CustomParametersListData GetCustomParametersList(SheetComponentVM vm) => new() {
+    private CustomParametersListData GetCustomParametersList(BaseParamContainerVM vm) => new() {
         Params = vm.CustomParamsList.Params
             .Select(r => new CustomParameterData() {
                 ParamName = r.ParamName ?? string.Empty,

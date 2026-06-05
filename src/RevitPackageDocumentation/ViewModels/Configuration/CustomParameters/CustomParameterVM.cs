@@ -40,17 +40,17 @@ internal class CustomParameterVM : BaseViewModel {
     }
 
     private void PropUpdateByFormula(string formulaPropertyName) {
-        StrParamSetService.Set(this, formulaPropertyName, CustomParamsList.SheetComponent.Sheet.SheetSet.Params);
+        StrParamSetService.Set(this, formulaPropertyName, CustomParamsList.BaseParamContainer.SheetSetParams);
     }
 
     /// <summary>
     /// В случае изменения имени параметра конфигурации нужно обновить свойства дополнительного параметра
     /// </summary>
     public void UpdateDueParamNameChange() {
-        StrParamSetService.SetAll(this, CustomParamsList.SheetComponent.Sheet.SheetSet.Params);
+        StrParamSetService.SetAll(this, CustomParamsList.BaseParamContainer.SheetSetParams);
     }
 
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
-        StrParamSetService.SetAll(this, CustomParamsList.SheetComponent.Sheet.SheetSet.Params, stringParam);
+        StrParamSetService.SetAll(this, CustomParamsList.BaseParamContainer.SheetSetParams, stringParam);
     }
 }

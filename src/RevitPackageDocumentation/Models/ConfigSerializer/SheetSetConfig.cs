@@ -62,14 +62,17 @@ public class SheetSetData {
     public List<PluginParamData> Params { get; set; } = [];
 }
 
-/// <summary>
-/// DTO комплекта листа
-/// </summary>
-public class SheetData {
+public abstract class ParamContainerModuleData {
     public bool? IsModuleCheck { get; set; }
     public string ModuleName { get; set; }
     public string ModuleComment { get; set; }
+    public CustomParametersListData CustomParamsList { get; set; }
+}
 
+/// <summary>
+/// DTO комплекта листа
+/// </summary>
+public class SheetData : ParamContainerModuleData {
     public string SheetNameFormula { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
@@ -78,13 +81,8 @@ public class SheetData {
     public List<SheetComponentData> Views { get; set; } = [];
 }
 
-
-public abstract class SheetComponentData {
+public abstract class SheetComponentData : ParamContainerModuleData {
     public abstract string ComponentType { get; }
-    public bool? IsModuleCheck { get; set; }
-    public string ModuleName { get; set; }
-    public string ModuleComment { get; set; }
-    public CustomParametersListData CustomParamsList { get; set; }
 }
 
 /// <summary>

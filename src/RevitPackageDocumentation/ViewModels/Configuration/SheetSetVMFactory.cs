@@ -19,7 +19,7 @@ namespace RevitPackageDocumentation.ViewModels.Configuration;
 internal interface ISheetSetVMFactory {
     SheetSetVM CreateSheetSetVM(SheetSetData data);
     SheetVM CreateSheetVM(SheetSetVM sheetSetVM, SheetData data);
-    SheetComponentVM CreateComponentVM(SheetVM sheetVM, SheetComponentData data);
+    SheetComponentVM CreateComponentVM(SheetSetVM sheetSetVM, SheetVM sheetVM, SheetComponentData data);
     PluginParamVM CreateParamVM(SheetSetVM sheetSetVM, PluginParamData data);
 }
 
@@ -84,13 +84,14 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         var titleBlockType = titleBlockTypes?.FirstOrDefault(v => v.Name.Equals(data.TitleBlockTypeName));
 
         var sheetVM = new SheetVM(
-            sheetSetVM,
             _revitRepository,
+            _stringParamSetService,
+            sheetSetVM.Params,
+            sheetSetVM,
             _localizationService,
             _messageBoxService,
             this,
-            _sheetSetDataFactory,
-            _stringParamSetService) {
+            _sheetSetDataFactory) {
 
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
@@ -105,31 +106,32 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             TitleBlockTypes = titleBlockTypes,
             TitleBlockType = titleBlockType,
         };
+        // Добавляем список дополнительных параметров
+        SetCustomParametersList(sheetVM, data);
 
         foreach(var componentData in data.Views) {
-            var componentVM = CreateComponentVM(sheetVM, componentData);
+            var componentVM = CreateComponentVM(sheetSetVM, sheetVM, componentData);
             sheetVM.SheetComponents.Add(componentVM);
         }
-
         return sheetVM;
     }
 
-    public SheetComponentVM CreateComponentVM(SheetVM sheetVM, SheetComponentData sheetComponentData) {
+    public SheetComponentVM CreateComponentVM(SheetSetVM sheetSetVM, SheetVM sheetVM, SheetComponentData sheetComponentData) {
         return sheetComponentData switch {
-            StructuralPlanViewData data => CreateStructuralPlanViewVM(sheetVM, data),
-            StructuralCalloutViewData data => CreateStructuralCalloutViewVM(sheetVM, data),
-            SectionViewData data => CreateSectionViewVM(sheetVM, data),
-            ScheduleViewData data => CreateScheduleViewVM(sheetVM, data),
-            TextNoteData data => CreateTextNoteVM(sheetVM, data),
-            TypicalAnnotationData data => CreateTypicalAnnotationVM(sheetVM, data),
-            LegendViewData data => CreateLegendViewVM(sheetVM, data),
+            StructuralPlanViewData data => CreateStructuralPlanViewVM(sheetSetVM, sheetVM, data),
+            StructuralCalloutViewData data => CreateStructuralCalloutViewVM(sheetSetVM, sheetVM, data),
+            SectionViewData data => CreateSectionViewVM(sheetSetVM, sheetVM, data),
+            ScheduleViewData data => CreateScheduleViewVM(sheetSetVM, sheetVM, data),
+            TextNoteData data => CreateTextNoteVM(sheetSetVM, sheetVM, data),
+            TypicalAnnotationData data => CreateTypicalAnnotationVM(sheetSetVM, sheetVM, data),
+            LegendViewData data => CreateLegendViewVM(sheetSetVM, sheetVM, data),
             _ => throw new NotSupportedException($"Тип '{sheetComponentData?.GetType().Name}' не поддерживается")
         };
     }
 
-    private StructuralPlanViewVM CreateStructuralPlanViewVM(SheetVM sheetVM, StructuralPlanViewData data) {
+    private StructuralPlanViewVM CreateStructuralPlanViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, StructuralPlanViewData data) {
         var sheetComponentVM = new StructuralPlanViewVM(
-            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -149,9 +151,9 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         return sheetComponentVM;
     }
 
-    private StructuralCalloutViewVM CreateStructuralCalloutViewVM(SheetVM sheetVM, StructuralCalloutViewData data) {
+    private StructuralCalloutViewVM CreateStructuralCalloutViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, StructuralCalloutViewData data) {
         var sheetComponentVM = new StructuralCalloutViewVM(
-            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -171,9 +173,9 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         return sheetComponentVM;
     }
 
-    private SectionViewVM CreateSectionViewVM(SheetVM sheetVM, SectionViewData data) {
+    private SectionViewVM CreateSectionViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, SectionViewData data) {
         var sheetComponentVM = new SectionViewVM(
-            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -193,11 +195,11 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         return sheetComponentVM;
     }
 
-    private ScheduleViewVM CreateScheduleViewVM(SheetVM sheetVM, ScheduleViewData data) {
+    private ScheduleViewVM CreateScheduleViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, ScheduleViewData data) {
         var referenceSpec = _revitRepository.GetSpecByName(data.ReferenceViewName);
 
         var scheduleViewVM = new ScheduleViewVM(
-            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -217,9 +219,9 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         return scheduleViewVM;
     }
 
-    private TextNoteVM CreateTextNoteVM(SheetVM sheetVM, TextNoteData data) {
+    private TextNoteVM CreateTextNoteVM(SheetSetVM sheetSetVM, SheetVM sheetVM, TextNoteData data) {
         var sheetComponentVM = new TextNoteVM(
-            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -234,7 +236,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         return sheetComponentVM;
     }
 
-    private TypicalAnnotationVM CreateTypicalAnnotationVM(SheetVM sheetVM, TypicalAnnotationData data) {
+    private TypicalAnnotationVM CreateTypicalAnnotationVM(SheetSetVM sheetSetVM, SheetVM sheetVM, TypicalAnnotationData data) {
         var annotationFamily = _revitRepository.GenericAnnotationFamilies?.FirstOrDefault(v => v.Name.Equals(data.AnnotationFamilyName));
 
         var annotationTypes = annotationFamily
@@ -246,7 +248,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                     ?.FirstOrDefault(v => v.Name.Equals(data.AnnotationTypeName));
 
         var sheetComponentVM = new TypicalAnnotationVM(
-            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -262,9 +264,9 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         return sheetComponentVM;
     }
 
-    private LegendViewVM CreateLegendViewVM(SheetVM sheetVM, LegendViewData data) {
+    private LegendViewVM CreateLegendViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, LegendViewData data) {
         var sheetComponentVM = new LegendViewVM(
-            sheetVM, _revitRepository, _localizationService, _stringParamSetService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -282,9 +284,9 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
     /// <summary>
     /// Добавляет список дополнительных параметров
     /// </summary>
-    private void SetCustomParametersList(SheetComponentVM sheetComponentVM, SheetComponentData data) {
+    private void SetCustomParametersList(BaseParamContainerVM baseParamContainer, ParamContainerModuleData data) {
         // Добавляем список дополнительных параметров
-        var customParamsList = new CustomParametersListVM(sheetComponentVM, _stringParamSetService);
+        var customParamsList = new CustomParametersListVM(baseParamContainer, _stringParamSetService);
         foreach(var paramData in data.CustomParamsList?.Params ?? []) {
             var paramVM = new CustomParameterVM(customParamsList, _stringParamSetService) {
                 ParamName = paramData.ParamName ?? string.Empty,
@@ -292,7 +294,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             };
             customParamsList.Params.Add(paramVM);
         }
-        sheetComponentVM.CustomParamsList = customParamsList;
+        baseParamContainer.CustomParamsList = customParamsList;
     }
 
     /// <summary>

@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
@@ -31,11 +33,12 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     private SelectElemParamVM _selectedSelectElemParam;
 
     public StructuralCalloutViewVM(
-        SheetVM sheetVM,
         RevitRepository repository,
-        ILocalizationService localizationService,
-        StringParamSetService stringParamSetService)
-        : base(sheetVM, repository, localizationService, stringParamSetService) {
+        StringParamSetService stringParamSetService,
+        ObservableCollection<PluginParamVM> sheetSetParams,
+        SheetVM sheetVM,
+        ILocalizationService localizationService)
+        : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 

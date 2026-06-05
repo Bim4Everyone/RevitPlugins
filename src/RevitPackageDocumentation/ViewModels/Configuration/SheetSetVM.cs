@@ -97,13 +97,14 @@ internal class SheetSetVM : BaseViewModel {
     internal void AddSheet() {
         SheetList.Add(
             new SheetVM(
-                this,
                 _revitRepository,
+                _stringParamSetService,
+                Params,
+                this,
                 _localizationService,
                 _messageBoxService,
                 _sheetSetVMFactory,
-                _sheetSetDataFactory,
-                _stringParamSetService) { ModuleName = "Новый лист" });
+                _sheetSetDataFactory) { ModuleName = "Новый лист" });
     }
 
     internal void RemoveSheet(SheetVM sheet) {

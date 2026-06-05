@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -8,6 +9,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class TypicalAnnotationVM : SheetComponentVM {
@@ -16,11 +18,12 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     private AnnotationSymbolType _annotationType;
 
     public TypicalAnnotationVM(
-        SheetVM sheetVM,
         RevitRepository repository,
-        ILocalizationService localizationService,
-        StringParamSetService stringParamSetService)
-        : base(sheetVM, repository, localizationService, stringParamSetService) {
+        StringParamSetService stringParamSetService,
+        ObservableCollection<PluginParamVM> sheetSetParams,
+        SheetVM sheetVM,
+        ILocalizationService localizationService)
+        : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
         SelectAnnotationFamilyCommand = RelayCommand.Create(SelectAnnotationFamily);
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }

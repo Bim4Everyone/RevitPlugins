@@ -8,7 +8,6 @@ using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
-using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
@@ -16,8 +15,7 @@ using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
-internal class SheetVM : BaseViewModel {
-    private readonly RevitRepository _revitRepository;
+internal class SheetVM : BaseParamContainerVM {
     private readonly ILocalizationService _localizationService;
     private readonly IMessageBoxService _messageBoxService;
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
@@ -45,16 +43,16 @@ internal class SheetVM : BaseViewModel {
     private ViewSheet _sheetInstance;
 
     public SheetVM(
+        RevitRepository repository,
+        StringParamSetService stringParamSetService,
+        ObservableCollection<PluginParamVM> sheetSetParams,
         SheetSetVM sheetSetVM,
-        RevitRepository revitRepository,
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService,
         ISheetSetVMFactory sheetSetVMFactory,
-        ISheetSetDataFactory sheetSetDataFactory,
-        StringParamSetService stringParamSetService) {
+        ISheetSetDataFactory sheetSetDataFactory) : base(repository, stringParamSetService, sheetSetParams) {
 
         SheetSet = sheetSetVM;
-        _revitRepository = revitRepository;
         _localizationService = localizationService;
         _messageBoxService = messageBoxService;
         _sheetSetVMFactory = sheetSetVMFactory;
@@ -66,8 +64,6 @@ internal class SheetVM : BaseViewModel {
 
         AddComponentCommand = RelayCommand.Create<ComponentTypeItem>(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
-
-        PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
     }
 
     public ICommand SelectTitleBlockFamilyCommand { get; }
@@ -76,7 +72,6 @@ internal class SheetVM : BaseViewModel {
     public ICommand AddComponentCommand { get; }
     public ICommand RemoveComponentCommand { get; }
 
-    public ICommand PropUpdateByFormulaCommand { get; }
 
     public bool IsModuleCheck {
         get => _isModuleCheck;
@@ -168,7 +163,7 @@ internal class SheetVM : BaseViewModel {
     public void SetTitleBlockTypes(Family titleBlockFamily) {
         TitleBlockTypes = titleBlockFamily
             ?.GetFamilySymbolIds()
-            ?.Select(id => _revitRepository.Document.GetElement(id) as FamilySymbol)
+            ?.Select(id => Repository.Document.GetElement(id) as FamilySymbol)
             ?.ToList();
     }
 
@@ -187,36 +182,32 @@ internal class SheetVM : BaseViewModel {
             if(componentData == null)
                 return;
 
-            var component = _sheetSetVMFactory.CreateComponentVM(this, componentData);
+            var component = _sheetSetVMFactory.CreateComponentVM(SheetSet, this, componentData);
             SheetComponents.Add(component);
         } catch(System.Exception) {
             _messageBoxService.Show("An error occurred while adding the component!", "Error");
         }
     }
 
-    private void PropUpdateByFormula(string formulaPropertyName) {
-        _stringParamSetService.Set(this, formulaPropertyName, SheetSet.Params);
-    }
+    ///// <summary>
+    ///// В случае изменения имени параметра нужно обойти все листы и их компоненты, и обновить привязки
+    ///// </summary>
+    //public void UpdateDueParamNameChange() {
+    //    _stringParamSetService.SetAll(this, SheetSet.Params);
+    //    foreach(var sheetComponent in SheetComponents) {
+    //        sheetComponent.UpdateDueParamNameChange();
+    //    }
+    //}
 
-    /// <summary>
-    /// В случае изменения имени параметра нужно обойти все листы и их компоненты, и обновить привязки
-    /// </summary>
-    public void UpdateDueParamNameChange() {
-        _stringParamSetService.SetAll(this, SheetSet.Params);
-        foreach(var sheetComponent in SheetComponents) {
-            sheetComponent.UpdateDueParamNameChange();
-        }
-    }
-
-    public void UpdateDueParamValueChange(StringParamVM stringParam) {
-        if(stringParam.StringValue is null) {
-            return;
-        }
-        _stringParamSetService.SetAll(this, SheetSet.Params, stringParam);
-        foreach(var sheetComponent in SheetComponents) {
-            sheetComponent.UpdateDueParamValueChange(stringParam);
-        }
-    }
+    //public void UpdateDueParamValueChange(StringParamVM stringParam) {
+    //    if(stringParam.StringValue is null) {
+    //        return;
+    //    }
+    //    _stringParamSetService.SetAll(this, SheetSet.Params, stringParam);
+    //    foreach(var sheetComponent in SheetComponents) {
+    //        sheetComponent.UpdateDueParamValueChange(stringParam);
+    //    }
+    //}
 
 
     public void CreateComponent() { }
@@ -260,14 +251,14 @@ internal class SheetVM : BaseViewModel {
 
     public void Process() {
         SheetInstance = null;
-        SheetInstance = _revitRepository.GetSheetByName(SheetName);
+        SheetInstance = Repository.GetSheetByName(SheetName);
 
         if(SheetInstance is null) {
             try {
-                SheetInstance = ViewSheet.Create(_revitRepository.Document, TitleBlockType.Id);
+                SheetInstance = ViewSheet.Create(Repository.Document, TitleBlockType.Id);
                 SheetInstance.Name = SheetName;
 
-                var titleBlock = _revitRepository.GetTitleBlocks(SheetInstance);
+                var titleBlock = Repository.GetTitleBlocks(SheetInstance);
 
                 double.TryParse(SheetSize, out double sheetSize);
                 titleBlock.LookupParameter(_sheetSizeParamName).Set(sheetSize);
@@ -275,7 +266,9 @@ internal class SheetVM : BaseViewModel {
                 double.TryParse(SheetCoefficient, out double sheetCoefficient);
                 titleBlock.LookupParameter(_sheetCoefficientParamName).Set(sheetCoefficient);
 
-                _revitRepository.Document.Regenerate();
+                SetCustomParams(SheetInstance);
+
+                Repository.Document.Regenerate();
             } catch(Exception) { }
         }
 

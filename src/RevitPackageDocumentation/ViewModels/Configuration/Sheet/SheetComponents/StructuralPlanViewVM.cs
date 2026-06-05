@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 
 using Autodesk.Revit.DB;
 
@@ -27,11 +28,12 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     private readonly double _titleBlockFrameTopOffset = UnitUtilsHelper.ConvertToInternalValue(15);
 
     public StructuralPlanViewVM(
-        SheetVM sheetVM,
         RevitRepository repository,
-        ILocalizationService localizationService,
-        StringParamSetService stringParamSetService)
-        : base(sheetVM, repository, localizationService, stringParamSetService) {
+        StringParamSetService stringParamSetService,
+        ObservableCollection<PluginParamVM> sheetSetParams,
+        SheetVM sheetVM,
+        ILocalizationService localizationService)
+        : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 

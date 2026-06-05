@@ -222,6 +222,7 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
                     <ui:TextBlock
@@ -312,10 +313,42 @@
                         SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         IsSynchronizedWithCurrentItem="False" />
 
-                    <ui:TextBlock
+                    <Border
                         Grid.Column="0"
                         Grid.ColumnSpan="4"
                         Grid.Row="3"
+                        Margin="5"
+                        Style="{StaticResource CustomBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <ui:TextBlock
+                                Grid.Row="0"
+                                Margin="5 0"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"
+                                Text="Дополнительные параметры" />
+
+                            <ui:Button
+                                Grid.Row="0"
+                                HorizontalAlignment="Right"
+                                Content="+"
+                                Command="{Binding Path=CurrentSheetSet.SelectedSheet.CustomParamsList.AddCustomParameterCommand}" />
+
+                            <ItemsControl
+                                Grid.Row="1"
+                                HorizontalContentAlignment="Stretch"
+                                ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        </Grid>
+                    </Border>
+
+                    <ui:TextBlock
+                        Grid.Column="0"
+                        Grid.ColumnSpan="4"
+                        Grid.Row="4"
                         Margin="5"
                         VerticalAlignment="Center"
                         Text="Примечания" />
@@ -323,14 +356,14 @@
                     <ui:TextBox
                         Grid.Column="0"
                         Grid.ColumnSpan="4"
-                        Grid.Row="4"
+                        Grid.Row="5"
                         Margin="5"
                         Text="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleComment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
                     <ui:TextBox
                         Grid.Column="0"
                         Grid.ColumnSpan="4"
-                        Grid.Row="5"
+                        Grid.Row="6"
                         Foreground="Orange"
                         Margin="5"
                         VerticalAlignment="Center"

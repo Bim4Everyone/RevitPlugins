@@ -1,9 +1,12 @@
+using System.Collections.ObjectModel;
+
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class LegendViewVM : SheetComponentVM {
@@ -11,11 +14,12 @@ internal class LegendViewVM : SheetComponentVM {
     private ElementType _viewportType;
 
     public LegendViewVM(
-        SheetVM sheetVM,
         RevitRepository repository,
-        ILocalizationService localizationService,
-        StringParamSetService stringParamSetService)
-        : base(sheetVM, repository, localizationService, stringParamSetService) {
+        StringParamSetService stringParamSetService,
+        ObservableCollection<PluginParamVM> sheetSetParams,
+        SheetVM sheetVM,
+        ILocalizationService localizationService)
+        : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 

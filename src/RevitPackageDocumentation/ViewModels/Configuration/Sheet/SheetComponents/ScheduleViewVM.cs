@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -6,6 +7,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.ViewModels.Parameters;
 using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
@@ -24,11 +26,12 @@ internal class ScheduleViewVM : SheetComponentVM {
     private readonly double _specViewportTopOffset = UnitUtilsHelper.ConvertToInternalValue(12);
 
     public ScheduleViewVM(
-        SheetVM sheetVM,
         RevitRepository repository,
-        ILocalizationService localizationService,
-        StringParamSetService stringParamSetService)
-        : base(sheetVM, repository, localizationService, stringParamSetService) {
+        StringParamSetService stringParamSetService,
+        ObservableCollection<PluginParamVM> sheetSetParams,
+        SheetVM sheetVM,
+        ILocalizationService localizationService)
+        : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
         ScheduleFilterList = new ScheduleFilterListVM(this, stringParamSetService);
 
         CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
