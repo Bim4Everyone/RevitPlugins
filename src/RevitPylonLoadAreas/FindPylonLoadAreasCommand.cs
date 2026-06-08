@@ -17,7 +17,6 @@ using Ninject;
 
 using RevitPylonLoadAreas.Exceptions;
 using RevitPylonLoadAreas.Models;
-using RevitPylonLoadAreas.Models.Geometry;
 using RevitPylonLoadAreas.Services;
 
 namespace RevitPylonLoadAreas;
@@ -71,7 +70,7 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
         using(var t = repo.Document.StartTransaction(transactionName)) {
             drawer.Draw(repo.ActiveView, loadAreas, filledRegionType);
             foreach(var area in loadAreas) {
-                double sqM = area.GetArea() / GeometryTolerance.SqFeetPerSqMeter;
+                double sqM = UnitUtils.ConvertFromInternalUnits(area.GetArea(), UnitTypeId.SquareMeters);
                 area.Element.SetParamValue(
                     BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
                     sqM.ToString("0.00", CultureInfo.InvariantCulture));
