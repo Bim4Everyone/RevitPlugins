@@ -125,11 +125,13 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Grid.Row="2"
-                Margin="5 10 5 5"
+                Margin="5 5 5 5"
                 Foreground="Orange"
                 Text="{Binding ModuleErrors}"
                 PlaceholderText="{me:LocalizationSource MainWindow.ErrorsNotFound}"
-                IsEnabled="False" />
+                IsEnabled="False"
+                Tag="{Binding Path=ModuleErrors}"
+                Style="{StaticResource TextBoxForError}"/>
         </Grid>
     </Border>
 </UserControl>

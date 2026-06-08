@@ -369,7 +369,9 @@
                         VerticalAlignment="Center"
                         Text="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleErrors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         PlaceholderText="{me:LocalizationSource MainWindow.ErrorsNotFound}"
-                        IsEnabled="False" />
+                        IsEnabled="False"
+                        Tag="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleErrors}"
+                        Style="{StaticResource TextBoxForError}" />
                 </Grid>
             </Border>
 
