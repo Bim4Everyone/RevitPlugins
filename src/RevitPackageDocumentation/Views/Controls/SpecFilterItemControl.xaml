@@ -27,7 +27,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
@@ -46,7 +46,7 @@
             Margin="5"
             VerticalAlignment="Top"
             DisplayMemberPath="FieldName"
-            ItemsSource="{Binding SpecFields, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            ItemsSource="{Binding ScheduleFilterList.SelectedScheduleFields, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
             SelectedItem="{Binding SelectedSpecField, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <i:Interaction.Triggers>
                 <i:EventTrigger

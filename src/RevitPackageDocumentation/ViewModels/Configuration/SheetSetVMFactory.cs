@@ -310,11 +310,11 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 SelectedSpecFieldName = ruleData.FieldName,
                 SelectedFilterType = _revitRepository.FilterTypes.FirstOrDefault(t => t.FilterType == ruleData.FilterType),
                 FilterValueFormula = ruleData.FilterValueFormula ?? string.Empty,
+                FilterValue = ruleData.FilterValueFormula ?? string.Empty,
             };
-
-            ruleVM.SetSchedule(referenceSpec);
             scheduleFilterList.ScheduleFilterRules.Add(ruleVM);
         }
+        scheduleFilterList.SetScheduleToRemember(referenceSpec);
         scheduleViewVM.ScheduleFilterList = scheduleFilterList;
     }
 

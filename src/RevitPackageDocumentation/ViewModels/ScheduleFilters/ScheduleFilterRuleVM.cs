@@ -1,8 +1,4 @@
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Input;
-
-using Autodesk.Revit.DB;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -13,7 +9,6 @@ using RevitPackageDocumentation.ViewModels.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.ScheduleFilters;
 internal class ScheduleFilterRuleVM : BaseViewModel {
-    private ObservableCollection<ScheduleFieldInfo> _specFields = [];
     private ScheduleFieldInfo _selectedSpecField;
     private string _selectedSpecFieldName;
     private ScheduleTypeInfo _selectedFilterType;
@@ -34,11 +29,6 @@ internal class ScheduleFilterRuleVM : BaseViewModel {
 
     public ScheduleFilterListVM ScheduleFilterList { get; }
     public StringParamSetService StrParamSetService { get; }
-
-    public ObservableCollection<ScheduleFieldInfo> SpecFields {
-        get => _specFields;
-        set => RaiseAndSetIfChanged(ref _specFields, value);
-    }
 
     public ScheduleFieldInfo SelectedSpecField {
         get => _selectedSpecField;
@@ -69,19 +59,6 @@ internal class ScheduleFilterRuleVM : BaseViewModel {
         if(SelectedSpecField != null) {
             SelectedSpecFieldName = SelectedSpecField.FieldName ?? string.Empty;
         }
-    }
-
-    public void SetSchedule(ViewSchedule viewSchedule) {
-        if(viewSchedule is null) {
-            return;
-        }
-        var scheduleDefinition = viewSchedule.Definition;
-
-        SpecFields.Clear();
-        foreach(var fieldId in scheduleDefinition.GetFieldOrder()) {
-            SpecFields.Add(new ScheduleFieldInfo(scheduleDefinition.GetField(fieldId)));
-        }
-        SelectedSpecField = SpecFields.FirstOrDefault(f => f.FieldName == SelectedSpecFieldName);
     }
 
     private void PropUpdateByFormula(string formulaPropertyName) {
