@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,13 +9,9 @@ using Autodesk.Revit.UI.Selection;
 
 namespace RevitPylonLoadAreas.Models;
 
-/// <summary>
-/// Класс доступа к документу и приложению Revit:
-/// выбор пилонов/стен/плит пользователем, доступ к активному виду, транзакции.
-/// </summary>
 internal class RevitRepository {
     public RevitRepository(UIApplication uiApplication) {
-        UIApplication = uiApplication;
+        UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
     }
 
     public UIApplication UIApplication { get; }
@@ -23,10 +20,10 @@ internal class RevitRepository {
     public Document Document => ActiveUIDocument.Document;
     public View ActiveView => ActiveUIDocument.ActiveView;
 
-    public IReadOnlyList<Floor> PickFloors(string statusPrompt) {
-        var refs = ActiveUIDocument.Selection.PickObjects(
+    public Floor PickFloor(string statusPrompt) {
+        var reference = ActiveUIDocument.Selection.PickObject(
             ObjectType.Element, new FloorFilter(), statusPrompt);
-        return refs.Select(r => (Floor) Document.GetElement(r)).ToList();
+        return (Floor) Document.GetElement(reference);
     }
 
     public IReadOnlyList<FamilyInstance> PickStructuralColumns(string statusPrompt) {
@@ -41,6 +38,27 @@ internal class RevitRepository {
         return refs.Select(r => (Wall) Document.GetElement(r)).ToList();
     }
 
+    public FilledRegionType GetFirstFilledRegionType() {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(FilledRegionType))
+            .OfType<FilledRegionType>()
+            .FirstOrDefault();
+    }
+
+    public bool IsViewSupportsLoadAreas(View view) {
+        if(view == null) {
+            return false;
+        }
+        return view.ViewType == ViewType.FloorPlan
+            || view.ViewType == ViewType.CeilingPlan
+            || view.ViewType == ViewType.EngineeringPlan
+            || view.ViewType == ViewType.AreaPlan
+            || view.ViewType == ViewType.Section
+            || view.ViewType == ViewType.Elevation
+            || view.ViewType == ViewType.Detail
+            || view.ViewType == ViewType.DraftingView;
+    }
+
     private sealed class FloorFilter : ISelectionFilter {
         public bool AllowElement(Element elem) => elem is Floor;
         public bool AllowReference(Reference reference, XYZ position) => true;
@@ -48,12 +66,12 @@ internal class RevitRepository {
 
     private sealed class StructuralColumnFilter : ISelectionFilter {
         private static readonly ElementId _structuralColumnsId =
-            new ElementId(BuiltInCategory.OST_StructuralColumns);
+            new(BuiltInCategory.OST_StructuralColumns);
 
         public bool AllowElement(Element elem) {
             return elem is FamilyInstance fi
-                   && fi.Category != null
-                   && fi.Category.Id == _structuralColumnsId;
+                && fi.Category != null
+                && fi.Category.Id == _structuralColumnsId;
         }
         public bool AllowReference(Reference reference, XYZ position) => true;
     }
