@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 
 using Ninject;
@@ -42,41 +43,43 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
             CultureInfo.GetCultureInfo("ru-RU"));
 
         var repo = kernel.Get<RevitRepository>();
+        var localization = kernel.Get<ILocalizationService>();
+
         if(!repo.IsViewSupportsLoadAreas(repo.ActiveView)) {
-            TaskDialog.Show(PluginName, "Активный вид не поддерживает создание грузовых площадей. Откройте план, разрез или фасад.");
+            TaskDialog.Show(PluginName, localization.GetLocalizedString("Error.ViewNotSupported"));
             throw new OperationCanceledException();
         }
 
-        var floor = repo.PickFloor("Выберите плиту перекрытия");
-        var pylons = repo.PickStructuralColumns("Выберите пилоны (несущие колонны)");
-        var walls = TryPickWalls(repo);
+        var floor = repo.PickFloor(localization.GetLocalizedString("Pick.Floor"));
+        var pylons = repo.PickStructuralColumns(localization.GetLocalizedString("Pick.Pylons"));
+        IReadOnlyList<Wall> walls;
+        try {
+            walls = repo.PickWalls(localization.GetLocalizedString("Pick.Walls"));
+        } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
+            walls = Array.Empty<Wall>();
+        }
 
         var filledRegionType = repo.GetFirstFilledRegionType()
-            ?? throw new FilledRegionTypeNotFoundException();
+                               ?? throw new FilledRegionTypeNotFoundException(
+                                   localization.GetLocalizedString("Error.FilledRegionTypeNotFound"));
 
         var finder = kernel.Get<LoadAreasFinder>();
         var loadAreas = finder.Process(floor, pylons, walls);
 
         var drawer = kernel.Get<FilledRegionDrawer>();
-        using(var t = repo.Document.StartTransaction("BIM: Грузовые площади")) {
+        string transactionName = localization.GetLocalizedString("Transaction.DrawLoadAreas");
+        using(var t = repo.Document.StartTransaction(transactionName)) {
             drawer.Draw(repo.ActiveView, loadAreas, filledRegionType);
             foreach(var area in loadAreas) {
-                double sqM = GeometryTolerance.SqFeetToSqMeters(area.GetArea());
+                double sqM = area.GetArea() / GeometryTolerance.SqFeetPerSqMeter;
                 area.Element.SetParamValue(
                     BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
                     sqM.ToString("0.00", CultureInfo.InvariantCulture));
             }
+
             t.Commit();
         }
 
         Notification(true);
-    }
-
-    private static IReadOnlyList<Wall> TryPickWalls(RevitRepository repo) {
-        try {
-            return repo.PickWalls("Выберите стены под плитой (ESC чтобы пропустить)");
-        } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
-            return Array.Empty<Wall>();
-        }
     }
 }

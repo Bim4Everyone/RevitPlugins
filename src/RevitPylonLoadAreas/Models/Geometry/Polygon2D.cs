@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -13,7 +12,23 @@ internal sealed class Polygon2D {
 
     public IList<XY> Vertices { get; }
 
-    public double SignedArea => SignedRingArea(Vertices);
+    public double SignedArea {
+        get {
+            if(Vertices.Count < 3) {
+                return 0;
+            }
+
+            double sum = 0;
+            int n = Vertices.Count;
+            for(int i = 0; i < n; i++) {
+                var a = Vertices[i];
+                var b = Vertices[(i + 1) % n];
+                sum += (a.X * b.Y) - (b.X * a.Y);
+            }
+
+            return sum * 0.5;
+        }
+    }
 
     public double Area => Math.Abs(SignedArea);
 
@@ -25,48 +40,20 @@ internal sealed class Polygon2D {
             var b = Vertices[(i + 1) % n].ToXYZ(z);
             loop.Append(Line.CreateBound(a, b));
         }
+
         return loop;
     }
 
-    public bool Contains(XY point) => RingContains(Vertices, point);
-
-    public static double SignedRingArea(IList<XY> ring) {
-        if(ring == null || ring.Count < 3) {
-            return 0;
-        }
-        double sum = 0;
-        int n = ring.Count;
-        for(int i = 0; i < n; i++) {
-            var a = ring[i];
-            var b = ring[(i + 1) % n];
-            sum += (a.X * b.Y) - (b.X * a.Y);
-        }
-        return sum * 0.5;
-    }
-
-    public static IList<XY> EnsureCcw(IList<XY> ring) {
-        if(SignedRingArea(ring) < 0) {
-            return ring.Reverse().ToList();
-        }
-        return ring;
-    }
-
-    public static IList<XY> EnsureCw(IList<XY> ring) {
-        if(SignedRingArea(ring) > 0) {
-            return ring.Reverse().ToList();
-        }
-        return ring;
-    }
-
-    public static bool RingContains(IList<XY> ring, XY point) {
-        if(ring == null || ring.Count < 3) {
+    public bool Contains(XY point) {
+        if(Vertices.Count < 3) {
             return false;
         }
+
         bool inside = false;
-        int n = ring.Count;
+        int n = Vertices.Count;
         for(int i = 0, j = n - 1; i < n; j = i++) {
-            var pi = ring[i];
-            var pj = ring[j];
+            var pi = Vertices[i];
+            var pj = Vertices[j];
             bool crossesY = (pi.Y > point.Y) != (pj.Y > point.Y);
             if(crossesY) {
                 double xCross = (pj.X - pi.X) * (point.Y - pi.Y) / (pj.Y - pi.Y) + pi.X;
@@ -75,6 +62,21 @@ internal sealed class Polygon2D {
                 }
             }
         }
+
         return inside;
+    }
+
+    public Polygon2D EnsureCcw() {
+        return SignedArea < 0 ? Reversed() : this;
+    }
+
+    public Polygon2D EnsureCw() {
+        return SignedArea > 0 ? Reversed() : this;
+    }
+
+    private Polygon2D Reversed() {
+        var reversed = new List<XY>(Vertices);
+        reversed.Reverse();
+        return new Polygon2D(reversed);
     }
 }

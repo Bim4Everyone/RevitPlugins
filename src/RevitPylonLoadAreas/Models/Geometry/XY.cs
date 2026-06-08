@@ -10,7 +10,9 @@ internal readonly struct XY : IEquatable<XY> {
         Y = y;
     }
 
-    public XY(XYZ xyz) : this(xyz.X, xyz.Y) { }
+    public XY(XYZ xyz)
+        : this(xyz.X, xyz.Y) {
+    }
 
     public double X { get; }
     public double Y { get; }
@@ -35,8 +37,7 @@ internal readonly struct XY : IEquatable<XY> {
 
     public bool IsAlmostEqual(XY other) => IsAlmostEqual(other, GeometryTolerance.Model);
 
-    public bool IsAlmostEqual(XY other, double tol) =>
-        Math.Abs(X - other.X) <= tol && Math.Abs(Y - other.Y) <= tol;
+    public bool IsAlmostEqual(XY other, double tol) => Math.Abs(X - other.X) <= tol && Math.Abs(Y - other.Y) <= tol;
 
     public XYZ ToXYZ(double z) => new(X, Y, z);
 

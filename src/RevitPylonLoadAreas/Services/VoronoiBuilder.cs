@@ -53,21 +53,26 @@ internal sealed class VoronoiBuilder {
             } else {
                 cellRing = new List<XY>();
             }
+
             cells.Add(new VoronoiCell(new Polygon2D(cellRing), siteList[s]));
         }
+
         return new VoronoiResult(cells);
     }
 
-    private static void AddTriangleToSite(Dictionary<int, List<int>> map, int siteIndex, int triangleIndex) {
+    private void AddTriangleToSite(Dictionary<int, List<int>> map, int siteIndex, int triangleIndex) {
         if(!map.TryGetValue(siteIndex, out var list)) {
             list = new List<int>();
             map[siteIndex] = list;
         }
+
         list.Add(triangleIndex);
     }
 
-    private static List<XY> OrderCircumcentersAroundSite(
-        BowyerWatsonDelaunay delaunay, List<int> triangleIndices, XY site) {
+    private List<XY> OrderCircumcentersAroundSite(
+        BowyerWatsonDelaunay delaunay,
+        List<int> triangleIndices,
+        XY site) {
         var entries = new List<(double Angle, XY Center)>(triangleIndices.Count);
         foreach(int ti in triangleIndices) {
             var tri = delaunay.Triangles[ti];
@@ -75,21 +80,27 @@ internal sealed class VoronoiBuilder {
             double angle = Math.Atan2(center.Y - site.Y, center.X - site.X);
             entries.Add((angle, center));
         }
+
         entries.Sort((a, b) => a.Angle.CompareTo(b.Angle));
         var ordered = new List<XY>(entries.Count);
         foreach(var e in entries) {
-            if(ordered.Count > 0 && ordered[ordered.Count - 1].IsAlmostEqual(e.Center)) {
+            if(ordered.Count > 0
+               && ordered[ordered.Count - 1].IsAlmostEqual(e.Center)) {
                 continue;
             }
+
             ordered.Add(e.Center);
         }
-        if(ordered.Count > 1 && ordered[0].IsAlmostEqual(ordered[ordered.Count - 1])) {
+
+        if(ordered.Count > 1
+           && ordered[0].IsAlmostEqual(ordered[ordered.Count - 1])) {
             ordered.RemoveAt(ordered.Count - 1);
         }
+
         return ordered;
     }
 
-    private static List<XY> ConvexClipPolygonByRect(List<XY> polygon, IList<XY> rect) {
+    private List<XY> ConvexClipPolygonByRect(List<XY> polygon, IList<XY> rect) {
         var input = polygon;
         for(int i = 0; i < rect.Count; i++) {
             var a = rect[i];
@@ -99,14 +110,16 @@ internal sealed class VoronoiBuilder {
                 return new List<XY>();
             }
         }
+
         return input;
     }
 
-    private static List<XY> ClipByHalfPlane(List<XY> ring, XY a, XY b) {
+    private List<XY> ClipByHalfPlane(List<XY> ring, XY a, XY b) {
         var output = new List<XY>();
         if(ring.Count == 0) {
             return output;
         }
+
         for(int i = 0; i < ring.Count; i++) {
             var current = ring[i];
             var previous = ring[(i - 1 + ring.Count) % ring.Count];
@@ -116,17 +129,19 @@ internal sealed class VoronoiBuilder {
             bool prevIn = sidePrevious >= -GeometryTolerance.Model;
             if(curIn) {
                 if(!prevIn) {
-                    output.Add(Intersect(previous, current, a, b));
+                    output.Add(IntersectEdges(previous, current, a, b));
                 }
+
                 output.Add(current);
             } else if(prevIn) {
-                output.Add(Intersect(previous, current, a, b));
+                output.Add(IntersectEdges(previous, current, a, b));
             }
         }
+
         return output;
     }
 
-    private static XY Intersect(XY p1, XY p2, XY a, XY b) {
+    private XY IntersectEdges(XY p1, XY p2, XY a, XY b) {
         double rx = p2.X - p1.X;
         double ry = p2.Y - p1.Y;
         double sx = b.X - a.X;
@@ -135,11 +150,12 @@ internal sealed class VoronoiBuilder {
         if(Math.Abs(denom) < GeometryTolerance.Model) {
             return p2;
         }
+
         double t = ((a.X - p1.X) * sy - (a.Y - p1.Y) * sx) / denom;
         return new XY(p1.X + t * rx, p1.Y + t * ry);
     }
 
-    private static List<XY> WorldRect(BoundingBoxXY b) {
+    private List<XY> WorldRect(BoundingBoxXY b) {
         return new List<XY> {
             new(b.Min.X, b.Min.Y),
             new(b.Max.X, b.Min.Y),

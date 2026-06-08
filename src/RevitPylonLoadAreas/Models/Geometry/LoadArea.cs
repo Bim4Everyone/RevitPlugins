@@ -19,10 +19,12 @@ internal sealed class LoadArea {
         if(Circuits.Count == 0) {
             return 0;
         }
+
         double outer = Circuits[0].Area;
         for(int i = 1; i < Circuits.Count; i++) {
             outer -= Circuits[i].Area;
         }
+
         return Math.Max(0, outer);
     }
 }

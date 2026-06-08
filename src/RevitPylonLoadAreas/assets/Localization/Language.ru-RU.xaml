@@ -1,7 +1,34 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="Plugin.Title">Грузовые площади</system:String>
+    <system:String
+        x:Key="Plugin.Title">Грузовые площади</system:String>
+
+    <system:String
+        x:Key="Pick.Floor">Выберите плиту перекрытия</system:String>
+    <system:String
+        x:Key="Pick.Pylons">Выберите пилоны (несущие колонны)</system:String>
+    <system:String
+        x:Key="Pick.Walls">Выберите стены под плитой (ESC чтобы пропустить)</system:String>
+
+    <system:String
+        x:Key="Transaction.DrawLoadAreas">BIM: Грузовые площади</system:String>
+
+    <system:String
+        x:Key="Error.ViewNotSupported">Активный вид не поддерживает создание грузовых площадей. Откройте план, разрез или фасад.</system:String>
+    <system:String
+        x:Key="Error.PylonsTooClose">Пилоны [{0}] и [{1}] расположены слишком близко (расстояние {2:0.###} фт).</system:String>
+    <system:String
+        x:Key="Error.PylonAndWallTooClose">Пилон [{0}] расположен слишком близко к точке стены (расстояние {1:0.###} фт).</system:String>
+    <system:String
+        x:Key="Error.FloorTopFaceNotFound">У плиты [{0}] не найдена верхняя плоская грань.</system:String>
+    <system:String
+        x:Key="Error.FilledRegionTypeNotFound">В проекте не найден ни один тип FilledRegionType. Добавьте хотя бы один тип закраски.</system:String>
+    <system:String
+        x:Key="Error.FloorHasNoLoops">У верхней грани плиты нет ни одного контура.</system:String>
+    <system:String
+        x:Key="Error.PylonHasNoLocation">У пилона [{0}] нет позиции (Location/BoundingBox).</system:String>
 
 </ResourceDictionary>
