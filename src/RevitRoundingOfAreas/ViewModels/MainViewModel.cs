@@ -133,15 +133,17 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод получения коллекции ParamViewModel для TargetParams
     private IEnumerable<ParamViewModel> GetTargetParamViewModels() {
+        var spatialElements = _revitRepository.GetAllSpatialElements().ToList();
+
         return _paramService.AllRevitParams
             .Where(revitParam => {
-                var spatialElements = _revitRepository.GetAllSpatialElements();
-                var randomSpatialElement = spatialElements.FirstOrDefault();
-                if(randomSpatialElement is null) {
-                    return false;
-                }
-                var param = revitParam.GetParam(randomSpatialElement);
-                return !param.IsReadOnly;
+                if (!spatialElements.Any())
+                    return true;
+
+                return spatialElements.All(spatialElement => {
+                    var param = revitParam.GetParam(spatialElement);
+                    return param != null && !param.IsReadOnly;
+                });
             })
             .Select(param => new ParamViewModel {
                 Name = param.Name,
