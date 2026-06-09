@@ -19,16 +19,6 @@
     <system:String
         x:Key="Error.ViewNotSupported">Активный вид не поддерживает создание грузовых площадей. Откройте план, разрез или фасад.</system:String>
     <system:String
-        x:Key="Error.PylonsTooClose">Пилоны [{0}] и [{1}] расположены слишком близко (расстояние {2:0.###} фт).</system:String>
-    <system:String
-        x:Key="Error.PylonAndWallTooClose">Пилон [{0}] расположен слишком близко к точке стены (расстояние {1:0.###} фт).</system:String>
-    <system:String
-        x:Key="Error.FloorTopFaceNotFound">У плиты [{0}] не найдена верхняя плоская грань.</system:String>
-    <system:String
-        x:Key="Error.FilledRegionTypeNotFound">В проекте не найден ни один тип FilledRegionType. Добавьте хотя бы один тип закраски.</system:String>
-    <system:String
-        x:Key="Error.FloorHasNoLoops">У верхней грани плиты нет ни одного контура.</system:String>
-    <system:String
-        x:Key="Error.PylonHasNoLocation">У пилона [{0}] нет позиции (Location/BoundingBox).</system:String>
+        x:Key="Error.FilledRegionTypeNotFound">В проекте не найден ни один тип цветовой области.</system:String>
 
 </ResourceDictionary>

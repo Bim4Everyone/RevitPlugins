@@ -4,31 +4,21 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="Plugin.Title">Pylon load areas</system:String>
+        x:Key="Plugin.Title">Load Areas</system:String>
 
     <system:String
-        x:Key="Pick.Floor">Pick the slab</system:String>
+        x:Key="Pick.Floor">Select a floor slab</system:String>
     <system:String
-        x:Key="Pick.Pylons">Pick pylons (structural columns)</system:String>
+        x:Key="Pick.Pylons">Select pylons (structural columns)</system:String>
     <system:String
-        x:Key="Pick.Walls">Pick walls under the slab (press ESC to skip)</system:String>
+        x:Key="Pick.Walls">Select walls below the slab (press ESC to skip)</system:String>
 
     <system:String
-        x:Key="Transaction.DrawLoadAreas">BIM: Pylon load areas</system:String>
+        x:Key="Transaction.DrawLoadAreas">BIM: Load Areas</system:String>
 
     <system:String
-        x:Key="Error.ViewNotSupported">The active view does not support load areas. Open a plan, section or elevation view.</system:String>
+        x:Key="Error.ViewNotSupported">The active view does not support creation of load areas. Open a plan, section, or elevation view.</system:String>
     <system:String
-        x:Key="Error.PylonsTooClose">Pylons [{0}] and [{1}] are placed too close (distance {2:0.###} ft).</system:String>
-    <system:String
-        x:Key="Error.PylonAndWallTooClose">Pylon [{0}] is placed too close to a wall sample point (distance {1:0.###} ft).</system:String>
-    <system:String
-        x:Key="Error.FloorTopFaceNotFound">No top planar face found for the slab [{0}].</system:String>
-    <system:String
-        x:Key="Error.FilledRegionTypeNotFound">No FilledRegionType available in the project. Add at least one filled region type.</system:String>
-    <system:String
-        x:Key="Error.FloorHasNoLoops">The top face of the slab has no curve loops.</system:String>
-    <system:String
-        x:Key="Error.PylonHasNoLocation">Pylon [{0}] has no usable Location/BoundingBox.</system:String>
+        x:Key="Error.FilledRegionTypeNotFound">No filled region type was found in the project.</system:String>
 
 </ResourceDictionary>

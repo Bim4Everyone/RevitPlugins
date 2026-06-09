@@ -1,6 +1,6 @@
 using System;
 
-namespace RevitPylonLoadAreas.Services;
+namespace RevitPylonLoadAreas.Models.Geometry.Delaunay;
 
 internal readonly struct DelaunayEdgeKey : IEquatable<DelaunayEdgeKey> {
     public DelaunayEdgeKey(int a, int b) {

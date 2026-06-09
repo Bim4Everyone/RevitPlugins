@@ -3,28 +3,25 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 namespace RevitPylonLoadAreas.Models.Geometry;
 
+/// <summary>
+/// Грузовая площадь заданного вертикального несущего элемента
+/// </summary>
 internal sealed class LoadArea {
-    public LoadArea(Element element, IList<Polygon2D> circuits) {
+    /// <summary>
+    /// Конструирует грузовую площадь
+    /// </summary>
+    /// <param name="element">Вертикальный элемент</param>
+    /// <param name="circuits">Список контуров грузовой площади. Первый контур - наружный, остальные - отверстия</param>
+    public LoadArea(Element element, IList<CurveLoop> circuits) {
         Element = element ?? throw new ArgumentNullException(nameof(element));
         Circuits = circuits ?? throw new ArgumentNullException(nameof(circuits));
     }
 
     public Element Element { get; }
 
-    public IList<Polygon2D> Circuits { get; }
-
-    public double GetArea() {
-        if(Circuits.Count == 0) {
-            return 0;
-        }
-
-        double outer = Circuits[0].Area;
-        for(int i = 1; i < Circuits.Count; i++) {
-            outer -= Circuits[i].Area;
-        }
-
-        return Math.Max(0, outer);
-    }
+    public IList<CurveLoop> Circuits { get; }
 }

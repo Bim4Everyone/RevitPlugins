@@ -15,7 +15,6 @@ using dosymep.WpfCore.Ninject;
 
 using Ninject;
 
-using RevitPylonLoadAreas.Exceptions;
 using RevitPylonLoadAreas.Models;
 using RevitPylonLoadAreas.Services;
 
@@ -44,41 +43,56 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
         var repo = kernel.Get<RevitRepository>();
         var localization = kernel.Get<ILocalizationService>();
 
-        if(!repo.IsViewSupportsLoadAreas(repo.ActiveView)) {
-            TaskDialog.Show(PluginName, localization.GetLocalizedString("Error.ViewNotSupported"));
-            throw new OperationCanceledException();
-        }
+        ValidateView(repo, localization);
+        var floor = PickFloor(repo, localization);
+        var pylons = PickPylons(repo, localization);
+        var walls = PickWalls(repo, localization);
 
-        var floor = repo.PickFloor(localization.GetLocalizedString("Pick.Floor"));
-        var pylons = repo.PickStructuralColumns(localization.GetLocalizedString("Pick.Pylons"));
-        IReadOnlyList<Wall> walls;
-        try {
-            walls = repo.PickWalls(localization.GetLocalizedString("Pick.Walls"));
-        } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
-            walls = Array.Empty<Wall>();
-        }
-
-        var filledRegionType = repo.GetFirstFilledRegionType()
-                               ?? throw new FilledRegionTypeNotFoundException(
-                                   localization.GetLocalizedString("Error.FilledRegionTypeNotFound"));
-
-        var finder = kernel.Get<LoadAreasFinder>();
-        var loadAreas = finder.Process(floor, pylons, walls);
+        var loadAreasFinder = kernel.Get<LoadAreasFinder>();
+        var loadAreas = loadAreasFinder.Process(floor, pylons, walls);
 
         var drawer = kernel.Get<FilledRegionDrawer>();
-        string transactionName = localization.GetLocalizedString("Transaction.DrawLoadAreas");
-        using(var t = repo.Document.StartTransaction(transactionName)) {
-            drawer.Draw(repo.ActiveView, loadAreas, filledRegionType);
+        using(var t = repo.Document.StartTransaction(localization.GetLocalizedString("Transaction.DrawLoadAreas"))) {
             foreach(var area in loadAreas) {
-                double sqM = UnitUtils.ConvertFromInternalUnits(area.GetArea(), UnitTypeId.SquareMeters);
+                var region = drawer.Draw(area);
+                // TODO определить параметр, куда писать площадь
                 area.Element.SetParamValue(
                     BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
-                    sqM.ToString("0.00", CultureInfo.InvariantCulture));
+                    UnitUtils.ConvertFromInternalUnits(
+                            region.GetParamValue<double>(BuiltInParameter.HOST_AREA_COMPUTED),
+                            UnitTypeId.SquareMeters)
+                        .ToString("0.00", CultureInfo.CurrentCulture));
             }
 
             t.Commit();
         }
 
         Notification(true);
+    }
+
+    private void ValidateView(RevitRepository repo, ILocalizationService localization) {
+        if(repo.ActiveView.ViewType != ViewType.FloorPlan) {
+            TaskDialog.Show(PluginName, localization.GetLocalizedString("Error.ViewNotSupported"));
+            throw new OperationCanceledException();
+        }
+    }
+
+    private Floor PickFloor(RevitRepository repo, ILocalizationService localization) {
+        return repo.PickFloor(localization.GetLocalizedString("Pick.Floor"));
+    }
+
+    private ICollection<FamilyInstance> PickPylons(RevitRepository repo, ILocalizationService localization) {
+        return repo.PickStructuralColumns(localization.GetLocalizedString("Pick.Pylons"));
+    }
+
+    private ICollection<Wall> PickWalls(RevitRepository repo, ILocalizationService localization) {
+        ICollection<Wall> walls;
+        try {
+            walls = repo.PickWalls(localization.GetLocalizedString("Pick.Walls"));
+        } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
+            walls = [];
+        }
+
+        return walls;
     }
 }

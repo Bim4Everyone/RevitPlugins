@@ -2,51 +2,50 @@ using System;
 using System.Collections.Generic;
 
 using RevitPylonLoadAreas.Models.Geometry;
+using RevitPylonLoadAreas.Models.Geometry.Delaunay;
 
 namespace RevitPylonLoadAreas.Services;
 
+/// <summary>
+/// Триангуляция Делоне
+/// </summary>
 internal sealed class BowyerWatsonDelaunay {
     private readonly List<XY> _points = new();
     private readonly List<DelaunayTriangle> _triangles = new();
 
-    public (int A, int B, int C) SuperTriangle { get; private set; }
+    public IList<DelaunayTriangle> Triangles => _triangles;
 
-    public IReadOnlyList<XY> Points => _points;
-
-    public IReadOnlyList<DelaunayTriangle> Triangles => _triangles;
-
-    public int[] Triangulate(IReadOnlyList<XY> sites, BoundingBoxXY bounds, double margin) {
-        BuildSuperTriangle(bounds, margin);
-
+    public int[] Triangulate(ICollection<XY> sites) {
+        BuildSuperTriangle(sites);
         var indices = new int[sites.Count];
-        for(int i = 0; i < sites.Count; i++) {
+        int i = 0;
+        foreach(var site in sites) {
             indices[i] = _points.Count;
-            _points.Add(sites[i]);
+            _points.Add(site);
             InsertPoint(indices[i]);
         }
 
         return indices;
     }
 
-    public bool IsSuperVertex(int index) {
-        return index == SuperTriangle.A || index == SuperTriangle.B || index == SuperTriangle.C;
-    }
-
-    private void BuildSuperTriangle(BoundingBoxXY bounds, double margin) {
-        var center = bounds.Center;
-        double diag = Math.Max(bounds.Diagonal, 1.0) + margin;
-        double size = diag * 50;
-        var a = new XY(center.X - size, center.Y - size);
-        var b = new XY(center.X + size, center.Y - size);
-        var c = new XY(center.X, center.Y + size * 2);
-        int ia = _points.Count;
+    /// <summary>
+    /// Строит треугольник, внутри которого находятся все точки
+    /// </summary>
+    /// <param name="sites">Точки диаграммы Вороного</param>
+    private void BuildSuperTriangle(ICollection<XY> sites) {
+        // построение равностороннего треугольника, вписанная окружность которого описывает с запасом прямоугольник, ограничивающий все точки
+        _points.Clear();
+        var bounds = new BoundingBoxXY(sites);
+        var center = bounds.GetCenter();
+        double r = bounds.GetDiagonalLength() / 2 + 1; // увеличенный на 1 радиус вписанной окружности треугольника
+        double t = 6 * r / Math.Sqrt(3); // сторона равностороннего треугольника
+        var a = new XY(center.X - t / 2, center.Y - r);
+        var b = new XY(center.X, center.Y + 2 * r);
+        var c = new XY(center.X + t / 2, center.Y - r);
         _points.Add(a);
-        int ib = _points.Count;
         _points.Add(b);
-        int ic = _points.Count;
         _points.Add(c);
-        SuperTriangle = (ia, ib, ic);
-        _triangles.Add(new DelaunayTriangle(ia, ib, ic, _points));
+        _triangles.Add(new DelaunayTriangle(0, 1, 2, _points));
     }
 
     private void InsertPoint(int newIndex) {

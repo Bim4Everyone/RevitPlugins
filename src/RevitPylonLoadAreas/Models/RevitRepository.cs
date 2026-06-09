@@ -4,8 +4,11 @@ using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.IFC;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+
+using dosymep.Revit.Geometry;
 
 using RevitPylonLoadAreas.Models.Selection;
 
@@ -30,7 +33,7 @@ internal class RevitRepository {
         return (Floor) Document.GetElement(reference);
     }
 
-    public IReadOnlyList<FamilyInstance> PickStructuralColumns(string statusPrompt) {
+    public ICollection<FamilyInstance> PickStructuralColumns(string statusPrompt) {
         var refs = ActiveUIDocument.Selection.PickObjects(
             ObjectType.Element,
             new StructuralColumnSelectionFilter(),
@@ -38,12 +41,12 @@ internal class RevitRepository {
         return refs.Select(r => (FamilyInstance) Document.GetElement(r)).ToList();
     }
 
-    public IReadOnlyList<Wall> PickWalls(string statusPrompt) {
+    public ICollection<Wall> PickWalls(string statusPrompt) {
         var refs = ActiveUIDocument.Selection.PickObjects(
             ObjectType.Element,
             new WallSelectionFilter(),
             statusPrompt);
-        return refs.Select(r => (Wall) Document.GetElement(r)).ToList();
+        return refs.Select(r => (Wall) Document.GetElement(r)).ToArray();
     }
 
     public FilledRegionType GetFirstFilledRegionType() {
@@ -51,20 +54,5 @@ internal class RevitRepository {
             .OfClass(typeof(FilledRegionType))
             .OfType<FilledRegionType>()
             .FirstOrDefault();
-    }
-
-    public bool IsViewSupportsLoadAreas(View view) {
-        if(view == null) {
-            return false;
-        }
-
-        return view.ViewType == ViewType.FloorPlan
-               || view.ViewType == ViewType.CeilingPlan
-               || view.ViewType == ViewType.EngineeringPlan
-               || view.ViewType == ViewType.AreaPlan
-               || view.ViewType == ViewType.Section
-               || view.ViewType == ViewType.Elevation
-               || view.ViewType == ViewType.Detail
-               || view.ViewType == ViewType.DraftingView;
     }
 }

@@ -12,5 +12,7 @@ internal sealed class StructuralColumnSelectionFilter : ISelectionFilter {
                && fi.Category.Id == _structuralColumnsId;
     }
 
-    public bool AllowReference(Reference reference, XYZ position) => true;
+    public bool AllowReference(Reference reference, XYZ position) {
+        return true;
+    }
 }
