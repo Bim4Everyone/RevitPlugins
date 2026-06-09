@@ -41,6 +41,9 @@
   <Project Path="src/RevitArchitecturalDocumentation/RevitArchitecturalDocumentation.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitAreaBoundaries/RevitAreaBoundaries.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitAxonometryViews/RevitAxonometryViews.csproj">
     <Platform Project="x64" />
   </Project>
