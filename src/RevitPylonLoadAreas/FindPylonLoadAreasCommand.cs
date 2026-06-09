@@ -53,15 +53,14 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
 
         var drawer = kernel.Get<FilledRegionDrawer>();
         using(var t = repo.Document.StartTransaction(localization.GetLocalizedString("Transaction.DrawLoadAreas"))) {
-            foreach(var area in loadAreas) {
-                var region = drawer.Draw(area);
+            foreach(var loadArea in loadAreas) {
+                drawer.Draw(loadArea);
+                double area = repo.GetArea([..loadArea.Circuits]);
                 // TODO определить параметр, куда писать площадь
-                area.Element.SetParamValue(
+                loadArea.Element.SetParamValue(
                     BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
-                    UnitUtils.ConvertFromInternalUnits(
-                            region.GetParamValue<double>(BuiltInParameter.HOST_AREA_COMPUTED),
-                            UnitTypeId.SquareMeters)
-                        .ToString("0.00", CultureInfo.CurrentCulture));
+                    UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters)
+                        .ToString("0.000", CultureInfo.CurrentCulture));
             }
 
             t.Commit();

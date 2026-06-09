@@ -22,20 +22,21 @@ internal readonly struct DelaunayTriangle {
         var a = points[v0];
         var b = points[v1];
         var c = points[v2];
-        Circumradius = (a.X * (b.Y - c.Y)) + (b.X * (c.Y - a.Y)) + (c.X * (a.Y - b.Y)); // радиус описанной окружности
-        Circumdiameter = 2 * Circumradius;
 
+        double d = 2 * ((a.X * (b.Y - c.Y)) + (b.X * (c.Y - a.Y)) + (c.X * (a.Y - b.Y)));
         double ux = (((a.X * a.X) + (a.Y * a.Y)) * (b.Y - c.Y)
                      + ((b.X * b.X) + (b.Y * b.Y)) * (c.Y - a.Y)
                      + ((c.X * c.X) + (c.Y * c.Y)) * (a.Y - b.Y))
-                    / Circumdiameter; // x координата центра описанной окружности
+                    / d; // x координата центра описанной окружности
 
         double uy = (((a.X * a.X) + (a.Y * a.Y)) * (c.X - b.X)
                      + ((b.X * b.X) + (b.Y * b.Y)) * (a.X - c.X)
                      + ((c.X * c.X) + (c.Y * c.Y)) * (b.X - a.X))
-                    / Circumdiameter; // y координата центра описанной окружности
+                    / d; // y координата центра описанной окружности
 
         Circumcenter = new XY(ux, uy);
+        double radiusWithTolerance = (Circumcenter.DistanceTo(a) + XY.Tolerance);
+        SqrDistanceLimit = radiusWithTolerance * radiusWithTolerance;
     }
 
     /// <summary>
@@ -59,19 +60,14 @@ internal readonly struct DelaunayTriangle {
     public XY Circumcenter { get; }
 
     /// <summary>
-    /// Диаметр описанной окружности
+    /// Квадрат радиуса описанной окружности с радиусом, увеличенным на <see cref="XY.Tolerance"/>
     /// </summary>
-    public double Circumdiameter { get; }
-
-    /// <summary>
-    /// Радиус описанной окружности
-    /// </summary>
-    public double Circumradius { get; }
+    private double SqrDistanceLimit { get; }
 
     /// <summary>
     /// Проверяет, находится ли точка внутри описанной окружности
     /// </summary>
     public bool CircumcircleContains(XY p) {
-        return Circumcenter.SqrDistanceTo(p) <= ((Circumradius + XY.Tolerance) * (Circumradius + XY.Tolerance));
+        return Circumcenter.SqrDistanceTo(p) <= SqrDistanceLimit;
     }
 }

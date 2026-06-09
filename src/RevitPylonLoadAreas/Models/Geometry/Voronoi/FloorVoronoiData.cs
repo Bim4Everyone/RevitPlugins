@@ -9,6 +9,8 @@ using dosymep.Revit.Geometry;
 namespace RevitPylonLoadAreas.Models.Geometry.Voronoi;
 
 internal class FloorVoronoiData {
+    private readonly RevitRepository _repo;
+
     /// <summary>
     /// Пороговая площадь, меньше которой отверстия не учитываются
     /// </summary>
@@ -38,8 +40,10 @@ internal class FloorVoronoiData {
     /// Конструирует перекрытие для построения на нём диаграммы Вороного
     /// </summary>
     /// <param name="floor">Перекрытие</param>
+    /// <param name="repo">Revit репозиторий</param>
     /// <param name="openingsAreaThreshold">Площадь отверстий в единицах Revit, меньше которой они не учитываются</param>
-    public FloorVoronoiData(Floor floor, double openingsAreaThreshold) {
+    public FloorVoronoiData(Floor floor, RevitRepository repo, double openingsAreaThreshold) {
+        _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         _openingsAreaThreshold = openingsAreaThreshold;
         Floor = floor ?? throw new ArgumentNullException(nameof(floor));
     }
@@ -59,13 +63,13 @@ internal class FloorVoronoiData {
     /// <param name="cell">Ячейка диаграммы Вороного</param>
     /// <returns>Список петель плоской фигуры, полученной после обрезки</returns>
     public IList<CurveLoop> Clip(VoronoiCell cell) {
-        var cellSolid = CreateSolid(cell.Polygon.AsCurveLoop());
+        var cellSolid = _repo.CreateSolid(cell.Polygon.AsCurveLoop());
         var floorSolid = GetVoronoiSolid();
         var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
             cellSolid,
             floorSolid,
             BooleanOperationsType.Intersect);
-        var topFace = GetTopFace(intersection);
+        var topFace = _repo.GetTopFace(intersection);
         return topFace.GetEdgesAsCurveLoops();
     }
 
@@ -81,38 +85,19 @@ internal class FloorVoronoiData {
         var solid = Floor.GetSolids()
             .OrderByDescending(s => s.Volume)
             .First();
-        var topFace = GetTopFace(solid);
+        var topFace = _repo.GetTopFace(solid);
         _outline = topFace.GetEdgesAsCurveLoops()
-            .Where(l => GetArea(l) >= _openingsAreaThreshold)
+            .Where(l => _repo.GetArea(l) >= _openingsAreaThreshold)
             .OrderBy(l => l.Sum(c => c.Length))
             .ToArray();
         return _outline;
     }
 
     private Face GetVoronoiFace() {
-        return _face ??= GetTopFace(GetVoronoiSolid());
+        return _face ??= _repo.GetTopFace(GetVoronoiSolid());
     }
 
     private Solid GetVoronoiSolid() {
-        return _solid ??= CreateSolid([..GetVoronoiOutline()]);
-    }
-
-    private double GetArea(CurveLoop loop) {
-        var solid = CreateSolid(loop);
-        return GetTopFace(solid).Area;
-    }
-
-    private Face GetTopFace(Solid solid) {
-        return solid.Faces
-            .OfType<PlanarFace>()
-            .First(f => f.FaceNormal.IsAlmostEqualTo(XYZ.BasisZ));
-    }
-
-    private Solid CreateSolid(params CurveLoop[] loops) {
-        if(loops.Length == 0) {
-            throw new ArgumentOutOfRangeException(nameof(loops));
-        }
-
-        return GeometryCreationUtilities.CreateExtrusionGeometry(loops, XYZ.BasisZ, 1);
+        return _solid ??= _repo.CreateSolid([..GetVoronoiOutline()]);
     }
 }

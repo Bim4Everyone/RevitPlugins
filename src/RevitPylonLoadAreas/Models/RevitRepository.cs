@@ -55,4 +55,27 @@ internal class RevitRepository {
             .OfType<FilledRegionType>()
             .FirstOrDefault();
     }
+
+    public double GetArea(params CurveLoop[] loops) {
+        if(loops.Length == 0) {
+            throw new ArgumentOutOfRangeException(nameof(loops));
+        }
+
+        var solid = CreateSolid(loops);
+        return GetTopFace(solid).Area;
+    }
+
+    public Face GetTopFace(Solid solid) {
+        return solid.Faces
+            .OfType<PlanarFace>()
+            .First(f => f.FaceNormal.IsAlmostEqualTo(XYZ.BasisZ));
+    }
+
+    public Solid CreateSolid(params CurveLoop[] loops) {
+        if(loops.Length == 0) {
+            throw new ArgumentOutOfRangeException(nameof(loops));
+        }
+
+        return GeometryCreationUtilities.CreateExtrusionGeometry(loops, XYZ.BasisZ, 1);
+    }
 }

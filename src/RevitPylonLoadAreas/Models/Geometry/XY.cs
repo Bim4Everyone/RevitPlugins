@@ -32,6 +32,10 @@ internal readonly struct XY {
         return dx * dx + dy * dy;
     }
 
+    public double DistanceTo(XY other) {
+        return Math.Sqrt(SqrDistanceTo(other));
+    }
+
     public bool IsAlmostEqual(XY other) {
         return _xyz.IsAlmostEqualTo(other._xyz);
     }

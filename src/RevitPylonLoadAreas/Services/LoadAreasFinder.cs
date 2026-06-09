@@ -13,17 +13,20 @@ namespace RevitPylonLoadAreas.Services;
 
 internal sealed class LoadAreasFinder {
     private readonly SystemConfig _config;
+    private readonly RevitRepository _repo;
     private readonly VoronoiBuilder _voronoiBuilder;
 
     public LoadAreasFinder(
         SystemConfig config,
+        RevitRepository repo,
         VoronoiBuilder voronoiBuilder) {
         _config = config ?? throw new ArgumentNullException(nameof(config));
+        _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         _voronoiBuilder = voronoiBuilder ?? throw new ArgumentNullException(nameof(voronoiBuilder));
     }
 
     public ICollection<LoadArea> Process(Floor floor, ICollection<FamilyInstance> pylons, ICollection<Wall> walls) {
-        var floorData = new FloorVoronoiData(floor, _config.OpeningMinArea);
+        var floorData = new FloorVoronoiData(floor, _repo, _config.OpeningMinArea);
         var sites = GetSites(floorData, pylons, walls);
         var voronoiCells = _voronoiBuilder.Build(sites).ToArray();
 

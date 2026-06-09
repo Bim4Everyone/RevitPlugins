@@ -23,6 +23,7 @@ internal sealed class BowyerWatsonDelaunay {
             indices[i] = _points.Count;
             _points.Add(site);
             InsertPoint(indices[i]);
+            i++;
         }
 
         return indices;
