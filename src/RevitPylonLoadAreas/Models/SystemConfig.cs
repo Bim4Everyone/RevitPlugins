@@ -4,9 +4,6 @@ namespace RevitPylonLoadAreas.Models;
 
 // TODO пределать в json конфиг
 internal sealed class SystemConfig {
-    public double FloorArcTessellationStep { get; set; } =
-        UnitUtils.ConvertToInternalUnits(100.0, UnitTypeId.Millimeters);
-
     public double WallsTessellationStep { get; set; } =
         UnitUtils.ConvertToInternalUnits(300.0, UnitTypeId.Millimeters);
 
