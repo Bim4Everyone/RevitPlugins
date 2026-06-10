@@ -34,6 +34,7 @@
         <ui:TextBox
             x:Name="FormulaInputTextBox"
             Grid.Row="0"
+            Style="{StaticResource TextBoxBySelectedSheet}"
             Text="{Binding Path=PropFormula, ElementName=root, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
         <ui:TextBlock

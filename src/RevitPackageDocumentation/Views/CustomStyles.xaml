@@ -27,6 +27,10 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBox/TextBox.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBlock/TextBlock.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/NumberBox/NumberBox.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
     
     <Style
@@ -413,6 +417,78 @@
                         </Storyboard>
                     </BeginStoryboard>
                 </DataTrigger.ExitActions>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="TextBoxBySelectedSheet"
+        TargetType="ui:TextBox"
+        BasedOn="{StaticResource DefaultTextBoxStyle}">
+        <Setter
+            Property="IsEnabled"
+            Value="True" />
+        <Style.Triggers>
+            <DataTrigger
+                Binding="{Binding CurrentSheetSet.SelectedSheet}"
+                Value="{x:Null}">
+                <Setter
+                    Property="IsEnabled"
+                    Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="NumberBoxBySelectedSheet"
+        TargetType="ui:NumberBox"
+        BasedOn="{StaticResource DefaultUiNumberBoxStyle}">
+        <Setter
+            Property="IsEnabled"
+            Value="True" />
+        <Style.Triggers>
+            <DataTrigger
+                Binding="{Binding CurrentSheetSet.SelectedSheet}"
+                Value="{x:Null}">
+                <Setter
+                    Property="IsEnabled"
+                    Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="ComboBoxBySelectedSheet"
+        TargetType="ComboBox"
+        BasedOn="{StaticResource DefaultComboBoxStyle}">
+        <Setter
+            Property="IsEnabled"
+            Value="True" />
+        <Style.Triggers>
+            <DataTrigger
+                Binding="{Binding CurrentSheetSet.SelectedSheet}"
+                Value="{x:Null}">
+                <Setter
+                    Property="IsEnabled"
+                    Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="ButtonBySelectedSheet"
+        TargetType="ui:Button"
+        BasedOn="{StaticResource DefaultButtonStyle}">
+        <Setter
+            Property="IsEnabled"
+            Value="True" />
+        <Style.Triggers>
+            <DataTrigger
+                Binding="{Binding CurrentSheetSet.SelectedSheet}"
+                Value="{x:Null}">
+                <Setter
+                    Property="IsEnabled"
+                    Value="False" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

@@ -259,6 +259,7 @@
                         Grid.Column="1"
                         Grid.Row="1"
                         Margin="5"
+                        Style="{StaticResource NumberBoxBySelectedSheet}"
                         Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                     <ui:TextBlock
@@ -272,6 +273,7 @@
                         Grid.Column="3"
                         Grid.Row="1"
                         Margin="5"
+                        Style="{StaticResource NumberBoxBySelectedSheet}"
                         Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetCoefficient, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                     <ui:TextBlock
@@ -285,6 +287,7 @@
                         Grid.Column="1"
                         Grid.Row="2"
                         Margin="5"
+                        Style="{StaticResource ComboBoxBySelectedSheet}"
                         ItemsSource="{Binding Path=TitleBlockFamilies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         DisplayMemberPath="Name"
                         SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
@@ -308,6 +311,7 @@
                         Grid.Column="3"
                         Grid.Row="2"
                         Margin="5"
+                        Style="{StaticResource ComboBoxBySelectedSheet}"
                         ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         DisplayMemberPath="Name"
                         SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -336,6 +340,7 @@
                                 Grid.Row="0"
                                 HorizontalAlignment="Right"
                                 Content="+"
+                                Style="{StaticResource ButtonBySelectedSheet}"
                                 Command="{Binding Path=CurrentSheetSet.SelectedSheet.CustomParamsList.AddCustomParameterCommand}" />
 
                             <ItemsControl
@@ -358,6 +363,7 @@
                         Grid.ColumnSpan="4"
                         Grid.Row="5"
                         Margin="5"
+                        Style="{StaticResource TextBoxBySelectedSheet}"
                         Text="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleComment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
                     <ui:TextBox
