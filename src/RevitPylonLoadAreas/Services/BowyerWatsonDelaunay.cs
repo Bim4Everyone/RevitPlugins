@@ -7,23 +7,42 @@ using RevitPylonLoadAreas.Models.Geometry.Delaunay;
 namespace RevitPylonLoadAreas.Services;
 
 /// <summary>
-/// Триангуляция Делоне
+/// Триангуляция Делоне методом Боуэра–Уотсона
 /// </summary>
 internal sealed class BowyerWatsonDelaunay {
+    /// <summary>
+    /// Все вершины триангуляции, первые 3 точки - вершины супертреугольника
+    /// </summary>
     private readonly List<XY> _points = new();
+
+    /// <summary>
+    /// Текущий набор треугольников триангуляции. Индексы вершин = индексы точек в <see cref="_points"/>.
+    /// </summary>
     private readonly List<DelaunayTriangle> _triangles = new();
 
+    /// <summary>
+    /// Текущий набор треугольников триангуляции. Индексы вершин = индексы точек в <see cref="_points"/>.
+    /// </summary>
     public IList<DelaunayTriangle> Triangles => _triangles;
 
-    public int[] Triangulate(ICollection<XY> sites) {
+    /// <summary>
+    /// Строит триангуляцию Делоне по набору точек
+    /// </summary>
+    /// <param name="sites">Точки, которые нужно триангулировать</param>
+    /// <returns>
+    /// Массив индексов: для каждой исходной точки
+    /// возвращается её позиция во внутреннем списке <see cref="_points"/>
+    /// </returns>
+    public int[] Triangulate(IList<XY> sites) {
+        // 1. Создаём супертреугольник, накрывающий все точки — стартовая триангуляция.
         BuildSuperTriangle(sites);
-        var indices = new int[sites.Count];
-        int i = 0;
-        foreach(var site in sites) {
+        int[] indices = new int[sites.Count];
+        for(int i = 0; i < sites.Count; i++) {
+            // Запоминаем позицию точки в общем списке вершин и добавляем её туда.
             indices[i] = _points.Count;
-            _points.Add(site);
+            _points.Add(sites[i]);
+            // 2. Встраиваем точку в триангуляцию, локально перестраивая её.
             InsertPoint(indices[i]);
-            i++;
         }
 
         return indices;
@@ -49,44 +68,60 @@ internal sealed class BowyerWatsonDelaunay {
         _triangles.Add(new DelaunayTriangle(0, 1, 2, _points));
     }
 
+    /// <summary>
+    /// Встраивает новую точку в триангуляцию, восстанавливая свойство Делоне.
+    /// </summary>
+    /// <param name="newIndex">Индекс новой точки в списке <see cref="_points"/></param>
     private void InsertPoint(int newIndex) {
         var newPoint = _points[newIndex];
-        var bad = new List<int>();
+
+        // поиск "плохих" треугольников, в чью описанную окружность попала новая точка
+        var badTrianglesIndices = new List<int>();
         for(int i = 0; i < _triangles.Count; i++) {
             if(_triangles[i].CircumcircleContains(newPoint)) {
-                bad.Add(i);
+                badTrianglesIndices.Add(i);
             }
         }
 
-        if(bad.Count == 0) {
+        if(badTrianglesIndices.Count == 0) {
             return;
         }
 
+        // "плохие" треугольники образуют полость, которую надо перестроить,
+        // считаем, сколько плохих треугольников делят каждое ребро
         var edgeCounts = new Dictionary<DelaunayEdgeKey, int>();
-        foreach(int ti in bad) {
-            var t = _triangles[ti];
-            CountEdge(edgeCounts, t.V0, t.V1);
-            CountEdge(edgeCounts, t.V1, t.V2);
-            CountEdge(edgeCounts, t.V2, t.V0);
+        foreach(int i in badTrianglesIndices) {
+            var triangle = _triangles[i];
+            CountEdge(edgeCounts, triangle.V0, triangle.V1);
+            CountEdge(edgeCounts, triangle.V1, triangle.V2);
+            CountEdge(edgeCounts, triangle.V2, triangle.V0);
         }
 
-        var bs = new HashSet<int>(bad);
+        // удаляем все плохие треугольники из триангуляции
         for(int i = _triangles.Count - 1; i >= 0; i--) {
-            if(bs.Contains(i)) {
+            if(badTrianglesIndices.Contains(i)) {
                 _triangles.RemoveAt(i);
             }
         }
 
-        foreach(var kv in edgeCounts) {
-            if(kv.Value == 1) {
-                _triangles.Add(new DelaunayTriangle(kv.Key.A, kv.Key.B, newIndex, _points));
+        // перестраиваем полость: соединяем каждое граничное ребро (встретилось ровно один раз) с новой точкой
+        foreach(var edgeCount in edgeCounts) {
+            if(edgeCount.Value == 1) {
+                _triangles.Add(new DelaunayTriangle(edgeCount.Key.A, edgeCount.Key.B, newIndex, _points));
             }
         }
     }
 
-    private void CountEdge(Dictionary<DelaunayEdgeKey, int> sink, int a, int b) {
-        var key = new DelaunayEdgeKey(a, b);
-        sink.TryGetValue(key, out int c);
-        sink[key] = c + 1;
+    /// <summary>
+    /// Увеличивает счётчик ребра (a, b)
+    /// </summary>
+    private void CountEdge(Dictionary<DelaunayEdgeKey, int> edgesCounts, int a, int b) {
+        var edgeKey = new DelaunayEdgeKey(a, b);
+        if(edgesCounts.TryGetValue(edgeKey, out int count)) {
+            edgesCounts[edgeKey] = count + 1;
+        } else {
+            // ребро встречается впервые
+            edgesCounts[edgeKey] = 1;
+        }
     }
 }

@@ -2,12 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Autodesk.Revit.DB;
+
 using RevitPylonLoadAreas.Models.Geometry;
 using RevitPylonLoadAreas.Models.Geometry.Voronoi;
 
 namespace RevitPylonLoadAreas.Services;
 
+/// <summary>
+/// Строит диаграмму Вороного на основе триангуляции Делоне.
+/// <para>
+/// Диаграмма Вороного двойственна триангуляции Делоне: ячейка вокруг точки (site) образована
+/// центрами описанных окружностей всех треугольников Делоне, которым принадлежит эта точка.
+/// Если упорядочить эти центры по углу вокруг точки, они образуют границу выпуклой ячейки.
+/// </para>
+/// </summary>
 internal sealed class VoronoiBuilder {
+    /// <summary>
+    /// Строит ячейки диаграммы Вороного для заданных точек.
+    /// </summary>
+    /// <param name="sites">Исходные точки (центры ячеек) с привязкой к элементам Revit</param>
+    /// <returns>Набор построенных ячеек Вороного</returns>
     public ICollection<VoronoiCell> Build(IList<VoronoiSite> sites) {
         if(sites == null) {
             throw new ArgumentNullException(nameof(sites));
@@ -22,6 +37,7 @@ internal sealed class VoronoiBuilder {
         var delaunay = new BowyerWatsonDelaunay();
         int[] siteIndices = delaunay.Triangulate(sitePoints);
 
+        // для каждого индекса точки находим индексы примыкающих к ней треугольников
         var trianglesBySite = new Dictionary<int, List<int>>();
         for(int t = 0; t < delaunay.Triangles.Count; t++) {
             var tri = delaunay.Triangles[t];
@@ -30,11 +46,12 @@ internal sealed class VoronoiBuilder {
             AddTriangleToSite(trianglesBySite, tri.V2, t);
         }
 
+        // строим ячейки Вороного
         for(int s = 0; s < sites.Count; s++) {
             int siteIndex = siteIndices[s];
             IList<XY> cellRing;
-            if(trianglesBySite.TryGetValue(siteIndex, out var tris)) {
-                var ordered = OrderCircumcentersAroundSite(delaunay, tris, sitePoints[s]);
+            if(trianglesBySite.TryGetValue(siteIndex, out var triangleIndices)) {
+                var ordered = OrderCircumcentersAroundSite(delaunay, triangleIndices, sitePoints[s]);
                 if(ordered.Count >= 3) {
                     cellRing = ordered;
                 } else {
@@ -50,15 +67,29 @@ internal sealed class VoronoiBuilder {
         return cells;
     }
 
-    private void AddTriangleToSite(Dictionary<int, List<int>> map, int siteIndex, int triangleIndex) {
-        if(!map.TryGetValue(siteIndex, out var list)) {
-            list = new List<int>();
-            map[siteIndex] = list;
+    /// <summary>
+    /// Добавляет треугольник в список индексов треугольников, примыкающих к данной вершине (точке)
+    /// </summary>
+    /// <param name="trianglesBySite">Ключ - индекс точки, значение - список индексов треугольников, примыкающих к ней</param>
+    /// <param name="siteIndex">Индекс точки</param>
+    /// <param name="triangleIndex">Индекс треугольника</param>
+    private void AddTriangleToSite(Dictionary<int, List<int>> trianglesBySite, int siteIndex, int triangleIndex) {
+        if(!trianglesBySite.TryGetValue(siteIndex, out var trianglesIndices)) {
+            trianglesIndices = [];
+            trianglesBySite[siteIndex] = trianglesIndices;
         }
 
-        list.Add(triangleIndex);
+        trianglesIndices.Add(triangleIndex);
     }
 
+    /// <summary>
+    /// Упорядочивает центры описанных окружностей треугольников по углу вокруг точки,
+    /// формируя замкнутый контур ячейки Вороного (вершины идут против часовой стрелки).
+    /// </summary>
+    /// <param name="delaunay">Триангуляция Делоне, из которой берутся центры окружностей</param>
+    /// <param name="triangleIndices">Индексы треугольников, примыкающих к точке</param>
+    /// <param name="site">Центр ячейки, относительно которой считается угол</param>
+    /// <returns>Вершины контура ячейки в угловом порядке без дубликатов</returns>
     private List<XY> OrderCircumcentersAroundSite(
         BowyerWatsonDelaunay delaunay,
         List<int> triangleIndices,
@@ -76,6 +107,7 @@ internal sealed class VoronoiBuilder {
         foreach(var e in entries) {
             if(ordered.Count > 0
                && ordered[ordered.Count - 1].IsAlmostEqual(e.Center)) {
+                // пропускаем дублирующиеся точки, идущие подряд
                 continue;
             }
 
@@ -84,6 +116,7 @@ internal sealed class VoronoiBuilder {
 
         if(ordered.Count > 1
            && ordered[0].IsAlmostEqual(ordered[ordered.Count - 1])) {
+            // удаляем дубль первой и последней точек
             ordered.RemoveAt(ordered.Count - 1);
         }
 
