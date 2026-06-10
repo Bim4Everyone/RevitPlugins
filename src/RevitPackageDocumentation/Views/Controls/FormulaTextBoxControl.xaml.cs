@@ -19,6 +19,9 @@ public partial class FormulaTextBoxControl : UserControl {
     public static readonly DependencyProperty UpdateCommandProperty =
         DependencyProperty.Register(nameof(UpdateCommand), typeof(ICommand), typeof(FormulaTextBoxControl));
 
+    public static readonly DependencyProperty TextBoxStyleProperty =
+        DependencyProperty.Register(nameof(TextBoxStyle), typeof(Style), typeof(FormulaTextBoxControl));
+
     public string PropFormula {
         get => (string) GetValue(PropFormulaProperty);
         set => SetValue(PropFormulaProperty, value);
@@ -32,6 +35,11 @@ public partial class FormulaTextBoxControl : UserControl {
     public ICommand UpdateCommand {
         get => (ICommand) GetValue(UpdateCommandProperty);
         set => SetValue(UpdateCommandProperty, value);
+    }
+
+    public Style TextBoxStyle {
+        get => (Style) GetValue(TextBoxStyleProperty);
+        set => SetValue(TextBoxStyleProperty, value);
     }
 
     private static void OnPropResultChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
