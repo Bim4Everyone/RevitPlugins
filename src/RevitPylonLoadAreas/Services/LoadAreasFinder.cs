@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
-using dosymep.SimpleServices;
+
+using dosymep.Revit;
 
 using RevitPylonLoadAreas.Models;
 using RevitPylonLoadAreas.Models.Geometry;
@@ -28,7 +29,9 @@ internal sealed class LoadAreasFinder {
     public ICollection<LoadArea> Process(Floor floor, ICollection<FamilyInstance> pylons, ICollection<Wall> walls) {
         var floorData = new FloorVoronoiData(floor, _repo, _config.GetOpeningMinArea());
         var sites = GetSites(floorData, pylons, walls);
-        var elementsCells = _voronoiBuilder.Build(sites).GroupBy(c => c.Site.Element.Id).ToArray();
+        var elementsCells = _voronoiBuilder.Build(sites, new BoundingBoxXY(floorData.Floor.GetBoundingBox()))
+            .GroupBy(c => c.Site.Element.Id)
+            .ToArray();
 
         List<LoadArea> loadAreas = [];
         foreach(var elementCells in elementsCells) {

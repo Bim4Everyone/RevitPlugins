@@ -55,16 +55,8 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
         }
     }
 
-    private Floor PickFloor(RevitRepository repo, ILocalizationService localization) {
+    private Floor GetFloor(RevitRepository repo, ILocalizationService localization) {
         return repo.PickFloor(localization.GetLocalizedString("Pick.Floor"));
-    }
-
-    private ICollection<FamilyInstance> PickPylons(RevitRepository repo, ILocalizationService localization) {
-        return repo.PickStructuralColumns(localization.GetLocalizedString("Pick.Pylons"));
-    }
-
-    private ICollection<Wall> PickWalls(RevitRepository repo, ILocalizationService localization) {
-        return repo.PickWalls(localization.GetLocalizedString("Pick.Walls"));
     }
 
     private void Run(IKernel kernel) {
@@ -72,9 +64,9 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
         var localization = kernel.Get<ILocalizationService>();
 
         ValidateView(repo, localization);
-        var floor = PickFloor(repo, localization);
-        var pylons = PickPylons(repo, localization);
-        var walls = PickWalls(repo, localization);
+        var floor = GetFloor(repo, localization);
+        var pylons = repo.GetPylonsFromView();
+        var walls = repo.GetWallsFromView();
 
         var loadAreasFinder = kernel.Get<LoadAreasFinder>();
         var loadAreas = loadAreasFinder.Process(floor, pylons, walls);

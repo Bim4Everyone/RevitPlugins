@@ -29,13 +29,14 @@ internal sealed class BowyerWatsonDelaunay {
     /// Строит триангуляцию Делоне по набору точек
     /// </summary>
     /// <param name="sites">Точки, которые нужно триангулировать</param>
+    /// <param name="floorBox">Прямоугольник, ограничивающий контур перекрытия</param>
     /// <returns>
     /// Массив индексов: для каждой исходной точки
     /// возвращается её позиция во внутреннем списке <see cref="_points"/>
     /// </returns>
-    public int[] Triangulate(IList<XY> sites) {
+    public int[] Triangulate(IList<XY> sites, BoundingBoxXY floorBox) {
         // 1. Создаём супертреугольник, накрывающий все точки — стартовая триангуляция.
-        BuildSuperTriangle(sites);
+        BuildSuperTriangle(sites, floorBox);
         int[] indices = new int[sites.Count];
         for(int i = 0; i < sites.Count; i++) {
             // Запоминаем позицию точки в общем списке вершин и добавляем её туда.
@@ -52,10 +53,11 @@ internal sealed class BowyerWatsonDelaunay {
     /// Строит треугольник, внутри которого находятся все точки
     /// </summary>
     /// <param name="sites">Точки диаграммы Вороного</param>
-    private void BuildSuperTriangle(ICollection<XY> sites) {
+    /// <param name="floorBox">Прямоугольник, ограничивающий контур перекрытия</param>
+    private void BuildSuperTriangle(ICollection<XY> sites, BoundingBoxXY floorBox) {
         // построение равностороннего треугольника, вписанная окружность которого описывает с запасом прямоугольник, ограничивающий все точки
         _points.Clear();
-        var bounds = new BoundingBoxXY(sites);
+        var bounds = new BoundingBoxXY([..sites, floorBox.Min, floorBox.Max]);
         var center = bounds.GetCenter();
         double r = bounds.GetDiagonalLength() / 2 + 1; // увеличенный на 1 радиус вписанной окружности треугольника
         double t = 6 * r / Math.Sqrt(3); // сторона равностороннего треугольника

@@ -94,4 +94,27 @@ internal class RevitRepository {
             right,
             BooleanOperationsType.Union);
     }
+
+    /// <summary>
+    /// Возвращает все видимые несущие колонны с активного вида
+    /// </summary>
+    public ICollection<FamilyInstance> GetPylonsFromView() {
+        return new FilteredElementCollector(Document, Document.ActiveView.Id)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(FamilyInstance))
+            .OfCategory(BuiltInCategory.OST_StructuralColumns)
+            .OfType<FamilyInstance>()
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Возвращает все видимые стены с активного вида
+    /// </summary>
+    public ICollection<Wall> GetWallsFromView() {
+        return new FilteredElementCollector(Document, Document.ActiveView.Id)
+            .WhereElementIsNotElementType()
+            .OfClass(typeof(Wall))
+            .OfType<Wall>()
+            .ToArray();
+    }
 }

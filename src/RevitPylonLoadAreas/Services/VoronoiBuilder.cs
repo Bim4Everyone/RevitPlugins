@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Autodesk.Revit.DB;
-
 using RevitPylonLoadAreas.Models.Geometry;
 using RevitPylonLoadAreas.Models.Geometry.Voronoi;
 
@@ -22,8 +20,9 @@ internal sealed class VoronoiBuilder {
     /// Строит ячейки диаграммы Вороного для заданных точек.
     /// </summary>
     /// <param name="sites">Исходные точки (центры ячеек) с привязкой к элементам Revit</param>
+    /// <param name="floorBox">Прямоугольник, ограничивающий контур перекрытия</param>
     /// <returns>Набор построенных ячеек Вороного</returns>
-    public ICollection<VoronoiCell> Build(IList<VoronoiSite> sites) {
+    public ICollection<VoronoiCell> Build(IList<VoronoiSite> sites, BoundingBoxXY floorBox) {
         if(sites == null) {
             throw new ArgumentNullException(nameof(sites));
         }
@@ -35,7 +34,7 @@ internal sealed class VoronoiBuilder {
         var cells = new List<VoronoiCell>(sites.Count);
         var sitePoints = sites.Select(s => s.Point).ToArray();
         var delaunay = new BowyerWatsonDelaunay();
-        int[] siteIndices = delaunay.Triangulate(sitePoints);
+        int[] siteIndices = delaunay.Triangulate(sitePoints, floorBox);
 
         // для каждого индекса точки находим индексы примыкающих к ней треугольников
         var trianglesBySite = new Dictionary<int, List<int>>();
