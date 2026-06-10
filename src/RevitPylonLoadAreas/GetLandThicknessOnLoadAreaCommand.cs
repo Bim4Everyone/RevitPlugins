@@ -8,8 +8,8 @@ using dosymep.Bim4Everyone;
 namespace RevitPylonLoadAreas;
 
 [Transaction(TransactionMode.Manual)]
-public class ImportLandXmlCommand : BasePluginCommand {
-    public ImportLandXmlCommand() {
+public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
+    public GetLandThicknessOnLoadAreaCommand() {
         PluginName = "Импорт LandXML";
     }
 

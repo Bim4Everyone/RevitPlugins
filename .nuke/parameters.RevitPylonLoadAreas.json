@@ -9,7 +9,7 @@
     "Rv2024"
   ],
   "IconUrl": "https://icons8.com/icon/18118/modern-art",
-  "BundleName": "Грузовые площади",
+  "BundleName": "Грузовая площадь",
   "BundleType": "InvokeButton",
-  "BundleOutput": "03.KR.extension\\КР.tab\\Документация.panel"
+  "BundleOutput": "03.KR.extension\\КР.tab\\Расчет конструкций.panel"
 }
