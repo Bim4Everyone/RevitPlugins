@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -18,12 +19,17 @@ internal class ScheduleViewVM : SheetComponentVM {
     private string _viewCount;
     private ViewSchedule _referenceSpec;
     private ScheduleFilterListVM _scheduleFilterList;
+    private ScheduleSheetInstance _viewportInstance;
 
     // Смещение по горизонтали в футах, для размещаемых на листе спецификациях требуемое, чтобы они попали на лист
     private readonly double _specViewportRightOffset = UnitUtilsHelper.ConvertToInternalValue(0.77);
 
     // Смещение по вертикали в футах, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _specViewportTopOffset = UnitUtilsHelper.ConvertToInternalValue(12);
+
+    // Смещения по вертикали в футах, для размещаемых спецификаций
+    // требуемое, для их корректного взаимного размещения на листе (в случае наличия маленькой шапки спецификации)
+    private readonly double _scheduleTopOffsetSmall = UnitUtilsHelper.ConvertToInternalValue(2.117);
 
     public ScheduleViewVM(
         RevitRepository repository,
@@ -70,6 +76,11 @@ internal class ScheduleViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _scheduleFilterList, value);
     }
 
+    public ScheduleSheetInstance ViewportInstance {
+        get => _viewportInstance;
+        set => RaiseAndSetIfChanged(ref _viewportInstance, value);
+    }
+
 
     public override void CreateComponent() { }
 
@@ -113,7 +124,7 @@ internal class ScheduleViewVM : SheetComponentVM {
 
     public override void Process() {
         var view = Create();
-        var instance = Place(view);
+        ViewportInstance = Place(view);
         SetCustomParams(view);
     }
 
@@ -180,19 +191,58 @@ internal class ScheduleViewVM : SheetComponentVM {
         double titleBlockWidth = titleBlockBB.Max.X - titleBlockBB.Min.X;
         double titleBlockHeight = titleBlockBB.Max.Y - titleBlockBB.Min.Y;
 
-
-        var scheduleSheetInstance = ScheduleSheetInstance.Create(
-            Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
-
+        // Изначально размещаем в Zero
         // Точка вставки у спеки в верхнем левом углу спеки
+        var scheduleSheetInstance = ScheduleSheetInstance.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
+
         var viewportBB = scheduleSheetInstance.get_BoundingBox(sheetInstance);
         double viewportWidth = viewportBB.Max.X - viewportBB.Min.X;
+        double viewportHeight = viewportBB.Max.Y - viewportBB.Min.Y;
 
-        var newCenter = new XYZ(
+        // Значение по умолчанию = как для первой
+        XYZ ptForPlace = new XYZ(
             -viewportWidth - _specViewportRightOffset,
             titleBlockHeight - _specViewportTopOffset,
             0);
-        scheduleSheetInstance.Point = newCenter;
+
+        // Размещенные спеки на листе
+        var placedScheduleComponents = Sheet.SheetComponents
+            .OfType<ScheduleViewVM>()
+            .Where(c => c.ViewportInstance is not null)
+            .ToList();
+
+        // Если на листе еще не было размещено спек
+        if(placedScheduleComponents.Count == 0) {
+            // Присваиваем новую точку
+            scheduleSheetInstance.Point = ptForPlace;
+            return scheduleSheetInstance;
+        }
+
+        // Размещенные спеки на листе из этой колонки
+        var currentColumn = placedScheduleComponents.Where(c => c.ViewColumn.Equals(ViewColumn)).ToList();
+
+        if(currentColumn.Count > 0) {
+            // Если в этой колонке есть спеки - min последней
+            var prevViewport = currentColumn
+                .Select(v => v.ViewportInstance)
+                .OrderBy(v => v.get_BoundingBox(sheetInstance).Min.Y)
+                .First();
+            ptForPlace = new XYZ(
+                prevViewport.Point.X,
+                prevViewport.get_BoundingBox(sheetInstance).Min.Y + _scheduleTopOffsetSmall,
+                0);
+        } else {
+            // Если в этой колонки нет спек - х = min х предыдущей колонки
+            ptForPlace = new XYZ(placedScheduleComponents
+                .Select(c => c.ViewportInstance.get_BoundingBox(sheetInstance).Min)
+                .OrderBy(pt => pt.X)
+                .First()
+                .X - viewportWidth,
+                ptForPlace.Y,
+                ptForPlace.Z);
+        }
+        // Присваиваем новую точку
+        scheduleSheetInstance.Point = ptForPlace;
         return scheduleSheetInstance;
     }
 }

@@ -183,8 +183,9 @@ internal class SheetVM : BaseParamContainerVM {
                 return;
 
             var component = _sheetSetVMFactory.CreateComponentVM(SheetSet, this, componentData);
+            component.IsModuleCheck = true;
             SheetComponents.Add(component);
-        } catch(System.Exception) {
+        } catch(Exception) {
             _messageBoxService.Show("An error occurred while adding the component!", "Error");
         }
     }
