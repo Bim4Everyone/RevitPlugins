@@ -8,10 +8,6 @@
 
     <system:String
         x:Key="Pick.Floor">Выберите плиту перекрытия</system:String>
-    <system:String
-        x:Key="Pick.Pylons">Выберите пилоны (несущие колонны)</system:String>
-    <system:String
-        x:Key="Pick.Walls">Выберите стены под плитой (ESC чтобы пропустить)</system:String>
 
     <system:String
         x:Key="Transaction.DrawLoadAreas">BIM: Грузовые площади</system:String>

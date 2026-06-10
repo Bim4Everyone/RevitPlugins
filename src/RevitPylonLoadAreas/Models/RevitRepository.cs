@@ -67,10 +67,17 @@ internal class RevitRepository {
         return GetTopFace(solid).Area;
     }
 
-    public Face GetTopFace(Solid solid) {
+    public PlanarFace GetTopFace(Solid solid) {
         return solid.Faces
             .OfType<PlanarFace>()
             .First(f => f.FaceNormal.IsAlmostEqualTo(XYZ.BasisZ));
+    }
+
+    public IList<PlanarFace> GetTopFaces(Solid solid) {
+        return solid.Faces
+            .OfType<PlanarFace>()
+            .Where(f => f.FaceNormal.IsAlmostEqualTo(XYZ.BasisZ))
+            .ToArray();
     }
 
     public Solid CreateSolid(params CurveLoop[] loops) {

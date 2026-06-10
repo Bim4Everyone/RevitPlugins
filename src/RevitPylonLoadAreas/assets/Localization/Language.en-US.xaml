@@ -7,11 +7,7 @@
         x:Key="Plugin.Title">Load Areas</system:String>
 
     <system:String
-        x:Key="Pick.Floor">Select a floor slab</system:String>
-    <system:String
-        x:Key="Pick.Pylons">Select pylons (structural columns)</system:String>
-    <system:String
-        x:Key="Pick.Walls">Select walls below the slab (press ESC to skip)</system:String>
+        x:Key="Pick.Floor">Select a floor</system:String>
 
     <system:String
         x:Key="Transaction.DrawLoadAreas">BIM: Load Areas</system:String>

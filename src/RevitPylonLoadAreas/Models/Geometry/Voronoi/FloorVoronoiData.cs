@@ -24,7 +24,7 @@ internal class FloorVoronoiData {
     /// <summary>
     /// Грань перекрытия для построения грузовых площадей с учетом заданной пороговой площади отверстий
     /// </summary>
-    private Face _face;
+    private PlanarFace _face;
 
     /// <summary>
     /// Поверхность <see cref="_face"/>
@@ -78,8 +78,8 @@ internal class FloorVoronoiData {
     public IList<CurveLoop> Clip(IList<VoronoiCell> wallCells) {
         var unitedSolid = CreateUnitedSolid(wallCells);
         var intersection = _repo.Intersect(unitedSolid, GetVoronoiSolid());
-        var topFace = _repo.GetTopFace(intersection);
-        return topFace.GetEdgesAsCurveLoops();
+        var topFaces = _repo.GetTopFaces(intersection);
+        return topFaces.SelectMany(f => f.GetEdgesAsCurveLoops()).ToArray();
     }
 
     private Solid CreateUnitedSolid(IList<VoronoiCell> cells) {
