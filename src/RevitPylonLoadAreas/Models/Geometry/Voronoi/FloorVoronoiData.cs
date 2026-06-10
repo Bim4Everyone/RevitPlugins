@@ -17,7 +17,7 @@ internal class FloorVoronoiData {
     private readonly double _openingsAreaThreshold;
 
     /// <summary>
-    /// Контур перекрытий для построения грузовых площадей с учетом заданной пороговой площади отверстий
+    /// Контур перекрытия в плоскости XOY для построения грузовых площадей с учетом заданной пороговой площади отверстий
     /// </summary>
     private IList<CurveLoop> _outline;
 
@@ -105,8 +105,11 @@ internal class FloorVoronoiData {
             .OrderByDescending(s => s.Volume)
             .First();
         var topFace = _repo.GetTopFace(solid);
+        double z = topFace.Evaluate(new UV(0, 0)).Z;
+        var transform = Transform.CreateTranslation(new XYZ(0, 0, -z));
         _outline = topFace.GetEdgesAsCurveLoops()
             .Where(l => _repo.GetArea(l) >= _openingsAreaThreshold)
+            .Select(l => CurveLoop.CreateViaTransform(l, transform))
             .OrderBy(l => l.Sum(c => c.Length))
             .ToArray();
         return _outline;

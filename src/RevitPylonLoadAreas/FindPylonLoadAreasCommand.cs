@@ -49,7 +49,7 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
     }
 
     private void ValidateView(RevitRepository repo, ILocalizationService localization) {
-        if(repo.ActiveView.ViewType != ViewType.FloorPlan) {
+        if(repo.ActiveView is not ViewPlan) {
             TaskDialog.Show(PluginName, localization.GetLocalizedString("Error.ViewNotSupported"));
             throw new OperationCanceledException();
         }
