@@ -190,27 +190,6 @@ internal class SheetVM : BaseParamContainerVM {
         }
     }
 
-    ///// <summary>
-    ///// В случае изменения имени параметра нужно обойти все листы и их компоненты, и обновить привязки
-    ///// </summary>
-    //public void UpdateDueParamNameChange() {
-    //    _stringParamSetService.SetAll(this, SheetSet.Params);
-    //    foreach(var sheetComponent in SheetComponents) {
-    //        sheetComponent.UpdateDueParamNameChange();
-    //    }
-    //}
-
-    //public void UpdateDueParamValueChange(StringParamVM stringParam) {
-    //    if(stringParam.StringValue is null) {
-    //        return;
-    //    }
-    //    _stringParamSetService.SetAll(this, SheetSet.Params, stringParam);
-    //    foreach(var sheetComponent in SheetComponents) {
-    //        sheetComponent.UpdateDueParamValueChange(stringParam);
-    //    }
-    //}
-
-
     public void CreateComponent() { }
 
     public bool ValidateModule() {

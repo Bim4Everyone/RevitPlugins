@@ -174,6 +174,9 @@ internal class SheetSetVM : BaseViewModel {
         }
         foreach(var sheet in SheetList) {
             sheet.UpdateDueParamNameChange();
+            foreach(var component in sheet.SheetComponents) {
+                component.UpdateDueParamNameChange();
+            }
         }
     }
 
@@ -183,6 +186,9 @@ internal class SheetSetVM : BaseViewModel {
         }
         foreach(var sheet in SheetList) {
             sheet.UpdateDueParamValueChange(stringParam);
+            foreach(var component in sheet.SheetComponents) {
+                component.UpdateDueParamValueChange(stringParam);
+            }
         }
     }
 }
