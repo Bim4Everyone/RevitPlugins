@@ -78,4 +78,18 @@ internal class RevitRepository {
 
         return GeometryCreationUtilities.CreateExtrusionGeometry(loops, XYZ.BasisZ, 1);
     }
+
+    public Solid Intersect(Solid left, Solid right) {
+        return BooleanOperationsUtils.ExecuteBooleanOperation(
+            left,
+            right,
+            BooleanOperationsType.Intersect);
+    }
+
+    public Solid Unite(Solid left, Solid right) {
+        return BooleanOperationsUtils.ExecuteBooleanOperation(
+            left,
+            right,
+            BooleanOperationsType.Union);
+    }
 }

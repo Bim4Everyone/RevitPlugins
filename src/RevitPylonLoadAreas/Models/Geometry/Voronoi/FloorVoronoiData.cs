@@ -65,19 +65,38 @@ internal class FloorVoronoiData {
     public IList<CurveLoop> Clip(VoronoiCell cell) {
         var cellSolid = _repo.CreateSolid(cell.Polygon.AsCurveLoop());
         var floorSolid = GetVoronoiSolid();
-        var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
-            cellSolid,
-            floorSolid,
-            BooleanOperationsType.Intersect);
+        var intersection = _repo.Intersect(cellSolid, floorSolid);
         var topFace = _repo.GetTopFace(intersection);
         return topFace.GetEdgesAsCurveLoops();
+    }
+
+    /// <summary>
+    /// Объединяет заданные ячейки и обрезает их по контуру перекрытия с учетом заданной пороговой площади отверстий
+    /// </summary>
+    /// <param name="wallCells">Ячейки диаграммы Вороного, построенные для одной стены</param>
+    /// <returns>Список петель ячейки диаграммы для всей стены</returns>
+    public IList<CurveLoop> Clip(IList<VoronoiCell> wallCells) {
+        var unitedSolid = CreateUnitedSolid(wallCells);
+        var intersection = _repo.Intersect(unitedSolid, GetVoronoiSolid());
+        var topFace = _repo.GetTopFace(intersection);
+        return topFace.GetEdgesAsCurveLoops();
+    }
+
+    private Solid CreateUnitedSolid(IList<VoronoiCell> cells) {
+        var solid = _repo.CreateSolid(cells[0].Polygon.AsCurveLoop());
+        for(int i = 1; i < cells.Count; i++) {
+            var isolid = _repo.CreateSolid(cells[i].Polygon.AsCurveLoop());
+            solid = _repo.Unite(solid, isolid);
+        }
+
+        return solid;
     }
 
     /// <summary>
     /// Возвращает список контуров перекрытия в плоскости XOY с учетом заданной пороговой площади отверстий
     /// </summary>
     /// <returns>Первая петля - наружняя, остальные - отверстия, удовлетворяющие допуску</returns>
-    public IList<CurveLoop> GetVoronoiOutline() {
+    private IList<CurveLoop> GetVoronoiOutline() {
         if(_outline is not null) {
             return _outline;
         }

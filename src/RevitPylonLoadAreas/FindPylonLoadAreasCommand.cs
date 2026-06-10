@@ -8,6 +8,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
@@ -30,7 +31,8 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
         using IKernel kernel = uiApplication.CreatePlatformServices();
 
         kernel.Bind<RevitRepository>().ToSelf().InSingletonScope();
-        kernel.Bind<SystemConfig>().ToSelf().InSingletonScope();
+        kernel.Bind<SystemConfig>()
+            .ToMethod(c => SystemConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()));
         kernel.Bind<VoronoiBuilder>().ToSelf().InSingletonScope();
         kernel.Bind<LoadAreasFinder>().ToSelf().InSingletonScope();
         kernel.Bind<FilledRegionDrawer>().ToSelf().InSingletonScope();
@@ -40,32 +42,8 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        var repo = kernel.Get<RevitRepository>();
-        var localization = kernel.Get<ILocalizationService>();
-
-        ValidateView(repo, localization);
-        var floor = PickFloor(repo, localization);
-        var pylons = PickPylons(repo, localization);
-        var walls = PickWalls(repo, localization);
-
-        var loadAreasFinder = kernel.Get<LoadAreasFinder>();
-        var loadAreas = loadAreasFinder.Process(floor, pylons, walls);
-
-        var drawer = kernel.Get<FilledRegionDrawer>();
-        using(var t = repo.Document.StartTransaction(localization.GetLocalizedString("Transaction.DrawLoadAreas"))) {
-            foreach(var loadArea in loadAreas) {
-                drawer.Draw(loadArea);
-                double area = repo.GetArea([..loadArea.Circuits]);
-                // TODO определить параметр, куда писать площадь
-                loadArea.Element.SetParamValue(
-                    BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
-                    UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters)
-                        .ToString("0.000", CultureInfo.CurrentCulture));
-            }
-
-            t.Commit();
-        }
-
+        Run(kernel);
+        kernel.Get<SystemConfig>().SaveProjectConfig();
         Notification(true);
     }
 
@@ -85,13 +63,35 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
     }
 
     private ICollection<Wall> PickWalls(RevitRepository repo, ILocalizationService localization) {
-        ICollection<Wall> walls;
-        try {
-            walls = repo.PickWalls(localization.GetLocalizedString("Pick.Walls"));
-        } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
-            walls = [];
+        return repo.PickWalls(localization.GetLocalizedString("Pick.Walls"));
+    }
+
+    private void Run(IKernel kernel) {
+        var repo = kernel.Get<RevitRepository>();
+        var localization = kernel.Get<ILocalizationService>();
+
+        ValidateView(repo, localization);
+        var floor = PickFloor(repo, localization);
+        var pylons = PickPylons(repo, localization);
+        var walls = PickWalls(repo, localization);
+
+        var loadAreasFinder = kernel.Get<LoadAreasFinder>();
+        var loadAreas = loadAreasFinder.Process(floor, pylons, walls);
+
+        var drawer = kernel.Get<FilledRegionDrawer>();
+        using var t = repo.Document.StartTransaction(localization.GetLocalizedString("Transaction.DrawLoadAreas"));
+        foreach(var loadArea in loadAreas) {
+            drawer.Draw(loadArea);
+            double area = repo.GetArea([..loadArea.Circuits]);
+            // TODO определить параметр, куда писать площадь
+            if(loadArea.Element is FamilyInstance pylon) {
+                pylon.SetParamValue(
+                    BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
+                    UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters)
+                        .ToString("0.000", CultureInfo.CurrentCulture));
+            }
         }
 
-        return walls;
+        t.Commit();
     }
 }

@@ -26,20 +26,22 @@ internal sealed class LoadAreasFinder {
     }
 
     public ICollection<LoadArea> Process(Floor floor, ICollection<FamilyInstance> pylons, ICollection<Wall> walls) {
-        var floorData = new FloorVoronoiData(floor, _repo, _config.OpeningMinArea);
+        var floorData = new FloorVoronoiData(floor, _repo, _config.GetOpeningMinArea());
         var sites = GetSites(floorData, pylons, walls);
-        var voronoiCells = _voronoiBuilder.Build(sites).ToArray();
+        var elementsCells = _voronoiBuilder.Build(sites).GroupBy(c => c.Site.Element.Id).ToArray();
 
-        var pylonIds = pylons.Select(pylon => pylon.Id).ToHashSet();
         List<LoadArea> loadAreas = [];
-        foreach(var cell in voronoiCells) {
-            // работаем только с грузовыми площадями пилонов
-            if(!pylonIds.Contains(cell.Site.Element.Id)) {
-                continue;
+        foreach(var elementCells in elementsCells) {
+            var cells = elementCells.ToArray();
+            IList<CurveLoop> loops;
+            var element = cells[0].Site.Element;
+            if(cells.Length == 1) {
+                loops = floorData.Clip(cells[0]);
+            } else {
+                loops = floorData.Clip(cells);
             }
 
-            var areaLoops = floorData.Clip(cell);
-            loadAreas.Add(new LoadArea(cell.Site.Element, areaLoops));
+            loadAreas.Add(new LoadArea(element, loops));
         }
 
         return loadAreas;
@@ -69,11 +71,11 @@ internal sealed class LoadAreasFinder {
     private ICollection<XY> GetWallPoints(Wall wall) {
         var curve = ((LocationCurve) wall.Location).Curve;
         double length = curve.Length;
-        if(length < _config.WallsTessellationStep) {
+        if(length < _config.GetWallsTessellationStep()) {
             return [new XY(curve.GetEndPoint(0))];
         }
 
-        int segments = (int) Math.Ceiling(length / _config.WallsTessellationStep);
+        int segments = (int) Math.Ceiling(length / _config.GetWallsTessellationStep());
         List<XY> points = [];
         for(int i = 0; i <= segments; i++) {
             double t = i / (double) segments;

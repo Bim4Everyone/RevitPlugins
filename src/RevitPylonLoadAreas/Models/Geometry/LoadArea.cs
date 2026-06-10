@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -19,6 +20,9 @@ internal sealed class LoadArea {
     public LoadArea(Element element, IList<CurveLoop> circuits) {
         Element = element ?? throw new ArgumentNullException(nameof(element));
         Circuits = circuits ?? throw new ArgumentNullException(nameof(circuits));
+        if(Circuits.Count == 0) {
+            throw new ArgumentOutOfRangeException(nameof(circuits));
+        }
     }
 
     public Element Element { get; }
