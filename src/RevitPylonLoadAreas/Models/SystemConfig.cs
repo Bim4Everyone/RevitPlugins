@@ -25,6 +25,11 @@ internal sealed class SystemConfig : ProjectConfig {
     public double OpeningMinAreaM2 { get; set; } = 1;
 
     /// <summary>
+    /// Название типоразмера семейства цветовой области для отображения грузовой площади
+    /// </summary>
+    public string FilledRegionTypeName { get; set; } = string.Empty;
+
+    /// <summary>
     /// Возвращает <see cref="OpeningMinAreaM2"/> в единицах Revit
     /// </summary>
     public double GetOpeningMinArea() {

@@ -32,7 +32,8 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
 
         kernel.Bind<RevitRepository>().ToSelf().InSingletonScope();
         kernel.Bind<SystemConfig>()
-            .ToMethod(c => SystemConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()));
+            .ToMethod(c => SystemConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()))
+            .InSingletonScope();
         kernel.Bind<VoronoiBuilder>().ToSelf().InSingletonScope();
         kernel.Bind<LoadAreasFinder>().ToSelf().InSingletonScope();
         kernel.Bind<FilledRegionDrawer>().ToSelf().InSingletonScope();

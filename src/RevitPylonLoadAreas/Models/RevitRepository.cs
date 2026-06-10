@@ -49,11 +49,13 @@ internal class RevitRepository {
         return refs.Select(r => (Wall) Document.GetElement(r)).ToArray();
     }
 
-    public FilledRegionType GetFirstFilledRegionType() {
-        return new FilteredElementCollector(Document)
+    public FilledRegionType GetFilledRegionTypeOrDefault(string name = "") {
+        var types = new FilteredElementCollector(Document)
             .OfClass(typeof(FilledRegionType))
             .OfType<FilledRegionType>()
-            .FirstOrDefault();
+            .ToArray();
+        return types.FirstOrDefault(t => t.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase))
+               ?? types.FirstOrDefault();
     }
 
     public double GetArea(params CurveLoop[] loops) {
