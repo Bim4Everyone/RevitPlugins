@@ -74,7 +74,10 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
         var drawer = kernel.Get<FilledRegionDrawer>();
         using var t = repo.Document.StartTransaction(localization.GetLocalizedString("Transaction.DrawLoadAreas"));
         foreach(var loadArea in loadAreas) {
-            drawer.Draw(loadArea);
+            var region = drawer.Draw(loadArea);
+            region.SetParamValue(
+                BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
+                loadArea.Element.Id.GetIdValue().ToString()); // для контроля правильности построения
             double area = repo.GetArea([..loadArea.Circuits]);
             // TODO определить параметр, куда писать площадь
             if(loadArea.Element is FamilyInstance pylon) {
