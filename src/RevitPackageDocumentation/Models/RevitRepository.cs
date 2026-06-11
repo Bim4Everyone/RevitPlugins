@@ -133,20 +133,14 @@ internal class RevitRepository {
     /// Возвращает список всех типов видовых экранов в проекте
     /// </summary>
     public List<ElementType> GetViewportTypes() {
-        var viewport = new FilteredElementCollector(Document)
-            .OfClass(typeof(Viewport))
-            .OfType<Viewport>()
-            .FirstOrDefault();
+        var defaultElementType = Document.GetElement(
+            Document.GetDefaultElementTypeId(ElementTypeGroup.ViewportType)) as ElementType;
 
-        if(viewport is null) {
-            _messageBoxService.Show("Для корректной работы плагина разместите любой один вид на любом листе!", "Ошибка!");
-            return [];
-        } else {
-            return viewport.GetValidTypes()
-                .Select(id => Document.GetElement(id) as ElementType)
-                .OrderBy(a => a.Name)
-                .ToList();
-        }
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(ElementType))
+            .OfType<ElementType>()
+            .Where(q => q.FamilyName == defaultElementType.FamilyName)
+            .ToList();
     }
 
     /// <summary>
