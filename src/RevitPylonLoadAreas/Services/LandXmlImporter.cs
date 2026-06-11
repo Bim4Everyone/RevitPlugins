@@ -9,6 +9,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 
+using RevitPylonLoadAreas.Models;
 using RevitPylonLoadAreas.Models.Geometry;
 
 namespace RevitPylonLoadAreas.Services;
@@ -18,11 +19,12 @@ namespace RevitPylonLoadAreas.Services;
 /// LandXML 1.2 spec: http://www.landxml.org/schema/LandXML-1.2/LandXML-1.2.xsd
 /// </summary>
 internal sealed class LandXmlImporter {
-    private readonly ILocalizationService _localizationService;
+    private readonly RevitRepository _repo;
+    private readonly ILocalizationService _localization;
 
-    public LandXmlImporter(ILocalizationService localizationService) {
-        _localizationService = localizationService
-                               ?? throw new ArgumentNullException(nameof(localizationService));
+    public LandXmlImporter(RevitRepository repo, ILocalizationService localization) {
+        _repo = repo ?? throw new ArgumentNullException(nameof(repo));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
     }
 
     /// <summary>
@@ -35,18 +37,18 @@ internal sealed class LandXmlImporter {
     public ICollection<Polygon3D> Import(string path) {
         if(!File.Exists(path)) {
             throw new FileNotFoundException(
-                _localizationService.GetLocalizedString("Error.LandXmlFileNotFound"),
+                _localization.GetLocalizedString("Error.LandXmlFileNotFound"),
                 path);
         }
 
         var doc = XDocument.Load(path);
         var root = doc.Root
                    ?? throw new InvalidOperationException(
-                       _localizationService.GetLocalizedString("Error.LandXmlEmptyFile"));
+                       _localization.GetLocalizedString("Error.LandXmlEmptyFile"));
         var ns = root.Name.Namespace;
         if(ns != XNamespace.Get("http://www.landxml.org/schema/LandXML-1.2")) {
             throw new InvalidOperationException(
-                _localizationService.GetLocalizedString("Error.LandXmlVersionNotSupported", ns));
+                _localization.GetLocalizedString("Error.LandXmlVersionNotSupported", ns));
         }
 
         double feetPerUnit = GetFeetPerLinearUnit(root, ns);
@@ -78,7 +80,7 @@ internal sealed class LandXmlImporter {
             "USSurveyFoot" => UnitUtils.ConvertToInternalUnits(1, UnitTypeId.UsSurveyFeet),
             "mile" => 5280,
             _ => throw new InvalidOperationException(
-                _localizationService.GetLocalizedString("Error.LandXmlUnknownLinearUnit", linearUnit))
+                _localization.GetLocalizedString("Error.LandXmlUnknownLinearUnit", linearUnit))
         };
     }
 
@@ -87,11 +89,11 @@ internal sealed class LandXmlImporter {
         foreach(var p in definition.Elements(ns + "Pnts").Elements(ns + "P")) {
             string id = p.Attribute("id")?.Value
                         ?? throw new InvalidOperationException(
-                            _localizationService.GetLocalizedString("Error.LandXmlPointWithoutId"));
+                            _localization.GetLocalizedString("Error.LandXmlPointWithoutId"));
             double[] coords = ParseDoubles(p.Value);
             if(coords.Length < 3) {
                 throw new InvalidOperationException(
-                    _localizationService.GetLocalizedString("Error.LandXmlPointInvalidCoords", id));
+                    _localization.GetLocalizedString("Error.LandXmlPointInvalidCoords", id));
             }
 
             // порядок координат по схеме LandXML: northing easting elevation
@@ -118,10 +120,55 @@ internal sealed class LandXmlImporter {
                 .Select(id => points.TryGetValue(id, out var xyz)
                     ? xyz
                     : throw new InvalidOperationException(
-                        _localizationService.GetLocalizedString("Error.LandXmlFaceUnknownPoint", id)))
+                        _localization.GetLocalizedString("Error.LandXmlFaceUnknownPoint", id)))
                 .ToArray();
+            if(IsDegeneratePolygon(vertices)) {
+                continue; // вырожденный 3D полигон
+            }
+
+            if(IsDegeneratePolygon(vertices.Select(v => new XY(v)).ToArray())) {
+                continue; // проекция полигона на XOY - вырожденный 2D полигон 
+            }
             yield return new Polygon3D(vertices);
         }
+    }
+
+    private bool IsDegeneratePolygon(XYZ[] points) {
+        if(points.Length < 3) {
+            return true;
+        }
+
+        double tolerance = _repo.Application.ShortCurveTolerance;
+        if(points[0].DistanceTo(points[points.Length - 1]) <= tolerance) {
+            return true;
+        }
+
+        for(int i = 0; i < points.Length - 1; i++) {
+            if(points[i].DistanceTo(points[i + 1]) <= tolerance) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool IsDegeneratePolygon(XY[] points) {
+        if(points.Length < 3) {
+            return true;
+        }
+
+        double tolerance = _repo.Application.ShortCurveTolerance;
+        if(points[0].DistanceTo(points[points.Length - 1]) <= tolerance) {
+            return true;
+        }
+
+        for(int i = 0; i < points.Length - 1; i++) {
+            if(points[i].DistanceTo(points[i + 1]) <= tolerance) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private double[] ParseDoubles(string value) {

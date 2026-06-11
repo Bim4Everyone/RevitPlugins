@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Reflection;
 
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -53,9 +54,17 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
         var repo = kernel.Get<RevitRepository>();
         // TODO
         var polygons = importer.Import(dialog.File.FullName);
-        var solid = repo.CreateSolid(polygons);
         using var t = repo.Document.StartTransaction("test");
-        repo.CreateDirectShape(solid);
+        var basePoint = BasePoint.GetSurveyPoint(repo.Document);
+        var transform = Transform.CreateTranslation(new XYZ(basePoint.Position.X, basePoint.Position.Y, 0));
+        foreach(var polygon in polygons) {
+            try {
+                var solid = repo.CreateSolid(polygon, transform);
+                repo.CreateDirectShape(solid);
+            } catch(Autodesk.Revit.Exceptions.InternalException) {
+                continue;
+            }
+        }
         t.Commit();
     }
 }

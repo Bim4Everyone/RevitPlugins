@@ -73,17 +73,14 @@ internal class RevitRepository {
         return GeometryCreationUtilities.CreateExtrusionGeometry(loops, XYZ.BasisZ, 1);
     }
 
-    public Solid CreateSolid(ICollection<Polygon3D> polygons) {
-        Solid solid = null;
-        foreach(var polygon in polygons) {
-            var xyLoop = polygon.ToPolygon2D().AsCurveLoop();
-            var xyzLoop = polygon.AsCurveLoop();
-            var vertexPairs = Enumerable.Range(0, xyLoop.Count()).Select(i => new VertexPair(i, i)).ToArray();
-            var polygonSolid = GeometryCreationUtilities.CreateBlendGeometry(xyLoop, xyzLoop, vertexPairs);
-            solid = solid is null ? polygonSolid : Unite(solid, polygonSolid);
-        }
-
-        return solid;
+    public Solid CreateSolid(Polygon3D polygon, Transform transform) {
+        var xyLoop = CurveLoop.CreateViaTransform(
+            polygon.ToPolygon2D().AsCurveLoop(),
+            Transform.CreateTranslation(-5 * XYZ.BasisZ)
+                .Multiply(transform));
+        var xyzLoop = CurveLoop.CreateViaTransform(polygon.AsCurveLoop(), transform);
+        var vertexPairs = Enumerable.Range(0, xyLoop.Count()).Select(i => new VertexPair(i, i)).ToArray();
+        return GeometryCreationUtilities.CreateBlendGeometry(xyLoop, xyzLoop, vertexPairs);
     }
 
     public void CreateDirectShape(Solid solid) {
