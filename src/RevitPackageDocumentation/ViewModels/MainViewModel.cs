@@ -16,7 +16,7 @@ using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.Models.ScheduleFilters;
 using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
-using RevitPackageDocumentation.ViewModels.Parameters;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels;
 

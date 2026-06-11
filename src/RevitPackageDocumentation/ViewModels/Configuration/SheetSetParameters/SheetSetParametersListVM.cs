@@ -8,7 +8,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
-using RevitPackageDocumentation.ViewModels.Parameters;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters;
 internal class SheetSetParametersListVM : BaseViewModel {

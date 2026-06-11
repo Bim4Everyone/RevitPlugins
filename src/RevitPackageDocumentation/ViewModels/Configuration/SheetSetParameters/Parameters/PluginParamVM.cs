@@ -3,9 +3,7 @@ using System.Windows.Input;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters;
-
-namespace RevitPackageDocumentation.ViewModels.Parameters;
+namespace RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 internal abstract class PluginParamVM : BaseViewModel {
     private string _paramName;
     private string _paramComment;

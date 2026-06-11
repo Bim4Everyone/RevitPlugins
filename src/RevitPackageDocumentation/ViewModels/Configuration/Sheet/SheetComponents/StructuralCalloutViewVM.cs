@@ -7,7 +7,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
-using RevitPackageDocumentation.ViewModels.Parameters;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class StructuralCalloutViewVM : SheetComponentVM {

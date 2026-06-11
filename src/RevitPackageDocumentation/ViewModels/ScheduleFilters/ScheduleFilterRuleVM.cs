@@ -5,7 +5,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ScheduleFilters;
-using RevitPackageDocumentation.ViewModels.Parameters;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.ScheduleFilters;
 internal class ScheduleFilterRuleVM : BaseViewModel {

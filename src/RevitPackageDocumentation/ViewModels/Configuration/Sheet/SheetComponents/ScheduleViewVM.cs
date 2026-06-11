@@ -8,7 +8,7 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
-using RevitPackageDocumentation.ViewModels.Parameters;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;

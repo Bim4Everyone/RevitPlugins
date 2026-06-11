@@ -7,7 +7,7 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitPackageDocumentation.Models;
-using RevitPackageDocumentation.ViewModels.Parameters;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class StructuralPlanViewVM : SheetComponentVM {

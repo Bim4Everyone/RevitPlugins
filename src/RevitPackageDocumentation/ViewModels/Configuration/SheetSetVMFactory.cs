@@ -12,7 +12,7 @@ using RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters;
-using RevitPackageDocumentation.ViewModels.Parameters;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration;

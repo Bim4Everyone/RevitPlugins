@@ -11,7 +11,7 @@
     xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
     xmlns:s="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
     xmlns:sc="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents"
-    xmlns:pp="clr-namespace:RevitPackageDocumentation.ViewModels.Parameters">
+    xmlns:pp="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="CustomStyles.xaml" />

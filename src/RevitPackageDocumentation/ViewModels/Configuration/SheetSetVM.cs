@@ -9,7 +9,7 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters;
-using RevitPackageDocumentation.ViewModels.Parameters;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration;
 internal class SheetSetVM : BaseViewModel {

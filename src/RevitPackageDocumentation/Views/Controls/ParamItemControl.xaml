@@ -7,7 +7,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    xmlns:pp="clr-namespace:RevitPackageDocumentation.ViewModels.Parameters"
+    xmlns:pp="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters"
     xmlns:local="clr-namespace:RevitPackageDocumentation.Views.Controls"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=pp:PluginParamVM}"
