@@ -17,4 +17,22 @@
     <system:String
         x:Key="Error.FilledRegionTypeNotFound">В проекте не найден ни один тип цветовой области.</system:String>
 
+    <system:String
+        x:Key="OpenLandXmlDialog.Title">Выберите файл LandXML</system:String>
+
+    <system:String
+        x:Key="Error.LandXmlFileNotFound">Файл не найден.</system:String>
+    <system:String
+        x:Key="Error.LandXmlEmptyFile">Файл LandXML пуст.</system:String>
+    <system:String
+        x:Key="Error.LandXmlVersionNotSupported">Поддерживается только LandXML версии 1.2, схема файла: '{0}'</system:String>
+    <system:String
+        x:Key="Error.LandXmlUnknownLinearUnit">Не удалось определить единицы длины файла LandXML: '{0}'</system:String>
+    <system:String
+        x:Key="Error.LandXmlPointWithoutId">Точка поверхности не содержит id.</system:String>
+    <system:String
+        x:Key="Error.LandXmlPointInvalidCoords">Точка {0} не содержит трех координат.</system:String>
+    <system:String
+        x:Key="Error.LandXmlFaceUnknownPoint">Грань ссылается на несуществующую точку {0}.</system:String>
+
 </ResourceDictionary>

@@ -17,4 +17,22 @@
     <system:String
         x:Key="Error.FilledRegionTypeNotFound">No filled region type was found in the project.</system:String>
 
+    <system:String
+        x:Key="OpenLandXmlDialog.Title">Select a LandXML file</system:String>
+
+    <system:String
+        x:Key="Error.LandXmlFileNotFound">File not found.</system:String>
+    <system:String
+        x:Key="Error.LandXmlEmptyFile">The LandXML file is empty.</system:String>
+    <system:String
+        x:Key="Error.LandXmlVersionNotSupported">Only LandXML version 1.2 is supported, file schema: '{0}'</system:String>
+    <system:String
+        x:Key="Error.LandXmlUnknownLinearUnit">Failed to determine the linear unit of the LandXML file: '{0}'</system:String>
+    <system:String
+        x:Key="Error.LandXmlPointWithoutId">A surface point has no id.</system:String>
+    <system:String
+        x:Key="Error.LandXmlPointInvalidCoords">Point {0} does not contain three coordinates.</system:String>
+    <system:String
+        x:Key="Error.LandXmlFaceUnknownPoint">A face references a non-existent point {0}.</system:String>
+
 </ResourceDictionary>

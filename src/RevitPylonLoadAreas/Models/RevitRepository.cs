@@ -10,6 +10,7 @@ using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit.Geometry;
 
+using RevitPylonLoadAreas.Models.Geometry;
 using RevitPylonLoadAreas.Models.Selection;
 
 namespace RevitPylonLoadAreas.Models;
@@ -31,22 +32,6 @@ internal class RevitRepository {
             new FloorSelectionFilter(),
             statusPrompt);
         return (Floor) Document.GetElement(reference);
-    }
-
-    public ICollection<FamilyInstance> PickStructuralColumns(string statusPrompt) {
-        var refs = ActiveUIDocument.Selection.PickObjects(
-            ObjectType.Element,
-            new StructuralColumnSelectionFilter(),
-            statusPrompt);
-        return refs.Select(r => (FamilyInstance) Document.GetElement(r)).ToList();
-    }
-
-    public ICollection<Wall> PickWalls(string statusPrompt) {
-        var refs = ActiveUIDocument.Selection.PickObjects(
-            ObjectType.Element,
-            new WallSelectionFilter(),
-            statusPrompt);
-        return refs.Select(r => (Wall) Document.GetElement(r)).ToArray();
     }
 
     public FilledRegionType GetFilledRegionTypeOrDefault(string name = "") {
@@ -86,6 +71,26 @@ internal class RevitRepository {
         }
 
         return GeometryCreationUtilities.CreateExtrusionGeometry(loops, XYZ.BasisZ, 1);
+    }
+
+    public Solid CreateSolid(ICollection<Polygon3D> polygons) {
+        Solid solid = null;
+        foreach(var polygon in polygons) {
+            var xyLoop = polygon.ToPolygon2D().AsCurveLoop();
+            var xyzLoop = polygon.AsCurveLoop();
+            var vertexPairs = Enumerable.Range(0, xyLoop.Count()).Select(i => new VertexPair(i, i)).ToArray();
+            var polygonSolid = GeometryCreationUtilities.CreateBlendGeometry(xyLoop, xyzLoop, vertexPairs);
+            solid = solid is null ? polygonSolid : Unite(solid, polygonSolid);
+        }
+
+        return solid;
+    }
+
+    public void CreateDirectShape(Solid solid) {
+        DirectShape ds = DirectShape.CreateElement(
+            Document,
+            new ElementId(BuiltInCategory.OST_GenericModel));
+        ds.SetShape(new GeometryObject[] { solid });
     }
 
     public Solid Intersect(Solid left, Solid right) {
