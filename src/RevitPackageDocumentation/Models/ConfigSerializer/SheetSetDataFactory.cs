@@ -27,7 +27,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
         return new SheetSetData {
             Name = vm.Name,
             Sheets = vm.SheetList?.Select(CreateSheetData).ToList(),
-            Params = vm.Params?.Select(CreatePluginParamData).ToList()
+            Params = vm.SheetSetParams.Params?.Select(CreatePluginParamData).ToList()
         };
     }
 

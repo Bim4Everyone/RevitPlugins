@@ -3,7 +3,7 @@ using System.Windows.Input;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitPackageDocumentation.ViewModels.Configuration;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters;
 
 namespace RevitPackageDocumentation.ViewModels.Parameters;
 internal abstract class PluginParamVM : BaseViewModel {
@@ -11,10 +11,9 @@ internal abstract class PluginParamVM : BaseViewModel {
     private string _paramComment;
     private bool _errorInParamName;
     private bool _errorInParamValue;
-    private readonly SheetSetVM _sheetSet;
 
-    protected PluginParamVM(SheetSetVM sheetSetVM, string paramName, string paramComment) {
-        _sheetSet = sheetSetVM;
+    protected PluginParamVM(SheetSetParametersListVM sheetSetParamsList, string paramName, string paramComment) {
+        SheetSetParamsList = sheetSetParamsList;
         ParamName = paramName ?? string.Empty;
         ParamComment = paramComment ?? string.Empty;
 
@@ -27,7 +26,7 @@ internal abstract class PluginParamVM : BaseViewModel {
     public ICommand ParamNameChangeCommand { get; }
     public ICommand ParamValueChangeCommand { get; }
 
-    public SheetSetVM SheetSet => _sheetSet;
+    public SheetSetParametersListVM SheetSetParamsList { get; }
 
     public string ParamName {
         get => _paramName;
@@ -52,13 +51,13 @@ internal abstract class PluginParamVM : BaseViewModel {
     private void ParamNameChange(PluginParamVM pluginParam) {
         ValidateParamName();
         if(!ErrorInParamName) {
-            SheetSet.UpdateDueParamNameChange(pluginParam);
+            SheetSetParamsList.SheetSet.UpdateDueParamNameChange(pluginParam);
         }
     }
 
     private void ParamValueChange(PluginParamVM pluginParam) {
         ValidateParamValue();
-        SheetSet.UpdateDueParamValueChange(pluginParam);
+        SheetSetParamsList.SheetSet.UpdateDueParamValueChange(pluginParam);
     }
 
 

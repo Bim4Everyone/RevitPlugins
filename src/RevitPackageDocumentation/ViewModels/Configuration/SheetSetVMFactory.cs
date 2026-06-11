@@ -11,6 +11,7 @@ using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters;
 using RevitPackageDocumentation.ViewModels.Parameters;
 using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 
@@ -20,7 +21,7 @@ internal interface ISheetSetVMFactory {
     SheetSetVM CreateSheetSetVM(SheetSetData data);
     SheetVM CreateSheetVM(SheetSetVM sheetSetVM, SheetData data);
     SheetComponentVM CreateComponentVM(SheetSetVM sheetSetVM, SheetVM sheetVM, SheetComponentData data);
-    PluginParamVM CreateParamVM(SheetSetVM sheetSetVM, PluginParamData data);
+    PluginParamVM CreateParamVM(SheetSetParametersListVM sheetSetParamsList, PluginParamData data);
 }
 
 internal class SheetSetVMFactory : ISheetSetVMFactory {
@@ -58,8 +59,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             Name = data.Name
         };
 
+        var sheetSetParams = new SheetSetParametersListVM(sheetSetVM, _messageBoxService, this, _sheetSetDataFactory);
         foreach(var paramData in data.Params) {
-            sheetSetVM.AddSheetSetParam(paramData);
+            sheetSetParams.AddSheetSetParam(paramData);
+            sheetSetVM.SheetSetParams = sheetSetParams;
         }
 
         foreach(var sheetData in data.Sheets) {
@@ -86,7 +89,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         var sheetVM = new SheetVM(
             _revitRepository,
             _stringParamSetService,
-            sheetSetVM.Params,
+            sheetSetVM.SheetSetParams.Params,
             sheetSetVM,
             _localizationService,
             _messageBoxService,
@@ -132,7 +135,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     private StructuralPlanViewVM CreateStructuralPlanViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, StructuralPlanViewData data) {
         var sheetComponentVM = new StructuralPlanViewVM(
-            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -144,7 +147,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
             ViewCount = data.ViewCount ?? "1",
-            SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
+            SelectedSelectElemParam = sheetVM.SheetSet.SheetSetParams.SelectElemParams
                 .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
         };
 
@@ -155,7 +158,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     private StructuralCalloutViewVM CreateStructuralCalloutViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, StructuralCalloutViewData data) {
         var sheetComponentVM = new StructuralCalloutViewVM(
-            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -167,7 +170,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
             ViewCount = data.ViewCount ?? "1",
-            SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
+            SelectedSelectElemParam = sheetVM.SheetSet.SheetSetParams.SelectElemParams
                 .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
         };
 
@@ -178,7 +181,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     private SectionViewVM CreateSectionViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, SectionViewData data) {
         var sheetComponentVM = new SectionViewVM(
-            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -190,7 +193,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ViewTemplate = _revitRepository.SectionViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
             ViewCount = data.ViewCount ?? "1",
-            SelectedSelectElemParam = sheetVM.SheetSet.SelectElemParams
+            SelectedSelectElemParam = sheetVM.SheetSet.SheetSetParams.SelectElemParams
                 .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
         };
 
@@ -203,7 +206,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         var referenceSpec = _revitRepository.GetSpecByName(data.ReferenceViewName);
 
         var scheduleViewVM = new ScheduleViewVM(
-            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -226,7 +229,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     private TextNoteVM CreateTextNoteVM(SheetSetVM sheetSetVM, SheetVM sheetVM, TextNoteData data) {
         var sheetComponentVM = new TextNoteVM(
-            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -254,7 +257,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                     ?.FirstOrDefault(v => v.Name.Equals(data.AnnotationTypeName));
 
         var sheetComponentVM = new TypicalAnnotationVM(
-            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -272,7 +275,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     private LegendViewVM CreateLegendViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, LegendViewData data) {
         var sheetComponentVM = new LegendViewVM(
-            _revitRepository, _stringParamSetService, sheetSetVM.Params, sheetVM, _localizationService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
@@ -325,10 +328,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         scheduleViewVM.ScheduleFilterList = scheduleFilterList;
     }
 
-    public PluginParamVM CreateParamVM(SheetSetVM sheetSetVM, PluginParamData paramData) {
+    public PluginParamVM CreateParamVM(SheetSetParametersListVM sheetSetParamsList, PluginParamData paramData) {
         return paramData switch {
-            StringParamData data => new StringParamVM(sheetSetVM, data.ParamName, data.ParamComment, data.StringValue),
-            SelectElemParamData data => new SelectElemParamVM(sheetSetVM, data.ParamName, data.ParamComment),
+            StringParamData data => new StringParamVM(sheetSetParamsList, data.ParamName, data.ParamComment, data.StringValue),
+            SelectElemParamData data => new SelectElemParamVM(sheetSetParamsList, data.ParamName, data.ParamComment),
             _ => throw new NotSupportedException($"Тип '{paramData?.GetType().Name}' не поддерживается")
         };
     }

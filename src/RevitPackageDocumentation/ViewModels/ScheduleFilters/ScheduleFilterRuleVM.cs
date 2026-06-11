@@ -62,10 +62,10 @@ internal class ScheduleFilterRuleVM : BaseViewModel {
     }
 
     private void PropUpdateByFormula(string formulaPropertyName) {
-        StrParamSetService.Set(this, formulaPropertyName, ScheduleFilterList.ScheduleView.Sheet.SheetSet.Params);
+        StrParamSetService.Set(this, formulaPropertyName, ScheduleFilterList.ScheduleView.Sheet.SheetSet.SheetSetParams.Params);
     }
 
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
-        StrParamSetService.SetAll(this, ScheduleFilterList.ScheduleView.Sheet.SheetSet.Params, stringParam);
+        StrParamSetService.SetAll(this, ScheduleFilterList.ScheduleView.Sheet.SheetSet.SheetSetParams.Params, stringParam);
     }
 }

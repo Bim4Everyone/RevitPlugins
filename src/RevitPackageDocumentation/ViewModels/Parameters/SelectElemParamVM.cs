@@ -1,13 +1,13 @@
 using Autodesk.Revit.DB;
 
-using RevitPackageDocumentation.ViewModels.Configuration;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters;
 
 namespace RevitPackageDocumentation.ViewModels.Parameters;
 internal class SelectElemParamVM : PluginParamVM {
     private Element _selectedElem;
 
-    public SelectElemParamVM(SheetSetVM sheetSetVM, string paramName, string paramComment)
-        : base(sheetSetVM, paramName, paramComment) {
+    public SelectElemParamVM(SheetSetParametersListVM sheetSetParamsList, string paramName, string paramComment)
+        : base(sheetSetParamsList, paramName, paramComment) {
         ValidateParamValue();
     }
 

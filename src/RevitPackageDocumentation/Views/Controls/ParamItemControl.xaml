@@ -107,7 +107,7 @@
                 Content="✕"
                 Appearance="Danger"
                 Command="{Binding 
-                    Path=DataContext.CurrentSheetSet.RemoveSheetSetParamCommand, 
+                    Path=DataContext.CurrentSheetSet.SheetSetParams.RemoveSheetSetParamCommand, 
                     RelativeSource={RelativeSource AncestorType=Window}}"
                 CommandParameter="{Binding}">
             </ui:Button>

@@ -105,6 +105,10 @@ internal class SectionViewVM : SheetComponentVM {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
             return false;
         }
+        if(SelectedSelectElemParam.SelectedElem is null) {
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamValueIsNull");
+            return false;
+        }
         foreach(var param in CustomParamsList.Params) {
             if(string.IsNullOrEmpty(param.ParamName)) {
                 ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");

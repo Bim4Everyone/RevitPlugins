@@ -164,7 +164,7 @@
 
                         <ItemsControl
                             ItemsSource="{Binding 
-                                Path=CurrentSheetSet.Params, 
+                                Path=CurrentSheetSet.SheetSetParams.Params, 
                                 UpdateSourceTrigger=PropertyChanged, 
                                 Mode=TwoWay}">
                             <ItemsControl.ItemsPanel>
@@ -192,7 +192,7 @@
                             <i:EventTrigger
                                 EventName="SelectionChanged">
                                 <i:InvokeCommandAction
-                                    Command="{Binding CurrentSheetSet.AddSheetSetParamCommand}"
+                                    Command="{Binding CurrentSheetSet.SheetSetParams.AddSheetSetParamCommand}"
                                     CommandParameter="{Binding SelectedSheetSetParamType}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>

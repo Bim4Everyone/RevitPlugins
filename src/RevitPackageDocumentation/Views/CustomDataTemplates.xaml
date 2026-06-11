@@ -121,7 +121,7 @@
                 Grid.Column="1"
                 Grid.Row="5"
                 Margin="5"
-                ItemsSource="{Binding DataContext.CurrentSheetSet.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="ParamName"
                 SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
@@ -271,7 +271,7 @@
                 Grid.Column="1"
                 Grid.Row="5"
                 Margin="5"
-                ItemsSource="{Binding DataContext.CurrentSheetSet.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="ParamName"
                 SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
@@ -421,7 +421,7 @@
                 Grid.Column="1"
                 Grid.Row="5"
                 Margin="5"
-                ItemsSource="{Binding DataContext.CurrentSheetSet.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="ParamName"
                 SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 

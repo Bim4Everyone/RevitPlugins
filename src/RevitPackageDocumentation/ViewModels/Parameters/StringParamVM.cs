@@ -1,11 +1,11 @@
-using RevitPackageDocumentation.ViewModels.Configuration;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters;
 
 namespace RevitPackageDocumentation.ViewModels.Parameters;
 internal class StringParamVM : PluginParamVM {
     private string _stringValue;
 
-    public StringParamVM(SheetSetVM sheetSetVM, string paramName, string paramComment, string stringValue)
-        : base(sheetSetVM, paramName, paramComment) {
+    public StringParamVM(SheetSetParametersListVM sheetSetParamsList, string paramName, string paramComment, string stringValue)
+        : base(sheetSetParamsList, paramName, paramComment) {
         StringValue = stringValue ?? string.Empty;
         ValidateParamValue();
     }
