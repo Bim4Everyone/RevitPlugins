@@ -99,6 +99,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleCode = "123",
 
             SheetNameFormula = data.SheetNameFormula ?? string.Empty,
+            SheetName = data.SheetNameFormula ?? string.Empty,
             SheetSize = data.SheetSize ?? string.Empty,
             SheetCoefficient = data.SheetCoefficient ?? string.Empty,
 
@@ -138,6 +139,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleCode = "123",
 
             ViewNameFormula = data.ViewNameFormula ?? string.Empty,
+            ViewName = data.ViewNameFormula ?? string.Empty,
             ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
             ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
@@ -160,6 +162,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleCode = "05",
 
             ViewNameFormula = data.ViewNameFormula ?? string.Empty,
+            ViewName = data.ViewNameFormula ?? string.Empty,
             ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
             ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
@@ -182,6 +185,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleCode = "789",
 
             ViewNameFormula = data.ViewNameFormula ?? string.Empty,
+            ViewName = data.ViewNameFormula ?? string.Empty,
             ViewFamilyType = _revitRepository.SectionViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
             ViewTemplate = _revitRepository.SectionViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
@@ -207,6 +211,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             ReferenceSpec = referenceSpec,
             ViewNameFormula = data.ViewNameFormula ?? string.Empty,
+            ViewName = data.ViewNameFormula ?? string.Empty,
             ViewColumn = data.ViewColumn ?? "1",
             ViewCount = data.ViewCount ?? "1",
         };
@@ -228,6 +233,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleCode = "01",
 
             TextFormula = data.TextFormula ?? string.Empty,
+            Text = data.TextFormula ?? string.Empty,
             TextNoteType = _revitRepository.TextNoteTypes.FirstOrDefault(v => v.Name.Equals(data.TextNoteTypeName)),
         };
 
@@ -291,6 +297,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             var paramVM = new CustomParameterVM(customParamsList, _stringParamSetService) {
                 ParamName = paramData.ParamName ?? string.Empty,
                 ParamValueFormula = paramData.ParamValueFormula ?? string.Empty,
+                ParamValue = paramData.ParamValueFormula ?? string.Empty,
             };
             customParamsList.Params.Add(paramVM);
         }
