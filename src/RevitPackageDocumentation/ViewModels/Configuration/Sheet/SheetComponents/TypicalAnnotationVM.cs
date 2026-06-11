@@ -57,8 +57,6 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             ?.ToList();
     }
 
-    public override void CreateComponent() { }
-
     public override bool ValidateModule() {
         if(AnnotationFamily is null) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.AnnotationFamilyIsNull");

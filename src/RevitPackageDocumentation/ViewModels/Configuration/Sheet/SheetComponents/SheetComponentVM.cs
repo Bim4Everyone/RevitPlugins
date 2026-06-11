@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Parameters;
@@ -31,6 +32,7 @@ internal abstract class SheetComponentVM : BaseParamContainerVM {
         LocalizationService = localizationService;
 
         ModuleTypeName = LocalizationService.GetLocalizedString($"Type.{this.GetType().Name}");
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 
     public ICommand CreateComponentCommand { get; set; }
@@ -107,7 +109,17 @@ internal abstract class SheetComponentVM : BaseParamContainerVM {
             .FirstOrDefault()?.Viewport;
     }
 
-    public abstract void CreateComponent();
+    public void CreateComponent() {
+        using var transaction = Repository.Document.StartTransaction(
+            LocalizationService.GetLocalizedString("MainWindow.Title"));
+
+        if(Sheet.SheetInstance is null) {
+            Sheet.Process(false);
+        }
+        Process();
+        transaction.Commit();
+    }
+
     public abstract bool ValidateModule();
     public abstract void Process();
 }

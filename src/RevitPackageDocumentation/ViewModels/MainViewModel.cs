@@ -303,21 +303,9 @@ internal class MainViewModel : BaseViewModel {
         using var transaction = _revitRepository.Document.StartTransaction(
             _localizationService.GetLocalizedString("MainWindow.Title"));
 
-        var sheets = CurrentSheetSet.SheetList.Where(s => s.IsModuleCheck).ToList();
-
-        foreach(var sheet in sheets) {
-            sheet.Process();
+        foreach(var sheet in CurrentSheetSet.SheetList.Where(s => s.IsModuleCheck).ToList()) {
+            sheet.Process(true);
         }
-
-
-
-        //foreach(var component in CurrentSheetSet.SheetList
-        //    .Where(s => s.IsModuleCheck)
-        //    .SelectMany(s => s.SheetComponents)
-        //    .Where(c => c.IsModuleCheck)
-        //    .ToList()) {
-        //    component.Process();
-        //}
         transaction.Commit();
     }
 

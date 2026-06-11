@@ -82,8 +82,6 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
 
-    public override void CreateComponent() { }
-
     public override bool ValidateModule() {
         if(string.IsNullOrEmpty(ViewNameFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");

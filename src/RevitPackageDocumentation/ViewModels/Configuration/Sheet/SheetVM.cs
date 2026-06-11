@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
@@ -190,7 +191,13 @@ internal class SheetVM : BaseParamContainerVM {
         }
     }
 
-    public void CreateComponent() { }
+    public void CreateComponent() {
+        using var transaction = Repository.Document.StartTransaction(
+            _localizationService.GetLocalizedString("MainWindow.Title"));
+
+        Process(true);
+        transaction.Commit();
+    }
 
     public bool ValidateModule() {
         if(string.IsNullOrEmpty(SheetNameFormula)) {
@@ -229,7 +236,7 @@ internal class SheetVM : BaseParamContainerVM {
         return true;
     }
 
-    public void Process() {
+    public void Process(bool processComponent) {
         SheetInstance = null;
         SheetInstance = Repository.GetSheetByName(SheetName);
 
@@ -252,8 +259,10 @@ internal class SheetVM : BaseParamContainerVM {
             } catch(Exception) { }
         }
 
-        foreach(var component in SheetComponents.Where(c => c.IsModuleCheck).ToList()) {
-            component.Process();
+        if(processComponent) {
+            foreach(var component in SheetComponents.Where(c => c.IsModuleCheck).ToList()) {
+                component.Process();
+            }
         }
     }
 }

@@ -5,7 +5,6 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
-using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Parameters;
@@ -34,7 +33,6 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
     }
 
     public string ViewNameFormula {
@@ -77,8 +75,6 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewInstance, value);
     }
 
-    public override void CreateComponent() { ViewName += "1"; }
-
     public override bool ValidateModule() {
         if(string.IsNullOrEmpty(ViewNameFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
@@ -102,6 +98,10 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         }
         if(SelectedSelectElemParam is null) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
+            return false;
+        }
+        if(SelectedSelectElemParam.SelectedElem is null) {
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamValueIsNull");
             return false;
         }
         foreach(var param in CustomParamsList.Params) {

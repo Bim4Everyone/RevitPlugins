@@ -82,8 +82,6 @@ internal class ScheduleViewVM : SheetComponentVM {
     }
 
 
-    public override void CreateComponent() { }
-
     public override bool ValidateModule() {
         if(ReferenceSpec is null) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ReferenceViewNameIsEmpty");

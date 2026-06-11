@@ -33,8 +33,6 @@ internal class LegendViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewportType, value);
     }
 
-    public override void CreateComponent() { }
-
     public override bool ValidateModule() {
         if(LegendView is null) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.LegendViewIsNull");

@@ -39,8 +39,6 @@ internal class TextNoteVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _textType, value);
     }
 
-    public override void CreateComponent() { }
-
     public override bool ValidateModule() {
         if(string.IsNullOrEmpty(TextFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextIsEmpty");

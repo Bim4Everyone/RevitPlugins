@@ -104,7 +104,12 @@ internal class SheetSetVM : BaseViewModel {
                 _localizationService,
                 _messageBoxService,
                 _sheetSetVMFactory,
-                _sheetSetDataFactory) { ModuleName = "Новый лист" });
+                _sheetSetDataFactory) {
+                IsModuleCheck = true,
+                ModuleName = "Новый лист",
+                SheetSize = "1",
+                SheetCoefficient = "1",
+            });
     }
 
     internal void RemoveSheet(SheetVM sheet) {
