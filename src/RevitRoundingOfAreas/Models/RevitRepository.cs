@@ -33,7 +33,7 @@ internal class RevitRepository(
             if(sourceValue is 0) {
                 continue;
             }
-
+            
             double roundedValue = RoundWithAccuracy(sourceValue, accuracy);
 
             if(roundedValue is 0) {
@@ -178,9 +178,11 @@ internal class RevitRepository(
 
     // Метод округления числа с заданной точкой после запятой
     private double RoundWithAccuracy(double? value, int accuracy) {
+        double step = Math.Pow(10, -accuracy); // Зависимость от знаков после запятой
+        double eps  = step / 1000.0; // Погрешность
         return value.HasValue
             ? Math.Round(
-                ConvertValueFromInternalUnits(value.Value),
+                ConvertValueFromInternalUnits(value.Value) + eps,
                 accuracy,
                 systemPluginConfig.MidpointRounding)
             : 0;
