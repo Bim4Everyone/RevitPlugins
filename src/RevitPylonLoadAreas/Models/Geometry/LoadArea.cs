@@ -28,4 +28,9 @@ internal sealed class LoadArea {
     public Element Element { get; }
 
     public IList<CurveLoop> Circuits { get; }
+
+    public bool ElementIsPylon() {
+        return Element is FamilyInstance pylon
+               && pylon.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralColumns;
+    }
 }

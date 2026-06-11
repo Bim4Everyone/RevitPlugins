@@ -80,8 +80,8 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
                 loadArea.Element.Id.GetIdValue().ToString()); // для контроля правильности построения
             double area = repo.GetArea([..loadArea.Circuits]);
             // TODO определить параметр, куда писать площадь
-            if(loadArea.Element is FamilyInstance pylon) {
-                pylon.SetParamValue(
+            if(loadArea.ElementIsPylon()) {
+                loadArea.Element.SetParamValue(
                     BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
                     UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters)
                         .ToString("0.000", CultureInfo.CurrentCulture));
