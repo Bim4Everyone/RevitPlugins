@@ -145,6 +145,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -206,6 +207,19 @@
                         HorizontalAlignment="Right"
                         Text="{me:LocalizationSource MainWindow.AddSheetSetParam}"
                         PreviewMouseDown="SheetSetParamTypesComboBox_PreviewMouseDown" />
+
+                    <ui:TextBox
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Foreground="Orange"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="{Binding Path=CurrentSheetSet.SheetSetParams.SheetSetParamsErrors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PlaceholderText="{me:LocalizationSource MainWindow.ErrorsNotFound}"
+                        IsEnabled="False"
+                        Tag="{Binding Path=CurrentSheetSet.SheetSetParams.SheetSetParamsErrors}"
+                        Style="{StaticResource TextBoxForError}" />
                 </Grid>
             </Border>
 

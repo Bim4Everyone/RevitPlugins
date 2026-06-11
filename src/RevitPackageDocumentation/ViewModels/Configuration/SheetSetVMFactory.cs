@@ -59,7 +59,12 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             Name = data.Name
         };
 
-        var sheetSetParams = new SheetSetParametersListVM(sheetSetVM, _messageBoxService, this, _sheetSetDataFactory);
+        var sheetSetParams = new SheetSetParametersListVM(
+            sheetSetVM,
+            _messageBoxService,
+            this,
+            _sheetSetDataFactory,
+            _localizationService);
         foreach(var paramData in data.Params) {
             sheetSetParams.AddSheetSetParam(paramData);
             sheetSetVM.SheetSetParams = sheetSetParams;

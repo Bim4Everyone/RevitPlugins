@@ -15,18 +15,22 @@ internal class SheetSetParametersListVM : BaseViewModel {
     private readonly IMessageBoxService _messageBoxService;
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
+    private readonly ILocalizationService _localizationService;
     private ObservableCollection<PluginParamVM> _params = [];
     private ObservableCollection<SelectElemParamVM> _selectElemParams = [];
+    private string _sheetSetParamsErrors;
 
     public SheetSetParametersListVM(
         SheetSetVM sheetSet,
         IMessageBoxService messageBoxService,
         ISheetSetVMFactory sheetSetVMFactory,
-        ISheetSetDataFactory sheetSetDataFactory) {
+        ISheetSetDataFactory sheetSetDataFactory,
+        ILocalizationService localizationService) {
         SheetSet = sheetSet;
         _messageBoxService = messageBoxService;
         _sheetSetVMFactory = sheetSetVMFactory;
         _sheetSetDataFactory = sheetSetDataFactory;
+        _localizationService = localizationService;
 
         AddSheetSetParamCommand = RelayCommand.Create<ComponentTypeItem>(AddSheetSetParam);
         RemoveSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(RemoveSheetSetParam);
@@ -47,6 +51,25 @@ internal class SheetSetParametersListVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectElemParams, value);
     }
 
+    public string SheetSetParamsErrors {
+        get => _sheetSetParamsErrors;
+        set => RaiseAndSetIfChanged(ref _sheetSetParamsErrors, value);
+    }
+
+
+    public bool ValidateParams() {
+        if(Params?.Any(p => p.ErrorInParamName) == true) {
+            SheetSetParamsErrors = _localizationService.GetLocalizedString("MainWindow.ErrorInSheetSetParamNames");
+            return false;
+        }
+        if(Params?.Any(p => p.ErrorInParamValue) == true) {
+            SheetSetParamsErrors = _localizationService.GetLocalizedString("MainWindow.ErrorInSheetSetParamValues");
+            return false;
+        }
+
+        SheetSetParamsErrors = string.Empty;
+        return true;
+    }
 
     private void AddSheetSetParam(ComponentTypeItem selectedSheetSetParamType) {
         if(selectedSheetSetParamType?.ComponentType == null)
@@ -70,6 +93,7 @@ internal class SheetSetParametersListVM : BaseViewModel {
         if(parameter is SelectElemParamVM selectParam) {
             SelectElemParams.Add(selectParam);
         }
+        ValidateParams();
     }
 
 
@@ -96,6 +120,7 @@ internal class SheetSetParametersListVM : BaseViewModel {
         if(pluginParam != null && Params.Contains(pluginParam)) {
             Params.Remove(pluginParam);
         }
+        ValidateParams();
         SheetSet.ValidateAllSheets();
     }
 }

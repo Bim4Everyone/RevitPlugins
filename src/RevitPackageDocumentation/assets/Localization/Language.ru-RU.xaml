@@ -10,7 +10,7 @@
     <system:String x:Key="MainWindow.AddSheet">Добавить лист</system:String>
     <system:String x:Key="MainWindow.AddSheetComponent">Добавить компонент листа</system:String>
     <system:String x:Key="MainWindow.AddSheetSetParam">Добавить параметр</system:String>
-    <system:String x:Key="MainWindow.SheetSetParams">Параметр комплекта</system:String>
+    <system:String x:Key="MainWindow.SheetSetParams">Параметры комплекта</system:String>
     
     <system:String x:Key="ScheduleFilterType.Equal">Равно</system:String>
     <system:String x:Key="ScheduleFilterType.NotEqual">Не равно</system:String>

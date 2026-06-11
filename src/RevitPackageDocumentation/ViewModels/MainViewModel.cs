@@ -318,15 +318,9 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        if(CurrentSheetSet?.SheetSetParams.Params?.Any(p => p.ErrorInParamName) == true) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheetSetParamNames");
-            return false;
-        }
-        if(CurrentSheetSet?.SheetSetParams.Params?.Any(p => p.ErrorInParamValue) == true) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheetSetParamValues");
-            return false;
-        }
-        if(CurrentSheetSet?.SheetList?.Any(p => !string.IsNullOrEmpty(p.ModuleErrors)) == true) {
+        if(CurrentSheetSet?.SheetList?
+            .Where(s => s.IsModuleCheck)
+            .Any(p => !string.IsNullOrEmpty(p.ModuleErrors)) == true) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheets");
             return false;
         }

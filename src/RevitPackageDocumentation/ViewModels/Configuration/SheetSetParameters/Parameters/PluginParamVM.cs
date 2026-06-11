@@ -48,6 +48,7 @@ internal abstract class PluginParamVM : BaseViewModel {
 
     private void ParamNameChange(PluginParamVM pluginParam) {
         ValidateParamName();
+        SheetSetParamsList.ValidateParams();
         if(!ErrorInParamName) {
             SheetSetParamsList.SheetSet.UpdateDueParamNameChange(pluginParam);
         }
@@ -55,6 +56,7 @@ internal abstract class PluginParamVM : BaseViewModel {
 
     private void ParamValueChange(PluginParamVM pluginParam) {
         ValidateParamValue();
+        SheetSetParamsList.ValidateParams();
         SheetSetParamsList.SheetSet.UpdateDueParamValueChange(pluginParam);
     }
 
