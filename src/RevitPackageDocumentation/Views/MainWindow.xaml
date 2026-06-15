@@ -273,108 +273,113 @@
                         Margin="5"
                         Header="Настройки листа">
                         <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <ui:TextBlock
-                                Grid.Column="0"
-                                Grid.Row="0"
-                                Margin="5"
-                                VerticalAlignment="Center"
-                                Text="Семейство рамки" />
+                            <UniformGrid
+                                Rows="0"
+                                Grid.IsSharedSizeScope="True"
+                                extensions:UniformGridExtensions.AutoColumns="True"
+                                extensions:UniformGridExtensions.ColumnThresholds="1000,700">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                            <ComboBox
-                                Grid.Column="1"
-                                Grid.Row="0"
-                                Margin="5"
-                                Style="{StaticResource ComboBoxBySelectedSheet}"
-                                ItemsSource="{Binding Path=TitleBlockFamilies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                DisplayMemberPath="Name"
-                                SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger
-                                        EventName="DropDownClosed">
-                                        <i:InvokeCommandAction
-                                            Command="{Binding CurrentSheetSet.SelectedSheet.SelectTitleBlockFamilyCommand}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </ComboBox>
+                                    <ui:TextBlock
+                                        Grid.Column="0"
+                                        Margin="10 5 5 5"
+                                        VerticalAlignment="Center"
+                                        Text="Семейство рамки" />
 
-                            <ui:TextBlock
-                                Grid.Column="2"
-                                Grid.Row="0"
-                                Margin="5"
-                                VerticalAlignment="Center"
-                                Text="Типоразмер рамки" />
+                                    <ComboBox
+                                        Grid.Column="1"
+                                        Margin="5"
+                                        Style="{StaticResource ComboBoxBySelectedSheet}"
+                                        ItemsSource="{Binding Path=TitleBlockFamilies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        DisplayMemberPath="Name"
+                                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger
+                                                EventName="DropDownClosed">
+                                                <i:InvokeCommandAction
+                                                    Command="{Binding CurrentSheetSet.SelectedSheet.SelectTitleBlockFamilyCommand}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ComboBox>
+                                </Grid>
 
-                            <ComboBox
-                                Grid.Column="3"
-                                Grid.Row="0"
-                                Margin="5"
-                                Style="{StaticResource ComboBoxBySelectedSheet}"
-                                ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                DisplayMemberPath="Name"
-                                SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                IsSynchronizedWithCurrentItem="False" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                            <ui:TextBlock
-                                Grid.Column="0"
-                                Grid.Row="1"
-                                Margin="5"
-                                VerticalAlignment="Center"
-                                Text="Размер листа" />
+                                    <ui:TextBlock
+                                        Grid.Column="0"
+                                        Margin="10 5 5 5"
+                                        VerticalAlignment="Center"
+                                        Text="Типоразмер рамки" />
 
-                            <Grid
-                                Grid.Column="1"
-                                Grid.Row="1"
-                                Margin="10 5 5 5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                                    <ComboBox
+                                        Grid.Column="1"
+                                        Margin="5"
+                                        Style="{StaticResource ComboBoxBySelectedSheet}"
+                                        ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        DisplayMemberPath="Name"
+                                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        IsSynchronizedWithCurrentItem="False" />
+                                </Grid>
 
-                                <ui:TextBlock
-                                    Grid.Column="0"
-                                    Margin="5"
-                                    VerticalAlignment="Center"
-                                    Text="А" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <ui:TextBox
-                                    Grid.Column="1"
-                                    Margin="5"
-                                    Style="{StaticResource TextBoxBySelectedSheet}"
-                                    Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                    <ui:TextBlock
+                                        Grid.Column="0"
+                                        Margin="10 5 5 5"
+                                        VerticalAlignment="Center"
+                                        Text="Размер листа" />
 
-                                <ui:TextBlock
-                                    Grid.Column="2"
-                                    Margin="5"
-                                    VerticalAlignment="Center"
-                                    Text="x" />
+                                    <ui:TextBlock
+                                        Grid.Column="1"
+                                        Margin="5"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Right"
+                                        Text="А" />
 
-                                <ui:TextBox
-                                    Grid.Column="3"
-                                    Margin="5"
-                                    Style="{StaticResource TextBoxBySelectedSheet}"
-                                    Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetCoefficient, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                            </Grid>
+                                    <ui:TextBox
+                                        Grid.Column="2"
+                                        Margin="5"
+                                        MinWidth="50"
+                                        Style="{StaticResource TextBoxBySelectedSheet}"
+                                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+                                    <ui:TextBlock
+                                        Grid.Column="3"
+                                        Margin="5"
+                                        VerticalAlignment="Center"
+                                        Text="x" />
+
+                                    <ui:TextBox
+                                        Grid.Column="4"
+                                        Margin="5"
+                                        MinWidth="50"
+                                        Style="{StaticResource TextBoxBySelectedSheet}"
+                                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetCoefficient, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                </Grid>
+                            </UniformGrid>
 
                             <Border
-                                Grid.Column="0"
-                                Grid.ColumnSpan="4"
-                                Grid.Row="2"
+                                Grid.Row="1"
                                 Margin="5"
                                 Style="{StaticResource CustomBorder}">
                                 <Grid>

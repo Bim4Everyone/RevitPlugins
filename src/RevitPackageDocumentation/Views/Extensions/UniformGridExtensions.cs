@@ -38,12 +38,7 @@ internal static class UniformGridExtensions {
 
     private static void OnThresholdsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
         if(d is UniformGrid uniformGrid && GetAutoColumns(uniformGrid)) {
-            if((bool) e.NewValue) {
-                uniformGrid.SizeChanged += UniformGrid_SizeChanged;
-                UpdateColumns(uniformGrid);
-            } else {
-                uniformGrid.SizeChanged -= UniformGrid_SizeChanged;
-            }
+            UpdateColumns(uniformGrid);
         }
     }
 
