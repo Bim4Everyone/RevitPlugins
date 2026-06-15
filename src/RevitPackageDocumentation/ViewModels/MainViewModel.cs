@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -220,6 +221,12 @@ internal class MainViewModel : BaseViewModel {
             .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SheetComponentVM)))
             .Select(t =>
                 new ComponentTypeItem(t, _localizationService.GetLocalizedString($"Type.{t.Name}") ?? string.Empty))
+            .OrderBy(item => item.ComponentType switch {
+                Type t when t == typeof(StructuralPlanViewVM) => 1,
+                Type t when t == typeof(SectionViewVM) => 2,
+                Type t when t == typeof(StructuralCalloutViewVM) => 3,
+                _ => 4
+            })
             .ToList();
         SelectedComponentType = null;
 
