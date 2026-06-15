@@ -34,6 +34,8 @@
         <ui:TextBox
             x:Name="FormulaInputTextBox"
             Grid.Row="0"
+            AcceptsReturn="{Binding Path=AcceptsReturn, ElementName=root}"
+            TextWrapping="WrapWithOverflow"
             Style="{Binding Path=TextBoxStyle, ElementName=root, TargetNullValue={StaticResource {x:Type ui:TextBox}}}"
             Text="{Binding Path=PropFormula, ElementName=root, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
@@ -45,6 +47,7 @@
             FontSize="12"
             VerticalAlignment="Top"
             Visibility="Collapsed"
+            TextWrapping="WrapWithOverflow"
             Text="{Binding Path=PropResult, ElementName=root, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
     </Grid>
 </UserControl>

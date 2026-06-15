@@ -22,6 +22,10 @@ public partial class FormulaTextBoxControl : UserControl {
     public static readonly DependencyProperty TextBoxStyleProperty =
         DependencyProperty.Register(nameof(TextBoxStyle), typeof(Style), typeof(FormulaTextBoxControl));
 
+    public static readonly DependencyProperty AcceptsReturnProperty =
+        DependencyProperty.Register(nameof(AcceptsReturn), typeof(bool), typeof(FormulaTextBoxControl),
+            new FrameworkPropertyMetadata(false));
+
     public string PropFormula {
         get => (string) GetValue(PropFormulaProperty);
         set => SetValue(PropFormulaProperty, value);
@@ -40,6 +44,11 @@ public partial class FormulaTextBoxControl : UserControl {
     public Style TextBoxStyle {
         get => (Style) GetValue(TextBoxStyleProperty);
         set => SetValue(TextBoxStyleProperty, value);
+    }
+
+    public bool AcceptsReturn {
+        get => (bool) GetValue(AcceptsReturnProperty);
+        set => SetValue(AcceptsReturnProperty, value);
     }
 
     private static void OnPropResultChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
