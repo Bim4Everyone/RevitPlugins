@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 
 using Autodesk.Revit.Attributes;
@@ -7,6 +9,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
@@ -15,6 +18,7 @@ using dosymep.WpfCore.Ninject;
 using Ninject;
 
 using RevitPylonLoadAreas.Models;
+using RevitPylonLoadAreas.Models.Geometry;
 using RevitPylonLoadAreas.Services;
 
 namespace RevitPylonLoadAreas;
@@ -28,7 +32,13 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
         using IKernel kernel = uiApplication.CreatePlatformServices();
 
+        kernel.Bind<SystemConfig>()
+            .ToMethod(c => SystemConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()))
+            .InSingletonScope();
         kernel.Bind<LandXmlImporter>().ToSelf().InSingletonScope();
+        kernel.Bind<LoadAreasFinder>().ToSelf().InSingletonScope();
+        kernel.Bind<VoronoiBuilder>().ToSelf().InSingletonScope();
+        kernel.Bind<LandThicknessFinder>().ToSelf().InSingletonScope();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization(
@@ -45,26 +55,27 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
     }
 
     private void Run(IKernel kernel) {
-        var dialog = kernel.Get<IOpenFileDialogService>();
-        if(!dialog.ShowDialog()) {
+        var repo = kernel.Get<RevitRepository>();
+        var localization = kernel.Get<ILocalizationService>();
+        ValidateView(repo, localization);
+        ValidateParams(repo, localization);
+
+        var thicknessFinder = kernel.Get<LandThicknessFinder>();
+        using var t = repo.Document.StartTransaction(localization.GetLocalizedString("Transaction.LandThickness"));
+        thicknessFinder.FindAndSetLandThickness();
+        t.Commit();
+
+        // TODO добавить показ ошибок, если они есть в ErrorsService
+    }
+
+    private void ValidateView(RevitRepository repo, ILocalizationService localization) {
+        if(repo.ActiveView is not ViewPlan) {
+            TaskDialog.Show(PluginName, localization.GetLocalizedString("Error.ViewNotSupported"));
             throw new OperationCanceledException();
         }
+    }
 
-        var importer = kernel.Get<LandXmlImporter>();
-        var repo = kernel.Get<RevitRepository>();
+    private void ValidateParams(RevitRepository repo, ILocalizationService localization) {
         // TODO
-        var polygons = importer.Import(dialog.File.FullName);
-        using var t = repo.Document.StartTransaction("test");
-        var basePoint = BasePoint.GetSurveyPoint(repo.Document);
-        var transform = Transform.CreateTranslation(new XYZ(basePoint.Position.X, basePoint.Position.Y, 0));
-        foreach(var polygon in polygons) {
-            try {
-                var solid = repo.CreateSolid(polygon, transform);
-                repo.CreateDirectShape(solid);
-            } catch(Autodesk.Revit.Exceptions.InternalException) {
-                continue;
-            }
-        }
-        t.Commit();
     }
 }

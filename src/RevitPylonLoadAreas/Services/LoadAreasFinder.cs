@@ -44,7 +44,7 @@ internal sealed class LoadAreasFinder {
                 loops = floorData.Clip(cells);
             }
 
-            loadAreas.Add(new LoadArea(element, loops));
+            loadAreas.Add(new LoadArea(element, _repo, loops));
         }
 
         return loadAreas;

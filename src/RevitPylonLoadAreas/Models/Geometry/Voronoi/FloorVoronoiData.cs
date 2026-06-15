@@ -63,7 +63,7 @@ internal class FloorVoronoiData {
     /// <param name="cell">Ячейка диаграммы Вороного</param>
     /// <returns>Список петель плоской фигуры, полученной после обрезки</returns>
     public IList<CurveLoop> Clip(VoronoiCell cell) {
-        var cellSolid = _repo.CreateSolid(cell.Polygon.AsCurveLoop());
+        var cellSolid = _repo.CreateSolid(1, cell.Polygon.AsCurveLoop());
         var floorSolid = GetVoronoiSolid();
         var intersection = _repo.Intersect(cellSolid, floorSolid);
         var topFace = _repo.GetTopFace(intersection);
@@ -83,9 +83,9 @@ internal class FloorVoronoiData {
     }
 
     private Solid CreateUnitedSolid(IList<VoronoiCell> cells) {
-        var solid = _repo.CreateSolid(cells[0].Polygon.AsCurveLoop());
+        var solid = _repo.CreateSolid(1, cells[0].Polygon.AsCurveLoop());
         for(int i = 1; i < cells.Count; i++) {
-            var isolid = _repo.CreateSolid(cells[i].Polygon.AsCurveLoop());
+            var isolid = _repo.CreateSolid(1, cells[i].Polygon.AsCurveLoop());
             solid = _repo.Unite(solid, isolid);
         }
 
@@ -101,6 +101,7 @@ internal class FloorVoronoiData {
             return _outline;
         }
 
+        // у 1 элемента перекрытия должно быть только 1 тело
         var solid = Floor.GetSolids()
             .OrderByDescending(s => s.Volume)
             .First();
@@ -115,11 +116,11 @@ internal class FloorVoronoiData {
         return _outline;
     }
 
-    private Face GetVoronoiFace() {
+    private PlanarFace GetVoronoiFace() {
         return _face ??= _repo.GetTopFace(GetVoronoiSolid());
     }
 
     private Solid GetVoronoiSolid() {
-        return _solid ??= _repo.CreateSolid([..GetVoronoiOutline()]);
+        return _solid ??= _repo.CreateSolid(1, [..GetVoronoiOutline()]);
     }
 }

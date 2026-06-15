@@ -4,11 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.IFC;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
-
-using dosymep.Revit.Geometry;
 
 using RevitPylonLoadAreas.Models.Geometry;
 using RevitPylonLoadAreas.Models.Selection;
@@ -16,6 +13,9 @@ using RevitPylonLoadAreas.Models.Selection;
 namespace RevitPylonLoadAreas.Models;
 
 internal class RevitRepository {
+    public const string LoadAreaParamName = "ФОП_Площадь грузовая";
+    public const string LandThicknessParamName = "ФОП_Толщина БИО";
+    
     public RevitRepository(UIApplication uiApplication) {
         UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
     }
@@ -34,6 +34,14 @@ internal class RevitRepository {
         return (Floor) Document.GetElement(reference);
     }
 
+    public ICollection<Floor> PickFloors(string statusPrompt) {
+        var reference = ActiveUIDocument.Selection.PickObjects(
+            ObjectType.Element,
+            new FloorSelectionFilter(),
+            statusPrompt);
+        return reference.Select(r => (Floor) Document.GetElement(r)).ToArray();
+    }
+
     public FilledRegionType GetFilledRegionTypeOrDefault(string name = "") {
         var types = new FilteredElementCollector(Document)
             .OfClass(typeof(FilledRegionType))
@@ -48,7 +56,7 @@ internal class RevitRepository {
             throw new ArgumentOutOfRangeException(nameof(loops));
         }
 
-        var solid = CreateSolid(loops);
+        var solid = CreateSolid(1, loops);
         return GetTopFace(solid).Area;
     }
 
@@ -65,20 +73,32 @@ internal class RevitRepository {
             .ToArray();
     }
 
-    public Solid CreateSolid(params CurveLoop[] loops) {
+    /// <summary>
+    /// Для каждой петли создает призму заданной высоты с основанием в плоскости петли
+    /// </summary>
+    /// <param name="height">Высота призмы</param>
+    /// <param name="loops">Петли</param>
+    /// <returns>Солид, образованный призмами петель</returns>
+    public Solid CreateSolid(double height = 1, params CurveLoop[] loops) {
         if(loops.Length == 0) {
             throw new ArgumentOutOfRangeException(nameof(loops));
         }
 
-        return GeometryCreationUtilities.CreateExtrusionGeometry(loops, XYZ.BasisZ, 1);
+        if(height < 0) {
+            throw new ArgumentException(nameof(height));
+        }
+
+        return GeometryCreationUtilities.CreateExtrusionGeometry(loops, XYZ.BasisZ, height);
     }
 
-    public Solid CreateSolid(Polygon3D polygon, Transform transform) {
-        var xyLoop = CurveLoop.CreateViaTransform(
-            polygon.ToPolygon2D().AsCurveLoop(),
-            Transform.CreateTranslation(-5 * XYZ.BasisZ)
-                .Multiply(transform));
-        var xyzLoop = CurveLoop.CreateViaTransform(polygon.AsCurveLoop(), transform);
+    /// <summary>
+    /// Строит косую призму с основанием в плоскости XOY и с верхней гранью по полигону
+    /// </summary>
+    /// <param name="polygon">Полигон, который должен лежать выше плоскости XOY</param>
+    /// <returns>Косая призма</returns>
+    public Solid CreateSolid(Polygon3D polygon) {
+        var xyLoop = polygon.ToPolygon2D().AsCurveLoop();
+        var xyzLoop = polygon.AsCurveLoop();
         var vertexPairs = Enumerable.Range(0, xyLoop.Count()).Select(i => new VertexPair(i, i)).ToArray();
         return GeometryCreationUtilities.CreateBlendGeometry(xyLoop, xyzLoop, vertexPairs);
     }
@@ -87,7 +107,7 @@ internal class RevitRepository {
         DirectShape ds = DirectShape.CreateElement(
             Document,
             new ElementId(BuiltInCategory.OST_GenericModel));
-        ds.SetShape(new GeometryObject[] { solid });
+        ds.SetShape([solid]);
     }
 
     public Solid Intersect(Solid left, Solid right) {

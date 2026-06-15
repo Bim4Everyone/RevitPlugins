@@ -22,9 +22,22 @@ internal sealed class LandXmlImporter {
     private readonly RevitRepository _repo;
     private readonly ILocalizationService _localization;
 
+    /// <summary>
+    /// Точка съемки активного проекта. Должна совпадать с началом координат ГП
+    /// </summary>
+    private readonly BasePoint _surveyPoint;
+
+    /// <summary>
+    /// Координаты точки съемки в плоскости XOY относительно начала активного документа
+    /// </summary>
+    private readonly XYZ _surveyPointXYTranslation;
+
     public LandXmlImporter(RevitRepository repo, ILocalizationService localization) {
         _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+
+        _surveyPoint = BasePoint.GetSurveyPoint(repo.Document);
+        _surveyPointXYTranslation = new XYZ(_surveyPoint.Position.X, _surveyPoint.Position.Y, 0);
     }
 
     /// <summary>
@@ -97,10 +110,12 @@ internal sealed class LandXmlImporter {
             }
 
             // порядок координат по схеме LandXML: northing easting elevation
-            points[id] = new XYZ(
+            var landXmlPoint = new XYZ(
                 coords[1] * feetPerUnit,
                 coords[0] * feetPerUnit,
                 coords[2] * feetPerUnit);
+            // преобразование системы координат из LandXML в систему координат ревита
+            points[id] = landXmlPoint + _surveyPointXYTranslation;
         }
 
         return points;

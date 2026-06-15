@@ -8,12 +8,16 @@
 
     <system:String
         x:Key="Pick.Floor">Выберите плиту перекрытия</system:String>
+    <system:String
+        x:Key="Pick.Floors">Выберите одно или несколько перекрытий</system:String>
 
     <system:String
-        x:Key="Transaction.DrawLoadAreas">BIM: Грузовые площади</system:String>
+        x:Key="Transaction.DrawLoadAreas">Грузовые площади</system:String>
+    <system:String
+        x:Key="Transaction.LandThickness">Толщина БИО</system:String>
 
     <system:String
-        x:Key="Error.ViewNotSupported">Активный вид не поддерживает создание грузовых площадей. Откройте план, разрез или фасад.</system:String>
+        x:Key="Error.ViewNotSupported">Активный вид должен быть планом.</system:String>
     <system:String
         x:Key="Error.FilledRegionTypeNotFound">В проекте не найден ни один тип цветовой области.</system:String>
 
@@ -34,5 +38,10 @@
         x:Key="Error.LandXmlPointInvalidCoords">Точка {0} не содержит трех координат.</system:String>
     <system:String
         x:Key="Error.LandXmlFaceUnknownPoint">Грань ссылается на несуществующую точку {0}.</system:String>
+
+    <system:String
+        x:Key="Error.InvalidLandXmlData">В LandXml присутствуют отрицательные отметки</system:String>
+    <system:String
+        x:Key="Error.CannotCalculateLandThickness">Не удалось рассчитать толщину слоя БИО</system:String>
 
 </ResourceDictionary>

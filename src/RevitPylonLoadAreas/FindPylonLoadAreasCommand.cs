@@ -55,16 +55,13 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
         }
     }
 
-    private Floor GetFloor(RevitRepository repo, ILocalizationService localization) {
-        return repo.PickFloor(localization.GetLocalizedString("Pick.Floor"));
-    }
-
     private void Run(IKernel kernel) {
         var repo = kernel.Get<RevitRepository>();
         var localization = kernel.Get<ILocalizationService>();
 
         ValidateView(repo, localization);
-        var floor = GetFloor(repo, localization);
+        ValidateParams(repo, localization);
+        var floor = repo.PickFloor(localization.GetLocalizedString("Pick.Floor"));
         var pylons = repo.GetPylonsFromView();
         var walls = repo.GetWallsFromView();
 
@@ -78,16 +75,18 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
             region.SetParamValue(
                 BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
                 loadArea.Element.Id.GetIdValue().ToString()); // для контроля правильности построения
-            double area = repo.GetArea([..loadArea.Circuits]);
-            // TODO определить параметр, куда писать площадь
+            double area = loadArea.GetArea();
             if(loadArea.ElementIsPylon()) {
                 loadArea.Element.SetParamValue(
-                    BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS,
-                    UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters)
-                        .ToString("0.000", CultureInfo.CurrentCulture));
+                    RevitRepository.LoadAreaParamName,
+                    UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters));
             }
         }
 
         t.Commit();
+    }
+
+    private void ValidateParams(RevitRepository repo, ILocalizationService localization) {
+        // TODO
     }
 }

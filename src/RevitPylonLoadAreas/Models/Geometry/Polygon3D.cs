@@ -36,6 +36,28 @@ internal sealed class Polygon3D {
     /// Проецирует многоугольник на плоскость XOY
     /// </summary>
     public Polygon2D ToPolygon2D() {
-        return new Polygon2D(Vertices.Select(v => new XY(v)).ToArray());
+        return new Polygon2D(Get2DVertices());
+    }
+
+    /// <summary>
+    /// Возвращает проекцию вершин многоугольника на плоскость XOY
+    /// </summary>
+    /// <returns>Новая коллекция вершин в том же порядке, что и <see cref="Vertices"/></returns>
+    public IList<XY> Get2DVertices() {
+        return Vertices.Select(v => new XY(v)).ToArray();
+    }
+
+    /// <summary>
+    /// Возвращает максимальное значение координаты Z среди всех вершин
+    /// </summary>
+    public double GetMaxZ() {
+        return Vertices.Max(v => v.Z);
+    }
+
+    /// <summary>
+    /// Проверяет, пересекает ли полигон плоскость XOY
+    /// </summary>
+    public bool IntersectsXOY() {
+        return Vertices.Any(v => v.Z < 0);
     }
 }

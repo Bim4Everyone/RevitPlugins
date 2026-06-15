@@ -8,12 +8,16 @@
 
     <system:String
         x:Key="Pick.Floor">Select a floor</system:String>
+    <system:String
+        x:Key="Pick.Floors">Select one or many floors</system:String>
 
     <system:String
-        x:Key="Transaction.DrawLoadAreas">BIM: Load Areas</system:String>
+        x:Key="Transaction.DrawLoadAreas">Load areas</system:String>
+    <system:String
+        x:Key="Transaction.LandThickness">Land thickness</system:String>
 
     <system:String
-        x:Key="Error.ViewNotSupported">The active view does not support creation of load areas. Open a plan, section, or elevation view.</system:String>
+        x:Key="Error.ViewNotSupported">The active view must be a plan.</system:String>
     <system:String
         x:Key="Error.FilledRegionTypeNotFound">No filled region type was found in the project.</system:String>
 
@@ -34,5 +38,10 @@
         x:Key="Error.LandXmlPointInvalidCoords">Point {0} does not contain three coordinates.</system:String>
     <system:String
         x:Key="Error.LandXmlFaceUnknownPoint">A face references a non-existent point {0}.</system:String>
+
+    <system:String
+        x:Key="Error.InvalidLandXmlData">There are negative elevations in LandXml points</system:String>
+    <system:String
+        x:Key="Error.CannotCalculateLandThickness">Cannot calculate land thickness</system:String>
 
 </ResourceDictionary>
