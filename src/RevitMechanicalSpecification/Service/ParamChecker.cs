@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
@@ -101,7 +99,8 @@ namespace RevitMechanicalSpecification.Service {
             SharedParamsConfig.Instance.VISPipeDuctReserve,
             SharedParamsConfig.Instance.VISIndividualStock,
             SharedParamsConfig.Instance.VISJunction,
-            SharedParamsConfig.Instance.VISExcludeFromJunction
+            SharedParamsConfig.Instance.VISExcludeFromJunction,
+            SharedParamsConfig.Instance.VISSpecNumbersCurrency
         };
         private SpecConfiguration _specConfiguration;
         private Document _document;
@@ -143,23 +142,6 @@ namespace RevitMechanicalSpecification.Service {
             definition.ReInsertToGroup(document, group);
         }
 
-        // Временная проверка пока мы не переходим на редактируемые экземпляры групп. Если ФОП_ВИС_Число и ФОП_ВИС_Число ДЕ в проекте вместе - отменяем работу 
-        private void CheckNumberDuplicate(Document document) {
-            if(document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbers) &&
-                (document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency))) {
-
-                MessageBox.Show(
-                    "Работа невозможна при одновременном наличии в проекте параметров ФОП_ВИС_Число и ФОП_ВИС_Число ДЕ");
-                throw new OperationCanceledException();
-            }
-
-            if(!document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
-                _revitParams.Add(SharedParamsConfig.Instance.VISSpecNumbers);
-            } else {
-                _revitParams.Add(SharedParamsConfig.Instance.VISSpecNumbersCurrency);
-            }
-        }
-
         /// <summary>
         /// Создать недостающие параметры, устранить расхождения по галочкам
         /// </summary>
@@ -168,7 +150,6 @@ namespace RevitMechanicalSpecification.Service {
             _document = document;
             _specConfiguration = specConfiguration;
 
-            CheckNumberDuplicate(document);
             ProjectParameters projectParameters = ProjectParameters.Create(document.Application);
             projectParameters.SetupRevitParams(document, _revitParams);
 

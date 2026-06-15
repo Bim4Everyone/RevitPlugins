@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -10,7 +11,6 @@ using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Models.Fillers;
 using RevitMechanicalSpecification.Models;
 using dosymep.Revit;
-using System.Windows;
 using System.Threading;
 using dosymep.SimpleServices;
 using dosymep.Xpf.Core.SimpleServices;
@@ -24,6 +24,7 @@ namespace RevitMechanicalSpecification.Service {
         private readonly string _userName;
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
+        private readonly IMessageBoxService _messageBoxService;
         private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
 
@@ -38,11 +39,15 @@ namespace RevitMechanicalSpecification.Service {
                         BuiltInCategory.OST_PipeInsulations
     };
 
-        public ElementProcessor(Document document) {
+        public ElementProcessor(
+            Document document,
+            SpecConfiguration specConfiguration,
+            IMessageBoxService messageBoxService) {
             _userName = document.Application.Username;
             _document = document;
 
-            _specConfiguration = new SpecConfiguration(_document);
+            _specConfiguration = specConfiguration;
+            _messageBoxService = messageBoxService;
             _paramChecker = new ParamChecker();
             _maskReplacer = new MaskReplacer(_specConfiguration);
         }
@@ -160,8 +165,12 @@ namespace RevitMechanicalSpecification.Service {
         /// <param name="editors"></param>
         private void ShowReport() {
             if(_editors.Count != 0) {
-                MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
-                    + string.Join(", ", _editors.ToArray()));
+                _messageBoxService.Show(
+                    "Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
+                    + string.Join(", ", _editors.ToArray()),
+                    "Обновление спецификации",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
         }
 
