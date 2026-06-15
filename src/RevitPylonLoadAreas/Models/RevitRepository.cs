@@ -66,10 +66,16 @@ internal class RevitRepository {
             .First(f => f.FaceNormal.IsAlmostEqualTo(XYZ.BasisZ));
     }
 
-    public IList<PlanarFace> GetTopFaces(Solid solid) {
+    public PlanarFace GetBottomFace(Solid solid) {
         return solid.Faces
             .OfType<PlanarFace>()
-            .Where(f => f.FaceNormal.IsAlmostEqualTo(XYZ.BasisZ))
+            .First(f => f.FaceNormal.IsAlmostEqualTo(-XYZ.BasisZ));
+    }
+
+    public IList<PlanarFace> GetBottomFaces(Solid solid) {
+        return solid.Faces
+            .OfType<PlanarFace>()
+            .Where(f => f.FaceNormal.IsAlmostEqualTo(-XYZ.BasisZ))
             .ToArray();
     }
 

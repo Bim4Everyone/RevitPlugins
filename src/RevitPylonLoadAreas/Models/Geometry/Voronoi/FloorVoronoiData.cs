@@ -61,25 +61,25 @@ internal class FloorVoronoiData {
     /// Обрезает ячейку диаграммы Вороного по контуру перекрытием с учетом заданной пороговой площади отверстий
     /// </summary>
     /// <param name="cell">Ячейка диаграммы Вороного</param>
-    /// <returns>Список петель плоской фигуры, полученной после обрезки</returns>
+    /// <returns>Список петель в плоскости XOY плоской фигуры, полученной после обрезки</returns>
     public IList<CurveLoop> Clip(VoronoiCell cell) {
         var cellSolid = _repo.CreateSolid(1, cell.Polygon.AsCurveLoop());
         var floorSolid = GetVoronoiSolid();
         var intersection = _repo.Intersect(cellSolid, floorSolid);
-        var topFace = _repo.GetTopFace(intersection);
-        return topFace.GetEdgesAsCurveLoops();
+        var bottomFace = _repo.GetBottomFace(intersection);
+        return bottomFace.GetEdgesAsCurveLoops();
     }
 
     /// <summary>
     /// Объединяет заданные ячейки и обрезает их по контуру перекрытия с учетом заданной пороговой площади отверстий
     /// </summary>
     /// <param name="wallCells">Ячейки диаграммы Вороного, построенные для одной стены</param>
-    /// <returns>Список петель ячейки диаграммы для всей стены</returns>
+    /// <returns>Список петель ячейки диаграммы для всей стены в плоскости XOY</returns>
     public IList<CurveLoop> Clip(IList<VoronoiCell> wallCells) {
         var unitedSolid = CreateUnitedSolid(wallCells);
         var intersection = _repo.Intersect(unitedSolid, GetVoronoiSolid());
-        var topFaces = _repo.GetTopFaces(intersection);
-        return topFaces.SelectMany(f => f.GetEdgesAsCurveLoops()).ToArray();
+        var bottomFaces = _repo.GetBottomFaces(intersection);
+        return bottomFaces.SelectMany(f => f.GetEdgesAsCurveLoops()).ToArray();
     }
 
     private Solid CreateUnitedSolid(IList<VoronoiCell> cells) {

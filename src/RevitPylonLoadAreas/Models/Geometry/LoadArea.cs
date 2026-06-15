@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -14,7 +13,7 @@ namespace RevitPylonLoadAreas.Models.Geometry;
 internal sealed class LoadArea {
     private readonly RevitRepository _repo;
     private PlanarFace _face;
-    private Surface _surface;
+    private Solid _solid;
 
     /// <summary>
     /// Конструирует грузовую площадь
@@ -40,25 +39,26 @@ internal sealed class LoadArea {
                && pylon.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralColumns;
     }
 
-    public bool IsInside(XY point) {
-        var face = GetFace();
-        var surface = GetSurface();
-        surface.Project(point.ToXYZ(), out var uv, out _);
-        return face.IsInside(uv);
-    }
-
-    private PlanarFace GetFace() {
-        return _face ??= _repo.GetTopFace(_repo.CreateSolid(1, [..Circuits]));
-    }
-
-    private Surface GetSurface() {
-        return _surface ??= GetFace().GetSurface();
-    }
-
     /// <summary>
     /// Возвращает площадь в единицах Revit
     /// </summary>
     public double GetArea() {
         return GetFace().Area;
+    }
+
+    public bool Intersects(Polygon2D polygon) {
+        var polygonSolid = _repo.CreateSolid(1, polygon.AsCurveLoop());
+        var solid = GetSolid();
+        return BooleanOperationsUtils.ExecuteBooleanOperation(polygonSolid, solid, BooleanOperationsType.Intersect)
+                   .Volume
+               > 0;
+    }
+
+    private PlanarFace GetFace() {
+        return _face ??= _repo.GetTopFace(GetSolid());
+    }
+
+    private Solid GetSolid() {
+        return _solid ??= _repo.CreateSolid(1, [..Circuits]);
     }
 }

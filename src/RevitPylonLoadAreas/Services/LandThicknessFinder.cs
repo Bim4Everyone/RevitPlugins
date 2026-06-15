@@ -7,8 +7,6 @@ using Autodesk.Revit.DB;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
-using Ninject;
-
 using RevitPylonLoadAreas.Models;
 using RevitPylonLoadAreas.Models.Geometry;
 
@@ -40,7 +38,7 @@ internal class LandThicknessFinder {
         var landPolygons = GetLandPolygons();
         foreach(var loadArea in loadAreas) {
             var intersectingLandPolygons = landPolygons
-                .Where(p => p.Get2DVertices().Any(v => loadArea.IsInside(v)))
+                .Where(p => loadArea.Intersects(p.ToPolygon2D()))
                 .ToArray();
             if(intersectingLandPolygons.Length == 0) {
                 continue;
