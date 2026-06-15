@@ -48,23 +48,18 @@ internal static class UniformGridExtensions {
         }
     }
 
-    //private static void UpdateColumns(UniformGrid uniformGrid) {
-    //    uniformGrid.Columns = uniformGrid.ActualWidth switch {
-    //        > 1300 => 3,
-    //        > 900 => 2,
-    //        _ => 1
-    //    };
-    //}
-
+    /// <summary>
+    /// Метод задает количество колонок в UniformGrid в зависимости от задания в ColumnThresholdsProperty
+    /// Пример: "1000,700,400" означает:
+    /// >1000 → 4 колонки
+    /// >700  → 3 колонки
+    /// >400  → 2 колонки
+    /// ≤400  → 1 колонка
+    /// </summary>
+    /// <param name="uniformGrid"></param>
     private static void UpdateColumns(UniformGrid uniformGrid) {
         string thresholds = GetColumnThresholds(uniformGrid);
         int[] widths = thresholds.Split(',').Select(int.Parse).ToArray();
-
-        // Пример: "1000,700,400" означает:
-        // >1000 → 4 колонки
-        // >700  → 3 колонки
-        // >400  → 2 колонки
-        // ≤400  → 1 колонка
 
         for(int i = 0; i < widths.Length; i++) {
             if(uniformGrid.ActualWidth > widths[i]) {
