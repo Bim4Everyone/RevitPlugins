@@ -48,7 +48,5 @@
 
     <system:String
         x:Key="ErrorsWindow.Title">Errors</system:String>
-    <system:String
-        x:Key="ErrorsWindow.ElementHeader">Element</system:String>
 
 </ResourceDictionary>

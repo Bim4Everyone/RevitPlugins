@@ -48,7 +48,5 @@
 
     <system:String
         x:Key="ErrorsWindow.Title">Ошибки</system:String>
-    <system:String
-        x:Key="ErrorsWindow.ElementHeader">Элемент</system:String>
 
 </ResourceDictionary>

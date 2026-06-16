@@ -22,9 +22,6 @@
                     <PropertyGroupDescription PropertyName="Message" />
                 </CollectionViewSource.GroupDescriptions>
             </CollectionViewSource>
-            <ui:TextBlock
-                x:Key="ElementHeader"
-                Text="{me:LocalizationSource ErrorsWindow.ElementHeader}" />
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../assets/Styles/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -61,7 +58,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:Button
-                                    Appearance="Info"
+                                    Appearance="Secondary"
                                     Height="Auto"
                                     Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}, Path=DataContext.ShowElementsCommand}"
                                     CommandParameter="{Binding}"
@@ -71,7 +68,6 @@
                     </DataGridTemplateColumn>
                     <DataGridTextColumn
                         MinWidth="100"
-                        Header="{StaticResource ElementHeader}"
                         Binding="{Binding ElementName}" />
                 </ui:DataGrid.Columns>
             </ui:DataGrid>
