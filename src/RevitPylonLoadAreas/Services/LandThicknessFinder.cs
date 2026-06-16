@@ -68,6 +68,7 @@ internal class LandThicknessFinder {
             throw new OperationCanceledException();
         }
 
+        // TODO добавить сохранение пути по документам
         // в LandXml файле должна быть выгружена разность проектной поверхности ГП и поверхности плиты,
         // при такой выгрузке в LandXml по координате Z лежат готовые толщины слоя земли над плитой
         return _landXmlImporter.Import(_openFileDialogService.File.FullName);

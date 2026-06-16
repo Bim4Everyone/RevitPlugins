@@ -20,7 +20,7 @@ internal sealed class LoadArea {
     /// </summary>
     /// <param name="element">Вертикальный элемент</param>
     /// <param name="repo">Репозиторий Revit</param>
-    /// <param name="circuits">Список контуров грузовой площади. Первый контур - наружный, остальные - отверстия</param>
+    /// <param name="circuits">Список контуров грузовой площади в плоскости XOY. Первый контур - наружный, остальные - отверстия</param>
     public LoadArea(Element element, RevitRepository repo, IList<CurveLoop> circuits) {
         _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         Element = element ?? throw new ArgumentNullException(nameof(element));
