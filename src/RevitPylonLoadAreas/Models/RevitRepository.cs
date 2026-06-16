@@ -105,7 +105,7 @@ internal class RevitRepository {
     /// <param name="polygon">Полигон, который должен лежать выше плоскости XOY</param>
     /// <returns>Косая призма</returns>
     public Solid CreateSolid(Polygon3D polygon) {
-        var xyLoop = polygon.ToPolygon2D().AsCurveLoop();
+        var xyLoop = polygon.AsPolygon2D().AsCurveLoop();
         var xyzLoop = polygon.AsCurveLoop();
         var vertexPairs = Enumerable.Range(0, xyLoop.Count()).Select(i => new VertexPair(i, i)).ToArray();
         return GeometryCreationUtilities.CreateBlendGeometry(xyLoop, xyzLoop, vertexPairs);

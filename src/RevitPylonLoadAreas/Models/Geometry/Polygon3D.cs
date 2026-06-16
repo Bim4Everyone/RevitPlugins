@@ -35,7 +35,7 @@ internal sealed class Polygon3D {
     /// <summary>
     /// Проецирует многоугольник на плоскость XOY
     /// </summary>
-    public Polygon2D ToPolygon2D() {
+    public Polygon2D AsPolygon2D() {
         return new Polygon2D(Get2DVertices());
     }
 

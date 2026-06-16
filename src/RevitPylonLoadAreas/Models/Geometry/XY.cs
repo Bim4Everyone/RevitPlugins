@@ -40,7 +40,7 @@ internal readonly struct XY {
         return _xyz.IsAlmostEqualTo(other._xyz);
     }
 
-    public XYZ ToXYZ() {
+    public XYZ AsXYZ() {
         return new XYZ(X, Y, 0);
     }
 

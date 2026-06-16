@@ -18,7 +18,7 @@ internal class LandThicknessFinder {
     private readonly RevitRepository _repo;
     private readonly LandXmlImporter _landXmlImporter;
     private readonly LoadAreasFinder _loadAreasFinder;
-    private readonly IOpenFileDialogService _openFileDialogService;
+    private readonly IOpenFileDialogService _openFileDialog;
     private readonly ILocalizationService _localization;
     private readonly IErrorsService _errorsService;
     private readonly LandXmlImportConfig _config;
@@ -34,8 +34,7 @@ internal class LandThicknessFinder {
         _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         _landXmlImporter = landXmlImporter ?? throw new ArgumentNullException(nameof(landXmlImporter));
         _loadAreasFinder = loadAreasFinder ?? throw new ArgumentNullException(nameof(loadAreasFinder));
-        _openFileDialogService =
-            openFileDialog ?? throw new ArgumentNullException(nameof(openFileDialog));
+        _openFileDialog = openFileDialog ?? throw new ArgumentNullException(nameof(openFileDialog));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
         _config = config ?? throw new ArgumentNullException(nameof(config));
@@ -48,7 +47,7 @@ internal class LandThicknessFinder {
             Polygon3D[] intersectingLandPolygons;
             try {
                 intersectingLandPolygons = landPolygons
-                    .Where(p => loadArea.Intersects(p.ToPolygon2D()))
+                    .Where(p => loadArea.Intersects(p.AsPolygon2D()))
                     .ToArray();
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
                 _errorsService.AddError(loadArea.Element, "Error.CannotCalculateLandThickness");
@@ -80,11 +79,11 @@ internal class LandThicknessFinder {
 
     private ICollection<Polygon3D> GetLandPolygons() {
         var settings = _config.GetSettings(_repo.Document) ?? _config.AddSettings(_repo.Document);
-        if(!_openFileDialogService.ShowDialog(settings.LandXmlInitialDirectory ?? string.Empty)) {
+        if(!_openFileDialog.ShowDialog(settings.LandXmlInitialDirectory ?? string.Empty)) {
             throw new OperationCanceledException();
         }
 
-        string fullName = _openFileDialogService.File.FullName;
+        string fullName = _openFileDialog.File.FullName;
         settings.LandXmlInitialDirectory = Path.GetDirectoryName(fullName);
         _config.SaveProjectConfig();
 

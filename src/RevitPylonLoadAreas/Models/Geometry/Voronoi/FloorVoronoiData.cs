@@ -53,7 +53,7 @@ internal class FloorVoronoiData {
     public bool IsInside(XY point) {
         var face = GetVoronoiFace();
         _surface ??= face.GetSurface();
-        _surface.Project(point.ToXYZ(), out var uv, out _);
+        _surface.Project(point.AsXYZ(), out var uv, out _);
         return face.IsInside(uv);
     }
 

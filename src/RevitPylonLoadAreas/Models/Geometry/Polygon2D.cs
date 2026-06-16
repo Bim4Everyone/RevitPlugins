@@ -24,8 +24,8 @@ internal sealed class Polygon2D {
         var loop = new CurveLoop();
         int n = Vertices.Count;
         for(int i = 0; i < n; i++) {
-            var a = Vertices[i].ToXYZ();
-            var b = Vertices[(i + 1) % n].ToXYZ();
+            var a = Vertices[i].AsXYZ();
+            var b = Vertices[(i + 1) % n].AsXYZ();
             loop.Append(Line.CreateBound(a, b));
         }
 
