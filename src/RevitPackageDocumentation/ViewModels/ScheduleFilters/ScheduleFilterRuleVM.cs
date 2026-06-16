@@ -65,6 +65,13 @@ internal class ScheduleFilterRuleVM : BaseViewModel {
         StrParamSetService.Set(this, formulaPropertyName, ScheduleFilterList.ScheduleView.Sheet.SheetSet.SheetSetParams.Params);
     }
 
+    /// <summary>
+    /// В случае изменения имени параметра конфигурации нужно обновить свойства дополнительного параметра
+    /// </summary>
+    public void UpdateDueParamNameChange() {
+        StrParamSetService.SetAll(this, ScheduleFilterList.ScheduleView.Sheet.SheetSet.SheetSetParams.Params);
+    }
+
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
         StrParamSetService.SetAll(this, ScheduleFilterList.ScheduleView.Sheet.SheetSet.SheetSetParams.Params, stringParam);
     }

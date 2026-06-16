@@ -10,6 +10,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
+using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
@@ -51,6 +52,11 @@ internal abstract class BaseParamContainerVM : BaseViewModel {
     public void UpdateDueParamNameChange() {
         _strParamSetService.SetAll(this, SheetSetParams);
         CustomParamsList.Params.ToList().ForEach(p => p.UpdateDueParamNameChange());
+        if(this is ScheduleViewVM scheduleViewVM) {
+            foreach(var rule in scheduleViewVM.ScheduleFilterList.ScheduleFilterRules) {
+                rule.UpdateDueParamNameChange();
+            }
+        }
     }
 
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
@@ -59,6 +65,11 @@ internal abstract class BaseParamContainerVM : BaseViewModel {
         }
         _strParamSetService.SetAll(this, SheetSetParams, stringParam);
         CustomParamsList.Params.ToList().ForEach(p => p.UpdateDueParamValueChange(stringParam));
+        if(this is ScheduleViewVM scheduleViewVM) {
+            foreach(var rule in scheduleViewVM.ScheduleFilterList.ScheduleFilterRules) {
+                rule.UpdateDueParamValueChange(stringParam);
+            }
+        }
     }
 
 

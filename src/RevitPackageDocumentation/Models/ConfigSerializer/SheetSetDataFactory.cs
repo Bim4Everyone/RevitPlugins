@@ -63,7 +63,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewTemplateName = vm.ViewTemplate?.Name,
                 ViewportTypeName = vm.ViewportType?.Name,
                 ViewCount = vm.ViewCount,
-                SelectedSelectElemParamName = vm.SelectedSelectElemParam.ParamName,
+                SelectedSelectElemParamName = vm.SelectedSelectElemParam?.ParamName,
             },
 
             StructuralCalloutViewVM vm => new StructuralCalloutViewData {

@@ -5,13 +5,15 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:c="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
-    xmlns:filters="clr-namespace:RevitPackageDocumentation.ViewModels.ScheduleFilters"
-    xmlns:customParams="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.CustomParameters"
-    xmlns:local="clr-namespace:RevitPackageDocumentation.Views"
-    xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
+    
     xmlns:s="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
     xmlns:sc="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents"
-    xmlns:pp="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters">
+    xmlns:pp="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters"
+    xmlns:customParams="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.CustomParameters"
+    xmlns:filters="clr-namespace:RevitPackageDocumentation.ViewModels.ScheduleFilters"
+    xmlns:local="clr-namespace:RevitPackageDocumentation.Views"
+    xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
+    xmlns:extensions="clr-namespace:RevitPackageDocumentation.Views.Extensions">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
             Source="CustomStyles.xaml" />
@@ -25,139 +27,193 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock
-                Grid.Column="0"
+            <WrapPanel
                 Grid.Row="0"
-                Margin="5 13"
-                VerticalAlignment="Top"
-                Text="Имя вида" />
+                Orientation="Horizontal">
+                <Grid
+                    Width="{Binding ElementName=refGrid, Path=ActualWidth}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding ElementName=refGridColumn, Path=ActualWidth}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-            <controls:FormulaTextBoxControl
-                Grid.Column="1"
-                Grid.Row="0"
-                Margin="5"
-                PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5 13"
+                        VerticalAlignment="Top"
+                        Text="Имя вида" />
 
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="1"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Типоразмер вида" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="1"
-                Margin="5"
-                ItemsSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="2"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Типоразмер видового экрана" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="2"
-                Margin="5"
-                ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="3"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Шаблон вида" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="3"
-                Margin="5"
-                ItemsSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="4"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Количество" />
-
-            <ui:NumberBox
-                Grid.Column="1"
-                Grid.Row="4"
-                Margin="5"
-                Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                IsEnabled="False"/>
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="5"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Привязка к объекту" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="5"
-                Margin="5"
-                ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="ParamName"
-                SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <Border
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Grid.Row="6"
-                Margin="5"
-                Style="{StaticResource CustomBorder}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition
-                            Height="*" />
-                        <RowDefinition
-                            Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <ui:TextBlock
-                        Grid.Row="0"
-                        Margin="5 0"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="Дополнительные параметры" />
-
-                    <ui:Button
-                        Grid.Row="0"
-                        HorizontalAlignment="Right"
-                        Content="+"
-                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
-
-                    <ItemsControl
-                        Grid.Row="1"
-                        HorizontalContentAlignment="Stretch"
-                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <controls:FormulaTextBoxControl
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Margin="5"
+                        PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
                 </Grid>
-            </Border>
+
+                <Grid
+                    Width="{Binding ElementName=refGrid, Path=ActualWidth}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding ElementName=refGridColumn, Path=ActualWidth}"/>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Типоразмер вида" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </WrapPanel>
+
+            <UniformGrid
+                Grid.Row="1"
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
+
+                <Grid
+                    x:Name="refGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" x:Name="refGridColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Типоразмер видового экрана" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Шаблон вида" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Количество" />
+
+                    <ui:NumberBox
+                        Grid.Column="1"
+                        Margin="5"
+                        Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        IsEnabled="False" />
+                </Grid>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Привязка к объекту" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="ParamName"
+                        SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </UniformGrid>
+
+            <UniformGrid
+                Grid.Row="2"
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
+                
+                <Border
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Margin="5"
+                    Style="{StaticResource CustomBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <ui:TextBlock
+                            Grid.Row="0"
+                            Margin="5 0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Text="Дополнительные параметры" />
+
+                        <ui:Button
+                            Grid.Row="0"
+                            HorizontalAlignment="Right"
+                            Content="+"
+                            Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                        <ItemsControl
+                            Grid.Row="1"
+                            HorizontalContentAlignment="Stretch"
+                            ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </Grid>
+                </Border>
+
+                <ui:TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    AcceptsReturn="True"
+                    TextWrapping="WrapWithOverflow"
+                    PlaceholderText="Комментарии"
+                    Foreground="LightGray"
+                    Text="{Binding ModuleComment}" />
+            </UniformGrid>
         </Grid>
     </DataTemplate>
 
@@ -176,138 +232,191 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock
-                Grid.Column="0"
+            <WrapPanel
                 Grid.Row="0"
-                Margin="5 13"
-                VerticalAlignment="Top"
-                Text="Имя вида" />
+                Orientation="Horizontal">
+                <Grid
+                    Width="{Binding ElementName=refGrid, Path=ActualWidth}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding ElementName=refGridColumn, Path=ActualWidth}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-            <controls:FormulaTextBoxControl
-                Grid.Column="1"
-                Grid.Row="0"
-                Margin="5"
-                PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5 13"
+                        VerticalAlignment="Top"
+                        Text="Имя вида" />
 
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="1"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Типоразмер вида" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="1"
-                Margin="5"
-                ItemsSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="2"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Типоразмер видового экрана" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="2"
-                Margin="5"
-                ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="3"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Шаблон вида" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="3"
-                Margin="5"
-                ItemsSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="4"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Количество" />
-
-            <ui:NumberBox
-                Grid.Column="1"
-                Grid.Row="4"
-                Margin="5"
-                Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="5"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Привязка к объекту" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="5"
-                Margin="5"
-                ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="ParamName"
-                SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <Border
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Grid.Row="6"
-                Margin="5"
-                Style="{StaticResource CustomBorder}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition
-                            Height="*" />
-                        <RowDefinition
-                            Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <ui:TextBlock
-                        Grid.Row="0"
-                        Margin="5 0"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="Дополнительные параметры" />
-
-                    <ui:Button
-                        Grid.Row="0"
-                        HorizontalAlignment="Right"
-                        Content="+"
-                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
-
-                    <ItemsControl
-                        Grid.Row="1"
-                        HorizontalContentAlignment="Stretch"
-                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <controls:FormulaTextBoxControl
+                        Grid.Column="1"
+                        Margin="5"
+                        PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
                 </Grid>
-            </Border>
+
+                <Grid
+                    Width="{Binding ElementName=refGrid, Path=ActualWidth}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding ElementName=refGridColumn, Path=ActualWidth}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Типоразмер вида" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </WrapPanel>
+
+            <UniformGrid
+                Grid.Row="1"
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
+                <Grid
+                    x:Name="refGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" x:Name="refGridColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Типоразмер видового экрана" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+    
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Шаблон вида" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+    
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Количество" />
+
+                    <ui:NumberBox
+                        Grid.Column="1"
+                        Margin="5"
+                        Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+    
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Привязка к объекту" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="ParamName"
+                        SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </UniformGrid>
+
+            <UniformGrid
+                Grid.Row="2"
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
+
+                <Border
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Margin="5"
+                    Style="{StaticResource CustomBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="*" />
+                            <RowDefinition
+                                Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <ui:TextBlock
+                            Grid.Row="0"
+                            Margin="5 0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Text="Дополнительные параметры" />
+
+                        <ui:Button
+                            Grid.Row="0"
+                            HorizontalAlignment="Right"
+                            Content="+"
+                            Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                        <ItemsControl
+                            Grid.Row="1"
+                            HorizontalContentAlignment="Stretch"
+                            ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </Grid>
+                </Border>
+
+                <ui:TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    AcceptsReturn="True"
+                    TextWrapping="WrapWithOverflow"
+                    PlaceholderText="Комментарии"
+                    Foreground="LightGray"
+                    Text="{Binding ModuleComment}" />
+            </UniformGrid>
         </Grid>
     </DataTemplate>
 
@@ -326,138 +435,193 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock
-                Grid.Column="0"
+            <WrapPanel
                 Grid.Row="0"
-                Margin="5 13"
-                VerticalAlignment="Top"
-                Text="Имя вида" />
+                Orientation="Horizontal">
+                <Grid
+                    Width="{Binding ElementName=refGrid, Path=ActualWidth}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="{Binding ElementName=refGridColumn, Path=ActualWidth}" />
+                        <ColumnDefinition
+                            Width="*" />
+                    </Grid.ColumnDefinitions>
 
-            <controls:FormulaTextBoxControl
-                Grid.Column="1"
-                Grid.Row="0"
-                Margin="5"
-                PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5 13"
+                        VerticalAlignment="Top"
+                        Text="Имя вида" />
 
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="1"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Типоразмер вида" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="1"
-                Margin="5"
-                ItemsSource="{Binding DataContext.SectionViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="2"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Типоразмер видового экрана" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="2"
-                Margin="5"
-                ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="3"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Шаблон вида" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="3"
-                Margin="5"
-                ItemsSource="{Binding DataContext.SectionViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="4"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Количество" />
-
-            <ui:NumberBox
-                Grid.Column="1"
-                Grid.Row="4"
-                Margin="5"
-                Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="5"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Привязка к объекту" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="5"
-                Margin="5"
-                ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="ParamName"
-                SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <Border
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Grid.Row="6"
-                Margin="5"
-                Style="{StaticResource CustomBorder}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition
-                            Height="*" />
-                        <RowDefinition
-                            Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <ui:TextBlock
-                        Grid.Row="0"
-                        Margin="5 0"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="Дополнительные параметры" />
-
-                    <ui:Button
-                        Grid.Row="0"
-                        HorizontalAlignment="Right"
-                        Content="+"
-                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
-
-                    <ItemsControl
-                        Grid.Row="1"
-                        HorizontalContentAlignment="Stretch"
-                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <controls:FormulaTextBoxControl
+                        Grid.Column="1"
+                        Margin="5"
+                        PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
                 </Grid>
-            </Border>
+
+                <Grid
+                    Width="{Binding ElementName=refGrid, Path=ActualWidth}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="{Binding ElementName=refGridColumn, Path=ActualWidth}" />
+                        <ColumnDefinition
+                            Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Типоразмер вида" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.SectionViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </WrapPanel>
+
+            <UniformGrid
+                Grid.Row="1"
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
+                <Grid
+                    x:Name="refGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" x:Name="refGridColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Типоразмер видового экрана" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+    
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Шаблон вида" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.SectionViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+    
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Количество" />
+
+                    <ui:NumberBox
+                        Grid.Column="1"
+                        Margin="5"
+                        Text="{Binding Path=ViewCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+    
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Привязка к объекту" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="ParamName"
+                        SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </UniformGrid>
+
+            <UniformGrid
+                Grid.Row="2"
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
+
+                <Border
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Margin="5"
+                    Style="{StaticResource CustomBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <ui:TextBlock
+                            Grid.Row="0"
+                            Margin="5 0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Text="Дополнительные параметры" />
+
+                        <ui:Button
+                            Grid.Row="0"
+                            HorizontalAlignment="Right"
+                            Content="+"
+                            Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                        <ItemsControl
+                            Grid.Row="1"
+                            HorizontalContentAlignment="Stretch"
+                            ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </Grid>
+                </Border>
+
+                <ui:TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    AcceptsReturn="True"
+                    TextWrapping="WrapWithOverflow"
+                    PlaceholderText="Комментарии"
+                    Foreground="LightGray"
+                    Text="{Binding ModuleComment}" />
+            </UniformGrid>
         </Grid>
     </DataTemplate>
 

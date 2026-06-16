@@ -56,16 +56,6 @@
                     Command="{Binding Path=CreateComponentCommand}">
                 </ui:Button>
 
-                <ui:Button
-                    Margin="5"
-                    Content="✕"
-                    Appearance="Danger"
-                    Command="{Binding 
-                        Path=DataContext.CurrentSheetSet.SelectedSheet.RemoveComponentCommand, 
-                        RelativeSource={RelativeSource AncestorType=Window}}"
-                    CommandParameter="{Binding}">
-                </ui:Button>
-
                 <ui:TextBox
                     Margin="5"
                     Text="{Binding ModuleName}" />
@@ -82,7 +72,7 @@
                     IsEnabled="False"
                     Text="{Binding Path=ModuleTypeName}" />                
                 
-                <ui:TextBlock
+                <!--<ui:TextBlock
                     Margin="5"
                     VerticalAlignment="Center"
                     Text="Code: " />
@@ -90,36 +80,25 @@
                 <ui:TextBlock
                     Margin="5"
                     VerticalAlignment="Center"
-                    Text="{Binding ModuleCode}" />
+                    Text="{Binding ModuleCode}" />-->
+
+                <ui:Button
+                    Margin="5"
+                    Content="✕"
+                    Appearance="Danger"
+                    Command="{Binding 
+                        Path=DataContext.CurrentSheetSet.SelectedSheet.RemoveComponentCommand, 
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                    CommandParameter="{Binding}">
+                </ui:Button>
             </StackPanel>
 
             <ContentControl
                 Grid.Column="0"
+                Grid.ColumnSpan="2"
                 Grid.Row="1"
                 Content="{Binding}"
                 ContentTemplate="{Binding DerivedTemplate, ElementName=root}" />
-
-            <Grid
-                Grid.Column="1"
-                Grid.Row="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <ui:TextBlock
-                    Grid.Row="0"
-                    Margin="5"
-                    Text="Comments:" />
-
-                <ui:TextBox
-                    Grid.Row="1"
-                    Margin="5"
-                    VerticalAlignment="Stretch"
-                    AcceptsReturn="True"
-                    TextWrapping="WrapWithOverflow"
-                    Text="{Binding ModuleComment}" />
-            </Grid>
 
             <ui:TextBox
                 Grid.Column="0"
