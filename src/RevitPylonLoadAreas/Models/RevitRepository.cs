@@ -59,13 +59,7 @@ internal class RevitRepository {
         }
 
         var solid = CreateSolid(1, loops);
-        return GetTopFace(solid).Area;
-    }
-
-    public PlanarFace GetTopFace(Solid solid) {
-        return solid.Faces
-            .OfType<PlanarFace>()
-            .First(f => f.FaceNormal.IsAlmostEqualTo(XYZ.BasisZ));
+        return GetBottomFace(solid).Area;
     }
 
     public PlanarFace GetBottomFace(Solid solid) {

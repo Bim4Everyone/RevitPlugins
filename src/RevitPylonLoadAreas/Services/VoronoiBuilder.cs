@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using RevitPylonLoadAreas.Models;
 using RevitPylonLoadAreas.Models.Geometry;
 using RevitPylonLoadAreas.Models.Geometry.Voronoi;
 
@@ -16,6 +17,12 @@ namespace RevitPylonLoadAreas.Services;
 /// </para>
 /// </summary>
 internal sealed class VoronoiBuilder {
+    private readonly RevitRepository _repo;
+
+    public VoronoiBuilder(RevitRepository repo) {
+        _repo = repo ?? throw new ArgumentNullException(nameof(repo));
+    }
+    
     /// <summary>
     /// Строит ячейки диаграммы Вороного для заданных точек.
     /// </summary>
@@ -105,7 +112,7 @@ internal sealed class VoronoiBuilder {
         var ordered = new List<XY>(entries.Count);
         foreach(var e in entries) {
             if(ordered.Count > 0
-               && ordered[ordered.Count - 1].IsAlmostEqual(e.Center)) {
+               && IsTooClose(ordered[ordered.Count - 1], e.Center)) {
                 // пропускаем дублирующиеся точки, идущие подряд
                 continue;
             }
@@ -114,11 +121,15 @@ internal sealed class VoronoiBuilder {
         }
 
         if(ordered.Count > 1
-           && ordered[0].IsAlmostEqual(ordered[ordered.Count - 1])) {
+           && IsTooClose(ordered[0], ordered[ordered.Count - 1])) {
             // удаляем дубль первой и последней точек
             ordered.RemoveAt(ordered.Count - 1);
         }
 
         return ordered;
+    }
+
+    private bool IsTooClose(XY first, XY second) {
+        return first.IsAlmostEqual(second) || first.DistanceTo(second) <= _repo.Application.ShortCurveTolerance;
     }
 }

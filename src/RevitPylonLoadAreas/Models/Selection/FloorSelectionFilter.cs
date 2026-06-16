@@ -9,13 +9,20 @@ namespace RevitPylonLoadAreas.Models.Selection;
 
 internal sealed class FloorSelectionFilter : ISelectionFilter {
     public bool AllowElement(Element elem) {
-        // допустимы только перекрытия с 1 телом
-        return elem is Floor
-               && elem.GetSolids()
-                   .SelectMany(SolidUtils.SplitVolumes)
-                   ?.Where(s => s.GetVolumeOrDefault(0) > 0)
-                   ?.Count()
-               == 1;
+        if(elem is not Floor) {
+            return false;
+        }
+
+        // допустимы только перекрытия с 1 телом, у которых есть нижняя горизонтальная грань
+        var solid = elem.GetSolids()
+            .SelectMany(SolidUtils.SplitVolumes)
+            ?.Where(s => s.GetVolumeOrDefault(0) > 0)
+            ?.FirstOrDefault();
+        return solid != null
+               && solid.Faces
+                   .OfType<PlanarFace>()
+                   .FirstOrDefault(f => f.FaceNormal.IsAlmostEqualTo(-XYZ.BasisZ))
+               != null;
     }
 
     public bool AllowReference(Reference reference, XYZ position) {

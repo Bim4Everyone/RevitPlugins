@@ -105,10 +105,10 @@ internal class FloorVoronoiData {
         var solid = Floor.GetSolids()
             .OrderByDescending(s => s.Volume)
             .First();
-        var topFace = _repo.GetTopFace(solid);
-        double z = topFace.Evaluate(new UV(0, 0)).Z;
+        var bottomFace = _repo.GetBottomFace(solid);
+        double z = bottomFace.Evaluate(new UV(0, 0)).Z;
         var transform = Transform.CreateTranslation(new XYZ(0, 0, -z));
-        _outline = topFace.GetEdgesAsCurveLoops()
+        _outline = bottomFace.GetEdgesAsCurveLoops()
             .Where(l => _repo.GetArea(l) >= _openingsAreaThreshold)
             .Select(l => CurveLoop.CreateViaTransform(l, transform))
             .OrderBy(l => l.Sum(c => c.Length))
@@ -117,7 +117,7 @@ internal class FloorVoronoiData {
     }
 
     private PlanarFace GetVoronoiFace() {
-        return _face ??= _repo.GetTopFace(GetVoronoiSolid());
+        return _face ??= _repo.GetBottomFace(GetVoronoiSolid());
     }
 
     private Solid GetVoronoiSolid() {

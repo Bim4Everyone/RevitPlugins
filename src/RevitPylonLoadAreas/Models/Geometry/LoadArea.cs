@@ -55,7 +55,7 @@ internal sealed class LoadArea {
     }
 
     private PlanarFace GetFace() {
-        return _face ??= _repo.GetTopFace(GetSolid());
+        return _face ??= _repo.GetBottomFace(GetSolid());
     }
 
     private Solid GetSolid() {
