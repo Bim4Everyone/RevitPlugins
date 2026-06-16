@@ -810,15 +810,15 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock
-                Grid.Column="0"
                 Grid.Row="0"
+                Grid.Column="0"
                 Margin="5"
                 VerticalAlignment="Center"
                 Text="Типоразмер текста" />
 
             <ComboBox
-                Grid.Column="1"
                 Grid.Row="0"
+                Grid.Column="1"
                 Margin="5"
                 ItemsSource="{Binding DataContext.TextNoteTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                 DisplayMemberPath="Name"
@@ -826,55 +826,73 @@
             
 
             <TextBlock
-                Grid.Column="0"
                 Grid.Row="1"
-                Margin="5 13"
+                Grid.Column="0"
+                Margin="5"
                 VerticalAlignment="Top"
                 Text="Шаблон текста" />
 
             <controls:FormulaTextBoxControl
+                Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
-                Grid.Row="2"
                 Margin="5"
                 AcceptsReturn="True"
                 PropFormula="{Binding Path=TextFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 PropResult="{Binding Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
 
-            <Border
+            <UniformGrid
+                Grid.Row="3"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
-                Grid.Row="3"
-                Margin="5"
-                Style="{StaticResource CustomBorder}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition
-                            Height="*" />
-                        <RowDefinition
-                            Height="*" />
-                    </Grid.RowDefinitions>
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
 
-                    <ui:TextBlock
-                        Grid.Row="0"
-                        Margin="5 0"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="Дополнительные параметры" />
+                <Border
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Margin="5"
+                    Style="{StaticResource CustomBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-                    <ui:Button
-                        Grid.Row="0"
-                        HorizontalAlignment="Right"
-                        Content="+"
-                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+                        <ui:TextBlock
+                            Grid.Row="0"
+                            Margin="5 0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Text="Дополнительные параметры" />
 
-                    <ItemsControl
-                        Grid.Row="1"
-                        HorizontalContentAlignment="Stretch"
-                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                </Grid>
-            </Border>
+                        <ui:Button
+                            Grid.Row="0"
+                            HorizontalAlignment="Right"
+                            Content="+"
+                            Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                        <ItemsControl
+                            Grid.Row="1"
+                            HorizontalContentAlignment="Stretch"
+                            ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </Grid>
+                </Border>
+
+                <ui:TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    AcceptsReturn="True"
+                    TextWrapping="WrapWithOverflow"
+                    PlaceholderText="Комментарии"
+                    Foreground="LightGray"
+                    Text="{Binding ModuleComment}" />
+            </UniformGrid>
         </Grid>
     </DataTemplate>
 
@@ -892,85 +910,114 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
 
-            <TextBlock
-                Grid.Column="0"
+            <UniformGrid
                 Grid.Row="0"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Семейство" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="0"
-                Margin="5"
-                ItemsSource="{Binding DataContext.GenericAnnotationFamilies, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding AnnotationFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" >
-                <i:Interaction.Triggers>
-                    <i:EventTrigger
-                        EventName="SelectionChanged">
-                        <i:InvokeCommandAction
-                            Command="{Binding SelectAnnotationFamilyCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </ComboBox>
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="1"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Типоразмер" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="1"
-                Margin="5"
-                ItemsSource="{Binding AnnotationTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding AnnotationType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <Border
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Margin="5"
-                Style="{StaticResource CustomBorder}">
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition
-                            Height="*" />
-                        <RowDefinition
-                            Height="*" />
-                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                    <ui:TextBlock
-                        Grid.Row="0"
-                        Margin="5 0"
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="Дополнительные параметры" />
+                        Text="Семейство" />
 
-                    <ui:Button
-                        Grid.Row="0"
-                        HorizontalAlignment="Right"
-                        Content="+"
-                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
-
-                    <ItemsControl
-                        Grid.Row="1"
-                        HorizontalContentAlignment="Stretch"
-                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.GenericAnnotationFamilies, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding AnnotationFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="SelectionChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SelectAnnotationFamilyCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ComboBox>
                 </Grid>
-            </Border>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Типоразмер" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="5"
+                        ItemsSource="{Binding AnnotationTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding AnnotationType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </UniformGrid>
+
+            <UniformGrid
+                Grid.Row="1"
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
+
+                <Border
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Margin="5"
+                    Style="{StaticResource CustomBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="*" />
+                            <RowDefinition
+                                Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <ui:TextBlock
+                            Grid.Row="0"
+                            Margin="5 0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Text="Дополнительные параметры" />
+
+                        <ui:Button
+                            Grid.Row="0"
+                            HorizontalAlignment="Right"
+                            Content="+"
+                            Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                        <ItemsControl
+                            Grid.Row="1"
+                            HorizontalContentAlignment="Stretch"
+                            ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </Grid>
+                </Border>
+
+                <ui:TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    AcceptsReturn="True"
+                    TextWrapping="WrapWithOverflow"
+                    PlaceholderText="Комментарии"
+                    Foreground="LightGray"
+                    Text="{Binding ModuleComment}" />
+            </UniformGrid>
         </Grid>
     </DataTemplate>
 
@@ -987,77 +1034,110 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock
-                Grid.Column="0"
+            <UniformGrid
                 Grid.Row="0"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Имя" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="0"
-                Margin="5"
-                ItemsSource="{Binding DataContext.LegendsInProject, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding LegendView, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <TextBlock
-                Grid.Column="0"
-                Grid.Row="1"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Типоразмер видового экрана" />
-
-            <ComboBox
-                Grid.Column="1"
-                Grid.Row="1"
-                Margin="5"
-                ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-            <Border
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Grid.Row="2"
-                Margin="5"
-                Style="{StaticResource CustomBorder}">
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition
-                            Height="*" />
-                        <RowDefinition
-                            Height="*" />
-                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                    <ui:TextBlock
+                    <TextBlock
+                        Grid.Column="0"
                         Grid.Row="0"
-                        Margin="5 0"
+                        Margin="5"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Text="Дополнительные параметры" />
+                        Text="Имя" />
 
-                    <ui:Button
+                    <ComboBox
+                        Grid.Column="1"
                         Grid.Row="0"
-                        HorizontalAlignment="Right"
-                        Content="+"
-                        Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
-
-                    <ItemsControl
-                        Grid.Row="1"
-                        HorizontalContentAlignment="Stretch"
-                        ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.LegendsInProject, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding LegendView, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
-            </Border>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Типоразмер видового экрана" />
+
+                    <ComboBox
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Margin="5"
+                        ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </UniformGrid>
+            
+            <UniformGrid
+                Grid.Row="1"
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
+
+                <Border
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Margin="5"
+                    Style="{StaticResource CustomBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="*" />
+                            <RowDefinition
+                                Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <ui:TextBlock
+                            Grid.Row="0"
+                            Margin="5 0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Text="Дополнительные параметры" />
+
+                        <ui:Button
+                            Grid.Row="0"
+                            HorizontalAlignment="Right"
+                            Content="+"
+                            Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                        <ItemsControl
+                            Grid.Row="1"
+                            HorizontalContentAlignment="Stretch"
+                            ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </Grid>
+                </Border>
+
+                <ui:TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="5"
+                    VerticalAlignment="Stretch"
+                    AcceptsReturn="True"
+                    TextWrapping="WrapWithOverflow"
+                    PlaceholderText="Комментарии"
+                    Foreground="LightGray"
+                    Text="{Binding ModuleComment}" />
+            </UniformGrid>
         </Grid>
     </DataTemplate>
 
