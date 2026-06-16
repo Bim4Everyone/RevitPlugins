@@ -14,12 +14,16 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
 using RevitPylonLoadAreas.Models;
 using RevitPylonLoadAreas.Models.Geometry;
 using RevitPylonLoadAreas.Services;
+using RevitPylonLoadAreas.Services.Core;
+using RevitPylonLoadAreas.ViewModels.Errors;
+using RevitPylonLoadAreas.Views;
 
 namespace RevitPylonLoadAreas;
 
@@ -35,15 +39,24 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
         kernel.Bind<SystemConfig>()
             .ToMethod(c => SystemConfig.GetConfig(c.Kernel.Get<IConfigSerializer>()))
             .InSingletonScope();
+        kernel.Bind<LandXmlImportConfig>()
+            .ToMethod(c => LandXmlImportConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()))
+            .InSingletonScope();
         kernel.Bind<LandXmlImporter>().ToSelf().InSingletonScope();
         kernel.Bind<LoadAreasFinder>().ToSelf().InSingletonScope();
         kernel.Bind<VoronoiBuilder>().ToSelf().InSingletonScope();
         kernel.Bind<LandThicknessFinder>().ToSelf().InSingletonScope();
 
+        kernel.Bind<IErrorsService>().To<ErrorsService>().InSingletonScope();
+        kernel.Bind<ErrorsWindowService>().ToSelf().InSingletonScope();
+
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+        kernel.UseWpfUIThemeUpdater();
+        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
 
         var localization = kernel.Get<ILocalizationService>();
         kernel.UseWpfOpenFileDialog(
@@ -65,7 +78,9 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
         thicknessFinder.FindAndSetLandThickness();
         t.Commit();
 
-        // TODO добавить показ ошибок, если они есть в ErrorsService
+        if(kernel.Get<IErrorsService>().ContainsErrors()) {
+            kernel.Get<ErrorsWindowService>().ShowErrorsWindow();
+        }
     }
 
     private void ValidateView(RevitRepository repo, ILocalizationService localization) {
@@ -76,6 +91,11 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
     }
 
     private void ValidateParams(RevitRepository repo, ILocalizationService localization) {
-        // TODO
+        if(!repo.CategoryHasParam(BuiltInCategory.OST_StructuralColumns, RevitRepository.LandThicknessParamName)) {
+            TaskDialog.Show(
+                PluginName,
+                localization.GetLocalizedString("Error.ParamNotFound", RevitRepository.LandThicknessParamName));
+            throw new OperationCanceledException();
+        }
     }
 }

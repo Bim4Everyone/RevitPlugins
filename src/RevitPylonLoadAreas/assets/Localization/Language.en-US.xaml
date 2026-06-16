@@ -43,5 +43,12 @@
         x:Key="Error.InvalidLandXmlData">There are negative elevations in LandXml points</system:String>
     <system:String
         x:Key="Error.CannotCalculateLandThickness">Cannot calculate land thickness</system:String>
+    <system:String
+        x:Key="Error.ParamNotFound">The "Structural Columns" category has no parameter '{0}'.</system:String>
+
+    <system:String
+        x:Key="ErrorsWindow.Title">Errors</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ElementHeader">Element</system:String>
 
 </ResourceDictionary>

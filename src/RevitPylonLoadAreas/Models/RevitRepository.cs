@@ -7,6 +7,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.Revit;
+
 using RevitPylonLoadAreas.Models.Geometry;
 using RevitPylonLoadAreas.Models.Selection;
 
@@ -151,5 +153,33 @@ internal class RevitRepository {
             .OfClass(typeof(Wall))
             .OfType<Wall>()
             .ToArray();
+    }
+
+    /// <summary>
+    /// Показывает и выделяет заданные элементы на активном виде
+    /// </summary>
+    public void ShowElements(params Element[] elements) {
+        if(elements is null || elements.Length == 0) {
+            return;
+        }
+
+        ElementId[] elementIds = elements
+            .Select(item => item.Id)
+            .ToArray();
+
+        ActiveUIDocument.ShowElements(elementIds);
+        ActiveUIDocument.Selection.SetElementIds(elementIds);
+    }
+
+    /// <summary>
+    /// Проверяет, что в документе у заданной категории присутствует общий параметр с указанным именем
+    /// </summary>
+    public bool CategoryHasParam(BuiltInCategory category, string paramName) {
+        return Document.IsExistsSharedParam(paramName)
+            && Document.GetSharedParamBinding(paramName)
+                .Binding
+                .GetCategories()
+                .Select(c => c.GetBuiltInCategory())
+                .Contains(category);
     }
 }

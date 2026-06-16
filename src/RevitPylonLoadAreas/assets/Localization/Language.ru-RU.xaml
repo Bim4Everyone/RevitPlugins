@@ -43,5 +43,12 @@
         x:Key="Error.InvalidLandXmlData">В LandXml присутствуют отрицательные отметки</system:String>
     <system:String
         x:Key="Error.CannotCalculateLandThickness">Не удалось рассчитать толщину слоя БИО</system:String>
+    <system:String
+        x:Key="Error.ParamNotFound">У категории "Несущие колонны" отсутствует параметр '{0}'.</system:String>
+
+    <system:String
+        x:Key="ErrorsWindow.Title">Ошибки</system:String>
+    <system:String
+        x:Key="ErrorsWindow.ElementHeader">Элемент</system:String>
 
 </ResourceDictionary>

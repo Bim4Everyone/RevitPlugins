@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -9,6 +10,7 @@ using dosymep.SimpleServices;
 
 using RevitPylonLoadAreas.Models;
 using RevitPylonLoadAreas.Models.Geometry;
+using RevitPylonLoadAreas.Services.Core;
 
 namespace RevitPylonLoadAreas.Services;
 
@@ -18,35 +20,48 @@ internal class LandThicknessFinder {
     private readonly LoadAreasFinder _loadAreasFinder;
     private readonly IOpenFileDialogService _openFileDialogService;
     private readonly ILocalizationService _localization;
+    private readonly IErrorsService _errorsService;
+    private readonly LandXmlImportConfig _config;
 
     public LandThicknessFinder(
         RevitRepository repo,
         LandXmlImporter landXmlImporter,
         LoadAreasFinder loadAreasFinder,
         IOpenFileDialogService openFileDialog,
-        ILocalizationService localization) {
+        ILocalizationService localization,
+        IErrorsService errorsService,
+        LandXmlImportConfig config) {
         _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         _landXmlImporter = landXmlImporter ?? throw new ArgumentNullException(nameof(landXmlImporter));
         _loadAreasFinder = loadAreasFinder ?? throw new ArgumentNullException(nameof(loadAreasFinder));
         _openFileDialogService =
             openFileDialog ?? throw new ArgumentNullException(nameof(openFileDialog));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
+        _config = config ?? throw new ArgumentNullException(nameof(config));
     }
 
     public void FindAndSetLandThickness() {
         var loadAreas = GetPylonLoadAreas();
         var landPolygons = GetLandPolygons();
         foreach(var loadArea in loadAreas) {
-            var intersectingLandPolygons = landPolygons
-                .Where(p => loadArea.Intersects(p.ToPolygon2D()))
-                .ToArray();
+            Polygon3D[] intersectingLandPolygons;
+            try {
+                intersectingLandPolygons = landPolygons
+                    .Where(p => loadArea.Intersects(p.ToPolygon2D()))
+                    .ToArray();
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                _errorsService.AddError(loadArea.Element, "Error.CannotCalculateLandThickness");
+                continue;
+            }
+
             if(intersectingLandPolygons.Length == 0) {
                 continue;
             }
 
             if(intersectingLandPolygons.Any(p => p.IntersectsXOY())) {
                 // LandXml был выгружен из некорректной модели ГП - часть слоя земли имеет отрицательную толщину
-                // TODO добавить соответствующую ошибку в ErrorsService
+                _errorsService.AddError(loadArea.Element, "Error.InvalidLandXmlData");
                 continue;
             }
 
@@ -54,7 +69,7 @@ internal class LandThicknessFinder {
             try {
                 landVolume = GetLandVolume(loadArea, intersectingLandPolygons);
             } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-                // TODO добавить соответствующую ошибку в ErrorsService
+                _errorsService.AddError(loadArea.Element, "Error.CannotCalculateLandThickness");
                 continue;
             }
 
@@ -64,14 +79,18 @@ internal class LandThicknessFinder {
     }
 
     private ICollection<Polygon3D> GetLandPolygons() {
-        if(!_openFileDialogService.ShowDialog()) {
+        var settings = _config.GetSettings(_repo.Document) ?? _config.AddSettings(_repo.Document);
+        if(!_openFileDialogService.ShowDialog(settings.LandXmlInitialDirectory ?? string.Empty)) {
             throw new OperationCanceledException();
         }
 
-        // TODO добавить сохранение пути по документам
+        string fullName = _openFileDialogService.File.FullName;
+        settings.LandXmlInitialDirectory = Path.GetDirectoryName(fullName);
+        _config.SaveProjectConfig();
+
         // в LandXml файле должна быть выгружена разность проектной поверхности ГП и поверхности плиты,
         // при такой выгрузке в LandXml по координате Z лежат готовые толщины слоя земли над плитой
-        return _landXmlImporter.Import(_openFileDialogService.File.FullName);
+        return _landXmlImporter.Import(fullName);
     }
 
     private double GetLandVolume(LoadArea loadArea, ICollection<Polygon3D> intersectingLandPolygons) {

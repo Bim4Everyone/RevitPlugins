@@ -87,6 +87,10 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
     }
 
     private void ValidateParams(RevitRepository repo, ILocalizationService localization) {
-        // TODO
+        if(!repo.CategoryHasParam(BuiltInCategory.OST_StructuralColumns, RevitRepository.LoadAreaParamName)) {
+            TaskDialog.Show(PluginName,
+                localization.GetLocalizedString("Error.ParamNotFound", RevitRepository.LoadAreaParamName));
+            throw new OperationCanceledException();
+        }
     }
 }
