@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 using Autodesk.Revit.DB;
 
@@ -40,10 +41,15 @@ internal class LandThicknessFinder {
         _config = config ?? throw new ArgumentNullException(nameof(config));
     }
 
-    public void FindAndSetLandThickness() {
-        var loadAreas = GetPylonLoadAreas();
-        var landPolygons = GetLandPolygons();
-        foreach(var loadArea in loadAreas) {
+    public void FindAndSetLandThickness(
+        ICollection<LoadArea> pylonLoadAreas,
+        ICollection<Polygon3D> landPolygons,
+        IProgress<int> progress = null,
+        CancellationToken ct = default) {
+        int i = 0;
+        foreach(var loadArea in pylonLoadAreas) {
+            ct.ThrowIfCancellationRequested();
+            progress?.Report(++i);
             Polygon3D[] intersectingLandPolygons;
             try {
                 intersectingLandPolygons = landPolygons
@@ -77,21 +83,6 @@ internal class LandThicknessFinder {
         }
     }
 
-    private ICollection<Polygon3D> GetLandPolygons() {
-        var settings = _config.GetSettings(_repo.Document) ?? _config.AddSettings(_repo.Document);
-        if(!_openFileDialog.ShowDialog(settings.LandXmlInitialDirectory ?? string.Empty)) {
-            throw new OperationCanceledException();
-        }
-
-        string fullName = _openFileDialog.File.FullName;
-        settings.LandXmlInitialDirectory = Path.GetDirectoryName(fullName);
-        _config.SaveProjectConfig();
-
-        // в LandXml файле должна быть выгружена разность проектной поверхности ГП и поверхности плиты,
-        // при такой выгрузке в LandXml по координате Z лежат готовые толщины слоя земли над плитой
-        return _landXmlImporter.Import(fullName);
-    }
-
     private double GetLandVolume(LoadArea loadArea, ICollection<Polygon3D> intersectingLandPolygons) {
         double volume = 0;
         var loadAreaSolid = _repo.CreateSolid(intersectingLandPolygons.Max(p => p.GetMaxZ()), [..loadArea.Circuits]);
@@ -102,18 +93,5 @@ internal class LandThicknessFinder {
         }
 
         return volume;
-    }
-
-    private ICollection<LoadArea> GetPylonLoadAreas() {
-        var floors = _repo.PickFloors(_localization.GetLocalizedString("Pick.Floors"));
-        var pylons = _repo.GetPylonsFromView();
-        var walls = _repo.GetWallsFromView();
-
-        List<LoadArea> loadAreas = [];
-        foreach(var floor in floors) {
-            loadAreas.AddRange(_loadAreasFinder.Process(floor, pylons, walls).Where(l => l.ElementIsPylon()));
-        }
-
-        return loadAreas;
     }
 }

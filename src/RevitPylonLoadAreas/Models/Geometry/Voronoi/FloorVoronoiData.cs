@@ -6,10 +6,13 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit.Geometry;
 
+using RevitPylonLoadAreas.Services;
+
 namespace RevitPylonLoadAreas.Models.Geometry.Voronoi;
 
 internal class FloorVoronoiData {
     private readonly RevitRepository _repo;
+    private readonly CurveLoopsSimplifier _simplifier;
 
     /// <summary>
     /// Пороговая площадь, меньше которой отверстия не учитываются
@@ -46,6 +49,7 @@ internal class FloorVoronoiData {
         _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         _openingsAreaThreshold = openingsAreaThreshold;
         Floor = floor ?? throw new ArgumentNullException(nameof(floor));
+        _simplifier = new CurveLoopsSimplifier();
     }
 
     public Floor Floor { get; }
@@ -67,7 +71,7 @@ internal class FloorVoronoiData {
         var floorSolid = GetVoronoiSolid();
         var intersection = _repo.Intersect(cellSolid, floorSolid);
         var bottomFace = _repo.GetBottomFace(intersection);
-        return bottomFace.GetEdgesAsCurveLoops();
+        return _simplifier.GetEdgesAsSimplifiedCurveLoops(bottomFace);
     }
 
     /// <summary>
@@ -79,7 +83,7 @@ internal class FloorVoronoiData {
         var unitedSolid = CreateUnitedSolid(wallCells);
         var intersection = _repo.Intersect(unitedSolid, GetVoronoiSolid());
         var bottomFaces = _repo.GetBottomFaces(intersection);
-        return bottomFaces.SelectMany(f => f.GetEdgesAsCurveLoops()).ToArray();
+        return bottomFaces.SelectMany(f => _simplifier.GetEdgesAsSimplifiedCurveLoops(f)).ToArray();
     }
 
     private Solid CreateUnitedSolid(IList<VoronoiCell> cells) {
@@ -108,7 +112,7 @@ internal class FloorVoronoiData {
         var bottomFace = _repo.GetBottomFace(solid);
         double z = bottomFace.Evaluate(new UV(0, 0)).Z;
         var transform = Transform.CreateTranslation(new XYZ(0, 0, -z));
-        _outline = bottomFace.GetEdgesAsCurveLoops()
+        _outline = _simplifier.GetEdgesAsSimplifiedCurveLoops(bottomFace)
             .Where(l => _repo.GetArea(l) >= _openingsAreaThreshold)
             .Select(l => CurveLoop.CreateViaTransform(l, transform))
             .OrderBy(l => l.Sum(c => c.Length))

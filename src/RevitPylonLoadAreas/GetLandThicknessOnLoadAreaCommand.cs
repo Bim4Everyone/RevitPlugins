@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -73,10 +74,20 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
         ValidateView(repo, localization);
         ValidateParams(repo, localization);
 
-        var thicknessFinder = kernel.Get<LandThicknessFinder>();
-        using var t = repo.Document.StartTransaction(localization.GetLocalizedString("Transaction.LandThickness"));
-        thicknessFinder.FindAndSetLandThickness();
-        t.Commit();
+        using(var t = repo.Document.StartTransaction(localization.GetLocalizedString("Transaction.LandThickness"))) {
+            using(var dialogService = kernel.Get<IProgressDialogService>()) {
+                var pylonLoadAreas = GetPylonLoadAreas(kernel);
+                var landPolygons = GetLandPolygons(kernel);
+                dialogService.StepValue = 10;
+                dialogService.MaxValue = pylonLoadAreas.Count;
+                var progress = dialogService.CreateProgress();
+                var ct = dialogService.CreateCancellationToken();
+                dialogService.Show();
+                kernel.Get<LandThicknessFinder>().FindAndSetLandThickness(pylonLoadAreas, landPolygons, progress, ct);
+            }
+
+            t.Commit();
+        }
 
         if(kernel.Get<IErrorsService>().ContainsErrors()) {
             kernel.Get<ErrorsWindowService>().ShowErrorsWindow();
@@ -97,5 +108,41 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
                 localization.GetLocalizedString("Error.ParamNotFound", RevitRepository.LandThicknessParamName));
             throw new OperationCanceledException();
         }
+    }
+
+    private ICollection<Polygon3D> GetLandPolygons(IKernel kernel) {
+        var repo = kernel.Get<RevitRepository>();
+        var config = kernel.Get<LandXmlImportConfig>();
+        var openFileDialog = kernel.Get<IOpenFileDialogService>();
+        var landXmlImporter = kernel.Get<LandXmlImporter>();
+
+        var settings = config.GetSettings(repo.Document) ?? config.AddSettings(repo.Document);
+        if(!openFileDialog.ShowDialog(settings.LandXmlInitialDirectory ?? string.Empty)) {
+            throw new OperationCanceledException();
+        }
+
+        string fullName = openFileDialog.File.FullName;
+        settings.LandXmlInitialDirectory = Path.GetDirectoryName(fullName);
+        config.SaveProjectConfig();
+
+        // в LandXml файле должна быть выгружена разность проектной поверхности ГП и поверхности плиты,
+        // при такой выгрузке в LandXml по координате Z лежат готовые толщины слоя земли над плитой
+        return landXmlImporter.Import(fullName);
+    }
+
+    private ICollection<LoadArea> GetPylonLoadAreas(IKernel kernel) {
+        var repo = kernel.Get<RevitRepository>();
+        var localization = kernel.Get<ILocalizationService>();
+        var floors = repo.PickFloors(localization.GetLocalizedString("Pick.Floors"));
+        var pylons = repo.GetPylonsFromView();
+        var walls = repo.GetWallsFromView();
+
+        var loadAreasFinder = kernel.Get<LoadAreasFinder>();
+        List<LoadArea> loadAreas = [];
+        foreach(var floor in floors) {
+            loadAreas.AddRange(loadAreasFinder.Process(floor, pylons, walls).Where(l => l.ElementIsPylon()));
+        }
+
+        return loadAreas;
     }
 }

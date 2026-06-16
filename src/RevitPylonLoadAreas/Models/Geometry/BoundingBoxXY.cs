@@ -50,4 +50,8 @@ internal readonly struct BoundingBoxXY {
     public XY GetCenter() {
         return new XY((Min.X + Max.X) / 2, (Min.Y + Max.Y) / 2);
     }
+
+    public Polygon2D AsPolygon2D() {
+        return new Polygon2D([Min, new XY(Min.X, Max.Y), Max, new XY(Max.X, Min.Y)]);
+    }
 }

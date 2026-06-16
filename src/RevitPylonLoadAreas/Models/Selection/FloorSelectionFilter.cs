@@ -14,12 +14,16 @@ internal sealed class FloorSelectionFilter : ISelectionFilter {
         }
 
         // допустимы только перекрытия с 1 телом, у которых есть нижняя горизонтальная грань
-        var solid = elem.GetSolids()
-            .SelectMany(SolidUtils.SplitVolumes)
-            ?.Where(s => s.GetVolumeOrDefault(0) > 0)
-            ?.FirstOrDefault();
-        return solid != null
-               && solid.Faces
+        var solids = elem.GetSolids()
+            ?.SelectMany(SolidUtils.SplitVolumes)
+            ?.Where(s => s?.GetVolumeOrDefault(0) > 0)
+            ?.ToArray();
+        if(solids?.Length != 1) {
+            return false;
+        }
+
+        return solids[0]
+                   .Faces
                    .OfType<PlanarFace>()
                    .FirstOrDefault(f => f.FaceNormal.IsAlmostEqualTo(-XYZ.BasisZ))
                != null;

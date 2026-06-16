@@ -34,8 +34,12 @@ internal sealed class VoronoiBuilder {
             throw new ArgumentNullException(nameof(sites));
         }
 
-        if(sites.Count <= 1) {
-            throw new ArgumentOutOfRangeException(nameof(sites));
+        if(sites.Count == 1) {
+            return [new VoronoiCell(floorBox.AsPolygon2D(), sites[0])];
+        }
+
+        if(sites.Count == 0) {
+            return [];
         }
 
         var cells = new List<VoronoiCell>(sites.Count);
