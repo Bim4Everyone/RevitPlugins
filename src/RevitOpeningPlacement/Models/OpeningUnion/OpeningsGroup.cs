@@ -145,19 +145,44 @@ internal class OpeningsGroup {
     private bool OpeningsLocatedOnTheSameLine(OpeningMepTaskOutcoming otherOpeningTask) {
         if(_elements.Count == 0) { return true; }
         if(_elements.Count == 1) {
-            var firstNormal = _elements.First().GetFamilyInstance().FacingOrientation;
+            var firstOrientation = _elements.First().GetFamilyInstance().FacingOrientation;
+            var secondOrientation = otherOpeningTask.GetFamilyInstance().FacingOrientation;
+            if(!firstOrientation.IsAlmostEqualTo(secondOrientation)) {
+                return false;
+            }
+
+            var firstHandOrientation = _elements.First().GetFamilyInstance().HandOrientation;
             var firstLocation = _elements.First().Location;
             var secondLocation = otherOpeningTask.Location;
             var direction = (secondLocation - firstLocation).Normalize();
-            return firstNormal.IsAlmostEqualTo(direction) || firstNormal.IsAlmostEqualTo(direction.Negate());
+            return AngleIsMultiplyOf(firstOrientation.AngleTo(direction), Math.PI / 2)
+                   && AngleIsMultiplyOf(firstHandOrientation.AngleTo(direction), Math.PI / 2);
         } else {
             var firstToOtherDirection = GetDirectionBetween(_elements.First(), otherOpeningTask);
             var lastToOtherDirection = GetDirectionBetween(_elements.Last(), otherOpeningTask);
             double angle = firstToOtherDirection.AngleTo(lastToOtherDirection);
-            bool angleIsZero = Math.Round(angle, 9) == 0;
-            bool angleIsPi = Math.Round(angle - Math.PI, 9) == 0;
-            return angleIsZero || angleIsPi;
+            return AngleIsMultiplyOf(angle, Math.PI);
         }
+    }
+
+    /// <summary>
+    /// Проверяет, что заданный угол кратен другому углу
+    /// </summary>
+    /// <param name="angle">Угол для проверки</param>
+    /// <param name="multiplyAngle">Угол, которому должен быть кратен первый <paramref name="angle"/></param>
+    /// <param name="epsilon">Точность сравнения углов</param>
+    /// <returns>True, если первый угол кратен второму</returns>
+    private bool AngleIsMultiplyOf(double angle, double multiplyAngle, double epsilon = 1e-9) {
+        if(Math.Abs(angle) <= epsilon) {
+            return true;
+        }
+
+        if(Math.Abs(angle - multiplyAngle) <= epsilon) {
+            return true;
+        }
+
+        double reminder = Math.Abs(angle % multiplyAngle);
+        return reminder <= epsilon || Math.Abs(reminder - multiplyAngle) <= epsilon;
     }
 
     /// <summary>
