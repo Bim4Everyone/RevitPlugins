@@ -2,6 +2,8 @@ using System;
 
 using Autodesk.Revit.DB;
 
+using RevitOpeningSlopes.Models.Enums;
+
 namespace RevitOpeningSlopes.Models {
     internal class SlopesDataGetter {
         private readonly RevitRepository _revitRepository;
@@ -30,20 +32,25 @@ namespace RevitOpeningSlopes.Models {
         /// <exception cref="ArgumentException">Срабатывает, если глубина проема равна или меньше нуля</exception>
         public SlopeCreationData GetOpeningSlopeCreationData(PluginConfig config, FamilyInstance opening) {
 
-            OpeningHandler openingParameters = new OpeningHandler(_revitRepository, _linesFromOpening,
+            var openingParameters = new OpeningHandler(_revitRepository, _linesFromOpening,
                 _nearestElements, _solidOperations, opening);
             double height = openingParameters.GetOpeningHeight();
             double width = openingParameters.GetOpeningWidth();
             double depth = openingParameters.GetOpeningDepth()
                 + _revitRepository.ConvertToFeet(config.SlopeFrontOffset.Value);
 
+            openingParameters.GetClosestPointByDirection(Direction.Left);
+            openingParameters.GetClosestPointByDirection(Direction.Right);
+            openingParameters.GetClosestPointByDirection(Direction.Top);
+            openingParameters.GetClosestPointByDirection(Direction.Down);
+
             if(_revitRepository.ConvertToMillimeters(depth) < 1) {
                 throw new ArgumentException("Глубина проема не может быть равна или меньше нуля");
             }
-            XYZ center = openingParameters.GetVerticalCenterPoint();
+            var center = openingParameters.GetVerticalCenterPoint();
             double rotationAngle = openingParameters.GetRotationAngle();
 
-            SlopeCreationData slopeData = new SlopeCreationData() {
+            var slopeData = new SlopeCreationData() {
                 Height = height,
                 Width = width,
                 Depth = depth,
