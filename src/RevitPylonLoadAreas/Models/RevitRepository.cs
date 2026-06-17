@@ -105,13 +105,6 @@ internal class RevitRepository {
         return GeometryCreationUtilities.CreateBlendGeometry(xyLoop, xyzLoop, vertexPairs);
     }
 
-    public void CreateDirectShape(Solid solid) {
-        DirectShape ds = DirectShape.CreateElement(
-            Document,
-            new ElementId(BuiltInCategory.OST_GenericModel));
-        ds.SetShape([solid]);
-    }
-
     public Solid Intersect(Solid left, Solid right) {
         return BooleanOperationsUtils.ExecuteBooleanOperation(
             left,

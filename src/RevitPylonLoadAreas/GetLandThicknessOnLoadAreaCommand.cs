@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -50,6 +51,7 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
 
         kernel.Bind<IErrorsService>().To<ErrorsService>().InSingletonScope();
         kernel.Bind<ErrorsWindowService>().ToSelf().InSingletonScope();
+        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization(
@@ -57,8 +59,12 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
             CultureInfo.GetCultureInfo("ru-RU"));
 
         kernel.UseWpfUIThemeUpdater();
-        kernel.BindOtherWindow<ErrorsViewModel, ErrorsWindow>();
+        kernel.UseWpfWindowsTheme();
+        kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
+        kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
 
+        kernel.UseWpfUIProgressDialog();
+        kernel.UseWpfUIMessageBox();
         var localization = kernel.Get<ILocalizationService>();
         kernel.UseWpfOpenFileDialog(
             title: localization.GetLocalizedString("OpenLandXmlDialog.Title"),
@@ -71,8 +77,9 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
     private void Run(IKernel kernel) {
         var repo = kernel.Get<RevitRepository>();
         var localization = kernel.Get<ILocalizationService>();
-        ValidateView(repo, localization);
-        ValidateParams(repo, localization);
+        var msg = kernel.Get<IMessageBoxService>();
+        ValidateView(repo, msg, localization);
+        ValidateParams(repo, msg, localization);
 
         using(var t = repo.Document.StartTransaction(localization.GetLocalizedString("Transaction.LandThickness"))) {
             using(var dialogService = kernel.Get<IProgressDialogService>()) {
@@ -94,17 +101,17 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
         }
     }
 
-    private void ValidateView(RevitRepository repo, ILocalizationService localization) {
+    private void ValidateView(RevitRepository repo, IMessageBoxService msg, ILocalizationService localization) {
         if(repo.ActiveView is not ViewPlan) {
-            TaskDialog.Show(PluginName, localization.GetLocalizedString("Error.ViewNotSupported"));
+            ShowError(msg, localization.GetLocalizedString("Error.ViewNotSupported"));
             throw new OperationCanceledException();
         }
     }
 
-    private void ValidateParams(RevitRepository repo, ILocalizationService localization) {
+    private void ValidateParams(RevitRepository repo, IMessageBoxService msg, ILocalizationService localization) {
         if(!repo.CategoryHasParam(BuiltInCategory.OST_StructuralColumns, RevitRepository.LandThicknessParamName)) {
-            TaskDialog.Show(
-                PluginName,
+            ShowError(
+                msg,
                 localization.GetLocalizedString("Error.ParamNotFound", RevitRepository.LandThicknessParamName));
             throw new OperationCanceledException();
         }
@@ -144,5 +151,9 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
         }
 
         return loadAreas;
+    }
+
+    private void ShowError(IMessageBoxService msg, string str) {
+        msg.Show(str, PluginName, MessageBoxButton.OK, MessageBoxImage.Error);
     }
 }

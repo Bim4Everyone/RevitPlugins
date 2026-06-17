@@ -22,6 +22,7 @@ internal sealed class FloorSelectionFilter : ISelectionFilter {
             return false;
         }
 
+        // должна быть нижняя горизонтальная грань
         return solids[0]
                    .Faces
                    .OfType<PlanarFace>()

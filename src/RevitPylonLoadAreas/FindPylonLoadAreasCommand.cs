@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -13,11 +14,13 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
 using RevitPylonLoadAreas.Models;
 using RevitPylonLoadAreas.Services;
+using RevitPylonLoadAreas.Services.Core;
 
 namespace RevitPylonLoadAreas;
 
@@ -43,14 +46,21 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        kernel.UseWpfUIThemeUpdater();
+        kernel.UseWpfWindowsTheme();
+        kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
+        kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
+
+        kernel.UseWpfUIMessageBox();
+
         Run(kernel);
-        kernel.Get<SystemConfig>().SaveProjectConfig();
+        kernel.Get<SystemConfig>().SaveProjectConfig(); // чтобы json файл появился при первом запуске плагина
         Notification(true);
     }
 
-    private void ValidateView(RevitRepository repo, ILocalizationService localization) {
+    private void ValidateView(RevitRepository repo, IMessageBoxService msg, ILocalizationService localization) {
         if(repo.ActiveView is not ViewPlan) {
-            TaskDialog.Show(PluginName, localization.GetLocalizedString("Error.ViewNotSupported"));
+            ShowError(msg, localization.GetLocalizedString("Error.ViewNotSupported"));
             throw new OperationCanceledException();
         }
     }
@@ -58,9 +68,10 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
     private void Run(IKernel kernel) {
         var repo = kernel.Get<RevitRepository>();
         var localization = kernel.Get<ILocalizationService>();
+        var msg = kernel.Get<IMessageBoxService>();
 
-        ValidateView(repo, localization);
-        ValidateParams(repo, localization);
+        ValidateView(repo, msg, localization);
+        ValidateParams(repo, msg, localization);
         var floor = repo.PickFloor(localization.GetLocalizedString("Pick.Floor"));
         var pylons = repo.GetPylonsFromView();
         var walls = repo.GetWallsFromView();
@@ -86,11 +97,14 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
         t.Commit();
     }
 
-    private void ValidateParams(RevitRepository repo, ILocalizationService localization) {
+    private void ValidateParams(RevitRepository repo, IMessageBoxService msg, ILocalizationService localization) {
         if(!repo.CategoryHasParam(BuiltInCategory.OST_StructuralColumns, RevitRepository.LoadAreaParamName)) {
-            TaskDialog.Show(PluginName,
-                localization.GetLocalizedString("Error.ParamNotFound", RevitRepository.LoadAreaParamName));
+            ShowError(msg, localization.GetLocalizedString("Error.ParamNotFound", RevitRepository.LoadAreaParamName));
             throw new OperationCanceledException();
         }
+    }
+
+    private void ShowError(IMessageBoxService msg, string str) {
+        msg.Show(str, PluginName, MessageBoxButton.OK, MessageBoxImage.Error);
     }
 }
