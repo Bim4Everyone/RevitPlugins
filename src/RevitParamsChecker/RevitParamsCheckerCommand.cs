@@ -62,8 +62,8 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.UseLogicalFilterFactory();
         kernel.UseLogicalFilterProviderFactory();
         kernel.UseFilterContextParser();
-        kernel.Bind<IDataProvider>()
-            .To<FilterDataProvider>()
+        kernel.Bind<DataProvider>()
+            .ToMethod(c => new FilterDataProvider(c.Kernel.Get<RevitRepository>()).CreateDataProvider())
             .InSingletonScope();
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()

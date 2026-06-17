@@ -22,7 +22,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly ILogicalFilterProviderFactory _filterProviderFactory;
     private readonly IFilterContextParser _filterContextParser;
-    private readonly IDataProvider _dataProvider;
+    private readonly DataProvider _dataProvider;
     private readonly FiltersRepository _filtersRepo;
     private readonly FiltersConverter _filtersConverter;
     private readonly NamesService _namesService;
@@ -39,7 +39,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
         IMessageBoxService messageBoxService,
         ILogicalFilterProviderFactory filterProviderFactory,
         IFilterContextParser filterContextParser,
-        IDataProvider dataProvider,
+        DataProvider dataProvider,
         FiltersRepository filtersRepo,
         FiltersConverter filtersConverter,
         NamesService namesService) {

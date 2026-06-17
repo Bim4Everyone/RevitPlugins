@@ -16,14 +16,18 @@ using RevitParamsChecker.Models.Revit;
 
 namespace RevitParamsChecker.Models.Filtration;
 
-internal class FilterDataProvider : IDataProvider {
+internal class FilterDataProvider {
     private readonly RevitRepository _revitRepository;
 
     public FilterDataProvider(RevitRepository revitRepository) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
     }
 
-    public ICollection<RevitParam> GetParams(ICollection<Category> categories) {
+    public DataProvider CreateDataProvider() {
+        return new DataProvider(GetCategories(), GetParams, GetDocuments());
+    }
+
+    private ICollection<RevitParam> GetParams(ICollection<Category> categories) {
         return ParameterFilterUtilities
             .GetFilterableParametersInCommon(_revitRepository.Document, [..categories.Select(c => c.Id)])
             .Select(GetFilterableParam)
@@ -31,7 +35,7 @@ internal class FilterDataProvider : IDataProvider {
             .ToArray();
     }
 
-    public ICollection<Category> GetCategories() {
+    private ICollection<Category> GetCategories() {
         return ParameterFilterUtilities.GetAllFilterableCategories()
             .Select(c => Category.GetCategory(_revitRepository.Document, c))
             .Where(category => category != null)
@@ -39,7 +43,7 @@ internal class FilterDataProvider : IDataProvider {
             .ToArray();
     }
 
-    public ICollection<Document> GetDocuments() {
+    private ICollection<Document> GetDocuments() {
         return _revitRepository.GetDocuments().Select(d => d.Document).ToArray();
     }
 

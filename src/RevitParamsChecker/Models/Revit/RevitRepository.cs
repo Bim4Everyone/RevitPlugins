@@ -15,7 +15,7 @@ namespace RevitParamsChecker.Models.Revit;
 internal class RevitRepository {
     private readonly IFilterContextParser _filterParser;
     private DocumentModel[] _documentsCache;
-    private readonly FilterBuildOptions _filterBuildOptions = new();
+    private readonly Bim4Everyone.RevitFiltration.Options _filterBuildOptions = new() { Tolerance = 0.001 };
 
     public RevitRepository(UIApplication uiApplication, IFilterContextParser filterParser) {
         _filterParser = filterParser ?? throw new ArgumentNullException(nameof(filterParser));
