@@ -1217,6 +1217,7 @@
 
             <ui:TextBox
                 Margin="2 0"
+                Padding="8 5"
                 VerticalAlignment="Center"
                 Text="{Binding Path=StringValue, UpdateSourceTrigger=PropertyChanged}">
                 <i:Interaction.Triggers>

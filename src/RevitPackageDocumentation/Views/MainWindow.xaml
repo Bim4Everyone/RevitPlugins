@@ -31,6 +31,9 @@
                 <ResourceDictionary
                     Source="CustomDataTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush
+                x:Key="ListBoxItemSelectedBackgroundThemeBrush"
+                Color="#80007ACC" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -122,12 +125,12 @@
 
                     <ListBox
                         Grid.Row="0"
-                        ItemsSource="{Binding Path=CurrentSheetSet.SheetList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        ItemsSource="{Binding CurrentSheetSet.SheetList}"
+                        SelectedItem="{Binding CurrentSheetSet.SelectedSheet}" />
 
                     <ui:Button
                         Grid.Row="1"
-                        Margin="10"
+                        Margin="5"
                         Padding="7"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Right"
@@ -476,7 +479,7 @@
                     <ComboBox
                         x:Name="ComponentTypesComboBox"
                         Grid.Row="1"
-                        Margin="10"
+                        Margin="5"
                         MinWidth="220"
                         HorizontalAlignment="Right"
                         ItemsSource="{Binding ComponentTypes}"
@@ -496,7 +499,7 @@
 
                     <TextBlock
                         Grid.Row="1"
-                        Margin="10 10 40 10"
+                        Margin="5 5 35 5"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Right"
                         Text="{me:LocalizationSource MainWindow.AddSheetComponent}"
