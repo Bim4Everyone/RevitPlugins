@@ -121,6 +121,12 @@ internal class SheetSetVM : BaseViewModel {
 
     public void UpdateDueParamValueChange(PluginParamVM pluginParam) {
         if(pluginParam is not StringParamVM stringParam) {
+            foreach(var sheet in SheetList) {
+                sheet.ValidateModule();
+                foreach(var component in sheet.SheetComponents) {
+                    component.ValidateModule();
+                }
+            }
             return;
         }
         foreach(var sheet in SheetList) {

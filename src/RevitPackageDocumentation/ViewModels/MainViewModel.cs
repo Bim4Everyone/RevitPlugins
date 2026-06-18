@@ -337,7 +337,29 @@ internal class MainViewModel : BaseViewModel {
         }
         if(CurrentSheetSet?.SheetList?.All(p => !p.IsModuleCheck) == true) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NoSheetsSelected");
-            return false;
+        }
+
+        var viewNames = new HashSet<string>();
+        foreach(var sheetComponent in CurrentSheetSet?.SheetList
+            ?.SelectMany(s => s.SheetComponents)
+            .Where(c => c.IsModuleCheck)
+            .ToList() ?? []) {
+            var name = sheetComponent switch {
+                ScheduleViewVM sv => sv.ViewName,
+                SectionViewVM sv => sv.ViewName,
+                StructuralCalloutViewVM sv => sv.ViewName,
+                StructuralPlanViewVM sv => sv.ViewName,
+                _ => string.Empty
+            };
+
+            if(string.IsNullOrEmpty(name))
+                continue;
+
+            if(!viewNames.Add(name)) {
+                ErrorText = $"{_localizationService.GetLocalizedString("MainWindow.ViewNameAlreadyHas")} - " +
+                            $"{sheetComponent.Sheet.ModuleName} - {name}";
+                return false;
+            }
         }
 
         ErrorText = string.Empty;

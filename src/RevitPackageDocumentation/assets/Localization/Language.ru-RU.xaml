@@ -68,6 +68,7 @@
     <system:String x:Key="MainWindow.SheetSetHasNotSheets">В комплект не добавлено ни одного листа</system:String>
     <system:String x:Key="MainWindow.NoSheetsSelected">Не выбрано ни одного листа</system:String>
     <system:String x:Key="MainWindow.ErrorInSheetComponents">Исправлены не все ошибки в компонентах листа</system:String>
+    <system:String x:Key="MainWindow.ViewNameAlreadyHas">Имя вида уже используется</system:String>
     
     <system:String x:Key="MainWindow.PickElement">Выберите один элемент</system:String>
     
