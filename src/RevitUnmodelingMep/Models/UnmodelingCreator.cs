@@ -72,7 +72,8 @@ internal class UnmodelingCreator {
                         SharedParamsConfig.Instance.BuildingWorksSection,
                         SharedParamsConfig.Instance.BuildingWorksLevel,
                         SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
-                        SharedParamsConfig.Instance.VISSettings
+                        SharedParamsConfig.Instance.VISSettings,
+                        SharedParamsConfig.Instance.VISSpecNumbersCurrency
             ];
 
         ProjectParameters projectParameters = ProjectParameters.Create(_doc.Application);
