@@ -83,12 +83,20 @@
                     <ui:Button
                         Grid.Column="0"
                         Margin="5"
+                        Height="35"
+                        Width="35"
+                        Padding="0"
+                        VerticalAlignment="Center"
                         Icon="{ui:SymbolIcon ArrowDownload20}"
                         Command="{Binding ImportCommand}" />
 
                     <ui:Button
                         Grid.Column="1"
                         Margin="5"
+                        Height="35"
+                        Width="35"
+                        Padding="0"
+                        VerticalAlignment="Center"
                         Icon="{ui:SymbolIcon ArrowExportUp20}"
                         Command="{Binding ExportCommand}" />
 
@@ -156,6 +164,7 @@
                     <TextBlock
                         Grid.Row="0"
                         Grid.Column="0"
+                        Margin="5"
                         Text="{me:LocalizationSource MainWindow.SheetSetParams}" />
 
                     <ScrollViewer
@@ -250,8 +259,9 @@
                         Text="Имя листа" />
 
                     <controls:FormulaTextBoxControl
-                        Grid.Column="1"
                         Grid.Row="0"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="3"
                         Margin="5"
                         PropFormula="{Binding Path=CurrentSheetSet.SelectedSheet.SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         PropResult="{Binding Path=CurrentSheetSet.SelectedSheet.SheetName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"

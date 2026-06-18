@@ -198,6 +198,7 @@
 
                         <ItemsControl
                             Grid.Row="1"
+                            Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
@@ -401,6 +402,7 @@
 
                         <ItemsControl
                             Grid.Row="1"
+                            Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
@@ -606,6 +608,7 @@
 
                         <ItemsControl
                             Grid.Row="1"
+                            Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
@@ -753,8 +756,8 @@
                     Style="{StaticResource CustomBorder}">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
                         <ui:TextBlock
@@ -772,6 +775,7 @@
 
                         <ItemsControl
                             Grid.Row="1"
+                            Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
                             ItemsSource="{Binding Path=ScheduleFilterList.ScheduleFilterRules, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
@@ -807,6 +811,7 @@
 
                             <ItemsControl
                                 Grid.Row="1"
+                                Margin="0 5 0 -5"
                                 HorizontalContentAlignment="Stretch"
                                 ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                         </Grid>
@@ -922,6 +927,7 @@
 
                         <ItemsControl
                             Grid.Row="1"
+                            Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
@@ -1047,6 +1053,7 @@
 
                         <ItemsControl
                             Grid.Row="1"
+                            Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
@@ -1167,6 +1174,7 @@
 
                         <ItemsControl
                             Grid.Row="1"
+                            Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>

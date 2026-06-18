@@ -47,17 +47,31 @@
                 Grid.Row="0"
                 Orientation="Horizontal">
                 <CheckBox
-                    Margin="5"
-                    IsChecked="{Binding IsModuleCheck}" />
+                    Margin="-12 1 12 0"
+                    VerticalAlignment="Top"
+                    IsChecked="{Binding IsModuleCheck}">
+                    <CheckBox.RenderTransform>
+                        <ScaleTransform
+                            ScaleX="1.55"
+                            ScaleY="1.55" />
+                    </CheckBox.RenderTransform>
+                </CheckBox>
 
                 <ui:Button
-                    Margin="5"
-                    Content="🗲"
+                    Margin="5 8"
+                    Height="35"
+                    Width="35"
+                    Padding="0"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Icon="{ui:SymbolIcon Flash28}"
                     Command="{Binding Path=CreateComponentCommand}">
                 </ui:Button>
 
                 <ui:TextBox
                     Margin="5"
+                    MinWidth="50"
+                    VerticalAlignment="Center"
                     Text="{Binding ModuleName}" />
             </StackPanel>
 
@@ -67,9 +81,10 @@
                 Orientation="Horizontal"
                 HorizontalAlignment="Right">
                 <ui:TextBox
-                    Margin="10 5"
+                    Margin="5"
                     VerticalAlignment="Center"
                     IsEnabled="False"
+                    FontWeight="Bold"
                     Text="{Binding Path=ModuleTypeName}" />                
                 
                 <!--<ui:TextBlock
@@ -84,6 +99,8 @@
 
                 <ui:Button
                     Margin="5"
+                    Height="35"
+                    Width="35"
                     Content="✕"
                     Appearance="Danger"
                     Command="{Binding 

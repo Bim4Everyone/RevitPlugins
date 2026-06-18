@@ -34,7 +34,9 @@
 
         <ui:Button
             Grid.Column="0"
-            Margin="0 7"
+            Margin="0 4"
+            Height="38"
+            Width="38"
             VerticalAlignment="Top"
             Appearance="Danger"
             Content="✕"
@@ -59,7 +61,7 @@
 
         <ComboBox
             Grid.Column="2"
-            Margin="5"
+            Margin="0 5 5 5"
             VerticalAlignment="Top"
             DisplayMemberPath="Name"
             ItemsSource="{Binding 
