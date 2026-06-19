@@ -8,6 +8,7 @@ using dosymep.SimpleServices;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class StructuralPlanViewVM : SheetComponentVM {
@@ -19,6 +20,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     private string _viewCount;
     private SelectElemParamVM _selectedSelectElemParam;
     private ViewPlan _viewInstance;
+    private FiltrationComboBoxFilterListVM _viewportTypeFilter;
 
     // Смещение по горизонтали в дюймах слева, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _titleBlockFrameLeftOffset = UnitUtilsHelper.ConvertToInternalValue(20);
@@ -33,6 +35,10 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
+
+        ViewportTypeFilter = new FiltrationComboBoxFilterListVM();
+        ViewportTypeFilter.ValueList.Add(new FiltrationComboBoxFilterVM() { Value = "Фра" });
+        ViewportTypeFilter.ValueList.Add(new FiltrationComboBoxFilterVM() { Value = "гме" });
     }
 
     public string ViewNameFormula {
@@ -54,6 +60,16 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         get => _viewportType;
         set => RaiseAndSetIfChanged(ref _viewportType, value);
     }
+
+
+
+    public FiltrationComboBoxFilterListVM ViewportTypeFilter {
+        get => _viewportTypeFilter;
+        set => RaiseAndSetIfChanged(ref _viewportTypeFilter, value);
+    }
+
+
+
 
     public ViewPlan ViewTemplate {
         get => _viewTemplate;

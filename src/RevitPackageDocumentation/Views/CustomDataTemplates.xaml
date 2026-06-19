@@ -97,12 +97,24 @@
                         VerticalAlignment="Center"
                         Text="Типоразмер видового экрана" />
 
-                    <ComboBox
+
+
+
+
+
+                    <controls:FiltrationComboBoxControl
+                        Grid.Column="1"
+                        Margin="5"
+                        ComboBoxSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ComboBoxSelected="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    
+                    <!--<ComboBox
                         Grid.Column="1"
                         Margin="5"
                         ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         DisplayMemberPath="Name"
-                        SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />-->
                 </Grid>
                 
                 <Grid>
