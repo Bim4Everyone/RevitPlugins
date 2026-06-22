@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Linq;
 
 using Autodesk.Revit.DB;
@@ -10,6 +11,7 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitMechanicalSpecification.Models {
     public class SpecConfiguration {
@@ -26,6 +28,7 @@ namespace RevitMechanicalSpecification.Models {
         public readonly double DuctAndPipeStock;
         public readonly bool IsSpecifyDuctFittings;
         public readonly bool IsSpecifyPipeFittings;
+        public readonly bool NullifyOutdatedNumber;
 
         public readonly string TargetNameGroup = SharedParamsConfig.Instance.VISGrouping.Name; //ФОП_ВИС_Группирование
         public readonly string TargetNameFunction = SharedParamsConfig.Instance.EconomicFunction.Name; //"ФОП_Экономическая функция";
@@ -35,8 +38,10 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string TargetNameCode = SharedParamsConfig.Instance.VISItemCode.Name;//"ФОП_ВИС_Код изделия";
         public readonly string TargetNameUnit = SharedParamsConfig.Instance.VISUnit.Name; //"ФОП_ВИС_Единица измерения";
         public readonly string TargetNameCreator = SharedParamsConfig.Instance.VISManufacturer.Name; //"ФОП_ВИС_Завод-изготовитель";
-        public readonly string TargetNameNumber = SharedParamsConfig.Instance.VISSpecNumbers.Name; //"ФОП_ВИС_Число";
-
+        
+        public readonly string TargetNameNumber = SharedParamsConfig.Instance.VISSpecNumbersCurrency.Name; //"ФОП_ВИС_Число_ДЕ";
+        public readonly string OutdatedNameNumber = SharedParamsConfig.Instance.VISSpecNumbers.Name; //"ФОП_ВИС_Число";
+        
         public readonly string NameAddition = SharedParamsConfig.Instance.VISNameAddition.Name; //"ФОП_ВИС_Дополнение к имени";
         public readonly string ForcedName = SharedParamsConfig.Instance.VISNameForced.Name; //"ФОП_ВИС_Наименование принудительное";
         public readonly string ForcedSystemName = SharedParamsConfig.Instance.VISSystemNameForced.Name; //"ФОП_ВИС_Имя системы принудительное";
@@ -83,12 +88,20 @@ namespace RevitMechanicalSpecification.Models {
         public readonly string MaskNameName = SharedParamsConfig.Instance.VISMaskName.Name; //"ФОП_ВИС_Маска наименования";
         public readonly string MaskShortNameName = SharedParamsConfig.Instance.VISMaskShortName.Name; //ФОП_ВИС_Маска краткого наименования
         
-        public SpecConfiguration(Document document) {
+        public SpecConfiguration(Document document, IMessageBoxService messageBoxService) {
             ProjectInfo info = document.ProjectInformation;
-
-            // Временная проверка пока ФОП_ВИС_Число не ушло из оборота
-            if(document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
-                TargetNameNumber = SharedParamsConfig.Instance.VISSpecNumbersCurrency.Name; //"ФОП_ВИС_Число ДЕ";
+            
+            if(document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbers)) {
+                if(!document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
+                    messageBoxService.Show(
+                        $"В проекте найден устаревший параметр \"{OutdatedNameNumber}\". "
+                        + $"Параметр \"{TargetNameNumber}\" будет создан, "
+                        + $"а значения \"{OutdatedNameNumber}\" будут обнулены. Замените параметр в спецификациях.",
+                        "Обновление спецификации",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+                NullifyOutdatedNumber = true; 
             }
 
             DoNotCountPlaceHolder = "!Не учитывать";
