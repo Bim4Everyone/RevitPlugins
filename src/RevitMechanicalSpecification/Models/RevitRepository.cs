@@ -35,11 +35,13 @@ namespace RevitMechanicalSpecification.Models {
         private readonly MaskReplacer _maskReplacer;
 
 
-        public RevitRepository(UIApplication uiApplication) {
-
+        public RevitRepository(
+            UIApplication uiApplication,
+            SpecConfiguration specConfiguration,
+            ElementProcessor elementProcessor) {
             UIApplication = uiApplication;
-            _elementProcessor = new ElementProcessor(Document);
-            _specConfiguration = new SpecConfiguration(Document);
+            _elementProcessor = elementProcessor;
+            _specConfiguration = specConfiguration;
             _collector = new CollectionFactory(Document, _specConfiguration, ActiveUIDocument);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
             _maskReplacer = new MaskReplacer(_specConfiguration);
