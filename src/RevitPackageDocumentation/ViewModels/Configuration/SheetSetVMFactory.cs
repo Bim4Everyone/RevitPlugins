@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 
@@ -116,7 +117,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             TitleBlockType = titleBlockType,
         };
         // Добавляем список дополнительных параметров
-        SetCustomParametersList(sheetVM, data);
+        SetCustomParametersList(sheetVM, data, sheetSetVM.SheetSetParams.Params);
 
         foreach(var componentData in data.Views) {
             var componentVM = CreateComponentVM(sheetSetVM, sheetVM, componentData);
@@ -157,7 +158,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
 
         // Добавляем список дополнительных параметров
-        SetCustomParametersList(sheetComponentVM, data);
+        SetCustomParametersList(sheetComponentVM, data, sheetSetVM.SheetSetParams.Params);
         return sheetComponentVM;
     }
 
@@ -180,7 +181,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
 
         // Добавляем список дополнительных параметров
-        SetCustomParametersList(sheetComponentVM, data);
+        SetCustomParametersList(sheetComponentVM, data, sheetSetVM.SheetSetParams.Params);
         return sheetComponentVM;
     }
 
@@ -203,7 +204,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
 
         // Добавляем список дополнительных параметров
-        SetCustomParametersList(sheetComponentVM, data);
+        SetCustomParametersList(sheetComponentVM, data, sheetSetVM.SheetSetParams.Params);
         return sheetComponentVM;
     }
 
@@ -228,7 +229,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         SetScheduleFilterList(scheduleViewVM, data, referenceSpec);
 
         // Добавляем список дополнительных параметров
-        SetCustomParametersList(scheduleViewVM, data);
+        SetCustomParametersList(scheduleViewVM, data, sheetSetVM.SheetSetParams.Params);
         return scheduleViewVM;
     }
 
@@ -246,7 +247,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
 
         // Добавляем список дополнительных параметров
-        SetCustomParametersList(sheetComponentVM, data);
+        SetCustomParametersList(sheetComponentVM, data, sheetSetVM.SheetSetParams.Params);
         return sheetComponentVM;
     }
 
@@ -274,7 +275,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
 
         // Добавляем список дополнительных параметров
-        SetCustomParametersList(sheetComponentVM, data);
+        SetCustomParametersList(sheetComponentVM, data, sheetSetVM.SheetSetParams.Params);
         return sheetComponentVM;
     }
 
@@ -291,16 +292,19 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
 
         // Добавляем список дополнительных параметров
-        SetCustomParametersList(sheetComponentVM, data);
+        SetCustomParametersList(sheetComponentVM, data, sheetSetVM.SheetSetParams.Params);
         return sheetComponentVM;
     }
 
     /// <summary>
     /// Добавляет список дополнительных параметров
     /// </summary>
-    private void SetCustomParametersList(BaseParamContainerVM baseParamContainer, ParamContainerModuleData data) {
+    private void SetCustomParametersList(
+        BaseParamContainerVM baseParamContainer,
+        ParamContainerModuleData data,
+        ObservableCollection<PluginParamVM> sheetSetParams) {
         // Добавляем список дополнительных параметров
-        var customParamsList = new CustomParametersListVM(baseParamContainer, _stringParamSetService);
+        var customParamsList = new CustomParametersListVM(sheetSetParams, _stringParamSetService);
         foreach(var paramData in data.CustomParamsList?.Params ?? []) {
             var paramVM = new CustomParameterVM(customParamsList, _stringParamSetService) {
                 ParamName = paramData.ParamName ?? string.Empty,

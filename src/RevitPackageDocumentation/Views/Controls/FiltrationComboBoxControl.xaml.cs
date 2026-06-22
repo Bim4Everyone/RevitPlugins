@@ -68,9 +68,9 @@ public partial class FiltrationComboBoxControl : UserControl {
     }
 
     /// <summary>
-    /// Выполняем обновление значений по фильтрам после того, как пользователь изменил строку фильтра
+    /// Выполняем обновление значений по фильтрам после того, как пользователь изменил строку фильтра или переменные
     /// </summary>
-    private void TextBox_TextChanged(object sender, TextChangedEventArgs e) {
+    private void FormulaTextBox_TextChanged(object sender, TextChangedEventArgs e) {
         UpdateFilteredItems();
     }
 

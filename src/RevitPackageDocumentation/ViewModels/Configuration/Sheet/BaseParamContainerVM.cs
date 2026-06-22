@@ -12,6 +12,7 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 internal abstract class BaseParamContainerVM : BaseViewModel {
@@ -25,7 +26,7 @@ internal abstract class BaseParamContainerVM : BaseViewModel {
         Repository = repository;
         _strParamSetService = stringParamSetService;
         SheetSetParams = sheetSetParams;
-        CustomParamsList = new CustomParametersListVM(this, _strParamSetService);
+        CustomParamsList = new CustomParametersListVM(SheetSetParams, _strParamSetService);
 
         PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
     }
@@ -51,7 +52,19 @@ internal abstract class BaseParamContainerVM : BaseViewModel {
     /// </summary>
     public void UpdateDueParamNameChange() {
         _strParamSetService.SetAll(this, SheetSetParams);
-        CustomParamsList.Params.ToList().ForEach(p => p.UpdateDueParamNameChange());
+        foreach(var parameter in CustomParamsList.Params) {
+            parameter.UpdateDueParamNameChange();
+        }
+
+        // Проходимся по наследникам и ищем свойства FiltrationComboBoxFilterListVM, в фильтрах вызываем метод обновления
+        this.GetType().GetProperties()
+            .Where(p => p.PropertyType == typeof(FiltrationComboBoxFilterListVM))
+            .Select(p => p.GetValue(this) as FiltrationComboBoxFilterListVM)
+            .Where(filterList => filterList != null)
+            .SelectMany(filterList => filterList.ValueList)
+            .ToList()
+            .ForEach(f => f.UpdateDueParamNameChange());
+
         if(this is ScheduleViewVM scheduleViewVM) {
             foreach(var rule in scheduleViewVM.ScheduleFilterList.ScheduleFilterRules) {
                 rule.UpdateDueParamNameChange();
@@ -64,7 +77,20 @@ internal abstract class BaseParamContainerVM : BaseViewModel {
             return;
         }
         _strParamSetService.SetAll(this, SheetSetParams, stringParam);
-        CustomParamsList.Params.ToList().ForEach(p => p.UpdateDueParamValueChange(stringParam));
+
+        foreach(var parameter in CustomParamsList.Params) {
+            parameter.UpdateDueParamValueChange(stringParam);
+        }
+
+        // Проходимся по наследникам и ищем свойства FiltrationComboBoxFilterListVM, в фильтрах вызываем метод обновления
+        this.GetType().GetProperties()
+            .Where(p => p.PropertyType == typeof(FiltrationComboBoxFilterListVM))
+            .Select(p => p.GetValue(this) as FiltrationComboBoxFilterListVM)
+            .Where(filterList => filterList != null)
+            .SelectMany(filterList => filterList.ValueList)
+            .ToList()
+            .ForEach(f => f.UpdateDueParamValueChange(stringParam));
+
         if(this is ScheduleViewVM scheduleViewVM) {
             foreach(var rule in scheduleViewVM.ScheduleFilterList.ScheduleFilterRules) {
                 rule.UpdateDueParamValueChange(stringParam);

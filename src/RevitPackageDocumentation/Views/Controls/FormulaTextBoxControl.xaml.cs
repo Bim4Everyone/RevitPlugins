@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -26,6 +27,7 @@ public partial class FormulaTextBoxControl : UserControl {
         DependencyProperty.Register(nameof(AcceptsReturn), typeof(bool), typeof(FormulaTextBoxControl),
             new FrameworkPropertyMetadata(false));
 
+
     public string PropFormula {
         get => (string) GetValue(PropFormulaProperty);
         set => SetValue(PropFormulaProperty, value);
@@ -51,18 +53,68 @@ public partial class FormulaTextBoxControl : UserControl {
         set => SetValue(AcceptsReturnProperty, value);
     }
 
-    private static void OnPropResultChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-        var control = d as FormulaTextBoxControl;
-        control?.UpdateResultVisibility();
+    /// <summary>
+    /// Событие изменения текста TextBox
+    /// </summary>
+    public static readonly RoutedEvent TextBoxTextChangedEvent =
+        EventManager.RegisterRoutedEvent(
+            nameof(TextBoxTextChanged),
+            RoutingStrategy.Bubble,
+            typeof(TextChangedEventHandler),
+            typeof(FormulaTextBoxControl));
+
+    /// <summary>
+    /// Событие изменения текста формулы TextBox
+    /// </summary>
+    public event TextChangedEventHandler TextBoxTextChanged {
+        add => AddHandler(TextBoxTextChangedEvent, value);
+        remove => RemoveHandler(TextBoxTextChangedEvent, value);
+    }
+
+    /// <summary>
+    /// Событие изменения текста TextBlock
+    /// </summary>
+    public static readonly RoutedEvent TextBlockTextChangedEvent =
+        EventManager.RegisterRoutedEvent(
+            nameof(TextBlockTextChanged),
+            RoutingStrategy.Bubble,
+            typeof(TextChangedEventHandler),
+            typeof(FormulaTextBoxControl));
+
+    /// <summary>
+    /// Событие изменения текста значения TextBlock
+    /// </summary>
+    public event TextChangedEventHandler TextBlockTextChanged {
+        add => AddHandler(TextBlockTextChangedEvent, value);
+        remove => RemoveHandler(TextBlockTextChangedEvent, value);
     }
 
     public FormulaTextBoxControl() {
         InitializeComponent();
 
+        // Когда меняется формула
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
-        _timer.Tick += (s, e) => { _timer.Stop(); UpdateFormula(); };
-
+        _timer.Tick += (s, e) => {
+            _timer.Stop();
+            UpdateFormula();
+            UpdateResultVisibility();
+            OnFormulaInputTextChanged(this, EventArgs.Empty);
+            OnResultTextChanged(this, EventArgs.Empty);
+        };
         FormulaInputTextBox.TextChanged += OnTextChanged;
+
+        // Когда меняется значение формулы
+        // Значение формулы может меняться, когда меняется формула и когда меняются переменные, указанные в формуле
+        var textBlockDescriptor = DependencyPropertyDescriptor.FromProperty(TextBlock.TextProperty, typeof(TextBlock));
+        textBlockDescriptor.AddValueChanged(ResultTextBlock, OnResultTextChanged);
+    }
+
+    /// <summary>
+    /// При инициализации
+    /// </summary>
+    private static void OnPropResultChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+        var control = d as FormulaTextBoxControl;
+        control?.UpdateResultVisibility();
     }
 
     private void OnTextChanged(object sender, TextChangedEventArgs e) {
@@ -70,16 +122,26 @@ public partial class FormulaTextBoxControl : UserControl {
         _timer.Start();
     }
 
+    /// <summary>
+    /// Запускает команду, что текст формулы изменился
+    /// </summary>
     private void UpdateFormula() {
         string propertyName = GetBindingExpression(PropFormulaProperty)?.ResolvedSourcePropertyName;
         if(propertyName != null) {
             UpdateCommand?.Execute(propertyName);
         }
-        UpdateResultVisibility();
     }
 
     private void UpdateResultVisibility() {
         bool areEqual = string.Equals(PropFormula ?? string.Empty, PropResult ?? string.Empty);
         ResultTextBlock.Visibility = areEqual ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void OnFormulaInputTextChanged(object sender, EventArgs e) {
+        RaiseEvent(new TextChangedEventArgs(TextBoxTextChangedEvent, UndoAction.None));
+    }
+
+    private void OnResultTextChanged(object sender, EventArgs e) {
+        RaiseEvent(new TextChangedEventArgs(TextBlockTextChangedEvent, UndoAction.None));
     }
 }
