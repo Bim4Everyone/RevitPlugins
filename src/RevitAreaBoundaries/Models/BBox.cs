@@ -4,27 +4,27 @@ using Autodesk.Revit.DB;
 
 namespace RevitAreaBoundaries.Models;
 
-public class BBox2(double minX, double minY, double maxX, double maxY) {
+public class BBox(double minX, double minY, double maxX, double maxY) {
     
     public double MinX { get; } = minX;
     public double MinY { get; } = minY;
     public double MaxX { get; } = maxX;
     public double MaxY { get; } = maxY;
 
-    public bool Intersects(BBox2 other) {
+    public bool Intersects(BBox other) {
         return !(other.MinX > MaxX || other.MaxX < MinX ||
                  other.MinY > MaxY || other.MaxY < MinY);
     }
 
-    public static BBox2 FromSegmentXY(XYZ a, XYZ b) {
+    public static BBox FromSegmentXY(XYZ a, XYZ b) {
         double minX = Math.Min(a.X, b.X);
         double minY = Math.Min(a.Y, b.Y);
         double maxX = Math.Max(a.X, b.X);
         double maxY = Math.Max(a.Y, b.Y);
-        return new BBox2(minX, minY, maxX, maxY);
+        return new BBox(minX, minY, maxX, maxY);
     }
 
-    public static BBox2 FromCurveXY(Curve c) {
+    public static BBox FromCurveXY(Curve c) {
         var pts = c.Tessellate();
         if (pts == null || pts.Count == 0) {
             var p0 = c.GetEndPoint(0);
@@ -42,6 +42,6 @@ public class BBox2(double minX, double minY, double maxX, double maxY) {
             if (p.Y > maxY) maxY = p.Y;
         }
 
-        return new BBox2(minX, minY, maxX, maxY);
+        return new BBox(minX, minY, maxX, maxY);
     }
 }

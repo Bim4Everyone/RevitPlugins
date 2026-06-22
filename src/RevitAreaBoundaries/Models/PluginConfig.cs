@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -64,3 +68,25 @@ internal class RevitSettings : ProjectSettings {
     /// </summary>
     public string SaveProperty { get; set; }
 }
+
+public class SystemPluginConfig {
+    
+    public readonly ICollection<BuiltInCategory> AllCategories = [
+        BuiltInCategory.OST_Doors,
+        BuiltInCategory.OST_Floors,
+        BuiltInCategory.OST_Railings,
+        BuiltInCategory.OST_RailingSystem,
+        BuiltInCategory.OST_StairsRailing,
+        BuiltInCategory.OST_StairsRailingBaluster,
+        BuiltInCategory.OST_StairsRailingRail,
+        BuiltInCategory.OST_RailingBalusterRail,
+        BuiltInCategory.OST_RailingBalusterRailCut,
+        BuiltInCategory.OST_RailingHandRail,
+        BuiltInCategory.OST_RailingHandRailAboveCut,
+        BuiltInCategory.OST_Roofs,
+        BuiltInCategory.OST_Walls,
+        BuiltInCategory.OST_Windows,
+        BuiltInCategory.OST_GenericModel
+    ];
+}
+

@@ -11,7 +11,7 @@ public class CurveSpatialIndex
     private readonly Dictionary<long, List<int>> _buckets = new Dictionary<long, List<int>>();
 
     public List<Curve> Curves { get; }
-    public List<BBox2> Boxes { get; }
+    public List<BBox> Boxes { get; }
 
     public CurveSpatialIndex(List<Curve> curves, double cellSize)
     {
@@ -19,7 +19,7 @@ public class CurveSpatialIndex
         if (cellSize <= 0) throw new ArgumentOutOfRangeException(nameof(cellSize));
 
         _cell = cellSize;
-        Boxes = curves.Select(BBox2.FromCurveXY).ToList();
+        Boxes = curves.Select(BBox.FromCurveXY).ToList();
         Build();
     }
 
@@ -27,7 +27,7 @@ public class CurveSpatialIndex
     {
         for (int i = 0; i < Curves.Count; i++)
         {
-            BBox2 b = Boxes[i];
+            BBox b = Boxes[i];
 
             int ix0 = ToCell(b.MinX);
             int iy0 = ToCell(b.MinY);
@@ -50,7 +50,7 @@ public class CurveSpatialIndex
         }
     }
 
-    public IEnumerable<int> Query(BBox2 box)
+    public IEnumerable<int> Query(BBox box)
     {
         int ix0 = ToCell(box.MinX);
         int iy0 = ToCell(box.MinY);

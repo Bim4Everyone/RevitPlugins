@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.DB;
+﻿using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
 
 namespace RevitAreaBoundaries.Models;
 
@@ -13,6 +15,8 @@ public class CellSquare
     public CellVertexType BRType { get; set; }
     public CellVertexType TRType { get; set; }
     public CellVertexType TLType { get; set; }
+    
+    public List<Curve> Curves { get; set; }
 }
 
 public enum CellVertexType {

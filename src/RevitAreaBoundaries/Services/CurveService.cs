@@ -1,31 +1,24 @@
-﻿using Autodesk.Revit.DB;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-public static class CurveSplitUtils
-{
-    /// <summary>
-    /// Разбивает Curve на короткие Curve.
-    /// - Line режется на несколько Line.
-    /// - Arc режется на несколько Arc (не аппроксимация линиями).
-    /// Для других типов можно добавить ветку или упасть с исключением.
-    /// </summary>
-    /// <param name="curve">Исходная кривая (Line или Arc).</param>
-    /// <param name="maxSegmentLength">Макс. длина сегмента (internal units).</param>
-    /// <param name="minSegments">Минимум сегментов.</param>
-    public static List<Curve> SplitToShortCurves(Curve curve, double maxSegmentLength, int minSegments = 1)
-    {
-        if (curve == null) throw new ArgumentNullException(nameof(curve));
-        if (maxSegmentLength <= 0) throw new ArgumentException("maxSegmentLength must be > 0", nameof(maxSegmentLength));
-        if (minSegments <= 0) minSegments = 1;
+using Autodesk.Revit.DB;
 
-        if (curve is Line line)
-            return SplitLine(line, maxSegmentLength, minSegments);
+namespace RevitAreaBoundaries.Services;
 
-        if (curve is Arc arc)
-            return SplitArc(arc, maxSegmentLength, minSegments);
-
-        throw new NotSupportedException($"Curve type '{curve.GetType().Name}' is not supported. Only Line and Arc.");
+public class CurveService {
+    
+    public List<Curve> SplitToShortCurves(Curve curve, double maxLenCurveMm, int minSegments = 1) {
+        if(curve == null) {
+            return [];
+        }
+        if(minSegments <= 0) {
+            minSegments = 1;
+        }
+        return curve switch {
+            Line line => SplitLine(line, maxLenCurveMm, minSegments),
+            Arc arc => SplitArc(arc, maxLenCurveMm, minSegments),
+            _ => [curve]
+        };
     }
 
     private static List<Curve> SplitLine(Line line, double maxSegmentLength, int minSegments)
@@ -93,4 +86,13 @@ public static class CurveSplitUtils
 
         return res;
     }
+    
+    public Curve ProjectCurveToXy(Curve curve) {
+        var p1 = curve.GetEndPoint(0);
+        var p2 = curve.GetEndPoint(1);
+        return Line.CreateBound(
+            new XYZ(p1.X, p1.Y, 0),
+            new XYZ(p2.X, p2.Y, 0));
+    }
+    
 }

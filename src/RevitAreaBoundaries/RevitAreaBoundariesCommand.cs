@@ -13,6 +13,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitAreaBoundaries.Models;
+using RevitAreaBoundaries.Services;
 using RevitAreaBoundaries.ViewModels;
 using RevitAreaBoundaries.Views;
 
@@ -47,6 +48,31 @@ public class RevitAreaBoundariesCommand : BasePluginCommand {
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Создание системных настроек
+        kernel.Bind<SystemPluginConfig>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к 
+        kernel.Bind<OuterSquareService>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к 
+        kernel.Bind<ElementSectionService>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к 
+        kernel.Bind<CurveService>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к 
+        kernel.Bind<BoundaryFindService>()
             .ToSelf()
             .InSingletonScope();
 
