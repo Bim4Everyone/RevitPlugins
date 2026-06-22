@@ -6,21 +6,14 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
+using dosymep.Revit.Comparators;
 
-using RevitRooms.Comparators;
 using RevitRooms.Models;
 using RevitRooms.ViewModels;
 
 namespace RevitRooms.Commands.Numerates;
-internal abstract class NumerateCommand {
-    private readonly RevitRepository _revitRepository;
-
-    protected readonly IComparer<string> _logicStringComparer = new LogicalStringComparer();
-    protected readonly IComparer<Element> _elementComparer = new dosymep.Revit.Comparators.ElementComparer();
-
-    public NumerateCommand(RevitRepository revitRepository) {
-        _revitRepository = revitRepository;
-    }
+internal abstract class NumerateCommand(RevitRepository revitRepository) {
+    protected readonly IComparer<Element> _elementComparer = RevitElementComparer.ElementName;
 
     public int Start { get; set; }
     public string Prefix { get; set; }
@@ -33,7 +26,7 @@ internal abstract class NumerateCommand {
                          IProgress<int> progress = default, 
                          CancellationToken cancellationToken = default) {
         var orderedElements = OrderElements(spatialElements);
-        using(var transaction = _revitRepository.Document.StartTransaction(TransactionName)) {
+        using(var transaction = revitRepository.Document.StartTransaction(TransactionName)) {
             int flatCount = Start;
 
             int count = 0;
