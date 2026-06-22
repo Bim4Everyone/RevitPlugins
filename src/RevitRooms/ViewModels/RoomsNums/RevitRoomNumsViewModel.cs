@@ -8,6 +8,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.ProjectParams;
+using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -181,12 +182,12 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
 
     public ObservableCollection<NumberingOrderViewModel> NumberingOrders {
         get => _numberingOrders;
-        set => RaiseAndSetIfChanged(ref _numberingOrders, value);
+        private set => RaiseAndSetIfChanged(ref _numberingOrders, value);
     }
 
     public ObservableCollection<NumberingOrderViewModel> SelectedNumberingOrders {
         get => _selectedNumberingOrders;
-        set => RaiseAndSetIfChanged(ref _selectedNumberingOrders, value);
+        private set => RaiseAndSetIfChanged(ref _selectedNumberingOrders, value);
     }
 
     private IEnumerable<PhaseViewModel> GetPhases() {
@@ -216,7 +217,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
             .Where(item => item != null)
             .Select(item => new ElementViewModel<Element>(item, _revitRepository))
             .Distinct()
-            .OrderBy(item => item.Element, new dosymep.Revit.Comparators.ElementComparer());
+            .OrderBy(item => item.Element, RevitElementComparer.ElementName);
     }
 
     private IEnumerable<IElementViewModel<Element>> GetSections() {
@@ -225,7 +226,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
             .Where(item => item != null)
             .Select(item => new ElementViewModel<Element>(item, _revitRepository))
             .Distinct()
-            .OrderBy(item => item.Element, new dosymep.Revit.Comparators.ElementComparer());
+            .OrderBy(item => item.Element, RevitElementComparer.ElementName);
     }
 
     private IEnumerable<NumberingOrderViewModel> GetNumberingOrders() {
@@ -373,7 +374,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
 
     private string[] GetNotFoundNames(IEnumerable<SpatialElementViewModel> orderedObjects) {
         return IsNumFlats
-            ? (new string[0])
+            ? ([])
             : orderedObjects
             .Select(item => item.Room.Name)
             .Except(SelectedNumberingOrders.Select(item => item.Name))
@@ -447,9 +448,7 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
                 AddElements(WarningInfo.GetErrorMultiLevelRoom(_localizationService), multiLevelRoomGroup, errors);
             }
         }
-
-        bool showWarnings = true;
-        return _errorWindowService.ShowNoticeWindow(showWarnings, [.. errors.Values]);
+        return _errorWindowService.ShowNoticeWindow(true, [.. errors.Values]);
     }
 
     private bool CanNumerateRooms(object param) {
@@ -537,11 +536,11 @@ internal abstract class RevitRoomNumsViewModel : BaseViewModel, INumberingOrder 
         var settings = _roomsNumsConfig.GetSettings(_revitRepository.DocumentName);
 
         StartNumber = settings?.StartNumber ?? "1";
-        IsNumFlats = settings?.IsNumFlats ?? default;
-        IsNumRooms = settings?.IsNumRooms ?? default;
-        IsNumRoomsGroup = settings?.IsNumRoomsGroup ?? default;
-        IsNumRoomsSection = settings?.IsNumRoomsSection ?? default;
-        IsNumRoomsSectionLevels = settings?.IsNumRoomsSectionLevels ?? default;
+        IsNumFlats = settings?.IsNumFlats ?? false;
+        IsNumRooms = settings?.IsNumRooms ?? false;
+        IsNumRoomsGroup = settings?.IsNumRoomsGroup ?? false;
+        IsNumRoomsSection = settings?.IsNumRoomsSection ?? false;
+        IsNumRoomsSectionLevels = settings?.IsNumRoomsSectionLevels ?? false;
 
         if(_revitRepository.GetElement(settings?.PhaseElementId ?? ElementId.InvalidElementId) is Phase phase) {
             Phase = Phases.FirstOrDefault(item => item.ElementId == phase.Id) ?? Phases.FirstOrDefault();
