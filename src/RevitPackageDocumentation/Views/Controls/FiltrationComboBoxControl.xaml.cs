@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
@@ -43,8 +42,14 @@ public partial class FiltrationComboBoxControl : UserControl {
         set => SetValue(FilterListProperty, value);
     }
 
+    /// <summary>
+    /// Коллекция элементов для ComboBox, после того как проведена фильтрация по фильтрам
+    /// </summary>
     public ObservableCollection<Element> FilteredItemsSource { get; } = [];
 
+    /// <summary>
+    /// Показывает/скрывает видимость фильтров
+    /// </summary>
     private void Button_Click(object sender, RoutedEventArgs e) {
         FiltersItemsControl.Visibility = FiltersItemsControl.Visibility == System.Windows.Visibility.Visible
             ? System.Windows.Visibility.Collapsed
@@ -54,19 +59,39 @@ public partial class FiltrationComboBoxControl : UserControl {
             : System.Windows.Visibility.Visible;
     }
 
+    /// <summary>
+    /// Выполняем обновление значений ComboBox по фильтрам после привязки источников
+    /// </summary>
     private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
         var control = (FiltrationComboBoxControl) d;
         control.UpdateFilteredItems();
     }
 
+    /// <summary>
+    /// Выполняем обновление значений по фильтрам после того, как пользователь изменил строку фильтра
+    /// </summary>
+    private void TextBox_TextChanged(object sender, TextChangedEventArgs e) {
+        UpdateFilteredItems();
+    }
 
+    /// <summary>
+    /// Выполняем обновление значений ComboBox по фильтрам после того, как отработала команда удаления фильтра
+    /// </summary>
+    private void Button_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
+        Dispatcher.BeginInvoke(new Action(() => {
+            UpdateFilteredItems();
+        }), System.Windows.Threading.DispatcherPriority.Background);
+    }
+
+    /// <summary>
+    /// Обновляет значения ComboBox по фильтрам
+    /// </summary>
     private void UpdateFilteredItems() {
         FilteredItemsSource.Clear();
 
         if(ComboBoxSource is null || FilterList is null) {
             return;
         }
-
         var filters = FilterList.ValueList
             .Select(x => x?.Value)
             .Where(x => !string.IsNullOrWhiteSpace(x))
@@ -77,38 +102,20 @@ public partial class FiltrationComboBoxControl : UserControl {
                 FilteredItemsSource.Add(element);
             }
         }
+
+        if(FilteredItemsSource.Count == 1) {
+            ComboBoxSelected = FilteredItemsSource.First();
+        }
     }
 
+    /// <summary>
+    /// Проверяет, что имя элемента содержит все строки фильтра
+    /// </summary>
     private bool ItemMatchesAllFilters(Element element, IReadOnlyCollection<string> filters) {
         if(filters.Count == 0) {
             return true;
         }
-
         string name = element.Name ?? string.Empty;
         return filters.All(name.Contains);
-    }
-
-
-    private void DeleteButton_Click(object sender, RoutedEventArgs e) {
-        UpdateFilteredItems();
-        TaskDialog.Show("e", FilterList.ValueList.Count().ToString());
-    }
-
-    private void TextBox_TextChanged(object sender, TextChangedEventArgs e) {
-        UpdateFilteredItems();
-    }
-
-    private void Button_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-        // Проверяем, что команда уже отработала (можно использовать флаг)
-        // или просто обновляем список с задержкой
-        Dispatcher.BeginInvoke(new Action(() => {
-            UpdateFilteredItems();
-            TaskDialog.Show("e", FilterList.ValueList.Count().ToString());
-        }), System.Windows.Threading.DispatcherPriority.Background);
-    }
-
-    private void Button_Click_1(object sender, RoutedEventArgs e) {
-        UpdateFilteredItems();
-        TaskDialog.Show("e", FilterList.ValueList.Count().ToString());
     }
 }
