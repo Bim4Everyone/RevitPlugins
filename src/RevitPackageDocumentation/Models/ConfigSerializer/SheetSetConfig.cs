@@ -110,8 +110,11 @@ public class StructuralCalloutViewData : SheetComponentData {
 
     public string ViewNameFormula { get; set; }
     public string ViewFamilyTypeName { get; set; }
+    public FiltrationComboBoxFilterListData ViewFamilyTypeFilterValues { get; set; }
     public string ViewTemplateName { get; set; }
+    public FiltrationComboBoxFilterListData ViewTemplateFilterValues { get; set; }
     public string ViewportTypeName { get; set; }
+    public FiltrationComboBoxFilterListData ViewportTypeFilterValues { get; set; }
     public string ViewCount { get; set; }
     public string SelectedSelectElemParamName { get; set; }
 }
@@ -126,8 +129,11 @@ public class SectionViewData : SheetComponentData {
     public string ViewNameFormula { get; set; }
     public string ViewCount { get; set; }
     public string ViewFamilyTypeName { get; set; }
+    public FiltrationComboBoxFilterListData ViewFamilyTypeFilterValues { get; set; }
     public string ViewTemplateName { get; set; }
+    public FiltrationComboBoxFilterListData ViewTemplateFilterValues { get; set; }
     public string ViewportTypeName { get; set; }
+    public FiltrationComboBoxFilterListData ViewportTypeFilterValues { get; set; }
     public string SelectedSelectElemParamName { get; set; }
 }
 

@@ -8,6 +8,7 @@ using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class StructuralCalloutViewVM : SheetComponentVM {
@@ -31,6 +32,10 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     private string _viewCount;
     private string _viewportNumber;
     private SelectElemParamVM _selectedSelectElemParam;
+
+    private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
+    private FiltrationComboBoxFilterListVM _viewportTypeFilter;
+    private FiltrationComboBoxFilterListVM _viewTemplateFilter;
 
     public StructuralCalloutViewVM(
         RevitRepository repository,
@@ -57,14 +62,29 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewFamilyType, value);
     }
 
+    public FiltrationComboBoxFilterListVM ViewFamilyTypeFilter {
+        get => _viewFamilyTypeFilter;
+        set => RaiseAndSetIfChanged(ref _viewFamilyTypeFilter, value);
+    }
+
     public ElementType ViewportType {
         get => _viewportType;
         set => RaiseAndSetIfChanged(ref _viewportType, value);
     }
 
+    public FiltrationComboBoxFilterListVM ViewportTypeFilter {
+        get => _viewportTypeFilter;
+        set => RaiseAndSetIfChanged(ref _viewportTypeFilter, value);
+    }
+
     public ViewPlan ViewTemplate {
         get => _viewTemplate;
         set => RaiseAndSetIfChanged(ref _viewTemplate, value);
+    }
+
+    public FiltrationComboBoxFilterListVM ViewTemplateFilter {
+        get => _viewTemplateFilter;
+        set => RaiseAndSetIfChanged(ref _viewTemplateFilter, value);
     }
 
     public string ViewCount {
@@ -118,6 +138,20 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
             }
         }
 
+        int index = Sheet.SheetComponents.IndexOf(this);
+        StructuralPlanViewVM parentView = null;
+        for(int i = index; i >= 0; i--) {
+            parentView = Sheet.SheetComponents[i] as StructuralPlanViewVM;
+
+            if(parentView != null && parentView.IsModuleCheck == true) {
+                break;
+            }
+        }
+        if(parentView is null) {
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.HasNotStructuralPlanView");
+            return false;
+        }
+
         ModuleErrors = string.Empty;
         return true;
     }
@@ -133,7 +167,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     }
 
     public View Create(int number) {
-        var viewName = $"{ViewName}_{number}";
+        string viewName = $"{ViewName}_{number}";
         var view = Repository.GetViewByName(viewName);
 
         if(view != null) {
@@ -141,7 +175,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         }
 
         try {
-            var index = Sheet.SheetComponents.IndexOf(this);
+            int index = Sheet.SheetComponents.IndexOf(this);
             StructuralPlanViewVM parentView = default;
 
             for(int i = index; i >= 0; i--) {

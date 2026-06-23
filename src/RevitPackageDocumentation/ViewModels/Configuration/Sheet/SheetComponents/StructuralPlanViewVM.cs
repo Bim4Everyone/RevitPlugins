@@ -20,6 +20,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     private string _viewCount;
     private SelectElemParamVM _selectedSelectElemParam;
     private ViewPlan _viewInstance;
+
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
     private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
     private FiltrationComboBoxFilterListVM _viewTemplateFilter;

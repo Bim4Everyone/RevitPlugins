@@ -9,6 +9,7 @@ using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class SectionViewVM : SheetComponentVM {
@@ -19,6 +20,10 @@ internal class SectionViewVM : SheetComponentVM {
     private ViewSection _viewTemplate;
     private string _viewCount;
     private SelectElemParamVM _selectedSelectElemParam;
+
+    private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
+    private FiltrationComboBoxFilterListVM _viewportTypeFilter;
+    private FiltrationComboBoxFilterListVM _viewTemplateFilter;
 
     // Расстояние до дальней секущей плоскости сечения
     private readonly double _viewDepth = UnitUtilsHelper.ConvertToInternalValue(3000);
@@ -60,14 +65,29 @@ internal class SectionViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewFamilyType, value);
     }
 
+    public FiltrationComboBoxFilterListVM ViewFamilyTypeFilter {
+        get => _viewFamilyTypeFilter;
+        set => RaiseAndSetIfChanged(ref _viewFamilyTypeFilter, value);
+    }
+
     public ElementType ViewportType {
         get => _viewportType;
         set => RaiseAndSetIfChanged(ref _viewportType, value);
     }
 
+    public FiltrationComboBoxFilterListVM ViewportTypeFilter {
+        get => _viewportTypeFilter;
+        set => RaiseAndSetIfChanged(ref _viewportTypeFilter, value);
+    }
+
     public ViewSection ViewTemplate {
         get => _viewTemplate;
         set => RaiseAndSetIfChanged(ref _viewTemplate, value);
+    }
+
+    public FiltrationComboBoxFilterListVM ViewTemplateFilter {
+        get => _viewTemplateFilter;
+        set => RaiseAndSetIfChanged(ref _viewTemplateFilter, value);
     }
 
     public string ViewCount {
