@@ -7,11 +7,15 @@ using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class LegendViewVM : SheetComponentVM {
     private View _legendView;
     private ElementType _viewportType;
+
+    private FiltrationComboBoxFilterListVM _legendViewFilter;
+    private FiltrationComboBoxFilterListVM _viewportTypeFilter;
 
     public LegendViewVM(
         RevitRepository repository,
@@ -28,9 +32,19 @@ internal class LegendViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _legendView, value);
     }
 
+    public FiltrationComboBoxFilterListVM LegendViewFilter {
+        get => _legendViewFilter;
+        set => RaiseAndSetIfChanged(ref _legendViewFilter, value);
+    }
+
     public ElementType ViewportType {
         get => _viewportType;
         set => RaiseAndSetIfChanged(ref _viewportType, value);
+    }
+
+    public FiltrationComboBoxFilterListVM ViewportTypeFilter {
+        get => _viewportTypeFilter;
+        set => RaiseAndSetIfChanged(ref _viewportTypeFilter, value);
     }
 
     public override bool ValidateModule() {

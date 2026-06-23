@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 using Autodesk.Revit.DB;
@@ -25,6 +26,9 @@ public partial class FiltrationComboBoxControl : UserControl {
         DependencyProperty.Register(nameof(FilterList), typeof(FiltrationComboBoxFilterListVM), typeof(FiltrationComboBoxControl),
             new PropertyMetadata(null, OnFilterListSourceChanged));
 
+    public static readonly DependencyProperty ComboBoxSelectionChangedCommandProperty =
+        DependencyProperty.Register(nameof(ComboBoxSelectionChangedCommand), typeof(ICommand), typeof(FiltrationComboBoxControl));
+
     public FiltrationComboBoxControl() {
         InitializeComponent();
     }
@@ -42,6 +46,11 @@ public partial class FiltrationComboBoxControl : UserControl {
     internal FiltrationComboBoxFilterListVM FilterList {
         get => (FiltrationComboBoxFilterListVM) GetValue(FilterListProperty);
         set => SetValue(FilterListProperty, value);
+    }
+
+    public ICommand ComboBoxSelectionChangedCommand {
+        get => (ICommand) GetValue(ComboBoxSelectionChangedCommandProperty);
+        set => SetValue(ComboBoxSelectionChangedCommandProperty, value);
     }
 
     /// <summary>

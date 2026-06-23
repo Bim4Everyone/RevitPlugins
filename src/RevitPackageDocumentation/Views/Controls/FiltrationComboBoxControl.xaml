@@ -44,6 +44,13 @@
             DisplayMemberPath="Name"
             ItemsSource="{Binding Path=FilteredItemsSource, ElementName=root}"
             SelectedItem="{Binding Path=ComboBoxSelected, ElementName=root}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger
+                    EventName="SelectionChanged">
+                    <i:InvokeCommandAction
+                        Command="{Binding Path=ComboBoxSelectionChangedCommand, ElementName=root}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
         </ComboBox>
 
         <ui:Button

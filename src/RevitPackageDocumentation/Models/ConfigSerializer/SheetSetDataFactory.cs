@@ -111,6 +111,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 CustomParamsList = GetCustomParametersList(vm),
 
                 ReferenceViewName = vm.ReferenceSpec.Name,
+                ReferenceViewFilterValues = GetFiltrationComboBoxFilterList(vm.ReferenceSpecFilter),
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewColumn = vm.ViewColumn,
                 ViewCount = vm.ViewCount,
@@ -144,7 +145,9 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 CustomParamsList = GetCustomParametersList(vm),
 
                 ViewName = vm.LegendView?.Name,
+                ViewFilterValues = GetFiltrationComboBoxFilterList(vm.LegendViewFilter),
                 ViewportTypeName = vm.ViewportType.Name,
+                ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
             },
 
             _ => throw new NotSupportedException($"Тип '{sheetComponentVM?.GetType().Name}' не поддерживается")

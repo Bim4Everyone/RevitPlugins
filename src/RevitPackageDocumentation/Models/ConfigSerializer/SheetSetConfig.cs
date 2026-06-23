@@ -144,6 +144,7 @@ public class ScheduleViewData : SheetComponentData {
     public override string ComponentType => "ScheduleView";
 
     public string ReferenceViewName { get; set; }
+    public FiltrationComboBoxFilterListData ReferenceViewFilterValues { get; set; }
     public string ViewNameFormula { get; set; }
     public string ViewCount { get; set; }
     public string ViewColumn { get; set; }
@@ -178,7 +179,9 @@ public class LegendViewData : SheetComponentData {
     public override string ComponentType => "LegendView";
 
     public string ViewName { get; set; }
+    public FiltrationComboBoxFilterListData ViewFilterValues { get; set; }
     public string ViewportTypeName { get; set; }
+    public FiltrationComboBoxFilterListData ViewportTypeFilterValues { get; set; }
 }
 
 /// <summary>

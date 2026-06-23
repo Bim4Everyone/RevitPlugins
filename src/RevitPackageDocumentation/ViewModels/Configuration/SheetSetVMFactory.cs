@@ -232,6 +232,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleCode = "456",
 
             ReferenceSpec = referenceSpec,
+            ReferenceSpecFilter = GetFilterList(data.ReferenceViewFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewNameFormula = data.ViewNameFormula ?? string.Empty,
             ViewName = data.ViewNameFormula ?? string.Empty,
             ViewColumn = data.ViewColumn ?? "1",
@@ -301,7 +302,9 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleCode = "03",
 
             LegendView = _revitRepository.LegendsInProject.FirstOrDefault(v => v.Name.Equals(data.ViewName)),
+            LegendViewFilter = GetFilterList(data.ViewFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
+            ViewportTypeFilter = GetFilterList(data.ViewportTypeFilterValues, sheetSetVM.SheetSetParams.Params),
         };
 
         // Добавляем список дополнительных параметров

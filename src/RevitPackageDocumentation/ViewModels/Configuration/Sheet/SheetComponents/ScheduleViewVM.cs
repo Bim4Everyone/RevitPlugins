@@ -9,6 +9,7 @@ using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
@@ -20,6 +21,8 @@ internal class ScheduleViewVM : SheetComponentVM {
     private ViewSchedule _referenceSpec;
     private ScheduleFilterListVM _scheduleFilterList;
     private ScheduleSheetInstance _viewportInstance;
+
+    private FiltrationComboBoxFilterListVM _referenceSpecFilter;
 
     // Смещение по горизонтали в футах, для размещаемых на листе спецификациях требуемое, чтобы они попали на лист
     private readonly double _specViewportRightOffset = UnitUtilsHelper.ConvertToInternalValue(0.77);
@@ -49,6 +52,11 @@ internal class ScheduleViewVM : SheetComponentVM {
     public ViewSchedule ReferenceSpec {
         get => _referenceSpec;
         set => RaiseAndSetIfChanged(ref _referenceSpec, value);
+    }
+
+    public FiltrationComboBoxFilterListVM ReferenceSpecFilter {
+        get => _referenceSpecFilter;
+        set => RaiseAndSetIfChanged(ref _referenceSpecFilter, value);
     }
 
     public string ViewNameFormula {

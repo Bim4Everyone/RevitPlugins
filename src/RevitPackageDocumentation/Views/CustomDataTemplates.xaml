@@ -689,20 +689,13 @@
                         VerticalAlignment="Center"
                         Text="Имя исходной" />
 
-                    <ComboBox
+                    <controls:FiltrationComboBoxControl
                         Grid.Column="1"
                         Margin="5"
-                        ItemsSource="{Binding DataContext.SpecsInPj, RelativeSource={RelativeSource AncestorType=Window}}"
-                        DisplayMemberPath="Name"
-                        SelectedItem="{Binding ReferenceSpec, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger
-                                EventName="SelectionChanged">
-                                <i:InvokeCommandAction
-                                    Command="{Binding SelectReferenceSpecCommand}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </ComboBox>
+                        ComboBoxSource="{Binding DataContext.SpecsInPj, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ComboBoxSelected="{Binding ReferenceSpec, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        FilterList="{Binding ReferenceSpecFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxSelectionChangedCommand="{Binding SelectReferenceSpecCommand}"/>
                 </Grid>
             </WrapPanel>
 
@@ -1114,13 +1107,12 @@
                         VerticalAlignment="Center"
                         Text="Имя" />
 
-                    <ComboBox
+                    <controls:FiltrationComboBoxControl
                         Grid.Column="1"
-                        Grid.Row="0"
                         Margin="5"
-                        ItemsSource="{Binding DataContext.LegendsInProject, RelativeSource={RelativeSource AncestorType=Window}}"
-                        DisplayMemberPath="Name"
-                        SelectedItem="{Binding LegendView, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        ComboBoxSource="{Binding DataContext.LegendsInProject, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ComboBoxSelected="{Binding LegendView, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        FilterList="{Binding LegendViewFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
 
                 <Grid>
@@ -1143,6 +1135,14 @@
                         ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         DisplayMemberPath="Name"
                         SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+
+                    <controls:FiltrationComboBoxControl
+                        Grid.Column="1"
+                        Margin="5"
+                        ComboBoxSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ComboBoxSelected="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
             </UniformGrid>
             
