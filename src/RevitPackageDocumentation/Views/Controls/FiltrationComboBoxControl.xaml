@@ -25,7 +25,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -34,7 +34,6 @@
         
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <ComboBox
@@ -50,60 +49,79 @@
         <ui:Button
             Grid.Row="0"
             Grid.Column="1"
-            Margin="0 4"
+            Margin="0 5"
             Height="37"
             Width="37"
             VerticalAlignment="Top"
-            Appearance="Danger"
-            Content="F"
-            Click="Button_Click"/>
+            Icon="{ui:SymbolIcon Beaker32}"
+            Click="Button_Click"
+            RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+                <RotateTransform
+                    Angle="180" />
+            </Button.RenderTransform>
+        </ui:Button>
 
-        <ItemsControl
-            x:Name="FiltersItemsControl"
-            Grid.Row="1"
-            Grid.Column="0"
-            Visibility="Collapsed"
-            ItemsSource="{Binding FilterList.ValueList, ElementName=root}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+        <ui:Flyout
+            x:Name="flyout"
+            Grid.Row="0"
+            Grid.ColumnSpan="2"
+            MinWidth="300"
+            IsOpen="False"
+            Placement="Bottom"
+            HorizontalAlignment="Right">
 
-                        <controls:FormulaTextBoxControl
-                            Grid.Column="0"
-                            Margin="0 5 5 5"
-                            PropFormula="{Binding Path=ValueFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            PropResult="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            UpdateCommand="{Binding Path=PropUpdateByFormulaCommand}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                        <Button
-                            Grid.Column="1"
-                            Content="✕"
-                            Height="37"
-                            Width="37"
-                            Margin="0 5 5 0"
-                            VerticalAlignment="Top"
-                            Command="{Binding FilterList.RemoveFilterCommand, ElementName=root}"
-                            CommandParameter="{Binding}">
-                        </Button>
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                <ItemsControl
+                    x:Name="FiltersItemsControl"
+                    Grid.Column="0"
+                    ItemsSource="{Binding FilterList.ValueList, ElementName=root}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-        <ui:Button
-            x:Name="FiltersAddButton"
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="0 4"
-            Height="37"
-            Width="37"
-            VerticalAlignment="Top"
-            Visibility="Collapsed"
-            Content="+"
-            Command="{Binding FilterList.AddFilterCommand, ElementName=root}" />
+                                <controls:FormulaTextBoxControl
+                                    Grid.Column="0"
+                                    Margin="0 5 5 5"
+                                    PropFormula="{Binding Path=ValueFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    PropResult="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    UpdateCommand="{Binding Path=PropUpdateByFormulaCommand}" />
+
+                                <Button
+                                    Grid.Column="1"
+                                    Content="✕"
+                                    Height="35"
+                                    Width="35"
+                                    Margin="0 5 5 0"
+                                    VerticalAlignment="Top"
+                                    Command="{Binding FilterList.RemoveFilterCommand, ElementName=root}"
+                                    CommandParameter="{Binding}">
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ui:Button
+                    x:Name="FiltersAddButton"
+                    Grid.Column="1"
+                    Margin="0 5"
+                    Height="35"
+                    Width="35"
+                    VerticalAlignment="Top"
+                    Appearance="Info"
+                    Content="+"
+                    Command="{Binding FilterList.AddFilterCommand, ElementName=root}" />
+            </Grid>
+        </ui:Flyout>
     </Grid>
 </UserControl>

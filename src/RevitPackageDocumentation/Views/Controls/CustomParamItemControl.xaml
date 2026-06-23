@@ -36,9 +36,9 @@
 
         <ui:Button
             Grid.Column="0"
-            Margin="0 4"
-            Height="38"
-            Width="38"
+            Margin="0 5"
+            Height="35"
+            Width="35"
             VerticalAlignment="Top"
             Appearance="Danger"
             Content="✕"

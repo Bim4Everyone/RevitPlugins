@@ -167,11 +167,17 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// Показывает/скрывает видимость фильтров
     /// </summary>
     private void Button_Click(object sender, RoutedEventArgs e) {
-        FiltersItemsControl.Visibility = FiltersItemsControl.Visibility == System.Windows.Visibility.Visible
-            ? System.Windows.Visibility.Collapsed
-            : System.Windows.Visibility.Visible;
-        FiltersAddButton.Visibility = FiltersAddButton.Visibility == System.Windows.Visibility.Visible
-            ? System.Windows.Visibility.Collapsed
-            : System.Windows.Visibility.Visible;
+        flyout.IsOpen = flyout.IsOpen == true
+            ? false
+            : true;
+
+
+
+        //FiltersItemsControl.Visibility = FiltersItemsControl.Visibility == System.Windows.Visibility.Visible
+        //    ? System.Windows.Visibility.Collapsed
+        //    : System.Windows.Visibility.Visible;
+        //FiltersAddButton.Visibility = FiltersAddButton.Visibility == System.Windows.Visibility.Visible
+        //    ? System.Windows.Visibility.Collapsed
+        //    : System.Windows.Visibility.Visible;
     }
 }

@@ -21,6 +21,8 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     private SelectElemParamVM _selectedSelectElemParam;
     private ViewPlan _viewInstance;
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
+    private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
+    private FiltrationComboBoxFilterListVM _viewTemplateFilter;
 
     // Смещение по горизонтали в дюймах слева, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _titleBlockFrameLeftOffset = UnitUtilsHelper.ConvertToInternalValue(20);
@@ -52,6 +54,11 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewFamilyType, value);
     }
 
+    public FiltrationComboBoxFilterListVM ViewFamilyTypeFilter {
+        get => _viewFamilyTypeFilter;
+        set => RaiseAndSetIfChanged(ref _viewFamilyTypeFilter, value);
+    }
+
     public ElementType ViewportType {
         get => _viewportType;
         set => RaiseAndSetIfChanged(ref _viewportType, value);
@@ -65,6 +72,11 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     public ViewPlan ViewTemplate {
         get => _viewTemplate;
         set => RaiseAndSetIfChanged(ref _viewTemplate, value);
+    }
+
+    public FiltrationComboBoxFilterListVM ViewTemplateFilter {
+        get => _viewTemplateFilter;
+        set => RaiseAndSetIfChanged(ref _viewTemplateFilter, value);
     }
 
     public string ViewCount {

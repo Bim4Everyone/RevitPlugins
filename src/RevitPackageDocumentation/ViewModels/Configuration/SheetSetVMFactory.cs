@@ -151,7 +151,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ViewNameFormula = data.ViewNameFormula ?? string.Empty,
             ViewName = data.ViewNameFormula ?? string.Empty,
             ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
+            ViewFamilyTypeFilter = GetFilterList(data.ViewFamilyTypeFilterValues, sheetSetVM.SheetSetParams.Params),
+
             ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
+            ViewTemplateFilter = GetFilterList(data.ViewTemplateFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
             ViewportTypeFilter = GetFilterList(data.ViewportTypeFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewCount = data.ViewCount ?? "1",

@@ -67,13 +67,12 @@
                         VerticalAlignment="Center"
                         Text="Типоразмер вида" />
 
-                    <ComboBox
+                    <controls:FiltrationComboBoxControl
                         Grid.Column="1"
                         Margin="5"
-                        HorizontalAlignment="Stretch"
-                        ItemsSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                        DisplayMemberPath="Name"
-                        SelectedItem="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        ComboBoxSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ComboBoxSelected="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        FilterList="{Binding ViewFamilyTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
             </WrapPanel>
 
@@ -97,24 +96,12 @@
                         VerticalAlignment="Center"
                         Text="Типоразмер видового экрана" />
 
-
-
-
-
-
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                    
-                    <!--<ComboBox
-                        Grid.Column="1"
-                        Margin="5"
-                        ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                        DisplayMemberPath="Name"
-                        SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />-->
                 </Grid>
                 
                 <Grid>
@@ -129,12 +116,12 @@
                         VerticalAlignment="Center"
                         Text="Шаблон вида" />
 
-                    <ComboBox
+                    <controls:FiltrationComboBoxControl
                         Grid.Column="1"
                         Margin="5"
-                        ItemsSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
-                        DisplayMemberPath="Name"
-                        SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        ComboBoxSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ComboBoxSelected="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        FilterList="{Binding ViewTemplateFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
                 
                 <Grid>

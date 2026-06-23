@@ -61,7 +61,9 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
 
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
+                ViewFamilyTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewFamilyTypeFilter),
                 ViewTemplateName = vm.ViewTemplate?.Name,
+                ViewTemplateFilterValues = GetFiltrationComboBoxFilterList(vm.ViewTemplateFilter),
                 ViewportTypeName = vm.ViewportType?.Name,
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,
