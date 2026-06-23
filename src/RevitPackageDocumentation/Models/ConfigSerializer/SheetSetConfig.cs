@@ -95,6 +95,7 @@ public class StructuralPlanViewData : SheetComponentData {
     public string ViewFamilyTypeName { get; set; }
     public string ViewTemplateName { get; set; }
     public string ViewportTypeName { get; set; }
+    public FiltrationComboBoxFilterListData ViewportTypeFilterValues { get; set; }
     public string ViewCount { get; set; }
     public string SelectedSelectElemParamName { get; set; }
 }
@@ -201,6 +202,20 @@ public class CustomParametersListData {
 public class CustomParameterData {
     public string ParamName { get; set; }
     public string ParamValueFormula { get; set; }
+}
+
+/// <summary>
+/// DTO списка фильтров для свойства
+/// </summary>
+public class FiltrationComboBoxFilterListData {
+    public List<FiltrationComboBoxFilterData> ValueList { get; set; }
+}
+
+/// <summary>
+/// DTO дополнительного параметра
+/// </summary>
+public class FiltrationComboBoxFilterData {
+    public string ValueFormula { get; set; }
 }
 
 

@@ -7,6 +7,7 @@ using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.Models.ConfigSerializer;
 
@@ -62,6 +63,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
                 ViewTemplateName = vm.ViewTemplate?.Name,
                 ViewportTypeName = vm.ViewportType?.Name,
+                ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,
                 SelectedSelectElemParamName = vm.SelectedSelectElemParam?.ParamName,
             },
@@ -146,6 +148,14 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             .Select(r => new CustomParameterData() {
                 ParamName = r.ParamName ?? string.Empty,
                 ParamValueFormula = r.ParamValueFormula ?? string.Empty,
+            })
+        .ToList()
+    };
+
+    private FiltrationComboBoxFilterListData GetFiltrationComboBoxFilterList(FiltrationComboBoxFilterListVM vm) => new() {
+        ValueList = vm.ValueList
+            .Select(r => new FiltrationComboBoxFilterData() {
+                ValueFormula = r.ValueFormula ?? string.Empty,
             })
         .ToList()
     };

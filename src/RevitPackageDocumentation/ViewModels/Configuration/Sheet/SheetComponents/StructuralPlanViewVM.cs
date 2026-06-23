@@ -35,17 +35,6 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-
-        ViewportTypeFilter = new FiltrationComboBoxFilterListVM(sheetSetParams, stringParamSetService);
-        ViewportTypeFilter.ValueList.Add(new FiltrationComboBoxFilterVM(ViewportTypeFilter, stringParamSetService) {
-            ValueFormula = "Фра",
-            Value = "Фра"
-        }
-        );
-        ViewportTypeFilter.ValueList.Add(new FiltrationComboBoxFilterVM(ViewportTypeFilter, stringParamSetService) {
-            ValueFormula = "Мас",
-            Value = "Мас"
-        });
     }
 
     public string ViewNameFormula {
@@ -68,15 +57,10 @@ internal class StructuralPlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewportType, value);
     }
 
-
-
     public FiltrationComboBoxFilterListVM ViewportTypeFilter {
         get => _viewportTypeFilter;
         set => RaiseAndSetIfChanged(ref _viewportTypeFilter, value);
     }
-
-
-
 
     public ViewPlan ViewTemplate {
         get => _viewTemplate;

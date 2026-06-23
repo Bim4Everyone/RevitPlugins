@@ -103,6 +103,14 @@ internal class SheetSetVM : BaseViewModel {
         }
     }
 
+    public void UpdateOnInitialization() {
+        foreach(var sheet in SheetList) {
+            sheet.UpdateDueParamNameChange();
+            foreach(var component in sheet.SheetComponents) {
+                component.UpdateDueParamNameChange();
+            }
+        }
+    }
 
     /// <summary>
     /// В случае изменения имени параметра нужно обойти все листы и их компоненты, и обновить привязки

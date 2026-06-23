@@ -77,9 +77,7 @@
                             Margin="0 5 5 5"
                             PropFormula="{Binding Path=ValueFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                             PropResult="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            UpdateCommand="{Binding Path=PropUpdateByFormulaCommand}"
-                            TextBoxTextChanged="FormulaTextBox_TextChanged"
-                            TextBlockTextChanged="FormulaTextBox_TextChanged"/>
+                            UpdateCommand="{Binding Path=PropUpdateByFormulaCommand}"/>
 
                         <Button
                             Grid.Column="1"
@@ -88,15 +86,8 @@
                             Width="37"
                             Margin="0 5 5 0"
                             VerticalAlignment="Top"
-                            PreviewMouseLeftButtonDown="Button_MouseLeftButtonDown">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger
-                                    EventName="PreviewMouseLeftButtonDown">
-                                    <i:InvokeCommandAction
-                                        Command="{Binding FilterList.RemoveFilterCommand, ElementName=root}"
-                                        CommandParameter="{Binding}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
+                            Command="{Binding FilterList.RemoveFilterCommand, ElementName=root}"
+                            CommandParameter="{Binding}">
                         </Button>
                     </Grid>
                 </DataTemplate>
