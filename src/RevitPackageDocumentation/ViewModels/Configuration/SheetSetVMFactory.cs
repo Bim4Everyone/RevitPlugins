@@ -258,6 +258,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             TextFormula = data.TextFormula ?? string.Empty,
             Text = data.TextFormula ?? string.Empty,
             TextNoteType = _revitRepository.TextNoteTypes.FirstOrDefault(v => v.Name.Equals(data.TextNoteTypeName)),
+            TextNoteTypeFilter = GetFilterList(data.TextNoteTypeFilterValues, sheetSetVM.SheetSetParams.Params),
         };
 
         // Добавляем список дополнительных параметров
@@ -285,7 +286,9 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             AnnotationTypes = annotationTypes,
             AnnotationFamily = annotationFamily,
-            AnnotationType = annotationType
+            AnnotationFamilyFilter = GetFilterList(data.AnnotationFamilyFilterValues, sheetSetVM.SheetSetParams.Params),
+            AnnotationType = annotationType,
+            AnnotationTypeFilter = GetFilterList(data.AnnotationTypeFilterValues, sheetSetVM.SheetSetParams.Params),
         };
 
         // Добавляем список дополнительных параметров

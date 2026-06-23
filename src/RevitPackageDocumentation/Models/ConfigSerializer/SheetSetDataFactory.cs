@@ -126,6 +126,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
 
                 TextFormula = vm.TextFormula,
                 TextNoteTypeName = vm.TextNoteType?.Name,
+                TextNoteTypeFilterValues = GetFiltrationComboBoxFilterList(vm.TextNoteTypeFilter),
             },
 
             TypicalAnnotationVM vm => new TypicalAnnotationData {
@@ -135,7 +136,9 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 CustomParamsList = GetCustomParametersList(vm),
 
                 AnnotationFamilyName = vm.AnnotationFamily?.Name,
+                AnnotationFamilyFilterValues = GetFiltrationComboBoxFilterList(vm.AnnotationFamilyFilter),
                 AnnotationTypeName = vm.AnnotationType?.Name,
+                AnnotationTypeFilterValues = GetFiltrationComboBoxFilterList(vm.AnnotationTypeFilter),
             },
 
             LegendViewVM vm => new LegendViewData {

@@ -10,12 +10,16 @@ using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class TypicalAnnotationVM : SheetComponentVM {
     private List<AnnotationSymbolType> _annotationTypes;
     private Family _annotationFamily;
     private AnnotationSymbolType _annotationType;
+
+    private FiltrationComboBoxFilterListVM _annotationFamilyFilter;
+    private FiltrationComboBoxFilterListVM _annotationTypeFilter;
 
     public TypicalAnnotationVM(
         RevitRepository repository,
@@ -40,9 +44,19 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _annotationFamily, value);
     }
 
+    public FiltrationComboBoxFilterListVM AnnotationFamilyFilter {
+        get => _annotationFamilyFilter;
+        set => RaiseAndSetIfChanged(ref _annotationFamilyFilter, value);
+    }
+
     public AnnotationSymbolType AnnotationType {
         get => _annotationType;
         set => RaiseAndSetIfChanged(ref _annotationType, value);
+    }
+
+    public FiltrationComboBoxFilterListVM AnnotationTypeFilter {
+        get => _annotationTypeFilter;
+        set => RaiseAndSetIfChanged(ref _annotationTypeFilter, value);
     }
 
     private void SelectAnnotationFamily() {

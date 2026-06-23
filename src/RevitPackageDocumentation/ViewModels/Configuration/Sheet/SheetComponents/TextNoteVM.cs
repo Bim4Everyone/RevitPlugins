@@ -7,12 +7,15 @@ using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class TextNoteVM : SheetComponentVM {
     private string _textFormula = string.Empty;
     private string _text;
     private TextNoteType _textType;
+
+    private FiltrationComboBoxFilterListVM _textNoteTypeFilter;
 
     public TextNoteVM(
         RevitRepository repository,
@@ -37,6 +40,11 @@ internal class TextNoteVM : SheetComponentVM {
     public TextNoteType TextNoteType {
         get => _textType;
         set => RaiseAndSetIfChanged(ref _textType, value);
+    }
+
+    public FiltrationComboBoxFilterListVM TextNoteTypeFilter {
+        get => _textNoteTypeFilter;
+        set => RaiseAndSetIfChanged(ref _textNoteTypeFilter, value);
     }
 
     public override bool ValidateModule() {
