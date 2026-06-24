@@ -16,9 +16,10 @@ internal class SheetSetParametersListVM : BaseViewModel {
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
     private readonly ILocalizationService _localizationService;
+
     private ObservableCollection<PluginParamVM> _params = [];
     private ObservableCollection<SelectElemParamVM> _selectElemParams = [];
-    private string _sheetSetParamsErrors;
+    private string _sheetSetParamsErrors = string.Empty;
 
     public SheetSetParametersListVM(
         SheetSetVM sheetSet,

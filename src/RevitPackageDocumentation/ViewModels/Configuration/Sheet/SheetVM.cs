@@ -29,7 +29,7 @@ internal class SheetVM : BaseParamContainerVM {
     private string _moduleName;
     private string _moduleComment;
     private string _moduleCode;
-    private string _moduleErrors;
+    private string _moduleErrors = string.Empty;
 
     private SheetSetVM _sheetSet;
     private string _sheetNameFormula = string.Empty;
