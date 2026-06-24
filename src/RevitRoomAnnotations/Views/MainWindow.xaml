@@ -4,8 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:local="clr-namespace:RevitRoomAnnotations.Views"
     xmlns:vms="clr-namespace:RevitRoomAnnotations.ViewModels"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
@@ -119,12 +117,10 @@
             </ui:DataGrid>
         </Border>        
         <StackPanel
-            Grid.Row="3"
-            Grid.Column="2"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
-                VerticalAlignment="Center"
                 Style="{StaticResource CustomErrorText}"
                 Text="{Binding ErrorText, UpdateSourceTrigger=PropertyChanged}" />
             <ui:Button
