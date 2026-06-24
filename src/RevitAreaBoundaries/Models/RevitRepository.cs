@@ -53,33 +53,28 @@ internal class RevitRepository {
         var fragmentedCurves = projected.SelectMany(curve => _curveService.SplitToShortCurves(curve, maxLenMm)).ToList();
 
         // Волна от 4 углов 
-        var cellsSquares = _boundaryFindService.GetCellsSquare(outerSquare, fragmentedCurves, _sideCell);
+        var cellsSquares = _boundaryFindService.GetCellsSquare(outerSquare, fragmentedCurves.Select(c => c.Piece).ToList(), _sideCell);
         
         // Записываем в клетку все ее кривые
         foreach(var cell in cellsSquares) {
-            var polygon = new List<XYZ> {
-                cell.BottomLeft,
-                cell.TopLeft,
-                cell.BottomRight,
-                cell.TopRight
-            };
-            
             var curvesInside = fragmentedCurves
-                .Where(x => IsCurveInsideCell(x, cell))
+                .Where(x => IsCurveInsideCell(x.Piece, cell))
                 .ToList();
-            
-            cell.Curves = curvesInside;
+            cell.Curves = curvesInside.Select(c => c.Piece).ToList();
         }
 
+        var curvesss = new List<Curve>();  
         foreach(var cell in cellsSquares) {
             var outPoint = GetOutsidePoint(cell);
             var curvess = _boundaryFindService.GetBoundaryCurves(cell, outPoint, cell.Curves, UnitUtils.ConvertToInternalUnits(10, UnitTypeId.Millimeters));
-            foreach(var curve in curvess) {
-                Document.Create.NewDetailCurve(activeView, curve);
-            }
-            
+            curvesss.AddRange(curvess); 
         }
-
+        
+        //var processed = CurveSplitter.SplitTouchedCurves(curvesss, UnitUtils.ConvertToInternalUnits(1.0, UnitTypeId.Millimeters));
+        
+        foreach(var curve in curvesss) {
+            Document.Create.NewDetailCurve(activeView, curve);
+        }
 
         // double maxLenCurveMm = UnitUtils.ConvertToInternalUnits(10, UnitTypeId.Millimeters);
         // foreach(var cell in cellsSquares) {
@@ -159,147 +154,6 @@ internal class RevitRepository {
         //     Document.Create.NewDetailCurve(activeView, curve);
         // }
     }
-    
-    public static HashSet<Curve> FindVisibleBoundaryCurves(
-        XYZ startPoint,
-        List<Curve> curves,
-        double rayLength,
-        double angleStepDeg = 1.0)
-    {
-        var result = new HashSet<Curve>();
-
-        for(double angle = 0; angle < 360.0; angle += angleStepDeg) {
-            double rad = angle * Math.PI / 180.0;
-
-            var dir = new XYZ(
-                Math.Cos(rad),
-                Math.Sin(rad),
-                0);
-
-            var rayEnd = startPoint + dir.Multiply(rayLength);
-
-            var ray = Line.CreateBound(startPoint, rayEnd);
-
-            Curve nearestCurve = null;
-            double nearestDistance = double.MaxValue;
-
-            foreach(var curve in curves) {
-                var cmp = ray.Intersect(curve, out IntersectionResultArray ira);
-
-                if(cmp != SetComparisonResult.Overlap ||
-                   ira == null ||
-                   ira.Size == 0) {
-                    continue;
-                }
-
-                for(int i = 0; i < ira.Size; i++) {
-                    var point = ira.get_Item(i)?.XYZPoint;
-
-                    if(point == null) {
-                        continue;
-                    }
-
-                    double dist = startPoint.DistanceTo(point);
-
-                    if(dist < nearestDistance) {
-                        nearestDistance = dist;
-                        nearestCurve = curve;
-                    }
-                }
-            }
-
-            if(nearestCurve != null) {
-                result.Add(nearestCurve);
-            }
-        }
-
-        return result;
-    }
-    
-    public static List<Curve> GetNearestContour(
-    CellSquare cell,
-    double joinTolerance)
-{
-    XYZ outsidePoint = GetOutsidePoint(cell);
-
-    if(outsidePoint == null || cell.Curves == null || cell.Curves.Count == 0)
-        return new List<Curve>();
-
-    // Разбиваем все линии на связанные группы
-    var groups = BuildCurveGroups(cell.Curves, joinTolerance);
-
-    // Ищем группу с минимальным расстоянием до внешней точки
-    List<Curve> bestGroup = null;
-    double bestDistance = double.MaxValue;
-
-    foreach(var group in groups) {
-        double groupDistance = group.Min(x => x.Distance(outsidePoint));
-
-        if(groupDistance < bestDistance) {
-            bestDistance = groupDistance;
-            bestGroup = group;
-        }
-    }
-
-    return bestGroup ?? new List<Curve>();
-}
-
-
-    private static List<List<Curve>> BuildCurveGroups(List<Curve> curves, double tolerance) {
-        var result = new List<List<Curve>>();
-        var visited = new HashSet<int>();
-
-        for(int i = 0; i < curves.Count; i++) {
-            if(visited.Contains(i))
-                continue;
-
-            var group = new List<Curve>();
-            var queue = new Queue<int>();
-
-            queue.Enqueue(i);
-            visited.Add(i);
-
-            while(queue.Count > 0) {
-                int current = queue.Dequeue();
-
-                Curve currentCurve = curves[current];
-                group.Add(currentCurve);
-
-                for(int j = 0; j < curves.Count; j++) {
-                    if(visited.Contains(j))
-                        continue;
-
-                    if(IsConnected(
-                            currentCurve,
-                            curves[j],
-                            tolerance)) {
-
-                        visited.Add(j);
-                        queue.Enqueue(j);
-                    }
-                }
-            }
-
-            result.Add(group);
-        }
-
-        return result;
-    }
-
-    private static bool IsConnected(Curve a, Curve b, double tolerance) {
-        XYZ a0 = a.GetEndPoint(0);
-        XYZ a1 = a.GetEndPoint(1);
-
-        XYZ b0 = b.GetEndPoint(0);
-        XYZ b1 = b.GetEndPoint(1);
-
-        return a0.DistanceTo(b0) <= tolerance
-               || a0.DistanceTo(b1) <= tolerance
-               || a1.DistanceTo(b0) <= tolerance
-               || a1.DistanceTo(b1) <= tolerance;
-    }
-    
-    
     
     private static XYZ GetOutsidePoint(CellSquare cell) {
         if(cell.BLType == CellVertexType.Outside)

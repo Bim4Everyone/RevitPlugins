@@ -9,18 +9,13 @@ using RevitAreaBoundaries.Models;
 namespace RevitAreaBoundaries.Services;
 
 public class BoundaryFindService {
+    // Допуск 1мм для пересечения кривых
+    private readonly double _eps = UnitUtils.ConvertToInternalUnits(1, UnitTypeId.Millimeters);
     
-    public HashSet<Curve> GetBoundaryCurves(
-        CellSquare cell,
-        XYZ startPoint,
-        List<Curve> curves,
-        double step)
-    {
-        double eps = UnitUtils.ConvertToInternalUnits(1, UnitTypeId.Millimeters);
-
+    // Метод получения кривых в квадрате с заданной точкой
+    public HashSet<Curve> GetBoundaryCurves(CellSquare cell, XYZ startPoint, List<Curve> curves, double step) {
         double minX = cell.BottomLeft.X;
         double minY = cell.BottomLeft.Y;
-
         double maxX = cell.TopRight.X;
         double maxY = cell.TopRight.Y;
 
@@ -37,184 +32,41 @@ public class BoundaryFindService {
         var visited = new HashSet<string>();
         var hitCurves = new HashSet<Curve>();
 
-        while (queue.Count > 0)
-        {
-            XYZ current = queue.Dequeue();
+        while (queue.Count > 0) {
+            var current = queue.Dequeue();
 
             string currentKey = GetKey(current, step);
 
-            if (!visited.Add(currentKey))
+            if(!visited.Add(currentKey)) {
                 continue;
+            }
 
-            foreach (var next in GetNeighbours(current, step))
-            {
+            foreach (var next in GetNeighbours(current, step)) {
                 if (next.X < minX ||
                     next.X > maxX ||
                     next.Y < minY ||
-                    next.Y > maxY)
-                {
+                    next.Y > maxY) {
                     continue;
                 }
 
                 string nextKey = GetKey(next, step);
 
-                if (visited.Contains(nextKey))
+                if (visited.Contains(nextKey)) {
                     continue;
+                }
 
-                if (FindNearestHitCurveFast(
-                        current,
-                        next,
-                        index,
-                        eps,
-                        out Curve hitCurve))
-                {
+                if (FindNearestHitCurveFast(current, next, index, out var hitCurve)) {
                     hitCurves.Add(hitCurve);
                     continue;
                 }
-
                 queue.Enqueue(next);
             }
         }
-
         return hitCurves;
     }
     
-    private static bool FindNearestHitCurveFast(
-        XYZ from,
-        XYZ to,
-        CurveSpatialIndex index,
-        double eps,
-        out Curve hitCurve)
-    {
-        hitCurve = null;
-
-        var probe = Line.CreateBound(from, to);
-
-        var probeBox0 = BBox.FromSegmentXY(from, to);
-        var probeBox = new BBox(
-            probeBox0.MinX - eps,
-            probeBox0.MinY - eps,
-            probeBox0.MaxX + eps,
-            probeBox0.MaxY + eps);
-
-        double bestDistance = double.MaxValue;
-
-        foreach (int id in index.Query(probeBox))
-        {
-            if (!probeBox.Intersects(index.Boxes[id]))
-                continue;
-
-            Curve curve = index.Curves[id];
-            XYZ hitPoint = null;
-
-            if (TryGetIntersectionPoint(probe, curve, out XYZ ip))
-            {
-                hitPoint = ip;
-            }
-            else if (CurveBlocksSegmentByDistance(from, to, curve, eps, out XYZ nearPoint))
-            {
-                hitPoint = nearPoint;
-            }
-            else if (SegmentBlocks(probe, curve, eps))
-            {
-                var projection = curve.Project(from);
-                if (projection != null)
-                    hitPoint = projection.XYZPoint;
-            }
-
-            if (hitPoint == null)
-                continue;
-
-            double distance = from.DistanceTo(hitPoint);
-
-            if (distance < bestDistance)
-            {
-                bestDistance = distance;
-                hitCurve = curve;
-            }
-        }
-
-        return hitCurve != null;
-    }
-    
-    public HashSet<CellSquare> GetCellsSquare(CellSquare cell, XYZ startPoint, List<Curve> curves, double step) {
-        double eps = UnitUtils.ConvertToInternalUnits(1, UnitTypeId.Millimeters);
-
-        double minX = cell.BottomLeft.X;
-        double minY = cell.BottomLeft.Y;
-
-        double maxX = cell.TopRight.X;
-        double maxY = cell.TopRight.Y;
-
-        var start = AlignToGridFloor(startPoint, step);
-        
-        // сдвиг на 1% шага внутрь, чтобы уйти с границы
-        double nudge = step * 0.01;
-        start = new XYZ(start.X + nudge, start.Y + nudge, 0);
-
-        var index = new CurveSpatialIndex(curves, step);
-
-        var queue = new Queue<XYZ>();
-        queue.Enqueue(start);
-
-        var visited = new HashSet<string>();
-
-        var hitCells = new HashSet<CellSquare>();
-        var hitCellKeys = new HashSet<string>();
-
-        while(queue.Count > 0) {
-            XYZ current = queue.Dequeue();
-
-            string currentKey = GetKey(current, step);
-
-            if(!visited.Add(currentKey))
-                continue;
-
-            foreach(var next in GetNeighbours(current, step)) {
-
-                if(next.X < minX ||
-                   next.X > maxX ||
-                   next.Y < minY ||
-                   next.Y > maxY) {
-                    continue;
-                }
-
-                string nextKey = GetKey(next, step);
-
-                if(visited.Contains(nextKey))
-                    continue;
-
-                bool hit = FindHitFast(current, next, index, eps, out var hitPoint);
-
-                if(hit) {
-                    var hitCell = hitPoint != null
-                        ? MakeCellFromPoint(hitPoint, step)
-                        : MakeCellFromEdge(current, next, step);
-
-                    MarkCellOrientation(hitCell, current);
-
-                    string cellKey =
-                        $"{hitCell.BottomLeft.X:F6}_{hitCell.BottomLeft.Y:F6}";
-
-                    if(hitCellKeys.Add(cellKey)) {
-                        hitCells.Add(hitCell);
-                    }
-
-                    continue;
-                }
-
-                queue.Enqueue(next);
-            }
-        }
-
-        return hitCells;
-    }
-    
+    // Метод получения квадратов в большом квадрате
     public HashSet<CellSquare> GetCellsSquare(List<XYZ> squareVertices, List<Curve> curves, double step) {
-
-        // eps лучше держать небольшим, чтобы не было ложных попаданий
-        double eps = UnitUtils.ConvertToInternalUnits(0, UnitTypeId.Millimeters);
-
         double minX = squareVertices.Min(p => p.X);
         double minY = squareVertices.Min(p => p.Y);
         double maxX = squareVertices.Max(p => p.X);
@@ -268,22 +120,24 @@ public class BoundaryFindService {
                 break;
 
             int source = qi;
-            XYZ current = queues[source].Dequeue();
+            var current = queues[source].Dequeue();
             qi = (source + 1) % 4;
 
             string currentKey = GetKey(current, step);
             if(!visited.Add(currentKey))
                 continue;
 
-            foreach(XYZ next in GetNeighbours(current, step)) {
+            foreach(var next in GetNeighbours(current, step)) {
                 if(next.X < minX || next.X > maxX || next.Y < minY || next.Y > maxY)
                     continue;
 
                 string nextKey = GetKey(next, step);
-                if(visited.Contains(nextKey))
+                
+                if(visited.Contains(nextKey)) {
                     continue;
+                }
 
-                bool hit = FindHitFast(current, next, index, eps, out XYZ hitPoint);
+                bool hit = FindHitFast(current, next, index, out XYZ hitPoint);
                 if(hit) {
                     var cell = hitPoint != null 
                         ? MakeCellFromPoint(hitPoint, step) 
@@ -298,7 +152,6 @@ public class BoundaryFindService {
                     }
                     continue;
                 }
-
                 queues[source].Enqueue(next);
             }
         }
@@ -308,6 +161,59 @@ public class BoundaryFindService {
         bool AnyQueueNotEmpty() => queues[0].Count > 0 || queues[1].Count > 0 || queues[2].Count > 0 || queues[3].Count > 0;
     }
     
+    // Метод поиска ближайшей кривой
+    private bool FindNearestHitCurveFast(XYZ from, XYZ to, CurveSpatialIndex index, out Curve hitCurve) {
+        hitCurve = null;
+
+        var probe = Line.CreateBound(from, to);
+
+        var probeBox0 = BBox.FromSegmentXY(from, to);
+        var probeBox = new BBox(
+            probeBox0.MinX - _eps,
+            probeBox0.MinY - _eps,
+            probeBox0.MaxX + _eps,
+            probeBox0.MaxY + _eps);
+
+        double bestDistance = double.MaxValue;
+
+        foreach (int id in index.Query(probeBox)) {
+            
+            if (!probeBox.Intersects(index.Boxes[id])) {
+                continue;
+            }
+
+            var curve = index.Curves[id];
+            XYZ hitPoint = null;
+
+            if (TryGetIntersectionPoint(probe, curve, out var ip)) {
+                hitPoint = ip;
+            } else if (CurveBlocksSegmentByDistance(from, to, curve, out var nearPoint)) {
+                hitPoint = nearPoint;
+            } else if (SegmentBlocks(probe, curve)) {
+                var projection = curve.Project(from);
+                if (projection != null) {
+                    hitPoint = projection.XYZPoint;
+                }
+            }
+
+            if(hitPoint == null) {
+                continue;
+            }
+
+            double distance = from.DistanceTo(hitPoint);
+
+            if(!(distance < bestDistance)) {
+                continue;
+            }
+
+            bestDistance = distance;
+            hitCurve = curve;
+        }
+
+        return hitCurve != null;
+    }
+    
+    // Метод получения периметра квадрата
     private static IEnumerable<XYZ> GetPerimeterSeeds(double minX, double minY, double maxX, double maxY, double step) {
         // идём по сетке по периметру
         for(double x = minX; x <= maxX; x += step) {
@@ -320,42 +226,31 @@ public class BoundaryFindService {
         }
     }
 
+    // Метод получения соседей точки
     private static IEnumerable<XYZ> GetNeighbours(XYZ point, double step) {
         yield return new XYZ(point.X + step, point.Y, 0);
         yield return new XYZ(point.X - step, point.Y, 0);
         yield return new XYZ(point.X, point.Y + step, 0);
         yield return new XYZ(point.X, point.Y - step, 0);
-
-        yield return new XYZ(point.X + step, point.Y + step, 0);
-        yield return new XYZ(point.X + step, point.Y - step, 0);
-        yield return new XYZ(point.X - step, point.Y + step, 0);
-        yield return new XYZ(point.X - step, point.Y - step, 0);
-    }
-    
-    private static IEnumerable<XYZ> GetNeighbours4(XYZ point, double step) {
-        yield return new XYZ(point.X + step, point.Y, 0);
-        yield return new XYZ(point.X - step, point.Y, 0);
-        yield return new XYZ(point.X, point.Y + step, 0);
-        yield return new XYZ(point.X, point.Y - step, 0);
-
+        
         yield return new XYZ(point.X + step, point.Y + step, 0);
         yield return new XYZ(point.X + step, point.Y - step, 0);
         yield return new XYZ(point.X - step, point.Y + step, 0);
         yield return new XYZ(point.X - step, point.Y - step, 0);
     }
 
+    // Метод округления до сетки
     private static XYZ AlignToGridFloor(XYZ p, double step) {
         int ix = (int)Math.Floor(p.X / step);
         int iy = (int)Math.Floor(p.Y / step);
         return new XYZ(ix * step, iy * step, 0);
     }
 
-    /// <summary>
-    /// Ищем пересечение ребра (from->to) с кривыми.
-    /// Если есть реальная точка пересечения -> возвращаем hitPoint.
-    /// Если только касание (через Distance eps) -> hitPoint=null, но hit=true.
-    /// </summary>
-    private static bool FindHitFast(XYZ from, XYZ to, CurveSpatialIndex index, double eps, out XYZ hitPoint) {
+    
+    // Метод пересечение ребра (from->to) с кривыми.
+    // Если есть реальная точка пересечения -> возвращаем hitPoint.
+    // Если только касание (через Distance eps) -> hitPoint=null, но hit=true.
+    private bool FindHitFast(XYZ from, XYZ to, CurveSpatialIndex index, out XYZ hitPoint) {
         hitPoint = null;
 
         // Отрезок перехода (ребро сетки)
@@ -364,10 +259,10 @@ public class BoundaryFindService {
         // bbox отрезка в XY + расширение на eps
         var probeBox0 = BBox.FromSegmentXY(from, to);
         var probeBox = new BBox(
-            probeBox0.MinX - eps,
-            probeBox0.MinY - eps,
-            probeBox0.MaxX + eps,
-            probeBox0.MaxY + eps);
+            probeBox0.MinX - _eps,
+            probeBox0.MinY - _eps,
+            probeBox0.MaxX + _eps,
+            probeBox0.MaxY + _eps);
 
         foreach(int id in index.Query(probeBox)) {
             // дополнительная защита: индекс мог вернуть лишнее
@@ -383,22 +278,22 @@ public class BoundaryFindService {
             }
         
             // 2) Если Intersect "молчит" — проверяем блокировку по расстоянию
-            if(CurveBlocksSegmentByDistance(from, to, c, eps, out var nearPoint)) {
+            if(CurveBlocksSegmentByDistance(from, to, c, out var nearPoint)) {
                 hitPoint = nearPoint; // точка на сегменте (приблизительно)
                 return true;
             }
         
             // 3) Фолбэк (если хочешь оставить твой старый метод касания)
-            if(SegmentBlocks(probe, c, eps)) {
+            if(SegmentBlocks(probe, c)) {
                 return true;
             }
         }
         return false;
     }
     
-    private static bool CurveBlocksSegmentByDistance(XYZ segA, XYZ segB, Curve boundary, double eps, out XYZ nearPointOnSegment) {
+    // Метод проверки блокировки сегмента boundary отрезком segA->segB
+    private bool CurveBlocksSegmentByDistance(XYZ segA, XYZ segB, Curve boundary, out XYZ nearPointOnSegment) {
         nearPointOnSegment = null;
-        // работаем в 2D
         var a = new XYZ(segA.X, segA.Y, 0);
         var b = new XYZ(segB.X, segB.Y, 0);
 
@@ -408,7 +303,7 @@ public class BoundaryFindService {
             var d = bl.GetEndPoint(1); d = new XYZ(d.X, d.Y, 0);
 
             double dist = SegmentSegmentDistance2D(a, b, c, d, out var closestOnAb);
-            if(!(dist <= eps)) {
+            if(!(dist <= _eps)) {
                 return false;
             }
             nearPointOnSegment = closestOnAb;
@@ -429,7 +324,7 @@ public class BoundaryFindService {
                 var d = new XYZ(tess[i+1].X, tess[i+1].Y, 0);
                 double dist = SegmentSegmentDistance2D(a, b, c, d, out var closestOnAb);
                 if(dist < best) { best = dist; bestP = closestOnAb; }
-                if(best <= eps) break;
+                if(best <= _eps) break;
             }
         } else {
             // совсем плохой случай: семплируем параметрически
@@ -444,11 +339,11 @@ public class BoundaryFindService {
 
                 double dist = PointSegmentDistance2D(q, a, b, out var closestOnAb);
                 if(dist < best) { best = dist; bestP = closestOnAb; }
-                if(best <= eps) break;
+                if(best <= _eps) break;
             }
         }
 
-        if(!(best <= eps)) {
+        if(!(best <= _eps)) {
             return false;
         }
 
@@ -456,6 +351,7 @@ public class BoundaryFindService {
         return true;
     }
     
+    // Метод определения ближайшего расстояния
     private static double PointSegmentDistance2D(XYZ p, XYZ a, XYZ b, out XYZ closest) {
         var ab = b - a;
         double ab2 = ab.X * ab.X + ab.Y * ab.Y;
@@ -491,10 +387,10 @@ public class BoundaryFindService {
         dist = PointSegmentDistance2D(b, c, d, out _);
         if(dist < best) { best = dist; closestOnAb = b; }
 
-        dist = PointSegmentDistance2D(c, a, b, out XYZ ca);
+        dist = PointSegmentDistance2D(c, a, b, out var ca);
         if(dist < best) { best = dist; closestOnAb = ca; }
 
-        dist = PointSegmentDistance2D(d, a, b, out XYZ da);
+        dist = PointSegmentDistance2D(d, a, b, out var da);
         
         if(!(dist < best)) {
             return best;
@@ -559,7 +455,7 @@ public class BoundaryFindService {
     private static bool TryGetIntersectionPoint(Line probe, Curve boundary, out XYZ ip) {
         ip = null;
 
-        var res = probe.Intersect(boundary, out IntersectionResultArray ira);
+        var res = probe.Intersect(boundary, out var ira);
         if(res != SetComparisonResult.Overlap || ira == null || ira.Size == 0)
             return false;
 
@@ -568,7 +464,7 @@ public class BoundaryFindService {
         return ip != null;
     }
 
-    private static bool SegmentBlocks(Curve probe, Curve boundary, double eps) {
+    private bool SegmentBlocks(Curve probe, Curve boundary) {
         // Если кривые хоть как-то пересекаются/накладываются — считаем препятствием
         var cmp = probe.Intersect(boundary);
         if(cmp != SetComparisonResult.Disjoint) {
@@ -580,12 +476,17 @@ public class BoundaryFindService {
         var b = probe.GetEndPoint(1);
         var mid = new XYZ((a.X + b.X) * 0.5, (a.Y + b.Y) * 0.5, (a.Z + b.Z) * 0.5);
 
-        if(boundary.Distance(a) < eps) return true;
-        if(boundary.Distance(mid) < eps) return true;
+        if(boundary.Distance(a) < _eps) {
+            return true;
+        }
+        if(boundary.Distance(mid) < _eps) {
+            return true;
+        }
         
-        return boundary.Distance(b) < eps;
+        return boundary.Distance(b) < _eps;
     }
 
+    // Метод получения клетки по точке
     private static CellSquare MakeCellFromPoint(XYZ p, double step) {
         int ix = (int)Math.Floor(p.X / step);
         int iy = (int)Math.Floor(p.Y / step);
@@ -603,6 +504,7 @@ public class BoundaryFindService {
         };
     }
 
+    // Метод получения клетки по координатам "от - до"
     private static CellSquare MakeCellFromEdge(XYZ from, XYZ to, double step) {
         double x0 = Math.Min(from.X, to.X);
         double y0 = Math.Min(from.Y, to.Y);
@@ -623,31 +525,28 @@ public class BoundaryFindService {
         };
     }
 
-    // Ключ через Floor, а не Round (меньше дрожания)
+    // Метод получения ключа
     private static string GetKey(XYZ point, double step) {
         int x = (int)Math.Floor(point.X / step);
         int y = (int)Math.Floor(point.Y / step);
         return $"{x}_{y}";
     }
     
-    private static void MarkCellOrientation(
-        CellSquare cell,
-        XYZ outsidePoint)
-    {
+    // Метод установки ориентации клетки
+    private static void MarkCellOrientation(CellSquare cell, XYZ outsidePoint) {
         cell.BLType = CellVertexType.Boundary;
         cell.BRType = CellVertexType.Boundary;
         cell.TRType = CellVertexType.Boundary;
         cell.TLType = CellVertexType.Boundary;
 
-        var corners = new Dictionary<XYZ, Action>
-        {
+        var corners = new Dictionary<XYZ, Action> {
             [cell.BottomLeft]  = () => cell.BLType = CellVertexType.Outside,
             [cell.BottomRight] = () => cell.BRType = CellVertexType.Outside,
             [cell.TopRight]    = () => cell.TRType = CellVertexType.Outside,
             [cell.TopLeft]     = () => cell.TLType = CellVertexType.Outside
         };
 
-        XYZ nearest = corners
+        var nearest = corners
             .Keys
             .OrderBy(x => x.DistanceTo(outsidePoint))
             .First();
