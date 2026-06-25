@@ -32,7 +32,7 @@ namespace RevitPylonLoadAreas;
 [Transaction(TransactionMode.Manual)]
 public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
     public GetLandThicknessOnLoadAreaCommand() {
-        PluginName = "Импорт LandXML";
+        PluginName = "Толщина БИО";
     }
 
     protected override void Execute(UIApplication uiApplication) {

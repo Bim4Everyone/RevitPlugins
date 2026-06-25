@@ -27,7 +27,7 @@ namespace RevitPylonLoadAreas;
 [Transaction(TransactionMode.Manual)]
 public class FindPylonLoadAreasCommand : BasePluginCommand {
     public FindPylonLoadAreasCommand() {
-        PluginName = "Грузовые площади";
+        PluginName = "Грузовая площадь";
     }
 
     protected override void Execute(UIApplication uiApplication) {

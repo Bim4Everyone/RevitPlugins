@@ -16,13 +16,13 @@ using RevitPylonLoadAreas.Models.Selection;
 namespace RevitPylonLoadAreas.Models;
 
 internal class RevitRepository {
-    public readonly SharedParam LoadAreaParam = SharedParamsConfig.Instance.CargoArea;
-    public readonly SharedParam LandThicknessParam = SharedParamsConfig.Instance.LandscapingThickness;
 
     public RevitRepository(UIApplication uiApplication) {
         UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
     }
 
+    public SharedParam LoadAreaParam { get; } = SharedParamsConfig.Instance.CargoArea;
+    public SharedParam LandThicknessParam { get; } = SharedParamsConfig.Instance.LandscapingThickness;
     public UIApplication UIApplication { get; }
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
     public Application Application => UIApplication.Application;
