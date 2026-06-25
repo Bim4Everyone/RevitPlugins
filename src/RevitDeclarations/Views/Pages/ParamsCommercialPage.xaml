@@ -637,7 +637,7 @@
                         Text="{me:LocalizationSource ParametersPage.ComRoomProjectName}"/>
                     <TextBox
                         Grid.Column="2"
-                        Grid.Row="19"
+                        Grid.Row="21"
                         Margin="10, 0"
                         Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>

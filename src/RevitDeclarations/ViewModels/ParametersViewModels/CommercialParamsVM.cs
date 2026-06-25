@@ -147,5 +147,6 @@ internal class CommercialParamsVM : ParametersViewModel {
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.GroupNameParam);
 
         AddPrefixToNumber = commercialConfigSettings.AddPrefixToNumber;
+        AddHyphenToPrefix = commercialConfigSettings.AddHyphenToPrefix;
     }
 }
