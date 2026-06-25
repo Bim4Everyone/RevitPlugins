@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using dosymep.Revit.Comparators;
-
 using pyRevitLabs.Json;
+
+using RevitDeclarations.Comparators;
 
 namespace RevitDeclarations.Models;
 internal abstract class RoomGroup {
     protected const double _maxAreaDeviation = 0.2;
 
     protected readonly StringComparer _strComparer = StringComparer.OrdinalIgnoreCase;
-    protected readonly LogicalStringComparer _logicalStrComparer;
+    protected readonly RevitLogicalStringComparer _logicalStrComparer;
     protected readonly RoomParamProvider _paramProvider;
     protected readonly int _accuracyForArea;
     protected readonly int _accuracyForLength;
@@ -19,13 +19,13 @@ internal abstract class RoomGroup {
     protected readonly IEnumerable<RoomElement> _rooms;
 
     protected readonly RoomElement _firstRoom;
-    protected readonly bool _isOneRoomGroup = false;
+    protected readonly bool _isOneRoomGroup;
     private readonly DeclarationSettings _settings;
 
     public RoomGroup(IEnumerable<RoomElement> rooms, 
                      DeclarationSettings settings, 
                      RoomParamProvider paramProvider,
-                     LogicalStringComparer logicalStrComparer) {
+                     RevitLogicalStringComparer logicalStrComparer) {
         _settings = settings;
         _paramProvider = paramProvider;
         _accuracyForArea = settings.AccuracyForArea;

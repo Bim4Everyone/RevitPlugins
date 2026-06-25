@@ -4,16 +4,16 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 
+using RevitDeclarations.Comparators;
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models;
 internal abstract class DeclarationProject {
     protected readonly RevitDocumentViewModel _document;
     protected readonly RevitRepository _revitRepository;
-    protected readonly LogicalStringComparer _logicalStrComparer;
+    protected readonly RevitLogicalStringComparer _logicalStrComparer;
     protected readonly DeclarationSettings _settings;
     protected readonly ILocalizationService _localizationService;
 
@@ -25,7 +25,7 @@ internal abstract class DeclarationProject {
     public DeclarationProject(RevitDocumentViewModel document,
                               RevitRepository revitRepository,
                               DeclarationSettings settings,
-                              LogicalStringComparer logicalStrComparer,
+                              RevitLogicalStringComparer logicalStrComparer,
                               ILocalizationService localizationService) {
         _document = document;
         _revitRepository = revitRepository;
