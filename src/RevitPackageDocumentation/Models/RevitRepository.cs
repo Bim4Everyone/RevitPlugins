@@ -238,4 +238,20 @@ internal class RevitRepository {
             .Select(id => Document.GetElement(id) as Viewport)
             .ToList();
     }
+
+    public List<ScheduleSheetInstance> GetScheduleSheetInstances(ViewSheet viewSheet) {
+        return new FilteredElementCollector(Document, viewSheet.Id)
+            .OfClass(typeof(ScheduleSheetInstance))
+            .WhereElementIsNotElementType()
+            .Cast<ScheduleSheetInstance>()
+            .ToList();
+    }
+
+    public List<TextNote> GetTextNotes(ViewSheet viewSheet) {
+        return new FilteredElementCollector(Document, viewSheet.Id)
+            .OfClass(typeof(TextNote))
+            .WhereElementIsNotElementType()
+            .Cast<TextNote>()
+            .ToList();
+    }
 }

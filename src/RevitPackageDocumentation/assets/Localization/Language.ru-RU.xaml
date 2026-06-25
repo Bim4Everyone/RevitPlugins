@@ -42,6 +42,7 @@
     <system:String x:Key="MainWindow.SheetNameIsEmpty">Не заполнено имя листа</system:String>
     <system:String x:Key="MainWindow.ReferenceViewNameIsEmpty">Не заполнено имя эталонной спецификации</system:String>
     <system:String x:Key="MainWindow.TextIsEmpty">Не заполнено текст</system:String>
+    <system:String x:Key="MainWindow.TextWidthIsNotCorrect">Ширина текста не корректна</system:String>
     
     <system:String x:Key="MainWindow.ViewFamilyTypeIsNull">Не выбран тип вида</system:String>
     <system:String x:Key="MainWindow.ViewportTypeIsNull">Не выбран тип видового экрана</system:String>

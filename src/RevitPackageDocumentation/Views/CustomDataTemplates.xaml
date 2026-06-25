@@ -319,14 +319,6 @@
                         VerticalAlignment="Center"
                         Text="Шаблон вида" />
 
-                    <ComboBox
-                        Grid.Column="1"
-                        Margin="5"
-                        ItemsSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
-                        DisplayMemberPath="Name"
-                        SelectedItem="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
                         Margin="5"
@@ -853,38 +845,66 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
 
-            <TextBlock
+            <UniformGrid
                 Grid.Row="0"
-                Grid.Column="0"
-                Margin="5"
-                VerticalAlignment="Center"
-                Text="Типоразмер текста" />
+                Rows="0"
+                Grid.IsSharedSizeScope="True"
+                extensions:UniformGridExtensions.AutoColumns="True"
+                extensions:UniformGridExtensions.ColumnThresholds="800">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="Auto"
+                            SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition
+                            Width="*" />
+                    </Grid.ColumnDefinitions>
 
-            <controls:FiltrationComboBoxControl
-                Grid.Row="0"
-                Grid.Column="1"
-                Margin="5"
-                ComboBoxSource="{Binding DataContext.TextNoteTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                ComboBoxSelected="{Binding TextNoteType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                FilterList="{Binding TextNoteTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Типоразмер текста" />
+
+                    <controls:FiltrationComboBoxControl
+                        Grid.Column="1"
+                        Margin="5"
+                        ComboBoxSource="{Binding DataContext.TextNoteTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ComboBoxSelected="{Binding TextNoteType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        FilterList="{Binding TextNoteTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="Auto"
+                            SharedSizeGroup="LabelColumn" />
+                        <ColumnDefinition
+                            Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        Text="Ширина текста на листе" />
+
+                    <ui:NumberBox
+                        Grid.Column="1"
+                        Margin="5"
+                        Text="{Binding Path=TextWidth, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </UniformGrid>
 
             <TextBlock
                 Grid.Row="1"
-                Grid.Column="0"
                 Margin="5"
                 VerticalAlignment="Center"
                 Text="Шаблон текста" />
 
             <controls:FormulaTextBoxControl
                 Grid.Row="2"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
                 Margin="5"
                 AcceptsReturn="True"
                 PropFormula="{Binding Path=TextFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -893,8 +913,6 @@
 
             <UniformGrid
                 Grid.Row="3"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
                 Rows="0"
                 Grid.IsSharedSizeScope="True"
                 extensions:UniformGridExtensions.AutoColumns="True"
@@ -1119,15 +1137,6 @@
                         Margin="5"
                         VerticalAlignment="Center"
                         Text="Типоразмер видового экрана" />
-
-                    <ComboBox
-                        Grid.Column="1"
-                        Grid.Row="1"
-                        Margin="5"
-                        ItemsSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                        DisplayMemberPath="Name"
-                        SelectedItem="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"

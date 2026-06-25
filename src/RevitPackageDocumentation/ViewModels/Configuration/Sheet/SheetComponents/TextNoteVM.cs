@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -16,6 +17,7 @@ internal class TextNoteVM : SheetComponentVM {
     private TextNoteType _textType;
 
     private FiltrationComboBoxFilterListVM _textNoteTypeFilter;
+    private string _textWidth;
 
     public TextNoteVM(
         RevitRepository repository,
@@ -47,6 +49,11 @@ internal class TextNoteVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _textNoteTypeFilter, value);
     }
 
+    public string TextWidth {
+        get => _textWidth;
+        set => RaiseAndSetIfChanged(ref _textWidth, value);
+    }
+
     public override bool ValidateModule() {
         if(string.IsNullOrEmpty(TextFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextIsEmpty");
@@ -54,6 +61,10 @@ internal class TextNoteVM : SheetComponentVM {
         }
         if(TextNoteType is null) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextNoteTypeIsNull");
+            return false;
+        }
+        if(!int.TryParse(TextWidth, out int textWidthAsInt) || textWidthAsInt < 1) {
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextWidthIsNotCorrect");
             return false;
         }
         foreach(var param in CustomParamsList.Params) {
@@ -74,11 +85,23 @@ internal class TextNoteVM : SheetComponentVM {
 
     public TextNote Place() {
         var sheetInstance = Sheet.SheetInstance;
+
+        // Если текстовое примечание с таким текстом уже существует на листе, то новую не ставим
+        if(Repository.GetTextNotes(sheetInstance)
+            .FirstOrDefault(t => t.Text.Replace("\r\n", "\n").Replace("\r", "\n").Trim()
+                == Text.Replace("\r\n", "\n").Replace("\r", "\n").Trim()) is TextNote textNote) {
+            return textNote;
+        }
+
         var options = new TextNoteOptions(TextNoteType.Id);
         var position = new XYZ(
             UnitUtilsHelper.ConvertToInternalValue(-190),
             UnitUtilsHelper.ConvertToInternalValue(120),
             0);
-        return TextNote.Create(Repository.Document, sheetInstance.Id, position, Text, options);
+        var textNoteInstance = TextNote.Create(Repository.Document, sheetInstance.Id, position, Text, options);
+
+        int textWidthAsInt = int.Parse(TextWidth);
+        textNoteInstance.Width = UnitUtilsHelper.ConvertToInternalValue(textWidthAsInt);
+        return textNoteInstance;
     }
 }

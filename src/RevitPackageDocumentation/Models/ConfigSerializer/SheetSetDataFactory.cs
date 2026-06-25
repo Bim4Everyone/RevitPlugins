@@ -132,6 +132,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 TextFormula = vm.TextFormula,
                 TextNoteTypeName = vm.TextNoteType?.Name,
                 TextNoteTypeFilterValues = GetFiltrationComboBoxFilterList(vm.TextNoteTypeFilter),
+                TextWidth = vm.TextWidth,
             },
 
             TypicalAnnotationVM vm => new TypicalAnnotationData {

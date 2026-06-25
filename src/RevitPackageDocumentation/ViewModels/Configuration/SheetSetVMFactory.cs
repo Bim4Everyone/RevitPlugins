@@ -258,6 +258,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             Text = data.TextFormula ?? string.Empty,
             TextNoteType = _revitRepository.TextNoteTypes.FirstOrDefault(v => v.Name.Equals(data.TextNoteTypeName)),
             TextNoteTypeFilter = GetFilterList(data.TextNoteTypeFilterValues, sheetSetVM.SheetSetParams.Params),
+            TextWidth = data.TextWidth ?? "180",
         };
 
         // Добавляем список дополнительных параметров

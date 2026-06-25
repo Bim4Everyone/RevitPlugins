@@ -161,6 +161,7 @@ public class TextNoteData : SheetComponentData {
     public string TextFormula { get; set; }
     public string TextNoteTypeName { get; set; }
     public FiltrationComboBoxFilterListData TextNoteTypeFilterValues { get; set; }
+    public string TextWidth { get; set; }
 }
 
 /// <summary>

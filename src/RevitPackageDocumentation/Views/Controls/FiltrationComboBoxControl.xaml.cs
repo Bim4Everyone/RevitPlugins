@@ -179,14 +179,5 @@ public partial class FiltrationComboBoxControl : UserControl {
         flyout.IsOpen = flyout.IsOpen == true
             ? false
             : true;
-
-
-
-        //FiltersItemsControl.Visibility = FiltersItemsControl.Visibility == System.Windows.Visibility.Visible
-        //    ? System.Windows.Visibility.Collapsed
-        //    : System.Windows.Visibility.Visible;
-        //FiltersAddButton.Visibility = FiltersAddButton.Visibility == System.Windows.Visibility.Visible
-        //    ? System.Windows.Visibility.Collapsed
-        //    : System.Windows.Visibility.Visible;
     }
 }

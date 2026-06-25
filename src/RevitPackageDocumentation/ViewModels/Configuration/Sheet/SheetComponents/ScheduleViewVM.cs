@@ -189,6 +189,12 @@ internal class ScheduleViewVM : SheetComponentVM {
             return null;
         }
 
+        // Если видовой экран спецификации уже есть не листе, то не размещаем повторно
+        if(Repository.GetScheduleSheetInstances(sheetInstance)
+            .FirstOrDefault(s => s.ScheduleId == view.Id) is ScheduleSheetInstance scheduleSheetInstance) {
+            return scheduleSheetInstance;
+        }
+
         // Получение габаритов рамки листа
         if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
             return null;
@@ -199,7 +205,7 @@ internal class ScheduleViewVM : SheetComponentVM {
 
         // Изначально размещаем в Zero
         // Точка вставки у спеки в верхнем левом углу спеки
-        var scheduleSheetInstance = ScheduleSheetInstance.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
+        scheduleSheetInstance = ScheduleSheetInstance.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
 
         var viewportBB = scheduleSheetInstance.get_BoundingBox(sheetInstance);
         double viewportWidth = viewportBB.Max.X - viewportBB.Min.X;
