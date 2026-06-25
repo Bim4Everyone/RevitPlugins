@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
-using dosymep.Revit.Comparators;
-
 using pyRevitLabs.Json;
+
+using RevitDeclarations.Comparators;
 
 namespace RevitDeclarations.Models;
 internal class Apartment : RoomGroup {
@@ -24,7 +23,7 @@ internal class Apartment : RoomGroup {
     public Apartment(IEnumerable<RoomElement> rooms,
                      DeclarationSettings settings,
                      RoomParamProvider paramProvider, 
-                     LogicalStringComparer logicalStrComparer)
+                     RevitLogicalStringComparer logicalStrComparer)
         : base(rooms, settings, paramProvider, logicalStrComparer) {
         _settings = (ApartmentsSettings) settings;
         _mainRooms = new Dictionary<string, List<RoomElement>>(_strComparer);

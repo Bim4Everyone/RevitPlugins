@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-using dosymep.Revit.Comparators;
-
 using pyRevitLabs.Json;
+
+using RevitDeclarations.Comparators;
 
 namespace RevitDeclarations.Models;
 internal class CommercialRooms : RoomGroup {
@@ -11,7 +11,7 @@ internal class CommercialRooms : RoomGroup {
     public CommercialRooms(IEnumerable<RoomElement> rooms,
                                        DeclarationSettings settings,
                                        RoomParamProvider paramProvider, 
-                                       LogicalStringComparer logicalStrComparer)
+                                       RevitLogicalStringComparer logicalStrComparer)
         : base(rooms, settings, paramProvider, logicalStrComparer) {
         _settings = (CommercialSettings) settings;
     }

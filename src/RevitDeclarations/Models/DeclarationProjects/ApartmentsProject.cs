@@ -4,8 +4,8 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
-using dosymep.Revit.Comparators;
 
+using RevitDeclarations.Comparators;
 using RevitDeclarations.ViewModels;
 
 namespace RevitDeclarations.Models;
@@ -15,7 +15,7 @@ internal class ApartmentsProject : DeclarationProject {
     public ApartmentsProject(RevitDocumentViewModel document,
                              RevitRepository revitRepository,
                              DeclarationSettings settings,
-                             LogicalStringComparer logicalStrComparer,
+                             RevitLogicalStringComparer logicalStrComparer,
                              ILocalizationService localizationService) 
         : base(document, revitRepository, settings, logicalStrComparer, localizationService) {
 

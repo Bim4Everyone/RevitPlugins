@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using dosymep.Revit.Comparators;
+using RevitDeclarations.Comparators;
 
 namespace RevitDeclarations.Models;
 internal class RoomParamProvider {
@@ -48,7 +48,7 @@ internal class RoomParamProvider {
         return string.Join(", ", resultString);
     }
 
-    public string GetAllLevels(IEnumerable<RoomElement> rooms, LogicalStringComparer logicalStrComparer) {
+    public string GetAllLevels(IEnumerable<RoomElement> rooms, RevitLogicalStringComparer logicalStrComparer) {
         var levelNames = rooms
             .Select(x => x.GetTextParamValue(_settings.LevelParam))
             .Distinct()

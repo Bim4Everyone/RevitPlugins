@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-using dosymep.Revit.Comparators;
+using RevitDeclarations.Comparators;
 
 namespace RevitDeclarations.Models;
 internal class PublicArea : RoomGroup {
@@ -10,7 +10,7 @@ internal class PublicArea : RoomGroup {
     public PublicArea(IEnumerable<RoomElement> rooms,
                       DeclarationSettings settings,
                       RoomParamProvider paramProvider, 
-                      LogicalStringComparer logicalStrComparer)
+                      RevitLogicalStringComparer logicalStrComparer)
         : base(rooms, settings, paramProvider, logicalStrComparer) {
         _settings = (PublicAreasSettings) settings;
 

@@ -1,11 +1,11 @@
 using System.Linq;
 using System.Windows.Input;
 
-using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitDeclarations.Comparators;
 using RevitDeclarations.Models;
 using RevitDeclarations.Services;
 
@@ -21,7 +21,7 @@ internal abstract class MainViewModel : BaseViewModel {
     protected PrioritiesViewModel _prioritiesViewModel;
     protected DeclarationViewModel _declarationViewModel;
 
-    protected LogicalStringComparer _stringComparer;
+    protected RevitLogicalStringComparer _stringComparer;
 
     private bool _hasDeclarationPageErrors;
     private bool _hasParametersPageErrors;
@@ -38,7 +38,7 @@ internal abstract class MainViewModel : BaseViewModel {
         _messageBoxService = messageBoxService;
         _errorWindowService = errorWindowService;
 
-        _stringComparer = new LogicalStringComparer();
+        _stringComparer = new RevitLogicalStringComparer();
 
         ExportDeclarationCommand = new RelayCommand(ExportDeclaration, CanExport);
     }
