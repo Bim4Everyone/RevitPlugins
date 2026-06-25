@@ -77,7 +77,8 @@
     <system:String x:Key="ParametersPage.DeclParamsHeader">Parameters for filling out the declaration</system:String>
     <system:String x:Key="ParametersPage.ComRoomNumber">1.1 Room number:</system:String>
     <system:String x:Key="ParametersPage.ComRoomAddPrefix">1.2 Add prefix to the number:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomPrefixParam">1.3 Parameter for prefix:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomAddHyphen">1.3 Add hyphen after prefix:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomPrefixParam">1.4 Parameter for prefix:</system:String>
     <system:String x:Key="ParametersPage.ComRoomArea">8. Total area</system:String>
     <system:String x:Key="ParametersPage.ComRoomAreaGroupParam">8.1 For a group of multiple rooms:</system:String>
     <system:String x:Key="ParametersPage.ComRoomAreaParam">8.2 For a single room:</system:String>

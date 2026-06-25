@@ -77,7 +77,8 @@
     <system:String x:Key="ParametersPage.DeclParamsHeader">Параметры для заполнения декларации</system:String>
     <system:String x:Key="ParametersPage.ComRoomNumber">1.1 Номер помещения:</system:String>
     <system:String x:Key="ParametersPage.ComRoomAddPrefix">1.2 Добавить префикс в номер:</system:String>
-    <system:String x:Key="ParametersPage.ComRoomPrefixParam">1.3 Параметр для префикса:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomAddHyphen">1.3 Добавить дефис после префикса:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomPrefixParam">1.4 Параметр для префикса:</system:String>
     <system:String x:Key="ParametersPage.ComRoomArea">8. Общая площадь</system:String>
     <system:String x:Key="ParametersPage.ComRoomAreaGroupParam">8.1 Для группы из нескольких помещений:</system:String>
     <system:String x:Key="ParametersPage.ComRoomAreaParam">8.2 Для одного помещения:</system:String>
