@@ -254,16 +254,32 @@ internal class MainViewModel : BaseViewModel {
 
     private void ImportSheetSet() {
         _sheetSetDataPath = _fileDialogService.OpenFileDialog();
-        ImportSheetSet(_sheetSetDataPath);
+
+        if(_sheetSetDataPath is null) {
+            if(CurrentSheetSet is null) {
+                // Если пользователь нажал Отмена при выборе файла и текущая конфигурация еще не загружена
+                var sheetSetData = _sheetSetDataFactory.CreateSheetSetData();
+                ImportSheetSet(sheetSetData);
+            } else {
+                // Если пользователь нажал Отмена при выборе файла и текущая конфигурация УЖЕ загружена
+                return;
+            }
+        } else {
+            // Если пользователь выбрал файл при выборе файла
+            ImportSheetSet(_sheetSetDataPath);
+        }
     }
 
     private void ImportSheetSet(string sheetSetDataPath) {
-        var currentSheetSetData = _sheetSetConfig.Import(sheetSetDataPath);
-        CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(currentSheetSetData);
+        var sheetSetData = _sheetSetConfig.Import(sheetSetDataPath);
+        ImportSheetSet(sheetSetData);
+    }
+
+    private void ImportSheetSet(SheetSetData sheetSetData) {
+        CurrentSheetSet = _sheetSetVMFactory.CreateSheetSetVM(sheetSetData);
         CurrentSheetSet.SelectedSheet = CurrentSheetSet.SheetList.FirstOrDefault();
         CurrentSheetSet.ValidateAllSheets();
     }
-
 
     private void ExportSheetSet() {
         _sheetSetDataPath = _fileDialogService.SaveFileDialog();

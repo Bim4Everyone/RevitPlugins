@@ -12,6 +12,7 @@ using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 namespace RevitPackageDocumentation.Models.ConfigSerializer;
 
 internal interface ISheetSetDataFactory {
+    SheetSetData CreateSheetSetData();
     SheetSetData CreateSheetSetData(SheetSetVM vm);
     SheetData CreateSheetData(SheetVM vm);
     SheetComponentData CreateComponentData(SheetComponentVM vm);
@@ -21,9 +22,13 @@ internal interface ISheetSetDataFactory {
 }
 
 internal class SheetSetDataFactory : ISheetSetDataFactory {
+    public SheetSetData CreateSheetSetData() {
+        return new SheetSetData();
+    }
+
     public SheetSetData CreateSheetSetData(SheetSetVM vm) {
         if(vm == null)
-            return new SheetSetData();
+            return CreateSheetSetData();
 
         return new SheetSetData {
             Name = vm.Name,

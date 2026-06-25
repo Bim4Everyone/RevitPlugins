@@ -26,9 +26,9 @@ internal class SheetVM : BaseParamContainerVM {
     private readonly string _sheetSizeParamName = "х";
 
     private bool _isModuleCheck;
-    private string _moduleName;
-    private string _moduleComment;
-    private string _moduleCode;
+    private string _moduleName = string.Empty;
+    private string _moduleComment = string.Empty;
+    private string _moduleCode = string.Empty;
     private string _moduleErrors = string.Empty;
 
     private SheetSetVM _sheetSet;
