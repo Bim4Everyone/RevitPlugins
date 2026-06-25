@@ -109,10 +109,10 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
     }
 
     private void ValidateParams(RevitRepository repo, IMessageBoxService msg, ILocalizationService localization) {
-        if(!repo.CategoryHasParam(BuiltInCategory.OST_StructuralColumns, RevitRepository.LandThicknessParamName)) {
+        if(!repo.CategoryHasParam(BuiltInCategory.OST_StructuralColumns, repo.LandThicknessParam)) {
             ShowError(
                 msg,
-                localization.GetLocalizedString("Error.ParamNotFound", RevitRepository.LandThicknessParamName));
+                localization.GetLocalizedString("Error.ParamNotFound", repo.LandThicknessParam.Name));
             throw new OperationCanceledException();
         }
     }

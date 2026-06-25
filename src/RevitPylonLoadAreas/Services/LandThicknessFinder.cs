@@ -6,7 +6,7 @@ using System.Threading;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
+using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 
 using RevitPylonLoadAreas.Models;
@@ -79,7 +79,7 @@ internal class LandThicknessFinder {
             }
 
             double thickness = UnitUtils.ConvertFromInternalUnits(landVolume / loadArea.GetArea(), UnitTypeId.Meters);
-            loadArea.Element.SetParamValue(RevitRepository.LandThicknessParamName, thickness);
+            loadArea.Element.SetParamValue(_repo.LandThicknessParam, thickness);
         }
     }
 

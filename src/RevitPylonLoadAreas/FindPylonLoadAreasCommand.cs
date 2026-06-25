@@ -89,7 +89,7 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
             double area = loadArea.GetArea();
             if(loadArea.ElementIsPylon()) {
                 loadArea.Element.SetParamValue(
-                    RevitRepository.LoadAreaParamName,
+                    repo.LoadAreaParam,
                     UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters));
             }
         }
@@ -98,8 +98,8 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
     }
 
     private void ValidateParams(RevitRepository repo, IMessageBoxService msg, ILocalizationService localization) {
-        if(!repo.CategoryHasParam(BuiltInCategory.OST_StructuralColumns, RevitRepository.LoadAreaParamName)) {
-            ShowError(msg, localization.GetLocalizedString("Error.ParamNotFound", RevitRepository.LoadAreaParamName));
+        if(!repo.CategoryHasParam(BuiltInCategory.OST_StructuralColumns, repo.LoadAreaParam)) {
+            ShowError(msg, localization.GetLocalizedString("Error.ParamNotFound", repo.LoadAreaParam.Name));
             throw new OperationCanceledException();
         }
     }

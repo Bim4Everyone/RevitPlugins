@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 using RevitPylonLoadAreas.Models.Geometry;
@@ -15,9 +16,9 @@ using RevitPylonLoadAreas.Models.Selection;
 namespace RevitPylonLoadAreas.Models;
 
 internal class RevitRepository {
-    public const string LoadAreaParamName = "ФОП_Площадь грузовая";
-    public const string LandThicknessParamName = "ФОП_Толщина БИО";
-    
+    public readonly SharedParam LoadAreaParam = SharedParamsConfig.Instance.CargoArea;
+    public readonly SharedParam LandThicknessParam = SharedParamsConfig.Instance.LandscapingThickness;
+
     public RevitRepository(UIApplication uiApplication) {
         UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
     }
@@ -159,14 +160,14 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Проверяет, что в документе у заданной категории присутствует общий параметр с указанным именем
+    /// Проверяет, что в документе у заданной категории присутствует общий параметр
     /// </summary>
-    public bool CategoryHasParam(BuiltInCategory category, string paramName) {
-        return Document.IsExistsSharedParam(paramName)
-            && Document.GetSharedParamBinding(paramName)
-                .Binding
-                .GetCategories()
-                .Select(c => c.GetBuiltInCategory())
-                .Contains(category);
+    public bool CategoryHasParam(BuiltInCategory category, SharedParam param) {
+        return param.IsExistsParam(Document)
+               && param.GetParamBinding(Document)
+                   .Binding
+                   .GetCategories()
+                   .Select(c => c.GetBuiltInCategory())
+                   .Contains(category);
     }
 }
