@@ -94,6 +94,7 @@ internal class RevitRepository {
         .OfClass(typeof(ViewFamilyType))
         .OfType<ViewFamilyType>()
         .Where(a => ViewFamily.StructuralPlan == a.ViewFamily)
+        .OrderBy(a => a.Name)
         .ToList();
 
     /// <summary>
@@ -103,6 +104,7 @@ internal class RevitRepository {
         .OfClass(typeof(ViewFamilyType))
         .OfType<ViewFamilyType>()
         .Where(a => ViewFamily.Section == a.ViewFamily)
+        .OrderBy(a => a.Name)
         .ToList();
 
 
@@ -140,6 +142,7 @@ internal class RevitRepository {
             .OfClass(typeof(ElementType))
             .OfType<ElementType>()
             .Where(q => q.FamilyName == defaultElementType.FamilyName)
+            .OrderBy(a => a.Name)
             .ToList();
     }
 
@@ -170,6 +173,7 @@ internal class RevitRepository {
         .OfClass(typeof(View))
         .OfType<View>()
         .Where(view => view.ViewType == ViewType.Legend)
+        .OrderBy(a => a.Name)
         .ToList();
 
     /// <summary>
