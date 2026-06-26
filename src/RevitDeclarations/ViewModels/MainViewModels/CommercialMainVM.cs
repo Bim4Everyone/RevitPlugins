@@ -144,6 +144,6 @@ internal class CommercialMainVM : MainViewModel {
         _settings.PositionType = commercialParamsVM.SelectedPositionType;
         _settings.GroupNameParam = commercialParamsVM.SelectedGroupNameParam;
         _settings.AddPrefixToNumber = commercialParamsVM.AddPrefixToNumber;
-        _settings.AddHyphenToPrefix = commercialParamsVM.AddHyphenToPrefix;
+        _settings.AddHyphenToPrefix = commercialParamsVM.AddHyphenToPrefix && commercialParamsVM.AddPrefixToNumber;
     }
 }

@@ -62,7 +62,7 @@ internal class CommercialConfigSettings : DeclarationConfigSettings {
             ProjectNameID = "",
 
             AddPrefixToNumber = true,
-            AddHyphenToPrefix = true,
+            AddHyphenToPrefix = false,
 
             RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
             RoomNameParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME),
