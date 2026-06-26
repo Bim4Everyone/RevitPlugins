@@ -50,9 +50,11 @@ namespace RevitMechanicalSpecification.Service {
         public string GetDuctFittingMark(Element element) {
             List<Connector> connectors = GetConnectors(element);
             Element duct = GetDuctFromConnectorList(connectors);
+            
             if(duct is null) {
-                return "!Не учитывать";
+                return String.Empty;
             }
+            
             return duct.GetTypeOrInstanceParamStringValue(duct.GetElementType(), _specConfiguration.OriginalParamNameMark);
         }
 
@@ -61,15 +63,11 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        public string GetDuctFittingName(Element element) {
+        public string GetDuctFittingName(Element element, string nameAddon) {
             string thikness = GetDuctFittingThikness(element);
             string startName = "Не удалось определить тип фитинга";
             FamilyInstance instanse = element as FamilyInstance;
             MechanicalFitting fitting = instanse.MEPModel as MechanicalFitting;
-            
-            if(thikness is null && fitting.PartType != PartType.MultiPort) {
-                return "!Не учитывать";
-            }
 
             if(!_specConfiguration.IsSpecifyDuctFittings) {
                 return "Металл для фасонных деталей воздуховодов с толщиной стенки " + thikness + " мм";
@@ -122,7 +120,16 @@ namespace RevitMechanicalSpecification.Service {
             if(notTransition && notTee) {
                 size = size.Split('-').First();
             }
-            return startName + " " + size + ", с толщиной стенки " + thikness + " мм";
+            
+            if(string.IsNullOrEmpty(nameAddon) && thikness is null) {
+                return $"{startName} {size}, УКАЖИТЕ ТОЛЩИНУ ЧЕРЕЗ \"ФОП_ВИС_Дополнение к имени\"";
+            }
+
+            if(thikness is null) {
+                return $"{startName} {size},";
+            }
+
+            return $"{startName} {size}, с толщиной стенки {thikness} мм";
         }
 
         /// <summary>
