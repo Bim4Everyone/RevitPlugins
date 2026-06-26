@@ -95,7 +95,7 @@
     <system:String x:Key="ParametersPage.PublicAreaGroupParams">Parameter for grouping within public area groups:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaRoomNumber">1.1 Room number:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaAddPrefix">1.2 Add prefix:</system:String>
-    <system:String x:Key="ParametersPage.PublicAreaPrefixParam">1.3 Parameter for prefix:</system:String>
+    <system:String x:Key="ParametersPage.PublicAreaPrefixParam">1.4 Parameter for prefix:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaRoomType">2. Room type:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaPositionBuilding">3.1 Location - building block:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaPositionSection">3.2 Location - section:</system:String>

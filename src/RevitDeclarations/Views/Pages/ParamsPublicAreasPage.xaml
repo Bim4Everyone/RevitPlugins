@@ -294,6 +294,7 @@
                         <RowDefinition Height="43"/>
                         <RowDefinition Height="43"/>
                         <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="30"/>
@@ -335,15 +336,27 @@
                         Grid.Row="2"
                         Margin="10, 0"
                         IsChecked="{Binding AddPrefixToNumber}"/>
-
+                    
                     <TextBlock
                         Grid.Column="1"
                         Grid.Row="3"
                         Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ComRoomAddHyphen}"/>
+                    <CheckBox
+                        Grid.Column="2"
+                        Grid.Row="3"
+                        Margin="10, 0"
+                        IsEnabled="{Binding AddPrefixToNumber}"
+                        IsChecked="{Binding AddHyphenToPrefix}"/>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="4"
+                        Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.PublicAreaPrefixParam}" />
                     <ComboBox
                         Grid.Column="2"
-                        Grid.Row="3"
+                        Grid.Row="4"
                         Margin="10, 0"
                         IsEnabled="{Binding AddPrefixToNumber}"
                         ItemsSource="{Binding TextParameters}"
@@ -351,36 +364,36 @@
                         SelectedItem="{Binding SelectedApartNumParam}"/>
 
                     <ui:Button
-                        Grid.Row="4"
+                        Grid.Row="5"
                         Grid.Column="0"
                         Style="{StaticResource ToolTipButton}"
                         ToolTip="{me:LocalizationSource ToolTip.PublicAreaNameParamToolTip}" />
                     <TextBlock
                         Grid.Column="1"
-                        Grid.Row="4"
+                        Grid.Row="5"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.PublicAreaRoomType}" />
                     <ComboBox
                         Grid.Column="2"
-                        Grid.Row="4"
+                        Grid.Row="5"
                         Margin="10, 0"
                         ItemsSource="{Binding TextParameters}"
                         DisplayMemberPath="Definition.Name"
                         SelectedItem="{Binding SelectedRoomNameParam}"/>
 
                     <ui:Button
-                        Grid.Row="5"
+                        Grid.Row="6"
                         Grid.Column="0"
                         Style="{StaticResource ToolTipButton}"
                         ToolTip="{me:LocalizationSource ToolTip.PublicAreaPositionParamToolTip}" />
                     <TextBlock
                         Grid.Column="1"
-                        Grid.Row="5"
+                        Grid.Row="6"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.PublicAreaPositionBuilding}" />
                     <ComboBox
                         Grid.Column="2"
-                        Grid.Row="5"
+                        Grid.Row="6"
                         Margin="10, 0"
                         ItemsSource="{Binding TextParameters}"
                         DisplayMemberPath="Definition.Name"
@@ -388,12 +401,12 @@
 
                     <TextBlock
                         Grid.Column="1"
-                        Grid.Row="6"
+                        Grid.Row="7"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.PublicAreaPositionSection}" />
                     <ComboBox
                         Grid.Column="2"
-                        Grid.Row="6"
+                        Grid.Row="7"
                         Margin="10, 0"
                         ItemsSource="{Binding TextParameters}"
                         DisplayMemberPath="Definition.Name"
@@ -401,54 +414,54 @@
 
                     <TextBlock
                         Grid.Column="1"
-                        Grid.Row="7"
+                        Grid.Row="8"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.PublicAreaPositionLevel}" />
                     <ComboBox
                         Grid.Column="2"
-                        Grid.Row="7"
+                        Grid.Row="8"
                         Margin="10, 0"
                         ItemsSource="{Binding TextParameters}"
                         DisplayMemberPath="Definition.Name"
                         SelectedItem="{Binding SelectedLevelParam}"/>
 
                     <ui:Button
-                        Grid.Row="8"
+                        Grid.Row="9"
                         Grid.Column="0"
                         Style="{StaticResource ToolTipButton}"
                         ToolTip="{me:LocalizationSource ToolTip.PublicAreaDepartmentParamToolTip}" />
                     <TextBlock
                         Grid.Column="1"
-                        Grid.Row="8"
+                        Grid.Row="9"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.PublicAreaDefinition}" />
                     <ComboBox
                         Grid.Column="2"
-                        Grid.Row="8"
+                        Grid.Row="9"
                         Margin="10, 0"
                         ItemsSource="{Binding TextParameters}"
                         DisplayMemberPath="Definition.Name"
                         SelectedItem="{Binding SelectedDepartmentParam}"/>
 
                     <ui:Button
-                        Grid.Row="9"
+                        Grid.Row="10"
                         Grid.Column="0"
                         Style="{StaticResource ToolTipButton}"
                         ToolTip="{me:LocalizationSource ToolTip.PublicAreaAreaParamToolTip}" />
                     <TextBlock
                         Grid.Column="1"
-                        Grid.Row="9"
+                        Grid.Row="10"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.PublicAreaArea}" />
 
                     <TextBlock
                         Grid.Column="1"
-                        Grid.Row="10"
+                        Grid.Row="11"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.PublicAreaAreaForSeveralRooms}" />
                     <ComboBox
                         Grid.Column="2"
-                        Grid.Row="10"
+                        Grid.Row="11"
                         Margin="10, 0"
                         ItemsSource="{Binding DoubleParameters}"
                         DisplayMemberPath="Definition.Name"
@@ -456,30 +469,30 @@
             
                     <TextBlock
                         Grid.Column="1"
-                        Grid.Row="11"
+                        Grid.Row="12"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.PublicAreaAreaForOneRoom}" />
                     <ComboBox
                         Grid.Column="2"
-                        Grid.Row="11"
+                        Grid.Row="12"
                         Margin="10, 0"
                         ItemsSource="{Binding DoubleParameters}"
                         DisplayMemberPath="Definition.Name"
                         SelectedItem="{Binding SelectedRoomAreaParam}"/>
 
                     <ui:Button
-                        Grid.Row="12"
+                        Grid.Row="13"
                         Grid.Column="0"
                         Style="{StaticResource ToolTipButton}"
                         ToolTip="{me:LocalizationSource ToolTip.ProjectNameToolTip}" />
                     <TextBlock
                         Grid.Column="1"
-                        Grid.Row="12"
+                        Grid.Row="13"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.PublicAreaProjectName}" />
                     <TextBox
                         Grid.Column="2"
-                        Grid.Row="12"
+                        Grid.Row="13"
                         Margin="10, 0"
                         Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
