@@ -1,0 +1,52 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="Plugin.Title">Load Areas</system:String>
+
+    <system:String
+        x:Key="Pick.Floor">Select a floor</system:String>
+    <system:String
+        x:Key="Pick.Floors">Select one or many floors</system:String>
+
+    <system:String
+        x:Key="Transaction.DrawLoadAreas">Load areas</system:String>
+    <system:String
+        x:Key="Transaction.LandThickness">Land thickness</system:String>
+
+    <system:String
+        x:Key="Error.ViewNotSupported">The active view must be a plan.</system:String>
+    <system:String
+        x:Key="Error.FilledRegionTypeNotFound">No filled region type was found in the project.</system:String>
+
+    <system:String
+        x:Key="OpenLandXmlDialog.Title">Select a LandXML file</system:String>
+
+    <system:String
+        x:Key="Error.LandXmlFileNotFound">File not found.</system:String>
+    <system:String
+        x:Key="Error.LandXmlEmptyFile">The LandXML file is empty.</system:String>
+    <system:String
+        x:Key="Error.LandXmlVersionNotSupported">Only LandXML version 1.2 is supported, file schema: '{0}'</system:String>
+    <system:String
+        x:Key="Error.LandXmlUnknownLinearUnit">Failed to determine the linear unit of the LandXML file: '{0}'</system:String>
+    <system:String
+        x:Key="Error.LandXmlPointWithoutId">A surface point has no id.</system:String>
+    <system:String
+        x:Key="Error.LandXmlPointInvalidCoords">Point {0} does not contain three coordinates.</system:String>
+    <system:String
+        x:Key="Error.LandXmlFaceUnknownPoint">A face references a non-existent point {0}.</system:String>
+
+    <system:String
+        x:Key="Error.InvalidLandXmlData">There are negative elevations in LandXml points</system:String>
+    <system:String
+        x:Key="Error.CannotCalculateLandThickness">Cannot calculate land thickness</system:String>
+    <system:String
+        x:Key="Error.ParamNotFound">The "Structural Columns" category has no parameter '{0}'.</system:String>
+
+    <system:String
+        x:Key="ErrorsWindow.Title">Errors</system:String>
+
+</ResourceDictionary>

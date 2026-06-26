@@ -1,0 +1,52 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String
+        x:Key="Plugin.Title">Грузовые площади</system:String>
+
+    <system:String
+        x:Key="Pick.Floor">Выберите плиту перекрытия</system:String>
+    <system:String
+        x:Key="Pick.Floors">Выберите одно или несколько перекрытий</system:String>
+
+    <system:String
+        x:Key="Transaction.DrawLoadAreas">Грузовые площади</system:String>
+    <system:String
+        x:Key="Transaction.LandThickness">Толщина БИО</system:String>
+
+    <system:String
+        x:Key="Error.ViewNotSupported">Активный вид должен быть планом.</system:String>
+    <system:String
+        x:Key="Error.FilledRegionTypeNotFound">В проекте не найден ни один тип цветовой области.</system:String>
+
+    <system:String
+        x:Key="OpenLandXmlDialog.Title">Выберите файл LandXML</system:String>
+
+    <system:String
+        x:Key="Error.LandXmlFileNotFound">Файл не найден.</system:String>
+    <system:String
+        x:Key="Error.LandXmlEmptyFile">Файл LandXML пуст.</system:String>
+    <system:String
+        x:Key="Error.LandXmlVersionNotSupported">Поддерживается только LandXML версии 1.2, схема файла: '{0}'</system:String>
+    <system:String
+        x:Key="Error.LandXmlUnknownLinearUnit">Не удалось определить единицы длины файла LandXML: '{0}'</system:String>
+    <system:String
+        x:Key="Error.LandXmlPointWithoutId">Точка поверхности не содержит id.</system:String>
+    <system:String
+        x:Key="Error.LandXmlPointInvalidCoords">Точка {0} не содержит трех координат.</system:String>
+    <system:String
+        x:Key="Error.LandXmlFaceUnknownPoint">Грань ссылается на несуществующую точку {0}.</system:String>
+
+    <system:String
+        x:Key="Error.InvalidLandXmlData">В LandXml присутствуют отрицательные отметки</system:String>
+    <system:String
+        x:Key="Error.CannotCalculateLandThickness">Не удалось рассчитать толщину слоя БИО</system:String>
+    <system:String
+        x:Key="Error.ParamNotFound">У категории "Несущие колонны" отсутствует параметр '{0}'.</system:String>
+
+    <system:String
+        x:Key="ErrorsWindow.Title">Ошибки</system:String>
+
+</ResourceDictionary>
