@@ -48,6 +48,7 @@ internal class RevitRepository {
         Views = GetViews();
         Specs = GetSpecs();
         FilterTypes = GetFilterTypes();
+        WorksetParamId = new ElementId(BuiltInParameter.ELEM_PARTITION_PARAM);
     }
 
     /// <summary>
@@ -85,6 +86,7 @@ internal class RevitRepository {
     public List<View> Views { get; }
     public List<ViewSchedule> Specs { get; }
     public List<ScheduleTypeInfo> FilterTypes { get; }
+    public ElementId WorksetParamId { get; }
 
 
     /// <summary>

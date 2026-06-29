@@ -43,7 +43,6 @@ internal class ScheduleFilterListVM : BaseViewModel {
 
     private void AddFilter() {
         var rule = new ScheduleFilterRuleVM(this, StrParamSetService);
-        //rule.SetSchedule(ScheduleView.ReferenceSpec);
         ScheduleFilterRules.Add(rule);
     }
 

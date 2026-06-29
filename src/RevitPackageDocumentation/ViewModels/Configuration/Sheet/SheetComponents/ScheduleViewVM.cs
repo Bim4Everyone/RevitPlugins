@@ -152,30 +152,12 @@ internal class ScheduleViewVM : SheetComponentVM {
             }
 
             var definition = view.Definition;
-            // Удаляем каждый фильтр
-            for(int i = definition.GetFilters().Count - 1; i >= 0; i--) {
-                definition.RemoveFilter(i);
-            }
-            // Добавляем указанные пользователем фильтры
-            foreach(var rule in ScheduleFilterList.ScheduleFilterRules) {
-                ScheduleFilter filter = default;
 
-                var fieldId = rule.SelectedSpecField.Field.FieldId;
-                if(definition.CanFilterBySubstring(fieldId)) {
-                    filter = new ScheduleFilter(
-                        fieldId,
-                        rule.SelectedFilterType.FilterType,
-                        rule.FilterValue);
-                } else {
-                    if(int.TryParse(rule.FilterValue, out int value)) {
-                        filter = new ScheduleFilter(
-                            fieldId,
-                            rule.SelectedFilterType.FilterType,
-                            value);
-                    }
-                }
-                definition.AddFilter(filter);
-            }
+            // Удаляем каждый фильтр
+            ClearAllFilters(definition);
+
+            // Добавляем указанные пользователем фильтры
+            ApplyFilters(definition);
         } catch(System.Exception) { }
         return view;
     }
@@ -256,5 +238,84 @@ internal class ScheduleViewVM : SheetComponentVM {
         // Присваиваем новую точку
         scheduleSheetInstance.Point = ptForPlace;
         return scheduleSheetInstance;
+    }
+
+    private void ClearAllFilters(ScheduleDefinition definition) {
+        for(int i = definition.GetFilters().Count - 1; i >= 0; i--) {
+            definition.RemoveFilter(i);
+        }
+    }
+
+    private void ApplyFilters(ScheduleDefinition definition) {
+        foreach(var rule in ScheduleFilterList.ScheduleFilterRules) {
+            var filter = CreateFilter(definition, rule);
+            if(filter != null) {
+                definition.AddFilter(filter);
+            }
+        }
+    }
+
+    private ScheduleFilter CreateFilter(ScheduleDefinition definition, ScheduleFilterRuleVM rule) {
+        // Пытаемся создать фильтр, где поле является параметров рабочего набора
+        var worksetFilter = CreateWorksetFilter(definition, rule);
+
+        if(worksetFilter is null) {
+            // Создаем фильтр для обычного поля
+            return CreateStandardFilter(definition, rule);
+        } else {
+            return worksetFilter;
+        }
+    }
+
+    private ScheduleFilter CreateWorksetFilter(ScheduleDefinition definition, ScheduleFilterRuleVM rule) {
+        var paramId = definition.GetField(rule.SelectedSpecField.Field.FieldId).ParameterId;
+
+        if(!AreIdsEqual(paramId, Repository.WorksetParamId)) {
+            return null;
+        }
+
+        // Получаем первый рабочий набор, который содержит нужную строку в имени
+        var workset = new FilteredWorksetCollector(Repository.Document)
+            .OfKind(WorksetKind.UserWorkset)
+            .OrderBy(w => w.Name)
+            .FirstOrDefault(w => w.Name.Contains(rule.FilterValue));
+
+        if(workset is null) {
+            return null;
+        }
+
+        return new ScheduleFilter(
+            rule.SelectedSpecField.Field.FieldId,
+            rule.SelectedFilterType.FilterType,
+            workset.Id.IntegerValue);
+    }
+
+    private ScheduleFilter CreateStandardFilter(ScheduleDefinition definition, ScheduleFilterRuleVM rule) {
+        var fieldId = rule.SelectedSpecField.Field.FieldId;
+        var filterType = rule.SelectedFilterType.FilterType;
+        string filterValue = rule.FilterValue;
+
+        if(definition.CanFilterBySubstring(fieldId)) {
+            return new ScheduleFilter(
+                fieldId,
+                filterType,
+                filterValue);
+        } else {
+            if(int.TryParse(filterValue, out int value)) {
+                return new ScheduleFilter(
+                    fieldId,
+                    filterType,
+                    value);
+            }
+        }
+        return null;
+    }
+
+    private bool AreIdsEqual(ElementId id1, ElementId id2) {
+#if REVIT_2024_OR_GREATER
+    return id1.Value == id2.Value;
+#else
+        return id1.IntegerValue == id2.IntegerValue;
+#endif
     }
 }
