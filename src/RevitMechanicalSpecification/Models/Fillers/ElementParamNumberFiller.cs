@@ -29,9 +29,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             TargetParam.Set(GetNumber(specificationElement));
             
             if(Config.NullifyOutdatedNumber) {
-                Parameter outDateParam = specificationElement.Element.GetParam(Config.OutdatedNameNumber);
-                if(!outDateParam.IsReadOnly) {
-                    outDateParam.Set(0);
+                if(specificationElement.Element.IsExistsParam(Config.OutdatedNameNumber)) {
+                    Parameter outDateParam = specificationElement.Element.GetParam(Config.OutdatedNameNumber);
+                    if(!outDateParam.IsReadOnly) {
+                        outDateParam.Set(0);
+                    }
                 }
             }
         }

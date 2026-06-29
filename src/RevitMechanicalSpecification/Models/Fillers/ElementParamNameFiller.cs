@@ -194,7 +194,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="specificationElement"></param>
         /// <returns></returns>
         private string GetDuctFittingName(SpecificationElement specificationElement) {
-            return $"{_calculator.GetDuctFittingName(specificationElement.Element)} {_nameAddon}";
+            return $"{_calculator.GetDuctFittingName(specificationElement.Element, _nameAddon)} {_nameAddon}";
         }
 
         /// <summary>
