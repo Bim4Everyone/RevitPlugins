@@ -26,7 +26,7 @@ internal class TextNoteVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
     }
 
     public string TextFormula {
@@ -54,7 +54,7 @@ internal class TextNoteVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _textWidth, value);
     }
 
-    public override bool ValidateModule() {
+    public override bool Validate() {
         if(string.IsNullOrEmpty(TextFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextIsEmpty");
             return false;
@@ -78,7 +78,7 @@ internal class TextNoteVM : SheetComponentVM {
         return true;
     }
 
-    public override void Process() {
+    public override void Process(bool processDependent = false) {
         var textNote = Place();
         SetCustomParams(textNote);
     }

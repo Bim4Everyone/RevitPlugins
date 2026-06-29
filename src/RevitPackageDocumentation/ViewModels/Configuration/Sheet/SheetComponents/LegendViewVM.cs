@@ -24,7 +24,7 @@ internal class LegendViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
     }
 
     public View LegendView {
@@ -47,7 +47,7 @@ internal class LegendViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewportTypeFilter, value);
     }
 
-    public override bool ValidateModule() {
+    public override bool Validate() {
         if(LegendView is null) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.LegendViewIsNull");
             return false;
@@ -67,7 +67,7 @@ internal class LegendViewVM : SheetComponentVM {
         return true;
     }
 
-    public override void Process() {
+    public override void Process(bool processDependent = false) {
         var viewPort = Place();
         SetCustomParams(viewPort);
     }

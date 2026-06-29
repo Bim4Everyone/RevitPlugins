@@ -95,7 +95,7 @@ internal class PlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewInstance, value);
     }
 
-    public override bool ValidateModule() {
+    public override bool Validate() {
         if(string.IsNullOrEmpty(ViewNameFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
             return false;
@@ -135,7 +135,7 @@ internal class PlanViewVM : SheetComponentVM {
         return true;
     }
 
-    public override void Process() {
+    public override void Process(bool processDependent = false) {
         ViewInstance = Create();
         var viewPort = Place(ViewInstance);
         SetCustomParams(viewPort);

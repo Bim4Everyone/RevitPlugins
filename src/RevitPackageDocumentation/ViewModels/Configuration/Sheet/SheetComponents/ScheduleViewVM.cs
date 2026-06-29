@@ -43,7 +43,7 @@ internal class ScheduleViewVM : SheetComponentVM {
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
         ScheduleFilterList = new ScheduleFilterListVM(this, stringParamSetService);
 
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
         SelectReferenceSpecCommand = RelayCommand.Create(SelectReferenceSpec);
     }
 
@@ -90,7 +90,7 @@ internal class ScheduleViewVM : SheetComponentVM {
     }
 
 
-    public override bool ValidateModule() {
+    public override bool Validate() {
         if(ReferenceSpec is null) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ReferenceViewNameIsEmpty");
             return false;
@@ -128,7 +128,7 @@ internal class ScheduleViewVM : SheetComponentVM {
         ScheduleFilterList.SetSchedule(ReferenceSpec);
     }
 
-    public override void Process() {
+    public override void Process(bool processDependent = false) {
         var view = Create();
         ViewportInstance = Place(view);
         SetCustomParams(view);

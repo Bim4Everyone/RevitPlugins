@@ -47,7 +47,7 @@ internal class SectionViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
     }
 
     public string ViewNameFormula {
@@ -100,7 +100,7 @@ internal class SectionViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
 
-    public override bool ValidateModule() {
+    public override bool Validate() {
         if(string.IsNullOrEmpty(ViewNameFormula)) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
             return false;
@@ -140,7 +140,7 @@ internal class SectionViewVM : SheetComponentVM {
         return true;
     }
 
-    public override void Process() {
+    public override void Process(bool processDependent = false) {
         int.TryParse(ViewCount, out int viewCountAsInt);
 
         for(int i = 1; i <= viewCountAsInt; i++) {

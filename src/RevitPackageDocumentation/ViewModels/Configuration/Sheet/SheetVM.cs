@@ -16,20 +16,13 @@ using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
-internal class SheetVM : BaseParamContainerVM {
+internal class SheetVM : ModuleVM {
     private readonly ILocalizationService _localizationService;
     private readonly IMessageBoxService _messageBoxService;
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
-    private readonly StringParamSetService _stringParamSetService;
     private readonly string _sheetCoefficientParamName = "А";
     private readonly string _sheetSizeParamName = "х";
-
-    private bool _isModuleCheck;
-    private string _moduleName = string.Empty;
-    private string _moduleComment = string.Empty;
-    private string _moduleCode = string.Empty;
-    private string _moduleErrors = string.Empty;
 
     private SheetSetVM _sheetSet;
     private string _sheetNameFormula = string.Empty;
@@ -40,7 +33,6 @@ internal class SheetVM : BaseParamContainerVM {
     private FamilySymbol _titleBlockType;
     private ObservableCollection<SheetComponentVM> _sheetComponents = [];
     private List<FamilySymbol> _titleBlockTypes;
-    private bool _hasErrors;
     private ViewSheet _sheetInstance;
 
     public SheetVM(
@@ -58,10 +50,9 @@ internal class SheetVM : BaseParamContainerVM {
         _messageBoxService = messageBoxService;
         _sheetSetVMFactory = sheetSetVMFactory;
         _sheetSetDataFactory = sheetSetDataFactory;
-        _stringParamSetService = stringParamSetService;
 
         SelectTitleBlockFamilyCommand = RelayCommand.Create(SelectTitleBlockFamily);
-        CreateSheetCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+        CreateSheetCommand = RelayCommand.Create(CreateComponent, Validate);
 
         AddComponentCommand = RelayCommand.Create<ComponentTypeItem>(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
@@ -72,38 +63,6 @@ internal class SheetVM : BaseParamContainerVM {
 
     public ICommand AddComponentCommand { get; }
     public ICommand RemoveComponentCommand { get; }
-
-
-    public bool IsModuleCheck {
-        get => _isModuleCheck;
-        set => RaiseAndSetIfChanged(ref _isModuleCheck, value);
-    }
-
-    public string ModuleName {
-        get => _moduleName;
-        set => RaiseAndSetIfChanged(ref _moduleName, value);
-    }
-
-    public string ModuleComment {
-        get => _moduleComment;
-        set => RaiseAndSetIfChanged(ref _moduleComment, value);
-    }
-
-    public string ModuleCode {
-        get => _moduleCode;
-        set => RaiseAndSetIfChanged(ref _moduleCode, value);
-    }
-
-    public string ModuleErrors {
-        get => _moduleErrors;
-        set => RaiseAndSetIfChanged(ref _moduleErrors, value);
-    }
-
-    public bool HasErrors {
-        get => _hasErrors;
-        set => RaiseAndSetIfChanged(ref _hasErrors, value);
-    }
-
 
     public SheetSetVM SheetSet {
         get => _sheetSet;
@@ -191,7 +150,7 @@ internal class SheetVM : BaseParamContainerVM {
         }
     }
 
-    public void CreateComponent() {
+    public override void CreateComponent() {
         using var transaction = Repository.Document.StartTransaction(
             _localizationService.GetLocalizedString("MainWindow.Title"));
 
@@ -199,7 +158,7 @@ internal class SheetVM : BaseParamContainerVM {
         transaction.Commit();
     }
 
-    public bool ValidateModule() {
+    public override bool Validate() {
         if(string.IsNullOrEmpty(SheetNameFormula)) {
             ModuleErrors = _localizationService.GetLocalizedString("MainWindow.SheetNameIsEmpty");
             HasErrors = true;
@@ -236,7 +195,7 @@ internal class SheetVM : BaseParamContainerVM {
         return true;
     }
 
-    public void Process(bool processComponent) {
+    public override void Process(bool processDependent) {
         SheetInstance = null;
         SheetInstance = Repository.GetSheetByName(SheetName);
 
@@ -259,7 +218,7 @@ internal class SheetVM : BaseParamContainerVM {
             } catch(Exception) { }
         }
 
-        if(processComponent) {
+        if(processDependent) {
             foreach(var component in SheetComponents.Where(c => c.IsModuleCheck).ToList()) {
                 component.Process();
             }

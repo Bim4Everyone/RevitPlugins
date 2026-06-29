@@ -29,7 +29,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
         SelectAnnotationFamilyCommand = RelayCommand.Create(SelectAnnotationFamily);
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
     }
 
     public ICommand SelectAnnotationFamilyCommand { get; }
@@ -71,7 +71,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             ?.ToList();
     }
 
-    public override bool ValidateModule() {
+    public override bool Validate() {
         if(AnnotationFamily is null) {
             ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.AnnotationFamilyIsNull");
             return false;
@@ -91,7 +91,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         return true;
     }
 
-    public override void Process() {
+    public override void Process(bool processDependent = false) {
         var instance = Place();
         SetCustomParams(instance);
     }

@@ -13,13 +13,7 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
-internal abstract class SheetComponentVM : BaseParamContainerVM {
-    private bool _isModuleCheck;
-    private string _moduleName;
-    private string _moduleComment;
-    private string _moduleCode;
-    private string _moduleTypeName;
-    private string _moduleErrors;
+internal abstract class SheetComponentVM : ModuleVM {
     private readonly SheetVM _sheet;
 
     protected SheetComponentVM(
@@ -32,7 +26,7 @@ internal abstract class SheetComponentVM : BaseParamContainerVM {
         LocalizationService = localizationService;
 
         ModuleTypeName = LocalizationService.GetLocalizedString($"Type.{this.GetType().Name}");
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, ValidateModule);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
     }
 
     public ICommand CreateComponentCommand { get; set; }
@@ -40,38 +34,6 @@ internal abstract class SheetComponentVM : BaseParamContainerVM {
     protected ILocalizationService LocalizationService { get; }
 
     public SheetVM Sheet => _sheet;
-
-    public bool IsModuleCheck {
-        get => _isModuleCheck;
-        set => RaiseAndSetIfChanged(ref _isModuleCheck, value);
-    }
-
-    public string ModuleName {
-        get => _moduleName;
-        set => RaiseAndSetIfChanged(ref _moduleName, value);
-    }
-
-    public string ModuleComment {
-        get => _moduleComment;
-        set => RaiseAndSetIfChanged(ref _moduleComment, value);
-    }
-
-    public string ModuleCode {
-        get => _moduleCode;
-        set => RaiseAndSetIfChanged(ref _moduleCode, value);
-    }
-
-    public string ModuleTypeName {
-        get => _moduleTypeName;
-        set => RaiseAndSetIfChanged(ref _moduleTypeName, value);
-    }
-
-    public string ModuleErrors {
-        get => _moduleErrors;
-        set => RaiseAndSetIfChanged(ref _moduleErrors, value);
-    }
-
-
 
     /// <summary>
     /// Получает следующий номер видового экрана на листе
@@ -109,7 +71,7 @@ internal abstract class SheetComponentVM : BaseParamContainerVM {
             .FirstOrDefault()?.Viewport;
     }
 
-    public void CreateComponent() {
+    public override void CreateComponent() {
         using var transaction = Repository.Document.StartTransaction(
             LocalizationService.GetLocalizedString("MainWindow.Title"));
 
@@ -119,7 +81,4 @@ internal abstract class SheetComponentVM : BaseParamContainerVM {
         Process();
         transaction.Commit();
     }
-
-    public abstract bool ValidateModule();
-    public abstract void Process();
 }

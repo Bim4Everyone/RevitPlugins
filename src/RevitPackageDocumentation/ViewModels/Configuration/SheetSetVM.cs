@@ -70,9 +70,9 @@ internal class SheetSetVM : BaseViewModel {
     public void ValidateAllSheets() {
         foreach(var sheet in SheetList) {
             foreach(var component in sheet.SheetComponents) {
-                component.ValidateModule();
+                component.Validate();
             }
-            sheet.ValidateModule();
+            sheet.Validate();
         }
     }
 
@@ -130,9 +130,9 @@ internal class SheetSetVM : BaseViewModel {
     public void UpdateDueParamValueChange(PluginParamVM pluginParam) {
         if(pluginParam is not StringParamVM stringParam) {
             foreach(var sheet in SheetList) {
-                sheet.ValidateModule();
+                sheet.Validate();
                 foreach(var component in sheet.SheetComponents) {
-                    component.ValidateModule();
+                    component.Validate();
                 }
             }
             return;
