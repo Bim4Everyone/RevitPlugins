@@ -128,8 +128,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     public SheetComponentVM CreateComponentVM(SheetSetVM sheetSetVM, SheetVM sheetVM, SheetComponentData sheetComponentData) {
         return sheetComponentData switch {
-            StructuralPlanViewData data => CreateStructuralPlanViewVM(sheetSetVM, sheetVM, data),
-            StructuralCalloutViewData data => CreateStructuralCalloutViewVM(sheetSetVM, sheetVM, data),
+            PlanViewData data => CreatePlanViewVM(sheetSetVM, sheetVM, data),
+            CalloutViewData data => CreateCalloutViewVM(sheetSetVM, sheetVM, data),
             SectionViewData data => CreateSectionViewVM(sheetSetVM, sheetVM, data),
             ScheduleViewData data => CreateScheduleViewVM(sheetSetVM, sheetVM, data),
             TextNoteData data => CreateTextNoteVM(sheetSetVM, sheetVM, data),
@@ -139,8 +139,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         };
     }
 
-    private StructuralPlanViewVM CreateStructuralPlanViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, StructuralPlanViewData data) {
-        var sheetComponentVM = new StructuralPlanViewVM(
+    private PlanViewVM CreatePlanViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, PlanViewData data) {
+        var sheetComponentVM = new PlanViewVM(
             _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
@@ -149,7 +149,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             ViewNameFormula = data.ViewNameFormula ?? string.Empty,
             ViewName = data.ViewNameFormula ?? string.Empty,
-            ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
+            ViewFamilyType = _revitRepository.PlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
             ViewFamilyTypeFilter = GetFilterList(data.ViewFamilyTypeFilterValues, sheetSetVM.SheetSetParams.Params),
 
             ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
@@ -166,8 +166,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         return sheetComponentVM;
     }
 
-    private StructuralCalloutViewVM CreateStructuralCalloutViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, StructuralCalloutViewData data) {
-        var sheetComponentVM = new StructuralCalloutViewVM(
+    private CalloutViewVM CreateCalloutViewVM(SheetSetVM sheetSetVM, SheetVM sheetVM, CalloutViewData data) {
+        var sheetComponentVM = new CalloutViewVM(
             _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
@@ -176,7 +176,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             ViewNameFormula = data.ViewNameFormula ?? string.Empty,
             ViewName = data.ViewNameFormula ?? string.Empty,
-            ViewFamilyType = _revitRepository.StructuralPlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
+            ViewFamilyType = _revitRepository.PlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
             ViewFamilyTypeFilter = GetFilterList(data.ViewFamilyTypeFilterValues, sheetSetVM.SheetSetParams.Params),
 
             ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),

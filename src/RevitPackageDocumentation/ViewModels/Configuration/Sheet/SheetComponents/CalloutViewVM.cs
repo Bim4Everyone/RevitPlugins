@@ -11,7 +11,7 @@ using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Para
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
-internal class StructuralCalloutViewVM : SheetComponentVM {
+internal class CalloutViewVM : SheetComponentVM {
     // Ширина фрагмента
     private readonly double _calloutWidth = UnitUtilsHelper.ConvertToInternalValue(4000);
 
@@ -37,7 +37,7 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
     private FiltrationComboBoxFilterListVM _viewTemplateFilter;
 
-    public StructuralCalloutViewVM(
+    public CalloutViewVM(
         RevitRepository repository,
         StringParamSetService stringParamSetService,
         ObservableCollection<PluginParamVM> sheetSetParams,
@@ -139,16 +139,16 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
         }
 
         int index = Sheet.SheetComponents.IndexOf(this);
-        StructuralPlanViewVM parentView = null;
+        PlanViewVM parentView = null;
         for(int i = index; i >= 0; i--) {
-            parentView = Sheet.SheetComponents[i] as StructuralPlanViewVM;
+            parentView = Sheet.SheetComponents[i] as PlanViewVM;
 
             if(parentView != null && parentView.IsModuleCheck == true) {
                 break;
             }
         }
         if(parentView is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.HasNotStructuralPlanView");
+            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.HasNotPlanView");
             return false;
         }
 
@@ -176,10 +176,10 @@ internal class StructuralCalloutViewVM : SheetComponentVM {
 
         try {
             int index = Sheet.SheetComponents.IndexOf(this);
-            StructuralPlanViewVM parentView = default;
+            PlanViewVM parentView = default;
 
             for(int i = index; i >= 0; i--) {
-                parentView = Sheet.SheetComponents[i] as StructuralPlanViewVM;
+                parentView = Sheet.SheetComponents[i] as PlanViewVM;
 
                 if(parentView != null) {
                     break;

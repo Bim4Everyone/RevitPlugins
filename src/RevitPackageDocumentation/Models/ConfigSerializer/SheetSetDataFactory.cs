@@ -58,7 +58,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
 
     public SheetComponentData CreateComponentData(SheetComponentVM sheetComponentVM) {
         return sheetComponentVM switch {
-            StructuralPlanViewVM vm => new StructuralPlanViewData {
+            PlanViewVM vm => new PlanViewData {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
@@ -75,7 +75,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 SelectedSelectElemParamName = vm.SelectedSelectElemParam?.ParamName,
             },
 
-            StructuralCalloutViewVM vm => new StructuralCalloutViewData {
+            CalloutViewVM vm => new CalloutViewData {
                 IsModuleCheck = vm.IsModuleCheck,
                 ModuleName = vm.ModuleName,
                 ModuleComment = vm.ModuleComment,
@@ -192,8 +192,8 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
 
     public SheetComponentData CreateComponentData(Type componentType) {
         return componentType switch {
-            Type t when t == typeof(StructuralPlanViewVM) => new StructuralPlanViewData(),
-            Type t when t == typeof(StructuralCalloutViewVM) => new StructuralCalloutViewData(),
+            Type t when t == typeof(PlanViewVM) => new PlanViewData(),
+            Type t when t == typeof(CalloutViewVM) => new CalloutViewData(),
             Type t when t == typeof(SectionViewVM) => new SectionViewData(),
             Type t when t == typeof(ScheduleViewVM) => new ScheduleViewData(),
             Type t when t == typeof(TextNoteVM) => new TextNoteData(),

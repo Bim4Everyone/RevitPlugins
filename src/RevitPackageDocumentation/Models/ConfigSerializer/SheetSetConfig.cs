@@ -88,8 +88,8 @@ public abstract class SheetComponentData : ParamContainerModuleData {
 /// <summary>
 /// DTO модуля вида в плане несущих конструкций
 /// </summary>
-public class StructuralPlanViewData : SheetComponentData {
-    public override string ComponentType => "StructuralPlanView";
+public class PlanViewData : SheetComponentData {
+    public override string ComponentType => "PlanView";
 
     public string ViewNameFormula { get; set; }
     public string ViewFamilyTypeName { get; set; }
@@ -105,8 +105,8 @@ public class StructuralPlanViewData : SheetComponentData {
 /// <summary>
 /// DTO модуля фрагмента плана несущих конструкций
 /// </summary>
-public class StructuralCalloutViewData : SheetComponentData {
-    public override string ComponentType => "StructuralCalloutView";
+public class CalloutViewData : SheetComponentData {
+    public override string ComponentType => "CalloutView";
 
     public string ViewNameFormula { get; set; }
     public string ViewFamilyTypeName { get; set; }

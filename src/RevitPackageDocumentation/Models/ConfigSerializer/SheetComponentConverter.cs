@@ -10,8 +10,8 @@ namespace RevitPackageDocumentation.Models.ConfigSerializer;
 /// </summary>
 public class SheetComponentConverter : JsonConverter {
     private const string _componentTypeProperty = "ComponentType";
-    private const string _structuralPlanViewType = "StructuralPlanView";
-    private const string _structuralCalloutViewType = "StructuralCalloutView";
+    private const string _structuralPlanViewType = "PlanView";
+    private const string _structuralCalloutViewType = "CalloutView";
     private const string _sectionViewType = "SectionView";
     private const string _scheduleViewType = "ScheduleView";
     private const string _textNoteType = "TextNote";
@@ -31,8 +31,8 @@ public class SheetComponentConverter : JsonConverter {
 
         try {
             return componentType switch {
-                _structuralPlanViewType => jObject.ToObject<StructuralPlanViewData>(serializer),
-                _structuralCalloutViewType => jObject.ToObject<StructuralCalloutViewData>(serializer),
+                _structuralPlanViewType => jObject.ToObject<PlanViewData>(serializer),
+                _structuralCalloutViewType => jObject.ToObject<CalloutViewData>(serializer),
                 _sectionViewType => jObject.ToObject<SectionViewData>(serializer),
                 _scheduleViewType => jObject.ToObject<ScheduleViewData>(serializer),
                 _textNoteType => jObject.ToObject<TextNoteData>(serializer),

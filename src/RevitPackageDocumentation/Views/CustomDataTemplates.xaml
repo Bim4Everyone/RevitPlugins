@@ -19,9 +19,9 @@
             Source="CustomStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <!--StructuralPlanView-->
+    <!--PlanView-->
     <DataTemplate
-        x:Key="StructuralPlanViewDerivedTemplate" >
+        x:Key="PlanViewDerivedTemplate" >
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -70,7 +70,7 @@
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
                         Margin="5"
-                        ComboBoxSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ComboBoxSource="{Binding DataContext.PlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         FilterList="{Binding ViewFamilyTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
@@ -218,15 +218,15 @@
     </DataTemplate>
 
     <DataTemplate
-        DataType="{x:Type sc:StructuralPlanViewVM}">
+        DataType="{x:Type sc:PlanViewVM}">
         <controls:SheetComponentItemControl
-            DerivedTemplate="{StaticResource StructuralPlanViewDerivedTemplate}" />
+            DerivedTemplate="{StaticResource PlanViewDerivedTemplate}" />
     </DataTemplate>
 
 
-    <!--StructuralCalloutView-->
+    <!--CalloutView-->
     <DataTemplate
-        x:Key="StructuralCalloutViewDerivedTemplate" >
+        x:Key="CalloutViewDerivedTemplate" >
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -274,7 +274,7 @@
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
                         Margin="5"
-                        ComboBoxSource="{Binding DataContext.StructuralPlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ComboBoxSource="{Binding DataContext.PlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         FilterList="{Binding ViewFamilyTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
@@ -422,9 +422,9 @@
     </DataTemplate>
 
     <DataTemplate
-        DataType="{x:Type sc:StructuralCalloutViewVM}">
+        DataType="{x:Type sc:CalloutViewVM}">
         <controls:SheetComponentItemControl
-            DerivedTemplate="{StaticResource StructuralCalloutViewDerivedTemplate}" />
+            DerivedTemplate="{StaticResource CalloutViewDerivedTemplate}" />
     </DataTemplate>
 
     

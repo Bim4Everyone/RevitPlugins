@@ -27,8 +27,8 @@
     <system:String x:Key="ScheduleFilterType.HasValue">Имеет значение</system:String>
     <system:String x:Key="ScheduleFilterType.HasNoValue">Не имеет значение</system:String>
     
-    <system:String x:Key="Type.StructuralPlanViewVM">Вид в плане</system:String>
-    <system:String x:Key="Type.StructuralCalloutViewVM">Фрагмент</system:String>
+    <system:String x:Key="Type.PlanViewVM">Вид в плане</system:String>
+    <system:String x:Key="Type.CalloutViewVM">Фрагмент</system:String>
     <system:String x:Key="Type.SectionViewVM">Сечение</system:String>
     <system:String x:Key="Type.ScheduleViewVM">Спецификация</system:String>
     <system:String x:Key="Type.TextNoteVM">Текст</system:String>
@@ -62,7 +62,7 @@
     <system:String x:Key="MainWindow.SheetCoefficientIsNotCorrect">Значение коэффициента формата листа не корректно</system:String>
     <system:String x:Key="MainWindow.ScheduleFiltersIsNotCorrect">Фильтры спецификации не корректны</system:String>
     <system:String x:Key="MainWindow.CustomParamsIsNotCorrect">Дополнительные параметры не корректны</system:String>
-    <system:String x:Key="MainWindow.HasNotStructuralPlanView">Расположите компонент после вида в плане</system:String>
+    <system:String x:Key="MainWindow.HasNotPlanView">Расположите компонент после вида в плане</system:String>
     
     <system:String x:Key="MainWindow.ErrorInSheetSetParamNames">Исправлены не все имена параметров комплекта</system:String>
     <system:String x:Key="MainWindow.ErrorInSheetSetParamValues">Исправлены не все значения параметров комплекта</system:String>

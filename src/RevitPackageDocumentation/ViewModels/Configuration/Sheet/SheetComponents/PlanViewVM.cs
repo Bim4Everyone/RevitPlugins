@@ -11,7 +11,7 @@ using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Para
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
-internal class StructuralPlanViewVM : SheetComponentVM {
+internal class PlanViewVM : SheetComponentVM {
     private string _viewNameFormula = string.Empty;
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
@@ -31,7 +31,7 @@ internal class StructuralPlanViewVM : SheetComponentVM {
     // Смещение по вертикали в дюймах сверху, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _titleBlockFrameTopOffset = UnitUtilsHelper.ConvertToInternalValue(15);
 
-    public StructuralPlanViewVM(
+    public PlanViewVM(
         RevitRepository repository,
         StringParamSetService stringParamSetService,
         ObservableCollection<PluginParamVM> sheetSetParams,

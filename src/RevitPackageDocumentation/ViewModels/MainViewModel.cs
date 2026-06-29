@@ -128,7 +128,7 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _currentSheetSet, value);
     }
 
-    public List<ViewFamilyType> StructuralPlanViewFamilyTypes {
+    public List<ViewFamilyType> PlanViewFamilyTypes {
         get => _structuralPlanViewFamilyTypes;
         set => RaiseAndSetIfChanged(ref _structuralPlanViewFamilyTypes, value);
     }
@@ -222,9 +222,9 @@ internal class MainViewModel : BaseViewModel {
             .Select(t =>
                 new ComponentTypeItem(t, _localizationService.GetLocalizedString($"Type.{t.Name}") ?? string.Empty))
             .OrderBy(item => item.ComponentType switch {
-                Type t when t == typeof(StructuralPlanViewVM) => 1,
+                Type t when t == typeof(PlanViewVM) => 1,
                 Type t when t == typeof(SectionViewVM) => 2,
-                Type t when t == typeof(StructuralCalloutViewVM) => 3,
+                Type t when t == typeof(CalloutViewVM) => 3,
                 _ => 4
             })
             .ToList();
@@ -238,7 +238,7 @@ internal class MainViewModel : BaseViewModel {
             .ToList();
         SelectedSheetSetParamType = null;
 
-        StructuralPlanViewFamilyTypes = _revitRepository.StructuralPlanViewTypes;
+        PlanViewFamilyTypes = _revitRepository.PlanViewTypes;
         SectionViewFamilyTypes = _revitRepository.SectionViewTypes;
         PlanViewTemplates = _revitRepository.PlanViewTemplates;
         SectionViewTemplates = _revitRepository.SectionViewTemplates;
@@ -363,8 +363,8 @@ internal class MainViewModel : BaseViewModel {
             var name = sheetComponent switch {
                 ScheduleViewVM sv => sv.ViewName,
                 SectionViewVM sv => sv.ViewName,
-                StructuralCalloutViewVM sv => sv.ViewName,
-                StructuralPlanViewVM sv => sv.ViewName,
+                CalloutViewVM sv => sv.ViewName,
+                PlanViewVM sv => sv.ViewName,
                 _ => string.Empty
             };
 

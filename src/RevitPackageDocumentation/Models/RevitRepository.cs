@@ -35,7 +35,7 @@ internal class RevitRepository {
         _messageBoxService = messageBoxService;
         _localizationService = localizationService;
 
-        StructuralPlanViewTypes = GetStructuralPlanViewTypes();
+        PlanViewTypes = GetFloorPlanViewTypes();
         SectionViewTypes = GetSectionViewTypes();
         PlanViewTemplates = GetPlanViewTemplates();
         SectionViewTemplates = GetSectionViewTemplates();
@@ -72,7 +72,7 @@ internal class RevitRepository {
     public Document Document => ActiveUIDocument.Document;
 
 
-    public List<ViewFamilyType> StructuralPlanViewTypes { get; }
+    public List<ViewFamilyType> PlanViewTypes { get; }
     public List<ViewFamilyType> SectionViewTypes { get; }
     public List<ViewPlan> PlanViewTemplates { get; }
     public List<ViewSection> SectionViewTemplates { get; }
@@ -90,6 +90,13 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает список типоразмеров видов в плане в проекте
     /// </summary>
+    private List<ViewFamilyType> GetFloorPlanViewTypes() => new FilteredElementCollector(Document)
+        .OfClass(typeof(ViewFamilyType))
+        .OfType<ViewFamilyType>()
+        .Where(a => ViewFamily.FloorPlan == a.ViewFamily)
+        .OrderBy(a => a.Name)
+        .ToList();
+
     private List<ViewFamilyType> GetStructuralPlanViewTypes() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewFamilyType))
         .OfType<ViewFamilyType>()
