@@ -29,7 +29,7 @@ internal class CommercialRooms : RoomGroup {
     public string PositionType => _firstRoom.GetTextParamValue(_settings.PositionType);
 
     public string DeclarationNumber =>
-        _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber);
+        _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber, _settings.AddHyphenToPrefix);
 
     public override double AreaMain => _isOneRoomGroup ? _firstRoom.Area : base.AreaMain;
 

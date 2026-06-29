@@ -29,6 +29,7 @@ internal class CommercialConfigSettings : DeclarationConfigSettings {
     public string BuildingNumberParam { get; set; }
     public string ConstrWorksNumberParam { get; set; }
     public bool AddPrefixToNumber { get; set; }
+    public bool AddHyphenToPrefix { get; set; }
     public string RoomsHeightParam { get; set; }
     public string ParkingSpaceClass { get; set; }
     public string ParkingInfo { get; set; }
@@ -38,7 +39,7 @@ internal class CommercialConfigSettings : DeclarationConfigSettings {
     public CommercialConfigSettings GetCompanyConfig() {
         return new CommercialConfigSettings() {
             FilterRoomsParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
-            FilterRoomsValues = new[] { "нежилое помещение", "машино-место", "кладовая" },
+            FilterRoomsValues = ["нежилое помещение", "машино-место", "кладовая"],
             GroupingBySectionParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
             GroupingByGroupParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER),
             MultiStoreyParam = SharedParamsConfig.Instance.RoomMultilevelGroup.Name,
@@ -61,6 +62,7 @@ internal class CommercialConfigSettings : DeclarationConfigSettings {
             ProjectNameID = "",
 
             AddPrefixToNumber = true,
+            AddHyphenToPrefix = false,
 
             RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
             RoomNameParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME),

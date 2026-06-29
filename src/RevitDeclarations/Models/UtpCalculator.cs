@@ -133,8 +133,9 @@ internal class UtpCalculator {
     public string CalculateExtraSummerRooms(Apartment apartment) {
         int balconies = apartment.GetRoomsByPrior(_priorities.Balcony).Count;
         int loggies = apartment.GetRoomsByPrior(_priorities.Loggia).Count;
+        int terraces = apartment.GetRoomsByPrior(_priorities.Terrace).Count;
 
-        return balconies + loggies > 1 ? _utpYes : _utpNo;
+        return balconies + loggies + terraces > 1 ? _utpYes : _utpNo;
     }
 
     // УТП Мастер-спальня.

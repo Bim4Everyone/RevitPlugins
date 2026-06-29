@@ -34,6 +34,7 @@ internal abstract class ParametersViewModel : BaseViewModel {
     private Parameter _selectedRoomNameParam;
     private Parameter _selectedRoomNumberParam;
     private bool _addPrefixToNumber;
+    private bool _addHyphenToPrefix;
 
     public ParametersViewModel(RevitRepository revitRepository, MainViewModel mainViewModel) {
         _mainViewModel = mainViewModel;
@@ -146,6 +147,11 @@ internal abstract class ParametersViewModel : BaseViewModel {
     public bool AddPrefixToNumber {
         get => _addPrefixToNumber;
         set => RaiseAndSetIfChanged(ref _addPrefixToNumber, value);
+    }
+    
+    public bool AddHyphenToPrefix {
+        get => _addHyphenToPrefix;
+        set => RaiseAndSetIfChanged(ref _addHyphenToPrefix, value);
     }
 
     /// <summary>

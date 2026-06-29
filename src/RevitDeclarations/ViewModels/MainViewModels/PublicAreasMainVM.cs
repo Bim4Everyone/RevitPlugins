@@ -110,6 +110,7 @@ internal class PublicAreasMainVM : MainViewModel {
         if(settings.AddPrefixToNumber) {
             configSettings.RoomNumberParam = settings.RoomNumberParam?.Definition.Name;
         }
+        configSettings.AddHyphenToPrefix = settings.AddHyphenToPrefix;
 
         config.SaveProjectConfig();
     }
@@ -131,5 +132,6 @@ internal class PublicAreasMainVM : MainViewModel {
     private void SetPublicAreasSettings() {
         var publicAreasParamsVM = (PublicAreasParamsVM) _parametersViewModel;
         _settings.AddPrefixToNumber = publicAreasParamsVM.AddPrefixToNumber;
+        _settings.AddHyphenToPrefix = publicAreasParamsVM.AddHyphenToPrefix && publicAreasParamsVM.AddPrefixToNumber;
     }
 }

@@ -22,7 +22,7 @@ internal class PublicArea : RoomGroup {
     }
 
     public string DeclarationNumber =>
-        _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber);
+        _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber, _settings.AddHyphenToPrefix);
 
     public override string Department => _paramProvider.GetDepartment(_firstRoom, "МОП");
     public override double AreaMain => _isOneRoomGroup ? _firstRoom.Area : base.AreaMain;

@@ -11,4 +11,5 @@ internal class CommercialSettings : DeclarationSettings {
 
     public Parameter GroupNameParam { get; set; }
     public bool AddPrefixToNumber { get; set; }
+    public bool AddHyphenToPrefix { get; set; }
 }
