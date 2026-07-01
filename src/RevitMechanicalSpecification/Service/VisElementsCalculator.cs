@@ -125,16 +125,17 @@ namespace RevitMechanicalSpecification.Service {
             optionalLength = string.IsNullOrEmpty(optionalLength)
                 ? string.Empty
                 : $", L={optionalLength} мм";
+            string fullName = $"{startName} {size}{optionalLength}";
             
             if(string.IsNullOrEmpty(nameAddon) && thikness is null) {
-                return $"{startName} {size}{optionalLength}, УКАЖИТЕ ТОЛЩИНУ ЧЕРЕЗ \"ФОП_ВИС_Дополнение к имени\"";
+                return $"{fullName}, УКАЖИТЕ ТОЛЩИНУ ЧЕРЕЗ \"ФОП_ВИС_Дополнение к имени\"";
             }
 
             if(thikness is null) {
-                return $"{startName} {size}{optionalLength},";
+                return $"{fullName},";
             }
 
-            return $"{startName} {size}{optionalLength}, с толщиной стенки {thikness} мм";
+            return $"{fullName}, с толщиной стенки {thikness} мм";
         }
 
         /// <summary>
