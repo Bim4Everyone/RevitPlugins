@@ -121,15 +121,43 @@ namespace RevitMechanicalSpecification.Service {
                 size = size.Split('-').First();
             }
             
+            string optionalLength = GetTransitionLength(element);
+            optionalLength = string.IsNullOrEmpty(optionalLength)
+                ? string.Empty
+                : $", L={optionalLength} мм";
+            string fullName = $"{startName} {size}{optionalLength}";
+            
             if(string.IsNullOrEmpty(nameAddon) && thikness is null) {
-                return $"{startName} {size}, УКАЖИТЕ ТОЛЩИНУ ЧЕРЕЗ \"ФОП_ВИС_Дополнение к имени\"";
+                return $"{fullName}, УКАЖИТЕ ТОЛЩИНУ ЧЕРЕЗ \"ФОП_ВИС_Дополнение к имени\"";
             }
 
             if(thikness is null) {
-                return $"{startName} {size},";
+                return $"{fullName},";
             }
 
-            return $"{startName} {size}, с толщиной стенки {thikness} мм";
+            return $"{fullName}, с толщиной стенки {thikness} мм";
+        }
+
+        /// <summary>
+        /// Получение длины перехода
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private string GetTransitionLength(Element element) {
+            FamilyInstance instance = element as FamilyInstance;
+            MechanicalFitting fitting = instance?.MEPModel as MechanicalFitting;
+
+            if(fitting == null || fitting.PartType != PartType.Transition) {
+                return string.Empty;
+            }
+
+            List<Connector> connectors = GetConnectors(element);
+            if(connectors.Count != 2) {
+                return string.Empty;
+            }
+
+            double length = connectors[0].Origin.DistanceTo(connectors[1].Origin);
+            return UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(length));
         }
 
         /// <summary>

@@ -31,7 +31,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             if(Config.NullifyOutdatedNumber) {
                 if(specificationElement.Element.IsExistsParam(Config.OutdatedNameNumber)) {
                     Parameter outDateParam = specificationElement.Element.GetParam(Config.OutdatedNameNumber);
-                    if(!outDateParam.IsReadOnly) {
+                    if(!outDateParam.IsReadOnly
+                        && specificationElement.Element.GroupId == ElementId.InvalidElementId) {
                         outDateParam.Set(0);
                     }
                 }
@@ -46,11 +47,21 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         private double GetNumber(SpecificationElement specificationElement) {
             string unit = specificationElement.Element.GetSharedParamValue<string>(Config.TargetNameUnit);
 
+            // Для элементов в семейства которых зашит в формулу расчет по старому параметру треубется возвращаение его значения
+            Parameter outDateParam = specificationElement.Element.GetTypeOrInstanceParam(
+                specificationElement.ElementType, 
+                Config.OutdatedNameNumber);
+            if(!(outDateParam is null)) {
+                if(outDateParam.IsReadOnly) {
+                    return outDateParam.AsDouble();
+                }
+            }
+            
             // Если единица измерения штуки или комплекты - возвращаем 1
             if(unit == Config.SingleUnit || unit == Config.KitUnit) {
                 return 1;
             }
-
+            
             // Если единица измерения метры квадратные - забираем или высчитываем (для фитингов) площадь в дабл и переводим в метры квадратные
             if(unit == Config.SquareUnit) {
                 if(specificationElement.BuiltInCategory == BuiltInCategory.OST_DuctInsulations) {

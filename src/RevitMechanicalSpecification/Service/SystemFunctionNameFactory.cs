@@ -184,8 +184,11 @@ namespace RevitMechanicalSpecification.Service {
 
             List<string> systemNames = GetSystemNames(element);
             if(!string.IsNullOrEmpty(forcedSystemSelector)) {
-                string selectedSystemName = systemNames.FirstOrDefault(systemName =>
-                    systemName.IndexOf(forcedSystemSelector, StringComparison.OrdinalIgnoreCase) >= 0);
+                IEnumerable<string> selectorSystemNames = systemNames.Count > 1
+                    ? systemNames.Skip(1)
+                    : systemNames;
+                string selectedSystemName = selectorSystemNames.FirstOrDefault(systemName =>
+                    systemName.StartsWith(forcedSystemSelector, StringComparison.OrdinalIgnoreCase));
                 VisSystem selectedSystem = GetVisSystemByName(selectedSystemName);
                 if(selectedSystem != null) {
                     return selectedSystem;
@@ -202,10 +205,16 @@ namespace RevitMechanicalSpecification.Service {
                 ? GetInsulationSystem(element as InsulationLiningBase)
                 : GetParamSystemValue(element);
 
-            return systemNames
-                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(item => item.Trim())
-                .Where(item => !string.IsNullOrEmpty(item))
+            if(string.IsNullOrWhiteSpace(systemNames)) {
+                return new List<string>();
+            }
+
+            return new[] { systemNames.Trim() }
+                .Concat(systemNames
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(item => item.Trim())
+                    .Where(item => !string.IsNullOrEmpty(item)))
+                .Distinct()
                 .ToList();
         }
 
