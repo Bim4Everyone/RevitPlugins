@@ -8,7 +8,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -45,13 +44,15 @@ namespace RevitCreateViewSheet.ViewModels {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _allViews = [.. _revitRepository.GetAllViewsForViewPorts()
                 .Select(v => new ViewViewModel(v))
-                .OrderBy(a => a.Name, new LogicalStringComparer())];
+                .OrderBy(a => a.Name, new RevitStringComparer())
+            ];
             _viewsCanBePlacedOnThisSheet = [.. _allViews];
             Views = new CollectionViewSource() { Source = _viewsCanBePlacedOnThisSheet };
             Views.Filter += ViewsFilterHandler;
             ViewPortTypes = [.. _revitRepository.GetViewPortTypes()
                 .Select(v => new ViewPortTypeViewModel(v))
-                .OrderBy(a => a.Name, new LogicalStringComparer())];
+                .OrderBy(a => a.Name, new RevitStringComparer())
+            ];
             ViewTypes = InitializeViewTypes();
             SelectedViewType = ViewTypes.First();
             SelectedViewPortType = ViewPortTypes.FirstOrDefault();
@@ -118,7 +119,7 @@ namespace RevitCreateViewSheet.ViewModels {
                 .ToHashSet();
             var enabledViews = _allViews
                 .Where(v => !disabledViews.Contains(v))
-                .OrderBy(v => v.Name, new LogicalStringComparer());
+                .OrderBy(v => v.Name, new RevitStringComparer());
             _viewsCanBePlacedOnThisSheet.Clear();
             foreach(var view in enabledViews) {
                 _viewsCanBePlacedOnThisSheet.Add(view);
