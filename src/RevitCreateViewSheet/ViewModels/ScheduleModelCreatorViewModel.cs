@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
 
-using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -30,7 +29,7 @@ namespace RevitCreateViewSheet.ViewModels {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
 
             _allSchedules = new ObservableCollection<ViewScheduleViewModel>(GetViewSchedules(_revitRepository)
-                .OrderBy(a => a.Name, new LogicalStringComparer()));
+                .OrderBy(a => a.Name, new RevitStringComparer()));
             ViewSchedules = new CollectionViewSource() { Source = _allSchedules };
             ViewSchedules.Filter += SchedulesFilterHandler;
             AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);

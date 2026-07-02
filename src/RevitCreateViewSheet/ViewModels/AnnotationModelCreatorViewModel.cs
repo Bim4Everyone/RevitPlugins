@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
 
-using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -28,7 +27,8 @@ namespace RevitCreateViewSheet.ViewModels {
             _localizationService = localizationService ?? throw new System.ArgumentNullException(nameof(localizationService));
             _allAnnotations = [.. _revitRepository.GetAllAnnotationSymbols()
                 .Select(a => new AnnotationSymbolTypeViewModel(a))
-                .OrderBy(a => a.RichName, new LogicalStringComparer())];
+                .OrderBy(a => a.RichName, new RevitStringComparer())
+            ];
             AnnotationSymbolTypes = new CollectionViewSource() { Source = _allAnnotations };
             AnnotationSymbolTypes.Filter += AnnotationsFilterHandler;
             AcceptViewCommand = RelayCommand.Create(() => { }, CanAcceptView);

@@ -1,15 +1,15 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 
-using dosymep.Revit.Comparators;
-
+using RevitCreateViewSheet.Models;
 using RevitCreateViewSheet.ViewModels;
 
 namespace RevitCreateViewSheet.Resources {
     public class SheetViewModelComparer : ICustomSorter {
-        private readonly LogicalStringComparer _comparer;
+        private readonly IComparer<string> _comparer;
 
         public SheetViewModelComparer() {
-            _comparer = new LogicalStringComparer();
+            _comparer = new RevitStringComparer();
         }
 
 
