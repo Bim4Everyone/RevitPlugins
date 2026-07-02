@@ -44,4 +44,11 @@ public class BBox(double minX, double minY, double maxX, double maxY) {
 
         return new BBox(minX, minY, maxX, maxY);
     }
+    
+    public static BBox BBoxFromPointXy(XYZ p, double r) {
+        return new BBox(
+            p.X - r, p.Y - r,
+            p.X + r, p.Y + r
+        );
+    }
 }

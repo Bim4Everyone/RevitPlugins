@@ -71,6 +71,18 @@ internal class RevitSettings : ProjectSettings {
 
 public class SystemPluginConfig {
     
+    public readonly double DefaultMaxToleranceToJoinCurvesMm = 15;
+    
+    public readonly double DefaultTolerance = 1e-9;
+
+    public readonly double DefaultCellsCoarseStepMm = 1500;
+    
+    public readonly double DefaultCellsFineStepMm = 10;
+    
+    public readonly double DefaultLengthSegmentMm = 200;
+    
+    public readonly int DefaultCellsMargin = 50;
+    
     public readonly ICollection<BuiltInCategory> AllCategories = [
         BuiltInCategory.OST_Doors,
         BuiltInCategory.OST_Floors,

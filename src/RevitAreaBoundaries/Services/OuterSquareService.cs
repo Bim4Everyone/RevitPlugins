@@ -3,11 +3,16 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using RevitAreaBoundaries.Models;
+
 namespace RevitAreaBoundaries.Services;
 
-public class OuterSquareService {
-    
-    public List<XYZ> BuildOuterSquareVertices(IEnumerable<Curve> curves, double step, int marginCells = 50) {
+public class OuterSquareService(SystemPluginConfig systemPluginConfig) {
+    private readonly double _margin = systemPluginConfig.DefaultCellsMargin;
+    private readonly double _step = UnitUtils.ConvertToInternalUnits(
+        systemPluginConfig.DefaultCellsCoarseStepMm, UnitTypeId.Millimeters);
+
+    public List<XYZ> BuildOuterSquareVertices(IEnumerable<Curve> curves) {
         double minX = double.MaxValue;
         double minY = double.MaxValue;
         double maxX = double.MinValue;
@@ -23,7 +28,7 @@ public class OuterSquareService {
         }
 
         // запас вокруг модели
-        double margin = marginCells * step;
+        double margin = _margin * _step;
 
         minX -= margin;
         minY -= margin;

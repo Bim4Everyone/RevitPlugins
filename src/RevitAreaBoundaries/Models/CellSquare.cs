@@ -20,7 +20,6 @@ public class CellSquare
 }
 
 public enum CellVertexType {
-    Inside,
     Outside,
     Boundary
 }

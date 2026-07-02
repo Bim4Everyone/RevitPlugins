@@ -6,6 +6,8 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitAreaBoundaries.Models;
+using RevitAreaBoundaries.Models.Processors;
+using RevitAreaBoundaries.Settings;
 
 namespace RevitAreaBoundaries.ViewModels;
 
@@ -16,6 +18,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly IBoundaryProcessor _processor;
 
     private string _errorText;
     private string _saveProperty;
@@ -23,11 +26,13 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
+        ILocalizationService localizationService,
+        IBoundaryProcessor processor) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        _processor = processor;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -51,10 +56,13 @@ internal class MainViewModel : BaseViewModel {
     private void AcceptView() {
         SaveConfig();
         
+        var view = _revitRepository.ActiveUiDocument.ActiveView;
+        var boundarySettings = new AreaBoundarySettings { TargetViews = [view] };
+
         const string transactionName = "TransactionName";
         using var t = _revitRepository.Document.StartTransaction(transactionName);
         
-        _revitRepository.Action();
+        _processor.DrawBoundaries(boundarySettings);
         
         t.Commit();
     }

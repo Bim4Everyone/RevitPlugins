@@ -13,6 +13,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitAreaBoundaries.Models;
+using RevitAreaBoundaries.Models.Processors;
 using RevitAreaBoundaries.Services;
 using RevitAreaBoundaries.ViewModels;
 using RevitAreaBoundaries.Views;
@@ -62,18 +63,44 @@ public class RevitAreaBoundariesCommand : BasePluginCommand {
             .InSingletonScope();
         
         // Настройка доступа к 
+        kernel.Bind<CurveDividerService>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к 
         kernel.Bind<ElementSectionService>()
             .ToSelf()
             .InSingletonScope();
         
         // Настройка доступа к 
-        kernel.Bind<CurveService>()
+        kernel.Bind<CellsBoundaryService>()
             .ToSelf()
             .InSingletonScope();
         
         // Настройка доступа к 
-        kernel.Bind<BoundaryFindService>()
+        kernel.Bind<CurveRepairService>()
             .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к 
+        kernel.Bind<DrawBoundaryService>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к 
+        kernel.Bind<CollinearLineMergeService>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к 
+        kernel.Bind<FreeEndsJoinService>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        
+        // Настройка доступа к 
+        kernel.Bind<IBoundaryProcessor>()
+            .To<OutBoundaryProcessor>()
             .InSingletonScope();
 
         // Настройка конфигурации плагина
