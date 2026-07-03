@@ -29,7 +29,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
         SelectAnnotationFamilyCommand = RelayCommand.Create(SelectAnnotationFamily);
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
     public ICommand SelectAnnotationFamilyCommand { get; }

@@ -95,7 +95,7 @@ internal class PlanViewVM : SheetComponentVM {
     }
 
     [Required(ErrorMessage = "Validation.SelectedSelectElemParamIsNull")]
-    //[SelectedElemIsNull(ErrorMessage = "Validation.SelectedSelectElemParamValueIsNull")]
+    [ChildHasErrors(ErrorMessage = "Validation.SelectElemParamSelectedElemIsNull")]
     public SelectElemParamVM SelectedSelectElemParam {
         get => _selectedSelectElemParam;
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);

@@ -26,7 +26,7 @@ internal class TextNoteVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
     public string TextFormula {

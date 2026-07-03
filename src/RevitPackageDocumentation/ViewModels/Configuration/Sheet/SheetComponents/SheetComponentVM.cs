@@ -28,7 +28,7 @@ internal abstract class SheetComponentVM : ModuleVM {
         LocalizationService = localizationService;
 
         ModuleTypeName = LocalizationService.GetLocalizedString($"Type.{this.GetType().Name}");
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
 
         ErrorsChanged += OnErrorsChanged;
     }
@@ -91,7 +91,7 @@ internal abstract class SheetComponentVM : ModuleVM {
         transaction.Commit();
     }
 
-    public override bool Validate() {
+    public override bool CanCreateComponent() {
         return !HasErrors;
     }
 }

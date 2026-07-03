@@ -57,7 +57,7 @@ internal class SheetVM : ModuleVM {
         ValidateAllProperties();
 
         SelectTitleBlockFamilyCommand = RelayCommand.Create(SelectTitleBlockFamily);
-        CreateSheetCommand = RelayCommand.Create(CreateComponent, Validate);
+        CreateSheetCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
 
         AddComponentCommand = RelayCommand.Create<ComponentTypeItem>(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
@@ -171,7 +171,7 @@ internal class SheetVM : ModuleVM {
         transaction.Commit();
     }
 
-    public override bool Validate() {
+    public override bool CanCreateComponent() {
         return !HasErrors;
     }
 

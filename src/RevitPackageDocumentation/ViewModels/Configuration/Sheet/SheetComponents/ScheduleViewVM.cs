@@ -43,7 +43,7 @@ internal class ScheduleViewVM : SheetComponentVM {
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
         ScheduleFilterList = new ScheduleFilterListVM(this, stringParamSetService);
 
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
+        CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
         SelectReferenceSpecCommand = RelayCommand.Create(SelectReferenceSpec);
     }
 

@@ -53,6 +53,6 @@ internal abstract class ModuleVM : BaseParamContainerVM {
     }
 
     public abstract void CreateComponent();
-    public abstract bool Validate();
+    public abstract bool CanCreateComponent();
     public abstract void Process(bool processDependent = false);
 }

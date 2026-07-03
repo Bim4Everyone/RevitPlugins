@@ -1,20 +1,31 @@
+using System.ComponentModel.DataAnnotations;
+
 using Autodesk.Revit.DB;
+
+using dosymep.SimpleServices;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 internal class SelectElemParamVM : PluginParamVM {
     private Element _selectedElem;
 
-    public SelectElemParamVM(SheetSetParametersListVM sheetSetParamsList, string paramName, string paramComment)
-        : base(sheetSetParamsList, paramName, paramComment) {
-        ValidateParamValue();
+    public SelectElemParamVM(
+        SheetSetParametersListVM sheetSetParamsList,
+        string paramName,
+        string paramComment,
+        ILocalizationService localizationService)
+        : base(sheetSetParamsList, paramName, paramComment, localizationService) {
+        //ValidateParamValue();
+
+        ValidateAllProperties();
     }
 
+    [Required]
     public Element SelectedElem {
         get => _selectedElem;
         set => RaiseAndSetIfChanged(ref _selectedElem, value);
     }
 
-    public override void ValidateParamValue() {
-        ErrorInParamValue = SelectedElem is null;
-    }
+    //public override void ValidateParamValue() {
+    //    ErrorInParamValue = SelectedElem is null;
+    //}
 }

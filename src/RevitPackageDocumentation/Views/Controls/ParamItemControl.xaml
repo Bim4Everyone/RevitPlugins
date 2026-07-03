@@ -28,19 +28,7 @@
                 BasedOn="{StaticResource CustomBorder}">
                 <Style.Triggers>
                     <DataTrigger
-                        Binding="{Binding Path=ErrorInParamName}"
-                        Value="True">
-                        <Setter
-                            Property="Background">
-                            <Setter.Value>
-                                <SolidColorBrush
-                                    Color="Orange"
-                                    Opacity="0.5" />
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                    <DataTrigger
-                        Binding="{Binding Path=ErrorInParamValue}"
+                        Binding="{Binding Path=HasErrors}"
                         Value="True">
                         <Setter
                             Property="Background">
@@ -84,7 +72,8 @@
                     x:Name="DisplayTextBlock"
                     Margin="0 0 2 0"
                     VerticalAlignment="Center"
-                    Text="{Binding Path=ParamName}" />
+                    Text="{Binding Path=ParamName}"
+                    Validation.ErrorTemplate="{x:Null}" />
 
                 <!-- Режим редактирования -->
                 <ui:TextBox
@@ -93,6 +82,7 @@
                     Text="{Binding Path=ParamName, UpdateSourceTrigger=PropertyChanged}"
                     LostFocus="EditTextBox_LostFocus"
                     KeyDown="EditTextBox_KeyDown"
+                    Validation.ErrorTemplate="{x:Null}"
                     Visibility="Collapsed">
                     <i:Interaction.Triggers>
                         <i:EventTrigger
@@ -109,7 +99,7 @@
                 Grid.Column="1"
                 Grid.Row="0"
                 Content="{Binding}"
-                ContentTemplate="{Binding DerivedTemplate, ElementName=root}" />
+                ContentTemplate="{Binding DerivedTemplate, ElementName=root}"/>
 
             <ui:Button
                 x:Name="DeleteButton"

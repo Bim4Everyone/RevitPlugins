@@ -18,9 +18,24 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
     private readonly ILocalizationService _localizationService;
 
     protected readonly Dictionary<string, List<string>> _errors = [];
-    private readonly IReadOnlyDictionary<string, PropertyInfo> _propertyCache;
-    private readonly Dictionary<object, PropertyChangedEventHandler> _subscriptions = [];
 
+    private readonly IReadOnlyDictionary<string, PropertyInfo> _propertyCache;
+    private readonly IReadOnlyDictionary<string, PropertyInfo> _trackedChildProperties;
+
+    /// <summary>
+    /// Подписки на PropertyChanged дочерних объектов
+    /// </summary>
+    private readonly Dictionary<object, PropertyChangedEventHandler> _childSubscriptions = [];
+
+    /// <summary>
+    /// Подписки на CollectionChanged коллекций
+    /// </summary>
+    private readonly Dictionary<INotifyCollectionChanged, NotifyCollectionChangedEventHandler> _collectionSubscriptions = [];
+
+    /// <summary>
+    /// Текущее значение отслеживаемого свойства, необходимо для корректной переподписки
+    /// </summary>
+    private readonly Dictionary<string, object> _trackedValues = [];
 
     private bool _hasErrors;
     private string _firstError;
@@ -43,23 +58,21 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
         var props = GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-        // Сохраняем в кэш все свойства с атрибутами, чтобы потом быстрее обрабатывать ошибки
         _propertyCache = props
-            .Where(p => p.CanRead && p.GetCustomAttributes<ValidationAttribute>().Any())
-            .ToDictionary(p => p.Name, p => p);
+            .Where(x => x.CanRead && x.GetCustomAttributes<ValidationAttribute>().Any())
+            .ToDictionary(x => x.Name);
 
-        // Отбираем свойства с атрибутом ChildHasErrorsAttribute и подписываемся на изменения HasErrors
-        foreach(var property in props.Where(
-            x => x.GetCustomAttribute<ChildHasErrorsAttribute>() != null)) {
-            RegisterTrackedCollection(property);
+        _trackedChildProperties = props
+            .Where(x => x.GetCustomAttribute<ChildHasErrorsAttribute>() != null)
+            .ToDictionary(x => x.Name);
+
+        foreach(var property in _trackedChildProperties.Values) {
+            RegisterTrackedProperty(property);
         }
     }
 
-    /// <summary>
-    /// Валидирует все свойства класса, помеченные атрибутами валидации
-    /// </summary>
     public void ValidateAllProperties() {
-        foreach(string propertyName in _propertyCache.Keys) {
+        foreach(var propertyName in _propertyCache.Keys) {
             ValidateProperty(propertyName);
         }
     }
@@ -70,12 +83,29 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
 
         var value = property.GetValue(this);
         var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(this) { MemberName = propertyName };
-
+        var validationContext = new ValidationContext(this) {
+            MemberName = propertyName
+        };
         Validator.TryValidateProperty(value, validationContext, validationResults);
-        var localizedErrors = validationResults.Select(x => Localize(x.ErrorMessage)).ToList();
 
+        var localizedErrors = validationResults.Select(x => Localize(x.ErrorMessage)).ToList();
         UpdateErrors(propertyName, localizedErrors);
+    }
+
+    private void UpdateErrors(string propertyName, IEnumerable<string> errors) {
+        var list = errors.ToList();
+
+        if(list.Any()) {
+            _errors[propertyName] = list;
+        } else {
+            _errors.Remove(propertyName);
+        }
+
+        ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        HasErrors = _errors.Any();
+        FirstError = _errors.Values
+            .FirstOrDefault(x => x.Any())
+            ?.FirstOrDefault() ?? string.Empty;
     }
 
     private string Localize(string key) {
@@ -86,99 +116,74 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
         return string.IsNullOrWhiteSpace(text) ? key : text;
     }
 
-    private void UpdateErrors(string propertyName, IEnumerable<string> newErrors) {
-        var errorsList = newErrors.ToList();
-        var hasErrors = errorsList.Any();
 
-        if(hasErrors) {
-            _errors[propertyName] = errorsList;
-        } else {
-            _errors.Remove(propertyName);
-        }
+    private void RegisterTrackedProperty(PropertyInfo property) {
+        var value = property.GetValue(this);
+        _trackedValues[property.Name] = value;
 
-        OnErrorsChanged(propertyName);
-        UpdateHasErrors();
-        UpdateFirstError();
-    }
+        switch(value) {
+            case INotifyCollectionChanged collection:
+                SubscribeCollection(property.Name, collection);
+                break;
 
-    private void OnErrorsChanged(string propertyName) {
-        ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
-    }
-
-    /// <summary>
-    /// Обновляет флаг наличия ошибки на объекте
-    /// </summary>
-    protected void UpdateHasErrors() {
-        HasErrors = _errors.Any();
-    }
-
-    /// <summary>
-    /// Обновляет значение ошибки на объекте (первой из всех имеющихся)
-    /// </summary>
-    protected void UpdateFirstError() {
-        FirstError = _errors.Values
-            .FirstOrDefault(errors => errors.Any())?
-            .FirstOrDefault() ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Обеспечивает вызов валидации каждый раз при изменении свойства
-    /// </summary>
-    protected override void RaisePropertyChanged(string propertyName) {
-        base.RaisePropertyChanged(propertyName);
-
-        if(!string.IsNullOrEmpty(propertyName)
-            && !propertyName.Equals(nameof(HasErrors), StringComparison.Ordinal)
-            && !propertyName.Equals(nameof(FirstError), StringComparison.Ordinal)) {
-            ValidateProperty(propertyName);
+            case INotifyPropertyChanged notify:
+                SubscribeChild(property.Name, notify);
+                break;
         }
     }
 
-    public IEnumerable GetErrors(string propertyName) {
-        //if(string.IsNullOrEmpty(propertyName)) {
-        //    // Возвращаем все ошибки
-        //    return _errors.Values.SelectMany(x => x).ToList();
-        //}
+    private void ReRegisterTrackedProperty(PropertyInfo property) {
+        if(_trackedValues.TryGetValue(property.Name, out var oldValue)) {
 
-        try {
-            return _errors.TryGetValue(propertyName, out var errors) ? errors : new List<string>();
-        } catch(Exception) {
-            return new List<string>();
+            switch(oldValue) {
+                case INotifyCollectionChanged collection:
+                    UnsubscribeCollection(collection);
+                    break;
+
+                case INotifyPropertyChanged notify:
+                    UnsubscribeChild(notify);
+                    break;
+            }
         }
-
-        //return _errors.TryGetValue(propertyName, out var errors) ? errors : null;
+        RegisterTrackedProperty(property);
+        ValidateProperty(property.Name);
     }
 
-
-    /// <summary>
-    /// Выполняем подписку на HasErrors у элементов коллекции
-    /// </summary>
-    private void RegisterTrackedCollection(PropertyInfo property) {
-        if(property.GetValue(this) is not INotifyCollectionChanged collection)
-            return;
+    private void SubscribeCollection(
+        string propertyName,
+        INotifyCollectionChanged collection) {
 
         foreach(var item in (IEnumerable) collection) {
-            Subscribe(item, property.Name);
+            SubscribeItem(propertyName, item);
         }
 
-        collection.CollectionChanged += (_, e) => {
+        NotifyCollectionChangedEventHandler handler = (_, e) => {
             if(e.NewItems != null) {
                 foreach(var item in e.NewItems) {
-                    Subscribe(item, property.Name);
+                    SubscribeItem(propertyName, item);
                 }
             }
             if(e.OldItems != null) {
                 foreach(var item in e.OldItems) {
-                    Unsubscribe(item);
+                    UnsubscribeChild(item);
                 }
             }
-            ValidateProperty(property.Name);
+            ValidateProperty(propertyName);
         };
+
+        collection.CollectionChanged += handler;
+        _collectionSubscriptions[collection] = handler;
     }
 
-    private void Subscribe(object item, string propertyName) {
-        if(item is not INotifyPropertyChanged notify)
-            return;
+    private void SubscribeItem(string propertyName, object item) {
+        if(item is INotifyPropertyChanged notify) {
+            SubscribeChild(propertyName, notify);
+        }
+    }
+
+    private void SubscribeChild(
+        string propertyName,
+        INotifyPropertyChanged notify) {
 
         PropertyChangedEventHandler handler = (_, e) => {
             if(e.PropertyName == nameof(HasErrors)) {
@@ -186,16 +191,53 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
             }
         };
         notify.PropertyChanged += handler;
-        _subscriptions[item] = handler;
+        _childSubscriptions[notify] = handler;
     }
 
-    private void Unsubscribe(object item) {
+    private void UnsubscribeCollection(INotifyCollectionChanged collection) {
+        if(_collectionSubscriptions.TryGetValue(collection, out var handler)) {
+            collection.CollectionChanged -= handler;
+            _collectionSubscriptions.Remove(collection);
+        }
+
+        foreach(var item in (IEnumerable) collection) {
+            UnsubscribeChild(item);
+        }
+    }
+
+    private void UnsubscribeChild(object item) {
         if(item is not INotifyPropertyChanged notify)
             return;
 
-        if(_subscriptions.TryGetValue(item, out var handler)) {
+        if(_childSubscriptions.TryGetValue(notify, out var handler)) {
             notify.PropertyChanged -= handler;
-            _subscriptions.Remove(item);
+            _childSubscriptions.Remove(notify);
+        }
+    }
+
+
+    protected override void RaisePropertyChanged(string propertyName) {
+        base.RaisePropertyChanged(propertyName);
+
+        if(string.IsNullOrEmpty(propertyName))
+            return;
+
+        if(propertyName != nameof(HasErrors) && propertyName != nameof(FirstError)) {
+            ValidateProperty(propertyName);
+        }
+
+        if(_trackedChildProperties.TryGetValue(propertyName, out var property)) {
+            ReRegisterTrackedProperty(property);
+        }
+    }
+
+    public IEnumerable GetErrors(string propertyName) {
+        try {
+            return _errors.TryGetValue(propertyName, out var errors)
+                ? errors
+                : Enumerable.Empty<string>();
+        } catch {
+            return Enumerable.Empty<string>();
         }
     }
 }

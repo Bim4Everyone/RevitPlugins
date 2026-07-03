@@ -90,13 +90,16 @@
     <system:String x:Key="Validation.TitleBlockTypeIsNull">Не выбран тип рамки листа</system:String>
     <system:String x:Key="Validation.ErrorInSheetComponents">Исправлены не все ошибки в компонентах листа</system:String>
 
-    <system:String x:Key="Validation.ViewNameIsEmpty">Имя вида не заполнено </system:String>
+    <system:String x:Key="Validation.ViewNameIsEmpty">Имя вида не заполнено</system:String>
     <system:String x:Key="Validation.ViewNameIsNotCorrect">Имя вида заполнено некорректно</system:String>
     <system:String x:Key="Validation.ViewFamilyTypeIsNull">Не выбран тип вида</system:String>
     <system:String x:Key="Validation.ViewportTypeIsNull">Не выбран тип видового экрана</system:String>
     <system:String x:Key="Validation.ViewTemplateIsNull">Не выбран шаблон вида</system:String>
     <system:String x:Key="Validation.ViewCountIsNotCorrect">Число задано некорректно</system:String>
+    
     <system:String x:Key="Validation.SelectedSelectElemParamIsNull">Не выбран параметр привязки к объекту</system:String>
-    <system:String x:Key="Validation.SelectedSelectElemParamValueIsNull">В параметре привязки к объекту не выбран элемент</system:String>
+    <system:String x:Key="Validation.ParamNameIsEmpty">Имя параметра не заполнено</system:String>
+    <system:String x:Key="Validation.SelectElemParamSelectedElemIsNull">Не выбран элемент в параметре привязки к объекту</system:String>
+    <system:String x:Key="Validation.ErrorInSheetSetParams">Исправлены не все ошибки в параметрах комплекта</system:String>
 
 </ResourceDictionary>

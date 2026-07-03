@@ -1,11 +1,19 @@
+using dosymep.SimpleServices;
+
 namespace RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 internal class StringParamVM : PluginParamVM {
     private string _stringValue;
 
-    public StringParamVM(SheetSetParametersListVM sheetSetParamsList, string paramName, string paramComment, string stringValue)
-        : base(sheetSetParamsList, paramName, paramComment) {
+    public StringParamVM(
+        SheetSetParametersListVM sheetSetParamsList,
+        string paramName,
+        string paramComment,
+        string stringValue,
+        ILocalizationService localizationService)
+        : base(sheetSetParamsList, paramName, paramComment, localizationService) {
         StringValue = stringValue ?? string.Empty;
-        ValidateParamValue();
+        //ValidateParamValue();
+        ValidateAllProperties();
     }
 
     public string StringValue {
@@ -13,7 +21,7 @@ internal class StringParamVM : PluginParamVM {
         set => RaiseAndSetIfChanged(ref _stringValue, value);
     }
 
-    public override void ValidateParamValue() {
-        ErrorInParamValue = string.IsNullOrEmpty(StringValue);
-    }
+    //public override void ValidateParamValue() {
+    //    ErrorInParamValue = string.IsNullOrEmpty(StringValue);
+    //}
 }
