@@ -24,7 +24,7 @@ internal class FilterDataProvider {
     }
 
     public DataProvider CreateDataProvider() {
-        return new DataProvider(GetCategories(), GetParams, GetDocuments());
+        return new DataProvider(GetCategories(), GetParams, GetParamValues);
     }
 
     private ICollection<RevitParam> GetParams(ICollection<Category> categories) {
@@ -41,10 +41,6 @@ internal class FilterDataProvider {
             .Where(category => category != null)
             .Where(c => c.CategoryType == CategoryType.Model && c.IsVisibleInUI)
             .ToArray();
-    }
-
-    private ICollection<Document> GetDocuments() {
-        return _revitRepository.GetDocuments().Select(d => d.Document).ToArray();
     }
 
     private RevitParam GetFilterableParam(ElementId paramId) {
@@ -69,6 +65,38 @@ internal class FilterDataProvider {
             return null;
         } catch(Exception) {
             return null;
+        }
+    }
+
+    private ICollection<string> GetParamValues(ICollection<Category> categories, RevitParam param) {
+        return _revitRepository.GetDocuments()
+            .SelectMany(d => GetParamValues(d.Document, categories, param))
+            .Distinct()
+            .ToArray();
+    }
+
+    private ICollection<string> GetParamValues(
+        Document doc,
+        ICollection<Category> categories,
+        RevitParam param) {
+        try {
+            if(param is SystemParam {
+                   SystemParamId: BuiltInParameter.ELEM_PARTITION_PARAM
+               }) {
+                return new FilteredWorksetCollector(doc)
+                    .OfKind(WorksetKind.UserWorkset)
+                    .Select(w => w.Name)
+                    .ToArray();
+            }
+
+            return new FilteredElementCollector(doc)
+                .WhereElementIsNotElementType()
+                .WherePasses(new ElementMulticategoryFilter(categories.Select(c => c.GetBuiltInCategory()).ToArray()))
+                .Where(e => e.IsExistsParamValue(param.Name))
+                .Select(e => e.GetParamValueString(param))
+                .ToArray();
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+            return [];
         }
     }
 }
