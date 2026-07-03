@@ -91,7 +91,8 @@ internal class MainViewModel : BaseViewModel {
         var paramsForMark = _paramProvider.GetParamsForMarks().ToList();
 
         _documentsPageViewModel = new DocumentsPageViewModel(_revitRepository, _localizationService);
-        var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilterAndSort);
+        var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilterAndSort)
+            .CreateDataProvider();
         _filterPageViewModel = new FilterPageViewModel(_filterFactory, dataProvider, _localizationService);
         _sortPageViewModel = new SortPageViewModel(paramsForFilterAndSort);
         _markSettingsPageViewModel = new MarkSettingsPageViewModel(paramsForMark);
@@ -292,7 +293,8 @@ internal class MainViewModel : BaseViewModel {
             }
 
             if(_filterParser.TryParse(settings.FilterSettings, out var filter)) {
-                var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilter);
+                var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilter)
+                    .CreateDataProvider();
                 _filterPageViewModel = new FilterPageViewModel(_filterFactory, dataProvider, filter, _localizationService);
             }
 

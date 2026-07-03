@@ -9,7 +9,7 @@ using dosymep.Bim4Everyone;
 
 namespace RevitMarkAllDocuments.Models;
 
-internal class FilterDataProvider : IDataProvider {
+internal class FilterDataProvider {
     private readonly Document _document;
     private readonly IList<FilterableParam> _parameters;
     private readonly Category _category;
@@ -20,17 +20,21 @@ internal class FilterDataProvider : IDataProvider {
         _parameters = parameters;
     }
 
-    public ICollection<RevitParam> GetParams(ICollection<Category> categories) {
+    public DataProvider CreateDataProvider() {
+        return new DataProvider(GetCategories(), GetParams, GetDocuments());
+    }
+
+    private ICollection<RevitParam> GetParams(ICollection<Category> categories) {
         return _parameters
             .Select(x => x.RevitParam)
             .ToList();
     }
 
-    public ICollection<Category> GetCategories() {
+    private ICollection<Category> GetCategories() {
         return [_category];
     }
 
-    public ICollection<Document> GetDocuments() {
+    private ICollection<Document> GetDocuments() {
         return [_document];
     }
 }
