@@ -39,7 +39,7 @@
     <system:String x:Key="Type.SelectElemParamVM">Выбор элемента</system:String>
     
     <system:String x:Key="MainWindow.ViewNameIsEmpty">Не заполнено имя вида</system:String>
-    <system:String x:Key="MainWindow.SheetNameIsEmpty">Не заполнено имя листа</system:String>
+    <!--<system:String x:Key="MainWindow.SheetNameIsEmpty">Не заполнено имя листа</system:String>-->
     <system:String x:Key="MainWindow.ReferenceViewNameIsEmpty">Не заполнено имя эталонной спецификации</system:String>
     <system:String x:Key="MainWindow.TextIsEmpty">Не заполнено текст</system:String>
     <system:String x:Key="MainWindow.TextWidthIsNotCorrect">Ширина текста не корректна</system:String>
@@ -77,4 +77,20 @@
     <system:String x:Key="MainWindow.ErrorsNotFound">Ошибки не найдены</system:String>
 
     <system:String x:Key="MainWindow.Edit">Изменить</system:String>
+    
+    
+    
+    <system:String x:Key="Validation.SheetNameIsEmpty">Имя листа не заполнено</system:String>
+    <system:String x:Key="Validation.SheetNameIsNotCorrect">Имя листа заполнено некорректно</system:String>
+    <system:String x:Key="Validation.SheetSizeIsEmpty">Значение номера формата листа не заполнено</system:String>
+    <system:String x:Key="Validation.SheetSizeIsNotCorrect">Значение номера формата листа некорректно</system:String>
+    <system:String x:Key="Validation.SheetCoefficientIsEmpty">Значение коэффициента формата листа не заполнено</system:String>
+    <system:String x:Key="Validation.SheetCoefficientIsNotCorrect">Значение коэффициента формата листа некорректно</system:String>
+    <system:String x:Key="Validation.TitleBlockFamilyIsNull">Не выбрано семейство рамки листа</system:String>
+    <system:String x:Key="Validation.TitleBlockTypeIsNull">Не выбран тип рамки листа</system:String>
+    <system:String x:Key="Validation.ErrorInSheetComponents">Исправлены не все ошибки в компонентах листа</system:String>
+
+    <system:String x:Key="Validation.ViewNameIsEmpty">Имя вида не заполнено </system:String>
+    <system:String x:Key="Validation.ViewNameIsNotCorrect">Имя вида заполнено некорректно</system:String>
+
 </ResourceDictionary>

@@ -36,7 +36,9 @@
         <ui:TextBox
             Grid.Column="0"
             Margin="5"
-            Text="{Binding Path=ModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            Text="{Binding 
+                Path=ModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True}"
             VerticalContentAlignment="Center"
             HorizontalAlignment="Stretch" />
 
@@ -49,7 +51,7 @@
             Foreground="Orange"
             VerticalAlignment="Center"
             HorizontalAlignment="Right"
-            Visibility="{Binding Path=HasErrors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, 
+            Visibility="{Binding Path=HasErrors, UpdateSourceTrigger=PropertyChanged, 
                 Converter={StaticResource BoolToVisibilityConverter}}"/>
 
         <CheckBox

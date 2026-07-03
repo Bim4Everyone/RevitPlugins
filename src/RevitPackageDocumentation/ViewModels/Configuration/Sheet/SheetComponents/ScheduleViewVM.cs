@@ -90,39 +90,39 @@ internal class ScheduleViewVM : SheetComponentVM {
     }
 
 
-    public override bool Validate() {
-        if(ReferenceSpec is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ReferenceViewNameIsEmpty");
-            return false;
-        }
-        if(string.IsNullOrEmpty(ViewNameFormula)) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
-            return false;
-        }
-        if(!int.TryParse(ViewColumn, out int viewColumnAsInt) || viewColumnAsInt < 1) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewColumnIsNotCorrect");
-            return false;
-        }
-        if(!int.TryParse(ViewCount, out int viewCountAsInt) || viewCountAsInt < 1) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
-            return false;
-        }
-        foreach(var rule in ScheduleFilterList.ScheduleFilterRules) {
-            if(rule.SelectedSpecField is null || rule.SelectedFilterType is null) {
-                ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ScheduleFiltersIsNotCorrect");
-                return false;
-            }
-        }
-        foreach(var param in CustomParamsList.Params) {
-            if(string.IsNullOrEmpty(param.ParamName)) {
-                ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
-                return false;
-            }
-        }
+    //public override bool Validate() {
+    //    //if(ReferenceSpec is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ReferenceViewNameIsEmpty");
+    //    //    return false;
+    //    //}
+    //    //if(string.IsNullOrEmpty(ViewNameFormula)) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
+    //    //    return false;
+    //    //}
+    //    //if(!int.TryParse(ViewColumn, out int viewColumnAsInt) || viewColumnAsInt < 1) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewColumnIsNotCorrect");
+    //    //    return false;
+    //    //}
+    //    //if(!int.TryParse(ViewCount, out int viewCountAsInt) || viewCountAsInt < 1) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
+    //    //    return false;
+    //    //}
+    //    //foreach(var rule in ScheduleFilterList.ScheduleFilterRules) {
+    //    //    if(rule.SelectedSpecField is null || rule.SelectedFilterType is null) {
+    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ScheduleFiltersIsNotCorrect");
+    //    //        return false;
+    //    //    }
+    //    //}
+    //    //foreach(var param in CustomParamsList.Params) {
+    //    //    if(string.IsNullOrEmpty(param.ParamName)) {
+    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
+    //    //        return false;
+    //    //    }
+    //    //}
 
-        ModuleErrors = string.Empty;
-        return true;
-    }
+    //    //ModuleErrors = string.Empty;
+    //    return true;
+    //}
 
     private void SelectReferenceSpec() {
         ScheduleFilterList.SetSchedule(ReferenceSpec);

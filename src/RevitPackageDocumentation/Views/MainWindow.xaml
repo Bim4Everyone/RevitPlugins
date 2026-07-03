@@ -29,6 +29,8 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
                 <ResourceDictionary
+                    Source="ErrorCustomStyles.xaml" />
+                <ResourceDictionary
                     Source="CustomDataTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <SolidColorBrush
@@ -266,10 +268,12 @@
                         Grid.Column="1"
                         Grid.ColumnSpan="3"
                         Margin="5"
-                        PropFormula="{Binding Path=CurrentSheetSet.SelectedSheet.SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PropFormula="{Binding 
+                            Path=CurrentSheetSet.SelectedSheet.SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                            ValidatesOnNotifyDataErrors=True}"
                         PropResult="{Binding Path=CurrentSheetSet.SelectedSheet.SheetName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         UpdateCommand="{Binding CurrentSheetSet.SelectedSheet.PropUpdateByFormulaCommand}"
-                        TextBoxStyle="{StaticResource TextBoxBySelectedSheet}"/>
+                        TextBoxStyle="{StaticResource ErrorFormulaTextBoxStyle}"/>
 
                     <!--<ui:TextBlock
                         Grid.Column="3"
@@ -311,7 +315,7 @@
                                     <ComboBox
                                         Grid.Column="1"
                                         Margin="5"
-                                        Style="{StaticResource ComboBoxBySelectedSheet}"
+                                        Style="{StaticResource ErrorComboBoxStyle}"
                                         ItemsSource="{Binding Path=TitleBlockFamilies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                         DisplayMemberPath="Name"
                                         SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
@@ -340,7 +344,7 @@
                                     <ComboBox
                                         Grid.Column="1"
                                         Margin="5"
-                                        Style="{StaticResource ComboBoxBySelectedSheet}"
+                                        Style="{StaticResource ErrorComboBoxStyle}"
                                         ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                         DisplayMemberPath="Name"
                                         SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -373,8 +377,10 @@
                                         Grid.Column="2"
                                         Margin="5"
                                         MinWidth="50"
-                                        Style="{StaticResource TextBoxBySelectedSheet}"
-                                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                        Style="{StaticResource ErrorTextBoxStyle}"
+                                        Text="{Binding 
+                                            Path=CurrentSheetSet.SelectedSheet.SheetSize, UpdateSourceTrigger=PropertyChanged, 
+                                            Mode=TwoWay, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True}" />
 
                                     <ui:TextBlock
                                         Grid.Column="3"
@@ -386,8 +392,10 @@
                                         Grid.Column="4"
                                         Margin="5"
                                         MinWidth="50"
-                                        Style="{StaticResource TextBoxBySelectedSheet}"
-                                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.SheetCoefficient, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                        Style="{StaticResource ErrorTextBoxStyle}"
+                                        Text="{Binding 
+                                            Path=CurrentSheetSet.SelectedSheet.SheetCoefficient, UpdateSourceTrigger=PropertyChanged, 
+                                            Mode=TwoWay, ValidatesOnNotifyDataErrors=True}" />
                                 </Grid>
                             </UniformGrid>
 
@@ -447,10 +455,12 @@
                         Foreground="Orange"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleErrors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        Text="{Binding 
+                            Path=CurrentSheetSet.SelectedSheet.FirstError, 
+                            UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         PlaceholderText="{me:LocalizationSource MainWindow.ErrorsNotFound}"
                         IsEnabled="False"
-                        Tag="{Binding Path=CurrentSheetSet.SelectedSheet.ModuleErrors}"
+                        Tag="{Binding Path=CurrentSheetSet.SelectedSheet.FirstError}"
                         Style="{StaticResource TextBoxForError}" />
                 </Grid>
             </Border>

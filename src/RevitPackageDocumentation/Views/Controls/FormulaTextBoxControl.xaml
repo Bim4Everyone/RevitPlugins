@@ -14,7 +14,9 @@
     x:Name="root"
     
     d:DesignHeight="100"
-    d:DesignWidth="400">
+    d:DesignWidth="400"
+    
+    Validation.ErrorTemplate="{x:Null}">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -37,7 +39,9 @@
             AcceptsReturn="{Binding Path=AcceptsReturn, ElementName=root}"
             TextWrapping="WrapWithOverflow"
             Style="{Binding Path=TextBoxStyle, ElementName=root, TargetNullValue={StaticResource {x:Type ui:TextBox}}}"
-            Text="{Binding Path=PropFormula, ElementName=root, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            Text="{Binding 
+                Path=PropFormula, ElementName=root, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                ValidatesOnNotifyDataErrors=True}" />
 
         <ui:TextBlock
             x:Name="ResultTextBlock"

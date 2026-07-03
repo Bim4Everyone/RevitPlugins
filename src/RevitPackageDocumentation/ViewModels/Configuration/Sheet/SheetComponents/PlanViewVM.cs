@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 using Autodesk.Revit.DB;
 
@@ -38,8 +39,11 @@ internal class PlanViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
+        ValidateAllProperties();
     }
 
+    [Required(ErrorMessage = "Validation.ViewNameIsEmpty")]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\];~]+$", ErrorMessage = "Validation.ViewNameIsNotCorrect")]
     public string ViewNameFormula {
         get => _viewNameFormula;
         set => RaiseAndSetIfChanged(ref _viewNameFormula, value);
@@ -95,45 +99,45 @@ internal class PlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewInstance, value);
     }
 
-    public override bool Validate() {
-        if(string.IsNullOrEmpty(ViewNameFormula)) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
-            return false;
-        }
-        if(ViewFamilyType is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewFamilyTypeIsNull");
-            return false;
-        }
-        if(ViewportType is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
-            return false;
-        }
-        if(ViewTemplate is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewTemplateIsNull");
-            return false;
-        }
-        if(!double.TryParse(ViewCount, out double viewCountAsDouble) || viewCountAsDouble < 1) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
-            return false;
-        }
-        if(SelectedSelectElemParam is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
-            return false;
-        }
-        if(SelectedSelectElemParam.SelectedElem is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamValueIsNull");
-            return false;
-        }
-        foreach(var param in CustomParamsList.Params) {
-            if(string.IsNullOrEmpty(param.ParamName)) {
-                ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
-                return false;
-            }
-        }
+    //public override bool Validate() {
+    //    //if(string.IsNullOrEmpty(ViewNameFormula)) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
+    //    //    return false;
+    //    //}
+    //    //if(ViewFamilyType is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewFamilyTypeIsNull");
+    //    //    return false;
+    //    //}
+    //    //if(ViewportType is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
+    //    //    return false;
+    //    //}
+    //    //if(ViewTemplate is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewTemplateIsNull");
+    //    //    return false;
+    //    //}
+    //    //if(!double.TryParse(ViewCount, out double viewCountAsDouble) || viewCountAsDouble < 1) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
+    //    //    return false;
+    //    //}
+    //    //if(SelectedSelectElemParam is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
+    //    //    return false;
+    //    //}
+    //    //if(SelectedSelectElemParam.SelectedElem is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamValueIsNull");
+    //    //    return false;
+    //    //}
+    //    //foreach(var param in CustomParamsList.Params) {
+    //    //    if(string.IsNullOrEmpty(param.ParamName)) {
+    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
+    //    //        return false;
+    //    //    }
+    //    //}
 
-        ModuleErrors = string.Empty;
-        return true;
-    }
+    //    //ModuleErrors = string.Empty;
+    //    return true;
+    //}
 
     public override void Process(bool processDependent = false) {
         ViewInstance = Create();

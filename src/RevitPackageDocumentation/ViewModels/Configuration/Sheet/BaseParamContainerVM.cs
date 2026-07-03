@@ -5,24 +5,28 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
-using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
+using RevitPackageDocumentation.ViewModels.Validation;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
-internal abstract class BaseParamContainerVM : BaseViewModel {
+internal abstract class BaseParamContainerVM : ValidatableVM {
     private CustomParametersListVM _customParamsList;
     private readonly StringParamSetService _strParamSetService;
 
     protected BaseParamContainerVM(
         RevitRepository repository,
         StringParamSetService stringParamSetService,
-        ObservableCollection<PluginParamVM> sheetSetParams) {
+        ObservableCollection<PluginParamVM> sheetSetParams,
+        ILocalizationService localizationService)
+        : base(localizationService) {
+
         Repository = repository;
         _strParamSetService = stringParamSetService;
         SheetSetParams = sheetSetParams;

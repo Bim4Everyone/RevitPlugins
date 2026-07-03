@@ -71,25 +71,25 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             ?.ToList();
     }
 
-    public override bool Validate() {
-        if(AnnotationFamily is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.AnnotationFamilyIsNull");
-            return false;
-        }
-        if(AnnotationType is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.AnnotationTypeIsNull");
-            return false;
-        }
-        foreach(var param in CustomParamsList.Params) {
-            if(string.IsNullOrEmpty(param.ParamName)) {
-                ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
-                return false;
-            }
-        }
+    //public override bool Validate() {
+    //    //if(AnnotationFamily is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.AnnotationFamilyIsNull");
+    //    //    return false;
+    //    //}
+    //    //if(AnnotationType is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.AnnotationTypeIsNull");
+    //    //    return false;
+    //    //}
+    //    //foreach(var param in CustomParamsList.Params) {
+    //    //    if(string.IsNullOrEmpty(param.ParamName)) {
+    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
+    //    //        return false;
+    //    //    }
+    //    //}
 
-        ModuleErrors = string.Empty;
-        return true;
-    }
+    //    //ModuleErrors = string.Empty;
+    //    return true;
+    //}
 
     public override void Process(bool processDependent = false) {
         var instance = Place();

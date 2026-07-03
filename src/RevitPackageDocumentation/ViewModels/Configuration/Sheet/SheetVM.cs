@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Windows.Input;
 
@@ -14,6 +15,7 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 internal class SheetVM : ModuleVM {
@@ -43,13 +45,16 @@ internal class SheetVM : ModuleVM {
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService,
         ISheetSetVMFactory sheetSetVMFactory,
-        ISheetSetDataFactory sheetSetDataFactory) : base(repository, stringParamSetService, sheetSetParams) {
+        ISheetSetDataFactory sheetSetDataFactory)
+        : base(repository, stringParamSetService, sheetSetParams, localizationService) {
 
         SheetSet = sheetSetVM;
         _localizationService = localizationService;
         _messageBoxService = messageBoxService;
         _sheetSetVMFactory = sheetSetVMFactory;
         _sheetSetDataFactory = sheetSetDataFactory;
+
+        ValidateAllProperties();
 
         SelectTitleBlockFamilyCommand = RelayCommand.Create(SelectTitleBlockFamily);
         CreateSheetCommand = RelayCommand.Create(CreateComponent, Validate);
@@ -69,6 +74,8 @@ internal class SheetVM : ModuleVM {
         set => RaiseAndSetIfChanged(ref _sheetSet, value);
     }
 
+    [Required(ErrorMessage = "Validation.SheetNameIsEmpty")]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\];~]+$", ErrorMessage = "Validation.SheetNameIsNotCorrect")]
     public string SheetNameFormula {
         get => _sheetNameFormula;
         set => RaiseAndSetIfChanged(ref _sheetNameFormula, value);
@@ -79,32 +86,38 @@ internal class SheetVM : ModuleVM {
         set => RaiseAndSetIfChanged(ref _sheetName, value);
     }
 
+    [Required(ErrorMessage = "Validation.SheetSizeIsEmpty")]
+    [RegularExpression(@"^-?\d+$", ErrorMessage = "Validation.SheetSizeIsNotCorrect")]
     public string SheetSize {
         get => _sheetSize;
         set => RaiseAndSetIfChanged(ref _sheetSize, value);
     }
 
+    [Required(ErrorMessage = "Validation.SheetCoefficientIsEmpty")]
+    [RegularExpression(@"^-?\d+$", ErrorMessage = "Validation.SheetCoefficientIsNotCorrect")]
     public string SheetCoefficient {
         get => _sheetCoefficient;
         set => RaiseAndSetIfChanged(ref _sheetCoefficient, value);
     }
-
 
     public List<FamilySymbol> TitleBlockTypes {
         get => _titleBlockTypes;
         set => RaiseAndSetIfChanged(ref _titleBlockTypes, value);
     }
 
+    [Required(ErrorMessage = "Validation.TitleBlockFamilyIsNull")]
     public Family TitleBlockFamily {
         get => _titleBlockFamily;
         set => RaiseAndSetIfChanged(ref _titleBlockFamily, value);
     }
 
+    [Required(ErrorMessage = "Validation.TitleBlockTypeIsNull")]
     public FamilySymbol TitleBlockType {
         get => _titleBlockType;
         set => RaiseAndSetIfChanged(ref _titleBlockType, value);
     }
 
+    [ChildHasErrors(ErrorMessage = "Validation.ErrorInSheetComponents")]
     public ObservableCollection<SheetComponentVM> SheetComponents {
         get => _sheetComponents;
         set => RaiseAndSetIfChanged(ref _sheetComponents, value);
@@ -159,40 +172,7 @@ internal class SheetVM : ModuleVM {
     }
 
     public override bool Validate() {
-        if(string.IsNullOrEmpty(SheetNameFormula)) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.SheetNameIsEmpty");
-            HasErrors = true;
-            return false;
-        }
-        if(!double.TryParse(SheetSize, out double sheetSizeAsDouble) || sheetSizeAsDouble < 1) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.SheetSizeIsNotCorrect");
-            HasErrors = true;
-            return false;
-        }
-        if(!double.TryParse(SheetCoefficient, out double sheetCoefficientAsDouble) || sheetCoefficientAsDouble < 1) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.SheetCoefficientIsNotCorrect");
-            HasErrors = true;
-            return false;
-        }
-        if(TitleBlockFamily is null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.TitleBlockFamilyIsNull");
-            HasErrors = true;
-            return false;
-        }
-        if(TitleBlockType is null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.TitleBlockTypeIsNull");
-            HasErrors = true;
-            return false;
-        }
-        if(SheetComponents.FirstOrDefault(c => c.ModuleErrors != string.Empty) != null) {
-            ModuleErrors = _localizationService.GetLocalizedString("MainWindow.ErrorInSheetComponents");
-            HasErrors = true;
-            return false;
-        }
-
-        HasErrors = false;
-        ModuleErrors = string.Empty;
-        return true;
+        return !HasErrors;
     }
 
     public override void Process(bool processDependent) {

@@ -100,45 +100,45 @@ internal class SectionViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
 
-    public override bool Validate() {
-        if(string.IsNullOrEmpty(ViewNameFormula)) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
-            return false;
-        }
-        if(ViewFamilyType is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewFamilyTypeIsNull");
-            return false;
-        }
-        if(ViewportType is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
-            return false;
-        }
-        if(ViewTemplate is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewTemplateIsNull");
-            return false;
-        }
-        if(!int.TryParse(ViewCount, out int viewCountAsInt) || viewCountAsInt < 1) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
-            return false;
-        }
-        if(SelectedSelectElemParam is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
-            return false;
-        }
-        if(SelectedSelectElemParam.SelectedElem is null) {
-            ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamValueIsNull");
-            return false;
-        }
-        foreach(var param in CustomParamsList.Params) {
-            if(string.IsNullOrEmpty(param.ParamName)) {
-                ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
-                return false;
-            }
-        }
+    //public override bool Validate() {
+    //    //if(string.IsNullOrEmpty(ViewNameFormula)) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
+    //    //    return false;
+    //    //}
+    //    //if(ViewFamilyType is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewFamilyTypeIsNull");
+    //    //    return false;
+    //    //}
+    //    //if(ViewportType is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
+    //    //    return false;
+    //    //}
+    //    //if(ViewTemplate is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewTemplateIsNull");
+    //    //    return false;
+    //    //}
+    //    //if(!int.TryParse(ViewCount, out int viewCountAsInt) || viewCountAsInt < 1) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
+    //    //    return false;
+    //    //}
+    //    //if(SelectedSelectElemParam is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
+    //    //    return false;
+    //    //}
+    //    //if(SelectedSelectElemParam.SelectedElem is null) {
+    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamValueIsNull");
+    //    //    return false;
+    //    //}
+    //    //foreach(var param in CustomParamsList.Params) {
+    //    //    if(string.IsNullOrEmpty(param.ParamName)) {
+    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
+    //    //        return false;
+    //    //    }
+    //    //}
 
-        ModuleErrors = string.Empty;
-        return true;
-    }
+    //    //ModuleErrors = string.Empty;
+    //    return true;
+    //}
 
     public override void Process(bool processDependent = false) {
         int.TryParse(ViewCount, out int viewCountAsInt);

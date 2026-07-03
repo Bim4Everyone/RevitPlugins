@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -21,12 +22,15 @@ internal abstract class SheetComponentVM : ModuleVM {
         StringParamSetService stringParamSetService,
         ObservableCollection<PluginParamVM> sheetSetParams,
         SheetVM sheetVM,
-        ILocalizationService localizationService) : base(repository, stringParamSetService, sheetSetParams) {
+        ILocalizationService localizationService)
+        : base(repository, stringParamSetService, sheetSetParams, localizationService) {
         _sheet = sheetVM;
         LocalizationService = localizationService;
 
         ModuleTypeName = LocalizationService.GetLocalizedString($"Type.{this.GetType().Name}");
         CreateComponentCommand = RelayCommand.Create(CreateComponent, Validate);
+
+        ErrorsChanged += OnErrorsChanged;
     }
 
     public ICommand CreateComponentCommand { get; set; }
@@ -34,6 +38,11 @@ internal abstract class SheetComponentVM : ModuleVM {
     protected ILocalizationService LocalizationService { get; }
 
     public SheetVM Sheet => _sheet;
+
+    private void OnErrorsChanged(object sender, DataErrorsChangedEventArgs e) {
+        // Обновляем состояние команды через CommandManager
+        CommandManager.InvalidateRequerySuggested();
+    }
 
     /// <summary>
     /// Получает следующий номер видового экрана на листе
@@ -80,5 +89,9 @@ internal abstract class SheetComponentVM : ModuleVM {
         }
         Process();
         transaction.Commit();
+    }
+
+    public override bool Validate() {
+        return !HasErrors;
     }
 }

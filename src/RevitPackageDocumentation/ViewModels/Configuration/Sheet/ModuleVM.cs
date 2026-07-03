@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
 
+using dosymep.SimpleServices;
+
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
@@ -11,12 +13,13 @@ internal abstract class ModuleVM : BaseParamContainerVM {
     private string _moduleCode = string.Empty;
     private string _moduleTypeName = string.Empty;
     private string _moduleErrors = string.Empty;
-    private bool _hasErrors = false;
 
     protected ModuleVM(
         RevitRepository repository,
         StringParamSetService stringParamSetService,
-        ObservableCollection<PluginParamVM> sheetSetParams) : base(repository, stringParamSetService, sheetSetParams) {
+        ObservableCollection<PluginParamVM> sheetSetParams,
+        ILocalizationService localizationService)
+        : base(repository, stringParamSetService, sheetSetParams, localizationService) {
     }
 
     public bool IsModuleCheck {
@@ -47,11 +50,6 @@ internal abstract class ModuleVM : BaseParamContainerVM {
     public string ModuleErrors {
         get => _moduleErrors;
         set => RaiseAndSetIfChanged(ref _moduleErrors, value);
-    }
-
-    public bool HasErrors {
-        get => _hasErrors;
-        set => RaiseAndSetIfChanged(ref _hasErrors, value);
     }
 
     public abstract void CreateComponent();

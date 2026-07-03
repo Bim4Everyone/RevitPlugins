@@ -341,12 +341,12 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        if(CurrentSheetSet?.SheetList?
-            .Where(s => s.IsModuleCheck)
-            .Any(p => !string.IsNullOrEmpty(p.ModuleErrors)) == true) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheets");
-            return false;
-        }
+        //if(CurrentSheetSet?.SheetList?
+        //    .Where(s => s.IsModuleCheck)
+        //    .Any(p => !string.IsNullOrEmpty(p.ModuleErrors)) == true) {
+        //    ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheets");
+        //    return false;
+        //}
         if(CurrentSheetSet?.SheetList?.Count() == 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.SheetSetHasNotSheets");
             return false;
