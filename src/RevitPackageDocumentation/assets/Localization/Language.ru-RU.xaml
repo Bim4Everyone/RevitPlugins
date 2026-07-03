@@ -92,5 +92,11 @@
 
     <system:String x:Key="Validation.ViewNameIsEmpty">Имя вида не заполнено </system:String>
     <system:String x:Key="Validation.ViewNameIsNotCorrect">Имя вида заполнено некорректно</system:String>
+    <system:String x:Key="Validation.ViewFamilyTypeIsNull">Не выбран тип вида</system:String>
+    <system:String x:Key="Validation.ViewportTypeIsNull">Не выбран тип видового экрана</system:String>
+    <system:String x:Key="Validation.ViewTemplateIsNull">Не выбран шаблон вида</system:String>
+    <system:String x:Key="Validation.ViewCountIsNotCorrect">Число задано некорректно</system:String>
+    <system:String x:Key="Validation.SelectedSelectElemParamIsNull">Не выбран параметр привязки к объекту</system:String>
+    <system:String x:Key="Validation.SelectedSelectElemParamValueIsNull">В параметре привязки к объекту не выбран элемент</system:String>
 
 </ResourceDictionary>

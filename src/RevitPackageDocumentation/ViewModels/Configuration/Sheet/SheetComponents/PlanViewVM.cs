@@ -10,6 +10,7 @@ using dosymep.SimpleServices;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
+using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class PlanViewVM : SheetComponentVM {
@@ -54,6 +55,7 @@ internal class PlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewName, value);
     }
 
+    [Required(ErrorMessage = "Validation.ViewFamilyTypeIsNull")]
     public ViewFamilyType ViewFamilyType {
         get => _viewFamilyType;
         set => RaiseAndSetIfChanged(ref _viewFamilyType, value);
@@ -64,6 +66,7 @@ internal class PlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewFamilyTypeFilter, value);
     }
 
+    [Required(ErrorMessage = "Validation.ViewportTypeIsNull")]
     public ElementType ViewportType {
         get => _viewportType;
         set => RaiseAndSetIfChanged(ref _viewportType, value);
@@ -74,6 +77,7 @@ internal class PlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewportTypeFilter, value);
     }
 
+    [Required(ErrorMessage = "Validation.ViewTemplateIsNull")]
     public ViewPlan ViewTemplate {
         get => _viewTemplate;
         set => RaiseAndSetIfChanged(ref _viewTemplate, value);
@@ -84,11 +88,14 @@ internal class PlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewTemplateFilter, value);
     }
 
+    [PositiveInteger(ErrorMessage = "Validation.ViewCountIsNotCorrect")]
     public string ViewCount {
         get => _viewCount;
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
 
+    [Required(ErrorMessage = "Validation.SelectedSelectElemParamIsNull")]
+    //[SelectedElemIsNull(ErrorMessage = "Validation.SelectedSelectElemParamValueIsNull")]
     public SelectElemParamVM SelectedSelectElemParam {
         get => _selectedSelectElemParam;
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
