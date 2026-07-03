@@ -10,7 +10,6 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
-using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 
 using RevitCreateViewSheet.Services;
@@ -43,7 +42,7 @@ namespace RevitCreateViewSheet.Models {
                 .Select(item => item.GetParamValueOrDefault(SharedParamsConfig.Instance.AlbumBlueprints, string.Empty))
                 .Distinct()
                 .Where(s => !string.IsNullOrWhiteSpace(s))
-                .OrderBy(item => item, new LogicalStringComparer())
+                .OrderBy(item => item, new RevitStringComparer())
                 .ToArray();
         }
 
@@ -261,10 +260,11 @@ namespace RevitCreateViewSheet.Models {
         internal Viewport UpdateViewPort(ViewPortModel viewPortModel) {
             if(!viewPortModel.TryGetViewport(out var viewport)) {
                 throw new InvalidOperationException(
-                    _localizationService.GetLocalizedString("Errors.CannotUpdateNotCreatetViewPort"));
+                    _localizationService.GetLocalizedString("Errors.CannotUpdateNotCreatedViewPort"));
             }
-            if(viewPortModel.ViewPortType?.Id.IsNotNull() ?? false
-                && viewPortModel.InitialViewPortType?.Id != viewPortModel.ViewPortType?.Id) {
+
+            if((viewPortModel.ViewPortType?.Id.IsNotNull() ?? false)
+               && viewPortModel.InitialViewPortType?.Id != viewPortModel.ViewPortType.Id) {
                 viewport.SetParamValue(BuiltInParameter.ELEM_TYPE_PARAM, viewPortModel.ViewPortType.Id);
             }
             return viewport;
