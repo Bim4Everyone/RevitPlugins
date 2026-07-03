@@ -21,7 +21,7 @@
     Width="1230"
     MinHeight="450"
     MinWidth="1230"
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vms:RsViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
