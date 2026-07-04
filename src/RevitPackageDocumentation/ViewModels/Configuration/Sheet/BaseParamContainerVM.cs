@@ -14,6 +14,7 @@ using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 using RevitPackageDocumentation.ViewModels.Validation;
+using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 internal abstract class BaseParamContainerVM : ValidatableVM {
@@ -30,7 +31,7 @@ internal abstract class BaseParamContainerVM : ValidatableVM {
         Repository = repository;
         _strParamSetService = stringParamSetService;
         SheetSetParams = sheetSetParams;
-        CustomParamsList = new CustomParametersListVM(SheetSetParams, _strParamSetService);
+        CustomParamsList = new CustomParametersListVM(SheetSetParams, _strParamSetService, localizationService);
 
         PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
     }
@@ -40,7 +41,7 @@ internal abstract class BaseParamContainerVM : ValidatableVM {
     public ObservableCollection<PluginParamVM> SheetSetParams { get; }
     public RevitRepository Repository { get; }
 
-
+    [ChildHasErrors(ErrorMessage = "Validation.ErrorInCustomParams")]
     public CustomParametersListVM CustomParamsList {
         get => _customParamsList;
         set => RaiseAndSetIfChanged(ref _customParamsList, value);

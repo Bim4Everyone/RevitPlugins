@@ -34,6 +34,7 @@ internal class SheetSetParametersListVM : ValidatableVM {
         _sheetSetVMFactory = sheetSetVMFactory;
         _sheetSetDataFactory = sheetSetDataFactory;
         //_localizationService = localizationService;
+        ValidateAllProperties();
 
         AddSheetSetParamCommand = RelayCommand.Create<ComponentTypeItem>(AddSheetSetParam);
         RemoveSheetSetParamCommand = RelayCommand.Create<PluginParamVM>(RemoveSheetSetParam);

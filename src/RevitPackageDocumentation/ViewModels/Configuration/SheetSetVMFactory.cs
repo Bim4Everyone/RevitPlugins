@@ -323,9 +323,9 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
         ParamContainerModuleData data,
         ObservableCollection<PluginParamVM> sheetSetParams) {
         // Добавляем список дополнительных параметров
-        var customParamsList = new CustomParametersListVM(sheetSetParams, _stringParamSetService);
+        var customParamsList = new CustomParametersListVM(sheetSetParams, _stringParamSetService, _localizationService);
         foreach(var paramData in data.CustomParamsList?.Params ?? []) {
-            var paramVM = new CustomParameterVM(customParamsList, _stringParamSetService) {
+            var paramVM = new CustomParameterVM(customParamsList, _stringParamSetService, _localizationService) {
                 ParamName = paramData.ParamName ?? string.Empty,
                 ParamValueFormula = paramData.ParamValueFormula ?? string.Empty,
                 ParamValue = paramData.ParamValueFormula ?? string.Empty,

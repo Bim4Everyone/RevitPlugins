@@ -1,20 +1,27 @@
+using System.ComponentModel.DataAnnotations;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
-using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.Validation;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
-internal class CustomParameterVM : BaseViewModel {
+internal class CustomParameterVM : ValidatableVM {
     private string _paramValueFormula = string.Empty;
     private string _paramName;
     private string _paramValue = string.Empty;
 
-    public CustomParameterVM(CustomParametersListVM customParamsList, StringParamSetService stringParamSetService) {
+    public CustomParameterVM(CustomParametersListVM customParamsList, StringParamSetService stringParamSetService,
+        ILocalizationService localizationService)
+        : base(localizationService) {
+
         CustomParamsList = customParamsList;
         StrParamSetService = stringParamSetService;
+        ValidateAllProperties();
+
         PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
     }
 
@@ -23,7 +30,8 @@ internal class CustomParameterVM : BaseViewModel {
     public CustomParametersListVM CustomParamsList { get; }
     public StringParamSetService StrParamSetService { get; }
 
-
+    [Required]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\];~]+$")]
     public string ParamName {
         get => _paramName;
         set => RaiseAndSetIfChanged(ref _paramName, value);

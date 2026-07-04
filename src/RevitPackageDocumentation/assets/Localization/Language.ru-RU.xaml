@@ -101,5 +101,8 @@
     <system:String x:Key="Validation.ParamNameIsEmpty">Имя параметра не заполнено</system:String>
     <system:String x:Key="Validation.SelectElemParamSelectedElemIsNull">Не выбран элемент в параметре привязки к объекту</system:String>
     <system:String x:Key="Validation.ErrorInSheetSetParams">Исправлены не все ошибки в параметрах комплекта</system:String>
+    
+    <system:String x:Key="Validation.ErrorInCustomParams">Исправлены не все ошибки в дополнительных параметрах</system:String>
+
 
 </ResourceDictionary>

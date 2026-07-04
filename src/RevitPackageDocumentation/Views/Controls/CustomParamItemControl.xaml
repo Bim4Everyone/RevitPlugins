@@ -49,7 +49,9 @@
             Grid.Column="1"
             Margin="5"
             VerticalAlignment="Top"
-            Text="{Binding Path=ParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            Text="{Binding 
+                Path=ParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                ValidatesOnNotifyDataErrors=True}" />
 
         <controls:FormulaTextBoxControl
             Grid.Column="2"

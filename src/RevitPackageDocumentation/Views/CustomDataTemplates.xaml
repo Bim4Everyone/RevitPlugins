@@ -203,7 +203,9 @@
                             Grid.Row="1"
                             Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
-                            ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            ItemsSource="{Binding 
+                                Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                ValidatesOnNotifyDataErrors=True}" />
                     </Grid>
                 </Border>
 
