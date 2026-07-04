@@ -14,7 +14,9 @@ internal class CustomParameterVM : ValidatableVM {
     private string _paramName;
     private string _paramValue = string.Empty;
 
-    public CustomParameterVM(CustomParametersListVM customParamsList, StringParamSetService stringParamSetService,
+    public CustomParameterVM(
+        CustomParametersListVM customParamsList,
+        StringParamSetService stringParamSetService,
         ILocalizationService localizationService)
         : base(localizationService) {
 

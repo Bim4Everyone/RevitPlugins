@@ -1,14 +1,16 @@
+using System.ComponentModel.DataAnnotations;
 using System.Windows.Input;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
-using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ScheduleFilters;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.Validation;
 
 namespace RevitPackageDocumentation.ViewModels.ScheduleFilters;
-internal class ScheduleFilterRuleVM : BaseViewModel {
+internal class ScheduleFilterRuleVM : ValidatableVM {
     private ScheduleFieldInfo _selectedSpecField;
     private string _selectedSpecFieldName;
     private ScheduleTypeInfo _selectedFilterType;
@@ -16,9 +18,15 @@ internal class ScheduleFilterRuleVM : BaseViewModel {
     private string _filterValueFormula = string.Empty;
     private string _filterValue;
 
-    public ScheduleFilterRuleVM(ScheduleFilterListVM scheduleFilterListVM, StringParamSetService stringParamSetService) {
+    public ScheduleFilterRuleVM(
+        ScheduleFilterListVM scheduleFilterListVM,
+        StringParamSetService stringParamSetService,
+        ILocalizationService localizationService)
+        : base(localizationService) {
+
         ScheduleFilterList = scheduleFilterListVM;
         StrParamSetService = stringParamSetService;
+        ValidateAllProperties();
 
         SelectSpecFieldCommand = RelayCommand.Create(SelectSpecField);
         PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
@@ -30,6 +38,7 @@ internal class ScheduleFilterRuleVM : BaseViewModel {
     public ScheduleFilterListVM ScheduleFilterList { get; }
     public StringParamSetService StrParamSetService { get; }
 
+    [Required]
     public ScheduleFieldInfo SelectedSpecField {
         get => _selectedSpecField;
         set => RaiseAndSetIfChanged(ref _selectedSpecField, value);
@@ -40,6 +49,7 @@ internal class ScheduleFilterRuleVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedSpecFieldName, value);
     }
 
+    [Required]
     public ScheduleTypeInfo SelectedFilterType {
         get => _selectedFilterType;
         set => RaiseAndSetIfChanged(ref _selectedFilterType, value);

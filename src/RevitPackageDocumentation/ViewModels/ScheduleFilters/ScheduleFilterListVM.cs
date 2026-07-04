@@ -5,21 +5,31 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
-using dosymep.WPF.ViewModels;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ScheduleFilters;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+using RevitPackageDocumentation.ViewModels.Validation;
+using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.ScheduleFilters;
-internal class ScheduleFilterListVM : BaseViewModel {
+internal class ScheduleFilterListVM : ValidatableVM {
+    private readonly ILocalizationService _localizationService;
     private ObservableCollection<ScheduleFilterRuleVM> _scheduleFilterRules = [];
     private ObservableCollection<ScheduleFieldInfo> _selectedScheduleFields = [];
 
-    public ScheduleFilterListVM(ScheduleViewVM scheduleViewVM, StringParamSetService stringParamSetService) {
+    public ScheduleFilterListVM(
+        ScheduleViewVM scheduleViewVM,
+        StringParamSetService stringParamSetService,
+        ILocalizationService localizationService)
+        : base(localizationService) {
+
         ScheduleView = scheduleViewVM;
         StrParamSetService = stringParamSetService;
+        _localizationService = localizationService;
+        ValidateAllProperties();
 
         AddFilterCommand = RelayCommand.Create(AddFilter);
         RemoveFilterCommand = RelayCommand.Create<ScheduleFilterRuleVM>(RemoveFilter);
@@ -31,6 +41,7 @@ internal class ScheduleFilterListVM : BaseViewModel {
     public ScheduleViewVM ScheduleView { get; }
     public StringParamSetService StrParamSetService { get; }
 
+    [ChildHasErrors]
     public ObservableCollection<ScheduleFilterRuleVM> ScheduleFilterRules {
         get => _scheduleFilterRules;
         set => RaiseAndSetIfChanged(ref _scheduleFilterRules, value);
@@ -42,7 +53,7 @@ internal class ScheduleFilterListVM : BaseViewModel {
     }
 
     private void AddFilter() {
-        var rule = new ScheduleFilterRuleVM(this, StrParamSetService);
+        var rule = new ScheduleFilterRuleVM(this, StrParamSetService, _localizationService);
         ScheduleFilterRules.Add(rule);
     }
 
@@ -78,7 +89,7 @@ internal class ScheduleFilterListVM : BaseViewModel {
                 }
             } catch(Exception) { }
 
-            var ruleVM = new ScheduleFilterRuleVM(this, StrParamSetService) {
+            var ruleVM = new ScheduleFilterRuleVM(this, StrParamSetService, _localizationService) {
                 SelectedSpecField = selectedSpecField,
                 SelectedSpecFieldName = selectedSpecField.FieldName,
                 SelectedFilterType =

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 using Autodesk.Revit.DB;
 
@@ -24,9 +25,11 @@ internal class LegendViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
+        ValidateAllProperties();
         CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
+    [Required(ErrorMessage = "Validation.LegendViewIsNull")]
     public View LegendView {
         get => _legendView;
         set => RaiseAndSetIfChanged(ref _legendView, value);
@@ -37,6 +40,7 @@ internal class LegendViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _legendViewFilter, value);
     }
 
+    [Required(ErrorMessage = "Validation.ViewportTypeIsNull")]
     public ElementType ViewportType {
         get => _viewportType;
         set => RaiseAndSetIfChanged(ref _viewportType, value);
@@ -46,26 +50,6 @@ internal class LegendViewVM : SheetComponentVM {
         get => _viewportTypeFilter;
         set => RaiseAndSetIfChanged(ref _viewportTypeFilter, value);
     }
-
-    //public override bool Validate() {
-    //    //if(LegendView is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.LegendViewIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(ViewportType is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
-    //    //    return false;
-    //    //}
-    //    //foreach(var param in CustomParamsList.Params) {
-    //    //    if(string.IsNullOrEmpty(param.ParamName)) {
-    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
-    //    //        return false;
-    //    //    }
-    //    //}
-
-    //    //ModuleErrors = string.Empty;
-    //    return true;
-    //}
 
     public override void Process(bool processDependent = false) {
         var viewPort = Place();

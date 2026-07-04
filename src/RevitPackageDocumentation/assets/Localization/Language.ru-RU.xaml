@@ -106,4 +106,9 @@
 
     <system:String x:Key="Validation.HasNotPlanView">Расположите компонент после вида в плане</system:String>
 
+    <system:String x:Key="Validation.LegendViewIsNull">Не выбрана легенда для размещения</system:String>
+    <system:String x:Key="Validation.ViewColumnIsNotCorrect">Номер столбца задан некорректно</system:String>
+    <system:String x:Key="Validation.ReferenceSpecIsNull">Не выбрана эталонная спецификация для дублирования</system:String>
+    <system:String x:Key="Validation.ScheduleFiltersIsNotCorrect">Фильтры спецификации не корректны</system:String>
+
 </ResourceDictionary>

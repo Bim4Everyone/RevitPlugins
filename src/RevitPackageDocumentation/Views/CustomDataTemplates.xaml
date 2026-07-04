@@ -672,9 +672,11 @@
                     <controls:FormulaTextBoxControl
                         Grid.Column="1"
                         Margin="5"
-                        PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                            ValidatesOnNotifyDataErrors=True}"
                         PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
+                        UpdateCommand="{Binding PropUpdateByFormulaCommand}"
+                        TextBoxStyle="{StaticResource ErrorFormulaTextBoxStyle}" />
                 </Grid>
 
                 <Grid

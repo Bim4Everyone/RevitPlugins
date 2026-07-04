@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Windows.Input;
 
@@ -11,6 +12,7 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 using RevitPackageDocumentation.ViewModels.ScheduleFilters;
+using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class ScheduleViewVM : SheetComponentVM {
@@ -41,7 +43,8 @@ internal class ScheduleViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        ScheduleFilterList = new ScheduleFilterListVM(this, stringParamSetService);
+        ScheduleFilterList = new ScheduleFilterListVM(this, stringParamSetService, localizationService);
+        ValidateAllProperties();
 
         CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
         SelectReferenceSpecCommand = RelayCommand.Create(SelectReferenceSpec);
@@ -49,16 +52,8 @@ internal class ScheduleViewVM : SheetComponentVM {
 
     public ICommand SelectReferenceSpecCommand { get; set; }
 
-    public ViewSchedule ReferenceSpec {
-        get => _referenceSpec;
-        set => RaiseAndSetIfChanged(ref _referenceSpec, value);
-    }
-
-    public FiltrationComboBoxFilterListVM ReferenceSpecFilter {
-        get => _referenceSpecFilter;
-        set => RaiseAndSetIfChanged(ref _referenceSpecFilter, value);
-    }
-
+    [Required(ErrorMessage = "Validation.ViewNameIsEmpty")]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\];~]+$", ErrorMessage = "Validation.ViewNameIsNotCorrect")]
     public string ViewNameFormula {
         get => _viewNameFormula;
         set => RaiseAndSetIfChanged(ref _viewNameFormula, value);
@@ -69,16 +64,30 @@ internal class ScheduleViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewName, value);
     }
 
+    [Required(ErrorMessage = "Validation.ReferenceSpecIsNull")]
+    public ViewSchedule ReferenceSpec {
+        get => _referenceSpec;
+        set => RaiseAndSetIfChanged(ref _referenceSpec, value);
+    }
+
+    public FiltrationComboBoxFilterListVM ReferenceSpecFilter {
+        get => _referenceSpecFilter;
+        set => RaiseAndSetIfChanged(ref _referenceSpecFilter, value);
+    }
+
+    [PositiveInteger(ErrorMessage = "Validation.ViewColumnIsNotCorrect")]
     public string ViewColumn {
         get => _viewColumn;
         set => RaiseAndSetIfChanged(ref _viewColumn, value);
     }
 
+    [PositiveInteger(ErrorMessage = "Validation.ViewCountIsNotCorrect")]
     public string ViewCount {
         get => _viewCount;
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
 
+    [ChildHasErrors(ErrorMessage = "Validation.ScheduleFiltersIsNotCorrect")]
     public ScheduleFilterListVM ScheduleFilterList {
         get => _scheduleFilterList;
         set => RaiseAndSetIfChanged(ref _scheduleFilterList, value);
@@ -88,41 +97,6 @@ internal class ScheduleViewVM : SheetComponentVM {
         get => _viewportInstance;
         set => RaiseAndSetIfChanged(ref _viewportInstance, value);
     }
-
-
-    //public override bool Validate() {
-    //    //if(ReferenceSpec is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ReferenceViewNameIsEmpty");
-    //    //    return false;
-    //    //}
-    //    //if(string.IsNullOrEmpty(ViewNameFormula)) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
-    //    //    return false;
-    //    //}
-    //    //if(!int.TryParse(ViewColumn, out int viewColumnAsInt) || viewColumnAsInt < 1) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewColumnIsNotCorrect");
-    //    //    return false;
-    //    //}
-    //    //if(!int.TryParse(ViewCount, out int viewCountAsInt) || viewCountAsInt < 1) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
-    //    //    return false;
-    //    //}
-    //    //foreach(var rule in ScheduleFilterList.ScheduleFilterRules) {
-    //    //    if(rule.SelectedSpecField is null || rule.SelectedFilterType is null) {
-    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ScheduleFiltersIsNotCorrect");
-    //    //        return false;
-    //    //    }
-    //    //}
-    //    //foreach(var param in CustomParamsList.Params) {
-    //    //    if(string.IsNullOrEmpty(param.ParamName)) {
-    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
-    //    //        return false;
-    //    //    }
-    //    //}
-
-    //    //ModuleErrors = string.Empty;
-    //    return true;
-    //}
 
     private void SelectReferenceSpec() {
         ScheduleFilterList.SetSchedule(ReferenceSpec);
