@@ -104,5 +104,6 @@
     
     <system:String x:Key="Validation.ErrorInCustomParams">Исправлены не все ошибки в дополнительных параметрах</system:String>
 
+    <system:String x:Key="Validation.HasNotPlanView">Расположите компонент после вида в плане</system:String>
 
 </ResourceDictionary>

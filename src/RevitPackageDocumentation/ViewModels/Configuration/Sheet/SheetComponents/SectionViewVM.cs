@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 using Autodesk.Revit.DB;
 
@@ -10,6 +11,7 @@ using dosymep.WPF.Commands;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
+using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class SectionViewVM : SheetComponentVM {
@@ -47,9 +49,12 @@ internal class SectionViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
+        ValidateAllProperties();
         CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
+    [Required(ErrorMessage = "Validation.ViewNameIsEmpty")]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\];~]+$", ErrorMessage = "Validation.ViewNameIsNotCorrect")]
     public string ViewNameFormula {
         get => _viewNameFormula;
         set => RaiseAndSetIfChanged(ref _viewNameFormula, value);
@@ -60,6 +65,7 @@ internal class SectionViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewName, value);
     }
 
+    [Required(ErrorMessage = "Validation.ViewFamilyTypeIsNull")]
     public ViewFamilyType ViewFamilyType {
         get => _viewFamilyType;
         set => RaiseAndSetIfChanged(ref _viewFamilyType, value);
@@ -70,6 +76,7 @@ internal class SectionViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewFamilyTypeFilter, value);
     }
 
+    [Required(ErrorMessage = "Validation.ViewportTypeIsNull")]
     public ElementType ViewportType {
         get => _viewportType;
         set => RaiseAndSetIfChanged(ref _viewportType, value);
@@ -80,6 +87,7 @@ internal class SectionViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewportTypeFilter, value);
     }
 
+    [Required(ErrorMessage = "Validation.ViewTemplateIsNull")]
     public ViewSection ViewTemplate {
         get => _viewTemplate;
         set => RaiseAndSetIfChanged(ref _viewTemplate, value);
@@ -90,55 +98,18 @@ internal class SectionViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewTemplateFilter, value);
     }
 
+    [PositiveInteger(ErrorMessage = "Validation.ViewCountIsNotCorrect")]
     public string ViewCount {
         get => _viewCount;
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
 
+    [Required(ErrorMessage = "Validation.SelectedSelectElemParamIsNull")]
+    [ChildHasErrors(ErrorMessage = "Validation.SelectElemParamSelectedElemIsNull")]
     public SelectElemParamVM SelectedSelectElemParam {
         get => _selectedSelectElemParam;
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
-
-    //public override bool Validate() {
-    //    //if(string.IsNullOrEmpty(ViewNameFormula)) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
-    //    //    return false;
-    //    //}
-    //    //if(ViewFamilyType is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewFamilyTypeIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(ViewportType is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(ViewTemplate is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewTemplateIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(!int.TryParse(ViewCount, out int viewCountAsInt) || viewCountAsInt < 1) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
-    //    //    return false;
-    //    //}
-    //    //if(SelectedSelectElemParam is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(SelectedSelectElemParam.SelectedElem is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamValueIsNull");
-    //    //    return false;
-    //    //}
-    //    //foreach(var param in CustomParamsList.Params) {
-    //    //    if(string.IsNullOrEmpty(param.ParamName)) {
-    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
-    //    //        return false;
-    //    //    }
-    //    //}
-
-    //    //ModuleErrors = string.Empty;
-    //    return true;
-    //}
 
     public override void Process(bool processDependent = false) {
         int.TryParse(ViewCount, out int viewCountAsInt);

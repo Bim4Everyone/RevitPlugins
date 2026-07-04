@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 using Autodesk.Revit.DB;
 
@@ -9,6 +10,7 @@ using dosymep.WPF.Commands;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
+using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class CalloutViewVM : SheetComponentVM {
@@ -44,9 +46,12 @@ internal class CalloutViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
+        ValidateAllProperties();
         CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
+    [Required(ErrorMessage = "Validation.ViewNameIsEmpty")]
+    [RegularExpression(@"^[^\\\/:*?""<>|\[\];~]+$", ErrorMessage = "Validation.ViewNameIsNotCorrect")]
     public string ViewNameFormula {
         get => _viewNameFormula;
         set => RaiseAndSetIfChanged(ref _viewNameFormula, value);
@@ -57,6 +62,7 @@ internal class CalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewName, value);
     }
 
+    [Required(ErrorMessage = "Validation.ViewFamilyTypeIsNull")]
     public ViewFamilyType ViewFamilyType {
         get => _viewFamilyType;
         set => RaiseAndSetIfChanged(ref _viewFamilyType, value);
@@ -67,6 +73,7 @@ internal class CalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewFamilyTypeFilter, value);
     }
 
+    [Required(ErrorMessage = "Validation.ViewportTypeIsNull")]
     public ElementType ViewportType {
         get => _viewportType;
         set => RaiseAndSetIfChanged(ref _viewportType, value);
@@ -77,6 +84,7 @@ internal class CalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewportTypeFilter, value);
     }
 
+    [Required(ErrorMessage = "Validation.ViewTemplateIsNull")]
     public ViewPlan ViewTemplate {
         get => _viewTemplate;
         set => RaiseAndSetIfChanged(ref _viewTemplate, value);
@@ -87,6 +95,7 @@ internal class CalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewTemplateFilter, value);
     }
 
+    [PositiveInteger(ErrorMessage = "Validation.ViewCountIsNotCorrect")]
     public string ViewCount {
         get => _viewCount;
         set => RaiseAndSetIfChanged(ref _viewCount, value);
@@ -97,64 +106,36 @@ internal class CalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewportNumber, value);
     }
 
+    [Required(ErrorMessage = "Validation.SelectedSelectElemParamIsNull")]
+    [ChildHasErrors(ErrorMessage = "Validation.SelectElemParamSelectedElemIsNull")]
     public SelectElemParamVM SelectedSelectElemParam {
         get => _selectedSelectElemParam;
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
 
-    //public override bool Validate() {
-    //    //if(string.IsNullOrEmpty(ViewNameFormula)) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewNameIsEmpty");
-    //    //    return false;
-    //    //}
-    //    //if(ViewFamilyType is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewFamilyTypeIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(ViewportType is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewportTypeIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(ViewTemplate is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewTemplateIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(!double.TryParse(ViewCount, out double viewCountAsDouble) || viewCountAsDouble < 1) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.ViewCountIsNotCorrect");
-    //    //    return false;
-    //    //}
-    //    //if(SelectedSelectElemParam is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(SelectedSelectElemParam.SelectedElem is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.SelectedSelectElemParamValueIsNull");
-    //    //    return false;
-    //    //}
-    //    //foreach(var param in CustomParamsList.Params) {
-    //    //    if(string.IsNullOrEmpty(param.ParamName)) {
-    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
-    //    //        return false;
-    //    //    }
-    //    //}
 
-    //    //int index = Sheet.SheetComponents.IndexOf(this);
-    //    //PlanViewVM parentView = null;
-    //    //for(int i = index; i >= 0; i--) {
-    //    //    parentView = Sheet.SheetComponents[i] as PlanViewVM;
+    public override bool CanCreateComponent() {
+        if(HasErrors) {
+            return false;
+        }
 
-    //    //    if(parentView != null && parentView.IsModuleCheck == true) {
-    //    //        break;
-    //    //    }
-    //    //}
-    //    //if(parentView is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.HasNotPlanView");
-    //    //    return false;
-    //    //}
+        int index = Sheet.SheetComponents.IndexOf(this);
+        PlanViewVM parentView = null;
+        for(int i = index; i >= 0; i--) {
+            parentView = Sheet.SheetComponents[i] as PlanViewVM;
 
-    //    //ModuleErrors = string.Empty;
-    //    return true;
-    //}
+            if(parentView != null && parentView.IsModuleCheck == true) {
+                break;
+            }
+        }
+        if(parentView is null) {
+            FirstError = LocalizationService.GetLocalizedString("Validation.HasNotPlanView");
+            return false;
+        }
+
+        FirstError = string.Empty;
+        return true;
+    }
 
     public override void Process(bool processDependent = false) {
         int.TryParse(ViewCount, out int viewCountAsInt);

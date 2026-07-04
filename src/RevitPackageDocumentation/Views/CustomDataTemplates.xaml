@@ -204,8 +204,7 @@
                             Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
                             ItemsSource="{Binding 
-                                Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
-                                ValidatesOnNotifyDataErrors=True}" />
+                                Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
                 </Border>
 
@@ -259,9 +258,11 @@
                     <controls:FormulaTextBoxControl
                         Grid.Column="1"
                         Margin="5"
-                        PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                            ValidatesOnNotifyDataErrors=True}"
                         PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
+                        UpdateCommand="{Binding PropUpdateByFormulaCommand}"
+                        TextBoxStyle="{StaticResource ErrorFormulaTextBoxStyle}"/>
                 </Grid>
 
                 <Grid
@@ -465,9 +466,11 @@
                     <controls:FormulaTextBoxControl
                         Grid.Column="1"
                         Margin="5"
-                        PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PropFormula="{Binding Path=ViewNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                            ValidatesOnNotifyDataErrors=True}"
                         PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
+                        UpdateCommand="{Binding PropUpdateByFormulaCommand}"
+                        TextBoxStyle="{StaticResource ErrorFormulaTextBoxStyle}" />
                 </Grid>
 
                 <Grid
