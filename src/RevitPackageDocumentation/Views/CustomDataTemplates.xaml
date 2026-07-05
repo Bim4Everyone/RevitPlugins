@@ -918,9 +918,11 @@
                 Grid.Row="2"
                 Margin="5"
                 AcceptsReturn="True"
-                PropFormula="{Binding Path=TextFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                PropFormula="{Binding Path=TextFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                    ValidatesOnNotifyDataErrors=True}"
                 PropResult="{Binding Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                UpdateCommand="{Binding PropUpdateByFormulaCommand}" />
+                UpdateCommand="{Binding PropUpdateByFormulaCommand}"
+                TextBoxStyle="{StaticResource ErrorFormulaTextBoxStyle}" />
 
             <UniformGrid
                 Grid.Row="3"

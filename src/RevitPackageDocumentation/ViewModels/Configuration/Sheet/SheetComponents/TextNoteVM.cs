@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -9,6 +10,7 @@ using dosymep.WPF.Commands;
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
+using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class TextNoteVM : SheetComponentVM {
@@ -26,19 +28,11 @@ internal class TextNoteVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
+        ValidateAllProperties();
         CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
-    public string TextFormula {
-        get => _textFormula;
-        set => RaiseAndSetIfChanged(ref _textFormula, value);
-    }
-
-    public string Text {
-        get => _text;
-        set => RaiseAndSetIfChanged(ref _text, value);
-    }
-
+    [Required(ErrorMessage = "Validation.TextNoteTypeIsNull")]
     public TextNoteType TextNoteType {
         get => _textType;
         set => RaiseAndSetIfChanged(ref _textType, value);
@@ -49,34 +43,23 @@ internal class TextNoteVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _textNoteTypeFilter, value);
     }
 
+    [PositiveInteger(ErrorMessage = "Validation.TextWidthIsNotCorrect")]
     public string TextWidth {
         get => _textWidth;
         set => RaiseAndSetIfChanged(ref _textWidth, value);
     }
 
-    //public override bool Validate() {
-    //    //if(string.IsNullOrEmpty(TextFormula)) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextIsEmpty");
-    //    //    return false;
-    //    //}
-    //    //if(TextNoteType is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextNoteTypeIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(!int.TryParse(TextWidth, out int textWidthAsInt) || textWidthAsInt < 1) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.TextWidthIsNotCorrect");
-    //    //    return false;
-    //    //}
-    //    //foreach(var param in CustomParamsList.Params) {
-    //    //    if(string.IsNullOrEmpty(param.ParamName)) {
-    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
-    //    //        return false;
-    //    //    }
-    //    //}
+    [Required(ErrorMessage = "Validation.TextIsEmpty")]
+    public string TextFormula {
+        get => _textFormula;
+        set => RaiseAndSetIfChanged(ref _textFormula, value);
+    }
 
-    //    //ModuleErrors = string.Empty;
-    //    return true;
-    //}
+    public string Text {
+        get => _text;
+        set => RaiseAndSetIfChanged(ref _text, value);
+    }
+
 
     public override void Process(bool processDependent = false) {
         var textNote = Place();

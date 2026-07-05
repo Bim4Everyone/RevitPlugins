@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Windows.Input;
 
@@ -28,17 +29,15 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
+        ValidateAllProperties();
+
         SelectAnnotationFamilyCommand = RelayCommand.Create(SelectAnnotationFamily);
         CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
     public ICommand SelectAnnotationFamilyCommand { get; }
 
-    public List<AnnotationSymbolType> AnnotationTypes {
-        get => _annotationTypes;
-        set => RaiseAndSetIfChanged(ref _annotationTypes, value);
-    }
-
+    [Required(ErrorMessage = "Validation.AnnotationFamilyIsNull")]
     public Family AnnotationFamily {
         get => _annotationFamily;
         set => RaiseAndSetIfChanged(ref _annotationFamily, value);
@@ -49,6 +48,12 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _annotationFamilyFilter, value);
     }
 
+    public List<AnnotationSymbolType> AnnotationTypes {
+        get => _annotationTypes;
+        set => RaiseAndSetIfChanged(ref _annotationTypes, value);
+    }
+
+    [Required(ErrorMessage = "Validation.AnnotationTypeIsNull")]
     public AnnotationSymbolType AnnotationType {
         get => _annotationType;
         set => RaiseAndSetIfChanged(ref _annotationType, value);
@@ -70,26 +75,6 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             ?.Select(id => Repository.Document.GetElement(id) as AnnotationSymbolType)
             ?.ToList();
     }
-
-    //public override bool Validate() {
-    //    //if(AnnotationFamily is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.AnnotationFamilyIsNull");
-    //    //    return false;
-    //    //}
-    //    //if(AnnotationType is null) {
-    //    //    ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.AnnotationTypeIsNull");
-    //    //    return false;
-    //    //}
-    //    //foreach(var param in CustomParamsList.Params) {
-    //    //    if(string.IsNullOrEmpty(param.ParamName)) {
-    //    //        ModuleErrors = LocalizationService.GetLocalizedString("MainWindow.CustomParamsIsNotCorrect");
-    //    //        return false;
-    //    //    }
-    //    //}
-
-    //    //ModuleErrors = string.Empty;
-    //    return true;
-    //}
 
     public override void Process(bool processDependent = false) {
         var instance = Place();

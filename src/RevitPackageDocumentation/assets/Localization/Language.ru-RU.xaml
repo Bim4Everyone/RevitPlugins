@@ -111,4 +111,11 @@
     <system:String x:Key="Validation.ReferenceSpecIsNull">Не выбрана эталонная спецификация для дублирования</system:String>
     <system:String x:Key="Validation.ScheduleFiltersIsNotCorrect">Фильтры спецификации не корректны</system:String>
 
+    <system:String x:Key="Validation.TextIsEmpty">Текст не заполнен</system:String>
+    <system:String x:Key="Validation.TextNoteTypeIsNull">Не выбран тип текстовой заметки</system:String>
+    <system:String x:Key="Validation.TextWidthIsNotCorrect">Ширина текста не корректна</system:String>
+
+    <system:String x:Key="Validation.AnnotationFamilyIsNull">Не выбрано семейство типовой аннотации</system:String>
+    <system:String x:Key="Validation.AnnotationTypeIsNull">Не выбран тип типовой аннотации</system:String>
+
 </ResourceDictionary>
