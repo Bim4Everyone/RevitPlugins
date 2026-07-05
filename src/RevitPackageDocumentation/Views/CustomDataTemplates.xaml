@@ -993,53 +993,28 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <UniformGrid
-                Grid.Row="0"
-                Rows="0"
-                Grid.IsSharedSizeScope="True"
-                extensions:UniformGridExtensions.AutoColumns="True"
-                extensions:UniformGridExtensions.ColumnThresholds="800">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="Auto"/>
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
 
-                    <TextBlock
-                        Grid.Column="0"
-                        Margin="5"
-                        VerticalAlignment="Center"
-                        Text="Семейство" />
+                <TextBlock
+                    Grid.Column="0"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Text="Типоразмер" />
 
-                    <controls:FiltrationComboBoxControl
-                        Grid.Column="1"
-                        Margin="5"
-                        ComboBoxSource="{Binding DataContext.GenericAnnotationFamilies, RelativeSource={RelativeSource AncestorType=Window}}"
-                        ComboBoxSelected="{Binding AnnotationFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding AnnotationFamilyFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ComboBoxSelectionChangedCommand="{Binding SelectAnnotationFamilyCommand}"/>
-                </Grid>
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        Grid.Column="0"
-                        Margin="5"
-                        VerticalAlignment="Center"
-                        Text="Типоразмер" />
-
-                    <controls:FiltrationComboBoxControl
-                        Grid.Column="1"
-                        Margin="5"
-                        ComboBoxSource="{Binding AnnotationTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ComboBoxSelected="{Binding AnnotationType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding AnnotationTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                </Grid>
-            </UniformGrid>
+                <controls:FiltrationComboBoxControl
+                    Grid.Column="1"
+                    Margin="5"
+                    ComboBoxSource="{Binding DataContext.GenericAnnotationTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                    ComboBoxSelected="{Binding AnnotationType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    FilterList="{Binding AnnotationTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    ItemTemplate="{StaticResource WithFamilyNameItemTemplate}"/>
+            </Grid>
 
             <UniformGrid
                 Grid.Row="1"
@@ -1055,10 +1030,8 @@
                     Style="{StaticResource CustomBorder}">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition
-                                Height="*" />
-                            <RowDefinition
-                                Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
                         <ui:TextBlock

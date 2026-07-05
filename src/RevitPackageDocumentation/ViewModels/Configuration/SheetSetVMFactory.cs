@@ -267,16 +267,6 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
     }
 
     private TypicalAnnotationVM CreateTypicalAnnotationVM(SheetSetVM sheetSetVM, SheetVM sheetVM, TypicalAnnotationData data) {
-        var annotationFamily = _revitRepository.GenericAnnotationFamilies?.FirstOrDefault(v => v.Name.Equals(data.AnnotationFamilyName));
-
-        var annotationTypes = annotationFamily
-                    ?.GetFamilySymbolIds()
-                    ?.Select(id => _revitRepository.Document.GetElement(id) as AnnotationSymbolType)
-                    ?.ToList();
-
-        var annotationType = annotationTypes
-                    ?.FirstOrDefault(v => v.Name.Equals(data.AnnotationTypeName));
-
         var sheetComponentVM = new TypicalAnnotationVM(
             _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
@@ -284,10 +274,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleComment = data.ModuleComment ?? string.Empty,
             ModuleCode = "02",
 
-            AnnotationTypes = annotationTypes,
-            AnnotationFamily = annotationFamily,
-            AnnotationFamilyFilter = GetFilterList(data.AnnotationFamilyFilterValues, sheetSetVM.SheetSetParams.Params),
-            AnnotationType = annotationType,
+            AnnotationType = _revitRepository.GenericAnnotationTypes.FirstOrDefault(t => $"{t.FamilyName}: {t.Name}".Equals(data.AnnotationTypeName)),
             AnnotationTypeFilter = GetFilterList(data.AnnotationTypeFilterValues, sheetSetVM.SheetSetParams.Params),
         };
 

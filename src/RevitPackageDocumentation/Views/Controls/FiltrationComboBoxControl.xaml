@@ -23,6 +23,19 @@
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            
+            <DataTemplate
+                x:Key="WithFamilyNameItemTemplate">
+                <TextBlock>
+                    <TextBlock.Text>
+                        <MultiBinding
+                            StringFormat="{}{0}: {1}">
+                            <Binding Path="FamilyName" />
+                            <Binding Path="Name" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -43,7 +56,8 @@
             VerticalAlignment="Top"
             DisplayMemberPath="Name"
             ItemsSource="{Binding Path=FilteredItemsSource, ElementName=root}"
-            SelectedItem="{Binding Path=ComboBoxSelected, ElementName=root}">
+            SelectedItem="{Binding Path=ComboBoxSelected, ElementName=root}"
+            ItemTemplate="{Binding ItemTemplate, ElementName=root}">
             <i:Interaction.Triggers>
                 <i:EventTrigger
                     EventName="SelectionChanged">

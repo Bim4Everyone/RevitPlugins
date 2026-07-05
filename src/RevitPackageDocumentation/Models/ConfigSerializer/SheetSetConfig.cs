@@ -170,8 +170,6 @@ public class TextNoteData : SheetComponentData {
 public class TypicalAnnotationData : SheetComponentData {
     public override string ComponentType => "TypicalAnnotation";
 
-    public string AnnotationFamilyName { get; set; }
-    public FiltrationComboBoxFilterListData AnnotationFamilyFilterValues { get; set; }
     public string AnnotationTypeName { get; set; }
     public FiltrationComboBoxFilterListData AnnotationTypeFilterValues { get; set; }
 }

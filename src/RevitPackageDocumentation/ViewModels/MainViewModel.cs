@@ -52,7 +52,7 @@ internal class MainViewModel : BaseViewModel {
     private List<ElementType> _viewportTypes;
     private List<ViewSchedule> _specsInPj;
     private List<TextNoteType> _textNoteTypes;
-    private List<Family> _genericAnnotationFamilies;
+    private List<FamilySymbol> _genericAnnotationTypes;
     private List<View> _legendsInProject;
     private List<Family> _titleBlockFamilies;
     private IList<ScheduleTypeInfo> _filterTypes;
@@ -163,9 +163,9 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _textNoteTypes, value);
     }
 
-    public List<Family> GenericAnnotationFamilies {
-        get => _genericAnnotationFamilies;
-        set => RaiseAndSetIfChanged(ref _genericAnnotationFamilies, value);
+    public List<FamilySymbol> GenericAnnotationTypes {
+        get => _genericAnnotationTypes;
+        set => RaiseAndSetIfChanged(ref _genericAnnotationTypes, value);
     }
 
     public List<View> LegendsInProject {
@@ -245,7 +245,7 @@ internal class MainViewModel : BaseViewModel {
         ViewportTypes = _revitRepository.ViewportTypes;
         SpecsInPj = _revitRepository.Specs;
         TextNoteTypes = _revitRepository.TextNoteTypes;
-        GenericAnnotationFamilies = _revitRepository.GenericAnnotationFamilies;
+        GenericAnnotationTypes = _revitRepository.GenericAnnotationTypes;
         LegendsInProject = _revitRepository.LegendsInProject;
         TitleBlockFamilies = _revitRepository.TitleBlockFamilies;
 

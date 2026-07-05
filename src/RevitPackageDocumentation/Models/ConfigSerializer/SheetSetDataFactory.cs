@@ -141,9 +141,10 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleComment = vm.ModuleComment,
                 CustomParamsList = GetCustomParametersList(vm),
 
-                AnnotationFamilyName = vm.AnnotationFamily?.Name,
-                AnnotationFamilyFilterValues = GetFiltrationComboBoxFilterList(vm.AnnotationFamilyFilter),
-                AnnotationTypeName = vm.AnnotationType?.Name,
+                AnnotationTypeName =
+                    string.Format("{0}: {1}",
+                    vm.AnnotationType?.FamilyName ?? string.Empty,
+                    vm.AnnotationType?.Name ?? string.Empty),
                 AnnotationTypeFilterValues = GetFiltrationComboBoxFilterList(vm.AnnotationTypeFilter),
             },
 
