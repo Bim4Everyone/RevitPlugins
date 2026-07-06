@@ -16,16 +16,18 @@
     
     d:DataContext="{d:DesignInstance Type=customParams:CustomParameterVM}"
     mc:Ignorable="d"
+    x:Name="root"
+    
     d:DesignHeight="50"
     d:DesignWidth="400"
+    
     Validation.ErrorTemplate="{x:Null}">
+    
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
-                <ResourceDictionary
-                    Source="../ErrorCustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -52,7 +54,7 @@
             Grid.Column="1"
             Margin="5"
             VerticalAlignment="Top"
-            Style="{StaticResource ErrorTextBoxStyle}"
+            Style="{Binding Path=TextBoxStyle, ElementName=root, TargetNullValue={StaticResource {x:Type ui:TextBox}}}"
             Text="{Binding 
                 Path=ParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
                 ValidatesOnNotifyDataErrors=True}" />

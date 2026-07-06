@@ -1292,6 +1292,7 @@
     <!--CustomParameter-->
     <DataTemplate
         DataType="{x:Type customParams:CustomParameterVM}">
-        <controls:CustomParamItemControl />
+        <controls:CustomParamItemControl
+            TextBoxStyle="{StaticResource ErrorTextBoxStyle}" />
     </DataTemplate>
 </ResourceDictionary>
