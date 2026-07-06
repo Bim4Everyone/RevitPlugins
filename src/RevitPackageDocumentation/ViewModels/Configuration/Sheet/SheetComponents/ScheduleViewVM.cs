@@ -230,7 +230,15 @@ internal class ScheduleViewVM : SheetComponentVM {
     }
 
     private ScheduleFilter CreateFilter(ScheduleDefinition definition, ScheduleFilterRuleVM rule) {
-        // Пытаемся создать фильтр, где поле является параметров рабочего набора
+        var filterType = rule.SelectedFilterType.FilterType;
+        if(filterType == ScheduleFilterType.HasValue
+            || filterType == ScheduleFilterType.HasNoValue
+            || filterType == ScheduleFilterType.HasParameter) {
+            // Создаем фильтр для поля по правилу имеет/не имеет значение/параметр
+            return CreateHasFilter(definition, rule);
+        }
+
+        // Пытаемся создать фильтр, где поле является параметром рабочего набора
         var worksetFilter = CreateWorksetFilter(definition, rule);
 
         if(worksetFilter is null) {
@@ -281,6 +289,16 @@ internal class ScheduleViewVM : SheetComponentVM {
                     filterType,
                     value);
             }
+        }
+        return null;
+    }
+
+    private ScheduleFilter CreateHasFilter(ScheduleDefinition definition, ScheduleFilterRuleVM rule) {
+        var fieldId = rule.SelectedSpecField.Field.FieldId;
+        var filterType = rule.SelectedFilterType.FilterType;
+
+        if(definition.CanFilterByParameterExistence(fieldId) || definition.CanFilterByValuePresence(fieldId)) {
+            return new ScheduleFilter(fieldId, filterType);
         }
         return null;
     }
