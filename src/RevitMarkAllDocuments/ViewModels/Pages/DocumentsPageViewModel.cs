@@ -12,7 +12,11 @@ internal class DocumentsPageViewModel : BaseViewModel {
     private readonly ObservableCollection<DocumentViewModel> _documents;
 
     public DocumentsPageViewModel(RevitRepository repository, ILocalizationService localizationService) {
-        _documents = [.. repository.GetAllDocuments().Select(doc => new DocumentViewModel(doc, localizationService))];
+        _documents = [
+            .. repository.GetAllDocuments()
+                .Select(doc => new DocumentViewModel(doc, localizationService))
+                .OrderBy(x => x.Name)
+        ];
     }
 
     public ObservableCollection<DocumentViewModel> Documents => _documents;
