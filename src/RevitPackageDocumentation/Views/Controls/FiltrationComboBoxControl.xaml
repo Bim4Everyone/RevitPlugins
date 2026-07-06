@@ -15,13 +15,17 @@
     mc:Ignorable="d"
     x:Name="root"
     d:DesignHeight="100"
-    d:DesignWidth="400">
+    d:DesignWidth="400"
+    
+    Validation.ErrorTemplate="{x:Null}">
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../ErrorCustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             
             <DataTemplate
@@ -55,6 +59,7 @@
             Margin="0 5 5 5"
             VerticalAlignment="Top"
             DisplayMemberPath="Name"
+            Style="{Binding Path=ComboBoxStyle, ElementName=root, TargetNullValue={StaticResource {x:Type ComboBox}}}"
             ItemsSource="{Binding Path=FilteredItemsSource, ElementName=root}"
             SelectedItem="{Binding Path=ComboBoxSelected, ElementName=root}"
             ItemTemplate="{Binding ItemTemplate, ElementName=root}">

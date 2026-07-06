@@ -32,6 +32,9 @@ public partial class FiltrationComboBoxControl : UserControl {
     public static readonly DependencyProperty ItemTemplateProperty = DependencyProperty.Register(
         nameof(ItemTemplate), typeof(DataTemplate), typeof(FiltrationComboBoxControl), new PropertyMetadata(default(DataTemplate)));
 
+    public static readonly DependencyProperty ComboBoxStyleProperty =
+        DependencyProperty.Register(nameof(ComboBoxStyle), typeof(Style), typeof(FiltrationComboBoxControl));
+
     public FiltrationComboBoxControl() {
         InitializeComponent();
     }
@@ -59,6 +62,11 @@ public partial class FiltrationComboBoxControl : UserControl {
     public DataTemplate ItemTemplate {
         get => (DataTemplate) GetValue(ItemTemplateProperty);
         set => SetValue(ItemTemplateProperty, value);
+    }
+
+    public Style ComboBoxStyle {
+        get => (Style) GetValue(ComboBoxStyleProperty);
+        set => SetValue(ComboBoxStyleProperty, value);
     }
 
     /// <summary>

@@ -55,7 +55,7 @@
                             ValidatesOnNotifyDataErrors=True}"
                         PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         UpdateCommand="{Binding PropUpdateByFormulaCommand}"
-                        TextBoxStyle="{StaticResource ErrorFormulaTextBoxStyle}"/>
+                        TextBoxStyle="{StaticResource ErrorControlTextBoxStyle}"/>
                 </Grid>
 
                 <Grid
@@ -76,7 +76,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.PlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding ViewFamilyTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding ViewFamilyTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}"/>
                 </Grid>
             </WrapPanel>
 
@@ -105,7 +106,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}"/>
                 </Grid>
                 
                 <Grid>
@@ -125,7 +127,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding ViewTemplateFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding ViewTemplateFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
                 
                 <Grid>
@@ -162,6 +165,7 @@
                     <ComboBox
                         Grid.Column="1"
                         Margin="5"
+                        Style="{StaticResource ErrorComboBoxStyle}"
                         ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
                         DisplayMemberPath="ParamName"
                         SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
@@ -263,7 +267,7 @@
                             ValidatesOnNotifyDataErrors=True}"
                         PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         UpdateCommand="{Binding PropUpdateByFormulaCommand}"
-                        TextBoxStyle="{StaticResource ErrorFormulaTextBoxStyle}"/>
+                        TextBoxStyle="{StaticResource ErrorControlTextBoxStyle}"/>
                 </Grid>
 
                 <Grid
@@ -284,7 +288,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.PlanViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding ViewFamilyTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding ViewFamilyTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
             </WrapPanel>
 
@@ -312,7 +317,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
     
                 <Grid>
@@ -332,7 +338,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.PlanViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding ViewTemplateFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding ViewTemplateFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
     
                 <Grid>
@@ -368,6 +375,7 @@
                     <ComboBox
                         Grid.Column="1"
                         Margin="5"
+                        Style="{StaticResource ErrorComboBoxStyle}"
                         ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
                         DisplayMemberPath="ParamName"
                         SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
@@ -472,7 +480,7 @@
                             ValidatesOnNotifyDataErrors=True}"
                         PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         UpdateCommand="{Binding PropUpdateByFormulaCommand}"
-                        TextBoxStyle="{StaticResource ErrorFormulaTextBoxStyle}" />
+                        TextBoxStyle="{StaticResource ErrorControlTextBoxStyle}" />
                 </Grid>
 
                 <Grid
@@ -495,7 +503,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.SectionViewFamilyTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewFamilyType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding ViewFamilyTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding ViewFamilyTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
             </WrapPanel>
 
@@ -523,7 +532,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
     
                 <Grid>
@@ -543,7 +553,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.SectionViewTemplates, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding ViewTemplateFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding ViewTemplateFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
     
                 <Grid>
@@ -579,6 +590,7 @@
                     <ComboBox
                         Grid.Column="1"
                         Margin="5"
+                        Style="{StaticResource ErrorComboBoxStyle}"
                         ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
                         DisplayMemberPath="ParamName"
                         SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
@@ -679,7 +691,7 @@
                             ValidatesOnNotifyDataErrors=True}"
                         PropResult="{Binding Path=ViewName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         UpdateCommand="{Binding PropUpdateByFormulaCommand}"
-                        TextBoxStyle="{StaticResource ErrorFormulaTextBoxStyle}" />
+                        TextBoxStyle="{StaticResource ErrorControlTextBoxStyle}" />
                 </Grid>
 
                 <Grid
@@ -701,7 +713,8 @@
                         ComboBoxSource="{Binding DataContext.SpecsInPj, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ReferenceSpec, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         FilterList="{Binding ReferenceSpecFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ComboBoxSelectionChangedCommand="{Binding SelectReferenceSpecCommand}"/>
+                        ComboBoxSelectionChangedCommand="{Binding SelectReferenceSpecCommand}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
             </WrapPanel>
 
@@ -783,6 +796,7 @@
                             Grid.Row="1"
                             Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
+                            Validation.ErrorTemplate="{x:Null}"
                             ItemsSource="{Binding Path=ScheduleFilterList.ScheduleFilterRules, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
                 </Border>
@@ -887,7 +901,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.TextNoteTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding TextNoteType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding TextNoteTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding TextNoteTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
 
                 <Grid>
@@ -926,7 +941,7 @@
                     ValidatesOnNotifyDataErrors=True}"
                 PropResult="{Binding Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 UpdateCommand="{Binding PropUpdateByFormulaCommand}"
-                TextBoxStyle="{StaticResource ErrorFormulaTextBoxStyle}" />
+                TextBoxStyle="{StaticResource ErrorControlTextBoxStyle}" />
 
             <UniformGrid
                 Grid.Row="3"
@@ -1018,7 +1033,8 @@
                     ComboBoxSource="{Binding DataContext.GenericAnnotationTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                     ComboBoxSelected="{Binding AnnotationType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     FilterList="{Binding AnnotationTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ItemTemplate="{StaticResource WithFamilyNameItemTemplate}"/>
+                    ItemTemplate="{StaticResource WithFamilyNameItemTemplate}"
+                    ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
             </Grid>
 
             <UniformGrid
@@ -1114,7 +1130,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.LegendsInProject, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding LegendView, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding LegendViewFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding LegendViewFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
 
                 <Grid>
@@ -1135,7 +1152,8 @@
                         Margin="5"
                         ComboBoxSource="{Binding DataContext.ViewportTypes, RelativeSource={RelativeSource AncestorType=Window}}"
                         ComboBoxSelected="{Binding ViewportType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        FilterList="{Binding ViewportTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                 </Grid>
             </UniformGrid>
             
