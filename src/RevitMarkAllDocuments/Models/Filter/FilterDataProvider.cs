@@ -7,7 +7,7 @@ using Bim4Everyone.RevitFiltration.Controls;
 
 using dosymep.Bim4Everyone;
 
-namespace RevitMarkAllDocuments.Models;
+namespace RevitMarkAllDocuments.Models.Filter;
 
 internal class FilterDataProvider {
     private readonly Document _document;

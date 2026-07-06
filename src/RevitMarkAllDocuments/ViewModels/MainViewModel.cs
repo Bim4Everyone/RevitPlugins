@@ -14,6 +14,7 @@ using dosymep.WPF.ViewModels;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 using RevitMarkAllDocuments.Models;
+using RevitMarkAllDocuments.Models.Filter;
 using RevitMarkAllDocuments.Services;
 using RevitMarkAllDocuments.Services.Export;
 
