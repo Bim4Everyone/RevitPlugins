@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Windows;
 
 using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
@@ -36,7 +37,9 @@ internal class WindowsService : IWindowsService {
 
         if(!markListViewModel.MarkedElements.Any()) {
             _messageBoxService.Show(_localizationService.GetLocalizedString("MessageBox.NoElements"),
-                                    _localizationService.GetLocalizedString("MessageBox.Title"));
+                _localizationService.GetLocalizedString("MessageBox.Title"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
             return false;
         }
 

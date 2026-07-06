@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,8 +51,10 @@ internal class MainViewModel : BaseViewModel {
                          WindowsService markListWindowService,
                          ILogicalFilterProviderFactory filterFactory,
                          JsonSerializerService jsonService,
+                         IOpenFolderDialogService openFolderDialogService,
                          IFilterContextParser filterParser,
-                         ILocalizationService localizationService) {        
+                         ILocalizationService localizationService) {
+        OpenFolderDialogService = openFolderDialogService;
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _documentService = documentService;
@@ -74,6 +77,8 @@ internal class MainViewModel : BaseViewModel {
     public ICommand LoadViewCommand { get; }
     
     public ICommand AcceptViewCommand { get; }
+
+    public IOpenFolderDialogService OpenFolderDialogService { get; }
 
     public DocumentsPageViewModel DocumentsPageViewModel => _documentsPageViewModel;
     public FilterPageViewModel FilterPageViewModel => _filterPageViewModel;
@@ -102,12 +107,8 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private string SelectFolder() {
-        var dialog = new CommonOpenFileDialog() {
-            IsFolderPicker = true
-        };
-
-        if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
-            return dialog.FileName;
+        if(OpenFolderDialogService.ShowDialog()) {
+            return OpenFolderDialogService.Folder.FullName;
         }
 
         return string.Empty;
