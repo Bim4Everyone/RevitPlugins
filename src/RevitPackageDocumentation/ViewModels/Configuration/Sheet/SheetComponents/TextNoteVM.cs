@@ -79,7 +79,7 @@ internal class TextNoteVM : SheetComponentVM {
         var options = new TextNoteOptions(TextNoteType.Id);
         var position = new XYZ(
             UnitUtilsHelper.ConvertToInternalValue(-190),
-            UnitUtilsHelper.ConvertToInternalValue(120),
+            UnitUtilsHelper.ConvertToInternalValue(170),
             0);
         var textNoteInstance = TextNote.Create(Repository.Document, sheetInstance.Id, position, Text, options);
 
