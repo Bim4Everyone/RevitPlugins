@@ -12,7 +12,6 @@ internal abstract class ModuleVM : BaseParamContainerVM {
     private string _moduleComment = string.Empty;
     private string _moduleCode = string.Empty;
     private string _moduleTypeName = string.Empty;
-    private string _moduleErrors = string.Empty;
 
     protected ModuleVM(
         RevitRepository repository,
@@ -45,11 +44,6 @@ internal abstract class ModuleVM : BaseParamContainerVM {
     public string ModuleTypeName {
         get => _moduleTypeName;
         set => RaiseAndSetIfChanged(ref _moduleTypeName, value);
-    }
-
-    public string ModuleErrors {
-        get => _moduleErrors;
-        set => RaiseAndSetIfChanged(ref _moduleErrors, value);
     }
 
     public abstract void CreateComponent();

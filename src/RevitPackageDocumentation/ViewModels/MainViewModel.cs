@@ -87,8 +87,6 @@ internal class MainViewModel : BaseViewModel {
         ImportCommand = RelayCommand.Create(ImportSheetSet);
         ExportCommand = RelayCommand.Create(ExportSheetSet);
 
-        CreateComponentCommand = RelayCommand.Create<SheetComponentVM>(CreateComponent, CanCreateComponent);
-
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
@@ -97,9 +95,6 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand ImportCommand { get; }
     public ICommand ExportCommand { get; }
-
-    public ICommand CreateComponentCommand { get; }
-
     public ICommand SelectElemForParamCommand { get; }
 
 
@@ -341,12 +336,12 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        //if(CurrentSheetSet?.SheetList?
-        //    .Where(s => s.IsModuleCheck)
-        //    .Any(p => !string.IsNullOrEmpty(p.ModuleErrors)) == true) {
-        //    ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheets");
-        //    return false;
-        //}
+        if(CurrentSheetSet?.SheetList?
+            .Where(s => s.IsModuleCheck)
+            .Any(c => c.HasErrors) ?? true) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheets");
+            return false;
+        }
         if(CurrentSheetSet?.SheetList?.Count() == 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.SheetSetHasNotSheets");
             return false;
@@ -360,7 +355,7 @@ internal class MainViewModel : BaseViewModel {
             ?.SelectMany(s => s.SheetComponents)
             .Where(c => c.IsModuleCheck)
             .ToList() ?? []) {
-            var name = sheetComponent switch {
+            string name = sheetComponent switch {
                 ScheduleViewVM sv => sv.ViewName,
                 SectionViewVM sv => sv.ViewName,
                 CalloutViewVM sv => sv.ViewName,
@@ -378,16 +373,19 @@ internal class MainViewModel : BaseViewModel {
             }
         }
 
+        var paramNames = new HashSet<string>();
+        foreach(var parameter in CurrentSheetSet.SheetSetParams.Params) {
+            string name = parameter.ParamName;
+            if(string.IsNullOrEmpty(name))
+                continue;
+
+            if(!paramNames.Add(name)) {
+                ErrorText = $"{_localizationService.GetLocalizedString("MainWindow.ParamNameAlreadyHas")} - {name}";
+                return false;
+            }
+        }
+
         ErrorText = string.Empty;
-        return true;
-    }
-
-    private void CreateComponent(SheetComponentVM sheetComponent) {
-        _messageBoxService.Show($"Creating {sheetComponent.ModuleName}", "Creating");
-    }
-
-    private bool CanCreateComponent(SheetComponentVM sheetComponent) {
-
         return true;
     }
 

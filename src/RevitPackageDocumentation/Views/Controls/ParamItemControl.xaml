@@ -20,6 +20,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../ErrorCustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <Style
@@ -38,6 +40,14 @@
                                     Opacity="0.3" />
                             </Setter.Value>
                         </Setter>
+
+                        <Setter
+                            Property="BorderBrush"
+                            Value="{StaticResource ErrorBorderBrush}" />
+
+                        <Setter
+                            Property="BorderThickness"
+                            Value="{StaticResource ErrorBorderThickness}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
