@@ -8,6 +8,8 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ComboBox/ComboBox.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBox/TextBox.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/NumberBox/NumberBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <SolidColorBrush
@@ -228,6 +230,45 @@
                     Property="Background"
                     Value="{StaticResource ErrorBackgroundBrush}" />
             </DataTrigger>
+
+            <DataTrigger
+                Binding="{Binding DataContext.CurrentSheetSet.SelectedSheet, RelativeSource={RelativeSource AncestorType=Window}}"
+                Value="{x:Null}">
+                <Setter
+                    Property="IsEnabled"
+                    Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="ErrorNumberBoxStyle"
+        TargetType="ui:NumberBox"
+        BasedOn="{StaticResource DefaultUiNumberBoxStyle}">
+
+        <Setter
+            Property="Validation.ErrorTemplate"
+            Value="{x:Null}" />
+        <Setter
+            Property="IsEnabled"
+            Value="True" />
+
+        <Style.Triggers>
+            <Trigger
+                Property="Validation.HasError"
+                Value="True">
+                <Setter
+                    Property="BorderBrush"
+                    Value="{StaticResource ErrorBorderBrush}" />
+
+                <Setter
+                    Property="BorderThickness"
+                    Value="{StaticResource ErrorBorderThickness}" />
+
+                <Setter
+                    Property="Background"
+                    Value="{StaticResource ErrorBackgroundBrush}" />
+            </Trigger>
 
             <DataTrigger
                 Binding="{Binding DataContext.CurrentSheetSet.SelectedSheet, RelativeSource={RelativeSource AncestorType=Window}}"
