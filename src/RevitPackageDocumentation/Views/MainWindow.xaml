@@ -381,7 +381,7 @@
                                         Style="{StaticResource ErrorTextBoxStyle}"
                                         Text="{Binding 
                                             Path=CurrentSheetSet.SelectedSheet.SheetSize, UpdateSourceTrigger=PropertyChanged, 
-                                            Mode=TwoWay, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True}" />
+                                            Mode=TwoWay, ValidatesOnNotifyDataErrors=True}" />
 
                                     <ui:TextBlock
                                         Grid.Column="3"
@@ -427,7 +427,10 @@
                                     <ItemsControl
                                         Grid.Row="1"
                                         HorizontalContentAlignment="Stretch"
-                                        ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                        Validation.ErrorTemplate="{x:Null}"
+                                        ItemsSource="{Binding 
+                                            Path=CurrentSheetSet.SelectedSheet.CustomParamsList.Params, 
+                                            UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                                 </Grid>
                             </Border>
                         </Grid>

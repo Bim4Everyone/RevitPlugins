@@ -203,6 +203,7 @@
                             Grid.Row="1"
                             Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
+                            Validation.ErrorTemplate="{x:Null}"
                             ItemsSource="{Binding 
                                 Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
@@ -410,6 +411,7 @@
                             Grid.Row="1"
                             Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
+                            Validation.ErrorTemplate="{x:Null}"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
                 </Border>
@@ -618,6 +620,7 @@
                             Grid.Row="1"
                             Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
+                            Validation.ErrorTemplate="{x:Null}"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
                 </Border>
@@ -816,6 +819,7 @@
                                 Grid.Row="1"
                                 Margin="0 5 0 -5"
                                 HorizontalContentAlignment="Stretch"
+                                Validation.ErrorTemplate="{x:Null}"
                                 ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                         </Grid>
                     </Border>
@@ -959,6 +963,7 @@
                             Grid.Row="1"
                             Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
+                            Validation.ErrorTemplate="{x:Null}"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
                 </Border>
@@ -1051,6 +1056,7 @@
                             Grid.Row="1"
                             Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
+                            Validation.ErrorTemplate="{x:Null}"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
                 </Border>
@@ -1170,6 +1176,7 @@
                             Grid.Row="1"
                             Margin="0 5 0 -5"
                             HorizontalContentAlignment="Stretch"
+                            Validation.ErrorTemplate="{x:Null}"
                             ItemsSource="{Binding Path=CustomParamsList.Params, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </Grid>
                 </Border>
