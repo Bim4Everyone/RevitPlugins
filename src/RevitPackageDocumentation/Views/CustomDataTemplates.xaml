@@ -865,7 +865,8 @@
 
     <DataTemplate
         DataType="{x:Type filters:ScheduleFilterRuleVM}">
-        <controls:SpecFilterItemControl />
+        <controls:SpecFilterItemControl
+            ComboBoxStyle="{StaticResource ErrorComboBoxStyle}" />
     </DataTemplate>
 
     

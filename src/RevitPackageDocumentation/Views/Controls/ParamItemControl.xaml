@@ -35,7 +35,7 @@
                             <Setter.Value>
                                 <SolidColorBrush
                                     Color="Orange"
-                                    Opacity="0.5" />
+                                    Opacity="0.3" />
                             </Setter.Value>
                         </Setter>
                     </DataTrigger>
