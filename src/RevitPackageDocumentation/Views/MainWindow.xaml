@@ -262,7 +262,7 @@
                         Grid.Row="0"
                         Margin="5 13"
                         VerticalAlignment="Top"
-                        Text="Имя листа" />
+                        Text="{me:LocalizationSource MainWindow.SheetName}" />
 
                     <controls:FormulaTextBoxControl
                         Grid.Row="0"
@@ -289,7 +289,7 @@
                         Grid.ColumnSpan="4"
                         Grid.Row="1"
                         Margin="5"
-                        Header="Настройки листа">
+                        Header="{me:LocalizationSource MainWindow.SheetSettings}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -311,7 +311,7 @@
                                         Grid.Column="0"
                                         Margin="10 5 5 5"
                                         VerticalAlignment="Center"
-                                        Text="Семейство рамки" />
+                                        Text="{me:LocalizationSource MainWindow.TitleBlockFamily}" />
 
                                     <ComboBox
                                         Grid.Column="1"
@@ -340,7 +340,7 @@
                                         Grid.Column="0"
                                         Margin="10 5 5 5"
                                         VerticalAlignment="Center"
-                                        Text="Типоразмер рамки" />
+                                        Text="{me:LocalizationSource MainWindow.TitleBlockType}" />
 
                                     <ComboBox
                                         Grid.Column="1"
@@ -365,14 +365,14 @@
                                         Grid.Column="0"
                                         Margin="10 5 5 5"
                                         VerticalAlignment="Center"
-                                        Text="Размер листа" />
+                                        Text="{me:LocalizationSource MainWindow.SheetSize}" />
 
                                     <ui:TextBlock
                                         Grid.Column="1"
                                         Margin="5"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Right"
-                                        Text="А" />
+                                        Text="A" />
 
                                     <ui:TextBox
                                         Grid.Column="2"
@@ -415,7 +415,7 @@
                                         Margin="5 0"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Left"
-                                        Text="Дополнительные параметры" />
+                                        Text="{me:LocalizationSource MainWindow.CustomParams}" />
 
                                     <ui:Button
                                         Grid.Row="0"

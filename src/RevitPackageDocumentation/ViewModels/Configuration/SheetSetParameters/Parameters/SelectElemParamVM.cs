@@ -14,8 +14,6 @@ internal class SelectElemParamVM : PluginParamVM {
         string paramComment,
         ILocalizationService localizationService)
         : base(sheetSetParamsList, paramName, paramComment, localizationService) {
-        //ValidateParamValue();
-
         ValidateAllProperties();
     }
 
@@ -24,8 +22,4 @@ internal class SelectElemParamVM : PluginParamVM {
         get => _selectedElem;
         set => RaiseAndSetIfChanged(ref _selectedElem, value);
     }
-
-    //public override void ValidateParamValue() {
-    //    ErrorInParamValue = SelectedElem is null;
-    //}
 }

@@ -12,7 +12,6 @@ internal class StringParamVM : PluginParamVM {
         ILocalizationService localizationService)
         : base(sheetSetParamsList, paramName, paramComment, localizationService) {
         StringValue = stringValue ?? string.Empty;
-        //ValidateParamValue();
         ValidateAllProperties();
     }
 
@@ -20,8 +19,4 @@ internal class StringParamVM : PluginParamVM {
         get => _stringValue;
         set => RaiseAndSetIfChanged(ref _stringValue, value);
     }
-
-    //public override void ValidateParamValue() {
-    //    ErrorInParamValue = string.IsNullOrEmpty(StringValue);
-    //}
 }

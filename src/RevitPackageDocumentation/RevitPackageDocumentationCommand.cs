@@ -20,6 +20,7 @@ using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels;
 using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.Views;
+using RevitPackageDocumentation.Views.Extensions;
 
 namespace RevitPackageDocumentation;
 
@@ -119,6 +120,10 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+        // Инициализируем extension для локализации ресурсов в файле ресурсов (без доступа к ресурсам окна)
+        var localizationService = kernel.Get<ILocalizationService>();
+        LocalizedExtension.Init(localizationService);
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());

@@ -4,6 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:c="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui"
     
     xmlns:s="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
@@ -45,7 +46,7 @@
                         Grid.Column="0"
                         Margin="5 13"
                         VerticalAlignment="Center"
-                        Text="Имя вида" />
+                        Text="{extensions:Localized MainWindow.ViewName}" />
 
                     <controls:FormulaTextBoxControl
                         Grid.Column="1"
@@ -69,7 +70,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Типоразмер вида" />
+                        Text="{extensions:Localized MainWindow.ViewFamilyType}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -99,7 +100,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Типоразмер видового экрана" />
+                        Text="{extensions:Localized MainWindow.ViewportType}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -120,7 +121,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Шаблон вида" />
+                        Text="{extensions:Localized MainWindow.ViewTemplate}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -141,7 +142,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Количество" />
+                        Text="{extensions:Localized MainWindow.Count}" />
 
                     <ui:NumberBox
                         Grid.Column="1"
@@ -161,7 +162,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Привязка к объекту" />
+                        Text="{extensions:Localized MainWindow.BindingToObject}" />
 
                     <ComboBox
                         Grid.Column="1"
@@ -196,7 +197,7 @@
                             Margin="5 0"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
-                            Text="Дополнительные параметры" />
+                            Text="{extensions:Localized MainWindow.CustomParams}" />
 
                         <ui:Button
                             Grid.Row="0"
@@ -221,7 +222,7 @@
                     VerticalAlignment="Stretch"
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
-                    PlaceholderText="Комментарии"
+                    PlaceholderText="{extensions:Localized MainWindow.Comments}"
                     Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
@@ -259,7 +260,7 @@
                         Grid.Column="0"
                         Margin="5 13"
                         VerticalAlignment="Center"
-                        Text="Имя вида" />
+                        Text="{extensions:Localized MainWindow.ViewName}" />
 
                     <controls:FormulaTextBoxControl
                         Grid.Column="1"
@@ -282,7 +283,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Типоразмер вида" />
+                        Text="{extensions:Localized MainWindow.ViewFamilyType}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -311,7 +312,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Типоразмер видового экрана" />
+                        Text="{extensions:Localized MainWindow.ViewportType}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -332,7 +333,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Шаблон вида" />
+                        Text="{extensions:Localized MainWindow.ViewTemplate}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -353,7 +354,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Количество" />
+                        Text="{extensions:Localized MainWindow.Count}" />
 
                     <ui:NumberBox
                         Grid.Column="1"
@@ -372,7 +373,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Привязка к объекту" />
+                        Text="{extensions:Localized MainWindow.BindingToObject}" />
 
                     <ComboBox
                         Grid.Column="1"
@@ -409,7 +410,7 @@
                             Margin="5 0"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
-                            Text="Дополнительные параметры" />
+                            Text="{extensions:Localized MainWindow.CustomParams}" />
 
                         <ui:Button
                             Grid.Row="0"
@@ -433,7 +434,7 @@
                     VerticalAlignment="Stretch"
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
-                    PlaceholderText="Комментарии"
+                    PlaceholderText="{extensions:Localized MainWindow.Comments}"
                     Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
@@ -473,7 +474,7 @@
                         Grid.Column="0"
                         Margin="5 13"
                         VerticalAlignment="Center"
-                        Text="Имя вида" />
+                        Text="{extensions:Localized MainWindow.ViewName}" />
 
                     <controls:FormulaTextBoxControl
                         Grid.Column="1"
@@ -498,7 +499,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Типоразмер вида" />
+                        Text="{extensions:Localized MainWindow.ViewFamilyType}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -527,7 +528,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Типоразмер видового экрана" />
+                        Text="{extensions:Localized MainWindow.ViewportType}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -548,7 +549,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Шаблон вида" />
+                        Text="{extensions:Localized MainWindow.ViewTemplate}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -569,7 +570,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Количество" />
+                        Text="{extensions:Localized MainWindow.Count}" />
 
                     <ui:NumberBox
                         Grid.Column="1"
@@ -588,7 +589,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Привязка к объекту" />
+                        Text="{extensions:Localized MainWindow.BindingToObject}" />
 
                     <ComboBox
                         Grid.Column="1"
@@ -623,7 +624,7 @@
                             Margin="5 0"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
-                            Text="Дополнительные параметры" />
+                            Text="{extensions:Localized MainWindow.CustomParams}" />
 
                         <ui:Button
                             Grid.Row="0"
@@ -647,7 +648,7 @@
                     VerticalAlignment="Stretch"
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
-                    PlaceholderText="Комментарии"
+                    PlaceholderText="{extensions:Localized MainWindow.Comments}"
                     Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
@@ -685,7 +686,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Имя итоговой" />
+                        Text="{extensions:Localized MainWindow.FinalSpecName}" />
 
                     <controls:FormulaTextBoxControl
                         Grid.Column="1"
@@ -708,7 +709,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Имя исходной" />
+                        Text="{extensions:Localized MainWindow.ReferenceSpecName}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -738,7 +739,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Ряд размещения" />
+                        Text="{extensions:Localized MainWindow.PlacementColumn}" />
 
                     <ui:NumberBox
                         Grid.Column="1"
@@ -757,7 +758,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Количество" />
+                        Text="{extensions:Localized MainWindow.Count}" />
 
                     <ui:NumberBox
                         Grid.Column="1"
@@ -789,7 +790,7 @@
                             Margin="5 0"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
-                            Text="Фильтры" />
+                            Text="{extensions:Localized MainWindow.Filters}" />
 
                         <ui:Button
                             Grid.Row="0"
@@ -826,7 +827,7 @@
                                 Margin="5 0"
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Left"
-                                Text="Дополнительные параметры" />
+                                Text="{extensions:Localized MainWindow.CustomParams}" />
 
                             <ui:Button
                                 Grid.Row="0"
@@ -849,7 +850,7 @@
                         VerticalAlignment="Stretch"
                         AcceptsReturn="True"
                         TextWrapping="WrapWithOverflow"
-                        PlaceholderText="Комментарии"
+                        PlaceholderText="{extensions:Localized MainWindow.Comments}"
                         Foreground="LightGray"
                         Text="{Binding ModuleComment}" />
                 </Grid>
@@ -900,7 +901,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Типоразмер текста" />
+                        Text="{extensions:Localized MainWindow.TextNoteType}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -924,7 +925,7 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Ширина текста на листе" />
+                        Text="{extensions:Localized MainWindow.TextWidthOnSheet}" />
 
                     <ui:NumberBox
                         Grid.Column="1"
@@ -938,7 +939,7 @@
                 Grid.Row="1"
                 Margin="5"
                 VerticalAlignment="Center"
-                Text="Шаблон текста" />
+                Text="{extensions:Localized MainWindow.TextTemplate}" />
 
             <controls:FormulaTextBoxControl
                 Grid.Row="2"
@@ -973,7 +974,7 @@
                             Margin="5 0"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
-                            Text="Дополнительные параметры" />
+                            Text="{extensions:Localized MainWindow.CustomParams}" />
 
                         <ui:Button
                             Grid.Row="0"
@@ -997,7 +998,7 @@
                     VerticalAlignment="Stretch"
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
-                    PlaceholderText="Комментарии"
+                    PlaceholderText="{extensions:Localized MainWindow.Comments}"
                     Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
@@ -1032,7 +1033,7 @@
                     Grid.Column="0"
                     Margin="5"
                     VerticalAlignment="Center"
-                    Text="Типоразмер" />
+                    Text="{extensions:Localized MainWindow.ElementType}" />
 
                 <controls:FiltrationComboBoxControl
                     Grid.Column="1"
@@ -1067,7 +1068,7 @@
                             Margin="5 0"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
-                            Text="Дополнительные параметры" />
+                            Text="{extensions:Localized MainWindow.CustomParams}" />
 
                         <ui:Button
                             Grid.Row="0"
@@ -1091,7 +1092,7 @@
                     VerticalAlignment="Stretch"
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
-                    PlaceholderText="Комментарии"
+                    PlaceholderText="{extensions:Localized MainWindow.Comments}"
                     Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
@@ -1130,7 +1131,7 @@
                         Grid.Row="0"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Имя" />
+                        Text="{extensions:Localized MainWindow.ViewName}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -1152,7 +1153,7 @@
                         Grid.Row="1"
                         Margin="5"
                         VerticalAlignment="Center"
-                        Text="Типоразмер видового экрана" />
+                        Text="{extensions:Localized MainWindow.ViewportType}" />
 
                     <controls:FiltrationComboBoxControl
                         Grid.Column="1"
@@ -1189,7 +1190,7 @@
                             Margin="5 0"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
-                            Text="Дополнительные параметры" />
+                            Text="{extensions:Localized MainWindow.CustomParams}" />
 
                         <ui:Button
                             Grid.Row="0"
@@ -1213,7 +1214,7 @@
                     VerticalAlignment="Stretch"
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
-                    PlaceholderText="Комментарии"
+                    PlaceholderText="{extensions:Localized MainWindow.Comments}"
                     Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
@@ -1274,7 +1275,7 @@
 
             <Button
                 Margin="2 0"
-                Content="Выбрать"
+                Content="{extensions:Localized MainWindow.Select}"
                 Command="{Binding 
                     Path=DataContext.SelectElemForParamCommand, 
                     RelativeSource={RelativeSource AncestorType=Window}}"

@@ -38,49 +38,43 @@
     <system:String x:Key="Type.StringParamVM">Текстовый параметр</system:String>
     <system:String x:Key="Type.SelectElemParamVM">Выбор элемента</system:String>
     
-    <system:String x:Key="MainWindow.ViewNameIsEmpty">Не заполнено имя вида</system:String>
-    <!--<system:String x:Key="MainWindow.SheetNameIsEmpty">Не заполнено имя листа</system:String>-->
-    <system:String x:Key="MainWindow.ReferenceViewNameIsEmpty">Не заполнено имя эталонной спецификации</system:String>
-    <system:String x:Key="MainWindow.TextIsEmpty">Не заполнено текст</system:String>
-    <system:String x:Key="MainWindow.TextWidthIsNotCorrect">Ширина текста не корректна</system:String>
     
-    <system:String x:Key="MainWindow.ViewFamilyTypeIsNull">Не выбран тип вида</system:String>
-    <system:String x:Key="MainWindow.ViewportTypeIsNull">Не выбран тип видового экрана</system:String>
-    <system:String x:Key="MainWindow.ViewTemplateIsNull">Не выбран шаблон вида</system:String>
-    <system:String x:Key="MainWindow.LegendViewIsNull">Не выбрана легенда для размещения</system:String>
-    <system:String x:Key="MainWindow.TextNoteTypeIsNull">Не выбран тип текстовой заметки</system:String>
-    <system:String x:Key="MainWindow.AnnotationFamilyIsNull">Не выбрано семейство типовой аннотации</system:String>
-    <system:String x:Key="MainWindow.AnnotationTypeIsNull">Не выбран тип типовой аннотации</system:String>
-    <system:String x:Key="MainWindow.TitleBlockFamilyIsNull">Не выбрано семейство рамки листа</system:String>
-    <system:String x:Key="MainWindow.TitleBlockTypeIsNull">Не выбран тип рамки листа</system:String>
-    <system:String x:Key="MainWindow.SelectedSelectElemParamIsNull">Не выбран параметр привязки к объекту</system:String>
-    <system:String x:Key="MainWindow.SelectedSelectElemParamValueIsNull">В параметре привязки к объекту не выбран элемент</system:String>
-    
-    <system:String x:Key="MainWindow.ViewCountIsNotCorrect">Число задано некорректно</system:String>
-    <system:String x:Key="MainWindow.ViewColumnIsNotCorrect">Номер столбца задан некорректно</system:String>
-    <system:String x:Key="MainWindow.SheetSizeIsNotCorrect">Значение номера формата листа не корректно</system:String>
-    <system:String x:Key="MainWindow.SheetCoefficientIsNotCorrect">Значение коэффициента формата листа не корректно</system:String>
-    <system:String x:Key="MainWindow.ScheduleFiltersIsNotCorrect">Фильтры спецификации не корректны</system:String>
-    <system:String x:Key="MainWindow.CustomParamsIsNotCorrect">Дополнительные параметры не корректны</system:String>
-    <system:String x:Key="MainWindow.HasNotPlanView">Расположите компонент после вида в плане</system:String>
-    
-    <system:String x:Key="MainWindow.ErrorInSheetSetParamNames">Исправлены не все имена параметров комплекта</system:String>
-    <system:String x:Key="MainWindow.ErrorInSheetSetParamValues">Исправлены не все значения параметров комплекта</system:String>
     <system:String x:Key="MainWindow.ErrorInSheets">Исправлены не все ошибки в выбранных листах комплекта</system:String>
     <system:String x:Key="MainWindow.SheetSetHasNotSheets">В комплект не добавлено ни одного листа</system:String>
     <system:String x:Key="MainWindow.NoSheetsSelected">Не выбрано ни одного листа</system:String>
-    <system:String x:Key="MainWindow.ErrorInSheetComponents">Исправлены не все ошибки в компонентах листа</system:String>
     <system:String x:Key="MainWindow.ViewNameAlreadyHas">Имя вида уже используется</system:String>
     <system:String x:Key="MainWindow.ParamNameAlreadyHas">Найдены параметры с одинаковыми именами</system:String>
     
     <system:String x:Key="MainWindow.PickElement">Выберите один элемент</system:String>
-    
     <system:String x:Key="MainWindow.ErrorsNotFound">Ошибки не найдены</system:String>
-
     <system:String x:Key="MainWindow.Edit">Изменить</system:String>
     
+    <system:String x:Key="MainWindow.SheetName">Имя листа</system:String>
+    <system:String x:Key="MainWindow.SheetSettings">Настройки листа</system:String>
+    <system:String x:Key="MainWindow.TitleBlockFamily">Семейство рамки</system:String>
+    <system:String x:Key="MainWindow.TitleBlockType">Типоразмер рамки</system:String>
+    <system:String x:Key="MainWindow.SheetSize">Размер листа</system:String>
+    <system:String x:Key="MainWindow.CustomParams">Дополнительные параметры</system:String>
     
-    
+    <system:String x:Key="MainWindow.ViewName">Имя вида</system:String>
+    <system:String x:Key="MainWindow.ViewFamilyType">Типоразмер вида</system:String>
+    <system:String x:Key="MainWindow.ViewTemplate">Шаблон вида</system:String>
+    <system:String x:Key="MainWindow.ViewportType">Типоразмер видового экрана</system:String>
+    <system:String x:Key="MainWindow.Count">Количество</system:String>
+    <system:String x:Key="MainWindow.BindingToObject">Привязка к объекту</system:String>
+    <system:String x:Key="MainWindow.Comments">Комментарии</system:String>
+    <system:String x:Key="MainWindow.FinalSpecName">Имя итоговой</system:String>
+    <system:String x:Key="MainWindow.ReferenceSpecName">Имя исходной</system:String>
+    <system:String x:Key="MainWindow.PlacementColumn">Ряд размещения</system:String>
+    <system:String x:Key="MainWindow.Filters">Фильтры</system:String>
+    <system:String x:Key="MainWindow.TextNoteType">Типоразмер текста</system:String>
+    <system:String x:Key="MainWindow.TextWidthOnSheet">Ширина текста на листе</system:String>
+    <system:String x:Key="MainWindow.TextTemplate">Шаблон текста</system:String>
+    <system:String x:Key="MainWindow.ElementType">Типоразмер</system:String>
+    <system:String x:Key="MainWindow.Select">Выбрать</system:String>
+
+
+
     <system:String x:Key="Validation.SheetNameIsEmpty">Имя листа не заполнено</system:String>
     <system:String x:Key="Validation.SheetNameIsNotCorrect">Имя листа заполнено некорректно</system:String>
     <system:String x:Key="Validation.SheetSizeIsEmpty">Значение номера формата листа не заполнено</system:String>
