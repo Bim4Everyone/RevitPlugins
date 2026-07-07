@@ -198,7 +198,7 @@
                         Grid.Column="1"
                         Margin="10"
                         MinWidth="170"
-                        HorizontalAlignment="Right"
+                        HorizontalAlignment="Left"
                         ItemsSource="{Binding Path=SheetSetParamTypes}"
                         SelectedItem="{Binding Path=SelectedSheetSetParamType}"
                         DisplayMemberPath="DisplayName"
@@ -217,9 +217,9 @@
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="1"
-                        Margin="10 10 40 10"
+                        Margin="20 5 5 5"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Right"
+                        HorizontalAlignment="Left"
                         Text="{me:LocalizationSource MainWindow.AddSheetSetParam}"
                         PreviewMouseDown="SheetSetParamTypesComboBox_PreviewMouseDown" />
 
@@ -479,9 +479,14 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
                     <ScrollViewer
                         Grid.Row="0"
+                        Grid.ColumnSpan="2"
                         VerticalScrollBarVisibility="Auto"
                         HorizontalScrollBarVisibility="Disabled">
 
@@ -493,9 +498,10 @@
                     <ComboBox
                         x:Name="ComponentTypesComboBox"
                         Grid.Row="1"
+                        Grid.Column="1"
                         Margin="5"
                         MinWidth="220"
-                        HorizontalAlignment="Right"
+                        HorizontalAlignment="Left"
                         ItemsSource="{Binding ComponentTypes}"
                         SelectedItem="{Binding SelectedComponentType}"
                         DisplayMemberPath="DisplayName"
@@ -513,9 +519,10 @@
 
                     <TextBlock
                         Grid.Row="1"
-                        Margin="5 5 35 5"
+                        Grid.Column="1"
+                        Margin="15 5 5 5"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Right"
+                        HorizontalAlignment="Left"
                         Text="{me:LocalizationSource MainWindow.AddSheetComponent}"
                         PreviewMouseDown="ComponentTypesComboBox_PreviewMouseDown" />
                 </Grid>
