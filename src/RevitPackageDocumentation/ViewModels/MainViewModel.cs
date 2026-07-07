@@ -28,8 +28,6 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-    private readonly IMessageBoxService _messageBoxService;
-    private readonly IFileDialogService _fileDialogService;
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
     private readonly IRevitElementPickerService _revitElementPickerService;
@@ -67,8 +65,9 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
+        IOpenFileDialogService openFileDialogService,
+        ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
-        IFileDialogService fileDialogService,
         ISheetSetVMFactory sheetSetVMFactory,
         ISheetSetDataFactory sheetSetDataFactory,
         IRevitElementPickerService revitElementPickerService,
@@ -77,12 +76,14 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
-        _messageBoxService = messageBoxService;
-        _fileDialogService = fileDialogService;
         _sheetSetVMFactory = sheetSetVMFactory;
         _sheetSetDataFactory = sheetSetDataFactory;
         _revitElementPickerService = revitElementPickerService;
         _sheetSetConfig = sheetSetConfig;
+
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
+        SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
 
         ImportCommand = RelayCommand.Create(ImportSheetSet);
         ExportCommand = RelayCommand.Create(ExportSheetSet);
@@ -97,7 +98,6 @@ internal class MainViewModel : BaseViewModel {
     public ICommand ExportCommand { get; }
     public ICommand SelectElemForParamCommand { get; }
 
-
     /// <summary>
     /// Команда загрузки главного окна.
     /// </summary>
@@ -109,6 +109,10 @@ internal class MainViewModel : BaseViewModel {
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
 
+
+    public IOpenFileDialogService OpenFileDialogService { get; }
+    public ISaveFileDialogService SaveFileDialogService { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -248,9 +252,11 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void ImportSheetSet() {
-        _sheetSetDataPath = _fileDialogService.OpenFileDialog();
-
-        if(_sheetSetDataPath is null) {
+        if(OpenFileDialogService.ShowDialog()) {
+            // Если пользователь выбрал файл при выборе файла
+            _sheetSetDataPath = OpenFileDialogService.File.FullName;
+            ImportSheetSet(_sheetSetDataPath);
+        } else {
             if(CurrentSheetSet is null) {
                 // Если пользователь нажал Отмена при выборе файла и текущая конфигурация еще не загружена
                 var sheetSetData = _sheetSetDataFactory.CreateSheetSetData();
@@ -259,9 +265,6 @@ internal class MainViewModel : BaseViewModel {
                 // Если пользователь нажал Отмена при выборе файла и текущая конфигурация УЖЕ загружена
                 return;
             }
-        } else {
-            // Если пользователь выбрал файл при выборе файла
-            ImportSheetSet(_sheetSetDataPath);
         }
     }
 
@@ -277,16 +280,32 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void ExportSheetSet() {
-        _sheetSetDataPath = _fileDialogService.SaveFileDialog();
-        if(string.IsNullOrEmpty(_sheetSetDataPath))
+        if(SaveFileDialogService.ShowDialog(_sheetSetDataPath, "config.json")) {
+            string temp = SaveFileDialogService.File.FullName;
+
+            // Если путь некорректен
+            if(string.IsNullOrEmpty(temp)) {
+                MessageBoxService.Show(
+                    _localizationService.GetLocalizedString("MainViewModel.ExportPathIsNotCorrect"),
+                    _localizationService.GetLocalizedString("MainViewModel.Export"));
+                return;
+            }
+
+            var currentSheetSetData = _sheetSetDataFactory.CreateSheetSetData(CurrentSheetSet);
+            _sheetSetConfig.Export(currentSheetSetData, temp);
+            // Сохраняем в плагине только после того, как все успешно экспортировалось
+            _sheetSetDataPath = temp;
+
+            MessageBoxService.Show(
+                _localizationService.GetLocalizedString("MainViewModel.ExportIsSuccessful"),
+                _localizationService.GetLocalizedString("MainViewModel.Export"));
+        } else {
+            // Если пользователь нажал отмена
+            MessageBoxService.Show(
+                _localizationService.GetLocalizedString("MainViewModel.ExportCanceled"),
+                _localizationService.GetLocalizedString("MainViewModel.Export"));
             return;
-
-        var currentSheetSetData = _sheetSetDataFactory.CreateSheetSetData(CurrentSheetSet);
-        _sheetSetConfig.Export(currentSheetSetData, _sheetSetDataPath);
-
-        _messageBoxService.Show(
-            _localizationService.GetLocalizedString("MainViewModel.ExportIsSuccessful"),
-            _localizationService.GetLocalizedString("MainViewModel.Export"));
+        }
     }
 
 

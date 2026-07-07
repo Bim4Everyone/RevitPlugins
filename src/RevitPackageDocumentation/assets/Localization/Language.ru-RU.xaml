@@ -113,6 +113,9 @@
     
     <system:String x:Key="MainViewModel.Export">Экспорт</system:String>
     <system:String x:Key="MainViewModel.ExportIsSuccessful">Экспорт прошел успешно!</system:String>
+    <system:String x:Key="MainViewModel.ExportPathIsNotCorrect">Путь для экспорт не корректен!</system:String>
+    <system:String x:Key="MainViewModel.ExportCanceled">Экспорт отменен!</system:String>
+    
     <system:String x:Key="MainViewModel.Type">Тип</system:String>
     <system:String x:Key="MainViewModel.ParameterType">Тип параметра</system:String>
     <system:String x:Key="MainViewModel.NotSupported">не поддерживается</system:String>

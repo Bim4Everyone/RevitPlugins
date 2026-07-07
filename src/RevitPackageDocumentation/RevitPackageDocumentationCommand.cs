@@ -60,11 +60,6 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
                 c.Kernel.Get<ILocalizationService>()))
             .InSingletonScope();
 
-        // Сервис открытия диалогового окна сохранения/открытия файла JSON
-        kernel.Bind<IFileDialogService>()
-            .To<JsonFileDialogService>()
-            .InSingletonScope();
-
         // Регистрация коллекции конвертеров JSON
         kernel.Bind<JsonConverter>()
             .To<SheetComponentConverter>()
@@ -102,9 +97,6 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        // Настройка сервиса окошек сообщений
-        kernel.UseWpfUIMessageBox<MainViewModel>();
-
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
@@ -124,6 +116,19 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
         // Инициализируем extension для локализации ресурсов в файле ресурсов (без доступа к ресурсам окна)
         var localizationService = kernel.Get<ILocalizationService>();
         LocalizedExtension.Init(localizationService);
+
+        // Настройка сервиса окошек сообщений
+        kernel.UseWpfUIMessageBox<MainViewModel>();
+
+        // Сервисы открытия диалогового окна сохранения/открытия файла JSON
+        kernel.UseWpfOpenFileDialog<MainViewModel>(
+            filter: "JSON files (*.json)|*.json|All files (*.*)|*.*",
+            title: localizationService.GetLocalizedString("MainViewModel.SelectConfigurationFile"));
+        kernel.UseWpfSaveFileDialog<MainViewModel>(
+            filter: "JSON files (*.json)|*.json",
+            title: localizationService.GetLocalizedString("MainViewModel.SaveConfiguration"),
+            defaultFileName: "config.json",
+            addExtension: true);
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());

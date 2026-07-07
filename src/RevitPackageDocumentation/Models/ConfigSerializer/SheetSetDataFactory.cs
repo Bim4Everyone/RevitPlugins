@@ -123,7 +123,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleComment = vm.ModuleComment,
                 CustomParamsList = GetCustomParametersList(vm),
 
-                ReferenceViewName = vm.ReferenceSpec.Name,
+                ReferenceViewName = vm.ReferenceSpec?.Name,
                 ReferenceViewFilterValues = GetFiltrationComboBoxFilterList(vm.ReferenceSpecFilter),
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewColumn = vm.ViewColumn,
