@@ -284,7 +284,9 @@ internal class MainViewModel : BaseViewModel {
         var currentSheetSetData = _sheetSetDataFactory.CreateSheetSetData(CurrentSheetSet);
         _sheetSetConfig.Export(currentSheetSetData, _sheetSetDataPath);
 
-        _messageBoxService.Show("Export is successful", "Export");
+        _messageBoxService.Show(
+            _localizationService.GetLocalizedString("MainViewModel.ExportIsSuccessful"),
+            _localizationService.GetLocalizedString("MainViewModel.Export"));
     }
 
 

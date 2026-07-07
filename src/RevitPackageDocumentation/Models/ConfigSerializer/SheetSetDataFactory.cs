@@ -3,6 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using RevitPackageDocumentation.ViewModels.Configuration;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
@@ -22,6 +24,12 @@ internal interface ISheetSetDataFactory {
 }
 
 internal class SheetSetDataFactory : ISheetSetDataFactory {
+    private readonly ILocalizationService _localizationService;
+
+    public SheetSetDataFactory(ILocalizationService localizationService) {
+        _localizationService = localizationService;
+    }
+
     public SheetSetData CreateSheetSetData() {
         return new SheetSetData();
     }
@@ -160,7 +168,9 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
             },
 
-            _ => throw new NotSupportedException($"Тип '{sheetComponentVM?.GetType().Name}' не поддерживается")
+            _ => throw new NotSupportedException(
+                $"{_localizationService.GetLocalizedString("MainViewModel.Type")} '{sheetComponentVM?.GetType().Name}' " +
+                    $"{_localizationService.GetLocalizedString("MainViewModel.NotSupported")}")
         };
     }
 
@@ -200,7 +210,8 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             Type t when t == typeof(TextNoteVM) => new TextNoteData(),
             Type t when t == typeof(TypicalAnnotationVM) => new TypicalAnnotationData(),
             Type t when t == typeof(LegendViewVM) => new LegendViewData(),
-            _ => throw new NotSupportedException($"Тип '{componentType?.Name}' не поддерживается")
+            _ => throw new NotSupportedException($"{_localizationService.GetLocalizedString("MainViewModel.Type")} " +
+                $"'{componentType?.Name}' {_localizationService.GetLocalizedString("MainViewModel.NotSupported")}")
         };
     }
 
@@ -218,7 +229,9 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ParamName = selectVm.ParamName,
                 ParamComment = selectVm.ParamComment
             },
-            _ => throw new NotSupportedException($"Тип параметра '{vm?.GetType().Name}' не поддерживается")
+            _ => throw new NotSupportedException(
+                $"{_localizationService.GetLocalizedString("MainViewModel.ParameterType")} '{vm?.GetType().Name}' " +
+                $"{_localizationService.GetLocalizedString("MainViewModel.NotSupported")}")
         };
     }
 
@@ -226,7 +239,9 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
         return paramType switch {
             Type t when t == typeof(StringParamVM) => new StringParamData(),
             Type t when t == typeof(SelectElemParamVM) => new SelectElemParamData(),
-            _ => throw new NotSupportedException($"Тип параметра '{paramType?.Name}' не поддерживается")
+            _ => throw new NotSupportedException(
+                $"{_localizationService.GetLocalizedString("MainViewModel.ParameterType")} '{paramType?.Name}' " +
+                $"{_localizationService.GetLocalizedString("MainViewModel.NotSupported")}")
         };
     }
 }

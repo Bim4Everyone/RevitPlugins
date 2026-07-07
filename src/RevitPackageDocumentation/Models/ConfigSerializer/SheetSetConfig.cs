@@ -4,15 +4,19 @@ using System.IO;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+
 using pyRevitLabs.Json;
 
 namespace RevitPackageDocumentation.Models.ConfigSerializer;
 
 public class SheetSetConfig {
     private readonly ISheetSetSerializer _serializer;
+    private readonly ILocalizationService _localizationService;
 
-    public SheetSetConfig(ISheetSetSerializer sheetSetSerializer) {
+    public SheetSetConfig(ISheetSetSerializer sheetSetSerializer, ILocalizationService localizationService) {
         _serializer = sheetSetSerializer;
+        _localizationService = localizationService;
     }
 
     /// <summary>
@@ -27,9 +31,11 @@ public class SheetSetConfig {
             string json = File.ReadAllText(path);
             return _serializer.Deserialize<SheetSetData>(json);
         } catch(JsonSerializationException ex) {
-            throw new InvalidOperationException($"Ошибка десериализации файла {path}", ex);
+            throw new InvalidOperationException(
+                $"{_localizationService.GetLocalizedString("MainViewModel.FileDeserializationError")} {path}", ex);
         } catch(IOException ex) {
-            throw new InvalidOperationException($"Ошибка чтения файла {path}", ex);
+            throw new InvalidOperationException(
+                $"{_localizationService.GetLocalizedString("MainViewModel.ErrorReadingFile")} {path}", ex);
         }
     }
 
@@ -38,7 +44,8 @@ public class SheetSetConfig {
     /// </summary>
     public void Export(SheetSetData data, string path) {
         if(string.IsNullOrEmpty(path))
-            throw new ArgumentException("Путь сохранения не корректен!", nameof(path));
+            throw new ArgumentException(
+                $"{_localizationService.GetLocalizedString("MainViewModel.SavePathIsNotCorrect")}", nameof(path));
 
         if(data == null)
             throw new ArgumentNullException(nameof(data));
@@ -47,7 +54,8 @@ public class SheetSetConfig {
             string json = _serializer.Serialize(data);
             File.WriteAllText(path, json);
         } catch(IOException ex) {
-            throw new InvalidOperationException($"Ошибка записи файла {path}", ex);
+            throw new InvalidOperationException(
+                $"{_localizationService.GetLocalizedString("MainViewModel.ErrorWritingFile")} {path}", ex);
         }
     }
 }

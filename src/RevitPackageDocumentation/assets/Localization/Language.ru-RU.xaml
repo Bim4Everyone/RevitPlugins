@@ -73,8 +73,6 @@
     <system:String x:Key="MainWindow.ElementType">Типоразмер</system:String>
     <system:String x:Key="MainWindow.Select">Выбрать</system:String>
 
-
-
     <system:String x:Key="Validation.SheetNameIsEmpty">Имя листа не заполнено</system:String>
     <system:String x:Key="Validation.SheetNameIsNotCorrect">Имя листа заполнено некорректно</system:String>
     <system:String x:Key="Validation.SheetSizeIsEmpty">Значение номера формата листа не заполнено</system:String>
@@ -111,5 +109,23 @@
     <system:String x:Key="Validation.TextWidthIsNotCorrect">Ширина текста не корректна</system:String>
 
     <system:String x:Key="Validation.AnnotationTypeIsNull">Не выбран тип типовой аннотации</system:String>
-
+    
+    
+    <system:String x:Key="MainViewModel.Export">Экспорт</system:String>
+    <system:String x:Key="MainViewModel.ExportIsSuccessful">Экспорт прошел успешно!</system:String>
+    <system:String x:Key="MainViewModel.Type">Тип</system:String>
+    <system:String x:Key="MainViewModel.ParameterType">Тип параметра</system:String>
+    <system:String x:Key="MainViewModel.NotSupported">не поддерживается</system:String>
+    <system:String x:Key="MainViewModel.FileDeserializationError">Ошибка десериализации файла</system:String>
+    <system:String x:Key="MainViewModel.ErrorReadingFile">Ошибка чтения файла</system:String>
+    <system:String x:Key="MainViewModel.ErrorWritingFile">Ошибка записи файла</system:String>
+    <system:String x:Key="MainViewModel.SavePathIsNotCorrect">Путь сохранения не корректен!</system:String>
+    <system:String x:Key="MainViewModel.Property">Свойство</system:String>
+    <system:String x:Key="MainViewModel.NotFoundInJSON">не найдено в JSON</system:String>
+    <system:String x:Key="MainViewModel.UnknownComponentType">Неизвестный тип компонента</system:String>
+    <system:String x:Key="MainViewModel.UnknownPluginParamType">Неизвестный тип параметра</system:String>
+    <system:String x:Key="MainViewModel.ErrorDeserializingType">Ошибка десериализации типа</system:String>
+    <system:String x:Key="MainViewModel.SelectConfigurationFile">Выберите файл конфигурации</system:String>
+    <system:String x:Key="MainViewModel.SaveConfiguration">Сохранить конфигурацию</system:String>
+    
 </ResourceDictionary>

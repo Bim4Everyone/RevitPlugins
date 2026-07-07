@@ -1,5 +1,7 @@
 using System;
 
+using dosymep.SimpleServices;
+
 using pyRevitLabs.Json;
 using pyRevitLabs.Json.Linq;
 
@@ -9,9 +11,15 @@ namespace RevitPackageDocumentation.Models.ConfigSerializer;
 /// Конвертер для полиморфной десериализации параметров плагина
 /// </summary>
 public class PluginParamConverter : JsonConverter {
+    private readonly ILocalizationService _localizationService;
+
     private const string _pluginParamTypeProperty = "PluginParamType";
     private const string _stringParamType = "StringParam";
     private const string _selectElemParamType = "SelectElem";
+
+    public PluginParamConverter(ILocalizationService localizationService) {
+        _localizationService = localizationService;
+    }
 
     public override bool CanConvert(Type objectType) {
         return objectType == typeof(PluginParamData);
@@ -22,17 +30,20 @@ public class PluginParamConverter : JsonConverter {
         var paramType = jObject[_pluginParamTypeProperty]?.Value<string>();
 
         if(string.IsNullOrEmpty(paramType))
-            throw new JsonSerializationException($"Property '{_pluginParamTypeProperty}' not found in JSON");
+            throw new JsonSerializationException(
+                $"{_localizationService.GetLocalizedString("MainViewModel.Property")} '{_pluginParamTypeProperty}' " +
+                $"{_localizationService.GetLocalizedString("MainViewModel.NotFoundInJSON")}");
 
         try {
             return paramType switch {
                 _stringParamType => jObject.ToObject<StringParamData>(serializer),
                 _selectElemParamType => jObject.ToObject<SelectElemParamData>(serializer),
-                _ => throw new NotSupportedException($"Unknown plugin param type: {paramType}")
+                _ => throw new NotSupportedException(
+                    $"{_localizationService.GetLocalizedString("MainViewModel.UnknownPluginParamType")}: {paramType}")
             };
         } catch(Exception ex) {
             throw new JsonSerializationException(
-                $"Error deserializing type '{paramType}'", ex);
+                $"{_localizationService.GetLocalizedString("MainViewModel.ErrorDeserializingType")} '{paramType}'", ex);
         }
     }
 
