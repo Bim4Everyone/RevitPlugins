@@ -7,14 +7,14 @@ namespace RevitMarkAllDocuments.ViewModels;
 
 internal class FilterPageViewModel : BaseViewModel {
     public FilterPageViewModel(ILogicalFilterProviderFactory filterProviderFactory,
-                               IDataProvider dataProvider,
+                               DataProvider dataProvider,
                                ILocalizationService languageService) {
         FilterProvider = filterProviderFactory.Create(dataProvider);
         LanguageService = languageService;
     }
 
     public FilterPageViewModel(ILogicalFilterProviderFactory filterProviderFactory,
-                               IDataProvider dataProvider,
+                               DataProvider dataProvider,
                                ILogicalFilterContext context,
                                ILocalizationService languageService) {
         FilterProvider = filterProviderFactory.Create(dataProvider, context);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ using dosymep.WPF.ViewModels;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 using RevitMarkAllDocuments.Models;
+using RevitMarkAllDocuments.Models.Filter;
 using RevitMarkAllDocuments.Services;
 using RevitMarkAllDocuments.Services.Export;
 
@@ -49,8 +51,10 @@ internal class MainViewModel : BaseViewModel {
                          WindowsService markListWindowService,
                          ILogicalFilterProviderFactory filterFactory,
                          JsonSerializerService jsonService,
+                         IOpenFolderDialogService openFolderDialogService,
                          IFilterContextParser filterParser,
-                         ILocalizationService localizationService) {        
+                         ILocalizationService localizationService) {
+        OpenFolderDialogService = openFolderDialogService;
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _documentService = documentService;
@@ -74,6 +78,8 @@ internal class MainViewModel : BaseViewModel {
     
     public ICommand AcceptViewCommand { get; }
 
+    public IOpenFolderDialogService OpenFolderDialogService { get; }
+
     public DocumentsPageViewModel DocumentsPageViewModel => _documentsPageViewModel;
     public FilterPageViewModel FilterPageViewModel => _filterPageViewModel;
     public SortPageViewModel SortPageViewModel => _sortPageViewModel;
@@ -91,7 +97,8 @@ internal class MainViewModel : BaseViewModel {
         var paramsForMark = _paramProvider.GetParamsForMarks().ToList();
 
         _documentsPageViewModel = new DocumentsPageViewModel(_revitRepository, _localizationService);
-        var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilterAndSort);
+        var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilterAndSort)
+            .CreateDataProvider();
         _filterPageViewModel = new FilterPageViewModel(_filterFactory, dataProvider, _localizationService);
         _sortPageViewModel = new SortPageViewModel(paramsForFilterAndSort);
         _markSettingsPageViewModel = new MarkSettingsPageViewModel(paramsForMark);
@@ -100,12 +107,8 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private string SelectFolder() {
-        var dialog = new CommonOpenFileDialog() {
-            IsFolderPicker = true
-        };
-
-        if(dialog.ShowDialog() == CommonFileDialogResult.Ok) {
-            return dialog.FileName;
+        if(OpenFolderDialogService.ShowDialog()) {
+            return OpenFolderDialogService.Folder.FullName;
         }
 
         return string.Empty;
@@ -292,7 +295,8 @@ internal class MainViewModel : BaseViewModel {
             }
 
             if(_filterParser.TryParse(settings.FilterSettings, out var filter)) {
-                var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilter);
+                var dataProvider = new FilterDataProvider(_revitRepository.Document, _selectedCategory, paramsForFilter)
+                    .CreateDataProvider();
                 _filterPageViewModel = new FilterPageViewModel(_filterFactory, dataProvider, filter, _localizationService);
             }
 

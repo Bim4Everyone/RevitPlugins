@@ -15,6 +15,7 @@
     <system:String x:Key="MainWindow.SortPage">Сортировка</system:String>
     <system:String x:Key="MainWindow.MarkPage">Марка</system:String>
     <system:String x:Key="MainWindow.SelectedCategory">Категория:</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Маркировка</system:String>
     
     <system:String x:Key="MainWindow.DocActive">Текущий</system:String>
     <system:String x:Key="MainWindow.DocLink">Связь</system:String>

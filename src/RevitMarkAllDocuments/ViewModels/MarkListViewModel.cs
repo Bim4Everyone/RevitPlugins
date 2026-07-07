@@ -6,7 +6,6 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
-using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -35,7 +34,7 @@ internal class MarkListViewModel : BaseViewModel {
             _markedElements = [..markDataForCurrentDoc
                 .Elements
                 .Select(x => new MarkedElementViewModel(x, _document, localizationService))
-                .OrderBy(x => x.MarkValue, new LogicalStringComparer())
+                .OrderBy(x => x.MarkValue, new RevitStringComparer())
                 .ToList()];
         }
 

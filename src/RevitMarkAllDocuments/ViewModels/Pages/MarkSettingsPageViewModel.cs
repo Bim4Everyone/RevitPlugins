@@ -23,7 +23,9 @@ internal class MarkSettingsPageViewModel : BaseViewModel {
             .Where(x => x.RevitParam.StorageType is StorageType.String
                 or StorageType.Integer
                 or StorageType.Double)
-            .Select(x => new ParameterViewModel(x))];
+            .Select(x => new ParameterViewModel(x))
+            .OrderBy(x => x.Name)
+        ];
     }
 
     public ObservableCollection<ParameterViewModel> ParamsForMark {

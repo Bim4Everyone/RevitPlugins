@@ -85,6 +85,7 @@ public class RevitMarkAllDocumentsCommand : BasePluginCommand {
 
         kernel.BindMainWindow<MainViewModel, MainWindow>();
         kernel.BindOtherWindow<CategoriesWindowVM, CategoriesWindow>();
+        kernel.UseWpfOpenFolderDialog<MainViewModel>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст

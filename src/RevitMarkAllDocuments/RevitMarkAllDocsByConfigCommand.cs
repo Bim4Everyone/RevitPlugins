@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Reflection;
 
@@ -8,6 +9,7 @@ using Bim4Everyone.RevitFiltration.Ninject;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -62,6 +64,11 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
+        kernel.UseWpfWindowsTheme();
+        kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
+        kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
+        kernel.UseWpfOpenFileDialog(filter: "JSON files (*.json)|*.json");
+        kernel.UseWpfUIMessageBox();
 
         kernel.Bind<MarkListWindow>().ToSelf();
 
@@ -75,27 +82,26 @@ public class RevitMarkAllDocsByConfigCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        string filePath = SelectFile(kernel);
+        var windowService = kernel.Get<WindowsService>();
+        var documentService = kernel.Get<DocumentService>();
+        var revitRepository = kernel.Get<RevitRepository>();
+        var jsonService = kernel.Get<JsonSerializerService>();
 
-        string filePath = SelectFile();
-        if(!string.IsNullOrEmpty(filePath)) {
-            var windowService = kernel.Get<WindowsService>();
-            var documentService = kernel.Get<DocumentService>();
-            var revitRepository = kernel.Get<RevitRepository>();
-            var jsonService = kernel.Get<JsonSerializerService>();
+        var markData = jsonService.ImportMarkData(filePath);
+        string currentDocName = documentService.GetDocumentFullName(revitRepository.Document);
+        var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
 
-            var markData = jsonService.ImportMarkData(filePath);
-            string currentDocName = documentService.GetDocumentFullName(revitRepository.Document);
-            var markDataForCurrentDoc = markData.GetDataByDocument(currentDocName);
-
-            Notification(windowService.ShowMarkListWindow(markDataForCurrentDoc, markData.MarkRevitParam));
-        } else {
-            Notification(false);
-        }
+        Notification(windowService.ShowMarkListWindow(markDataForCurrentDoc, markData.MarkRevitParam));
     }
 
-    private string SelectFile() {
-        var dialog = new CommonOpenFileDialog();
+    private string SelectFile(IKernel kernel) {
+        var dialog = kernel.Get<IOpenFileDialogService>();
 
-        return dialog.ShowDialog() == CommonFileDialogResult.Ok ? dialog.FileName : string.Empty;
+        if(!dialog.ShowDialog()) {
+            throw new OperationCanceledException();
+        }
+
+        return dialog.File.FullName;
     }
 }
