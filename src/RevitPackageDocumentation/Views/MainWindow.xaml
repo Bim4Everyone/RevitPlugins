@@ -502,6 +502,7 @@
                         Margin="5"
                         MinWidth="220"
                         HorizontalAlignment="Left"
+                        Style="{StaticResource ErrorComboBoxStyle}"
                         ItemsSource="{Binding ComponentTypes}"
                         SelectedItem="{Binding SelectedComponentType}"
                         DisplayMemberPath="DisplayName"
