@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.Revit;
@@ -16,20 +17,29 @@ namespace RevitAreaBoundaries.ViewModels;
 /// </summary>
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
+    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly IBoundaryProcessor _processor;
+    
+    private AreaBoundarySettings _areaBoundarySettings;
+    
+    private CommonSettingsViewModel _commonSettingsViewModel;
+    private ViewPlanSelectionViewModel _viewPlanSelectionViewModel;
+    private TypeElementSelectionViewModel _typeElementSelectionViewModel;
 
+    private bool _hasErrors;
     private string _errorText;
-    private string _saveProperty;
     
     public MainViewModel(
         PluginConfig pluginConfig,
+        SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         IBoundaryProcessor processor) {
         
         _pluginConfig = pluginConfig;
+        _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _processor = processor;
@@ -40,19 +50,52 @@ internal class MainViewModel : BaseViewModel {
     
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
-
     
+    public CommonSettingsViewModel CommonSettingsViewModel {
+        get => _commonSettingsViewModel;
+        set => RaiseAndSetIfChanged(ref _commonSettingsViewModel, value);
+    }
+    public ViewPlanSelectionViewModel ViewPlanSelectionViewModel {
+        get => _viewPlanSelectionViewModel;
+        set => RaiseAndSetIfChanged(ref _viewPlanSelectionViewModel, value);
+    }
+    public TypeElementSelectionViewModel TypeElementSelectionViewModel {
+        get => _typeElementSelectionViewModel;
+        set => RaiseAndSetIfChanged(ref _typeElementSelectionViewModel, value);
+    }
+
+    public bool HasErrors {
+        get => _hasErrors;
+        set => RaiseAndSetIfChanged(ref _hasErrors, value);
+    }
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
-    }
+    
     private void LoadView() {
         LoadConfig();
+        CommonSettingsViewModel = new CommonSettingsViewModel();
+        CommonSettingsViewModel.PropertyChanged += CommonSettingsViewModelChanged;
+        ViewPlanSelectionViewModel = new ViewPlanSelectionViewModel(_revitRepository, _areaBoundarySettings);
+        ViewPlanSelectionViewModel.PropertyChanged += ViewPlanSelectionViewModelChanged;
+        TypeElementSelectionViewModel = new TypeElementSelectionViewModel();
+        TypeElementSelectionViewModel.PropertyChanged += TypeElementSelectionViewModelChanged;
     }
+    
+    private void CommonSettingsViewModelChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+        
+    }
+
+    private void ViewPlanSelectionViewModelChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+        
+    }
+    
+    private void TypeElementSelectionViewModelChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+        
+    }
+    
+    
     private void AcceptView() {
         SaveConfig();
         
@@ -68,26 +111,40 @@ internal class MainViewModel : BaseViewModel {
     }
     
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
-            return false;
-        }
-
         ErrorText = null;
         return true;
     }
     
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        var projectConfig = _pluginConfig.GetSettings(_revitRepository.Document);
+        ConfigSettings configSettings;
+        if(projectConfig == null) {
+            configSettings = new ConfigSettings();
+            configSettings.ApplyDefaultValues(_systemPluginConfig);
+        } else {
+            configSettings = projectConfig.ConfigSettings;
+        }
 
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        _areaBoundarySettings = new AreaBoundarySettings {
+            AlgorithmType = configSettings.AlgorithmType,
+            SectionHeight = configSettings.SectionHeight,
+            Views = configSettings.SelectedViewPlans,
+            Types = configSettings.SelectedTypes
+                
+        };
     }
     
     private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                ?? _pluginConfig.AddSettings(_revitRepository.Document);
+        var configSettings = new ConfigSettings {
+            AlgorithmType = _areaBoundarySettings.AlgorithmType,
+            SectionHeight = _areaBoundarySettings.SectionHeight,
+            SelectedViewPlans = _areaBoundarySettings.Views,
+            SelectedTypes = _areaBoundarySettings.Types
+        };
 
-        setting.SaveProperty = SaveProperty;
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document)
+                      ?? _pluginConfig.AddSettings(_revitRepository.Document);
+        setting.ConfigSettings = configSettings;
         _pluginConfig.SaveProjectConfig();
     }
 }

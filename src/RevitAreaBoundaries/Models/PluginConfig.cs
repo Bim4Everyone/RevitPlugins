@@ -8,6 +8,9 @@ using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
+using RevitAreaBoundaries.Models.Enums;
+using RevitAreaBoundaries.Settings;
+
 namespace RevitAreaBoundaries.Models;
 
 /// <summary>
@@ -66,10 +69,20 @@ internal class RevitSettings : ProjectSettings {
     /// <summary>
     /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
     /// </summary>
-    public string SaveProperty { get; set; }
+    public ConfigSettings ConfigSettings { get; set; }
 }
 
 public class SystemPluginConfig {
+    
+    public readonly AlgorithmType DefaultAlgorithmType = AlgorithmType.OuterBoundary;
+    
+    public readonly double DefaultSectionHeight = 1200;
+    
+    public readonly List<RevitElementView> DefaultListViewPlans = [];
+    
+    public readonly List<RevitElementType> DefaultListTypes = [];
+    
+    public readonly string DefaultGroupParameterValue = "???";
     
     public readonly double DefaultMaxToleranceToJoinCurvesMm = 15;
     
@@ -99,6 +112,30 @@ public class SystemPluginConfig {
         BuiltInCategory.OST_Walls,
         BuiltInCategory.OST_Windows,
         BuiltInCategory.OST_GenericModel
+    ];
+    
+    public readonly ICollection<BuiltInCategory> CenterProjectionCats = [
+        BuiltInCategory.OST_Floors,
+        BuiltInCategory.OST_Roofs,
+        BuiltInCategory.OST_Walls,
+        BuiltInCategory.OST_GenericModel
+    ];
+    
+    public readonly ICollection<BuiltInCategory> FullProjectionCats = [
+        BuiltInCategory.OST_Railings,
+        BuiltInCategory.OST_RailingSystem,
+        BuiltInCategory.OST_StairsRailing,
+        BuiltInCategory.OST_StairsRailingBaluster,
+        BuiltInCategory.OST_StairsRailingRail,
+        BuiltInCategory.OST_RailingBalusterRail,
+        BuiltInCategory.OST_RailingBalusterRailCut,
+        BuiltInCategory.OST_RailingHandRail,
+        BuiltInCategory.OST_RailingHandRailAboveCut
+    ];
+    
+    public readonly ICollection<BuiltInCategory> PartialProjectionCats = [
+        BuiltInCategory.OST_Doors,
+        BuiltInCategory.OST_Windows
     ];
 }
 

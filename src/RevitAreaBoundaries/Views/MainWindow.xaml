@@ -4,8 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:local="clr-namespace:RevitAreaBoundaries.Views"
+    xmlns:pages="clr-namespace:RevitAreaBoundaries.Views.Pages"
     xmlns:vms="clr-namespace:RevitAreaBoundaries.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
@@ -15,13 +14,22 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="500"
-    Width="700"
+    Height="700"
+    Width="1000"
     
-    MinHeight="500"
-    MinWidth="700"
+    MinHeight="700"
+    MinWidth="1000"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -38,14 +46,43 @@
         
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />
-
-        <ui:TextBox
+            Icon="{ui:SymbolIcon borderNone24, FontSize=20}"
+            Title="{me:LocalizationSource MainWindow.Title}"
+            FontSize="14"
+            FontWeight="DemiBold" />
+        
+        <ui:NavigationView
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            x:Name="_rootNavigationView"
+            FrameMargin="0"
+            OpenPaneLength="300"
+            IsPaneOpen="True"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Collapsed"
+            IsPaneVisible="True"
+            IsPaneToggleVisible="True"
+            PaneTitle="{me:LocalizationSource MainWindow.Settings}"
+            BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
+
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource MainWindow.ViewPlanSelections}"
+                    FontSize="20"
+                    HorizontalAlignment="Stretch"
+                    TargetPageType="{x:Type pages:ViewPlanSelectionPage}">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="WindowBulletList20" FontSize="24" />
+                    </ui:NavigationViewItem.Icon>
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Style="{StaticResource RoundInfoBadgeStyle}"
+                            Visibility="{Binding Path=HasErrors, 
+                            Converter={StaticResource BooleanToVisibilityConverter}}">
+                        </ui:InfoBadge>
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
+            </ui:NavigationView.MenuItems>
+        </ui:NavigationView>
 
         <StackPanel
             Grid.Row="2"
@@ -60,7 +97,7 @@
 
             <ui:Button
                 Margin="10"
-                Width="80"
+                Width="100"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
@@ -68,7 +105,7 @@
 
             <ui:Button
                 Margin="10"
-                Width="80"
+                Width="100"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />

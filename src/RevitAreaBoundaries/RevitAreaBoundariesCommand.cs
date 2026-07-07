@@ -18,6 +18,8 @@ using RevitAreaBoundaries.Services;
 using RevitAreaBoundaries.ViewModels;
 using RevitAreaBoundaries.Views;
 
+using Wpf.Ui.Abstractions;
+
 namespace RevitAreaBoundaries;
 
 /// <summary>
@@ -102,6 +104,11 @@ public class RevitAreaBoundariesCommand : BasePluginCommand {
         kernel.Bind<IBoundaryProcessor>()
             .To<OutBoundaryProcessor>()
             .InSingletonScope();
+        
+        kernel.Bind<INavigationViewPageProvider>()
+            .To<NavigationViewPageProvider>()
+            .InSingletonScope();
+        
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
