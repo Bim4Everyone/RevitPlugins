@@ -6,17 +6,24 @@
     
     <system:String x:Key="MainWindow.Settings">Настройки</system:String>
     <system:String x:Key="MainWindow.ViewPlanSelections">Выбор планов зонирования</system:String>
+    <system:String x:Key="MainWindow.TypeElementSelections">Выбор типов границ</system:String>
     
     <system:String x:Key="ViewPlanSelectionPage.GroupParameters">Параметр группировки</system:String>
     <system:String x:Key="ViewPlanSelectionPage.GroupParametersTooltip">Параметр, используемый в группировке видов</system:String>
     
-    <system:String x:Key="ViewPlanSelectionViewModel.NoViews">Нет видов</system:String>
-    <system:String x:Key="ViewPlanSelectionViewModel.NoBrowserParameter">Нет параметров группировки</system:String>
+    <system:String x:Key="ViewPlanSelectionViewModel.NoViews">Нет планов зонирования</system:String>
+    <system:String x:Key="ViewPlanSelectionViewModel.NoBrowserParameter">Нет параметра группировки</system:String>
+    
+    
     
     
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     
+    <system:String x:Key="MainViewModel.ErrorNoViewPlans">В файле отсутствуют планы зонирования</system:String>
+    <system:String x:Key="MainViewModel.ErrorNoSelectionViewPlans">Не выбраны планы зонирования</system:String>
     
+    <system:String x:Key="MainViewModel.ErrorNoElementTypes">В файле отсутствуют типы элементов</system:String>
+    <system:String x:Key="MainViewModel.ErrorNoSelectionElementTypes">Не выбраны типы элементов</system:String>
     
     
     

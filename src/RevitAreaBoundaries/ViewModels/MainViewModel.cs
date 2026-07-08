@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -28,7 +29,8 @@ internal class MainViewModel : BaseViewModel {
     private ViewPlanSelectionViewModel _viewPlanSelectionViewModel;
     private TypeElementSelectionViewModel _typeElementSelectionViewModel;
 
-    private bool _hasErrors;
+    private bool _hasViewErrors;
+    private bool _hasElementErrors;
     private string _errorText;
     
     public MainViewModel(
@@ -64,10 +66,16 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _typeElementSelectionViewModel, value);
     }
 
-    public bool HasErrors {
-        get => _hasErrors;
-        set => RaiseAndSetIfChanged(ref _hasErrors, value);
+    public bool HasViewErrors {
+        get => _hasViewErrors;
+        set => RaiseAndSetIfChanged(ref _hasViewErrors, value);
     }
+    
+    public bool HasElementErrors {
+        get => _hasElementErrors;
+        set => RaiseAndSetIfChanged(ref _hasElementErrors, value);
+    }
+    
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
@@ -75,27 +83,13 @@ internal class MainViewModel : BaseViewModel {
     
     private void LoadView() {
         LoadConfig();
+        HasViewErrors = false;
         CommonSettingsViewModel = new CommonSettingsViewModel();
-        CommonSettingsViewModel.PropertyChanged += CommonSettingsViewModelChanged;
         ViewPlanSelectionViewModel = new ViewPlanSelectionViewModel(
             _localizationService,_systemPluginConfig, _revitRepository, _areaBoundarySettings);
-        ViewPlanSelectionViewModel.PropertyChanged += ViewPlanSelectionViewModelChanged;
-        TypeElementSelectionViewModel = new TypeElementSelectionViewModel();
-        TypeElementSelectionViewModel.PropertyChanged += TypeElementSelectionViewModelChanged;
+        TypeElementSelectionViewModel = new TypeElementSelectionViewModel(
+            _localizationService,_systemPluginConfig, _revitRepository, _areaBoundarySettings);
     }
-    
-    private void CommonSettingsViewModelChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
-        
-    }
-
-    private void ViewPlanSelectionViewModelChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
-        
-    }
-    
-    private void TypeElementSelectionViewModelChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
-        
-    }
-    
     
     private void AcceptView() {
         SaveConfig();
@@ -112,6 +106,34 @@ internal class MainViewModel : BaseViewModel {
     }
     
     private bool CanAcceptView() {
+        if(ViewPlanSelectionViewModel != null) {
+            if(ViewPlanSelectionViewModel.ViewPlanGroupViewModels.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorNoViewPlans");
+                HasViewErrors = true;
+                return false;
+                
+            }
+            if(ViewPlanSelectionViewModel.SelectedViewPlanViewModels.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorNoSelectionViewPlans");
+                HasViewErrors = true;
+                return false;
+            }
+            HasViewErrors = false;
+        }
+        if(ViewPlanSelectionViewModel != null) {
+            if(TypeElementSelectionViewModel.TypeElementGroupViewModels.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorNoElementTypes");
+                HasElementErrors = true;
+                return false;
+                
+            }
+            if(TypeElementSelectionViewModel.SelectedTypeElementViewModels.Count == 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorNoSelectionElementTypes");
+                HasElementErrors = true;
+                return false;
+            }
+            HasElementErrors = false;
+        }
         ErrorText = null;
         return true;
     }

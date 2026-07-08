@@ -76,7 +76,23 @@
                     <ui:NavigationViewItem.InfoBadge>
                         <ui:InfoBadge
                             Style="{StaticResource RoundInfoBadgeStyle}"
-                            Visibility="{Binding Path=HasErrors, 
+                            Visibility="{Binding Path=HasViewErrors,
+                            Converter={StaticResource BooleanToVisibilityConverter}}">
+                        </ui:InfoBadge>
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem
+                    Content="{me:LocalizationSource MainWindow.TypeElementSelections}"
+                    FontSize="20"
+                    HorizontalAlignment="Stretch"
+                    TargetPageType="{x:Type pages:TypeElementSelectionPage}">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="WindowBulletList20" FontSize="24" />
+                    </ui:NavigationViewItem.Icon>
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Style="{StaticResource RoundInfoBadgeStyle}"
+                            Visibility="{Binding Path=HasElementErrors,
                             Converter={StaticResource BooleanToVisibilityConverter}}">
                         </ui:InfoBadge>
                     </ui:NavigationViewItem.InfoBadge>

@@ -50,18 +50,17 @@ internal class RevitRepository {
             });
     }
 
-    public IEnumerable<RevitElement> GetTypeModels() {
+    public IEnumerable<RevitElementType> GetTypeModels() {
         return GetElements(_systemPluginConfig.CenterProjectionCats, SectionType.CenterProjection)
             .Concat(GetElements(_systemPluginConfig.PartialProjectionCats, SectionType.PartialProjection))
             .Concat(GetElements(_systemPluginConfig.FullProjectionCats, SectionType.FullProjection));
     }
 
-    private IEnumerable<RevitElement> GetElements(IEnumerable<BuiltInCategory> categories, SectionType sectionType) {
+    private IEnumerable<RevitElementType> GetElements(IEnumerable<BuiltInCategory> categories, SectionType sectionType) {
         return categories.SelectMany(category =>
             new FilteredElementCollector(Document)
                 .OfCategory(category)
                 .WhereElementIsElementType()
-                .Cast<ElementType>()
                 .Select(type => new RevitElementType {
                     Element = type,
                     Name = type.Name,

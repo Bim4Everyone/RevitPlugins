@@ -18,10 +18,10 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly AreaBoundarySettings _areaBoundarySettings;
     
-    private bool _hasError;
     private ObservableCollection<GroupParamViewModel> _groupParamViewModels;
     private GroupParamViewModel _selectedGroupParamViewModel;
     private ObservableCollection<RevitElementGroupViewModel> _viewPlanGroupViewModels;
+    private ObservableCollection<RevitElementViewModel> _selectedViewPlanViewModels;
     
     public ViewPlanSelectionViewModel(
         ILocalizationService localizationService, 
@@ -34,11 +34,6 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
         _areaBoundarySettings = areaBoundarySettings;
         
         LoadView();
-    }
-    
-    public bool HasError {
-        get => _hasError;
-        set => RaiseAndSetIfChanged(ref _hasError, value);
     }
     
     public ObservableCollection<GroupParamViewModel> GroupParamViewModels {
@@ -54,6 +49,11 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
     public ObservableCollection<RevitElementGroupViewModel> ViewPlanGroupViewModels {
         get => _viewPlanGroupViewModels;
         set => RaiseAndSetIfChanged(ref _viewPlanGroupViewModels, value);
+    }
+    
+    public ObservableCollection<RevitElementViewModel> SelectedViewPlanViewModels {
+        get => _selectedViewPlanViewModels;
+        set => RaiseAndSetIfChanged(ref _selectedViewPlanViewModels, value);
     }
 
     private IEnumerable<RevitElementGroupViewModel> GetViewPlanGroupViewModels() {
@@ -105,8 +105,10 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
     }
     
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        if(e.PropertyName == nameof(SelectedGroupParamViewModel)) {
-            UpdateGroupParameter();
+        switch (e.PropertyName) {
+            case nameof(SelectedGroupParamViewModel):
+                UpdateGroupParameter();
+                break;
         }
     }
     
@@ -115,6 +117,23 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
         ViewPlanGroupViewModels = new ObservableCollection<RevitElementGroupViewModel>(GetViewPlanGroupViewModels());
     }
     
+    // Метод, подписанный на событие изменения выделенных связанных файлов
+    private void OnViewViewModelChanged(object sender, PropertyChangedEventArgs e) {
+        if(sender is not RevitElementViewModel vm) {
+            return;
+        }
+        switch(e.PropertyName) {
+            case nameof(vm.IsChecked):
+                if(!SelectedViewPlanViewModels.Contains(vm)) {
+                    SelectedViewPlanViewModels.Add(vm);
+                } else {
+                    if(SelectedViewPlanViewModels.Contains(vm)) {
+                        SelectedViewPlanViewModels.Remove(vm);
+                    }
+                }
+                break;
+        }
+    }
 
     private void LoadView() {
         GroupParamViewModels = new ObservableCollection<GroupParamViewModel>(GetGroupParamViewModels());
@@ -125,6 +144,12 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
                 string.Equals(vm.Name, _systemPluginConfig.DefaultGroupParamName, StringComparison.OrdinalIgnoreCase))
             ?? GroupParamViewModels.FirstOrDefault();
         ViewPlanGroupViewModels = new ObservableCollection<RevitElementGroupViewModel>(GetViewPlanGroupViewModels());
+        SelectedViewPlanViewModels = [];
+        foreach(var group in ViewPlanGroupViewModels) {
+            foreach(var viewViewModel in group.RevitElementViewModels) {
+                viewViewModel.PropertyChanged += OnViewViewModelChanged;
+            }
+        }
         PropertyChanged += OnPropertyChanged;
     }
 }
