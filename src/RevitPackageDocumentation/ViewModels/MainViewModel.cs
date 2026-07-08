@@ -369,6 +369,7 @@ internal class MainViewModel : BaseViewModel {
         }
         if(CurrentSheetSet?.SheetList?.All(p => !p.IsModuleCheck) == true) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.NoSheetsSelected");
+            return false;
         }
 
         var viewNames = new HashSet<string>();

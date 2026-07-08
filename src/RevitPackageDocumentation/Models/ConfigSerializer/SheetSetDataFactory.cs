@@ -97,7 +97,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewportTypeName = vm.ViewportType?.Name,
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,
-                SelectedSelectElemParamName = vm.SelectedSelectElemParam.ParamName,
+                SelectedSelectElemParamName = vm.SelectedSelectElemParam?.ParamName,
             },
 
             SectionViewVM vm => new SectionViewData {
@@ -114,7 +114,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewportTypeName = vm.ViewportType?.Name,
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,
-                SelectedSelectElemParamName = vm.SelectedSelectElemParam.ParamName,
+                SelectedSelectElemParamName = vm.SelectedSelectElemParam?.ParamName,
             },
 
             ScheduleViewVM vm => new ScheduleViewData {
@@ -164,7 +164,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
 
                 ViewName = vm.LegendView?.Name,
                 ViewFilterValues = GetFiltrationComboBoxFilterList(vm.LegendViewFilter),
-                ViewportTypeName = vm.ViewportType.Name,
+                ViewportTypeName = vm.ViewportType?.Name,
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
             },
 
