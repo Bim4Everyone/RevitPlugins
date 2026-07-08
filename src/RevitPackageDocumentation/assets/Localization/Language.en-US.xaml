@@ -1,0 +1,129 @@
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Sheet set documentation</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="MainWindow.AddSheet">Add sheet</system:String>
+    <system:String x:Key="MainWindow.AddSheetComponent">Add sheet component</system:String>
+    <system:String x:Key="MainWindow.AddSheetSetParam">Add parameter</system:String>
+    <system:String x:Key="MainWindow.SheetSetParams">Sheet set parameters</system:String>
+
+    <system:String x:Key="ScheduleFilterType.Equal">Equal</system:String>
+    <system:String x:Key="ScheduleFilterType.NotEqual">Not equal</system:String>
+    <system:String x:Key="ScheduleFilterType.GreaterThan">Greater than</system:String>
+    <system:String x:Key="ScheduleFilterType.GreaterThanOrEqual">Greater than or equal</system:String>
+    <system:String x:Key="ScheduleFilterType.LessThan">Less than</system:String>
+    <system:String x:Key="ScheduleFilterType.LessThanOrEqual">Less than or equal</system:String>
+    <system:String x:Key="ScheduleFilterType.Contains">Contains</system:String>
+    <system:String x:Key="ScheduleFilterType.NotContains">Does not contain</system:String>
+    <system:String x:Key="ScheduleFilterType.BeginsWith">Begins with</system:String>
+    <system:String x:Key="ScheduleFilterType.NotBeginsWith">Does not begin with</system:String>
+    <system:String x:Key="ScheduleFilterType.EndsWith">Ends with</system:String>
+    <system:String x:Key="ScheduleFilterType.NotEndsWith">Does not end with</system:String>
+    <system:String x:Key="ScheduleFilterType.HasValue">Has value</system:String>
+    <system:String x:Key="ScheduleFilterType.HasNoValue">Has no value</system:String>
+
+    <system:String x:Key="Type.PlanViewVM">Plan view</system:String>
+    <system:String x:Key="Type.CalloutViewVM">Callout</system:String>
+    <system:String x:Key="Type.SectionViewVM">Section</system:String>
+    <system:String x:Key="Type.ScheduleViewVM">Schedule</system:String>
+    <system:String x:Key="Type.TextNoteVM">Text note</system:String>
+    <system:String x:Key="Type.TypicalAnnotationVM">Typical annotation</system:String>
+    <system:String x:Key="Type.LegendViewVM">Legend</system:String>
+
+    <system:String x:Key="Type.StringParamVM">Text parameter</system:String>
+    <system:String x:Key="Type.SelectElemParamVM">Element selection</system:String>
+
+    <system:String x:Key="MainWindow.ErrorInSheets">Not all errors have been fixed in the selected sheet set sheets</system:String>
+    <system:String x:Key="MainWindow.SheetSetHasNotSheets">No sheets have been added to the sheet set</system:String>
+    <system:String x:Key="MainWindow.NoSheetsSelected">No sheets selected</system:String>
+    <system:String x:Key="MainWindow.ViewNameAlreadyHas">View name already exists</system:String>
+    <system:String x:Key="MainWindow.ParamNameAlreadyHas">Parameters with identical names found</system:String>
+
+    <system:String x:Key="MainWindow.PickElement">Select one element</system:String>
+    <system:String x:Key="MainWindow.ErrorsNotFound">No errors found</system:String>
+    <system:String x:Key="MainWindow.Edit">Edit</system:String>
+
+    <system:String x:Key="MainWindow.SheetName">Sheet name</system:String>
+    <system:String x:Key="MainWindow.SheetSettings">Sheet settings</system:String>
+    <system:String x:Key="MainWindow.TitleBlockFamily">Title block family</system:String>
+    <system:String x:Key="MainWindow.TitleBlockType">Title block type</system:String>
+    <system:String x:Key="MainWindow.SheetSize">Sheet size</system:String>
+    <system:String x:Key="MainWindow.CustomParams">Custom parameters</system:String>
+
+    <system:String x:Key="MainWindow.ViewName">View name</system:String>
+    <system:String x:Key="MainWindow.ViewFamilyType">View type</system:String>
+    <system:String x:Key="MainWindow.ViewTemplate">View template</system:String>
+    <system:String x:Key="MainWindow.ViewportType">Viewport type</system:String>
+    <system:String x:Key="MainWindow.Count">Count</system:String>
+    <system:String x:Key="MainWindow.BindingToObject">Binding to object</system:String>
+    <system:String x:Key="MainWindow.Comments">Comments</system:String>
+    <system:String x:Key="MainWindow.FinalSpecName">Final schedule name</system:String>
+    <system:String x:Key="MainWindow.ReferenceSpecName">Source schedule name</system:String>
+    <system:String x:Key="MainWindow.PlacementColumn">Placement column</system:String>
+    <system:String x:Key="MainWindow.Filters">Filters</system:String>
+    <system:String x:Key="MainWindow.TextNoteType">Text note type</system:String>
+    <system:String x:Key="MainWindow.TextWidthOnSheet">Text width on sheet</system:String>
+    <system:String x:Key="MainWindow.TextTemplate">Text template</system:String>
+    <system:String x:Key="MainWindow.ElementType">Element type</system:String>
+    <system:String x:Key="MainWindow.Select">Select</system:String>
+
+    <system:String x:Key="Validation.SheetNameIsEmpty">Sheet name is empty</system:String>
+    <system:String x:Key="Validation.SheetNameIsNotCorrect">Sheet name is incorrect</system:String>
+    <system:String x:Key="Validation.SheetSizeIsEmpty">Sheet size value is empty</system:String>
+    <system:String x:Key="Validation.SheetSizeIsNotCorrect">Sheet size value is incorrect</system:String>
+    <system:String x:Key="Validation.SheetCoefficientIsEmpty">Sheet size coefficient is empty</system:String>
+    <system:String x:Key="Validation.SheetCoefficientIsNotCorrect">Sheet size coefficient is incorrect</system:String>
+    <system:String x:Key="Validation.TitleBlockFamilyIsNull">Title block family is not selected</system:String>
+    <system:String x:Key="Validation.TitleBlockTypeIsNull">Title block type is not selected</system:String>
+    <system:String x:Key="Validation.ErrorInSheetComponents">Not all errors have been fixed in sheet components</system:String>
+
+    <system:String x:Key="Validation.ViewNameIsEmpty">View name is empty</system:String>
+    <system:String x:Key="Validation.ViewNameIsNotCorrect">View name is incorrect</system:String>
+    <system:String x:Key="Validation.ViewFamilyTypeIsNull">View type is not selected</system:String>
+    <system:String x:Key="Validation.ViewportTypeIsNull">Viewport type is not selected</system:String>
+    <system:String x:Key="Validation.ViewTemplateIsNull">View template is not selected</system:String>
+    <system:String x:Key="Validation.ViewCountIsNotCorrect">Number is incorrect</system:String>
+
+    <system:String x:Key="Validation.SelectedSelectElemParamIsNull">Object binding parameter is not selected</system:String>
+    <system:String x:Key="Validation.ParamNameIsEmpty">Parameter name is empty</system:String>
+    <system:String x:Key="Validation.SelectElemParamSelectedElemIsNull">No element selected in object binding parameter</system:String>
+    <system:String x:Key="Validation.ErrorInSheetSetParams">Not all errors have been fixed in sheet set parameters</system:String>
+
+    <system:String x:Key="Validation.ErrorInCustomParams">Not all errors have been fixed in custom parameters</system:String>
+
+    <system:String x:Key="Validation.HasNotPlanView">Place the component after the plan view</system:String>
+
+    <system:String x:Key="Validation.LegendViewIsNull">No legend selected for placement</system:String>
+    <system:String x:Key="Validation.ViewColumnIsNotCorrect">Column number is incorrect</system:String>
+    <system:String x:Key="Validation.ReferenceSpecIsNull">No reference schedule selected for duplication</system:String>
+    <system:String x:Key="Validation.ScheduleFiltersIsNotCorrect">Schedule filters are incorrect</system:String>
+
+    <system:String x:Key="Validation.TextIsEmpty">Text is empty</system:String>
+    <system:String x:Key="Validation.TextNoteTypeIsNull">Text note type is not selected</system:String>
+    <system:String x:Key="Validation.TextWidthIsNotCorrect">Text width is incorrect</system:String>
+
+    <system:String x:Key="Validation.AnnotationTypeIsNull">Typical annotation type is not selected</system:String>
+
+    <system:String x:Key="MainViewModel.Export">Export</system:String>
+    <system:String x:Key="MainViewModel.ExportIsSuccessful">Export completed successfully!</system:String>
+    <system:String x:Key="MainViewModel.Type">Type</system:String>
+    <system:String x:Key="MainViewModel.ParameterType">Parameter type</system:String>
+    <system:String x:Key="MainViewModel.NotSupported">not supported</system:String>
+    <system:String x:Key="MainViewModel.FileDeserializationError">File deserialization error</system:String>
+    <system:String x:Key="MainViewModel.ErrorReadingFile">Error reading file</system:String>
+    <system:String x:Key="MainViewModel.ErrorWritingFile">Error writing file</system:String>
+    <system:String x:Key="MainViewModel.SavePathIsNotCorrect">Save path is incorrect!</system:String>
+    <system:String x:Key="MainViewModel.Property">Property</system:String>
+    <system:String x:Key="MainViewModel.NotFoundInJSON">not found in JSON</system:String>
+    <system:String x:Key="MainViewModel.UnknownComponentType">Unknown component type</system:String>
+    <system:String x:Key="MainViewModel.UnknownPluginParamType">Unknown parameter type</system:String>
+    <system:String x:Key="MainViewModel.ErrorDeserializingType">Error deserializing type</system:String>
+    <system:String x:Key="MainViewModel.SelectConfigurationFile">Select configuration file</system:String>
+    <system:String x:Key="MainViewModel.SaveConfiguration">Save configuration</system:String>
+</ResourceDictionary>

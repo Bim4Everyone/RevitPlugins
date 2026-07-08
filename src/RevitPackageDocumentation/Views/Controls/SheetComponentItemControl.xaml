@@ -1,0 +1,135 @@
+﻿<UserControl
+    x:Class="RevitPackageDocumentation.Views.Controls.SheetComponentItemControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:sc="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents"
+    xmlns:local="clr-namespace:RevitPackageDocumentation.Views.Controls"
+    
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=sc:SheetComponentVM}"
+    x:Name="root"
+    
+    d:DesignHeight="450"
+    d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="../ErrorCustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border
+        Margin="5"
+        Style="{StaticResource CustomBorder}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="0"
+                Orientation="Horizontal">
+                <CheckBox
+                    Margin="-12 1 12 0"
+                    VerticalAlignment="Top"
+                    IsChecked="{Binding IsModuleCheck}">
+                    <CheckBox.RenderTransform>
+                        <ScaleTransform
+                            ScaleX="1.55"
+                            ScaleY="1.55" />
+                    </CheckBox.RenderTransform>
+                </CheckBox>
+
+                <ui:Button
+                    Margin="5 8"
+                    Height="35"
+                    Width="35"
+                    Padding="0"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Icon="{ui:SymbolIcon Flash28}"
+                    Command="{Binding Path=CreateComponentCommand}">
+                </ui:Button>
+
+                <ui:TextBox
+                    Margin="5"
+                    MinWidth="50"
+                    VerticalAlignment="Center"
+                    Text="{Binding ModuleName}" />
+            </StackPanel>
+
+            <StackPanel
+                Grid.Column="1"
+                Grid.Row="0"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+                <ui:TextBox
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    IsEnabled="False"
+                    FontWeight="Bold"
+                    Text="{Binding Path=ModuleTypeName}" />                
+                
+                <!--<ui:TextBlock
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Text="Code: " />
+                
+                <ui:TextBlock
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Text="{Binding ModuleCode}" />-->
+
+                <ui:Button
+                    Margin="5"
+                    Height="35"
+                    Width="35"
+                    Content="✕"
+                    Appearance="Danger"
+                    Command="{Binding 
+                        Path=DataContext.CurrentSheetSet.SelectedSheet.RemoveComponentCommand, 
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                    CommandParameter="{Binding}">
+                </ui:Button>
+            </StackPanel>
+
+            <ContentControl
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="1"
+                Content="{Binding}"
+                ContentTemplate="{Binding DerivedTemplate, ElementName=root}" />
+
+            <ui:TextBox
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="2"
+                Margin="5 5 5 5"
+                Foreground="Orange"
+                Text="{Binding FirstError}"
+                PlaceholderText="{me:LocalizationSource MainWindow.ErrorsNotFound}"
+                IsEnabled="False"
+                Tag="{Binding Path=FirstError}"
+                Style="{StaticResource TextBoxForError}"/>
+        </Grid>
+    </Border>
+</UserControl>

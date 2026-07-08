@@ -1,0 +1,151 @@
+﻿<UserControl 
+    x:Class="RevitPackageDocumentation.Views.Controls.FiltrationComboBoxControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    
+    xmlns:sc="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents"
+    xmlns:local="clr-namespace:RevitPackageDocumentation.Views.Controls"
+    xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
+    
+    mc:Ignorable="d"
+    x:Name="root"
+    d:DesignHeight="100"
+    d:DesignWidth="400"
+    
+    Validation.ErrorTemplate="{x:Null}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <DataTemplate
+                x:Key="WithFamilyNameItemTemplate">
+                <TextBlock>
+                    <TextBlock.Text>
+                        <MultiBinding
+                            StringFormat="{}{0}: {1}">
+                            <Binding Path="FamilyName" />
+                            <Binding Path="Name" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ComboBox
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="0 5 5 5"
+            VerticalAlignment="Top"
+            DisplayMemberPath="Name"
+            Style="{Binding Path=ComboBoxStyle, ElementName=root, TargetNullValue={StaticResource {x:Type ComboBox}}}"
+            ItemsSource="{Binding Path=FilteredItemsSource, ElementName=root}"
+            SelectedItem="{Binding Path=ComboBoxSelected, ElementName=root}"
+            ItemTemplate="{Binding ItemTemplate, ElementName=root}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger
+                    EventName="SelectionChanged">
+                    <i:InvokeCommandAction
+                        Command="{Binding Path=ComboBoxSelectionChangedCommand, ElementName=root}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
+
+        <ui:Button
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="0 5"
+            Height="37"
+            Width="37"
+            VerticalAlignment="Top"
+            Icon="{ui:SymbolIcon Beaker32}"
+            Click="Button_Click"
+            RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+                <RotateTransform
+                    Angle="180" />
+            </Button.RenderTransform>
+        </ui:Button>
+
+        <ui:Flyout
+            x:Name="flyout"
+            Grid.Row="0"
+            Grid.ColumnSpan="2"
+            MinWidth="300"
+            IsOpen="False"
+            Placement="Bottom"
+            HorizontalAlignment="Right">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <ItemsControl
+                    x:Name="FiltersItemsControl"
+                    Grid.Column="0"
+                    ItemsSource="{Binding FilterList.ValueList, ElementName=root}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <controls:FormulaTextBoxControl
+                                    Grid.Column="0"
+                                    Margin="0 5 5 5"
+                                    PropFormula="{Binding Path=ValueFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    PropResult="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    UpdateCommand="{Binding Path=PropUpdateByFormulaCommand}" />
+
+                                <Button
+                                    Grid.Column="1"
+                                    Content="✕"
+                                    Height="35"
+                                    Width="35"
+                                    Margin="0 5 5 0"
+                                    VerticalAlignment="Top"
+                                    Command="{Binding FilterList.RemoveFilterCommand, ElementName=root}"
+                                    CommandParameter="{Binding}">
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ui:Button
+                    x:Name="FiltersAddButton"
+                    Grid.Column="1"
+                    Margin="0 5"
+                    Height="35"
+                    Width="35"
+                    VerticalAlignment="Top"
+                    Appearance="Info"
+                    Content="+"
+                    Command="{Binding FilterList.AddFilterCommand, ElementName=root}" />
+            </Grid>
+        </ui:Flyout>
+    </Grid>
+</UserControl>

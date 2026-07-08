@@ -1,0 +1,133 @@
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Документация комплекта</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="MainWindow.AddSheet">Добавить лист</system:String>
+    <system:String x:Key="MainWindow.AddSheetComponent">Добавить компонент листа</system:String>
+    <system:String x:Key="MainWindow.AddSheetSetParam">Добавить параметр</system:String>
+    <system:String x:Key="MainWindow.SheetSetParams">Параметры комплекта</system:String>
+    
+    <system:String x:Key="ScheduleFilterType.Equal">Равно</system:String>
+    <system:String x:Key="ScheduleFilterType.NotEqual">Не равно</system:String>
+    <system:String x:Key="ScheduleFilterType.GreaterThan">Больше</system:String>
+    <system:String x:Key="ScheduleFilterType.GreaterThanOrEqual">Больше или равно</system:String>
+    <system:String x:Key="ScheduleFilterType.LessThan">Меньше</system:String>
+    <system:String x:Key="ScheduleFilterType.LessThanOrEqual">Меньше или равно</system:String>
+    <system:String x:Key="ScheduleFilterType.Contains">Содержит</system:String>
+    <system:String x:Key="ScheduleFilterType.NotContains">Не содержит</system:String>
+    <system:String x:Key="ScheduleFilterType.BeginsWith">Начинается с</system:String>
+    <system:String x:Key="ScheduleFilterType.NotBeginsWith">Не начинается с</system:String>
+    <system:String x:Key="ScheduleFilterType.EndsWith">Заканчивается на</system:String>
+    <system:String x:Key="ScheduleFilterType.NotEndsWith">Не заканчивается на</system:String>
+    <system:String x:Key="ScheduleFilterType.HasValue">Имеет значение</system:String>
+    <system:String x:Key="ScheduleFilterType.HasNoValue">Не имеет значение</system:String>
+    
+    <system:String x:Key="Type.PlanViewVM">Вид в плане</system:String>
+    <system:String x:Key="Type.CalloutViewVM">Фрагмент</system:String>
+    <system:String x:Key="Type.SectionViewVM">Сечение</system:String>
+    <system:String x:Key="Type.ScheduleViewVM">Спецификация</system:String>
+    <system:String x:Key="Type.TextNoteVM">Текст</system:String>
+    <system:String x:Key="Type.TypicalAnnotationVM">Типовая аннотация</system:String>
+    <system:String x:Key="Type.LegendViewVM">Легенда</system:String>
+    
+    <system:String x:Key="Type.StringParamVM">Текстовый параметр</system:String>
+    <system:String x:Key="Type.SelectElemParamVM">Выбор элемента</system:String>
+    
+    
+    <system:String x:Key="MainWindow.ErrorInSheets">Исправлены не все ошибки в выбранных листах комплекта</system:String>
+    <system:String x:Key="MainWindow.SheetSetHasNotSheets">В комплект не добавлено ни одного листа</system:String>
+    <system:String x:Key="MainWindow.NoSheetsSelected">Не выбрано ни одного листа</system:String>
+    <system:String x:Key="MainWindow.ViewNameAlreadyHas">Имя вида уже используется</system:String>
+    <system:String x:Key="MainWindow.ParamNameAlreadyHas">Найдены параметры с одинаковыми именами</system:String>
+    
+    <system:String x:Key="MainWindow.PickElement">Выберите один элемент</system:String>
+    <system:String x:Key="MainWindow.ErrorsNotFound">Ошибки не найдены</system:String>
+    <system:String x:Key="MainWindow.Edit">Изменить</system:String>
+    
+    <system:String x:Key="MainWindow.SheetName">Имя листа</system:String>
+    <system:String x:Key="MainWindow.SheetSettings">Настройки листа</system:String>
+    <system:String x:Key="MainWindow.TitleBlockFamily">Семейство рамки</system:String>
+    <system:String x:Key="MainWindow.TitleBlockType">Типоразмер рамки</system:String>
+    <system:String x:Key="MainWindow.SheetSize">Размер листа</system:String>
+    <system:String x:Key="MainWindow.CustomParams">Дополнительные параметры</system:String>
+    
+    <system:String x:Key="MainWindow.ViewName">Имя вида</system:String>
+    <system:String x:Key="MainWindow.ViewFamilyType">Типоразмер вида</system:String>
+    <system:String x:Key="MainWindow.ViewTemplate">Шаблон вида</system:String>
+    <system:String x:Key="MainWindow.ViewportType">Типоразмер видового экрана</system:String>
+    <system:String x:Key="MainWindow.Count">Количество</system:String>
+    <system:String x:Key="MainWindow.BindingToObject">Привязка к объекту</system:String>
+    <system:String x:Key="MainWindow.Comments">Комментарии</system:String>
+    <system:String x:Key="MainWindow.FinalSpecName">Имя итоговой</system:String>
+    <system:String x:Key="MainWindow.ReferenceSpecName">Имя исходной</system:String>
+    <system:String x:Key="MainWindow.PlacementColumn">Ряд размещения</system:String>
+    <system:String x:Key="MainWindow.Filters">Фильтры</system:String>
+    <system:String x:Key="MainWindow.TextNoteType">Типоразмер текста</system:String>
+    <system:String x:Key="MainWindow.TextWidthOnSheet">Ширина текста на листе</system:String>
+    <system:String x:Key="MainWindow.TextTemplate">Шаблон текста</system:String>
+    <system:String x:Key="MainWindow.ElementType">Типоразмер</system:String>
+    <system:String x:Key="MainWindow.Select">Выбрать</system:String>
+
+    <system:String x:Key="Validation.SheetNameIsEmpty">Имя листа не заполнено</system:String>
+    <system:String x:Key="Validation.SheetNameIsNotCorrect">Имя листа заполнено некорректно</system:String>
+    <system:String x:Key="Validation.SheetSizeIsEmpty">Значение номера формата листа не заполнено</system:String>
+    <system:String x:Key="Validation.SheetSizeIsNotCorrect">Значение номера формата листа некорректно</system:String>
+    <system:String x:Key="Validation.SheetCoefficientIsEmpty">Значение коэффициента формата листа не заполнено</system:String>
+    <system:String x:Key="Validation.SheetCoefficientIsNotCorrect">Значение коэффициента формата листа некорректно</system:String>
+    <system:String x:Key="Validation.TitleBlockFamilyIsNull">Не выбрано семейство рамки листа</system:String>
+    <system:String x:Key="Validation.TitleBlockTypeIsNull">Не выбран тип рамки листа</system:String>
+    <system:String x:Key="Validation.ErrorInSheetComponents">Исправлены не все ошибки в компонентах листа</system:String>
+
+    <system:String x:Key="Validation.ViewNameIsEmpty">Имя вида не заполнено</system:String>
+    <system:String x:Key="Validation.ViewNameIsNotCorrect">Имя вида заполнено некорректно</system:String>
+    <system:String x:Key="Validation.ViewFamilyTypeIsNull">Не выбран тип вида</system:String>
+    <system:String x:Key="Validation.ViewportTypeIsNull">Не выбран тип видового экрана</system:String>
+    <system:String x:Key="Validation.ViewTemplateIsNull">Не выбран шаблон вида</system:String>
+    <system:String x:Key="Validation.ViewCountIsNotCorrect">Число задано некорректно</system:String>
+    
+    <system:String x:Key="Validation.SelectedSelectElemParamIsNull">Не выбран параметр привязки к объекту</system:String>
+    <system:String x:Key="Validation.ParamNameIsEmpty">Имя параметра не заполнено</system:String>
+    <system:String x:Key="Validation.SelectElemParamSelectedElemIsNull">Не выбран элемент в параметре привязки к объекту</system:String>
+    <system:String x:Key="Validation.ErrorInSheetSetParams">Исправлены не все ошибки в параметрах комплекта</system:String>
+    
+    <system:String x:Key="Validation.ErrorInCustomParams">Исправлены не все ошибки в дополнительных параметрах</system:String>
+
+    <system:String x:Key="Validation.HasNotPlanView">Расположите компонент после вида в плане</system:String>
+
+    <system:String x:Key="Validation.LegendViewIsNull">Не выбрана легенда для размещения</system:String>
+    <system:String x:Key="Validation.ViewColumnIsNotCorrect">Номер столбца задан некорректно</system:String>
+    <system:String x:Key="Validation.ReferenceSpecIsNull">Не выбрана эталонная спецификация для дублирования</system:String>
+    <system:String x:Key="Validation.ScheduleFiltersIsNotCorrect">Фильтры спецификации не корректны</system:String>
+
+    <system:String x:Key="Validation.TextIsEmpty">Текст не заполнен</system:String>
+    <system:String x:Key="Validation.TextNoteTypeIsNull">Не выбран тип текстовой заметки</system:String>
+    <system:String x:Key="Validation.TextWidthIsNotCorrect">Ширина текста не корректна</system:String>
+
+    <system:String x:Key="Validation.AnnotationTypeIsNull">Не выбран тип типовой аннотации</system:String>
+    
+    <system:String x:Key="MainViewModel.Export">Экспорт</system:String>
+    <system:String x:Key="MainViewModel.ExportIsSuccessful">Экспорт прошел успешно!</system:String>
+    <system:String x:Key="MainViewModel.ExportPathIsNotCorrect">Путь для экспорт не корректен!</system:String>
+    <system:String x:Key="MainViewModel.ExportCanceled">Экспорт отменен!</system:String>
+    
+    <system:String x:Key="MainViewModel.Type">Тип</system:String>
+    <system:String x:Key="MainViewModel.ParameterType">Тип параметра</system:String>
+    <system:String x:Key="MainViewModel.NotSupported">не поддерживается</system:String>
+    <system:String x:Key="MainViewModel.FileDeserializationError">Ошибка десериализации файла</system:String>
+    <system:String x:Key="MainViewModel.ErrorReadingFile">Ошибка чтения файла</system:String>
+    <system:String x:Key="MainViewModel.ErrorWritingFile">Ошибка записи файла</system:String>
+    <system:String x:Key="MainViewModel.SavePathIsNotCorrect">Путь сохранения не корректен!</system:String>
+    <system:String x:Key="MainViewModel.Property">Свойство</system:String>
+    <system:String x:Key="MainViewModel.NotFoundInJSON">не найдено в JSON</system:String>
+    <system:String x:Key="MainViewModel.UnknownComponentType">Неизвестный тип компонента</system:String>
+    <system:String x:Key="MainViewModel.UnknownPluginParamType">Неизвестный тип параметра</system:String>
+    <system:String x:Key="MainViewModel.ErrorDeserializingType">Ошибка десериализации типа</system:String>
+    <system:String x:Key="MainViewModel.SelectConfigurationFile">Выберите файл конфигурации</system:String>
+    <system:String x:Key="MainViewModel.SaveConfiguration">Сохранить конфигурацию</system:String>
+</ResourceDictionary>

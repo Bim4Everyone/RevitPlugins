@@ -1,0 +1,69 @@
+﻿<UserControl 
+    x:Class="RevitPackageDocumentation.Views.Controls.CustomParamItemControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    
+    xmlns:local="clr-namespace:RevitPackageDocumentation.Views.Controls"
+    xmlns:sheet="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet"
+    xmlns:filters="clr-namespace:RevitPackageDocumentation.ViewModels.ScheduleFilters"
+    xmlns:converters="clr-namespace:dosymep.WPF.Converters"
+    xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
+    xmlns:customParams="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.CustomParameters"
+    
+    d:DataContext="{d:DesignInstance Type=customParams:CustomParameterVM}"
+    mc:Ignorable="d"
+    x:Name="root"
+    
+    d:DesignHeight="50"
+    d:DesignWidth="400"
+    
+    Validation.ErrorTemplate="{x:Null}">
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <ui:Button
+            Grid.Column="0"
+            Margin="0 5"
+            Height="35"
+            Width="35"
+            VerticalAlignment="Top"
+            Appearance="Danger"
+            Content="✕"
+            Command="{Binding Path=CustomParamsList.RemoveCustomParameterCommand}"
+            CommandParameter="{Binding}" />
+
+        <ui:TextBox
+            Grid.Column="1"
+            Margin="5"
+            VerticalAlignment="Top"
+            Style="{Binding Path=TextBoxStyle, ElementName=root, TargetNullValue={StaticResource {x:Type ui:TextBox}}}"
+            Text="{Binding 
+                Path=ParamName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                ValidatesOnNotifyDataErrors=True}" />
+
+        <controls:FormulaTextBoxControl
+            Grid.Column="2"
+            Margin="0 5"
+            PropFormula="{Binding Path=ParamValueFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            PropResult="{Binding Path=ParamValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            UpdateCommand="{Binding Path=PropUpdateByFormulaCommand}" />
+    </Grid>
+</UserControl>
