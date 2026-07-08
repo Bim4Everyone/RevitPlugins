@@ -10,6 +10,9 @@
     <system:String x:Key="ViewPlanSelectionPage.GroupParameters">Параметр группировки</system:String>
     <system:String x:Key="ViewPlanSelectionPage.GroupParametersTooltip">Параметр, используемый в группировке видов</system:String>
     
+    <system:String x:Key="ViewPlanSelectionViewModel.NoViews">Нет видов</system:String>
+    <system:String x:Key="ViewPlanSelectionViewModel.NoBrowserParameter">Нет параметров группировки</system:String>
+    
     
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     

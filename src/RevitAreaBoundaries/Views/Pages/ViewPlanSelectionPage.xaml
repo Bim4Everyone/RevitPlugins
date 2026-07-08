@@ -50,8 +50,8 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 DisplayMemberPath="Name"
-                ItemsSource="{Binding GroupParameters}"
-                SelectedItem="{Binding SelectedGroupParameter}" />
+                ItemsSource="{Binding GroupParamViewModels}"
+                SelectedItem="{Binding SelectedGroupParamViewModel}" />
         </Grid>
         
         <ItemsControl

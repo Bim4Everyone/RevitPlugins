@@ -19,4 +19,5 @@ public class AreaBoundarySettings {
     
     public List<RevitElementType> Types { get; set; }
     
+    public string GroupParam { get; set; }
 }

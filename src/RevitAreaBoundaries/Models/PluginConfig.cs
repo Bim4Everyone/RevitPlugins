@@ -76,6 +76,8 @@ public class SystemPluginConfig {
     
     public readonly AlgorithmType DefaultAlgorithmType = AlgorithmType.OuterBoundary;
     
+    public readonly string DefaultGroupParamName = "_Группа Видов";
+    
     public readonly double DefaultSectionHeight = 1200;
     
     public readonly List<RevitElementView> DefaultListViewPlans = [];

@@ -2,6 +2,8 @@
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+
 using RevitAreaBoundaries.Models;
 using RevitAreaBoundaries.Models.Enums;
 
@@ -12,6 +14,7 @@ public class ConfigSettings {
     public double SectionHeight { get; set; }
     public  List<RevitElementView> SelectedViewPlans { get; set; }
     public  List<RevitElementType> SelectedTypes { get; set; }
+    public string GroupParam { get; set; }
 
 
     public void ApplyDefaultValues(SystemPluginConfig systemPluginConfig) {
@@ -19,5 +22,6 @@ public class ConfigSettings {
         SectionHeight = systemPluginConfig.DefaultSectionHeight;
         SelectedViewPlans = systemPluginConfig.DefaultListViewPlans;
         SelectedTypes = systemPluginConfig.DefaultListTypes;
+        GroupParam = systemPluginConfig.DefaultGroupParamName;
     }
 }

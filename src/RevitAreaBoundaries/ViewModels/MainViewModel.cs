@@ -77,7 +77,8 @@ internal class MainViewModel : BaseViewModel {
         LoadConfig();
         CommonSettingsViewModel = new CommonSettingsViewModel();
         CommonSettingsViewModel.PropertyChanged += CommonSettingsViewModelChanged;
-        ViewPlanSelectionViewModel = new ViewPlanSelectionViewModel(_revitRepository, _areaBoundarySettings);
+        ViewPlanSelectionViewModel = new ViewPlanSelectionViewModel(
+            _localizationService,_systemPluginConfig, _revitRepository, _areaBoundarySettings);
         ViewPlanSelectionViewModel.PropertyChanged += ViewPlanSelectionViewModelChanged;
         TypeElementSelectionViewModel = new TypeElementSelectionViewModel();
         TypeElementSelectionViewModel.PropertyChanged += TypeElementSelectionViewModelChanged;
@@ -129,8 +130,8 @@ internal class MainViewModel : BaseViewModel {
             AlgorithmType = configSettings.AlgorithmType,
             SectionHeight = configSettings.SectionHeight,
             Views = configSettings.SelectedViewPlans,
-            Types = configSettings.SelectedTypes
-                
+            Types = configSettings.SelectedTypes,
+            GroupParam = configSettings.GroupParam
         };
     }
     
@@ -139,7 +140,8 @@ internal class MainViewModel : BaseViewModel {
             AlgorithmType = _areaBoundarySettings.AlgorithmType,
             SectionHeight = _areaBoundarySettings.SectionHeight,
             SelectedViewPlans = _areaBoundarySettings.Views,
-            SelectedTypes = _areaBoundarySettings.Types
+            SelectedTypes = _areaBoundarySettings.Types,
+            GroupParam = _areaBoundarySettings.GroupParam
         };
 
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)

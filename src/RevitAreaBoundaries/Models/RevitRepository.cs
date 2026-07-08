@@ -29,19 +29,24 @@ internal class RevitRepository {
     public UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
     public Application Application => UiApplication.Application;
     public Document Document => ActiveUiDocument.Document;
+    public IEnumerable<Element> ViewPlans => GetViews();
+
+
+    public IEnumerable<Element> GetViews() {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewPlan))
+            .Cast<ViewPlan>()
+            .Where(vp => !vp.IsTemplate)
+            .Where(vp => vp.ViewType == ViewType.AreaPlan);
+    }
     
     
     // Метод получения коллекции ViewPlans
     public IEnumerable<RevitElement> GetViewPlans() {
-        return new FilteredElementCollector(Document)
-            .OfClass(typeof(ViewPlan))              
-            .Cast<ViewPlan>()
-            .Where(vp => !vp.IsTemplate)
-            .Where(vp => vp.ViewType == ViewType.AreaPlan)
+        return ViewPlans
             .Select(vp => new RevitElementView {
                 Element = vp,
-                Name = vp.Name,
-                GroupName = GetGroupNameViewPlan(vp)
+                Name = vp.Name
             });
     }
 
@@ -60,45 +65,38 @@ internal class RevitRepository {
                 .Select(type => new RevitElementType {
                     Element = type,
                     Name = type.Name,
-                    GroupName = GetCategoryName(type),
+                    CategoryName = GetCategoryName(type),
                     SectionType = sectionType 
                 })
         );
     }
     
-    private string GetGroupNameViewPlan(Element element) {
-        if(element == null) {
+    public string GetGroupNameViewPlan(Element element, RevitParam revitParam) {
+        if(revitParam is null) {
             return _systemPluginConfig.DefaultGroupParameterValue;
         }
-
-        var browserParameter = GetBrowserParameter(element);
-        if(browserParameter == null) {
-            return _systemPluginConfig.DefaultGroupParameterValue;
-        }
-
-        string value = element.GetParamValueStringOrDefault(browserParameter);
+        string value = element.GetParamValueStringOrDefault(revitParam);
         return string.IsNullOrEmpty(value)
             ? _systemPluginConfig.DefaultGroupParameterValue
             : value;
     }
     
-    private RevitParam GetBrowserParameter(Element element) {
-        var elementId = GetBrowserParameterElementId(element);
+    public IEnumerable<RevitParam> GetBrowserParameters(Element element) {
+        var elementIds = GetBrowserParameterElementIds(element);
         
-        return elementId == null 
-            ? null 
-            : _revitParamFactory.Create(Document, elementId);
+        return elementIds.Count == 0
+            ? [] 
+            : elementIds.Select(id => _revitParamFactory.Create(Document, id));
     }
     
-    private ElementId GetBrowserParameterElementId(Element element) {
+    private List<ElementId> GetBrowserParameterElementIds(Element element) {
         if(element is null) {
-            return null;
+            return [];
         }
         var browserOrganization = BrowserOrganization.GetCurrentBrowserOrganizationForViews(Document);
         var itemsInfo = browserOrganization.GetFolderItems(element.Id);
         
-        return itemsInfo.LastOrDefault()?
-            .ElementId;
+        return itemsInfo.Select(info => info.ElementId).ToList();
     }
     
     private static string GetCategoryName(Element element) {
