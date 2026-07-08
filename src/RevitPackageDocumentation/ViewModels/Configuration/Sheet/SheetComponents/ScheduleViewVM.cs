@@ -139,9 +139,7 @@ internal class ScheduleViewVM : SheetComponentVM {
 
     public ScheduleSheetInstance Place(ViewSchedule view) {
         var sheetInstance = Sheet.SheetInstance;
-        if(sheetInstance is null
-            || view is null
-            || Viewport.CanAddViewToSheet(Repository.Document, sheetInstance.Id, view.Id)) {
+        if(sheetInstance is null || view is null) {
             return null;
         }
 
