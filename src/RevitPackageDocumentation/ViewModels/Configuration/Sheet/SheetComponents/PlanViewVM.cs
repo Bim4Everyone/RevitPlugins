@@ -26,6 +26,7 @@ internal class PlanViewVM : SheetComponentVM {
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
     private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
     private FiltrationComboBoxFilterListVM _viewTemplateFilter;
+    private bool _viewTemplateRemoveAfterCreation = false;
 
     // Смещение по горизонтали в дюймах слева, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _titleBlockFrameLeftOffset = UnitUtilsHelper.ConvertToInternalValue(20);
@@ -88,6 +89,11 @@ internal class PlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewTemplateFilter, value);
     }
 
+    public bool ViewTemplateRemoveAfterCreation {
+        get => _viewTemplateRemoveAfterCreation;
+        set => RaiseAndSetIfChanged(ref _viewTemplateRemoveAfterCreation, value);
+    }
+
     [PositiveInteger(ErrorMessage = "Validation.ViewCountIsNotCorrect")]
     public string ViewCount {
         get => _viewCount;
@@ -142,6 +148,11 @@ internal class PlanViewVM : SheetComponentVM {
                 // Необходимо для перезагрузки габаритов видов перед их размещением, т.к. при назначении 
                 // секущего диапазона, видимых категорий, шаблона вида могут изменяться габариты вида
                 Repository.Document.Regenerate();
+
+                // Снимаем шаблон вида, если запросил пользователь
+                if(ViewTemplateRemoveAfterCreation) {
+                    view.ViewTemplateId = ElementId.InvalidElementId;
+                }
             } catch(Exception) { }
         }
         return view;

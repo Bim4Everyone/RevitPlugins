@@ -38,6 +38,7 @@ internal class CalloutViewVM : SheetComponentVM {
     private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
     private FiltrationComboBoxFilterListVM _viewTemplateFilter;
+    private bool _viewTemplateRemoveAfterCreation = false;
 
     public CalloutViewVM(
         RevitRepository repository,
@@ -93,6 +94,11 @@ internal class CalloutViewVM : SheetComponentVM {
     public FiltrationComboBoxFilterListVM ViewTemplateFilter {
         get => _viewTemplateFilter;
         set => RaiseAndSetIfChanged(ref _viewTemplateFilter, value);
+    }
+
+    public bool ViewTemplateRemoveAfterCreation {
+        get => _viewTemplateRemoveAfterCreation;
+        set => RaiseAndSetIfChanged(ref _viewTemplateRemoveAfterCreation, value);
     }
 
     [PositiveInteger(ErrorMessage = "Validation.ViewCountIsNotCorrect")]
@@ -190,6 +196,11 @@ internal class CalloutViewVM : SheetComponentVM {
             // Необходимо для перезагрузки габаритов видов перед их размещением, т.к. при назначении 
             // секущего диапазона, видимых категорий, шаблона вида могут изменяться габариты вида
             Repository.Document.Regenerate();
+
+            // Снимаем шаблон вида, если запросил пользователь
+            if(ViewTemplateRemoveAfterCreation) {
+                view.ViewTemplateId = ElementId.InvalidElementId;
+            }
         } catch(System.Exception) { }
         return view;
     }

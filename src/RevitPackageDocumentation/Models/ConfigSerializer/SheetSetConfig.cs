@@ -104,6 +104,7 @@ public class PlanViewData : SheetComponentData {
     public FiltrationComboBoxFilterListData ViewFamilyTypeFilterValues { get; set; }
     public string ViewTemplateName { get; set; }
     public FiltrationComboBoxFilterListData ViewTemplateFilterValues { get; set; }
+    public bool? ViewTemplateRemoveAfterCreation { get; set; }
     public string ViewportTypeName { get; set; }
     public FiltrationComboBoxFilterListData ViewportTypeFilterValues { get; set; }
     public string ViewCount { get; set; }
@@ -121,6 +122,7 @@ public class CalloutViewData : SheetComponentData {
     public FiltrationComboBoxFilterListData ViewFamilyTypeFilterValues { get; set; }
     public string ViewTemplateName { get; set; }
     public FiltrationComboBoxFilterListData ViewTemplateFilterValues { get; set; }
+    public bool? ViewTemplateRemoveAfterCreation { get; set; }
     public string ViewportTypeName { get; set; }
     public FiltrationComboBoxFilterListData ViewportTypeFilterValues { get; set; }
     public string ViewCount { get; set; }
@@ -140,6 +142,7 @@ public class SectionViewData : SheetComponentData {
     public FiltrationComboBoxFilterListData ViewFamilyTypeFilterValues { get; set; }
     public string ViewTemplateName { get; set; }
     public FiltrationComboBoxFilterListData ViewTemplateFilterValues { get; set; }
+    public bool? ViewTemplateRemoveAfterCreation { get; set; }
     public string ViewportTypeName { get; set; }
     public FiltrationComboBoxFilterListData ViewportTypeFilterValues { get; set; }
     public string SelectedSelectElemParamName { get; set; }

@@ -154,6 +154,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
             ViewTemplateFilter = GetFilterList(data.ViewTemplateFilterValues, sheetSetVM.SheetSetParams.Params),
+            ViewTemplateRemoveAfterCreation = data.ViewTemplateRemoveAfterCreation ?? false,
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
             ViewportTypeFilter = GetFilterList(data.ViewportTypeFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewCount = data.ViewCount ?? "1",
@@ -181,6 +182,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             ViewTemplate = _revitRepository.PlanViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
             ViewTemplateFilter = GetFilterList(data.ViewTemplateFilterValues, sheetSetVM.SheetSetParams.Params),
+            ViewTemplateRemoveAfterCreation = data.ViewTemplateRemoveAfterCreation ?? false,
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
             ViewportTypeFilter = GetFilterList(data.ViewportTypeFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewCount = data.ViewCount ?? "1",
@@ -208,6 +210,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             ViewTemplate = _revitRepository.SectionViewTemplates.FirstOrDefault(v => v.Name.Equals(data.ViewTemplateName)),
             ViewTemplateFilter = GetFilterList(data.ViewTemplateFilterValues, sheetSetVM.SheetSetParams.Params),
+            ViewTemplateRemoveAfterCreation = data.ViewTemplateRemoveAfterCreation ?? false,
             ViewportType = _revitRepository.ViewportTypes.FirstOrDefault(v => v.Name.Equals(data.ViewportTypeName)),
             ViewportTypeFilter = GetFilterList(data.ViewportTypeFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewCount = data.ViewCount ?? "1",
