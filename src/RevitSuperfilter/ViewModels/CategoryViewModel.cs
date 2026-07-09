@@ -134,6 +134,7 @@ internal sealed class CategoryViewModel : BaseViewModel, IElementIndexList {
 
             var elementParams = element.Parameters
                 .OfType<Parameter>()
+                .Where(x => x.Definition is not null)
                 .OrderBy(x => x.Definition, DefinitionNameComparer.Instance);
 
             foreach(var elementParam in elementParams) {
