@@ -14,6 +14,8 @@ using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class CalloutViewVM : SheetComponentVM {
+    private readonly string _uniqueViewportNumberKey = "‪";
+
     // Ширина фрагмента
     private readonly double _calloutWidth = UnitUtilsHelper.ConvertToInternalValue(4000);
 
@@ -222,9 +224,6 @@ internal class CalloutViewVM : SheetComponentVM {
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
-            int viewPortNumber = GetLastViewportNumber(0, 100) + 1;
-            var lastViewport = GetLastViewport<ViewPlan>(vp => vp.GetBoxCenter().Y < 0, true);
-
             // Получение габаритов видового экрана
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
             viewPort.ChangeTypeId(ViewportType.Id);
@@ -234,6 +233,7 @@ internal class CalloutViewVM : SheetComponentVM {
             double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
             double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
 
+            var lastViewport = GetLastViewport<ViewPlan>(vp => vp.GetBoxCenter().Y < 0, true);
             double correctPositionX = lastViewport is null
                 ? titleBlockMinX + viewportHalfWidth
                 : lastViewport.GetBoxOutline().MaximumPoint.X + viewportHalfWidth;
@@ -243,8 +243,11 @@ internal class CalloutViewVM : SheetComponentVM {
                 titleBlockMinY - viewportHalfHeight - _viewportOffset,
                 0);
 
+            string viewPortNumberAsStr =
+                _uniqueViewportNumberKey + (GetLastViewportNumber(_uniqueViewportNumberKey, 0, 100) + 1);
+
             viewPort.SetBoxCenter(correctPosition);
-            viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, viewPortNumber.ToString());
+            viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, viewPortNumberAsStr);
 
 #if REVIT_2022_OR_GREATER
             viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);
