@@ -51,14 +51,16 @@ internal class TypeElementSelectionViewModel : BaseViewModel {
         var savedViewIds = _areaBoundarySettings.Types
             .Select(view => view.Element.Id)
             .ToHashSet();
+        
+        
 
         return _revitRepository.GetTypeModels()
             .GroupBy(type => type.CategoryName)
             .Select(group => {
-                var viewModels = group.Select(view => new RevitElementViewModel {
-                    Name = view.Name,
-                    IsChecked = savedViewIds.Contains(view.Element.Id),
-                    RevitElement = view
+                var viewModels = group.Select(type => new RevitElementViewModel {
+                    Name = $"{type.FamilyName}: {type.Name}",
+                    IsChecked = savedViewIds.Count == 0 || savedViewIds.Contains(type.Element.Id),
+                    RevitElement = type
                 });
         
                 return new RevitElementGroupViewModel {

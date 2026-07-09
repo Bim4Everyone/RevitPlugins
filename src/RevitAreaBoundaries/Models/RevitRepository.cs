@@ -61,10 +61,12 @@ internal class RevitRepository {
             new FilteredElementCollector(Document)
                 .OfCategory(category)
                 .WhereElementIsElementType()
+                .Cast<ElementType>()
                 .Select(type => new RevitElementType {
                     Element = type,
                     Name = type.Name,
                     CategoryName = GetCategoryName(type),
+                    FamilyName = type.FamilyName,
                     SectionType = sectionType 
                 })
         );

@@ -15,26 +15,17 @@
         Icon="{Binding Icon, ElementName=_this}">
 
         <ui:CardExpander.Header>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="24" />
-                    <ColumnDefinition
-                        Width="Auto" />
-                </Grid.ColumnDefinitions>
-                
-                <ui:TextBlock
-                    Grid.Column="1"
-                    FontTypography="BodyStrong"
-                    TextWrapping="WrapWithOverflow"
-                    VerticalAlignment="Center"
-                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                    Text="{Binding Header, ElementName=_this}" />
-            </Grid>
+            <ui:TextBlock
+                FontTypography="BodyStrong"
+                TextWrapping="WrapWithOverflow"
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                Text="{Binding Header, ElementName=_this}" />
         </ui:CardExpander.Header>
 
         <ContentControl
             VerticalAlignment="Center"
             Content="{Binding EditControl, ElementName=_this}" />
+        
     </ui:CardExpander>
 </UserControl>

@@ -6,4 +6,6 @@ public class RevitElementType : RevitElement {
      
     public SectionType SectionType { get; set; }
     public string CategoryName { get; set; }
+    
+    public string FamilyName { get; set; }
 }
