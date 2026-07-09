@@ -15,6 +15,7 @@ internal sealed class DefinitionViewModel : BaseViewModel {
     private readonly Dictionary<string, ParamValueViewModel> _paramValues = new(StringComparer.CurrentCulture);
 
     private bool _isExpanded;
+    private bool _isSelected;
     private readonly Definition _definition;
 
     public DefinitionViewModel(Definition definition, bool isType) {
@@ -26,6 +27,11 @@ internal sealed class DefinitionViewModel : BaseViewModel {
 
     public int Count => ParamValues.Count;
     public string DisplayValue => _definition.Name;
+
+    public bool IsSelected {
+        get => _isSelected;
+        set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+    }
 
     public bool IsExpanded {
         get => _isExpanded;

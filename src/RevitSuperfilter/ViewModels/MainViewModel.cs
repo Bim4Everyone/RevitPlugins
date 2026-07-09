@@ -11,12 +11,15 @@ using dosymep.WPF.ViewModels;
 using RevitSuperfilter.Models;
 using RevitSuperfilter.Services;
 
+using Autodesk.Revit.DB;
+
 namespace RevitSuperfilter.ViewModels;
 
 /// <summary>
 /// Основная ViewModel главного окна плагина.
 /// </summary>
 internal class MainViewModel : BaseViewModel {
+    private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     
     private string _errorText;
@@ -29,15 +32,25 @@ internal class MainViewModel : BaseViewModel {
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
     public MainViewModel(
+        RevitRepository revitRepository,
         ILocalizationService localizationService,
         IReadOnlyCollection<ISuperfilterService> superfilterServices) {
+        _revitRepository = revitRepository;
         _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
-        AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
+        SelectCommand = RelayCommand.Create(SelectElements);
+        ShowCommand = RelayCommand.Create(ShowElements);
+        IsolateCommand = RelayCommand.Create(IsolateElements);
         
         SuperfilterServices = new ObservableCollection<ISuperfilterService>(superfilterServices);
     }
+
+    public ICommand SelectCommand { get; }
+
+    public ICommand ShowCommand { get; }
+
+    public ICommand IsolateCommand { get; }
 
     public CategoryViewModel Category {
         get => _category;
@@ -91,25 +104,19 @@ internal class MainViewModel : BaseViewModel {
                 item.Selection == Selection.DBSelection && item.CategoriesViewModel.Categories.Count > 0);
     }
 
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
-    private void AcceptView() {
+    private void SelectElements() {
+        _revitRepository.SelectElements(GetCheckedElementIds());
     }
 
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
-    /// </remarks>
-    private bool CanAcceptView() {
-        ErrorText = null;
-        return true;
+    private void ShowElements() {
+        _revitRepository.ShowElements(GetCheckedElementIds());
+    }
+
+    private void IsolateElements() {
+        _revitRepository.IsolateElements(GetCheckedElementIds());
+    }
+
+    private ICollection<ElementId> GetCheckedElementIds() {
+        return SuperfilterService?.CategoriesViewModel.GetCheckedElementIds() ?? [];
     }
 }

@@ -8,12 +8,22 @@ namespace RevitSuperfilter.ViewModels;
 
 internal sealed class ParamValueViewModel : BaseViewModel {
     private readonly HashSet<ElementId> _elementsById = [];
+    private bool _isSelected;
 
     public int Count => _elementsById.Count;
     public string DisplayValue { get; }
 
     public ParamValueViewModel(string displayValue) {
         DisplayValue = displayValue;
+    }
+
+    public bool IsSelected {
+        get => _isSelected;
+        set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+    }
+
+    public ICollection<ElementId> GetElementIds() {
+        return [.._elementsById];
     }
 
     public void Add(Element element) {

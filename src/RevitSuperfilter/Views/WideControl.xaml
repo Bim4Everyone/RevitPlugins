@@ -124,6 +124,7 @@
                 Width="80"
                 Margin="5 0 0 0"
                 DockPanel.Dock="Right"
+                Command="{Binding ShowCommand}"
                 Content="{me:LocalizationSource MainWindow.ButtonShow}" />
 
             <ComboBox />
@@ -138,12 +139,14 @@
             <ui:Button
                 Width="80"
                 DockPanel.Dock="Right"
+                Command="{Binding IsolateCommand}"
                 Content="{me:LocalizationSource MainWindow.ButtonIsolate}" />
 
             <ui:Button
                 Width="80"
                 Margin="5 0"
                 DockPanel.Dock="Right"
+                Command="{Binding SelectCommand}"
                 Content="{me:LocalizationSource MainWindow.ButtonSelect}" />
 
             <ui:TextBlock

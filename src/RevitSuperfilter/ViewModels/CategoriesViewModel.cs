@@ -76,6 +76,21 @@ internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList 
         OnPropertyChanged(nameof(Count));
     }
 
+    public ICollection<ElementId> GetCheckedElementIds() {
+        var result = new HashSet<ElementId>();
+        foreach(var category in Categories) {
+            foreach(var definition in category.Definitions) {
+                foreach(var paramValue in definition.ParamValues) {
+                    if(paramValue.IsSelected) {
+                        result.UnionWith(paramValue.GetElementIds());
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     private CategoryViewModel GetOrAdd(Element element) {
         if(!_categoryVms.TryGetValue(GetKey(element), out var categoryViewModel)) {
             categoryViewModel = new CategoryViewModel(element.Category);
