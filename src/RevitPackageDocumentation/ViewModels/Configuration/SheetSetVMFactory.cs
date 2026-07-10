@@ -66,10 +66,13 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             _messageBoxService,
             this,
             _sheetSetDataFactory,
-            _localizationService);
+            _localizationService) {
+            ModuleComment = data.ParamsComment
+        };
         foreach(var paramData in data.Params) {
             sheetSetVM.SheetSetParams.AddSheetSetParam(paramData);
         }
+
 
         foreach(var sheetData in data.Sheets) {
             var sheetVM = CreateSheetVM(sheetSetVM, sheetData);

@@ -234,7 +234,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>
@@ -457,7 +456,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>
@@ -682,7 +680,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>
@@ -884,7 +881,6 @@
                         AcceptsReturn="True"
                         TextWrapping="WrapWithOverflow"
                         PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                        Foreground="LightGray"
                         Text="{Binding ModuleComment}" />
                 </Grid>
             </UniformGrid>
@@ -1032,7 +1028,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>
@@ -1126,7 +1121,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>
@@ -1248,7 +1242,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>

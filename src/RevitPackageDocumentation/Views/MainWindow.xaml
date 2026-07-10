@@ -170,6 +170,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -235,6 +236,17 @@
 
                     <ui:TextBox
                         Grid.Row="2"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        AcceptsReturn="True"
+                        TextWrapping="WrapWithOverflow"
+                        Text="{Binding Path=CurrentSheetSet.SheetSetParams.ModuleComment, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        PlaceholderText="{me:LocalizationSource MainWindow.Comments}" />
+
+                    <ui:TextBox
+                        Grid.Row="3"
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
                         Foreground="Orange"

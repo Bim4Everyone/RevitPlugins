@@ -68,6 +68,7 @@ public class SheetSetData {
     public string Name { get; set; } = "Новая конфигурация";
     public List<SheetData> Sheets { get; set; } = [];
     public List<PluginParamData> Params { get; set; } = [];
+    public string ParamsComment { get; set; } = string.Empty;
 }
 
 public abstract class ParamContainerModuleData {

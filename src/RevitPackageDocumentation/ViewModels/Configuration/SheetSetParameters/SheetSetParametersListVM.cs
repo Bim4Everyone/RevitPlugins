@@ -19,6 +19,7 @@ internal class SheetSetParametersListVM : ValidatableVM {
 
     private ObservableCollection<PluginParamVM> _params = [];
     private ObservableCollection<SelectElemParamVM> _selectElemParams = [];
+    private string _moduleComment;
 
     public SheetSetParametersListVM(
         SheetSetVM sheetSet,
@@ -52,6 +53,11 @@ internal class SheetSetParametersListVM : ValidatableVM {
     public ObservableCollection<SelectElemParamVM> SelectElemParams {
         get => _selectElemParams;
         set => RaiseAndSetIfChanged(ref _selectElemParams, value);
+    }
+
+    public string ModuleComment {
+        get => _moduleComment;
+        set => RaiseAndSetIfChanged(ref _moduleComment, value);
     }
 
     private void AddSheetSetParam(ComponentTypeItem selectedSheetSetParamType) {
