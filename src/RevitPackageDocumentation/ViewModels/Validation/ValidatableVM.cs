@@ -69,6 +69,8 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
         foreach(var property in _trackedChildProperties.Values) {
             RegisterTrackedProperty(property);
         }
+
+        ValidateAllProperties();
     }
 
     public void ValidateAllProperties() {

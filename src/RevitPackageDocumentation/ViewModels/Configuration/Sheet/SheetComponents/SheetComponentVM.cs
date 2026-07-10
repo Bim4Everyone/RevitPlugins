@@ -60,7 +60,7 @@ internal abstract class SheetComponentVM : ModuleVM {
         foreach(var viewport in viewports) {
             string viewportNumberAsStr = viewport.GetParamValue<string>(BuiltInParameter.VIEWPORT_DETAIL_NUMBER);
 
-            if(!viewportNumberAsStr.Contains(subStrInViewportNumber)) {
+            if(viewportNumberAsStr is null || !viewportNumberAsStr.Contains(subStrInViewportNumber)) {
                 continue;
             }
 

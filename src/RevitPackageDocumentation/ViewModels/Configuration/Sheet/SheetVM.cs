@@ -54,8 +54,6 @@ internal class SheetVM : ModuleVM {
         _sheetSetVMFactory = sheetSetVMFactory;
         _sheetSetDataFactory = sheetSetDataFactory;
 
-        ValidateAllProperties();
-
         SelectTitleBlockFamilyCommand = RelayCommand.Create(SelectTitleBlockFamily);
         CreateSheetCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
 

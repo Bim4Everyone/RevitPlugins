@@ -43,7 +43,6 @@ internal class PlanViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        ValidateAllProperties();
     }
 
     [Required(ErrorMessage = "Validation.ViewNameIsEmpty")]
@@ -178,6 +177,8 @@ internal class PlanViewVM : SheetComponentVM {
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMaxY = boundingBoxXYZ.Max.Y;
 
+            var lastViewportInTitleBlock = GetLastViewport<ViewPlan>(vp => vp.GetBoxCenter().Y < titleBlockMaxY);
+
             // Создание видового экрана
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, new XYZ(0, 0, 0));
             viewPort.ChangeTypeId(ViewportType.Id);
@@ -189,8 +190,6 @@ internal class PlanViewVM : SheetComponentVM {
 
             double correctPositionX = titleBlockMinX + _titleBlockFrameLeftOffset + viewportHalfWidth;
             double correctPositionY = titleBlockMaxY - _titleBlockFrameTopOffset - viewportHalfHeight;
-
-            var lastViewportInTitleBlock = GetLastViewport<ViewPlan>(vp => vp.GetBoxCenter().Y < titleBlockMaxY);
             if(lastViewportInTitleBlock is not null) {
                 correctPositionY = titleBlockMaxY + viewportHalfHeight;
 

@@ -6,7 +6,6 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.SimpleServices;
-using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
@@ -52,8 +51,6 @@ internal class SectionViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        ValidateAllProperties();
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
     [Required(ErrorMessage = "Validation.ViewNameIsEmpty")]
@@ -194,6 +191,8 @@ internal class SectionViewVM : SheetComponentVM {
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
+            var lastViewport = GetLastViewport<ViewSection>(vp => vp.GetBoxCenter().Y < 0);
+
             // Создание видового экрана
             var viewPort = Viewport.Create(Repository.Document, sheetInstance.Id, view.Id, XYZ.Zero);
             viewPort.ChangeTypeId(ViewportType.Id);
@@ -203,7 +202,6 @@ internal class SectionViewVM : SheetComponentVM {
             double viewportHalfWidth = viewportOutline.MaximumPoint.X - viewportCenter.X;
             double viewportHalfHeight = viewportOutline.MaximumPoint.Y - viewportCenter.Y;
 
-            var lastViewport = GetLastViewport<ViewSection>(vp => vp.GetBoxCenter().Y < 0);
             double correctPositionX = lastViewport is null
                 ? titleBlockMinX + viewportHalfWidth
                 : lastViewport.GetBoxOutline().MaximumPoint.X + viewportHalfWidth;

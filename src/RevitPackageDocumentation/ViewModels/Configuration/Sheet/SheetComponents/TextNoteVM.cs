@@ -5,7 +5,6 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
-using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
@@ -28,8 +27,6 @@ internal class TextNoteVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        ValidateAllProperties();
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
     [Required(ErrorMessage = "Validation.TextNoteTypeIsNull")]
