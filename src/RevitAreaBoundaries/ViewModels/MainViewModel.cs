@@ -1,5 +1,3 @@
-using System.ComponentModel;
-using System.Linq;
 using System.Windows.Input;
 
 using dosymep.Revit;
@@ -29,6 +27,7 @@ internal class MainViewModel : BaseViewModel {
     private ViewPlanSelectionViewModel _viewPlanSelectionViewModel;
     private TypeElementSelectionViewModel _typeElementSelectionViewModel;
 
+    private bool _hasSettingsErrors;
     private bool _hasViewErrors;
     private bool _hasElementErrors;
     private string _errorText;
@@ -55,15 +54,20 @@ internal class MainViewModel : BaseViewModel {
     
     public CommonSettingsViewModel CommonSettingsViewModel {
         get => _commonSettingsViewModel;
-        set => RaiseAndSetIfChanged(ref _commonSettingsViewModel, value);
+        private set => RaiseAndSetIfChanged(ref _commonSettingsViewModel, value);
     }
     public ViewPlanSelectionViewModel ViewPlanSelectionViewModel {
         get => _viewPlanSelectionViewModel;
-        set => RaiseAndSetIfChanged(ref _viewPlanSelectionViewModel, value);
+        private set => RaiseAndSetIfChanged(ref _viewPlanSelectionViewModel, value);
     }
     public TypeElementSelectionViewModel TypeElementSelectionViewModel {
         get => _typeElementSelectionViewModel;
-        set => RaiseAndSetIfChanged(ref _typeElementSelectionViewModel, value);
+        private set => RaiseAndSetIfChanged(ref _typeElementSelectionViewModel, value);
+    }
+    
+    public bool HasSettingsErrors {
+        get => _hasSettingsErrors;
+        set => RaiseAndSetIfChanged(ref _hasSettingsErrors, value);
     }
 
     public bool HasViewErrors {
@@ -78,17 +82,17 @@ internal class MainViewModel : BaseViewModel {
     
     public string ErrorText {
         get => _errorText;
-        set => RaiseAndSetIfChanged(ref _errorText, value);
+        private set => RaiseAndSetIfChanged(ref _errorText, value);
     }
     
     private void LoadView() {
         LoadConfig();
         HasViewErrors = false;
-        CommonSettingsViewModel = new CommonSettingsViewModel();
+        CommonSettingsViewModel = new CommonSettingsViewModel(_localizationService, _areaBoundarySettings);
         ViewPlanSelectionViewModel = new ViewPlanSelectionViewModel(
             _localizationService,_systemPluginConfig, _revitRepository, _areaBoundarySettings);
         TypeElementSelectionViewModel = new TypeElementSelectionViewModel(
-            _localizationService,_systemPluginConfig, _revitRepository, _areaBoundarySettings);
+            _revitRepository, _areaBoundarySettings);
     }
     
     private void AcceptView() {

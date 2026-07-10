@@ -34,7 +34,7 @@ public partial class MainWindow {
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
 
         Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => {
-            _rootNavigationView.Navigate(typeof(ViewPlanSelectionPage));
+            _rootNavigationView.Navigate(typeof(CommonSettingsPage));
         });
     }
 

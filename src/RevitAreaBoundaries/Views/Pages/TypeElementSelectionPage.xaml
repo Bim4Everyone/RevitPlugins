@@ -13,7 +13,6 @@
     
     <ItemsControl
             VerticalAlignment="Top"
-            Padding="10"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.VirtualizationMode="Recycling"
             ScrollViewer.CanContentScroll="True"
@@ -24,6 +23,9 @@
                     <edits:CustomGroupEditControl
                         Icon="{ui:SymbolIcon screenshot24}"
                         Header="{Binding Name}"
+                        ButtonCommandSelect="{Binding SelectCommand}"
+                        ButtonCommandUnSelect="{Binding UnSelectCommand}"
+                        CountElements="{Binding CountElements}"
                         IsExpanded="False">
                         
                         <edits:CustomGroupEditControl.EditControl>
@@ -40,13 +42,11 @@
 
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <UniformGrid
-                                            Columns="1" />
+                                        <StackPanel/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
                         </edits:CustomGroupEditControl.EditControl>
-                            
                     </edits:CustomGroupEditControl>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

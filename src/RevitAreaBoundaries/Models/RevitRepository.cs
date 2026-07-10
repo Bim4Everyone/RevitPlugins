@@ -51,9 +51,9 @@ internal class RevitRepository {
     }
 
     public IEnumerable<RevitElementType> GetTypeModels() {
-        return GetElements(_systemPluginConfig.CenterProjectionCats, SectionType.CenterProjection)
-            .Concat(GetElements(_systemPluginConfig.PartialProjectionCats, SectionType.PartialProjection))
-            .Concat(GetElements(_systemPluginConfig.FullProjectionCats, SectionType.FullProjection));
+        return GetPlacedElementTypes(_systemPluginConfig.CenterProjectionCats, SectionType.CenterProjection)
+            .Concat(GetPlacedElementTypes(_systemPluginConfig.PartialProjectionCats, SectionType.PartialProjection))
+            .Concat(GetPlacedElementTypes(_systemPluginConfig.FullProjectionCats, SectionType.FullProjection));
     }
 
     private IEnumerable<RevitElementType> GetElements(IEnumerable<BuiltInCategory> categories, SectionType sectionType) {
@@ -70,6 +70,30 @@ internal class RevitRepository {
                     SectionType = sectionType 
                 })
         );
+    }
+    
+    private IEnumerable<RevitElementType> GetPlacedElementTypes(IEnumerable<BuiltInCategory> categories, SectionType sectionType)
+    {
+        var typeIds = categories
+            .SelectMany(category =>
+                new FilteredElementCollector(Document)
+                    .OfCategory(category)
+                    .WhereElementIsNotElementType() // только размещённые экземпляры
+                    .ToElements()
+                    .Select(e => e.GetTypeId())
+                    .Where(id => id != ElementId.InvalidElementId))
+            .Distinct();
+
+        return typeIds
+            .Select(id => Document.GetElement(id))
+            .OfType<ElementType>()
+            .Select(type => new RevitElementType {
+                Element = type,
+                Name = type.Name,
+                CategoryName = GetCategoryName(type),
+                FamilyName = type.FamilyName,
+                SectionType = sectionType
+            });
     }
     
     public string GetGroupNameViewPlan(Element element, RevitParam revitParam) {

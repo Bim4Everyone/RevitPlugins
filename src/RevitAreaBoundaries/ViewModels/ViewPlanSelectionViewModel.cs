@@ -72,10 +72,7 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
                     RevitElement = view
                 });
         
-                return new RevitElementGroupViewModel {
-                    Name = group.Key,
-                    RevitElementViewModels = new ObservableCollection<RevitElementViewModel>(viewModels)
-                };
+                return new RevitElementGroupViewModel (viewModels, group.Key);
             });
         
     }

@@ -14,11 +14,11 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="700"
-    Width="1000"
+    Height="750"
+    Width="1100"
     
-    MinHeight="700"
-    MinWidth="1000"
+    MinHeight="750"
+    MinWidth="1100"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     
@@ -66,12 +66,30 @@
 
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
+                    Height="50"
+                    Content="{me:LocalizationSource MainWindow.CommonSettings}"
+                    FontSize="20"
+                    HorizontalAlignment="Stretch"
+                    TargetPageType="{x:Type pages:CommonSettingsPage}">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="Settings24" FontSize="25" />
+                    </ui:NavigationViewItem.Icon>
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Style="{StaticResource RoundInfoBadgeStyle}"
+                            Visibility="{Binding Path=HasSettingsErrors,
+                            Converter={StaticResource BooleanToVisibilityConverter}}">
+                        </ui:InfoBadge>
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem
+                    Height="50"
                     Content="{me:LocalizationSource MainWindow.ViewPlanSelections}"
                     FontSize="20"
                     HorizontalAlignment="Stretch"
                     TargetPageType="{x:Type pages:ViewPlanSelectionPage}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="WindowBulletList20" FontSize="24" />
+                        <ui:SymbolIcon Symbol="subGrid24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>
                     <ui:NavigationViewItem.InfoBadge>
                         <ui:InfoBadge
@@ -82,12 +100,13 @@
                     </ui:NavigationViewItem.InfoBadge>
                 </ui:NavigationViewItem>
                 <ui:NavigationViewItem
+                    Height="50"
                     Content="{me:LocalizationSource MainWindow.TypeElementSelections}"
                     FontSize="20"
                     HorizontalAlignment="Stretch"
                     TargetPageType="{x:Type pages:TypeElementSelectionPage}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="WindowBulletList20" FontSize="24" />
+                        <ui:SymbolIcon Symbol="selectObject24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>
                     <ui:NavigationViewItem.InfoBadge>
                         <ui:InfoBadge

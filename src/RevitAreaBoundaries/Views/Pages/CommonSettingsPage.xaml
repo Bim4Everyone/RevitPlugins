@@ -1,0 +1,37 @@
+﻿<core:WpfUIPlatformPage 
+    x:Class="RevitAreaBoundaries.Views.Pages.CommonSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:edits="clr-namespace:RevitAreaBoundaries.Views.Edits"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitAreaBoundaries.ViewModels"
+    d:DataContext="{d:DesignInstance vms:CommonSettingsViewModel, IsDesignTimeCreatable=False}"
+    mc:Ignorable="d" x:ClassModifier="internal">
+    
+    <StackPanel>
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon brainCircuit24}"
+            Header="{me:LocalizationSource CommonSettingsPage.AlgorithmType}"
+            Description="{me:LocalizationSource CommonSettingsPage.AlgorithmTypeDescription}">
+            <ComboBox
+                ItemsSource="{Binding AlgorithmTypeViewModels}"
+                SelectedValue="{Binding SelectedAlgorithmTypeViewModel}"
+                DisplayMemberPath="Name" />
+        </edits:CustomEditControl>
+        
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon fullScreenMaximize24}"
+            Header="{me:LocalizationSource CommonSettingsPage.SectionHeight}"
+            Description="{me:LocalizationSource CommonSettingsPage.SectionHeightDescription}">
+            <ui:TextBox
+                Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ToolTip="{me:LocalizationSource CommonSettingsPage.SectionHeightTooltip}" />
+        </edits:CustomEditControl>
+        
+    </StackPanel>
+    
+</core:WpfUIPlatformPage>

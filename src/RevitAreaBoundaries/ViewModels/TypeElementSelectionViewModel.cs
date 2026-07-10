@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
-using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitAreaBoundaries.Models;
@@ -13,9 +11,6 @@ using RevitAreaBoundaries.Settings;
 namespace RevitAreaBoundaries.ViewModels;
 
 internal class TypeElementSelectionViewModel : BaseViewModel {
-    
-    private readonly ILocalizationService _localizationService;
-    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly AreaBoundarySettings _areaBoundarySettings;
     
@@ -23,12 +18,9 @@ internal class TypeElementSelectionViewModel : BaseViewModel {
     private ObservableCollection<RevitElementViewModel> _selectedTypeElementViewModels;
     
     public TypeElementSelectionViewModel(
-        ILocalizationService localizationService, 
-        SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository, 
         AreaBoundarySettings areaBoundarySettings) { 
-        _localizationService = localizationService;
-        _systemPluginConfig = systemPluginConfig;
+        
         _revitRepository = revitRepository;
         _areaBoundarySettings = areaBoundarySettings;
         
@@ -47,12 +39,9 @@ internal class TypeElementSelectionViewModel : BaseViewModel {
     }
 
     private IEnumerable<RevitElementGroupViewModel> GetTypeElementGroupViewModels() {
-        
         var savedViewIds = _areaBoundarySettings.Types
             .Select(view => view.Element.Id)
             .ToHashSet();
-        
-        
 
         return _revitRepository.GetTypeModels()
             .GroupBy(type => type.CategoryName)
@@ -63,15 +52,12 @@ internal class TypeElementSelectionViewModel : BaseViewModel {
                     RevitElement = type
                 });
         
-                return new RevitElementGroupViewModel {
-                    Name = group.Key,
-                    RevitElementViewModels = new ObservableCollection<RevitElementViewModel>(viewModels)
-                };
+                return new RevitElementGroupViewModel (viewModels, group.Key);
             });
         
     }
     
-    // Метод, подписанный на событие изменения выделенных связанных файлов
+    // Метод, подписанный на событие изменения выделенных типов
     private void OnTypeElementViewModelChanged(object sender, PropertyChangedEventArgs e) {
         if(sender is not RevitElementViewModel vm) {
             return;
@@ -91,12 +77,12 @@ internal class TypeElementSelectionViewModel : BaseViewModel {
 
     private void LoadView() {
         TypeElementGroupViewModels = new ObservableCollection<RevitElementGroupViewModel>(GetTypeElementGroupViewModels());
-        SelectedTypeElementViewModels = [];
         foreach(var group in TypeElementGroupViewModels) {
             foreach(var typeElementViewModel in group.RevitElementViewModels) {
                 typeElementViewModel.PropertyChanged += OnTypeElementViewModelChanged;
             }
         }
+        SelectedTypeElementViewModels = new ObservableCollection<RevitElementViewModel>(
+            TypeElementGroupViewModels.SelectMany(group => group.RevitElementViewModels));
     }
-    
 }

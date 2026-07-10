@@ -5,9 +5,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     x:Name="_this"
+    Margin="10,10,10,0"
     mc:Ignorable="d"
-    Margin="5"
     d:DesignHeight="300" d:DesignWidth="300">
 
     <ui:CardExpander
@@ -15,17 +16,48 @@
         Icon="{Binding Icon, ElementName=_this}">
 
         <ui:CardExpander.Header>
-            <ui:TextBlock
-                FontTypography="BodyStrong"
-                TextWrapping="WrapWithOverflow"
-                VerticalAlignment="Center"
-                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                Text="{Binding Header, ElementName=_this}" />
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <ui:TextBlock
+                    Grid.Column="0"
+                    FontTypography="BodyStrong"
+                    TextWrapping="WrapWithOverflow"
+                    VerticalAlignment="Center"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="{Binding Header, ElementName=_this}" />
+                
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="10,0,0,0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+                    <ui:Button
+                        Width="120"
+                        Content="{me:LocalizationSource CustomGroupEditControl.SelectCommandText}"
+                        Command="{Binding ButtonCommandSelect, ElementName=_this}"/>
+                    <ui:Button
+                        Margin="10,0,10,0"
+                        Width="120"
+                        Content="{me:LocalizationSource CustomGroupEditControl.UnSelectCommandText}"
+                        Command="{Binding ButtonCommandUnSelect, ElementName=_this}"/>
+                    <ui:TextBlock
+                        Width="80"
+                        FontTypography="BodyStrong"
+                        TextWrapping="WrapWithOverflow"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Text="{Binding CountElements, ElementName=_this}" />
+                </StackPanel>
+            </Grid>
+            
         </ui:CardExpander.Header>
-
         <ContentControl
             VerticalAlignment="Center"
             Content="{Binding EditControl, ElementName=_this}" />
-        
     </ui:CardExpander>
 </UserControl>

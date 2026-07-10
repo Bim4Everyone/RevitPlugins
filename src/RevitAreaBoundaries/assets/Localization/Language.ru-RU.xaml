@@ -4,20 +4,30 @@
 
     <system:String x:Key="MainWindow.Title">Границы зон ТЭП</system:String>
     
-    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
+    <system:String x:Key="MainWindow.Settings">Настройки плагина</system:String>
+    <system:String x:Key="MainWindow.CommonSettings">Общие настройки</system:String>
     <system:String x:Key="MainWindow.ViewPlanSelections">Выбор планов зонирования</system:String>
-    <system:String x:Key="MainWindow.TypeElementSelections">Выбор типов границ</system:String>
+    <system:String x:Key="MainWindow.TypeElementSelections">Выбор типов элементов</system:String>
     
     <system:String x:Key="ViewPlanSelectionPage.GroupParameters">Параметр группировки</system:String>
-    <system:String x:Key="ViewPlanSelectionPage.GroupParametersTooltip">Параметр, используемый в группировке видов</system:String>
+    <system:String x:Key="ViewPlanSelectionPage.GroupParametersDescription">Параметр, используемый в группировке видов</system:String>
     
-    <system:String x:Key="ViewPlanSelectionViewModel.NoViews">Нет планов зонирования</system:String>
-    <system:String x:Key="ViewPlanSelectionViewModel.NoBrowserParameter">Нет параметра группировки</system:String>
+    <system:String x:Key="CommonSettingsPage.AlgorithmType">Тип алгоритма</system:String>
+    <system:String x:Key="CommonSettingsPage.AlgorithmTypeDescription">Выбор типа алгоритма определения границ</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.SectionHeight">Высота от уровня, мм</system:String>
+    <system:String x:Key="CommonSettingsPage.SectionHeightDescription">Высота сечения здания в мм от уровня плана</system:String>
+    <system:String x:Key="CommonSettingsPage.SectionHeightTooltip">Значение нужно указывать в миллиметрах, без дробных частей</system:String>
+    
+    <system:String x:Key="ViewPlanSelectionViewModel.NoViews">В проекте отсутствуют планы зонирования</system:String>
+    <system:String x:Key="ViewPlanSelectionViewModel.NoBrowserParameter">В проекте не настроен параметр группировки видов</system:String>
+    
+    <system:String x:Key="CommonSettingViewModel.OuterBoundary">ГНС</system:String>
     
     
+    <system:String x:Key="CustomGroupEditControl.SelectCommandText">Выбрать все</system:String>
+    <system:String x:Key="CustomGroupEditControl.UnSelectCommandText">Снять выбор</system:String>
     
-    
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     
     <system:String x:Key="MainViewModel.ErrorNoViewPlans">В файле отсутствуют планы зонирования</system:String>
     <system:String x:Key="MainViewModel.ErrorNoSelectionViewPlans">Не выбраны планы зонирования</system:String>
@@ -27,8 +37,6 @@
     
     
     
-    
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">Построить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>

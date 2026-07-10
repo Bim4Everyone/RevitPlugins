@@ -14,50 +14,24 @@
     
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="80" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <Grid
+        <edits:CustomEditControl
             Grid.Row="0"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Center">
-            
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="400" />
-                <ColumnDefinition
-                    Width="Auto" />
-            </Grid.ColumnDefinitions>
-            
-            <StackPanel
-                Grid.Column="0">
-                <ui:TextBlock
-                    Margin="20,0,0,5"
-                    FontWeight="DemiBold"
-                    FontSize="15"
-                    VerticalAlignment="Center"
-                    Text="{me:LocalizationSource ViewPlanSelectionPage.GroupParameters}" />
-                <ui:TextBlock                        
-                    FontSize="13"
-                    Margin="20,0,0,0"
-                    VerticalAlignment="Center"
-                    Text="{me:LocalizationSource ViewPlanSelectionPage.GroupParametersTooltip}" />
-            </StackPanel>
+            Icon="{ui:SymbolIcon groupList24}"
+            Header="{me:LocalizationSource ViewPlanSelectionPage.GroupParameters}"
+            Description="{me:LocalizationSource ViewPlanSelectionPage.GroupParametersDescription}">
             <ComboBox
-                Grid.Column="1"
-                MinWidth="250"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                DisplayMemberPath="Name"
                 ItemsSource="{Binding GroupParamViewModels}"
-                SelectedItem="{Binding SelectedGroupParamViewModel}" />
-        </Grid>
+                SelectedValue="{Binding SelectedGroupParamViewModel}"
+                DisplayMemberPath="Name" />
+        </edits:CustomEditControl>
         
         <ItemsControl
             Grid.Row="1"
             VerticalAlignment="Top"
-            Padding="10"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.VirtualizationMode="Recycling"
             ScrollViewer.CanContentScroll="True"
@@ -68,7 +42,10 @@
                     <edits:CustomGroupEditControl
                         Icon="{ui:SymbolIcon screenshot24}"
                         Header="{Binding Name}"
-                        IsExpanded="False">
+                        ButtonCommandSelect="{Binding SelectCommand}"
+                        ButtonCommandUnSelect="{Binding UnSelectCommand}"
+                        CountElements="{Binding CountElements}"
+                        IsExpanded="True">
                         
                         <edits:CustomGroupEditControl.EditControl>
                             <ItemsControl
