@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
+using System.Text;
 
 using Autodesk.Revit.DB;
 
+using RevitAreaBoundaries.Models.Enums;
 using RevitAreaBoundaries.Services;
 using RevitAreaBoundaries.Settings;
 
@@ -23,6 +26,7 @@ internal class OutBoundaryProcessor (
     public void DrawBoundaries(AreaBoundarySettings areaBoundarySettings) {
         var targetViews = areaBoundarySettings.Views;
         foreach(var view in targetViews) {
+            
             DrawBoundary(view.Element as View);
         }
     }
@@ -35,7 +39,7 @@ internal class OutBoundaryProcessor (
             return;
         }
         
-        // Нормализация кривых сечения
+        // Перевод всех кривых в 0 по Z
         var normalizedCurves = curveNormalizeService.ProjectCurvesToXy(sectionCurves);
         
         if(normalizedCurves.Count == 0) {
@@ -56,33 +60,35 @@ internal class OutBoundaryProcessor (
         }
         
         // Получение кривых, максимально приближенных к наружней точке в каждой ячейке
-        var targetCurves = coarseCells.SelectMany(cellsBoundaryService.GetBoundaryCurves).ToList();
+        var targetCurves = coarseCells
+            .SelectMany(cellsBoundaryService.GetBoundaryCurves)
+            .ToList();
         
         if(targetCurves.Count == 0) {
             return;
         }
         
-         // Режем пересекающиеся линии
-         var croppedCurves = curveDividerService.SplitCurvesAtIntersections(targetCurves);
-         
-         // Закрываем разрывы прямыми линиями до 20мм
-         var closedCurves = curveRepairService.RepairContour(croppedCurves, 1,20);
+        // Режем пересекающиеся линии
+        var croppedCurves = curveDividerService.SplitCurvesAtIntersections(targetCurves);
         
-         // Очистка списка от дублирующихся кривых
-         var cleanCurves = curveRepairService.CleanDuplicateCurves(closedCurves
-             .Select(x => x)
-             .ToList());
+        // Закрываем разрывы прямыми линиями до 20мм
+        var closedCurves = curveRepairService.RepairContour(croppedCurves, 1,20);
         
-         // Возвращаем только те, которые соединены, удаляя концы за 1 итерацию
-         var connectedCurves = curveRepairService.GetCurvesConnectedByBothEnds(cleanCurves);
-         
-         // Мержим
-         var mergedCurves = collinearLineMergeService.MergeConnectedCollinearLines(connectedCurves);
-         
-         // Контур
-         var contour = freeEndsJoinService.JoinNearestFreeEndsSmart(mergedCurves, maxJoinDistanceMm: 500);
+        // Очистка списка от дублирующихся кривых
+        var cleanCurves = curveRepairService.CleanDuplicateCurves(closedCurves
+            .Select(x => x)
+            .ToList());
         
-         //Строим границы зоны
-         drawBoundaryService.DrawBoundaryOnView(view, contour);
+        // Возвращаем только те, которые соединены, удаляя концы за 1 итерацию
+        var connectedCurves = curveRepairService.GetCurvesConnectedByBothEnds(cleanCurves);
+        
+        // Мержим в длинные границы коллинеарные отрезки
+        var mergedCurves = collinearLineMergeService.MergeConnectedCollinearLines(connectedCurves);
+       
+        // Пытаемся соединить свободные концы
+        var contour = freeEndsJoinService.JoinNearestFreeEndsSmart(mergedCurves, maxJoinDistanceMm: 500);
+        
+        //Строим границы зоны
+        drawBoundaryService.DrawBoundaryOnView(view, contour);
     }
 }

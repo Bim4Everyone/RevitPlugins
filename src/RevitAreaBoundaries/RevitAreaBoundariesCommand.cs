@@ -104,6 +104,16 @@ public class RevitAreaBoundariesCommand : BasePluginCommand {
             .To<OutBoundaryProcessor>()
             .InSingletonScope();
         
+        // Настройка доступа к 
+        kernel.Bind<BoundaryProcessorSelector>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // // Настройка доступа к 
+        // kernel.Bind<ProgressService>()
+        //     .ToSelf()
+        //     .InSingletonScope();
+        
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
             .InSingletonScope();

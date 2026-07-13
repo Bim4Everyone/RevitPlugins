@@ -1,4 +1,4 @@
-using System.Globalization;
+using System;
 using System.Linq;
 using System.Windows.Input;
 
@@ -9,6 +9,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitAreaBoundaries.Models;
 using RevitAreaBoundaries.Models.Processors;
+using RevitAreaBoundaries.Services;
 using RevitAreaBoundaries.Settings;
 
 namespace RevitAreaBoundaries.ViewModels;
@@ -21,7 +22,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-    private readonly IBoundaryProcessor _processor;
+    private readonly BoundaryProcessorSelector _boundaryProcessorSelector;
     
     private ConfigSettings _configSettings;
     private AreaBoundarySettings _areaBoundarySettings;
@@ -40,18 +41,23 @@ internal class MainViewModel : BaseViewModel {
         SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
-        IBoundaryProcessor processor) {
+        IProgressDialogFactory progressDialogFactory,
+        BoundaryProcessorSelector boundaryProcessorSelector) {
         
         _pluginConfig = pluginConfig;
         _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
-        _processor = processor;
+        _boundaryProcessorSelector = boundaryProcessorSelector;
+        
+        ProgressDialogFactory = progressDialogFactory
+                                ?? throw new ArgumentNullException(nameof(progressDialogFactory));
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
     
+    public IProgressDialogFactory ProgressDialogFactory { get; }
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
     
@@ -102,10 +108,28 @@ internal class MainViewModel : BaseViewModel {
         SaveSettings();
         SaveConfig();
         
+        using var progressDialogService = ProgressDialogFactory.CreateDialog();
+        var progress = progressDialogService.CreateProgress();
+        var ct = progressDialogService.CreateCancellationToken();
+        //
+        // var progressService = new ProgressService(_localizationService) {
+        //     CancellationToken = ct,
+        //     ProgressCount = progress,
+        //     SetupStage = (text, max, step) => {
+        //         progressDialogService.DisplayTitleFormat = text;
+        //         progressDialogService.MaxValue = max;
+        //         progressDialogService.StepValue = step;
+        //     }
+        // };
+        
+        progressDialogService.Show();
+        
+        var processor = _boundaryProcessorSelector.SelectProcessor(_areaBoundarySettings);
+        
         string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
         
-        _processor.DrawBoundaries(_areaBoundarySettings);
+        processor.DrawBoundaries(_areaBoundarySettings);
         
         t.Commit();
     }

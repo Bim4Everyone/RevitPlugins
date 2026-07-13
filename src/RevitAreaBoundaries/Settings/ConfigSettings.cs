@@ -16,7 +16,6 @@ public class ConfigSettings {
     public  List<ElementId> Types { get; set; }
     public string GroupParam { get; set; }
 
-
     public void ApplyDefaultValues(SystemPluginConfig systemPluginConfig) {
         AlgorithmType = systemPluginConfig.DefaultAlgorithmType;
         SectionHeight = systemPluginConfig.DefaultSectionHeight;

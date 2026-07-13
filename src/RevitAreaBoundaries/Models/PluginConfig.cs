@@ -92,7 +92,7 @@ public class SystemPluginConfig {
 
     public readonly double DefaultCellsCoarseStepMm = 1500;
     
-    public readonly double DefaultCellsFineStepMm = 10;
+    public readonly double DefaultCellsFineStepMm = 50;
     
     public readonly double DefaultLengthSegmentMm = 200;
     
