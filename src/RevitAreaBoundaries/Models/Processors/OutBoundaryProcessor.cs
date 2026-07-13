@@ -21,9 +21,9 @@ internal class OutBoundaryProcessor (
     
 
     public void DrawBoundaries(AreaBoundarySettings areaBoundarySettings) {
-        var targetViews = areaBoundarySettings.TargetViews;
+        var targetViews = areaBoundarySettings.Views;
         foreach(var view in targetViews) {
-            DrawBoundary(view);
+            DrawBoundary(view.Element as View);
         }
     }
 

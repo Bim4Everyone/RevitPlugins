@@ -15,9 +15,9 @@ public class AreaBoundarySettings {
     
     public double SectionHeight { get; set; }
     
-    public List<RevitElementView> Views { get; set; }
+    public List<RevitElement> Views { get; set; }
     
-    public List<RevitElementType> Types { get; set; }
+    public List<RevitElement> Types { get; set; }
     
     public string GroupParam { get; set; }
 }

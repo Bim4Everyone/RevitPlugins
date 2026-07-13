@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.Revit;
@@ -21,6 +23,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly IBoundaryProcessor _processor;
     
+    private ConfigSettings _configSettings;
     private AreaBoundarySettings _areaBoundarySettings;
     
     private CommonSettingsViewModel _commonSettingsViewModel;
@@ -88,28 +91,39 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
         HasViewErrors = false;
-        CommonSettingsViewModel = new CommonSettingsViewModel(_localizationService, _areaBoundarySettings);
+        CommonSettingsViewModel = new CommonSettingsViewModel(_localizationService, _configSettings);
         ViewPlanSelectionViewModel = new ViewPlanSelectionViewModel(
-            _localizationService,_systemPluginConfig, _revitRepository, _areaBoundarySettings);
+            _localizationService,_systemPluginConfig, _revitRepository, _configSettings);
         TypeElementSelectionViewModel = new TypeElementSelectionViewModel(
-            _revitRepository, _areaBoundarySettings);
+            _revitRepository, _configSettings);
     }
     
     private void AcceptView() {
+        SaveSettings();
         SaveConfig();
         
-        var view = _revitRepository.ActiveUiDocument.ActiveView;
-        var boundarySettings = new AreaBoundarySettings { TargetViews = [view] };
-
-        const string transactionName = "TransactionName";
+        string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
         
-        _processor.DrawBoundaries(boundarySettings);
+        _processor.DrawBoundaries(_areaBoundarySettings);
         
         t.Commit();
     }
     
     private bool CanAcceptView() {
+        if(CommonSettingsViewModel != null) {
+            if(!double.TryParse(CommonSettingsViewModel.SectionHeight, out double sectionHeight)) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.SectionHeightNoDouble");
+                HasSettingsErrors = true;
+                return false;
+            }
+            if(sectionHeight <= 0) {
+                ErrorText = _localizationService.GetLocalizedString("MainViewModel.SectionHeightNegate");
+                HasSettingsErrors = true;
+                return false;
+            }
+            HasSettingsErrors = false;
+        }
         if(ViewPlanSelectionViewModel != null) {
             if(ViewPlanSelectionViewModel.ViewPlanGroupViewModels.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorNoViewPlans");
@@ -124,7 +138,7 @@ internal class MainViewModel : BaseViewModel {
             }
             HasViewErrors = false;
         }
-        if(ViewPlanSelectionViewModel != null) {
+        if(TypeElementSelectionViewModel != null) {
             if(TypeElementSelectionViewModel.TypeElementGroupViewModels.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.ErrorNoElementTypes");
                 HasElementErrors = true;
@@ -144,20 +158,30 @@ internal class MainViewModel : BaseViewModel {
     
     private void LoadConfig() {
         var projectConfig = _pluginConfig.GetSettings(_revitRepository.Document);
-        ConfigSettings configSettings;
         if(projectConfig == null) {
-            configSettings = new ConfigSettings();
-            configSettings.ApplyDefaultValues(_systemPluginConfig);
+            _configSettings = new ConfigSettings();
+            _configSettings.ApplyDefaultValues(_systemPluginConfig);
         } else {
-            configSettings = projectConfig.ConfigSettings;
+            _configSettings = projectConfig.ConfigSettings;
         }
+    }
+    
+    // Метод сохранения настроек
+    private void SaveSettings() {
+        var algorithmType = CommonSettingsViewModel.SelectedAlgorithmTypeViewModel.AlgorithmType;
+        double sectionHeight = double.Parse(CommonSettingsViewModel.SectionHeight);
+        var views = ViewPlanSelectionViewModel.SelectedViewPlanViewModels
+            .Select(vm => vm.RevitElement).ToList();
+        var types = TypeElementSelectionViewModel.SelectedTypeElementViewModels
+            .Select(vm => vm.RevitElement).ToList();
+        string groupParam = ViewPlanSelectionViewModel.SelectedGroupParamViewModel.Name;
 
         _areaBoundarySettings = new AreaBoundarySettings {
-            AlgorithmType = configSettings.AlgorithmType,
-            SectionHeight = configSettings.SectionHeight,
-            Views = configSettings.SelectedViewPlans,
-            Types = configSettings.SelectedTypes,
-            GroupParam = configSettings.GroupParam
+            AlgorithmType = algorithmType,
+            SectionHeight = sectionHeight,
+            Views = views,
+            Types = types,
+            GroupParam = groupParam
         };
     }
     
@@ -165,8 +189,8 @@ internal class MainViewModel : BaseViewModel {
         var configSettings = new ConfigSettings {
             AlgorithmType = _areaBoundarySettings.AlgorithmType,
             SectionHeight = _areaBoundarySettings.SectionHeight,
-            SelectedViewPlans = _areaBoundarySettings.Views,
-            SelectedTypes = _areaBoundarySettings.Types,
+            Views = _areaBoundarySettings.Views.Select(view => view.Element.Id).ToList(),
+            Types = _areaBoundarySettings.Types.Select(view => view.Element.Id).ToList(),
             GroupParam = _areaBoundarySettings.GroupParam
         };
 

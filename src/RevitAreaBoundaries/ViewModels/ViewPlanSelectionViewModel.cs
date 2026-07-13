@@ -16,7 +16,7 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
-    private readonly AreaBoundarySettings _areaBoundarySettings;
+    private readonly ConfigSettings _configSettings;
     
     private ObservableCollection<GroupParamViewModel> _groupParamViewModels;
     private GroupParamViewModel _selectedGroupParamViewModel;
@@ -27,11 +27,11 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
         ILocalizationService localizationService, 
         SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository, 
-        AreaBoundarySettings areaBoundarySettings) { 
+        ConfigSettings configSettings) { 
         _localizationService = localizationService;
         _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
-        _areaBoundarySettings = areaBoundarySettings;
+        _configSettings = configSettings;
         
         LoadView();
     }
@@ -57,9 +57,7 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
     }
 
     private IEnumerable<RevitElementGroupViewModel> GetViewPlanGroupViewModels() {
-        var savedViewIds = _areaBoundarySettings.Views
-            .Select(view => view.Element.Id)
-            .ToHashSet();
+        var savedViewIds = _configSettings.Views.ToHashSet();
 
         var groupParam = SelectedGroupParamViewModel?.Parameter;
 
@@ -104,14 +102,9 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
         switch (e.PropertyName) {
             case nameof(SelectedGroupParamViewModel):
-                UpdateGroupParameter();
+                RebuildViewPlanGroups();
                 break;
         }
-    }
-    
-    // Метод обновления видов в зависимости от параметра
-    private void UpdateGroupParameter() {
-        ViewPlanGroupViewModels = new ObservableCollection<RevitElementGroupViewModel>(GetViewPlanGroupViewModels());
     }
     
     // Метод, подписанный на событие изменения выделенных связанных файлов
@@ -131,22 +124,43 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
                 break;
         }
     }
+    
+    private void RebuildViewPlanGroups() {
+        // 1) отписка от старых
+        if(ViewPlanGroupViewModels != null) {
+            foreach(var group in ViewPlanGroupViewModels) {
+                foreach(var vm in group.RevitElementViewModels) {
+                    vm.PropertyChanged -= OnViewViewModelChanged;
+                }
+            }
+        }
+
+        // 2) обновление групп
+        ViewPlanGroupViewModels = new ObservableCollection<RevitElementGroupViewModel>(GetViewPlanGroupViewModels());
+
+        // 3) подписка на новые
+        foreach(var group in ViewPlanGroupViewModels) {
+            foreach(var vm in group.RevitElementViewModels) {
+                vm.PropertyChanged += OnViewViewModelChanged;
+            }
+        }
+
+        // опционально: пересобрать SelectedViewPlanViewModels по IsChecked
+        SelectedViewPlanViewModels = new ObservableCollection<RevitElementViewModel>(
+            ViewPlanGroupViewModels
+                .SelectMany(g => g.RevitElementViewModels)
+                .Where(x => x.IsChecked));
+    }
 
     private void LoadView() {
         GroupParamViewModels = new ObservableCollection<GroupParamViewModel>(GetGroupParamViewModels());
         SelectedGroupParamViewModel =
             GroupParamViewModels.FirstOrDefault(vm =>
-                string.Equals(vm.Name, _areaBoundarySettings.GroupParam, StringComparison.OrdinalIgnoreCase))
+                string.Equals(vm.Name, _configSettings.GroupParam, StringComparison.OrdinalIgnoreCase))
             ?? GroupParamViewModels.FirstOrDefault(vm =>
                 string.Equals(vm.Name, _systemPluginConfig.DefaultGroupParamName, StringComparison.OrdinalIgnoreCase))
             ?? GroupParamViewModels.FirstOrDefault();
-        ViewPlanGroupViewModels = new ObservableCollection<RevitElementGroupViewModel>(GetViewPlanGroupViewModels());
-        SelectedViewPlanViewModels = [];
-        foreach(var group in ViewPlanGroupViewModels) {
-            foreach(var viewViewModel in group.RevitElementViewModels) {
-                viewViewModel.PropertyChanged += OnViewViewModelChanged;
-            }
-        }
+        RebuildViewPlanGroups();
         PropertyChanged += OnPropertyChanged;
     }
 }

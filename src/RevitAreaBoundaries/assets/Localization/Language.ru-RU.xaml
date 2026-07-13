@@ -35,6 +35,11 @@
     <system:String x:Key="MainViewModel.ErrorNoElementTypes">В файле отсутствуют типы элементов</system:String>
     <system:String x:Key="MainViewModel.ErrorNoSelectionElementTypes">Не выбраны типы элементов</system:String>
     
+    <system:String x:Key="MainViewModel.SectionHeightNoDouble">Вводимые данные должны быть числом</system:String>
+    <system:String x:Key="MainViewModel.SectionHeightNegate">Вводимые данные должны быть положительным числом</system:String>
+    
+    <system:String x:Key="MainViewModel.TransactionName">Границы зон ТЭП</system:String>
+    
     
     
 

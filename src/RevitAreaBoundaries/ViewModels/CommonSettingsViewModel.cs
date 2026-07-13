@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 
 using dosymep.SimpleServices;
@@ -13,16 +14,16 @@ namespace RevitAreaBoundaries.ViewModels;
 
 internal class CommonSettingsViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
-    private readonly AreaBoundarySettings _areaBoundarySettings;
+    private readonly ConfigSettings _configSettings;
     
     private ObservableCollection<AlgorithmTypeViewModel> _algorithmTypeViewModels;
     private AlgorithmTypeViewModel _selectedAlgorithmTypeViewModel;
-    private double _sectionHeight;
+    private string _sectionHeight;
     
     
-    public CommonSettingsViewModel(ILocalizationService localizationService, AreaBoundarySettings areaBoundarySettings) {
+    public CommonSettingsViewModel(ILocalizationService localizationService, ConfigSettings configSettings) {
         _localizationService = localizationService;
-        _areaBoundarySettings = areaBoundarySettings;
+        _configSettings = configSettings;
         
         LoadView();
     }
@@ -32,7 +33,7 @@ internal class CommonSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _algorithmTypeViewModels, value);
     }
     
-    public double SectionHeight {
+    public string SectionHeight {
         get => _sectionHeight;
         set => RaiseAndSetIfChanged(ref _sectionHeight, value);
     }
@@ -43,7 +44,7 @@ internal class CommonSettingsViewModel : BaseViewModel {
     }
 
     private IEnumerable<AlgorithmTypeViewModel> GetAlgorithmTypeViewModels() {
-        var currentAlgorithmType = _areaBoundarySettings.AlgorithmType;
+        var currentAlgorithmType = _configSettings.AlgorithmType;
         var algorithmTypes = Enum.GetValues(typeof(AlgorithmType)).Cast<AlgorithmType>();
         return algorithmTypes
             .Select(algorithmType => new AlgorithmTypeViewModel {
@@ -57,6 +58,6 @@ internal class CommonSettingsViewModel : BaseViewModel {
     private void LoadView() {
         AlgorithmTypeViewModels = new ObservableCollection<AlgorithmTypeViewModel>(GetAlgorithmTypeViewModels());
         SelectedAlgorithmTypeViewModel = AlgorithmTypeViewModels.FirstOrDefault();
-        SectionHeight = _areaBoundarySettings.SectionHeight;
+        SectionHeight = _configSettings.SectionHeight.ToString(CultureInfo.InvariantCulture);
     }
 }

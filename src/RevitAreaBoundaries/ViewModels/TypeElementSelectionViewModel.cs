@@ -12,17 +12,17 @@ namespace RevitAreaBoundaries.ViewModels;
 
 internal class TypeElementSelectionViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
-    private readonly AreaBoundarySettings _areaBoundarySettings;
+    private readonly ConfigSettings _configSettings;
     
     private ObservableCollection<RevitElementGroupViewModel> _typeElementGroupViewModels;
     private ObservableCollection<RevitElementViewModel> _selectedTypeElementViewModels;
     
     public TypeElementSelectionViewModel(
         RevitRepository revitRepository, 
-        AreaBoundarySettings areaBoundarySettings) { 
+        ConfigSettings configSettings) { 
         
         _revitRepository = revitRepository;
-        _areaBoundarySettings = areaBoundarySettings;
+        _configSettings = configSettings;
         
         LoadView();
     }
@@ -39,9 +39,7 @@ internal class TypeElementSelectionViewModel : BaseViewModel {
     }
 
     private IEnumerable<RevitElementGroupViewModel> GetTypeElementGroupViewModels() {
-        var savedViewIds = _areaBoundarySettings.Types
-            .Select(view => view.Element.Id)
-            .ToHashSet();
+        var savedViewIds = _configSettings.Types.ToHashSet();
 
         return _revitRepository.GetTypeModels()
             .GroupBy(type => type.CategoryName)

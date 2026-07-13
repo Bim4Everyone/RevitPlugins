@@ -99,7 +99,6 @@ public class RevitAreaBoundariesCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
         
-        
         // Настройка доступа к 
         kernel.Bind<IBoundaryProcessor>()
             .To<OutBoundaryProcessor>()
@@ -108,7 +107,6 @@ public class RevitAreaBoundariesCommand : BasePluginCommand {
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
             .InSingletonScope();
-        
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()

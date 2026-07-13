@@ -80,9 +80,9 @@ public class SystemPluginConfig {
     
     public readonly double DefaultSectionHeight = 1200;
     
-    public readonly List<RevitElementView> DefaultListViewPlans = [];
+    public readonly List<ElementId> DefaultListViewPlans = [];
     
-    public readonly List<RevitElementType> DefaultListTypes = [];
+    public readonly List<ElementId> DefaultListTypes = [];
     
     public readonly string DefaultGroupParameterValue = "???";
     
