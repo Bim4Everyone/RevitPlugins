@@ -1,7 +1,7 @@
 ﻿namespace RevitAreaBoundaries.Models.Enums;
 
-public enum SectionType {
+public enum ProjectionType {
     FullProjection,
     PartialProjection,
-    CenterProjection
+    RegularProjection
 }

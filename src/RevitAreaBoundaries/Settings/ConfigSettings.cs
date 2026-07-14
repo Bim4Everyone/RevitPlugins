@@ -11,14 +11,14 @@ namespace RevitAreaBoundaries.Settings;
 
 public class ConfigSettings {
     public AlgorithmType AlgorithmType { get; set; }
-    public double SectionHeight { get; set; }
+    public double SectionHeightMm { get; set; }
     public  List<ElementId> Views { get; set; }
     public  List<ElementId> Types { get; set; }
     public string GroupParam { get; set; }
 
     public void ApplyDefaultValues(SystemPluginConfig systemPluginConfig) {
         AlgorithmType = systemPluginConfig.DefaultAlgorithmType;
-        SectionHeight = systemPluginConfig.DefaultSectionHeight;
+        SectionHeightMm = systemPluginConfig.DefaultSectionHeightMm;
         Views = systemPluginConfig.DefaultListViewPlans;
         Types = systemPluginConfig.DefaultListTypes;
         GroupParam = systemPluginConfig.DefaultGroupParamName;

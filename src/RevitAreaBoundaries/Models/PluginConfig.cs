@@ -78,7 +78,9 @@ public class SystemPluginConfig {
     
     public readonly string DefaultGroupParamName = "_Группа Видов";
     
-    public readonly double DefaultSectionHeight = 1200;
+    public readonly double DefaultSectionHeightMm = 1200;
+    
+    public readonly double DefaultSectionHeightOffsetMm = 100;
     
     public readonly List<ElementId> DefaultListViewPlans = [];
     

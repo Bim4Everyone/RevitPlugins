@@ -181,7 +181,7 @@ internal class MainViewModel : BaseViewModel {
 
         _areaBoundarySettings = new AreaBoundarySettings {
             AlgorithmType = algorithmType,
-            SectionHeight = sectionHeight,
+            SectionHeightMm = sectionHeight,
             Views = views,
             Types = types,
             GroupParam = groupParam
@@ -191,7 +191,7 @@ internal class MainViewModel : BaseViewModel {
     private void SaveConfig() {
         var configSettings = new ConfigSettings {
             AlgorithmType = _areaBoundarySettings.AlgorithmType,
-            SectionHeight = _areaBoundarySettings.SectionHeight,
+            SectionHeightMm = _areaBoundarySettings.SectionHeightMm,
             Views = _areaBoundarySettings.Views.Select(view => view.Element.Id).ToList(),
             Types = _areaBoundarySettings.Types.Select(view => view.Element.Id).ToList(),
             GroupParam = _areaBoundarySettings.GroupParam

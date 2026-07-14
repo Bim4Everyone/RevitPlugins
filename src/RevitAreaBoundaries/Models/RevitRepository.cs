@@ -11,13 +11,14 @@ using dosymep.Bim4Everyone.SimpleServices;
 
 using RevitAreaBoundaries.Models.Enums;
 
-using SectionType = RevitAreaBoundaries.Models.Enums.SectionType;
-
 namespace RevitAreaBoundaries.Models;
 
 internal class RevitRepository {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly IRevitParamFactory _revitParamFactory;
+    
+    private List<Element> _viewPlans;
+    private Transform _basePointTransform;
 
     public RevitRepository(UIApplication uiApplication, SystemPluginConfig systemPluginConfig, IRevitParamFactory revitParamFactory) {
         UiApplication = uiApplication;
@@ -29,17 +30,17 @@ internal class RevitRepository {
     public UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
     public Application Application => UiApplication.Application;
     public Document Document => ActiveUiDocument.Document;
-    public IEnumerable<Element> ViewPlans => GetViews();
+    public IReadOnlyList<Element> ViewPlans =>  _viewPlans ??= GetViews();
+    public Transform BasePointTransform => _basePointTransform ??= GetBasePointTransform();
 
-
-    public IEnumerable<Element> GetViews() {
+    public List<Element> GetViews() {
         return new FilteredElementCollector(Document)
             .OfClass(typeof(ViewPlan))
             .Cast<ViewPlan>()
             .Where(vp => !vp.IsTemplate)
-            .Where(vp => vp.ViewType == ViewType.AreaPlan);
+            .Where(vp => vp.ViewType == ViewType.AreaPlan)
+            .ToList<Element>();
     }
-    
     
     // Метод получения коллекции ViewPlans
     public IEnumerable<RevitElement> GetViewPlans() {
@@ -51,29 +52,27 @@ internal class RevitRepository {
     }
 
     public IEnumerable<RevitElementType> GetTypeModels() {
-        return GetPlacedElementTypes(_systemPluginConfig.CenterProjectionCats, SectionType.CenterProjection)
-            .Concat(GetPlacedElementTypes(_systemPluginConfig.PartialProjectionCats, SectionType.PartialProjection))
-            .Concat(GetPlacedElementTypes(_systemPluginConfig.FullProjectionCats, SectionType.FullProjection));
+        return GetPlacedElementTypes(_systemPluginConfig.CenterProjectionCats, ProjectionType.RegularProjection)
+            .Concat(GetPlacedElementTypes(_systemPluginConfig.PartialProjectionCats, ProjectionType.PartialProjection))
+            .Concat(GetPlacedElementTypes(_systemPluginConfig.FullProjectionCats, ProjectionType.FullProjection));
     }
 
-    private IEnumerable<RevitElementType> GetElements(IEnumerable<BuiltInCategory> categories, SectionType sectionType) {
-        return categories.SelectMany(category =>
-            new FilteredElementCollector(Document)
-                .OfCategory(category)
-                .WhereElementIsElementType()
-                .Cast<ElementType>()
-                .Select(type => new RevitElementType {
-                    Element = type,
-                    Name = type.Name,
-                    CategoryName = GetCategoryName(type),
-                    FamilyName = type.FamilyName,
-                    SectionType = sectionType 
-                })
-        );
+    private Transform GetBasePointTransform() {
+        var basePoint = GetBasePointPosition();
+        return Transform.CreateTranslation(-basePoint);
     }
     
-    private IEnumerable<RevitElementType> GetPlacedElementTypes(IEnumerable<BuiltInCategory> categories, SectionType sectionType)
-    {
+    // Метод получения смещения базовой точки
+    private XYZ GetBasePointPosition() {
+        var basePoint = new FilteredElementCollector(Document)
+            .OfCategory(BuiltInCategory.OST_ProjectBasePoint)
+            .WhereElementIsNotElementType()
+            .Cast<BasePoint>()
+            .FirstOrDefault();
+        return basePoint?.Position;
+    }
+
+    private IEnumerable<RevitElementType> GetPlacedElementTypes(IEnumerable<BuiltInCategory> categories, ProjectionType projectionType) {
         var typeIds = categories
             .SelectMany(category =>
                 new FilteredElementCollector(Document)
@@ -92,10 +91,25 @@ internal class RevitRepository {
                 Name = type.Name,
                 CategoryName = GetCategoryName(type),
                 FamilyName = type.FamilyName,
-                SectionType = sectionType
+                ProjectionType = projectionType
             });
     }
     
+    public IEnumerable<Element> GetElementsOnView(View view, List<RevitElement> revitElements) {
+        var elementIds = revitElements
+            .Select(x => x.Element.Id)
+            .ToHashSet();
+
+        return new FilteredElementCollector(Document, view.Id)
+            .WhereElementIsNotElementType()
+            .Where(element => ElementMatchesId(element, elementIds));
+    }
+    
+    private static bool ElementMatchesId(Element element, HashSet<ElementId> elementIds) {
+        var id = element.GetTypeId();
+        return id != ElementId.InvalidElementId && elementIds.Contains(id);
+    }
+
     public string GetGroupNameViewPlan(Element element, RevitParam revitParam) {
         if(revitParam is null) {
             return _systemPluginConfig.DefaultGroupParameterValue;

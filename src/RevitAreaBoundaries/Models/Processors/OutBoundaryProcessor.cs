@@ -11,7 +11,6 @@ using RevitAreaBoundaries.Settings;
 namespace RevitAreaBoundaries.Models.Processors;
 
 internal class OutBoundaryProcessor (
-    RevitRepository revitRepository,
     ElementSectionService elementSectionService, 
     CurveNormalizeService curveNormalizeService, 
     OuterSquareService outerSquareService,
@@ -25,17 +24,18 @@ internal class OutBoundaryProcessor (
 
     public void DrawBoundaries(AreaBoundarySettings areaBoundarySettings) {
         var targetViews = areaBoundarySettings.Views;
-        foreach(var view in targetViews) {
-            
-            DrawBoundary(view.Element as View);
+        foreach(var revitElement in targetViews) {
+            var view = revitElement.Element as View;
+            DrawBoundary(view, areaBoundarySettings);
         }
     }
 
-    private void DrawBoundary(View view) {
+    private void DrawBoundary(View view, AreaBoundarySettings areaBoundarySettings) {
         // Получение кривых сечения
-        var sectionCurves = elementSectionService.GetSectionCurves(revitRepository.Document, view);
+        var sectionCurves = elementSectionService.GetSectionCurves(view, areaBoundarySettings);
 
         if(sectionCurves.Count == 0) {
+            System.Windows.MessageBox.Show("No curves found");
             return;
         }
         

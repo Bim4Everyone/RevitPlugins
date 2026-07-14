@@ -58,6 +58,6 @@ internal class CommonSettingsViewModel : BaseViewModel {
     private void LoadView() {
         AlgorithmTypeViewModels = new ObservableCollection<AlgorithmTypeViewModel>(GetAlgorithmTypeViewModels());
         SelectedAlgorithmTypeViewModel = AlgorithmTypeViewModels.FirstOrDefault();
-        SectionHeight = _configSettings.SectionHeight.ToString(CultureInfo.InvariantCulture);
+        SectionHeight = _configSettings.SectionHeightMm.ToString(CultureInfo.InvariantCulture);
     }
 }
