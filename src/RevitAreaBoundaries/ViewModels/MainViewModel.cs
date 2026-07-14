@@ -41,7 +41,6 @@ internal class MainViewModel : BaseViewModel {
         SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
-        IProgressDialogFactory progressDialogFactory,
         BoundaryProcessorSelector boundaryProcessorSelector) {
         
         _pluginConfig = pluginConfig;
@@ -49,15 +48,11 @@ internal class MainViewModel : BaseViewModel {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _boundaryProcessorSelector = boundaryProcessorSelector;
-        
-        ProgressDialogFactory = progressDialogFactory
-                                ?? throw new ArgumentNullException(nameof(progressDialogFactory));
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
     
-    public IProgressDialogFactory ProgressDialogFactory { get; }
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
     
@@ -107,22 +102,6 @@ internal class MainViewModel : BaseViewModel {
     private void AcceptView() {
         SaveSettings();
         SaveConfig();
-        
-        using var progressDialogService = ProgressDialogFactory.CreateDialog();
-        var progress = progressDialogService.CreateProgress();
-        var ct = progressDialogService.CreateCancellationToken();
-        //
-        // var progressService = new ProgressService(_localizationService) {
-        //     CancellationToken = ct,
-        //     ProgressCount = progress,
-        //     SetupStage = (text, max, step) => {
-        //         progressDialogService.DisplayTitleFormat = text;
-        //         progressDialogService.MaxValue = max;
-        //         progressDialogService.StepValue = step;
-        //     }
-        // };
-        
-        progressDialogService.Show();
         
         var processor = _boundaryProcessorSelector.SelectProcessor(_areaBoundarySettings);
         

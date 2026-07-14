@@ -14,8 +14,10 @@ public partial class MainWindow {
     public MainWindow(
         ILoggerService loggerService,
         ISerializationService serializationService,
-        ILanguageService languageService, ILocalizationService localizationService,
-        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        ILanguageService languageService, 
+        ILocalizationService localizationService,
+        IUIThemeService uiThemeService, 
+        IUIThemeUpdaterService themeUpdaterService)
         : base(loggerService,
             serializationService,
             languageService, localizationService,

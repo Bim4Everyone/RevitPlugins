@@ -37,10 +37,6 @@
     <system:String x:Key="MainViewModel.SectionHeightNegate">Вводимые данные должны быть положительным числом</system:String>
     
     <system:String x:Key="MainViewModel.TransactionName">Построение границ зон ТЭП</system:String>
-    
-    <system:String x:Key="ProgressService.AreaPlanName">План зонирования {0}/{1}: </system:String>
-    <system:String x:Key="Test.ProgressTitle">Деление зоны {0}%</system:String>
-    
 
     <system:String x:Key="MainWindow.ButtonOk">Построить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
