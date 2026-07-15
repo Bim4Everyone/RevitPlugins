@@ -11,6 +11,7 @@ using RevitAreaBoundaries.Settings;
 namespace RevitAreaBoundaries.Models.Processors;
 
 internal class OutBoundaryProcessor (
+    SystemPluginConfig systemPluginConfig,
     ElementSectionService elementSectionService, 
     CurveNormalizeService curveNormalizeService, 
     OuterSquareService outerSquareService,
@@ -28,6 +29,8 @@ internal class OutBoundaryProcessor (
             var view = revitElement.Element as View;
             DrawBoundary(view, areaBoundarySettings);
         }
+
+        var o = systemPluginConfig.DefaultSectionHeightOffsetMm;
     }
 
     private void DrawBoundary(View view, AreaBoundarySettings areaBoundarySettings) {
@@ -35,7 +38,6 @@ internal class OutBoundaryProcessor (
         var sectionCurves = elementSectionService.GetSectionCurves(view, areaBoundarySettings);
 
         if(sectionCurves.Count == 0) {
-            System.Windows.MessageBox.Show("No curves found");
             return;
         }
         
@@ -71,8 +73,8 @@ internal class OutBoundaryProcessor (
         // Режем пересекающиеся линии
         var croppedCurves = curveDividerService.SplitCurvesAtIntersections(targetCurves);
         
-        // Закрываем разрывы прямыми линиями до 20мм
-        var closedCurves = curveRepairService.RepairContour(croppedCurves, 1,20);
+        // Закрываем разрывы прямыми линиями
+        var closedCurves = curveRepairService.RepairContour(croppedCurves);
         
         // Очистка списка от дублирующихся кривых
         var cleanCurves = curveRepairService.CleanDuplicateCurves(closedCurves
@@ -86,7 +88,7 @@ internal class OutBoundaryProcessor (
         var mergedCurves = collinearLineMergeService.MergeConnectedCollinearLines(connectedCurves);
        
         // Пытаемся соединить свободные концы
-        var contour = freeEndsJoinService.JoinNearestFreeEndsSmart(mergedCurves, maxJoinDistanceMm: 500);
+        var contour = freeEndsJoinService.JoinNearestFreeEndsSmart(mergedCurves);
         
         //Строим границы зоны
         drawBoundaryService.DrawBoundaryOnView(view, contour);

@@ -73,51 +73,41 @@ internal class RevitSettings : ProjectSettings {
 }
 
 public class SystemPluginConfig {
-    
+    // Алгоритм по умолчанию
     public readonly AlgorithmType DefaultAlgorithmType = AlgorithmType.OuterBoundary;
-    
+    // Параметр сортировки видов по умолчанию
     public readonly string DefaultGroupParamName = "_Группа Видов";
-    
+    // Высота сечения от уровня по умолчанию
     public readonly double DefaultSectionHeightMm = 1200;
-    
+    // Высота отступа от сечения по умолчанию
     public readonly double DefaultSectionHeightOffsetMm = 100;
-    
+    // Коллекция видов по умолчанию
     public readonly List<ElementId> DefaultListViewPlans = [];
-    
+    // Коллекция типов по умолчанию
     public readonly List<ElementId> DefaultListTypes = [];
-    
+    // Значения для параметра группировки, если оно не определено пользователем
     public readonly string DefaultGroupParameterValue = "???";
-    
-    public readonly double DefaultMaxToleranceToJoinCurvesMm = 15;
-    
+    // Допуск для геометрических операций
     public readonly double DefaultTolerance = 1e-9;
-
+    // Размер ячейки для грубого поиска границ здания
     public readonly double DefaultCellsCoarseStepMm = 1500;
-    
-    public readonly double DefaultCellsFineStepMm = 50;
-    
+    // Размер ячейки для точного поиска границ здания
+    public readonly double DefaultCellsFineStepMm = 30;
+    // Размер участка, на которые разбивается длинная кривая
     public readonly double DefaultLengthSegmentMm = 200;
-    
+    // Отступ количества ячеек от границы здания
     public readonly int DefaultCellsMargin = 50;
+    // Размер ячейки для пространственного индекса
+     public readonly double DefaultCellsSizeForIndexMm = 10;
+     // Минимальное расстояние для точек, до которого они будут соединяться в одну точку
+     public readonly double DefaultMinDistanceToJoinPointsMm = 1;
+     // Максимальное расстояние, до которого они будут соединяться линиями (микро разрывы)
+     public readonly double DefaultMaxDistanceToCreateCurveFineMm = 20;
+     // Максимальное расстояние, до которого они будут соединяться линиями (большие разрывы)
+     public readonly double DefaultMaxDistanceToCreateCurveCoarseMm = 500;
     
-    public readonly ICollection<BuiltInCategory> AllCategories = [
-        BuiltInCategory.OST_Doors,
-        BuiltInCategory.OST_Floors,
-        BuiltInCategory.OST_Railings,
-        BuiltInCategory.OST_RailingSystem,
-        BuiltInCategory.OST_StairsRailing,
-        BuiltInCategory.OST_StairsRailingBaluster,
-        BuiltInCategory.OST_StairsRailingRail,
-        BuiltInCategory.OST_RailingBalusterRail,
-        BuiltInCategory.OST_RailingBalusterRailCut,
-        BuiltInCategory.OST_RailingHandRail,
-        BuiltInCategory.OST_RailingHandRailAboveCut,
-        BuiltInCategory.OST_Roofs,
-        BuiltInCategory.OST_Walls,
-        BuiltInCategory.OST_Windows,
-        BuiltInCategory.OST_GenericModel
-    ];
-    
+    // Коллекция категорий, которые надо разрезать по высоте сечения (центр)
+    // так как эни чаще являются полнотелыми конструкциями
     public readonly ICollection<BuiltInCategory> CenterProjectionCats = [
         BuiltInCategory.OST_Floors,
         BuiltInCategory.OST_Roofs,
@@ -125,6 +115,8 @@ public class SystemPluginConfig {
         BuiltInCategory.OST_GenericModel
     ];
     
+    // Коллекция категорий, которые надо не разрезать, а брать полную проекцию
+    // так как они могут иметь прерывистую геометрию
     public readonly ICollection<BuiltInCategory> FullProjectionCats = [
         BuiltInCategory.OST_Railings,
         BuiltInCategory.OST_RailingSystem,
@@ -137,6 +129,8 @@ public class SystemPluginConfig {
         BuiltInCategory.OST_RailingHandRailAboveCut
     ];
     
+    // Коллекция категорий, которые надо разрезать с отступом от низа и верха
+    // для того, чтобы максимально охватить геометрию без возможных выступающих частей
     public readonly ICollection<BuiltInCategory> PartialProjectionCats = [
         BuiltInCategory.OST_Doors,
         BuiltInCategory.OST_Windows

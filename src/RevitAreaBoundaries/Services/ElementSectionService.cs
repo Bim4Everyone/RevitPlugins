@@ -4,7 +4,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
 using RevitAreaBoundaries.Models;
@@ -13,7 +12,10 @@ using RevitAreaBoundaries.Settings;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class ElementSectionService(RevitRepository revitRepository, SystemPluginConfig systemPluginConfig) {
+internal class ElementSectionService(
+    RevitRepository revitRepository, 
+    SystemPluginConfig systemPluginConfig, 
+    BoundingBoxService boundingBoxService) {
 
     public List<Curve> GetSectionCurves(View view, AreaBoundarySettings areaBoundarySettings) {
         var level = view.GenLevel;
@@ -41,7 +43,7 @@ internal class ElementSectionService(RevitRepository revitRepository, SystemPlug
                     resultCurves.AddRange(GetFullProjectionCurves(element));
                     break;
                 case ProjectionType.PartialProjection:
-                    resultCurves.AddRange(GetPartalProjectionCurves(element));
+                    resultCurves.AddRange(GetPartalProjectionCurves(element, sectionHeightOffset));
                     break;
                 case ProjectionType.RegularProjection:
                 default:
@@ -60,6 +62,21 @@ internal class ElementSectionService(RevitRepository revitRepository, SystemPlug
             : GetCurvesFromSolid(solid);
     }
     
+    private IEnumerable<Curve> GetPartalProjectionCurves(Element element, double offset) {
+        var solid = GetTransformedSolidFromElement(element);
+        if(solid is null) {
+            return [];
+        }
+        var bbox = boundingBoxService.GetBoundingBoxXyz(element);
+        double minPoint = bbox.Min.Z;
+        double offsetMinPoint = minPoint + offset;
+        var minPlane = CreateCutPlaneByOrigin(offsetMinPoint, true);
+        double maxPoint = bbox.Max.Z;
+        double offsetMaxPoint = maxPoint - offset;
+        var maxPlane = CreateCutPlaneByOrigin(offsetMaxPoint, true);
+        return GetCurvesFromSolid(solid, minPlane, maxPlane);
+    }
+    
     private IEnumerable<Curve> GetRegularProjectionCurves(Element element, double firstSection, double secondSection) {
         var solid =  GetTransformedSolidFromElement(element);
         var firstPlane = CreateCutPlaneByOrigin(firstSection, true);
@@ -69,14 +86,7 @@ internal class ElementSectionService(RevitRepository revitRepository, SystemPlug
             : GetCurvesFromSolid(solid, firstPlane, secondPlane);
     }
     
-    
-    private IEnumerable<Curve> GetPartalProjectionCurves(Element element) {
-        var solid = GetTransformedSolidFromElement(element);
-        return solid == null 
-            ? [] 
-            : GetCurvesFromSolid(solid);
-    }
-    
+    // Метод создания плоскости для обрезки
     private Plane CreateCutPlaneByOrigin(double positionZ, bool isPositive) {
         var origin = new XYZ(0, 0, positionZ);
         var direction = isPositive
@@ -86,6 +96,7 @@ internal class ElementSectionService(RevitRepository revitRepository, SystemPlug
         );
     }
 
+    // Метод получения кривых из Solid
     private IEnumerable<Curve> GetCurvesFromSolid(Solid solid) {
         var downFaces = new List<Face>();
         
@@ -93,7 +104,7 @@ internal class ElementSectionService(RevitRepository revitRepository, SystemPlug
             if(face is not PlanarFace planarFace) {
                 continue;
             }
-            if(Math.Abs(planarFace.FaceNormal.Z + 1.0) < 1e-6) {
+            if(Math.Abs(planarFace.FaceNormal.Z + 1.0) < systemPluginConfig.DefaultTolerance) {
                 downFaces.Add(planarFace);
             }
         }
@@ -109,6 +120,7 @@ internal class ElementSectionService(RevitRepository revitRepository, SystemPlug
         return curves;
     }
     
+    // Метод получения кривых из Solid путем обрезки исходного Solid
     private List<Curve> GetCurvesFromSolid(Solid solid, Plane positivePlane, Plane negativePlane) {
         var curves = new List<Curve>();
         try {
@@ -133,6 +145,7 @@ internal class ElementSectionService(RevitRepository revitRepository, SystemPlug
         return curves;
     }
     
+    // Метод получения трансформируемого Solid
     private Solid GetTransformedSolidFromElement(Element element) {
         var unitedSolid = GetUnitedSolid(element);
         return unitedSolid == null 
@@ -140,6 +153,7 @@ internal class ElementSectionService(RevitRepository revitRepository, SystemPlug
             : SolidUtils.CreateTransformed(unitedSolid, revitRepository.BasePointTransform);
     }
     
+    // Метод получения объединенного Solid
     private Solid GetUnitedSolid(Element element) {
         var solids = element.GetSolids().ToArray();
         if(!solids.Any())
@@ -156,6 +170,7 @@ internal class ElementSectionService(RevitRepository revitRepository, SystemPlug
             .FirstOrDefault();
     }
 
+    // Метод безопасного получения объема Solid
     private double GetSafeSolidVolume(Solid solid) {
         if(solid == null) return 0;
         try {
@@ -164,5 +179,4 @@ internal class ElementSectionService(RevitRepository revitRepository, SystemPlug
             return 0;
         }
     }
-    
 }
