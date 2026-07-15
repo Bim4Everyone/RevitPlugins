@@ -39,7 +39,7 @@
                 Padding="0"
                 Margin="12,0,12,0"
                 VerticalAlignment="Center"
-                IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                IsChecked="{Binding IsChecked, Mode=TwoWay}" />
             
             <ui:SymbolIcon
                 Margin="3 0"

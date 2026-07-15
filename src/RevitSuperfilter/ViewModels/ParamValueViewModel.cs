@@ -12,6 +12,7 @@ internal sealed class ParamValueViewModel : BaseViewModel {
 
     public int Count => _elementsById.Count;
     public string DisplayValue { get; }
+    private bool _isChecked;
 
     public ParamValueViewModel(string displayValue) {
         DisplayValue = displayValue;
@@ -20,6 +21,11 @@ internal sealed class ParamValueViewModel : BaseViewModel {
     public bool IsSelected {
         get => _isSelected;
         set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+    }
+
+    public bool IsChecked {
+        get => _isChecked;
+        set => this.RaiseAndSetIfChanged(ref _isChecked, value);
     }
 
     public ICollection<ElementId> GetElementIds() {

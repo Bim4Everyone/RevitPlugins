@@ -81,7 +81,7 @@ internal sealed class CategoriesViewModel : ObservableObject, IElementIndexList 
         foreach(var category in Categories) {
             foreach(var definition in category.Definitions) {
                 foreach(var paramValue in definition.ParamValues) {
-                    if(paramValue.IsSelected) {
+                    if(paramValue.IsChecked) {
                         result.UnionWith(paramValue.GetElementIds());
                     }
                 }
