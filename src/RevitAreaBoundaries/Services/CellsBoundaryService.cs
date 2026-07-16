@@ -8,7 +8,7 @@ using RevitAreaBoundaries.Models;
 
 namespace RevitAreaBoundaries.Services;
 
-public class CellsBoundaryService (SystemPluginConfig systemPluginConfig){
+internal class CellsBoundaryService (SystemPluginConfig systemPluginConfig){
     private readonly double _tolerance = systemPluginConfig.DefaultTolerance;
     private readonly double _stepCoarse = UnitUtils.ConvertToInternalUnits(
         systemPluginConfig.DefaultCellsCoarseStepMm, UnitTypeId.Millimeters);
@@ -61,8 +61,9 @@ public class CellsBoundaryService (SystemPluginConfig systemPluginConfig){
                 qi = (qi + 1) % 4;
                 tries++;
             }
-            if(tries == 4)
+            if(tries == 4) {
                 break;
+            }
 
             int source = qi;
             var current = queues[source].Dequeue();

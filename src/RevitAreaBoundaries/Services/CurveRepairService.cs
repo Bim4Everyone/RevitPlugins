@@ -7,8 +7,9 @@ using RevitAreaBoundaries.Models;
 
 namespace RevitAreaBoundaries.Services;
 
-public class CurveRepairService(SystemPluginConfig systemPluginConfig) {
+internal class CurveRepairService(SystemPluginConfig systemPluginConfig, RevitRepository revitRepository) {
     private readonly double _tolerance = systemPluginConfig.DefaultTolerance;
+    private readonly double _shortCurveTolerance = revitRepository.Application.ShortCurveTolerance;
     private readonly double _cellSizeForIndexMm = systemPluginConfig.DefaultCellsSizeForIndexMm;
 
     public List<Curve> CleanDuplicateCurves(List<Curve> curves) {
@@ -85,11 +86,17 @@ public class CurveRepairService(SystemPluginConfig systemPluginConfig) {
                 }
 
                 if (nearestDistance <= minDistance) {
-                    currentLine = ReplaceEndpoint(currentLine, endIndex, nearestPoint);
+                    var newLine = ReplaceEndpoint(currentLine, endIndex, nearestPoint);
+                    if(newLine == null) {
+                        continue;
+                    }
+                    currentLine = newLine;
                     result[curveIndex] = currentLine;
                     lineChanged = true;
                 } else {
-                    additionalCurves.Add(Line.CreateBound(endpoint, nearestPoint));
+                    if (!IsTooShort(endpoint, nearestPoint)) {
+                        additionalCurves.Add(Line.CreateBound(endpoint, nearestPoint));
+                    }
                 }
             }
             if (lineChanged) {
@@ -154,11 +161,16 @@ public class CurveRepairService(SystemPluginConfig systemPluginConfig) {
     private bool PointsEqual(XYZ p1, XYZ p2) {
         return p1.DistanceTo(p2) <= _tolerance;
     }
+    
+    private bool IsTooShort(XYZ p1, XYZ p2) {
+        return p1.DistanceTo(p2) < _shortCurveTolerance;
+    }
 
-    private static Line ReplaceEndpoint(Line line, int endpointIndex, XYZ newPoint) {
-        return endpointIndex == 0
-            ? Line.CreateBound(newPoint, line.GetEndPoint(1))
-            : Line.CreateBound(line.GetEndPoint(0), newPoint);
+    private Line ReplaceEndpoint(Line line, int endpointIndex, XYZ newPoint) {
+        var p1 = endpointIndex == 0 ? newPoint : line.GetEndPoint(0);
+        var p2 = endpointIndex == 0 ? line.GetEndPoint(1) : newPoint;
+
+        return IsTooShort(p1, p2) ? null : Line.CreateBound(p1, p2);
     }
 
     // Быстрый ключ кривой с квантованием по tolerance

@@ -7,7 +7,6 @@ namespace RevitAreaBoundaries.Services;
 
 internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
     private readonly double _tol = systemPluginConfig.DefaultTolerance;
-    
     private static int ToCell(double v, double cell) => (int)Math.Floor(v / cell);
     private static long Pack(int x, int y) => ((long)x << 32) ^ (uint)y;
     private static double Clamp(double v, double lo, double hi) => v < lo ? lo : (v > hi ? hi : v);
@@ -18,12 +17,20 @@ internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
     /// - с учетом угла продолжения,
     /// - без пересечения существующей геометрии (опционально).
     /// </summary>
-    public List<Curve> JoinNearestFreeEndsSmart(List<Curve> curves, int maxPairsPerRun = int.MaxValue, bool avoidCrossings = true, double angleWeight = 0.35) {
-        if (curves == null || curves.Count == 0)
+    public List<Curve> JoinNearestFreeEndsSmart(
+        List<Curve> curves,
+        int maxPairsPerRun = int.MaxValue,
+        bool avoidCrossings = true,
+        double angleWeight = 0.35) {
+        if(curves == null
+           || curves.Count == 0)
             return [];
 
-        double maxJoin = UnitUtils.ConvertToInternalUnits(systemPluginConfig.DefaultSectionHeightOffsetMm, UnitTypeId.Millimeters);
-        if (maxJoin <= _tol) {
+        double maxJoin = UnitUtils.ConvertToInternalUnits(
+            systemPluginConfig.DefaultMaxDistanceToCreateCurveCoarseMm,
+            UnitTypeId.Millimeters);
+
+        if(maxJoin <= _tol) {
             return CloneAll(curves);
         }
 
@@ -33,7 +40,7 @@ internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
         var index = new CurveSpatialIndex(result, cell);
 
         var freeEnds = CollectFreeEnds(result, index);
-        if (freeEnds.Count < 2) {
+        if(freeEnds.Count < 2) {
             return result;
         }
 
@@ -44,9 +51,15 @@ internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
         bool[] used = new bool[freeEnds.Count];
         int added = 0;
 
-        foreach (var c in candidates) {
-            if (added >= maxPairsPerRun) break;
-            if (used[c.A] || used[c.B]) continue;
+        foreach(var c in candidates) {
+            if(added >= maxPairsPerRun) {
+                break;
+            }
+
+            if(used[c.A]
+               || used[c.B]) {
+                continue;
+            }
 
             var feA = freeEnds[c.A];
             var feB = freeEnds[c.B];
@@ -54,15 +67,16 @@ internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
             var p1 = feA.Point;
             var p2 = feB.Point;
 
-            if (p1.DistanceTo(p2) <= _tol) {
+            if(p1.DistanceTo(p2) <= _tol) {
                 continue;
             }
-            if (HasSameLine(result, p1, p2)) 
+
+            if(HasSameLine(result, p1, p2))
                 continue;
 
             var bridge = Line.CreateBound(p1, p2);
 
-            if (avoidCrossings && IntersectsAny(bridge, result, feA.CurveIndex, feB.CurveIndex)) {
+            if(avoidCrossings && IntersectsAny(bridge, result, feA.CurveIndex, feB.CurveIndex)) {
                 continue;
             }
 
@@ -71,6 +85,7 @@ internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
             used[c.B] = true;
             added++;
         }
+
         return result;
     }
 
@@ -155,14 +170,22 @@ internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
         var probe = BBox.BBoxFromPointXy(point, tol);
 
         foreach (int i in index.Query(probe)) {
-            if (i == ownerIndex) continue;
+            if (i == ownerIndex) {
+                continue;
+            }
             var c = curves[i];
 
-            if (c.GetEndPoint(0).DistanceTo(point) <= tol) return true;
-            if (c.GetEndPoint(1).DistanceTo(point) <= tol) return true;
+            if (c.GetEndPoint(0).DistanceTo(point) <= tol) {
+                return true;
+            }
+            if (c.GetEndPoint(1).DistanceTo(point) <= tol) {
+                return true;
+            }
 
             var pr = c.Project(point);
-            if (pr != null && pr.Distance <= tol) return true;
+            if (pr != null && pr.Distance <= tol) {
+                return true;
+            }
         }
         return false;
     }
@@ -171,8 +194,9 @@ internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
         // Проверяем пересечение нового моста с существующими кривыми.
         // ownerA/ownerB пропускаем, потому что мост к ним как раз примыкает.
         for (int i = 0; i < curves.Count; i++) {
-            if (i == ownerA || i == ownerB) continue;
-
+            if (i == ownerA || i == ownerB) {
+                continue;
+            }
             var c = curves[i];
 
             try {
@@ -180,17 +204,19 @@ internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
                 if (ira == null || ira.Size == 0) continue;
 
                 // Разрешаем касание только в концах моста, всё остальное — пересечение
-                for (int k = 0; k < ira.Size; k++)
-                {
-                    XYZ p = ira.get_Item(k)?.XYZPoint;
-                    if (p == null) continue;
+                for (int k = 0; k < ira.Size; k++) {
+                    var p = ira.get_Item(k)?.XYZPoint;
+                    if (p == null) {
+                        continue;
+                    }
 
                     bool atBridgeEnd =
                         p.DistanceTo(bridge.GetEndPoint(0)) <= _tol ||
                         p.DistanceTo(bridge.GetEndPoint(1)) <= _tol;
 
-                    if (!atBridgeEnd)
+                    if (!atBridgeEnd) {
                         return true;
+                    }
                 }
             } catch {
                 // если API не смог корректно посчитать, лучше быть консервативным
@@ -202,13 +228,17 @@ internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
 
     private static bool HasSameLine(List<Curve> curves, XYZ p1, XYZ p2) {
         foreach (var c in curves) {
-            if (c is not Line l) continue;
+            if (c is not Line l) {
+                continue;
+            }
             var a = l.GetEndPoint(0);
             var b = l.GetEndPoint(1);
 
             bool same = a.IsAlmostEqualTo(p1) && b.IsAlmostEqualTo(p2);
             bool rev = a.IsAlmostEqualTo(p2) && b.IsAlmostEqualTo(p1);
-            if (same || rev) return true;
+            if (same || rev) {
+                return true;
+            }
         }
         return false;
     }

@@ -72,7 +72,7 @@ internal class RevitSettings : ProjectSettings {
     public ConfigSettings ConfigSettings { get; set; }
 }
 
-public class SystemPluginConfig {
+internal class SystemPluginConfig {
     // Алгоритм по умолчанию
     public readonly AlgorithmType DefaultAlgorithmType = AlgorithmType.OuterBoundary;
     // Параметр сортировки видов по умолчанию
@@ -92,7 +92,7 @@ public class SystemPluginConfig {
     // Размер ячейки для грубого поиска границ здания
     public readonly double DefaultCellsCoarseStepMm = 1500;
     // Размер ячейки для точного поиска границ здания
-    public readonly double DefaultCellsFineStepMm = 30;
+    public readonly double DefaultCellsFineStepMm = 20;
     // Размер участка, на которые разбивается длинная кривая
     public readonly double DefaultLengthSegmentMm = 200;
     // Отступ количества ячеек от границы здания

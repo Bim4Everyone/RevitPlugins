@@ -7,14 +7,8 @@ using Wpf.Ui.Abstractions;
 
 namespace RevitAreaBoundaries.Models;
 
-internal sealed class NavigationViewPageProvider : INavigationViewPageProvider {
-    private readonly IResolutionRoot _resolutionRoot;
-
-    public NavigationViewPageProvider(IResolutionRoot resolutionRoot) {
-        _resolutionRoot = resolutionRoot;
-    }
-
+internal sealed class NavigationViewPageProvider(IResolutionRoot resolutionRoot) : INavigationViewPageProvider {
     public object GetPage(Type pageType) {
-        return _resolutionRoot.Get(pageType);
+        return resolutionRoot.Get(pageType);
     }
 }

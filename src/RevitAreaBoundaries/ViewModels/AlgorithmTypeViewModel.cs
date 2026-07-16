@@ -2,7 +2,7 @@
 
 namespace RevitAreaBoundaries.ViewModels;
 
-public class AlgorithmTypeViewModel {
+internal class AlgorithmTypeViewModel {
     public AlgorithmType AlgorithmType { get; set; }
     public string Name { get; set; }
 }

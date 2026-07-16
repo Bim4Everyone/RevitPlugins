@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Windows.Input;
 
@@ -9,7 +8,6 @@ using dosymep.WPF.ViewModels;
 
 using RevitAreaBoundaries.Models;
 using RevitAreaBoundaries.Models.Processors;
-using RevitAreaBoundaries.Services;
 using RevitAreaBoundaries.Settings;
 
 namespace RevitAreaBoundaries.ViewModels;

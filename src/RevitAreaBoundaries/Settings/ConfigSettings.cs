@@ -2,14 +2,12 @@
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-
 using RevitAreaBoundaries.Models;
 using RevitAreaBoundaries.Models.Enums;
 
 namespace RevitAreaBoundaries.Settings;
 
-public class ConfigSettings {
+internal class ConfigSettings {
     public AlgorithmType AlgorithmType { get; set; }
     public double SectionHeightMm { get; set; }
     public  List<ElementId> Views { get; set; }

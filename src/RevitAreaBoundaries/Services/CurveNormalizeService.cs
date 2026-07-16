@@ -8,32 +8,34 @@ using RevitAreaBoundaries.Models;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class CurveNormalizeService (SystemPluginConfig systemPluginConfig){
+internal class CurveNormalizeService (SystemPluginConfig systemPluginConfig, RevitRepository revitRepository){
     private readonly double _tolerance = systemPluginConfig.DefaultTolerance;
     
     public List<Curve> ProjectCurvesToXy(List<Curve> curves) {
-        return curves.Select(ProjectCurveToXy).ToList();
+        return curves.Select(ProjectCurveToXy)
+            .Where(c => c != null)
+            .ToList();
     }
     
     private Curve ProjectCurveToXy(Curve curve) {
         return curve switch {
             Line line => ProjectLine(line),
-            Arc arc => (Curve)ProjectArc(arc) 
-                       ?? Line.CreateBound(
-                           ToXy(arc.GetEndPoint(0)), 
-                           ToXy(arc.GetEndPoint(1))),
-            _ => curve
+            Arc arc => ProjectArc(arc),
+            _ => null
         };
     }
     
-    private static Line ProjectLine(Line line) {
+    private Curve ProjectLine(Line line) {
+        double tolerance = revitRepository.Application.ShortCurveTolerance;
         var p1 = ToXy(line.GetEndPoint(0));
         var p2 = ToXy(line.GetEndPoint(1));
 
-        return Line.CreateBound(p1, p2);
+        return IsTooShort(p1, p2) 
+            ? null 
+            : Line.CreateBound(p1, p2);
     }
     
-    private Arc ProjectArc(Arc arc) {
+    private Curve ProjectArc(Arc arc) {
         double t0 = arc.GetEndParameter(0);
         double t1 = arc.GetEndParameter(1);
         double tm = (t0 + t1) * 0.5;
@@ -41,12 +43,14 @@ internal class CurveNormalizeService (SystemPluginConfig systemPluginConfig){
         var start = ToXy(arc.Evaluate(t0, false));
         var mid   = ToXy(arc.Evaluate(tm, false));
         var end   = ToXy(arc.Evaluate(t1, false));
-
-        double area = ((mid.X - start.X) * (end.Y - start.Y)) - ((mid.Y - start.Y) * (end.X - start.X));
-
-        return Math.Abs(area) < _tolerance
+        
+        return IsTooShort(start, end) 
             ? null 
             : Arc.Create(start, end, mid);
+    }
+    
+    private bool IsTooShort(XYZ p1, XYZ p2) {
+        return p1.DistanceTo(p2) < revitRepository.Application.ShortCurveTolerance;
     }
     
     private static XYZ ToXy(XYZ p) {

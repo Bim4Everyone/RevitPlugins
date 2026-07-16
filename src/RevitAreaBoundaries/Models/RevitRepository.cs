@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,27 +12,22 @@ using RevitAreaBoundaries.Models.Enums;
 
 namespace RevitAreaBoundaries.Models;
 
-internal class RevitRepository {
-    private readonly SystemPluginConfig _systemPluginConfig;
-    private readonly IRevitParamFactory _revitParamFactory;
+internal class RevitRepository(
+    UIApplication uiApplication,
+    SystemPluginConfig systemPluginConfig,
+    IRevitParamFactory revitParamFactory) {
     
     private List<Element> _viewPlans;
     private Transform _basePointTransform;
 
-    public RevitRepository(UIApplication uiApplication, SystemPluginConfig systemPluginConfig, IRevitParamFactory revitParamFactory) {
-        UiApplication = uiApplication;
-        _systemPluginConfig = systemPluginConfig;
-        _revitParamFactory = revitParamFactory;
-    }
-
-    private UIApplication UiApplication { get; }
-    public UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
-    public Application Application => UiApplication.Application;
+    private UIApplication UiApplication { get; } = uiApplication;
+    private UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
     public Document Document => ActiveUiDocument.Document;
+    public Application Application => UiApplication.Application;
     public IReadOnlyList<Element> ViewPlans =>  _viewPlans ??= GetViews();
     public Transform BasePointTransform => _basePointTransform ??= GetBasePointTransform();
 
-    public List<Element> GetViews() {
+    private List<Element> GetViews() {
         return new FilteredElementCollector(Document)
             .OfClass(typeof(ViewPlan))
             .Cast<ViewPlan>()
@@ -52,9 +46,9 @@ internal class RevitRepository {
     }
 
     public IEnumerable<RevitElementType> GetTypeModels() {
-        return GetPlacedElementTypes(_systemPluginConfig.CenterProjectionCats, ProjectionType.RegularProjection)
-            .Concat(GetPlacedElementTypes(_systemPluginConfig.PartialProjectionCats, ProjectionType.PartialProjection))
-            .Concat(GetPlacedElementTypes(_systemPluginConfig.FullProjectionCats, ProjectionType.FullProjection));
+        return GetPlacedElementTypes(systemPluginConfig.CenterProjectionCats, ProjectionType.RegularProjection)
+            .Concat(GetPlacedElementTypes(systemPluginConfig.PartialProjectionCats, ProjectionType.PartialProjection))
+            .Concat(GetPlacedElementTypes(systemPluginConfig.FullProjectionCats, ProjectionType.FullProjection));
     }
 
     private Transform GetBasePointTransform() {
@@ -112,11 +106,11 @@ internal class RevitRepository {
 
     public string GetGroupNameViewPlan(Element element, RevitParam revitParam) {
         if(revitParam is null) {
-            return _systemPluginConfig.DefaultGroupParameterValue;
+            return systemPluginConfig.DefaultGroupParameterValue;
         }
         string value = element.GetParamValueStringOrDefault(revitParam);
         return string.IsNullOrEmpty(value)
-            ? _systemPluginConfig.DefaultGroupParameterValue
+            ? systemPluginConfig.DefaultGroupParameterValue
             : value;
     }
     
@@ -125,7 +119,7 @@ internal class RevitRepository {
         
         return elementIds.Count == 0
             ? [] 
-            : elementIds.Select(id => _revitParamFactory.Create(Document, id));
+            : elementIds.Select(id => revitParamFactory.Create(Document, id));
     }
     
     private List<ElementId> GetBrowserParameterElementIds(Element element) {

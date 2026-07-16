@@ -3,6 +3,6 @@ using RevitAreaBoundaries.Settings;
 
 namespace RevitAreaBoundaries.Models.Processors;
 
-public interface IBoundaryProcessor {
+internal interface IBoundaryProcessor {
     void DrawBoundaries(AreaBoundarySettings areaBoundarySettings);
 }

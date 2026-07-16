@@ -57,19 +57,17 @@ internal class TypeElementSelectionViewModel : BaseViewModel {
     
     // Метод, подписанный на событие изменения выделенных типов
     private void OnTypeElementViewModelChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not RevitElementViewModel vm) {
+        if (sender is not RevitElementViewModel vm ||
+            e.PropertyName != nameof(RevitElementViewModel.IsChecked)) {
             return;
         }
-        switch(e.PropertyName) {
-            case nameof(vm.IsChecked):
-                if(!SelectedTypeElementViewModels.Contains(vm)) {
-                    SelectedTypeElementViewModels.Add(vm);
-                } else {
-                    if(SelectedTypeElementViewModels.Contains(vm)) {
-                        SelectedTypeElementViewModels.Remove(vm);
-                    }
-                }
-                break;
+
+        if (vm.IsChecked) {
+            if (!SelectedTypeElementViewModels.Contains(vm)) {
+                SelectedTypeElementViewModels.Add(vm);
+            }
+        } else {
+            SelectedTypeElementViewModels.Remove(vm);
         }
     }
 
@@ -81,6 +79,8 @@ internal class TypeElementSelectionViewModel : BaseViewModel {
             }
         }
         SelectedTypeElementViewModels = new ObservableCollection<RevitElementViewModel>(
-            TypeElementGroupViewModels.SelectMany(group => group.RevitElementViewModels));
+            TypeElementGroupViewModels
+                .SelectMany(group => group.RevitElementViewModels)
+                .Where(vm => vm.IsChecked));
     }
 }

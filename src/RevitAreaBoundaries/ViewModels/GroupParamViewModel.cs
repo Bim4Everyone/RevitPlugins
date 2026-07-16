@@ -2,7 +2,7 @@
 
 namespace RevitAreaBoundaries.ViewModels;
 
-public class GroupParamViewModel {
+internal class GroupParamViewModel {
     public RevitParam Parameter { get; set; }
     public string Name { get; set; }
    

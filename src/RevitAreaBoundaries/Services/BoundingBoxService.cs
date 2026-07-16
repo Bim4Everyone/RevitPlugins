@@ -33,17 +33,22 @@ internal class BoundingBoxService (RevitRepository revitRepository){
         }
         var list = new List<XYZ>();
         foreach(var geomObj in geomElement) {
-            if(geomObj is GeometryInstance instance) {
-                var instGeom = instance.GetInstanceGeometry();
-                foreach(var obj in instGeom) {
-                    if(obj is Solid solid && solid.Faces.Size > 0) {
-                        foreach(Edge e in solid.Edges) {
-                            var st = e.AsCurve().GetEndPoint(0);
-                            var fi = e.AsCurve().GetEndPoint(1);
-                            list.Add(st);
-                            list.Add(fi);
-                        }
-                    }
+            if(geomObj is not GeometryInstance instance) {
+                continue;
+            }
+
+            var instGeom = instance.GetInstanceGeometry();
+            foreach(var obj in instGeom) {
+                if(obj is not Solid solid
+                   || solid.Faces.Size <= 0) {
+                    continue;
+                }
+
+                foreach(Edge e in solid.Edges) {
+                    var st = e.AsCurve().GetEndPoint(0);
+                    var fi = e.AsCurve().GetEndPoint(1);
+                    list.Add(st);
+                    list.Add(fi);
                 }
             }
         }

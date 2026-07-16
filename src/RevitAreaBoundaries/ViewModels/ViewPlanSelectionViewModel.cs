@@ -109,19 +109,17 @@ internal class ViewPlanSelectionViewModel : BaseViewModel {
     
     // Метод, подписанный на событие изменения выделенных связанных файлов
     private void OnViewViewModelChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not RevitElementViewModel vm) {
+        if (sender is not RevitElementViewModel vm ||
+            e.PropertyName != nameof(RevitElementViewModel.IsChecked)) {
             return;
         }
-        switch(e.PropertyName) {
-            case nameof(vm.IsChecked):
-                if(!SelectedViewPlanViewModels.Contains(vm)) {
-                    SelectedViewPlanViewModels.Add(vm);
-                } else {
-                    if(SelectedViewPlanViewModels.Contains(vm)) {
-                        SelectedViewPlanViewModels.Remove(vm);
-                    }
-                }
-                break;
+
+        if (vm.IsChecked) {
+            if (!SelectedViewPlanViewModels.Contains(vm)) {
+                SelectedViewPlanViewModels.Add(vm);
+            }
+        } else {
+            SelectedViewPlanViewModels.Remove(vm);
         }
     }
     

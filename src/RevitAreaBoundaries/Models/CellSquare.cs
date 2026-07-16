@@ -4,8 +4,7 @@ using Autodesk.Revit.DB;
 
 namespace RevitAreaBoundaries.Models;
 
-public class CellSquare
-{
+internal class CellSquare {
     public XYZ BottomLeft { get; set; }
     public XYZ BottomRight { get; set; }
     public XYZ TopRight { get; set; }

@@ -2,11 +2,9 @@
 
 using Autodesk.Revit.DB;
 
-using RevitAreaBoundaries.Models;
-
 namespace RevitAreaBoundaries.Services;
 
-public class DrawBoundaryService {
+internal class DrawBoundaryService {
     
     public void DrawBoundaryOnView(View view, List<Curve> curves) {
         var document = view.Document;
