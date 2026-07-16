@@ -99,11 +99,5 @@ public class SuperfilterCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Get<MainWindow>().Show();
-
-        AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-    }
-
-    private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e) {
-        string sss = e.ExceptionObject.ToString();
     }
 }
