@@ -41,6 +41,4 @@
     <system:String x:Key="MainWindow.ButtonOk">Построить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     
-    
-    
 </ResourceDictionary>
