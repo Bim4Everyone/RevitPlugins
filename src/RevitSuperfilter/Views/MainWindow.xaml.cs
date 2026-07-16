@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 
 using Autodesk.Revit.UI;
@@ -55,14 +56,6 @@ public partial class MainWindow {
     /// </remarks>
     public override string ProjectConfigName => nameof(MainWindow);
 
-    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-        DialogResult = true;
-    }
-
-    private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-        DialogResult = false;
-    }
-
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e) {
         base.OnClosing(e);
         _externalEvent.Raise();
@@ -77,7 +70,7 @@ internal class ExternalEventHandler : IExternalEventHandler {
     }
 
     public void Execute(UIApplication app) {
-        _kernel.Dispose();
+        _kernel?.Dispose();
     }
 
     public string GetName() {
