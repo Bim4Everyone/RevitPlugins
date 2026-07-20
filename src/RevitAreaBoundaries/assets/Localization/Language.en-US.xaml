@@ -37,6 +37,11 @@
     <system:String x:Key="MainViewModel.SectionHeightNegate">The input value must be a positive number</system:String>
 
     <system:String x:Key="MainViewModel.TransactionName">Create Area Boundaries</system:String>
+    
+    <system:String x:Key="BoundaryProcessor.AreaPlanName">Plan {0}/{1}: </system:String>
+    <system:String x:Key="ProgressTitle.SectionProcessing">Section elements {0}%</system:String>
+    <system:String x:Key="ProgressTitle.BoundaryProcessing">Boundary detection {0}%</system:String>
+    <system:String x:Key="ProgressTitle.DrawProcessing">Drawing boundaries {0}%</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">Create</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>

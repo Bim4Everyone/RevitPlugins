@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Windows.Input;
 
@@ -8,6 +9,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitAreaBoundaries.Models;
 using RevitAreaBoundaries.Models.Processors;
+using RevitAreaBoundaries.Services;
 using RevitAreaBoundaries.Settings;
 
 namespace RevitAreaBoundaries.ViewModels;
@@ -39,6 +41,7 @@ internal class MainViewModel : BaseViewModel {
         SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
+        IProgressDialogFactory progressDialogFactory,
         BoundaryProcessorSelector boundaryProcessorSelector) {
         
         _pluginConfig = pluginConfig;
@@ -46,6 +49,9 @@ internal class MainViewModel : BaseViewModel {
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _boundaryProcessorSelector = boundaryProcessorSelector;
+        
+        ProgressDialogFactory = progressDialogFactory
+                                ?? throw new ArgumentNullException(nameof(progressDialogFactory));
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -53,6 +59,7 @@ internal class MainViewModel : BaseViewModel {
     
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
+    public IProgressDialogFactory ProgressDialogFactory { get; }
     
     public CommonSettingsViewModel CommonSettingsViewModel {
         get => _commonSettingsViewModel;
@@ -103,10 +110,26 @@ internal class MainViewModel : BaseViewModel {
         
         var processor = _boundaryProcessorSelector.SelectProcessor(_areaBoundarySettings);
         
+        using var progressDialogService = ProgressDialogFactory.CreateDialog();
+        var progress = progressDialogService.CreateProgress();
+        var ct = progressDialogService.CreateCancellationToken();
+
+        var progressService = new ProgressService(_localizationService) {
+            CancellationToken = ct,
+            ProgressCount = progress,
+            SetupStage = (text, max, step) => {
+                progressDialogService.DisplayTitleFormat = text;
+                progressDialogService.MaxValue = max;
+                progressDialogService.StepValue = step;
+            }
+        };
+
+        progressDialogService.Show();
+        
         string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
         
-        processor.DrawBoundaries(_areaBoundarySettings);
+        processor.DrawBoundaries(_areaBoundarySettings, progressService);
         
         t.Commit();
     }

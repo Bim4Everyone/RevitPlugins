@@ -4,5 +4,5 @@ using RevitAreaBoundaries.Settings;
 namespace RevitAreaBoundaries.Models.Processors;
 
 internal interface IBoundaryProcessor {
-    void DrawBoundaries(AreaBoundarySettings areaBoundarySettings);
+    void DrawBoundaries(AreaBoundarySettings areaBoundarySettings, ProgressService progressService);
 }

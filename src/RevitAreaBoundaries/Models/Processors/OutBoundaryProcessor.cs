@@ -11,7 +11,6 @@ using RevitAreaBoundaries.Settings;
 namespace RevitAreaBoundaries.Models.Processors;
 
 internal class OutBoundaryProcessor (
-    SystemPluginConfig systemPluginConfig,
     ElementSectionService elementSectionService, 
     CurveNormalizeService curveNormalizeService, 
     OuterSquareService outerSquareService,
@@ -23,19 +22,21 @@ internal class OutBoundaryProcessor (
     FreeEndsJoinService freeEndsJoinService) : IBoundaryProcessor {
     
 
-    public void DrawBoundaries(AreaBoundarySettings areaBoundarySettings) {
+    public void DrawBoundaries(AreaBoundarySettings areaBoundarySettings, ProgressService progressService) {
         var targetViews = areaBoundarySettings.Views;
-        foreach(var revitElement in targetViews) {
-            var view = revitElement.Element as View;
-            DrawBoundary(view, areaBoundarySettings);
+        progressService.AreaPlanCount = targetViews.Count.ToString();
+        
+        for(int i = 0; i < targetViews.Count; i++) {
+            progressService.CancellationToken.ThrowIfCancellationRequested();
+            progressService.AreaPlanNumber = (i + 1).ToString();
+            var view = targetViews[i].Element as View;
+            DrawBoundary(view, areaBoundarySettings, progressService);
         }
-
-        var o = systemPluginConfig.DefaultSectionHeightOffsetMm;
     }
 
-    private void DrawBoundary(View view, AreaBoundarySettings areaBoundarySettings) {
+    private void DrawBoundary(View view, AreaBoundarySettings areaBoundarySettings, ProgressService progressService) {
         // Получение кривых сечения
-        var sectionCurves = elementSectionService.GetSectionCurves(view, areaBoundarySettings);
+        var sectionCurves = elementSectionService.GetSectionCurves(view, areaBoundarySettings, progressService);
 
         if(sectionCurves.Count == 0) {
             return;
@@ -62,9 +63,7 @@ internal class OutBoundaryProcessor (
         }
         
         // Получение кривых, максимально приближенных к наружней точке в каждой ячейке
-        var targetCurves = coarseCells
-            .SelectMany(cellsBoundaryService.GetBoundaryCurves)
-            .ToList();
+        var targetCurves = cellsBoundaryService.GetBoundaryCurves(coarseCells, progressService).ToList();
         
         if(targetCurves.Count == 0) {
             return;
@@ -91,6 +90,6 @@ internal class OutBoundaryProcessor (
         var contour = freeEndsJoinService.JoinNearestFreeEndsSmart(mergedCurves);
         
         //Строим границы зоны
-        drawBoundaryService.DrawBoundaryOnView(view, contour);
+        drawBoundaryService.DrawBoundaryOnView(view, contour, progressService);
     }
 }

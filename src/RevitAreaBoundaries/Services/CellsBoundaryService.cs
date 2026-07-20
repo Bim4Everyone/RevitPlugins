@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using RevitAreaBoundaries.Models;
+using RevitAreaBoundaries.Models.Enums;
 
 namespace RevitAreaBoundaries.Services;
 
@@ -111,44 +112,66 @@ internal class CellsBoundaryService (SystemPluginConfig systemPluginConfig){
             queues[0].Count > 0 || queues[1].Count > 0 || queues[2].Count > 0 || queues[3].Count > 0;
     }
     
-    public HashSet<Curve> GetBoundaryCurves(CellSquare cell) {
-        double minX = cell.BottomLeft.X; 
-        double minY = cell.BottomLeft.Y; 
-        double maxX = cell.TopRight.X; 
-        double maxY = cell.TopRight.Y; 
-        
-        var startPoint = GetOutsidePoint(cell);
-        var start = GetAlignedPoint(startPoint, _stepFine); 
-        
-        var index = new CurveSpatialIndex(cell.Curves, _stepFine); 
-        var queue = new Queue<XYZ>(); 
-        queue.Enqueue(start); 
-        var visited = new HashSet<string>(); 
+    public HashSet<Curve> GetBoundaryCurves(HashSet<CellSquare> cells, ProgressService progressService) {
         var hitCurves = new HashSet<Curve>();
-        while(queue.Count > 0) {
-            var current = queue.Dequeue(); 
-            string currentKey = GetKey(current, _stepFine);
-            if(!visited.Add(currentKey)) {
-                continue;
-            }
-
-            foreach(var next in GetNeighbours(current, _stepFine)) {
-                if(next.X < minX
-                   || next.X > maxX
-                   || next.Y < minY
-                   || next.Y > maxY) {
-                    continue;
-                } 
-                string nextKey = GetKey(next, _stepFine);
-                if(visited.Contains(nextKey)) {
+        progressService?.BeginStage(ProgressType.BoundaryProcessing);
+        int total = cells.Count;
+        int processed = 0;
+        int reported = 0;
+        
+        foreach(var cell in cells) {
+            progressService?.CancellationToken.ThrowIfCancellationRequested();
+            double minX = cell.BottomLeft.X; 
+            double minY = cell.BottomLeft.Y; 
+            double maxX = cell.TopRight.X; 
+            double maxY = cell.TopRight.Y; 
+        
+            var startPoint = GetOutsidePoint(cell);
+            var start = GetAlignedPoint(startPoint, _stepFine); 
+        
+            var index = new CurveSpatialIndex(cell.Curves, _stepFine); 
+            var queue = new Queue<XYZ>(); 
+            queue.Enqueue(start); 
+            var visited = new HashSet<string>(); 
+        
+            while(queue.Count > 0) {
+                var currentXyz = queue.Dequeue(); 
+                string currentKey = GetKey(currentXyz, _stepFine);
+                if(!visited.Add(currentKey)) {
                     continue;
                 }
 
-                if(FindNearestHitCurveFast(current, next, index, out var hitCurve)) {
-                    hitCurves.Add(hitCurve); continue;
-                } queue.Enqueue(next);
+                foreach(var next in GetNeighbours(currentXyz, _stepFine)) {
+                    if(next.X < minX
+                       || next.X > maxX
+                       || next.Y < minY
+                       || next.Y > maxY) {
+                        continue;
+                    } 
+                    string nextKey = GetKey(next, _stepFine);
+                    if(visited.Contains(nextKey)) {
+                        continue;
+                    }
+
+                    if(FindNearestHitCurveFast(currentXyz, next, index, out var hitCurve)) {
+                        hitCurves.Add(hitCurve); continue;
+                    } queue.Enqueue(next);
+                }
+            } 
+            processed++;
+            int current = processed * 99 / total;
+            if(current > 99) {
+                current = 99;
             }
-        } return hitCurves;
+
+            if(current <= reported) {
+                continue;
+            }
+
+            reported = current;
+            progressService?.ProgressCount?.Report(reported);
+        }
+        return hitCurves;
     }
 
     private static XYZ GetAlignedPoint(XYZ startPoint, double step) {

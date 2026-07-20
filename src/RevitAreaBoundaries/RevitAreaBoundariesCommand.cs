@@ -10,6 +10,7 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
+
 using Ninject;
 
 using RevitAreaBoundaries.Models;
@@ -48,7 +49,7 @@ public class RevitAreaBoundariesCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using var kernel = uiApplication.CreatePlatformServices();
-
+        
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
@@ -122,6 +123,9 @@ public class RevitAreaBoundariesCommand : BasePluginCommand {
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+        
+        // Используем фабрику прогресс-бара
+        kernel.UseWpfUIProgressDialog<MainViewModel>();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();

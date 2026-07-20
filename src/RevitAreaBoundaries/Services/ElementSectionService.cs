@@ -17,7 +17,7 @@ internal class ElementSectionService(
     SystemPluginConfig systemPluginConfig, 
     BoundingBoxService boundingBoxService) {
 
-    public List<Curve> GetSectionCurves(View view, AreaBoundarySettings areaBoundarySettings) {
+    public List<Curve> GetSectionCurves(View view, AreaBoundarySettings areaBoundarySettings, ProgressService progressService) {
         var level = view.GenLevel;
         double elevation = level.Elevation;
         double sectionHeight = UnitUtils.ConvertToInternalUnits(areaBoundarySettings.SectionHeightMm, UnitTypeId.Millimeters);
@@ -26,14 +26,19 @@ internal class ElementSectionService(
         double secondSection = firstSection + sectionHeightOffset;
         
         var types = areaBoundarySettings.Types;
-        var elementsOnView = revitRepository.GetElementsOnView(view, types);
+        var elementsOnView = revitRepository.GetElementsOnView(view, types).ToList();
         
         var typeKinds = types
             .Cast<RevitElementType>()
             .ToDictionary(x => x.Element.Id, x => x.ProjectionType );
         
         var resultCurves = new List<Curve>();
+        progressService?.BeginStage(ProgressType.SectionProcessing);
+        int total = elementsOnView.Count;
+        int processed = 0;
+        int reported = 0;
         foreach(var element in elementsOnView) {
+            progressService?.CancellationToken.ThrowIfCancellationRequested();
             var typeId = element.GetTypeId();
             if(!typeKinds.TryGetValue(typeId, out var projectionType)) {
                 continue;
@@ -50,6 +55,18 @@ internal class ElementSectionService(
                     resultCurves.AddRange(GetRegularProjectionCurves(element, firstSection, secondSection));
                     break;
             }
+            processed++;
+            int current = processed * 99 / total;
+            if(current > 99) {
+                current = 99;
+            }
+
+            if(current <= reported) {
+                continue;
+            }
+
+            reported = current;
+            progressService?.ProgressCount?.Report(reported);
         }
         return resultCurves;
         
