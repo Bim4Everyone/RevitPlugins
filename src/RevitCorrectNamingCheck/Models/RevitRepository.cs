@@ -82,9 +82,9 @@ internal class RevitRepository {
     }
 
     public Dictionary<WorksetId, string> GetUserWorksets() {
-        return WorksharingUtils.GetUserWorksetInfo(
-                Document.GetWorksharingCentralModelPath()
-                ?? ModelPathUtils.ConvertUserVisiblePathToModelPath(Document.PathName))
+        return new FilteredWorksetCollector(Document)
+            .OfKind(WorksetKind.UserWorkset)
+            .ToWorksets()
             .ToDictionary(p => p.Id, p => p.Name);
     }
 
@@ -123,3 +123,4 @@ internal class RevitRepository {
         }
     }
 }
+ 
