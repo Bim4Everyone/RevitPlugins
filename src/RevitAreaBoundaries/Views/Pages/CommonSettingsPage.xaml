@@ -10,28 +10,32 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitAreaBoundaries.ViewModels"
     d:DataContext="{d:DesignInstance vms:CommonSettingsViewModel, IsDesignTimeCreatable=False}"
+    ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d" x:ClassModifier="internal">
     
-    <StackPanel>
-        <edits:CustomEditControl
-            Icon="{ui:SymbolIcon brainCircuit24}"
-            Header="{me:LocalizationSource CommonSettingsPage.AlgorithmType}"
-            Description="{me:LocalizationSource CommonSettingsPage.AlgorithmTypeDescription}">
-            <ComboBox
-                ItemsSource="{Binding AlgorithmTypeViewModels}"
-                SelectedValue="{Binding SelectedAlgorithmTypeViewModel}"
-                DisplayMemberPath="Name" />
-        </edits:CustomEditControl>
+    <ScrollViewer>
+        <StackPanel>
+            <edits:CustomEditControl
+                Icon="{ui:SymbolIcon brainCircuit24}"
+                Header="{me:LocalizationSource CommonSettingsPage.AlgorithmType}"
+                Description="{me:LocalizationSource CommonSettingsPage.AlgorithmTypeDescription}">
+                <ComboBox
+                    ItemsSource="{Binding AlgorithmTypeViewModels}"
+                    SelectedValue="{Binding SelectedAlgorithmTypeViewModel}"
+                    DisplayMemberPath="Name" />
+            </edits:CustomEditControl>
         
-        <edits:CustomEditControl
-            Icon="{ui:SymbolIcon fullScreenMaximize24}"
-            Header="{me:LocalizationSource CommonSettingsPage.SectionHeight}"
-            Description="{me:LocalizationSource CommonSettingsPage.SectionHeightDescription}">
-            <ui:TextBox
-                Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ToolTip="{me:LocalizationSource CommonSettingsPage.SectionHeightTooltip}" />
-        </edits:CustomEditControl>
-        
-    </StackPanel>
+            <edits:CustomEditControl
+                Icon="{ui:SymbolIcon fullScreenMaximize24}"
+                Header="{me:LocalizationSource CommonSettingsPage.SectionHeight}"
+                Description="{me:LocalizationSource CommonSettingsPage.SectionHeightDescription}">
+                <ui:TextBox
+                    Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTip="{me:LocalizationSource CommonSettingsPage.SectionHeightTooltip}" />
+            </edits:CustomEditControl>
+        </StackPanel>
+    </ScrollViewer>
+    
+    
     
 </core:WpfUIPlatformPage>

@@ -9,9 +9,12 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vms="clr-namespace:RevitAreaBoundaries.ViewModels"
     d:DataContext="{d:DesignInstance vms:TypeElementSelectionViewModel, IsDesignTimeCreatable=False}"
+    ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d" x:ClassModifier="internal">
     
-    <ItemsControl
+    <ScrollViewer>
+        
+        <ItemsControl
             VerticalAlignment="Top"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.VirtualizationMode="Recycling"
@@ -58,7 +61,11 @@
                         VirtualizationMode="Recycling" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-    </ItemsControl>
+        </ItemsControl>
+        
+    </ScrollViewer>
+    
+    
       
      
 </core:WpfUIPlatformPage>
