@@ -2,6 +2,7 @@ using System;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitCorrectNamingCheck.Models;
@@ -10,10 +11,12 @@ namespace RevitCorrectNamingCheck.ViewModels;
 
 internal class WorksetInfoViewModel : BaseViewModel, IEquatable<WorksetInfoViewModel> {
     private readonly WorksetInfo _worksetInfo;
+    private readonly ILocalizationService _localization;
     private NameStatus _worksetNameStatus;
 
-    public WorksetInfoViewModel(WorksetInfo worksetInfo) {
+    public WorksetInfoViewModel(WorksetInfo worksetInfo, ILocalizationService localization) {
         _worksetInfo = worksetInfo ?? throw new ArgumentNullException(nameof(worksetInfo));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
     }
 
     public WorksetId Id => _worksetInfo.Id;
@@ -21,8 +24,21 @@ internal class WorksetInfoViewModel : BaseViewModel, IEquatable<WorksetInfoViewM
 
     public NameStatus WorksetNameStatus {
         get => _worksetNameStatus;
-        set => RaiseAndSetIfChanged(ref _worksetNameStatus, value);
+        set {
+            RaiseAndSetIfChanged(ref _worksetNameStatus, value);
+            OnPropertyChanged(nameof(ToolTip));
+        }
     }
+
+    /// <summary>
+    /// Локализованное описание статуса рабочего набора для всплывающей подсказки.
+    /// </summary>
+    public string ToolTip => _localization.GetLocalizedString(WorksetNameStatus switch {
+        NameStatus.Correct => "WorksetNameStatus.WorksetCorrect",
+        NameStatus.Incorrect => "WorksetNameStatus.Incorrect",
+        NameStatus.PartialCorrect => "WorksetNameStatus.PartialCorrect",
+        _ => "WorksetNameStatus.NoMatch"
+    });
 
     public bool Equals(WorksetInfoViewModel other) {
         if(other is null) {

@@ -95,6 +95,7 @@
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     ItemsSource="{Binding TypeWorksets}"
                                     SelectedItem="{Binding TypeWorkset, UpdateSourceTrigger=PropertyChanged}"
+                                    ToolTip="{Binding TypeWorkset.ToolTip}"
                                     ItemTemplateSelector="{StaticResource WorksetSelector}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -116,6 +117,7 @@
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     ItemsSource="{Binding InstanceWorksets}"
                                     SelectedItem="{Binding InstanceWorkset, UpdateSourceTrigger=PropertyChanged}"
+                                    ToolTip="{Binding InstanceWorkset.ToolTip}"
                                     ItemTemplateSelector="{StaticResource WorksetSelector}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
