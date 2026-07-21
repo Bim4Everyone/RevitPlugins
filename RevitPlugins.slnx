@@ -125,6 +125,9 @@
   <Project Path="src/RevitLintelPlacement/RevitLintelPlacement.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitLintelsManager/RevitLintelsManager.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitListOfSchedules/RevitListOfSchedules.csproj">
     <Platform Project="x64" />
   </Project>
