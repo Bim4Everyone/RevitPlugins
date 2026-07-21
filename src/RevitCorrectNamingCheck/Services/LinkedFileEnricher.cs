@@ -35,6 +35,22 @@ internal class LinkedFileEnricher {
         { "SS", "SS" }, { "СС", "SS" }
     };
 
+    public void Enrich(LinkedFileViewModel linkedFile) {
+        linkedFile.FileNameStatus = GetFileNameStatus(linkedFile.Name);
+
+        var currentSection = GetFileSection(linkedFile.Name);
+
+        SetWorksetNameStatus(linkedFile.TypeWorkset, currentSection);
+        SetWorksetNameStatus(linkedFile.InstanceWorkset, currentSection);
+        foreach(var workset in linkedFile.TypeWorksets) {
+            SetWorksetNameStatus(workset, currentSection);
+        }
+
+        foreach(var workset in linkedFile.InstanceWorksets) {
+            SetWorksetNameStatus(workset, currentSection);
+        }
+    }
+
     private NameStatus GetFileNameStatus(string name) {
         int sections = GetSections(name, _fileLabelToSection).Count;
 
@@ -81,21 +97,5 @@ internal class LinkedFileEnricher {
 
     private void SetWorksetNameStatus(WorksetInfoViewModel workset, string currentSection) {
         workset.WorksetNameStatus = GetWorksetNameStatus(workset.Name, currentSection);
-    }
-
-    public void Enrich(LinkedFileViewModel linkedFile) {
-        linkedFile.FileNameStatus = GetFileNameStatus(linkedFile.Name);
-
-        var currentSection = GetFileSection(linkedFile.Name);
-
-        SetWorksetNameStatus(linkedFile.TypeWorkset, currentSection);
-        SetWorksetNameStatus(linkedFile.InstanceWorkset, currentSection);
-        foreach(var workset in linkedFile.TypeWorksets) {
-            SetWorksetNameStatus(workset, currentSection);
-        }
-
-        foreach(var workset in linkedFile.InstanceWorksets) {
-            SetWorksetNameStatus(workset, currentSection);
-        }
     }
 }
