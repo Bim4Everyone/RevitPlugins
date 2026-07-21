@@ -76,9 +76,7 @@ internal class OutBoundaryProcessor (
         var closedCurves = curveRepairService.RepairContour(croppedCurves);
         
         // Очистка списка от дублирующихся кривых
-        var cleanCurves = curveRepairService.CleanDuplicateCurves(closedCurves
-            .Select(x => x)
-            .ToList());
+        var cleanCurves = curveRepairService.CleanDuplicateCurves(closedCurves);
         
         // Возвращаем только те, которые соединены, удаляя концы за 1 итерацию
         var connectedCurves = curveRepairService.GetCurvesConnectedByBothEnds(cleanCurves);
