@@ -42,7 +42,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <edits:CustomGroupEditControl
-                        Icon="{ui:SymbolIcon screenshot24}"
+                        Icon="{ui:SymbolIcon subGrid24}"
                         Header="{Binding Name}"
                         ButtonCommandSelect="{Binding SelectCommand}"
                         ButtonCommandUnSelect="{Binding UnSelectCommand}"
