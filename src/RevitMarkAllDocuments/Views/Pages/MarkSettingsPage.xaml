@@ -50,6 +50,7 @@
                         VerticalAlignment="Center"
                         Text="{me:LocalizationSource MarkPage.Param}" />
                     <ComboBox
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
                         ItemsSource="{Binding ParamsForMark}"
                         DisplayMemberPath="Name"
                         SelectedItem="{Binding SelectedParam}" />
