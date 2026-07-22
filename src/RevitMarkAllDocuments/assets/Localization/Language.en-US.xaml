@@ -32,8 +32,8 @@
     <system:String x:Key="MarkPage.Settings">Set mark values</system:String>
     <system:String x:Key="MarkPage.Param">Parameter:</system:String>
     <system:String x:Key="MarkPage.StartNumber">Start value:</system:String>
-    <system:String x:Key="MarkPage.Prefix">Suffix:</system:String>
-    <system:String x:Key="MarkPage.Suffix">Prefix:</system:String>
+    <system:String x:Key="MarkPage.Prefix">Prefix:</system:String>
+    <system:String x:Key="MarkPage.Suffix">Suffix:</system:String>
     
     <system:String x:Key="MarkList.HeaderId">Id</system:String>
     <system:String x:Key="MarkList.HeaderName">Family name</system:String>
