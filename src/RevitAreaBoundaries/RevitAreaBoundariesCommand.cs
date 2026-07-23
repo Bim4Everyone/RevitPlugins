@@ -106,8 +106,8 @@ public class RevitAreaBoundariesCommand : BasePluginCommand {
             .InSingletonScope();
         
         // Настройка доступа к основному процессору
-        kernel.Bind<IBoundaryProcessor>()
-            .To<OutBoundaryProcessor>()
+        kernel.Bind<IBoundaryDrawer>()
+            .To<OutBoundaryDrawer>()
             .InSingletonScope();
         
         // Настройка доступа к классу по выбору процессора

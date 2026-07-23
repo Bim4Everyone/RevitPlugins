@@ -1,5 +1,6 @@
 ﻿namespace RevitAreaBoundaries.Models.Enums;
 
-public enum AlgorithmType {
+public enum DrawerType {
     OuterBoundary,
+    InnerBoundary
 }

@@ -74,7 +74,7 @@ internal class RevitSettings : ProjectSettings {
 
 internal class SystemPluginConfig {
     // Алгоритм по умолчанию
-    public readonly AlgorithmType DefaultAlgorithmType = AlgorithmType.OuterBoundary;
+    public readonly DrawerType DefaultDrawerType = DrawerType.OuterBoundary;
     // Параметр сортировки видов по умолчанию
     public readonly string DefaultGroupParamName = "_Группа Видов";
     // Высота сечения от уровня по умолчанию

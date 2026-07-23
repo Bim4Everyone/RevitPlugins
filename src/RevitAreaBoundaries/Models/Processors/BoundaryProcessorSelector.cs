@@ -3,11 +3,11 @@ using RevitAreaBoundaries.Settings;
 
 namespace RevitAreaBoundaries.Models.Processors;
 
-internal class BoundaryProcessorSelector (OutBoundaryProcessor outerProcessor){
-    public IBoundaryProcessor SelectProcessor(AreaBoundarySettings areaBoundarySettings) {
-        return areaBoundarySettings.AlgorithmType switch {
-            AlgorithmType.OuterBoundary => outerProcessor,
-            _ => outerProcessor
+internal class BoundaryProcessorSelector (OutBoundaryDrawer outerDrawer){
+    public IBoundaryDrawer SelectProcessor(AreaBoundarySettings areaBoundarySettings) {
+        return areaBoundarySettings.BoundaryDrawer.DrawerType switch {
+            DrawerType.OuterBoundary => outerDrawer,
+            _ => outerDrawer
         };
     }
     

@@ -10,7 +10,7 @@ using RevitAreaBoundaries.Settings;
 
 namespace RevitAreaBoundaries.Models.Processors;
 
-internal class OutBoundaryProcessor (
+internal class OutBoundaryDrawer (
     ElementSectionService elementSectionService, 
     CurveNormalizeService curveNormalizeService, 
     OuterSquareService outerSquareService,
@@ -19,7 +19,9 @@ internal class OutBoundaryProcessor (
     CurveRepairService curveRepairService,
     DrawBoundaryService drawBoundaryService,
     CollinearLineMergeService collinearLineMergeService,
-    FreeEndsJoinService freeEndsJoinService) : IBoundaryProcessor {
+    FreeEndsJoinService freeEndsJoinService) : IBoundaryDrawer {
+    
+    public DrawerType DrawerType => DrawerType.OuterBoundary;
     
 
     public void DrawBoundaries(AreaBoundarySettings areaBoundarySettings, ProgressService progressService) {

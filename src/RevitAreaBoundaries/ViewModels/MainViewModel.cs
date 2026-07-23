@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
@@ -22,7 +23,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-    private readonly BoundaryProcessorSelector _boundaryProcessorSelector;
+    private readonly IEnumerable<IBoundaryDrawer> _boundaryDrawers;
     
     private ConfigSettings _configSettings;
     private AreaBoundarySettings _areaBoundarySettings;
@@ -41,14 +42,14 @@ internal class MainViewModel : BaseViewModel {
         SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
-        IProgressDialogFactory progressDialogFactory,
-        BoundaryProcessorSelector boundaryProcessorSelector) {
+        IEnumerable<IBoundaryDrawer> boundaryDrawers,
+        IProgressDialogFactory progressDialogFactory) {
         
         _pluginConfig = pluginConfig;
         _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
-        _boundaryProcessorSelector = boundaryProcessorSelector;
+        _boundaryDrawers = boundaryDrawers;
         
         ProgressDialogFactory = progressDialogFactory
                                 ?? throw new ArgumentNullException(nameof(progressDialogFactory));
@@ -97,7 +98,7 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
         HasViewErrors = false;
-        CommonSettingsViewModel = new CommonSettingsViewModel(_localizationService, _configSettings);
+        CommonSettingsViewModel = new CommonSettingsViewModel(_localizationService, _configSettings, _boundaryDrawers);
         ViewPlanSelectionViewModel = new ViewPlanSelectionViewModel(
             _localizationService,_systemPluginConfig, _revitRepository, _configSettings);
         TypeElementSelectionViewModel = new TypeElementSelectionViewModel(
@@ -108,7 +109,7 @@ internal class MainViewModel : BaseViewModel {
         SaveSettings();
         SaveConfig();
         
-        var processor = _boundaryProcessorSelector.SelectProcessor(_areaBoundarySettings);
+        var drawer = _areaBoundarySettings.BoundaryDrawer;
         
         using var progressDialogService = ProgressDialogFactory.CreateDialog();
         var progress = progressDialogService.CreateProgress();
@@ -129,7 +130,7 @@ internal class MainViewModel : BaseViewModel {
         string transactionName = _localizationService.GetLocalizedString("MainViewModel.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
         
-        processor.DrawBoundaries(_areaBoundarySettings, progressService);
+        drawer.DrawBoundaries(_areaBoundarySettings, progressService);
         
         t.Commit();
     }
@@ -192,7 +193,7 @@ internal class MainViewModel : BaseViewModel {
     
     // Метод сохранения настроек
     private void SaveSettings() {
-        var algorithmType = CommonSettingsViewModel.SelectedAlgorithmTypeViewModel.AlgorithmType;
+        var boundaryDrawer = CommonSettingsViewModel.SelectedDrawerTypeViewModel.BoundaryDrawer;
         double sectionHeight = double.Parse(CommonSettingsViewModel.SectionHeight);
         var views = ViewPlanSelectionViewModel.SelectedViewPlanViewModels
             .Select(vm => vm.RevitElement).ToList();
@@ -201,7 +202,7 @@ internal class MainViewModel : BaseViewModel {
         string groupParam = ViewPlanSelectionViewModel.SelectedGroupParamViewModel.Name;
 
         _areaBoundarySettings = new AreaBoundarySettings {
-            AlgorithmType = algorithmType,
+            BoundaryDrawer = boundaryDrawer,
             SectionHeightMm = sectionHeight,
             Views = views,
             Types = types,
@@ -211,7 +212,7 @@ internal class MainViewModel : BaseViewModel {
     
     private void SaveConfig() {
         var configSettings = new ConfigSettings {
-            AlgorithmType = _areaBoundarySettings.AlgorithmType,
+            DrawerType = _areaBoundarySettings.BoundaryDrawer.DrawerType,
             SectionHeightMm = _areaBoundarySettings.SectionHeightMm,
             Views = _areaBoundarySettings.Views.Select(view => view.Element.Id).ToList(),
             Types = _areaBoundarySettings.Types.Select(view => view.Element.Id).ToList(),

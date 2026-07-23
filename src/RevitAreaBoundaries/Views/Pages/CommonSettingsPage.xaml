@@ -20,8 +20,8 @@
                 Header="{me:LocalizationSource CommonSettingsPage.AlgorithmType}"
                 Description="{me:LocalizationSource CommonSettingsPage.AlgorithmTypeDescription}">
                 <ComboBox
-                    ItemsSource="{Binding AlgorithmTypeViewModels}"
-                    SelectedValue="{Binding SelectedAlgorithmTypeViewModel}"
+                    ItemsSource="{Binding DrawerTypeViewModels}"
+                    SelectedValue="{Binding SelectedDrawerTypeViewModel}"
                     DisplayMemberPath="Name" />
             </edits:CustomEditControl>
         
