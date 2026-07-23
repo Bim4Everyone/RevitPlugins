@@ -32,8 +32,8 @@
     <system:String x:Key="MarkPage.Settings">Настройте параметры для значений марок</system:String>
     <system:String x:Key="MarkPage.Param">Параметр:</system:String>
     <system:String x:Key="MarkPage.StartNumber">Начальный номер:</system:String>
-    <system:String x:Key="MarkPage.Prefix">Суффикс:</system:String>
-    <system:String x:Key="MarkPage.Suffix">Префикс:</system:String>
+    <system:String x:Key="MarkPage.Prefix">Префикс:</system:String>
+    <system:String x:Key="MarkPage.Suffix">Суффикс:</system:String>
     
     <system:String x:Key="MarkList.HeaderId">Id</system:String>
     <system:String x:Key="MarkList.HeaderName">Имя семейства</system:String>

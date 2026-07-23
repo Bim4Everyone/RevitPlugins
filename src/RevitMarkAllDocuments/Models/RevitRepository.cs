@@ -63,13 +63,11 @@ internal class RevitRepository {
         List<FilterableParam> filterableParams = [];
 
         foreach(var param in parameters) {
-            var filterableParam = new FilterableParam() { RevitParam = param };
-
-            if(elementTypes.Any(x => x.IsExistsParam(param))) {
-                filterableParam.IsTypeParam = true;
-            }
-
-            filterableParams.Add(filterableParam);
+            filterableParams.Add(
+                new FilterableParam() {
+                    RevitParam = param,
+                    IsTypeParam = IsTypeParam(param, elementTypes)
+                });
         }
 
         return filterableParams;
@@ -80,6 +78,14 @@ internal class RevitRepository {
             .GetFilterableParametersInCommon(Document, [category.Id])
             .Select(x => _revitParamFactory.Create(Document, x))
             .Where(p => p != null)];
+    }
+
+    private bool IsTypeParam(RevitParam param, ICollection<Element> elementTypes) {
+        var (definition, binding) = param.GetParamBinding(Document);
+
+        return definition is null
+            ? elementTypes.Any(x => x.IsExistsParam(param))
+            : binding is TypeBinding;
     }
 
     private ICollection<Element> GetElementTypes(Category category) {
