@@ -55,7 +55,7 @@ internal class MainViewModel : BaseViewModel {
         var links = _revitRepository.GetLinkedFiles();
         var worksets = _revitRepository.GetUserWorksets().Select(w => new WorksetInfo(w.Key, w.Value)).ToArray();
         foreach(var link in links) {
-            var vm = new LinkedFileViewModel(link, worksets);
+            var vm = new LinkedFileViewModel(link, worksets, _localization);
             _linkedFileEnricher.Enrich(vm);
             LinkedFiles.Add(vm);
         }

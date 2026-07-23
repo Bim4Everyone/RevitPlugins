@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitCorrectNamingCheck.Models;
@@ -14,13 +15,16 @@ internal class LinkedFileViewModel : BaseViewModel {
     private WorksetInfoViewModel _instanceWorkset;
     private NameStatus _fileNameStatus;
 
-    public LinkedFileViewModel(LinkedFile linkedFile, ICollection<WorksetInfo> availableWorksets) {
+    public LinkedFileViewModel(
+        LinkedFile linkedFile,
+        ICollection<WorksetInfo> availableWorksets,
+        ILocalizationService localization) {
         LinkedFile = linkedFile ?? throw new ArgumentNullException(nameof(linkedFile));
         _isPinned = LinkedFile.IsPinned;
-        TypeWorkset = new WorksetInfoViewModel(LinkedFile.TypeWorkset);
-        InstanceWorkset = new WorksetInfoViewModel(LinkedFile.InstanceWorkset);
-        TypeWorksets = [..availableWorksets.Select(w => new WorksetInfoViewModel(w)).OrderBy(w => w.Name)];
-        InstanceWorksets = [..availableWorksets.Select(w => new WorksetInfoViewModel(w)).OrderBy(w => w.Name)];
+        TypeWorkset = new WorksetInfoViewModel(LinkedFile.TypeWorkset, localization);
+        InstanceWorkset = new WorksetInfoViewModel(LinkedFile.InstanceWorkset, localization);
+        TypeWorksets = [..availableWorksets.Select(w => new WorksetInfoViewModel(w, localization)).OrderBy(w => w.Name)];
+        InstanceWorksets = [..availableWorksets.Select(w => new WorksetInfoViewModel(w, localization)).OrderBy(w => w.Name)];
     }
 
     public LinkedFile LinkedFile { get; }
