@@ -115,12 +115,9 @@ internal class CellsBoundaryService (SystemPluginConfig systemPluginConfig){
     public HashSet<Curve> GetBoundaryCurves(HashSet<CellSquare> cells, ProgressService progressService) {
         var hitCurves = new HashSet<Curve>();
         progressService?.BeginStage(ProgressType.BoundaryProcessing);
-        int total = cells.Count;
-        int processed = 0;
-        int reported = 0;
-        
+        progressService?.BeginItemsProgress(cells.Count);
         foreach(var cell in cells) {
-            progressService?.CancellationToken.ThrowIfCancellationRequested();
+            progressService?.ThrowIfCancellationRequested();
             double minX = cell.BottomLeft.X; 
             double minY = cell.BottomLeft.Y; 
             double maxX = cell.TopRight.X; 
@@ -158,18 +155,7 @@ internal class CellsBoundaryService (SystemPluginConfig systemPluginConfig){
                     } queue.Enqueue(next);
                 }
             } 
-            processed++;
-            int current = processed * 99 / total;
-            if(current > 99) {
-                current = 99;
-            }
-
-            if(current <= reported) {
-                continue;
-            }
-
-            reported = current;
-            progressService?.ProgressCount?.Report(reported);
+            progressService?.ReportNextItem();
         }
         return hitCurves;
     }

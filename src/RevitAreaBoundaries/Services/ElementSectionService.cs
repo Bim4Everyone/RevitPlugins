@@ -34,11 +34,9 @@ internal class ElementSectionService(
         
         var resultCurves = new List<Curve>();
         progressService?.BeginStage(ProgressType.SectionProcessing);
-        int total = elementsOnView.Count;
-        int processed = 0;
-        int reported = 0;
+        progressService?.BeginItemsProgress(elementsOnView.Count);
         foreach(var element in elementsOnView) {
-            progressService?.CancellationToken.ThrowIfCancellationRequested();
+            progressService?.ThrowIfCancellationRequested();
             var typeId = element.GetTypeId();
             if(!typeKinds.TryGetValue(typeId, out var projectionType)) {
                 continue;
@@ -55,18 +53,7 @@ internal class ElementSectionService(
                     resultCurves.AddRange(GetRegularProjectionCurves(element, firstSection, secondSection));
                     break;
             }
-            processed++;
-            int current = processed * 99 / total;
-            if(current > 99) {
-                current = 99;
-            }
-
-            if(current <= reported) {
-                continue;
-            }
-
-            reported = current;
-            progressService?.ProgressCount?.Report(reported);
+            progressService?.ReportNextItem();
         }
         return resultCurves;
         

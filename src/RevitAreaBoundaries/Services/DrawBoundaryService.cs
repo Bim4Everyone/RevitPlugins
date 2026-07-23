@@ -12,25 +12,13 @@ internal class DrawBoundaryService {
         var document = view.Document;
         var sketchPlane = SketchPlane.Create(document, view.GenLevel.Id);
         progressService?.BeginStage(ProgressType.DrawProcessing);
-        int total = curves.Count;
-        int processed = 0;
-        int reported = 0;
+        progressService?.BeginItemsProgress(curves.Count);
         foreach(var curve in curves) {
-            progressService?.CancellationToken.ThrowIfCancellationRequested();
+            progressService?.ThrowIfCancellationRequested();
+            
             document.Create.NewAreaBoundaryLine(sketchPlane, curve, view as ViewPlan);
-            processed++;
-            int current = processed * 99 / total;
-            if(current > 99) {
-                current = 99;
-            }
-
-            if(current <= reported) {
-                continue;
-            }
-
-            reported = current;
-            progressService?.ProgressCount?.Report(reported);
+            
+            progressService?.ReportNextItem();
         }
     }
-    
 }
