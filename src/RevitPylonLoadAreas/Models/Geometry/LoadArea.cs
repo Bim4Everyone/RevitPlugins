@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -12,7 +13,6 @@ namespace RevitPylonLoadAreas.Models.Geometry;
 /// </summary>
 internal sealed class LoadArea {
     private readonly RevitRepository _repo;
-    private PlanarFace _face;
     private Solid _solid;
 
     /// <summary>
@@ -20,7 +20,7 @@ internal sealed class LoadArea {
     /// </summary>
     /// <param name="element">Вертикальный элемент</param>
     /// <param name="repo">Репозиторий Revit</param>
-    /// <param name="circuits">Список контуров грузовой площади в плоскости XOY. Первый контур - наружный, остальные - отверстия</param>
+    /// <param name="circuits">Список контуров грузовой площади в плоскости XOY</param>
     public LoadArea(Element element, RevitRepository repo, IList<CurveLoop> circuits) {
         _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         Element = element ?? throw new ArgumentNullException(nameof(element));
@@ -43,7 +43,7 @@ internal sealed class LoadArea {
     /// Возвращает площадь в единицах Revit
     /// </summary>
     public double GetArea() {
-        return GetFace().Area;
+        return _repo.GetBottomFaces(GetSolid()).Sum(f => f.Area);
     }
 
     public bool Intersects(Polygon2D polygon) {
@@ -52,10 +52,6 @@ internal sealed class LoadArea {
         return BooleanOperationsUtils.ExecuteBooleanOperation(polygonSolid, solid, BooleanOperationsType.Intersect)
                    .Volume
                > 0;
-    }
-
-    private PlanarFace GetFace() {
-        return _face ??= _repo.GetBottomFace(GetSolid());
     }
 
     private Solid GetSolid() {

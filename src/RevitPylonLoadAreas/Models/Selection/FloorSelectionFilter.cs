@@ -13,9 +13,8 @@ internal sealed class FloorSelectionFilter : ISelectionFilter {
             return false;
         }
 
-        // допустимы только перекрытия с 1 телом, у которых есть нижняя горизонтальная грань
+        // допустимы только перекрытия, у которых есть нижняя горизонтальная грань
         var solids = elem.GetSolids()
-            ?.SelectMany(SolidUtils.SplitVolumes)
             ?.Where(s => s?.GetVolumeOrDefault(0) > 0)
             ?.ToArray();
         if(solids?.Length != 1) {
@@ -24,10 +23,9 @@ internal sealed class FloorSelectionFilter : ISelectionFilter {
 
         // должна быть нижняя горизонтальная грань
         return solids[0]
-                   .Faces
-                   .OfType<PlanarFace>()
-                   .FirstOrDefault(f => f.FaceNormal.IsAlmostEqualTo(-XYZ.BasisZ))
-               != null;
+            .Faces
+            .OfType<PlanarFace>()
+            .Any(f => f.FaceNormal.IsAlmostEqualTo(-XYZ.BasisZ));
     }
 
     public bool AllowReference(Reference reference, XYZ position) {

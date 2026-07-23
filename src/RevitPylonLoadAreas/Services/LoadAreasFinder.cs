@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 
 using RevitPylonLoadAreas.Models;
 using RevitPylonLoadAreas.Models.Geometry;
@@ -16,6 +17,7 @@ internal sealed class LoadAreasFinder {
     private readonly SystemConfig _config;
     private readonly RevitRepository _repo;
     private readonly VoronoiBuilder _voronoiBuilder;
+    private readonly CurveLoopsSimplifier _simplifier;
 
     public LoadAreasFinder(
         SystemConfig config,
@@ -24,12 +26,23 @@ internal sealed class LoadAreasFinder {
         _config = config ?? throw new ArgumentNullException(nameof(config));
         _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         _voronoiBuilder = voronoiBuilder ?? throw new ArgumentNullException(nameof(voronoiBuilder));
+        _simplifier = new CurveLoopsSimplifier();
     }
 
-    public ICollection<LoadArea> Process(Floor floor, ICollection<FamilyInstance> pylons, ICollection<Wall> walls) {
-        var floorData = new FloorVoronoiData(floor, _repo, _config.GetOpeningMinArea());
-        var sites = GetSites(floorData, pylons, walls);
-        var elementsCells = _voronoiBuilder.Build(sites, new BoundingBoxXY(floorData.Floor.GetBoundingBox()))
+    public ICollection<LoadArea> Process(
+        ICollection<Floor> floors,
+        ICollection<FamilyInstance> pylons,
+        ICollection<Wall> walls) {
+        if(floors is null
+           || floors.Count == 0) {
+            throw new ArgumentOutOfRangeException(nameof(floors));
+        }
+
+        var floorsData = floors
+            .Select(f => new FloorVoronoiData(f, _repo, _config.GetOpeningMinArea()))
+            .ToArray();
+        var sites = GetSites(floorsData, pylons, walls);
+        var elementsCells = _voronoiBuilder.Build(sites, GetBoundingBox(floors))
             .GroupBy(c => c.Site.Element.Id)
             .ToArray();
 
@@ -39,9 +52,9 @@ internal sealed class LoadAreasFinder {
             IList<CurveLoop> loops;
             var element = cells[0].Site.Element;
             if(cells.Length == 1) {
-                loops = floorData.Clip(cells[0]);
+                loops = Clip(cells[0], floorsData);
             } else {
-                loops = floorData.Clip(cells);
+                loops = Clip(cells, floorsData);
             }
 
             loadAreas.Add(new LoadArea(element, _repo, loops));
@@ -50,22 +63,51 @@ internal sealed class LoadAreasFinder {
         return loadAreas;
     }
 
+    private BoundingBoxXY GetBoundingBox(ICollection<Floor> floors) {
+        var bboxXyz = floors
+            .Select(f => f.GetBoundingBox())
+            .ToArray()
+            .CreateUnitedBoundingBox();
+        return new BoundingBoxXY(bboxXyz);
+    }
+
+    private IList<CurveLoop> Clip(VoronoiCell cell, FloorVoronoiData[] floorsData) {
+        var cellSolid = _repo.CreateSolid(1, cell.Polygon.AsCurveLoop());
+        var floorsUnitedSolid = _repo.CreateUnitedSolid(floorsData.Select(f => f.GetVoronoiSolid()).ToArray());
+        return GetIntersectionLoops(cellSolid, floorsUnitedSolid);
+    }
+
+    private IList<CurveLoop> Clip(VoronoiCell[] wallCells, FloorVoronoiData[] floorsData) {
+        var cellUnitedSolid = _repo.CreateUnitedSolid(
+            wallCells.Select(c => _repo.CreateSolid(1, c.Polygon.AsCurveLoop()))
+                .ToArray());
+        var floorsUnitedSolid = _repo.CreateUnitedSolid(floorsData.Select(f => f.GetVoronoiSolid()).ToArray());
+        return GetIntersectionLoops(cellUnitedSolid, floorsUnitedSolid);
+    }
+
+    private IList<CurveLoop> GetIntersectionLoops(Solid left, Solid right) {
+        var intersection = _repo.Intersect(left, right);
+        var bottomFaces = _repo.GetBottomFaces(intersection);
+        return bottomFaces.SelectMany(f => _simplifier.GetEdgesAsSimplifiedCurveLoops(f)).ToArray();
+    }
+
     private IList<VoronoiSite> GetSites(
-        FloorVoronoiData floorData,
+        ICollection<FloorVoronoiData> floorsData,
         ICollection<FamilyInstance> pylons,
         ICollection<Wall> walls) {
         List<VoronoiSite> sites = [];
 
         foreach(var pylon in pylons) {
             var pylonPoint = new XY(((LocationPoint) pylon.Location).Point);
-            if(floorData.IsInside(pylonPoint)) {
+            if(floorsData.Any(fd => fd.IsInside(pylonPoint))) {
                 sites.Add(new VoronoiSite(pylonPoint, pylon));
             }
         }
 
         foreach(var wall in walls) {
             var wallPoints = GetWallPoints(wall);
-            sites.AddRange(wallPoints.Where(floorData.IsInside).Select(p => new VoronoiSite(p, wall)));
+            sites.AddRange(
+                wallPoints.Where(p => floorsData.Any(fd => fd.IsInside(p))).Select(p => new VoronoiSite(p, wall)));
         }
 
         return sites;

@@ -7,8 +7,6 @@
         x:Key="Plugin.Title">Грузовые площади</system:String>
 
     <system:String
-        x:Key="Pick.Floor">Выберите плиту перекрытия</system:String>
-    <system:String
         x:Key="Pick.Floors">Выберите одно или несколько перекрытий</system:String>
 
     <system:String
