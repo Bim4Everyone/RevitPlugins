@@ -9,7 +9,7 @@ using RevitAreaBoundaries.Models;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class BoundingBoxService (RevitRepository revitRepository){
+internal class BoundingBoxService (RevitRepository revitRepository): IBoundingBoxService{
     private readonly Options _geomOptions = new() {
         ComputeReferences = false,
         DetailLevel = ViewDetailLevel.Fine

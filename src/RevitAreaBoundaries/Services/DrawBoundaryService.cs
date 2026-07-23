@@ -6,9 +6,9 @@ using RevitAreaBoundaries.Models.Enums;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class DrawBoundaryService {
+internal class DrawBoundaryService: IDrawBoundaryService {
     
-    public void DrawBoundaryOnView(View view, List<Curve> curves, ProgressService progressService) {
+    public void DrawBoundaryOnView(View view, List<Curve> curves, ProgressService progressService){
         var document = view.Document;
         var sketchPlane = SketchPlane.Create(document, view.GenLevel.Id);
         progressService?.BeginStage(ProgressType.DrawProcessing);

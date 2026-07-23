@@ -15,7 +15,7 @@ namespace RevitAreaBoundaries.Services;
 internal class ElementSectionService(
     RevitRepository revitRepository, 
     SystemPluginConfig systemPluginConfig, 
-    BoundingBoxService boundingBoxService) {
+    BoundingBoxService boundingBoxService): IElementSectionService {
 
     public List<Curve> GetSectionCurves(View view, AreaBoundarySettings areaBoundarySettings, ProgressService progressService) {
         var level = view.GenLevel;

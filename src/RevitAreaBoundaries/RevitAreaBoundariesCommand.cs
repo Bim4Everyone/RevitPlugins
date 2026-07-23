@@ -61,58 +61,58 @@ public class RevitAreaBoundariesCommand : BasePluginCommand {
             .InSingletonScope();
         
         // Настройка доступа к сервису получения ограничивающего квадрата
-        kernel.Bind<OuterSquareService>()
-            .ToSelf()
+        kernel.Bind<IOuterSquareService>()
+            .To<OuterSquareService>()
             .InSingletonScope();
         
         // Настройка доступа к сервису по разделению линий на мелкие отрезки
-        kernel.Bind<CurveDividerService>()
-            .ToSelf()
+        kernel.Bind<ICurveDividerService>()
+            .To<CurveDividerService>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису по разделению линий на мелкие отрезки
+        kernel.Bind<ICurveNormalizeService>()
+            .To<CurveNormalizeService>()
             .InSingletonScope();
         
         // Настройка доступа к сервису по получению кривых сечения
-        kernel.Bind<ElementSectionService>()
-            .ToSelf()
+        kernel.Bind<IElementSectionService>()
+            .To<ElementSectionService>()
             .InSingletonScope();
         
         // Настройка доступа к сервису по получению границ ячеек
-        kernel.Bind<CellsBoundaryService>()
-            .ToSelf()
+        kernel.Bind<ICellsBoundaryService>()
+            .To<CellsBoundaryService>()
             .InSingletonScope();
         
         // Настройка доступа к сервису по исправлению кривых
-        kernel.Bind<CurveRepairService>()
-            .ToSelf()
+        kernel.Bind<ICurveRepairService>()
+            .To<CurveRepairService>()
             .InSingletonScope();
         
         // Настройка доступа к сервису по рисованию границ
-        kernel.Bind<DrawBoundaryService>()
-            .ToSelf()
+        kernel.Bind<IDrawBoundaryService>()
+            .To<DrawBoundaryService>()
             .InSingletonScope();
         
         // Настройка доступа к сервису по восстановлению коротких кривых в длинные
-        kernel.Bind<CollinearLineMergeService>()
-            .ToSelf()
+        kernel.Bind<ICollinearLineMergeService>()
+            .To<CollinearLineMergeService>()
             .InSingletonScope();
         
         // Настройка доступа к сервису по соединению свободных концов
-        kernel.Bind<FreeEndsJoinService>()
-            .ToSelf()
+        kernel.Bind<IFreeEndsJoinService>()
+            .To<FreeEndsJoinService>()
             .InSingletonScope();
         
         // Настройка доступа к сервису BoundingBox
-        kernel.Bind<BoundingBoxService>()
-            .ToSelf()
+        kernel.Bind<IBoundingBoxService>()
+            .To<BoundingBoxService>()
             .InSingletonScope();
         
         // Настройка доступа к основному процессору
         kernel.Bind<IBoundaryDrawer>()
             .To<OutBoundaryDrawer>()
-            .InSingletonScope();
-        
-        // Настройка доступа к классу по выбору процессора
-        kernel.Bind<BoundaryProcessorSelector>()
-            .ToSelf()
             .InSingletonScope();
            
         // Настройка доступа к провайдеру по навигации страниц

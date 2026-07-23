@@ -5,7 +5,7 @@ using RevitAreaBoundaries.Models;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class CurveDividerService(SystemPluginConfig systemPluginConfig) {
+internal class CurveDividerService(SystemPluginConfig systemPluginConfig): ICurveDividerService {
     private readonly double _tolerance = systemPluginConfig.DefaultTolerance;
     private readonly double _maxLenCurve = UnitUtils.ConvertToInternalUnits(
         systemPluginConfig.DefaultLengthSegmentMm, UnitTypeId.Millimeters);

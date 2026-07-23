@@ -8,7 +8,7 @@ using RevitAreaBoundaries.Models;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class CurveNormalizeService (SystemPluginConfig systemPluginConfig, RevitRepository revitRepository){
+internal class CurveNormalizeService (SystemPluginConfig systemPluginConfig, RevitRepository revitRepository): ICurveNormalizeService {
     private readonly double _tolerance = systemPluginConfig.DefaultTolerance;
     
     public List<Curve> ProjectCurvesToXy(List<Curve> curves) {

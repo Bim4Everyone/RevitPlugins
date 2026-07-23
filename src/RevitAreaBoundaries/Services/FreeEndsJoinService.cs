@@ -5,7 +5,7 @@ using RevitAreaBoundaries.Models;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig) {
+internal class FreeEndsJoinService(SystemPluginConfig systemPluginConfig): IFreeEndsJoinService {
     private readonly double _tol = systemPluginConfig.DefaultTolerance;
     private static int ToCell(double v, double cell) => (int)Math.Floor(v / cell);
     private static long Pack(int x, int y) => ((long)x << 32) ^ (uint)y;

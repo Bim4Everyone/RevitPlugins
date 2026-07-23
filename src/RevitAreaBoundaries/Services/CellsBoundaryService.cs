@@ -9,7 +9,7 @@ using RevitAreaBoundaries.Models.Enums;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class CellsBoundaryService (SystemPluginConfig systemPluginConfig){
+internal class CellsBoundaryService (SystemPluginConfig systemPluginConfig) : ICellsBoundaryService{
     private readonly double _tolerance = systemPluginConfig.DefaultTolerance;
     private readonly double _stepCoarse = UnitUtils.ConvertToInternalUnits(
         systemPluginConfig.DefaultCellsCoarseStepMm, UnitTypeId.Millimeters);
@@ -301,8 +301,6 @@ internal class CellsBoundaryService (SystemPluginConfig systemPluginConfig){
         return false;
     }
     
-    
-    
     private static bool TryGetIntersectionPoint(Line probe, Curve boundary, out XYZ ip) {
         ip = null;
         var res = probe.Intersect(boundary, out var ira);
@@ -383,8 +381,6 @@ internal class CellsBoundaryService (SystemPluginConfig systemPluginConfig){
         var ab = b - a;
         double ab2 = ab.X * ab.X + ab.Y * ab.Y;
         
-        /////////////////////////////////////////////////////////////////////////////////////
-
         if(ab2 < _tolerance) {
             closest = a;
             return Math.Sqrt((p.X - a.X) * (p.X - a.X) + (p.Y - a.Y) * (p.Y - a.Y));

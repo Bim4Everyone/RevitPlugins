@@ -6,10 +6,10 @@ using RevitAreaBoundaries.Models;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class CollinearLineMergeService(SystemPluginConfig config) {
+internal class CollinearLineMergeService(SystemPluginConfig config): ICollinearLineMergeService{
     private readonly double _tol = config.DefaultTolerance;
 
-    public List<Curve> MergeConnectedCollinearLines(List<Curve> curves) {
+    public List<Curve> MergeConnectedCollinearLines(List<Curve> curves){
         if (curves == null || curves.Count == 0)
             return [];
 

@@ -7,7 +7,7 @@ using RevitAreaBoundaries.Models;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class CurveRepairService(SystemPluginConfig systemPluginConfig, RevitRepository revitRepository) {
+internal class CurveRepairService(SystemPluginConfig systemPluginConfig, RevitRepository revitRepository): ICurveRepairService {
     private readonly double _tolerance = systemPluginConfig.DefaultTolerance;
     private readonly double _shortCurveTolerance = revitRepository.Application.ShortCurveTolerance;
     private readonly double _cellSizeForIndexMm = systemPluginConfig.DefaultCellsSizeForIndexMm;

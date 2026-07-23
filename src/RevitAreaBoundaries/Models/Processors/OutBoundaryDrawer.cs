@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -11,15 +9,15 @@ using RevitAreaBoundaries.Settings;
 namespace RevitAreaBoundaries.Models.Processors;
 
 internal class OutBoundaryDrawer (
-    ElementSectionService elementSectionService, 
-    CurveNormalizeService curveNormalizeService, 
-    OuterSquareService outerSquareService,
-    CurveDividerService curveDividerService,
-    CellsBoundaryService cellsBoundaryService,
-    CurveRepairService curveRepairService,
-    DrawBoundaryService drawBoundaryService,
-    CollinearLineMergeService collinearLineMergeService,
-    FreeEndsJoinService freeEndsJoinService) : IBoundaryDrawer {
+    IElementSectionService elementSectionService, 
+    ICurveNormalizeService curveNormalizeService, 
+    IOuterSquareService outerSquareService,
+    ICurveDividerService curveDividerService,
+    ICellsBoundaryService cellsBoundaryService,
+    ICurveRepairService curveRepairService,
+    IDrawBoundaryService drawBoundaryService,
+    ICollinearLineMergeService collinearLineMergeService,
+    IFreeEndsJoinService freeEndsJoinService) : IBoundaryDrawer {
     
     public DrawerType DrawerType => DrawerType.OuterBoundary;
     

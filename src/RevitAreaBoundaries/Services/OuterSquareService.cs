@@ -7,7 +7,7 @@ using RevitAreaBoundaries.Models;
 
 namespace RevitAreaBoundaries.Services;
 
-internal class OuterSquareService(SystemPluginConfig systemPluginConfig) {
+internal class OuterSquareService(SystemPluginConfig systemPluginConfig): IOuterSquareService {
     private readonly double _margin = systemPluginConfig.DefaultCellsMargin;
     private readonly double _step = UnitUtils.ConvertToInternalUnits(
         systemPluginConfig.DefaultCellsCoarseStepMm, UnitTypeId.Millimeters);
