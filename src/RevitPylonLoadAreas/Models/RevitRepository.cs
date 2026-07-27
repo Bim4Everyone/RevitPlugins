@@ -112,6 +112,9 @@ internal class RevitRepository {
     }
 
     public Solid CreateUnitedSolid(IList<Solid> solids) {
+        if(solids.Count == 0) {
+            throw new ArgumentOutOfRangeException(nameof(solids));
+        }
         var solid = solids[0];
         for(int i = 1; i < solids.Count; i++) {
             solid = Unite(solid, solids[i]);
