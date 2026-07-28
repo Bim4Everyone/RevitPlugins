@@ -72,12 +72,12 @@ public class FindPylonLoadAreasCommand : BasePluginCommand {
 
         ValidateView(repo, msg, localization);
         ValidateParams(repo, msg, localization);
-        var floor = repo.PickFloor(localization.GetLocalizedString("Pick.Floor"));
+        var floors = repo.PickFloors(localization.GetLocalizedString("Pick.Floors"));
         var pylons = repo.GetPylonsFromView();
         var walls = repo.GetWallsFromView();
 
         var loadAreasFinder = kernel.Get<LoadAreasFinder>();
-        var loadAreas = loadAreasFinder.Process(floor, pylons, walls);
+        var loadAreas = loadAreasFinder.Process(floors, pylons, walls);
 
         var drawer = kernel.Get<FilledRegionDrawer>();
         using var t = repo.Document.StartTransaction(localization.GetLocalizedString("Transaction.DrawLoadAreas"));

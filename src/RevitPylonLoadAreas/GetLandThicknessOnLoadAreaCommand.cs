@@ -145,12 +145,7 @@ public class GetLandThicknessOnLoadAreaCommand : BasePluginCommand {
         var walls = repo.GetWallsFromView();
 
         var loadAreasFinder = kernel.Get<LoadAreasFinder>();
-        List<LoadArea> loadAreas = [];
-        foreach(var floor in floors) {
-            loadAreas.AddRange(loadAreasFinder.Process(floor, pylons, walls).Where(l => l.ElementIsPylon()));
-        }
-
-        return loadAreas;
+        return loadAreasFinder.Process(floors, pylons, walls).Where(l => l.ElementIsPylon()).ToArray();
     }
 
     private void ShowError(IMessageBoxService msg, string str) {

@@ -12,7 +12,6 @@ namespace RevitPylonLoadAreas.Models.Geometry.Voronoi;
 
 internal class FloorVoronoiData {
     private readonly RevitRepository _repo;
-    private readonly CurveLoopsSimplifier _simplifier;
 
     /// <summary>
     /// Пороговая площадь, меньше которой отверстия не учитываются
@@ -20,24 +19,9 @@ internal class FloorVoronoiData {
     private readonly double _openingsAreaThreshold;
 
     /// <summary>
-    /// Контур перекрытия в плоскости XOY для построения грузовых площадей с учетом заданной пороговой площади отверстий
+    /// Данные диаграммы Вороного для каждой нижней грани солида перекрытия
     /// </summary>
-    private IList<CurveLoop> _outline;
-
-    /// <summary>
-    /// Грань перекрытия для построения грузовых площадей с учетом заданной пороговой площади отверстий
-    /// </summary>
-    private PlanarFace _face;
-
-    /// <summary>
-    /// Поверхность <see cref="_face"/>
-    /// </summary>
-    private Surface _surface;
-
-    /// <summary>
-    /// Солид перекрытия с учетом заданной пороговой площади отверстий
-    /// </summary>
-    private Solid _solid;
+    private IList<FaceVoronoiData> _facesData;
 
     /// <summary>
     /// Конструирует перекрытие для построения на нём диаграммы Вороного
@@ -49,82 +33,33 @@ internal class FloorVoronoiData {
         _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         _openingsAreaThreshold = openingsAreaThreshold;
         Floor = floor ?? throw new ArgumentNullException(nameof(floor));
-        _simplifier = new CurveLoopsSimplifier();
     }
 
     public Floor Floor { get; }
 
     public bool IsInside(XY point) {
-        var face = GetVoronoiFace();
-        _surface ??= face.GetSurface();
-        _surface.Project(point.AsXYZ(), out var uv, out _);
-        return face.IsInside(uv);
+        return GetFacesData().Any(f => f.IsInside(point));
     }
 
-    /// <summary>
-    /// Обрезает ячейку диаграммы Вороного по контуру перекрытием с учетом заданной пороговой площади отверстий
-    /// </summary>
-    /// <param name="cell">Ячейка диаграммы Вороного</param>
-    /// <returns>Список петель в плоскости XOY плоской фигуры, полученной после обрезки</returns>
-    public IList<CurveLoop> Clip(VoronoiCell cell) {
-        var cellSolid = _repo.CreateSolid(1, cell.Polygon.AsCurveLoop());
-        var floorSolid = GetVoronoiSolid();
-        var intersection = _repo.Intersect(cellSolid, floorSolid);
-        var bottomFace = _repo.GetBottomFace(intersection);
-        return _simplifier.GetEdgesAsSimplifiedCurveLoops(bottomFace);
-    }
-
-    /// <summary>
-    /// Объединяет заданные ячейки и обрезает их по контуру перекрытия с учетом заданной пороговой площади отверстий
-    /// </summary>
-    /// <param name="wallCells">Ячейки диаграммы Вороного, построенные для одной стены</param>
-    /// <returns>Список петель ячейки диаграммы для всей стены в плоскости XOY</returns>
-    public IList<CurveLoop> Clip(IList<VoronoiCell> wallCells) {
-        var unitedSolid = CreateUnitedSolid(wallCells);
-        var intersection = _repo.Intersect(unitedSolid, GetVoronoiSolid());
-        var bottomFaces = _repo.GetBottomFaces(intersection);
-        return bottomFaces.SelectMany(f => _simplifier.GetEdgesAsSimplifiedCurveLoops(f)).ToArray();
-    }
-
-    private Solid CreateUnitedSolid(IList<VoronoiCell> cells) {
-        var solid = _repo.CreateSolid(1, cells[0].Polygon.AsCurveLoop());
-        for(int i = 1; i < cells.Count; i++) {
-            var isolid = _repo.CreateSolid(1, cells[i].Polygon.AsCurveLoop());
-            solid = _repo.Unite(solid, isolid);
+    public Solid GetVoronoiSolid() {
+        var faces = GetFacesData();
+        var solid = faces.First().GetVoronoiSolid();
+        for(int i = 1; i < faces.Count; i++) {
+            solid = _repo.Unite(solid, faces[i].GetVoronoiSolid());
         }
 
         return solid;
     }
 
-    /// <summary>
-    /// Возвращает список контуров перекрытия в плоскости XOY с учетом заданной пороговой площади отверстий
-    /// </summary>
-    /// <returns>Первая петля - наружняя, остальные - отверстия, удовлетворяющие допуску</returns>
-    private IList<CurveLoop> GetVoronoiOutline() {
-        if(_outline is not null) {
-            return _outline;
+    private IList<FaceVoronoiData> GetFacesData() {
+        if(_facesData is not null) {
+            return _facesData;
         }
 
-        // у 1 элемента перекрытия должно быть только 1 тело
-        var solid = Floor.GetSolids()
-            .OrderByDescending(s => s.Volume)
-            .First();
-        var bottomFace = _repo.GetBottomFace(solid);
-        double z = bottomFace.Evaluate(new UV(0, 0)).Z;
-        var transform = Transform.CreateTranslation(new XYZ(0, 0, -z));
-        _outline = _simplifier.GetEdgesAsSimplifiedCurveLoops(bottomFace)
-            .Where(l => _repo.GetArea(l) >= _openingsAreaThreshold)
-            .Select(l => CurveLoop.CreateViaTransform(l, transform))
-            .OrderBy(l => l.Sum(c => c.Length))
+        var solids = Floor.GetSolids();
+        _facesData = solids.SelectMany(s => _repo.GetBottomFaces(s))
+            .Select(f => new FaceVoronoiData(f, _repo, _openingsAreaThreshold))
             .ToArray();
-        return _outline;
-    }
-
-    private PlanarFace GetVoronoiFace() {
-        return _face ??= _repo.GetBottomFace(GetVoronoiSolid());
-    }
-
-    private Solid GetVoronoiSolid() {
-        return _solid ??= _repo.CreateSolid(1, [..GetVoronoiOutline()]);
+        return _facesData;
     }
 }

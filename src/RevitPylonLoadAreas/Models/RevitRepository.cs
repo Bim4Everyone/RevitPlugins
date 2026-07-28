@@ -16,7 +16,6 @@ using RevitPylonLoadAreas.Models.Selection;
 namespace RevitPylonLoadAreas.Models;
 
 internal class RevitRepository {
-
     public RevitRepository(UIApplication uiApplication) {
         UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
     }
@@ -28,14 +27,6 @@ internal class RevitRepository {
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
     public View ActiveView => ActiveUIDocument.ActiveView;
-
-    public Floor PickFloor(string statusPrompt) {
-        var reference = ActiveUIDocument.Selection.PickObject(
-            ObjectType.Element,
-            new FloorSelectionFilter(),
-            statusPrompt);
-        return (Floor) Document.GetElement(reference);
-    }
 
     public ICollection<Floor> PickFloors(string statusPrompt) {
         var reference = ActiveUIDocument.Selection.PickObjects(
@@ -120,6 +111,18 @@ internal class RevitRepository {
             BooleanOperationsType.Union);
     }
 
+    public Solid CreateUnitedSolid(IList<Solid> solids) {
+        if(solids.Count == 0) {
+            throw new ArgumentOutOfRangeException(nameof(solids));
+        }
+        var solid = solids[0];
+        for(int i = 1; i < solids.Count; i++) {
+            solid = Unite(solid, solids[i]);
+        }
+
+        return solid;
+    }
+
     /// <summary>
     /// Возвращает все видимые несущие колонны с активного вида
     /// </summary>
@@ -147,7 +150,8 @@ internal class RevitRepository {
     /// Показывает и выделяет заданные элементы на активном виде
     /// </summary>
     public void ShowElements(params Element[] elements) {
-        if(elements is null || elements.Length == 0) {
+        if(elements is null
+           || elements.Length == 0) {
             return;
         }
 
