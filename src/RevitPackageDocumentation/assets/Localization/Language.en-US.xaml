@@ -72,6 +72,7 @@
     <system:String x:Key="MainWindow.TextTemplate">Text template</system:String>
     <system:String x:Key="MainWindow.ElementType">Element type</system:String>
     <system:String x:Key="MainWindow.Select">Select</system:String>
+    <system:String x:Key="MainWindow.RemoveAfterCreation">Remove after creation</system:String>
 
     <system:String x:Key="Validation.SheetNameIsEmpty">Sheet name is empty</system:String>
     <system:String x:Key="Validation.SheetNameIsNotCorrect">Sheet name is incorrect</system:String>

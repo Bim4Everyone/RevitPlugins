@@ -115,6 +115,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock
@@ -130,6 +131,16 @@
                         ComboBoxSelected="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         FilterList="{Binding ViewTemplateFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
+
+                    <ToggleButton
+                        Grid.Column="2"
+                        Margin="0 10 0 0"
+                        Height="37"
+                        Width="37"
+                        VerticalAlignment="Top"
+                        Content="✕"
+                        IsChecked="{Binding ViewTemplateRemoveAfterCreation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ToolTip="{extensions:Localized MainWindow.RemoveAfterCreation}"/>
                 </Grid>
                 
                 <Grid>
@@ -223,7 +234,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>
@@ -327,6 +337,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock
@@ -342,6 +353,16 @@
                         ComboBoxSelected="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         FilterList="{Binding ViewTemplateFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
+
+                    <ToggleButton
+                        Grid.Column="2"
+                        Margin="0 10 0 0"
+                        Height="37"
+                        Width="37"
+                        VerticalAlignment="Top"
+                        Content="✕"
+                        IsChecked="{Binding ViewTemplateRemoveAfterCreation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ToolTip="{extensions:Localized MainWindow.RemoveAfterCreation}"/>
                 </Grid>
     
                 <Grid>
@@ -435,7 +456,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>
@@ -543,6 +563,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock
@@ -558,6 +579,16 @@
                         ComboBoxSelected="{Binding ViewTemplate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         FilterList="{Binding ViewTemplateFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
+
+                    <ToggleButton
+                        Grid.Column="2"
+                        Margin="0 10 0 0"
+                        Height="37"
+                        Width="37"
+                        VerticalAlignment="Top"
+                        Content="✕"
+                        IsChecked="{Binding ViewTemplateRemoveAfterCreation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        ToolTip="{extensions:Localized MainWindow.RemoveAfterCreation}"/>
                 </Grid>
     
                 <Grid>
@@ -649,7 +680,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>
@@ -851,7 +881,6 @@
                         AcceptsReturn="True"
                         TextWrapping="WrapWithOverflow"
                         PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                        Foreground="LightGray"
                         Text="{Binding ModuleComment}" />
                 </Grid>
             </UniformGrid>
@@ -999,7 +1028,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>
@@ -1093,7 +1121,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>
@@ -1215,7 +1242,6 @@
                     AcceptsReturn="True"
                     TextWrapping="WrapWithOverflow"
                     PlaceholderText="{extensions:Localized MainWindow.Comments}"
-                    Foreground="LightGray"
                     Text="{Binding ModuleComment}" />
             </UniformGrid>
         </Grid>

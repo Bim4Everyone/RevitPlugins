@@ -14,6 +14,14 @@ using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class PlanViewVM : SheetComponentVM {
+    // При разработке документации пользователям необходимо иметь возможность задать одинаковый Номер вида
+    // для нескольких компонентов одного листа (значение задается одинаковое, но за счет разного типа вида в заголовке
+    // видового экрана на листе отображается по разному).
+    // По умолчанию в Revit это не допускается, поэтому пользователи используют регламентированные стандартами невидимые
+    // символы для различных типов видов. Для отличия Номера вида у планов регламентирован невидимый символ
+    // указанный ниже (в Юникоде это Left-to-Right Mark (LRM))
+    private readonly string _uniqueViewportNumberKey = "‎";
+
     private string _viewNameFormula = string.Empty;
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
@@ -26,6 +34,7 @@ internal class PlanViewVM : SheetComponentVM {
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
     private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
     private FiltrationComboBoxFilterListVM _viewTemplateFilter;
+    private bool _viewTemplateRemoveAfterCreation = false;
 
     // Смещение по горизонтали в дюймах слева, для размещаемых компонентов листа требуемое, чтобы они попали на лист
     private readonly double _titleBlockFrameLeftOffset = UnitUtilsHelper.ConvertToInternalValue(20);
@@ -40,7 +49,6 @@ internal class PlanViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        ValidateAllProperties();
     }
 
     [Required(ErrorMessage = "Validation.ViewNameIsEmpty")]
@@ -86,6 +94,11 @@ internal class PlanViewVM : SheetComponentVM {
     public FiltrationComboBoxFilterListVM ViewTemplateFilter {
         get => _viewTemplateFilter;
         set => RaiseAndSetIfChanged(ref _viewTemplateFilter, value);
+    }
+
+    public bool ViewTemplateRemoveAfterCreation {
+        get => _viewTemplateRemoveAfterCreation;
+        set => RaiseAndSetIfChanged(ref _viewTemplateRemoveAfterCreation, value);
     }
 
     [PositiveInteger(ErrorMessage = "Validation.ViewCountIsNotCorrect")]
@@ -142,6 +155,11 @@ internal class PlanViewVM : SheetComponentVM {
                 // Необходимо для перезагрузки габаритов видов перед их размещением, т.к. при назначении 
                 // секущего диапазона, видимых категорий, шаблона вида могут изменяться габариты вида
                 Repository.Document.Regenerate();
+
+                // Снимаем шаблон вида, если запросил пользователь
+                if(ViewTemplateRemoveAfterCreation) {
+                    view.ViewTemplateId = ElementId.InvalidElementId;
+                }
             } catch(Exception) { }
         }
         return view;
@@ -165,7 +183,6 @@ internal class PlanViewVM : SheetComponentVM {
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMaxY = boundingBoxXYZ.Max.Y;
 
-            int viewPortNumber = GetLastViewportNumber(100) + 1;
             var lastViewportInTitleBlock = GetLastViewport<ViewPlan>(vp => vp.GetBoxCenter().Y < titleBlockMaxY);
 
             // Создание видового экрана
@@ -192,8 +209,11 @@ internal class PlanViewVM : SheetComponentVM {
                 correctPositionY,
                 0);
 
+            string viewPortNumberAsStr =
+                _uniqueViewportNumberKey + (GetLastViewportNumber(_uniqueViewportNumberKey, 0, 100) + 1);
+
             viewPort.SetBoxCenter(correctPosition);
-            viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, viewPortNumber.ToString());
+            viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, viewPortNumberAsStr);
 
 #if REVIT_2022_OR_GREATER
             viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);

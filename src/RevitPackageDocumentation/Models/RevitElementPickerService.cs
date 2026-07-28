@@ -36,13 +36,20 @@ public class RevitElementPickerService : IRevitElementPickerService {
 
     public void PickElement(Action<Element> onSelected) {
         _mainWindow.Hide();
-        ISelectionFilter selectFilter = new FloorSelectionFilter();
-        var reference = _revitRepository.ActiveUIDocument.Selection.PickObject(
-            ObjectType.Element,
-            selectFilter,
-            _localizationService.GetLocalizedString("MainWindow.PickElement"));
-        var element = _revitRepository.Document.GetElement(reference);
-        onSelected?.Invoke(element);
-        _mainWindow.ShowDialog();
+        try {
+            // Даем пользователю выбрать объект в Revit
+            ISelectionFilter selectFilter = new FloorSelectionFilter();
+            var reference = _revitRepository.ActiveUIDocument.Selection.PickObject(
+                ObjectType.Element,
+                selectFilter,
+                _localizationService.GetLocalizedString("MainWindow.PickElement"));
+            var element = _revitRepository.Document.GetElement(reference);
+            onSelected?.Invoke(element);
+        } catch(OperationCanceledException) {
+            // Пользователь нажал Esc - ничего не делаем
+        } finally {
+            // В любом случае показываем окно обратно
+            _mainWindow.ShowDialog();
+        }
     }
 }

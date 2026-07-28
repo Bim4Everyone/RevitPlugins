@@ -6,7 +6,6 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.SimpleServices;
-using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
@@ -15,6 +14,14 @@ using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class SectionViewVM : SheetComponentVM {
+    // При разработке документации пользователям необходимо иметь возможность задать одинаковый Номер вида
+    // для нескольких компонентов одного листа (значение задается одинаковое, но за счет разного типа вида в заголовке
+    // видового экрана на листе отображается по разному).
+    // По умолчанию в Revit это не допускается, поэтому пользователи используют регламентированные стандартами невидимые
+    // символы для различных типов видов. Для отличия Номера вида у сечений регламентирован невидимый символ
+    // указанный ниже (в Юникоде это Right-to-Left Mark (RLM))
+    private readonly string _uniqueViewportNumberKey = "‏";
+
     private string _viewNameFormula = string.Empty;
     private string _viewName;
     private ViewFamilyType _viewFamilyType;
@@ -26,6 +33,7 @@ internal class SectionViewVM : SheetComponentVM {
     private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
     private FiltrationComboBoxFilterListVM _viewTemplateFilter;
+    private bool _viewTemplateRemoveAfterCreation = false;
 
     // Расстояние до дальней секущей плоскости сечения
     private readonly double _viewDepth = UnitUtilsHelper.ConvertToInternalValue(3000);
@@ -49,8 +57,6 @@ internal class SectionViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        ValidateAllProperties();
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
     [Required(ErrorMessage = "Validation.ViewNameIsEmpty")]
@@ -96,6 +102,11 @@ internal class SectionViewVM : SheetComponentVM {
     public FiltrationComboBoxFilterListVM ViewTemplateFilter {
         get => _viewTemplateFilter;
         set => RaiseAndSetIfChanged(ref _viewTemplateFilter, value);
+    }
+
+    public bool ViewTemplateRemoveAfterCreation {
+        get => _viewTemplateRemoveAfterCreation;
+        set => RaiseAndSetIfChanged(ref _viewTemplateRemoveAfterCreation, value);
     }
 
     [PositiveInteger(ErrorMessage = "Validation.ViewCountIsNotCorrect")]
@@ -160,6 +171,11 @@ internal class SectionViewVM : SheetComponentVM {
             // Необходимо для перезагрузки габаритов видов перед их размещением, т.к. при назначении 
             // секущего диапазона, видимых категорий, шаблона вида могут изменяться габариты вида
             Repository.Document.Regenerate();
+
+            // Снимаем шаблон вида, если запросил пользователь
+            if(ViewTemplateRemoveAfterCreation) {
+                view.ViewTemplateId = ElementId.InvalidElementId;
+            }
         } catch(System.Exception) { }
         return view;
     }
@@ -181,7 +197,6 @@ internal class SectionViewVM : SheetComponentVM {
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
-            int viewPortNumber = GetLastViewportNumber(0, 100) + 1;
             var lastViewport = GetLastViewport<ViewSection>(vp => vp.GetBoxCenter().Y < 0);
 
             // Создание видового экрана
@@ -202,8 +217,11 @@ internal class SectionViewVM : SheetComponentVM {
                 titleBlockMinY - viewportHalfHeight,
                 0);
 
+            string viewPortNumberAsStr =
+                _uniqueViewportNumberKey + (GetLastViewportNumber(_uniqueViewportNumberKey, 0, 100) + 1);
+
             viewPort.SetBoxCenter(correctPosition);
-            viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, viewPortNumber.ToString());
+            viewPort.SetParamValue(BuiltInParameter.VIEWPORT_DETAIL_NUMBER, viewPortNumberAsStr);
 
 #if REVIT_2022_OR_GREATER
             viewPort.LabelOffset = new XYZ(viewportHalfWidth * 0.9, viewportHalfHeight * 2, 0);

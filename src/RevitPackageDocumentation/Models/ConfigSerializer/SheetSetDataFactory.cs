@@ -41,7 +41,8 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
         return new SheetSetData {
             Name = vm.Name,
             Sheets = vm.SheetList?.Select(CreateSheetData).ToList(),
-            Params = vm.SheetSetParams.Params?.Select(CreatePluginParamData).ToList()
+            Params = vm.SheetSetParams.Params?.Select(CreatePluginParamData).ToList(),
+            ParamsComment = vm.SheetSetParams.ModuleComment
         };
     }
 
@@ -77,6 +78,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewFamilyTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewFamilyTypeFilter),
                 ViewTemplateName = vm.ViewTemplate?.Name,
                 ViewTemplateFilterValues = GetFiltrationComboBoxFilterList(vm.ViewTemplateFilter),
+                ViewTemplateRemoveAfterCreation = vm.ViewTemplateRemoveAfterCreation,
                 ViewportTypeName = vm.ViewportType?.Name,
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,
@@ -94,6 +96,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewFamilyTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewFamilyTypeFilter),
                 ViewTemplateName = vm.ViewTemplate?.Name,
                 ViewTemplateFilterValues = GetFiltrationComboBoxFilterList(vm.ViewTemplateFilter),
+                ViewTemplateRemoveAfterCreation = vm.ViewTemplateRemoveAfterCreation,
                 ViewportTypeName = vm.ViewportType?.Name,
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,
@@ -111,6 +114,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewFamilyTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewFamilyTypeFilter),
                 ViewTemplateName = vm.ViewTemplate?.Name,
                 ViewTemplateFilterValues = GetFiltrationComboBoxFilterList(vm.ViewTemplateFilter),
+                ViewTemplateRemoveAfterCreation = vm.ViewTemplateRemoveAfterCreation,
                 ViewportTypeName = vm.ViewportType?.Name,
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,

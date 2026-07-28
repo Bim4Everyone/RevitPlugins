@@ -73,6 +73,7 @@
     <system:String x:Key="MainWindow.TextTemplate">Шаблон текста</system:String>
     <system:String x:Key="MainWindow.ElementType">Типоразмер</system:String>
     <system:String x:Key="MainWindow.Select">Выбрать</system:String>
+    <system:String x:Key="MainWindow.RemoveAfterCreation">Снять после создания</system:String>
 
     <system:String x:Key="Validation.SheetNameIsEmpty">Имя листа не заполнено</system:String>
     <system:String x:Key="Validation.SheetNameIsNotCorrect">Имя листа заполнено некорректно</system:String>

@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
-using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
@@ -22,9 +21,6 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
-        ValidateAllProperties();
-
-        CreateComponentCommand = RelayCommand.Create(CreateComponent, CanCreateComponent);
     }
 
     [Required(ErrorMessage = "Validation.AnnotationTypeIsNull")]
