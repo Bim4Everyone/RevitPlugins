@@ -14,6 +14,11 @@ using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 internal class PlanViewVM : SheetComponentVM {
+    // При разработке документации пользователям необходимо иметь возможность задать одинаковое имя видового экрана
+    // для нескольких компонентов одного листа. По умолчанию в Revit это не допускается, поэтому пользователи используют
+    // регламентированные стандартами невидимые символы.
+    // Для отличия имен видовых экранов у планов регламентирован невидимый символ указанный ниже
+    // (в Юникоде это Left-to-Right Mark (LRM))
     private readonly string _uniqueViewportNumberKey = "‎";
 
     private string _viewNameFormula = string.Empty;
