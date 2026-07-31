@@ -3,11 +3,19 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <!-- Пример перевода на русский язык (google translate) -->
+    
+    <system:String x:Key="MainWindow.Title">Настройки менеджера перемычек</system:String>
+    <system:String x:Key="MainWindow.FamilySettings">Настройки семейств</system:String>
+    
+    <system:String x:Key="FamilySettingsPage.LintelFamilies">Соответствие параметров плагина и перемычки </system:String>
+    <system:String x:Key="FamilySettingsPage.OpeningFamilies">Соответствие параметров плагина и проемов </system:String>
+    
+    
+    <system:String x:Key="MainWindow.ButtonOk">Сохранить</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
+    
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
-
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
 </ResourceDictionary>

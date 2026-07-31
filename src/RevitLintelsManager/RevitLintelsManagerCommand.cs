@@ -17,8 +17,11 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitLintelsManager.Models;
+using RevitLintelsManager.Models.Configs;
 using RevitLintelsManager.ViewModels;
 using RevitLintelsManager.Views;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitLintelsManager;
 
@@ -48,6 +51,11 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
+        
+        // Настройка доступа к провайдеру по навигации страниц
+        kernel.Bind<INavigationViewPageProvider>()
+            .To<NavigationViewPageProvider>()
+            .InSingletonScope();
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()

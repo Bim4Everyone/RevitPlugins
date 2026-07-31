@@ -1,6 +1,11 @@
 using System.Windows;
+using System.Windows.Threading;
 
 using dosymep.SimpleServices;
+
+using RevitLintelsManager.Views.Pages;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitLintelsManager.Views;
 
@@ -11,32 +16,31 @@ public partial class MainWindow {
     /// <summary>
     /// Иницализирует главное окно плагина.
     /// </summary>
-    public MainWindow(
+    public MainWindow(INavigationViewPageProvider navigationViewPageProvider,
         ILoggerService loggerService,
         ISerializationService serializationService,
-        ILanguageService languageService, ILocalizationService localizationService,
-        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService)
+        ILanguageService languageService,
+        ILocalizationService localizationService,
+        IUIThemeService uiThemeService,
+        IUIThemeUpdaterService themeUpdaterService) 
         : base(loggerService,
             serializationService,
-            languageService, localizationService,
-            uiThemeService, themeUpdaterService) {
+            languageService,
+            localizationService,
+            uiThemeService,
+            themeUpdaterService) {
         InitializeComponent();
+        
+        _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
+
+        Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => {
+            _rootNavigationView.Navigate(typeof(FamilySettingsPage));
+        });
     }
 
-    /// <summary>
-    /// Наименование плагина.
-    /// </summary>
-    /// <remarks>
-    /// Используется для сохранения положения окна.
-    /// </remarks>
+    
     public override string PluginName => nameof(RevitLintelsManager);
     
-    /// <summary>
-    /// Наименование файла конфигурации.
-    /// </summary>
-    /// <remarks>
-    /// Используется для сохранения положения окна.
-    /// </remarks>
     public override string ProjectConfigName => nameof(MainWindow);
     
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {

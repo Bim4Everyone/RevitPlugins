@@ -5,6 +5,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelsManager.Models;
+using RevitLintelsManager.Models.Configs;
 
 namespace RevitLintelsManager.ViewModels;
 
@@ -18,6 +19,9 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
     private string _saveProperty;
+    
+    private bool _hasFamilySettingsErrors;
+    private FamilySettingsViewModel _familySettingsViewModel;
    
     public MainViewModel(
         PluginConfig pluginConfig,
@@ -45,13 +49,29 @@ internal class MainViewModel : BaseViewModel {
         get => _saveProperty;
         set => RaiseAndSetIfChanged(ref _saveProperty, value);
     }
+    
+    public bool HasFamilySettingsErrors {
+        get => _hasFamilySettingsErrors;
+        set => RaiseAndSetIfChanged(ref _hasFamilySettingsErrors, value);
+    }
+    
+    public FamilySettingsViewModel FamilySettingsViewModel {
+        get => _familySettingsViewModel;
+        set => RaiseAndSetIfChanged(ref _familySettingsViewModel, value);
+    }
    
     private void LoadView() {
         LoadConfig();
+        
+        FamilySettingsViewModel = new FamilySettingsViewModel(_revitRepository, _localizationService);
     }
     
     private void AcceptView() {
         SaveConfig();
+        
+        int fff = FamilySettingsViewModel.SelectedOpeningFamilyViewModels.Count;
+        
+        System.Windows.MessageBox.Show($"Selected: {fff}");
     }
 
     
@@ -67,17 +87,9 @@ internal class MainViewModel : BaseViewModel {
 
     
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
     }
 
     
     private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-        setting.SaveProperty = SaveProperty;
-        _pluginConfig.SaveProjectConfig();
     }
 }
