@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <UseWpfUI>true</UseWpfUI>
+        <LangVersion>12</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+      <Page Remove="assets\Localization\Language.cs-CZ.xaml" />
+      <Page Remove="assets\Localization\Language.hu-HU.xaml" />
+      <Page Remove="assets\Localization\Language.ko-KR.xaml" />
+      <Page Remove="assets\Localization\Language.pt-BR.xaml" />
+    </ItemGroup>
+</Project>

@@ -62,6 +62,9 @@
   <Project Path="src/RevitClashDetective/RevitClashDetective.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitClassifierParameters/RevitClassifierParameters.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitCopingZones/RevitCopingZones.csproj">
     <Platform Project="x64" />
   </Project>
