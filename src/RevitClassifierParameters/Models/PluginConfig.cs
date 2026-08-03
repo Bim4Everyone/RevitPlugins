@@ -59,8 +59,13 @@ internal class RevitSettings : ProjectSettings {
     /// </summary>
     public override string ProjectName { get; set; }
     
-    /// <summary>
-    /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
-    /// </summary>
-    public string SaveProperty { get; set; }
+    public string ExcelClassifierPath { get; set; }
+    public bool WorkWithFoundationCode { get; set; }
+    public bool WorkWithConstrBelowZeroCode { get; set; }
+    public bool WorkWithConstrAboveZeroCode { get; set; }
+    public bool WorkWithMasonryCode { get; set; }
+    public bool WorkWithRoofCode { get; set; }
+    public bool WorkWithFacadeCode { get; set; }
+    public bool WorkWithFacadeType { get; set; }
+    public string ParamNameForFacadeType { get; set; }
 }

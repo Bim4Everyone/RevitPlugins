@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -38,4 +40,13 @@ internal class RevitRepository {
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
+
+
+    public List<Material> GetElementMaterials() {
+        return null;
+    }    
+    
+    public List<Element> GetElementInPj() {
+        return null;
+    }
 }

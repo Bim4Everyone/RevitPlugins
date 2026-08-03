@@ -62,7 +62,7 @@ public class RevitClassifierParametersCommand : BasePluginCommand {
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
-        kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.BindMainWindow<ArParameterClassifierVM, ArParameterClassifierV>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -75,6 +75,6 @@ public class RevitClassifierParametersCommand : BasePluginCommand {
             CultureInfo.GetCultureInfo("ru-RU"));
 
         // Вызывает стандартное уведомление
-        Notification(kernel.Get<MainWindow>());
+        Notification(kernel.Get<ArParameterClassifierV>());
     }
 }

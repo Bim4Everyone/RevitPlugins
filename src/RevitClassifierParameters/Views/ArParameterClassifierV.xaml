@@ -1,5 +1,5 @@
 <core:WpfUIPlatformWindow
-    x:Class="RevitClassifierParameters.Views.MainWindow"
+    x:Class="RevitClassifierParameters.Views.ArParameterClassifierV"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -21,7 +21,7 @@
     MinHeight="500"
     MinWidth="700"
    
-    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
+    d:DataContext="{d:DesignInstance vms:ArParameterClassifierVM, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
