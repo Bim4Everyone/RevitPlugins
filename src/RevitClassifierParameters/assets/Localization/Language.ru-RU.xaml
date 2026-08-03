@@ -4,10 +4,12 @@
 
     <!-- Пример перевода на русский язык (google translate) -->
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
+    <system:String x:Key="MainWindow.Title">Параметры ВОР АР</system:String>
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="MainWindow.SelectClassifierFile">Выберите файл классификатора</system:String>
 </ResourceDictionary>

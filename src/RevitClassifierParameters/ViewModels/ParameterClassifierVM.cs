@@ -52,10 +52,12 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
 
+        ReadExcelCommand = RelayCommand.Create(ReadExcel);
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
+    public ICommand ReadExcelCommand { get; }
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
     

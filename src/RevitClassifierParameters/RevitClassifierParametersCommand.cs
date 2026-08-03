@@ -58,6 +58,22 @@ public class RevitClassifierParametersCommand : BasePluginCommand {
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
+        kernel.Bind<WorkGroupCode>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        kernel.Bind<MaterialParamSetter>()
+            .ToSelf()
+            .InSingletonScope();   
+        
+        kernel.Bind<ReportService>()
+            .ToSelf()
+            .InSingletonScope();
+                
+        kernel.Bind<ExcelClassifierReader>()
+            .ToSelf()
+            .InSingletonScope();
+        
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
@@ -74,6 +90,17 @@ public class RevitClassifierParametersCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
+        // Инициализируем extension для локализации ресурсов в файле ресурсов (без доступа к ресурсам окна)
+        var localizationService = kernel.Get<ILocalizationService>();
+
+        // Настройка сервиса окошек сообщений
+        kernel.UseWpfUIMessageBox<ArParameterClassifierVM>();
+
+        // Сервис открытия диалогового окна для чтения файла Классификатора
+        kernel.UseWpfOpenFileDialog<ArParameterClassifierVM>(
+            filter: "Excel files (*.xlsx;*.xls)|*.xlsx;*.xls|All files (*.*)|*.*",
+            title: localizationService.GetLocalizedString("MainWindow.SelectClassifierFile"));
+        
         // Вызывает стандартное уведомление
         Notification(kernel.Get<ArParameterClassifierV>());
     }
