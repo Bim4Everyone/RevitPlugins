@@ -14,19 +14,27 @@ public class ExcelClassifierReader {
         Range range = null;
 
         try {
-            excel = new Application();
+            excel = new Application {
+                Visible = false,
+                DisplayAlerts = false,
+                ScreenUpdating = false
+            };
             workbook = excel.Workbooks.Open(path, ReadOnly: true);
             worksheet = (Worksheet) workbook.Worksheets[1];
 
             int lastRow = GetLastRow(worksheet);
-            if(lastRow < 2)
-                return [];
+            if(lastRow < 3)
+                throw new InvalidOperationException(
+                    "Лист классификатора пуст или не содержит данных.");
 
             range = worksheet.Range[
                 worksheet.Cells[3, 1],
                 worksheet.Cells[lastRow, 3]];
 
-            object[,] values = (object[,]) range.Value2;
+            if(range.Value2 is not object[,] values)
+                throw new InvalidOperationException(
+                    "Лист классификатора пуст или не содержит данных.");
+
             return BuildClassifier(values);
         } finally {
             workbook?.Close(false);
@@ -36,6 +44,9 @@ public class ExcelClassifierReader {
             Release(worksheet);
             Release(workbook);
             Release(excel);
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
     }
 
