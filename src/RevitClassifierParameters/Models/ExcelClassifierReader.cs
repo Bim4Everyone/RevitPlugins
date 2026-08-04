@@ -2,11 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+using dosymep.SimpleServices;
+
 using Microsoft.Office.Interop.Excel;
 
 namespace RevitClassifierParameters.Models;
 
 public class ExcelClassifierReader {
+    private readonly ILocalizationService _localizationService;
+    private readonly IMessageBoxService _messageBoxService;
+
+    public ExcelClassifierReader(
+        ILocalizationService localizationService,
+        IMessageBoxService messageBoxService) {
+        _localizationService = localizationService;
+        _messageBoxService = messageBoxService;
+    }
+    
     public List<WorkGroup> Read(string path) {
         Application excel = null;
         Workbook workbook = null;
@@ -23,17 +35,19 @@ public class ExcelClassifierReader {
             worksheet = (Worksheet) workbook.Worksheets[1];
 
             int lastRow = GetLastRow(worksheet);
-            if(lastRow < 3)
-                throw new InvalidOperationException(
-                    "Лист классификатора пуст или не содержит данных.");
+            if(lastRow < 3) {
+                _messageBoxService.Show("Лист классификатора пуст или не содержит данных.");
+                return null;
+            }
 
             range = worksheet.Range[
                 worksheet.Cells[3, 1],
                 worksheet.Cells[lastRow, 3]];
 
-            if(range.Value2 is not object[,] values)
-                throw new InvalidOperationException(
-                    "Лист классификатора пуст или не содержит данных.");
+            if(range.Value2 is not object[,] values) {
+                _messageBoxService.Show("Лист классификатора пуст или не содержит данных.");
+                return null;
+            }
 
             return BuildClassifier(values);
         } finally {
