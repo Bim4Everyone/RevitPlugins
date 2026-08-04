@@ -56,7 +56,7 @@ public class ExcelClassifierReader {
             if(string.IsNullOrWhiteSpace(unit)) {
                 AddGroup(result, groups, code, name);
             } else {
-                AddWork(groups, code, name);
+                AddWork(groups, code, name, unit);
             }
         }
         return result;
@@ -86,7 +86,8 @@ public class ExcelClassifierReader {
     private void AddWork(
         Dictionary<string, WorkGroup> groups,
         string code,
-        string name) {
+        string name,
+        string unit) {
         var parent = FindParentGroup(groups, code);
         if(parent == null)
             return;
@@ -94,6 +95,7 @@ public class ExcelClassifierReader {
         parent.ChildWorks.Add(new Work {
             Code = code,
             Name = name,
+            Unit = unit,
             ParentWorkGroup = parent
         });
     }
