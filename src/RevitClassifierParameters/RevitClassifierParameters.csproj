@@ -4,14 +4,6 @@
         <LangVersion>12</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-      <Page Remove="assets\Localization\Language.cs-CZ.xaml" />
-      <Page Remove="assets\Localization\Language.hu-HU.xaml" />
-      <Page Remove="assets\Localization\Language.ko-KR.xaml" />
-      <Page Remove="assets\Localization\Language.pt-BR.xaml" />
-      <Page Update="Views\CustomStyles.xaml">
-        <Generator>MSBuild:Compile</Generator>
-        <XamlRuntime>Wpf</XamlRuntime>
-        <SubType>Designer</SubType>
-      </Page>
+        <PackageReference Include="Microsoft.Office.Interop.Excel" Version="15.0.4795.1001" />
     </ItemGroup>
 </Project>
