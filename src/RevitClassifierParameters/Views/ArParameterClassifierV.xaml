@@ -228,10 +228,11 @@
                 <CheckBox
                     Grid.Row="2"
                     Grid.RowSpan="2"
-                    Grid.Column="1"                    
+                    Grid.Column="1"      
                     Margin="5"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
+                    IsEnabled="{Binding Path=WorkWithFacadeCode}"
                     IsChecked="{Binding Path=WorkWithFacadeType}"/>
                 
                 <ui:TextBlock
@@ -248,7 +249,10 @@
                     MinWidth="200"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center" 
-                    />
+                    IsEnabled="{Binding Path=WorkWithFacadeCode}"
+                    DisplayMemberPath="Definition.Name"
+                    SelectedItem="{Binding Path=ParamForFacadeType, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding Path=ParamsForFacadeType, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </Border>
 

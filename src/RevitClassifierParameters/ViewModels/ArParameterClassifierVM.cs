@@ -1,3 +1,6 @@
+using System.Collections.ObjectModel;
+using System.Linq;
+
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
@@ -8,11 +11,14 @@ using RevitClassifierParameters.Views;
 namespace RevitClassifierParameters.ViewModels;
 
 internal class ArParameterClassifierVM : ParameterClassifierVM {
+    private string _defFacadeTypeParamName = "ФОП_Группирование";
+    
     private bool _workWithMasonryCode;
     private bool _workWithRoofCode;
     private bool _workWithFacadeCode;
     private bool _workWithFacadeType;
     private Parameter _paramForFacadeType;
+    private ObservableCollection<Parameter> _paramsForFacadeType;
 
     public ArParameterClassifierVM(
         PluginConfig pluginConfig,
@@ -53,18 +59,26 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
     public Parameter ParamForFacadeType {
         get => _paramForFacadeType;
         set => RaiseAndSetIfChanged(ref _paramForFacadeType, value);
-    }
-
+    }    
+    
+    public ObservableCollection<Parameter> ParamsForFacadeType {
+        get => _paramsForFacadeType;
+        private set => RaiseAndSetIfChanged(ref _paramsForFacadeType, value);
+    } 
 
     protected override void LoadView() {
         LoadConfig();
         ReadExcel();
         GetMaterials();
-        GetParamForFacadeType();
+        GetParamsForFacadeType();
     }
-
-    private void GetParamForFacadeType() {
-        // Получение параметра для типа фасада
+    
+    /// <summary>
+    /// Получение параметров для заполнения типа фасада
+    /// </summary>
+    private void GetParamsForFacadeType() {
+        ParamsForFacadeType = new ObservableCollection<Parameter>(_revitRepository.GetParametersForFacadeType()); 
+        ParamForFacadeType = ParamsForFacadeType.FirstOrDefault(p => p.Definition.Name == _defFacadeTypeParamName);
     }
 
     protected override void AcceptView() {
@@ -93,7 +107,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         WorkWithRoofCode = setting?.WorkWithRoofCode ?? true;
         WorkWithFacadeCode = setting?.WorkWithFacadeCode ?? true;
         WorkWithFacadeType = setting?.WorkWithFacadeType ?? true;
-        //ParamNameForFacadeType = setting?.ParamNameForFacadeType ?? null;
+        _defFacadeTypeParamName = setting?.ParamNameForFacadeType ?? _defFacadeTypeParamName;
     }
 
     private void SaveConfig() {
@@ -105,7 +119,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         setting.WorkWithRoofCode = WorkWithRoofCode;
         setting.WorkWithFacadeCode = WorkWithFacadeCode;
         setting.WorkWithFacadeType = WorkWithFacadeType;
-        //setting.ParamNameForFacadeType = ParamForFacadeType.Name;
+        setting.ParamNameForFacadeType = ParamForFacadeType.Definition.Name;
 
         _pluginConfig.SaveProjectConfig();
     }

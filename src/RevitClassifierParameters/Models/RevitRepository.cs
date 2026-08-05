@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -67,33 +68,6 @@ internal class RevitRepository {
             _messageBoxService.Show("Не найдено материалов у элементов в проекте!");
         return materials;
     }
-    
-    /*public List<Material> GetElementMaterials()
-    {
-        // Собираем уникальные ID материалов
-        var materialIds = new HashSet<ElementId>();
-        
-        foreach (var materialId in GetElementInPj()
-                     .Select(elem => elem.GetMaterialIds(false))
-                     .SelectMany(elemMaterialIds => elemMaterialIds))
-        {
-            materialIds.Add(materialId);
-        }
-        
-        // Получаем материалы по ID
-        var materials = new List<Material>();
-        foreach (var materialId in materialIds)
-        {
-            if (Document.GetElement(materialId) is Material material)
-            {
-                materials.Add(material);
-            }
-        }
-        if (materials.Count == 0) {
-            _messageBoxService.Show("Не найдено материалов у элементов в проекте!");
-        }
-        return materials;
-    }*/
 
     private List<Element> GetElementInPj() {
         var elements = new FilteredElementCollector(Document)
@@ -105,5 +79,22 @@ internal class RevitRepository {
         }
         _messageBoxService.Show("Не найдено элементов в проекте!");
         return [];
+    }
+
+    public List<Parameter> GetParametersForFacadeType() {
+        var wall = new FilteredElementCollector(Document)
+            .OfClass(typeof(Wall))
+            .WhereElementIsNotElementType()
+            .FirstOrDefault();
+
+        if(wall == null)
+            return [];
+        
+        return wall.Parameters
+            .Cast<Parameter>()
+            .Where(p => p.StorageType == StorageType.String)
+            .Where(p => !p.IsReadOnly)
+            .OrderBy(p => p.Definition.Name)
+            .ToList();
     }
 }
