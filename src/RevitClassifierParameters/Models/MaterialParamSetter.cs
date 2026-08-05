@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 namespace RevitClassifierParameters.Models;
@@ -133,7 +132,7 @@ internal class MaterialParamSetter {
     /// </summary>
     private void SetClassifierParameters(List<RevitMaterial> revitMaterials, bool forAr) {
         using(var transaction = _revitRepository.Document.StartTransaction(
-                  "BIM: Заполнение параметров классификатора")) {
+                  "Заполнение параметров классификатора")) {
 
             foreach(var revitMaterial in revitMaterials) {
                 var material = revitMaterial.Material;
@@ -210,7 +209,7 @@ internal class MaterialParamSetter {
     }
 
     /// <summary>
-    /// Устанавливает строковое значение параметра только если оно отличается от текущего.
+    /// Устанавливает строковое значение параметра, только если оно отличается от текущего.
     /// Возвращает true, если параметр был изменён.
     /// </summary>
     private bool SetStringParam(Material material, string paramName, string value) {
@@ -223,7 +222,7 @@ internal class MaterialParamSetter {
     }
 
     /// <summary>
-    /// Устанавливает строковое значение системного параметра только если оно отличается от текущего.
+    /// Устанавливает строковое значение системного параметра, только если оно отличается от текущего.
     /// Возвращает true, если параметр был изменён.
     /// </summary>
     private bool SetStringParam(Material material, BuiltInParameter builtInParameter, string value) {

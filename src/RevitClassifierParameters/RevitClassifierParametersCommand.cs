@@ -73,6 +73,17 @@ public class RevitClassifierParametersCommand : BasePluginCommand {
         kernel.Bind<ExcelClassifierReader>()
             .ToSelf()
             .InSingletonScope();
+
+        // Настройка окна отчёта
+        kernel.Bind<ReportVM>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<ReportV>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Window.DataContext),
+                c => c.Kernel.Get<ReportVM>());
         
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();

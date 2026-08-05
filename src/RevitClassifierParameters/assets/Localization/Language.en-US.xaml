@@ -10,4 +10,10 @@
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="ReportWindow.Title">Plugin execution report</system:String>
+    <system:String x:Key="ReportWindow.ColumnStatus">Status</system:String>
+    <system:String x:Key="ReportWindow.ColumnWorkCode">Work code</system:String>
+    <system:String x:Key="ReportWindow.ColumnMaterialName">Material name</system:String>
+    <system:String x:Key="ReportWindow.ButtonClose">Close</system:String>
 </ResourceDictionary>

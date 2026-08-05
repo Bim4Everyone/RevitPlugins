@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using dosymep.SimpleServices;
 
 using RevitClassifierParameters.Models;
+using RevitClassifierParameters.Views;
 
 namespace RevitClassifierParameters.ViewModels;
 
@@ -21,10 +22,11 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         MaterialParamSetter materialParamSetter,
         ReportService reportService,
         ExcelClassifierReader excelClassifierReader,
+        ReportV reportV,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) :
         base(pluginConfig, revitRepository, localizationService, workGroupCode, materialParamSetter, reportService,
-            excelClassifierReader, openFileDialogService, messageBoxService) {
+            excelClassifierReader, reportV, openFileDialogService, messageBoxService) {
 
     }
 
@@ -72,6 +74,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         if(WorkWithFacadeCode && WorkWithFacadeType) {
             SetFacadeType();
         }
+        ShowReport();
     }
 
     private void SetFacadeType() {

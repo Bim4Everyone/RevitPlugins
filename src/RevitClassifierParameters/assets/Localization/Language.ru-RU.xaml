@@ -12,4 +12,10 @@
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     
     <system:String x:Key="MainWindow.SelectClassifierFile">Выберите файл классификатора</system:String>
+
+    <system:String x:Key="ReportWindow.Title">Отчет работы плагина</system:String>
+    <system:String x:Key="ReportWindow.ColumnStatus">Статус</system:String>
+    <system:String x:Key="ReportWindow.ColumnWorkCode">Код работы</system:String>
+    <system:String x:Key="ReportWindow.ColumnMaterialName">Имя материала</system:String>
+    <system:String x:Key="ReportWindow.ButtonClose">Закрыть</system:String>
 </ResourceDictionary>

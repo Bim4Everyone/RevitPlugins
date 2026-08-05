@@ -12,6 +12,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClassifierParameters.Models;
+using RevitClassifierParameters.Views;
 
 namespace RevitClassifierParameters.ViewModels;
 
@@ -23,6 +24,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     protected readonly MaterialParamSetter _materialParamSetter;
     protected readonly ReportService _reportService;
     protected readonly ExcelClassifierReader _excelClassifierReader;
+    protected readonly ReportV _reportV;
 
     private string _errorText;
     private List<WorkGroup> _currentClassifierWorks;
@@ -37,6 +39,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         MaterialParamSetter materialParamSetter,
         ReportService reportService,
         ExcelClassifierReader excelClassifierReader,
+        ReportV reportV,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) {
         
@@ -48,6 +51,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         _materialParamSetter = materialParamSetter;
         _reportService = reportService;
         _excelClassifierReader = excelClassifierReader;
+        _reportV = reportV;
         
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
@@ -106,6 +110,20 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     protected abstract void LoadView();
     protected abstract void AcceptView();
     protected abstract bool CanAcceptView();
+
+    /// <summary>
+    /// Показывает окно отчёта, если по итогам обработки есть собранные записи.
+    /// </summary>
+    protected void ShowReport() {
+        if(_reportService.Items.Count == 0) {
+            return;
+        }
+
+        if(_reportV.DataContext is ReportVM reportVM) {
+            reportVM.UpdateReportData();
+        }
+        _reportV.ShowDialog();
+    }
 
     protected HashSet<string> GetActiveCodes() {
         return GetType()

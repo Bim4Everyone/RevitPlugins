@@ -59,6 +59,6 @@ public class RevitMaterial {
             return string.Empty;
         }
 
-        return materialName.Substring(firstIndex + 1, secondIndex - firstIndex - 1);
+        return materialName.Substring(firstIndex + 1, secondIndex - firstIndex - 1).Trim();
     }
 }
