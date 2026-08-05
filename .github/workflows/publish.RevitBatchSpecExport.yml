@@ -8,6 +8,7 @@ on:
     paths:
       - '**RevitBatchSpecExport**.cs'
       - '**RevitBatchSpecExport**.xaml'
+      - '**RevitBatchSpecExport**.csproj'
 
 env:
   plugin-name: "RevitBatchSpecExport"
