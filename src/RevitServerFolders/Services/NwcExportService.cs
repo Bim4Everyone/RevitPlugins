@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -21,6 +22,7 @@ namespace RevitServerFolders.Services;
 /// </summary>
 internal class NwcExportService : IModelsExportService<FileModelObjectExportSettings> {
     private const string _nwcSearchPattern = "*.nwc";
+    private const string _backupFolderSuffix = "_backup";
     private readonly RevitRepository _revitRepository;
     private readonly ILoggerService _loggerService;
     private readonly ILocalizationService _localization;
@@ -57,6 +59,9 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
         _failuresPreprocessor = new NwcFailuresPreprocessor(viewSettings, _loggerService);
         PrepareTargetFolder(settings);
 
+        // снимок делается до первого обращения к моделям, чтобы не удалить ранее созданные backup папки
+        string[] existingBackupFolders = GetBackupFolders(modelFiles);
+
         _revitRepository.Application.FailuresProcessing += ApplicationOnFailuresProcessing;
         _revitRepository.UIApplication.DialogBoxShowing += UIApplicationOnDialogBoxShowing;
         try {
@@ -65,6 +70,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             _revitRepository.Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
             _revitRepository.UIApplication.DialogBoxShowing -= UIApplicationOnDialogBoxShowing;
             _failuresPreprocessor = null;
+            DeleteNewBackupFolders(modelFiles, existingBackupFolders);
         }
     }
 
@@ -80,6 +86,50 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             File.SetAttributes(navisFile, FileAttributes.Normal);
             File.Delete(navisFile);
         }
+    }
+
+    /// <summary>
+    /// Возвращает backup папки, лежащие рядом с заданными моделями
+    /// </summary>
+    private string[] GetBackupFolders(string[] modelFiles) {
+        string[] modelFolders = [
+            .. modelFiles
+                .Select(Path.GetDirectoryName)
+                .Where(folder => !string.IsNullOrWhiteSpace(folder) && Directory.Exists(folder))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+        ];
+
+        var backupFolders = new List<string>();
+        foreach(string modelFolder in modelFolders) {
+            try {
+                backupFolders.AddRange(Directory.GetDirectories(modelFolder).Where(IsBackupFolder));
+            } catch(Exception ex) when(ex is IOException or UnauthorizedAccessException) {
+                _loggerService.Warning(ex, "Не удалось получить backup папки в директории: {@Path}", modelFolder);
+            }
+        }
+        return [.. backupFolders];
+    }
+
+    /// <summary>
+    /// Удаляет backup папки, которые Revit создал рядом с моделями в процессе экспорта.
+    /// Папки, лежавшие рядом с моделями до экспорта, не удаляются.
+    /// </summary>
+    private void DeleteNewBackupFolders(string[] modelFiles, string[] existingBackupFolders) {
+        var existingFolders = new HashSet<string>(existingBackupFolders, StringComparer.OrdinalIgnoreCase);
+        string[] newBackupFolders = [.. GetBackupFolders(modelFiles).Where(f => !existingFolders.Contains(f))];
+
+        foreach(string backupFolder in newBackupFolders) {
+            try {
+                Directory.Delete(backupFolder, true);
+                _loggerService.Information("Удалена backup папка: {@Path}", backupFolder);
+            } catch(Exception ex) when(ex is IOException or UnauthorizedAccessException) {
+                _loggerService.Warning(ex, "Не удалось удалить backup папку: {@Path}", backupFolder);
+            }
+        }
+    }
+
+    private bool IsBackupFolder(string folder) {
+        return Path.GetFileName(folder).EndsWith(_backupFolderSuffix, StringComparison.OrdinalIgnoreCase);
     }
 
     private void ExportModelFiles(
