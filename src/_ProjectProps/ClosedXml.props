@@ -1,0 +1,13 @@
+<Project>
+    <ItemGroup>
+        <PackageReference Include="ClosedXML" Version="0.104.2">
+            <PrivateAssets>all</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        
+        <PackageReference Include="ClosedXML.Parser" Version="1.3.0">
+            <PrivateAssets>all</PrivateAssets>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+    </ItemGroup>
+</Project>
