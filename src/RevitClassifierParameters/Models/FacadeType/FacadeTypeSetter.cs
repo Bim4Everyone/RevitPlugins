@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -31,8 +32,6 @@ internal class FacadeTypeSetter {
             return;
         }
 
-        var rules = BuildRules(facadeTypes);
-
         using var transaction = _revitRepository.Document.StartTransaction("Заполнение типа фасада");
 
         foreach(var wall in _revitRepository.GetWalls()) {
@@ -42,8 +41,15 @@ internal class FacadeTypeSetter {
                 continue;
             }
 
-            var key = (Normalize(parts.Function), Normalize(parts.Material));
-            if(!rules.TryGetValue(key, out string value)) {
+            // Ключевые поля правил уже нормализованы при чтении из Excel,
+            // поэтому здесь нормализуем только подстроки, извлечённые из имени типоразмера стены.
+            string function = parts.Function.Trim().ToUpperInvariant();
+            string material = parts.Material.Trim().ToUpperInvariant();
+
+            var rule = facadeTypes.FirstOrDefault(x =>
+                x.FunctionCharacteristic == function
+                && x.MaterialAbbreviation == material);
+            if(rule is null) {
                 continue;
             }
 
@@ -52,28 +58,11 @@ internal class FacadeTypeSetter {
                 continue;
             }
 
-            if(param.AsString() != value) {
-                param.Set(value);
+            if(param.AsString() != rule.Value) {
+                param.Set(rule.Value);
             }
         }
 
         transaction.Commit();
-    }
-
-    /// <summary>
-    /// Строит словарь для быстрого поиска значения по паре
-    /// (характеристика функции, сокращение материала).
-    /// </summary>
-    private Dictionary<(string Function, string Material), string> BuildRules(IReadOnlyList<FacadeTypeItem> facadeTypes) {
-        var map = new Dictionary<(string, string), string>();
-        foreach(var item in facadeTypes) {
-            var key = (Normalize(item.FunctionCharacteristic), Normalize(item.MaterialAbbreviation));
-            map[key] = item.Value;
-        }
-        return map;
-    }
-
-    private static string Normalize(string value) {
-        return (value ?? string.Empty).Trim().ToUpperInvariant();
     }
 }

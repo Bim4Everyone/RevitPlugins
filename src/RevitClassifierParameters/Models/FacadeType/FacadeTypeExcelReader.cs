@@ -91,8 +91,8 @@ public class FacadeTypeExcelReader {
             }
 
             result.Add(new FacadeTypeItem {
-                FunctionCharacteristic = function,
-                MaterialAbbreviation = material,
+                FunctionCharacteristic = Normalize(function),
+                MaterialAbbreviation = Normalize(material),
                 Value = value
             });
         }
@@ -117,6 +117,14 @@ public class FacadeTypeExcelReader {
 
     private string GetString(object value) {
         return value?.ToString()?.Trim();
+    }
+
+    /// <summary>
+    /// Приводит ключевое поле правила (характеристику функции или сокращение материала)
+    /// к единому виду для последующего сравнения с распарсенным именем типоразмера стены.
+    /// </summary>
+    private string Normalize(string value) {
+        return (value ?? string.Empty).Trim().ToUpperInvariant();
     }
 
     private void Release(object comObject) {
