@@ -15,8 +15,10 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    MinHeight="620"
-    MinWidth="800"
+    MinHeight="550"
+    MinWidth="750"    
+    Height="550"
+    Width="750"
    
     d:DataContext="{d:DesignInstance vms:ArParameterClassifierVM, IsDesignTimeCreatable=False}">
     
@@ -35,7 +37,8 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Grid>
+    <Grid
+        Grid.IsSharedSizeScope="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -56,7 +59,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="ControlColumn"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -97,7 +100,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="ControlColumn"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -137,7 +140,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="ControlColumn"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -177,7 +180,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="ControlColumn"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
