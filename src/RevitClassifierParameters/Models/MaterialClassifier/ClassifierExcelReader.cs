@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using dosymep.SimpleServices;
@@ -70,7 +71,7 @@ public class ClassifierExcelReader {
 
     private List<WorkGroup> BuildClassifier(object[,] rows) {
         var result = new List<WorkGroup>();
-        var groups = new Dictionary<string, WorkGroup>();
+        var groups = new List<WorkGroup>();
 
         int rowCount = rows.GetLength(0);
 
@@ -93,7 +94,7 @@ public class ClassifierExcelReader {
 
     private void AddGroup(
         List<WorkGroup> roots,
-        Dictionary<string, WorkGroup> groups,
+        List<WorkGroup> groups,
         string code,
         string name) {
         var group = new WorkGroup {
@@ -101,7 +102,7 @@ public class ClassifierExcelReader {
             Name = name
         };
 
-        groups.Add(code, group);
+        groups.Add(group);
 
         var parent = FindParentGroup(groups, code);
         if(parent != null) {
@@ -113,15 +114,13 @@ public class ClassifierExcelReader {
     }
 
     private void AddWork(
-        Dictionary<string, WorkGroup> groups,
+        List<WorkGroup> groups,
         string code,
         string name,
         string unit) {
         var parent = FindParentGroup(groups, code);
-        if(parent == null)
-            return;
 
-        parent.ChildWorks.Add(new Work.Work {
+        parent?.ChildWorks.Add(new Work.Work {
             Code = code,
             Name = name,
             Unit = unit,
@@ -150,14 +149,15 @@ public class ClassifierExcelReader {
     }
 
     private static WorkGroup FindParentGroup(
-        Dictionary<string, WorkGroup> groups,
+        List<WorkGroup> groups,
         string code) {
         string current = code;
         int separatorIndex;
 
         while((separatorIndex = current.LastIndexOf('.')) >= 0) {
             current = current.Substring(0, separatorIndex);
-            if(groups.TryGetValue(current, out var parent))
+            var parent = groups.FirstOrDefault(g => g.Code == current);
+            if(parent != null)
                 return parent;
         }
         return null;
