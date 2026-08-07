@@ -18,4 +18,8 @@
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
     
+    
+    <system:String x:Key="LintelConfigRuleResolver.DefaultRuleName">Без имени</system:String>
+    <system:String x:Key="LintelConfigRuleResolver.DefaultRuleWallName">Стена</system:String>
+    
 </ResourceDictionary>

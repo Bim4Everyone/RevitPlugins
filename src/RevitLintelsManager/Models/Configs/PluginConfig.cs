@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -74,6 +75,14 @@ internal class SystemPluginConfig {
     public string DefaultLintelFixParamName  => "ФОП_Фиксация решения";
     public double DefaultMinimalHeightAboveLintelMm  => 100;
     public IEnumerable<string> DefaultStructureWallTypeNames  => [];
-    public string DefaultPhase  => "Основная планировка";
+    public string DefaultPhaseName  => "Основная планировка";
+    public string DefaultRuleFolderName  => "Rules";
+    public string DefaultSettingFolderName  => "dosymep";
+    public string DefaultSettingPath => @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\";
+    public double DefaultMinWidthMm => 400;
+    public double DefaultMaxWidthMm => 900;
+    public double DefaultWallSupportMm => 250;
+    public string DefaultLintelType => String.Empty;
+
     
 }

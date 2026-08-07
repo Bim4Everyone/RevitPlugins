@@ -7,5 +7,5 @@ namespace RevitLintelsManager.Models;
 public class LintelPlaceRule {
     public string LintelPlaceRuleName { get; set; }
     public IEnumerable<LintelRule> LintelRules { get; set; }
-    public IEnumerable<ElementId> WallTypeIds { get; set; }
+    public IEnumerable<string> WallTypeIds { get; set; }
 }

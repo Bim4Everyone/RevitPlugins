@@ -45,7 +45,7 @@ internal class PluginConfigRepository {
             LintelFixParamName = _systemPluginConfig.DefaultLintelFixParamName,
             MinimalHeightAboveOpeningMm = _systemPluginConfig.DefaultMinimalHeightAboveLintelMm,
             StructureWallTypeNames = _systemPluginConfig.DefaultStructureWallTypeNames,
-            PhaseName = _systemPluginConfig.DefaultPhase,
+            PhaseName = _systemPluginConfig.DefaultPhaseName,
         };
     }
 
