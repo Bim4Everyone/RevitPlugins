@@ -17,6 +17,9 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitClassifierParameters.Models;
+using RevitClassifierParameters.Models.FacadeType;
+using RevitClassifierParameters.Models.MaterialClassifier;
+using RevitClassifierParameters.Models.Work;
 using RevitClassifierParameters.ViewModels;
 using RevitClassifierParameters.Views;
 
@@ -66,11 +69,19 @@ public class RevitClassifierParametersCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();   
         
-        kernel.Bind<ReportService>()
+        kernel.Bind<MaterialReportService>()
             .ToSelf()
             .InSingletonScope();
                 
-        kernel.Bind<ExcelClassifierReader>()
+        kernel.Bind<ClassifierExcelReader>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<FacadeTypeExcelReader>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<FacadeTypeSetter>()
             .ToSelf()
             .InSingletonScope();
 

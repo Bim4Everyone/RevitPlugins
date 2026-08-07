@@ -97,4 +97,25 @@ internal class RevitRepository {
             .OrderBy(p => p.Definition.Name)
             .ToList();
     }
+
+    /// <summary>
+    /// Возвращает все экземпляры стен в проекте.
+    /// </summary>
+    public List<Wall> GetWalls() {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(Wall))
+            .WhereElementIsNotElementType()
+            .Cast<Wall>()
+            .ToList();
+    }
+
+    /// <summary>
+    /// Возвращает имя типоразмера стены.
+    /// </summary>
+    public string GetWallTypeName(Wall wall) {
+        if(wall == null) {
+            return string.Empty;
+        }
+        return Document.GetElement(wall.GetTypeId())?.Name ?? string.Empty;
+    }
 }

@@ -60,6 +60,7 @@ internal class RevitSettings : ProjectSettings {
     public override string ProjectName { get; set; }
     
     public string ExcelClassifierPath { get; set; }
+    public string ExcelFacadeTypePath { get; set; }
     public bool WorkWithFoundationCode { get; set; }
     public bool WorkWithConstrBelowZeroCode { get; set; }
     public bool WorkWithConstrAboveZeroCode { get; set; }

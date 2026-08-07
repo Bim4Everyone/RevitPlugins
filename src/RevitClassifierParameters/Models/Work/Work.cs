@@ -1,4 +1,4 @@
-﻿namespace RevitClassifierParameters.Models;
+﻿namespace RevitClassifierParameters.Models.Work;
 
 public class Work {
     public string Code { get; set; }

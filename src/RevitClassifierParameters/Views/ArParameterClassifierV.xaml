@@ -15,7 +15,7 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    MinHeight="570"
+    MinHeight="620"
     MinWidth="800"
    
     d:DataContext="{d:DesignInstance vms:ArParameterClassifierVM, IsDesignTimeCreatable=False}">
@@ -86,7 +86,7 @@
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
                     Content="Выбрать"
-                    Command="{Binding ReadExcelCommand}" />
+                    Command="{Binding RereadClassifierExcelCommand}" />
             </Grid>
         </Border>
         
@@ -186,6 +186,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 
                 <ui:TextBlock
@@ -232,24 +233,41 @@
                     Margin="5"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
-                    IsEnabled="{Binding Path=WorkWithFacadeCode}"
+                    IsEnabled="{Binding Path=CanEditFacadeType}"
                     IsChecked="{Binding Path=WorkWithFacadeType}"/>
                 
                 <ui:TextBlock
                     Grid.Row="4"
                     Grid.Column="0"
-                    Margin="5"
+                    Margin="5 5 5 5"
                     TextWrapping="Wrap"
-                    Text="Параметр дял типа фасада" />
+                    Text="Файл с правилами заполнения типа фасада" />
+                
+                <ui:Button
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Content="Выбрать"
+                    Command="{Binding ReadFacadeTypeExcelCommand}" />
+                
+                <ui:TextBlock
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    TextWrapping="Wrap"
+                    Text="Параметр для типа фасада" />
                 
                 <ComboBox
-                    Grid.Row="4"
+                    Grid.Row="5"
                     Grid.Column="1"
                     Margin="5"
                     MinWidth="200"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center" 
-                    IsEnabled="{Binding Path=WorkWithFacadeCode}"
+                    IsEnabled="{Binding Path=CanEditFacadeType}"
                     DisplayMemberPath="Definition.Name"
                     SelectedItem="{Binding Path=ParamForFacadeType, UpdateSourceTrigger=PropertyChanged}"
                     ItemsSource="{Binding Path=ParamsForFacadeType, UpdateSourceTrigger=PropertyChanged}" />

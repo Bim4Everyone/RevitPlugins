@@ -12,6 +12,9 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClassifierParameters.Models;
+using RevitClassifierParameters.Models.FacadeType;
+using RevitClassifierParameters.Models.MaterialClassifier;
+using RevitClassifierParameters.Models.Work;
 using RevitClassifierParameters.Views;
 
 namespace RevitClassifierParameters.ViewModels;
@@ -22,8 +25,9 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     protected readonly ILocalizationService _localizationService;
     protected readonly WorkGroupCode _workGroupCode;
     protected readonly MaterialParamSetter _materialParamSetter;
-    protected readonly ReportService _reportService;
-    protected readonly ExcelClassifierReader _excelClassifierReader;
+    protected readonly MaterialReportService _materialReportService;
+    protected readonly ClassifierExcelReader _classifierExcelReader;
+    protected readonly FacadeTypeExcelReader _facadeTypeExcelReader;
     protected readonly ReportV _reportV;
 
     private string _errorText;
@@ -37,8 +41,9 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         ILocalizationService localizationService,
         WorkGroupCode workGroupCode,
         MaterialParamSetter materialParamSetter,
-        ReportService reportService,
-        ExcelClassifierReader excelClassifierReader,
+        MaterialReportService materialReportService,
+        ClassifierExcelReader classifierExcelReader,
+        FacadeTypeExcelReader facadeTypeExcelReader,
         ReportV reportV,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) {
@@ -49,19 +54,20 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         
         _workGroupCode = workGroupCode;
         _materialParamSetter = materialParamSetter;
-        _reportService = reportService;
-        _excelClassifierReader = excelClassifierReader;
+        _materialReportService = materialReportService;
+        _classifierExcelReader = classifierExcelReader;
+        _facadeTypeExcelReader = facadeTypeExcelReader;
         _reportV = reportV;
         
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
 
-        ReadExcelCommand = RelayCommand.Create(ReadExcel);
+        RereadClassifierExcelCommand = RelayCommand.Create(RereadClassifierExcel);
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
-    public ICommand ReadExcelCommand { get; }
+    public ICommand RereadClassifierExcelCommand { get; }
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
     
@@ -70,7 +76,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
 
     public List<WorkGroup> CurrentClassifierWorks {
         get => _currentClassifierWorks;
-        set => RaiseAndSetIfChanged(ref _currentClassifierWorks, value);
+        private set => RaiseAndSetIfChanged(ref _currentClassifierWorks, value);
     }
 
     protected List<Material> MaterialInPj {
@@ -83,7 +89,22 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    protected void ReadExcel(){
+    private void RereadClassifierExcel(){
+        if(OpenFileDialogService.ShowDialog()) {
+            // Если пользователь выбрал файл при выборе файла
+            _excelClassifierPath = OpenFileDialogService.File.FullName;
+        } else {
+            // Если пользователь не выбрал файл
+            MessageBoxService.Show("Не выбран файл Классификатора!");
+            return;
+        }
+        CurrentClassifierWorks = _classifierExcelReader.Read(_excelClassifierPath);
+        if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0){
+            MessageBoxService.Show("Не найдены работы в Классификатора!");
+        }
+    } 
+    
+    protected void ReadClassifierExcel(){
         if(string.IsNullOrEmpty(_excelClassifierPath) || !File.Exists(_excelClassifierPath)) {
             if(OpenFileDialogService.ShowDialog()) {
                 // Если пользователь выбрал файл при выборе файла
@@ -94,7 +115,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
                 return;
             }
         }
-        CurrentClassifierWorks = _excelClassifierReader.Read(_excelClassifierPath);
+        CurrentClassifierWorks = _classifierExcelReader.Read(_excelClassifierPath);
         if(CurrentClassifierWorks.Count == 0){
             MessageBoxService.Show("Не найдены работы в Классификатора!");
         }
@@ -115,7 +136,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     /// Показывает окно отчёта, если по итогам обработки есть собранные записи.
     /// </summary>
     protected void ShowReport() {
-        if(_reportService.Items.Count == 0) {
+        if(_materialReportService.Items.Count == 0) {
             return;
         }
 

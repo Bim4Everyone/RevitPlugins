@@ -1,4 +1,4 @@
-namespace RevitClassifierParameters.Models;
+namespace RevitClassifierParameters.Models.MaterialClassifier;
 
 /// <summary>
 /// Статус обработки материала.

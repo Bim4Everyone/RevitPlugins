@@ -6,13 +6,17 @@ using dosymep.SimpleServices;
 
 using Microsoft.Office.Interop.Excel;
 
-namespace RevitClassifierParameters.Models;
+using RevitClassifierParameters.Models.Work;
 
-public class ExcelClassifierReader {
+namespace RevitClassifierParameters.Models.MaterialClassifier;
+
+public class ClassifierExcelReader {
+    private const int _firstDataRow = 3;
+    
     private readonly ILocalizationService _localizationService;
     private readonly IMessageBoxService _messageBoxService;
 
-    public ExcelClassifierReader(
+    public ClassifierExcelReader(
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService) {
         _localizationService = localizationService;
@@ -35,13 +39,13 @@ public class ExcelClassifierReader {
             worksheet = (Worksheet) workbook.Worksheets[1];
 
             int lastRow = GetLastRow(worksheet);
-            if(lastRow < 3) {
+            if(lastRow < _firstDataRow) {
                 _messageBoxService.Show("Лист классификатора пуст или не содержит данных.");
                 return null;
             }
 
             range = worksheet.Range[
-                worksheet.Cells[3, 1],
+                worksheet.Cells[_firstDataRow, 1],
                 worksheet.Cells[lastRow, 3]];
 
             if(range.Value2 is not object[,] values) {
@@ -117,7 +121,7 @@ public class ExcelClassifierReader {
         if(parent == null)
             return;
 
-        parent.ChildWorks.Add(new Work {
+        parent.ChildWorks.Add(new Work.Work {
             Code = code,
             Name = name,
             Unit = unit,

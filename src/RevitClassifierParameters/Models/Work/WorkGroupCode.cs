@@ -1,4 +1,4 @@
-﻿namespace RevitClassifierParameters.Models;
+﻿namespace RevitClassifierParameters.Models.Work;
 
 public class WorkGroupCode {
     public string FoundationCode { get; set; } = "г02.02";

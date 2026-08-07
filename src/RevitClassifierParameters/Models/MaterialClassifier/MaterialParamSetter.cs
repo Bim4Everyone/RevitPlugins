@@ -5,7 +5,9 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
-namespace RevitClassifierParameters.Models;
+using RevitClassifierParameters.Models.Work;
+
+namespace RevitClassifierParameters.Models.MaterialClassifier;
 
 internal class MaterialParamSetter {
     private const string _chapterParameter = "ФОП_МТР_Наименование главы";
@@ -23,11 +25,11 @@ internal class MaterialParamSetter {
     };
 
     private readonly RevitRepository _revitRepository;
-    private readonly ReportService _reportService;
+    private readonly MaterialReportService _materialReportService;
 
-    public MaterialParamSetter(RevitRepository revitRepository, ReportService reportService) {
+    public MaterialParamSetter(RevitRepository revitRepository, MaterialReportService materialReportService) {
         _revitRepository = revitRepository;
-        _reportService = reportService;
+        _materialReportService = materialReportService;
     }
 
     /// <summary>
@@ -65,7 +67,7 @@ internal class MaterialParamSetter {
 
             // Отсеиваем ситуации, когда у материала не указана Ключевая заметка (код работы)
             if(string.IsNullOrEmpty(keynote)) {
-                _reportService.Add(MaterialReportStatus.NoWorkCode, string.Empty, material.Name);
+                _materialReportService.Add(MaterialReportStatus.NoWorkCode, string.Empty, material.Name);
                 continue;
             }
 
@@ -77,7 +79,7 @@ internal class MaterialParamSetter {
             // Отсеиваем ситуации, когда Классификатор не содержит указанный в материале код
             var work = FindWork(classifierWorks, keynote);
             if(work is null) {
-                _reportService.Add(MaterialReportStatus.ClassifierCodeNotFound, keynote, material.Name);
+                _materialReportService.Add(MaterialReportStatus.ClassifierCodeNotFound, keynote, material.Name);
                 continue;
             }
 
@@ -92,7 +94,7 @@ internal class MaterialParamSetter {
     /// Использует факт, что код работы включает код своей группы как префикс,
     /// поэтому заходит только в ту ветку, чей код группы является префиксом искомого кода.
     /// </summary>
-    private Work FindWork(List<WorkGroup> workGroups, string code) {
+    private Work.Work FindWork(List<WorkGroup> workGroups, string code) {
         if(workGroups is null) {
             return null;
         }
@@ -131,36 +133,33 @@ internal class MaterialParamSetter {
     /// Заполняет параметры Классификатора у материалов в одной транзакции.
     /// </summary>
     private void SetClassifierParameters(List<RevitMaterial> revitMaterials, bool forAr) {
-        using(var transaction = _revitRepository.Document.StartTransaction(
-                  "Заполнение параметров классификатора")) {
+        using var transaction = _revitRepository.Document.StartTransaction("Заполнение параметров классификатора");
+        foreach(var revitMaterial in revitMaterials) {
+            var material = revitMaterial.Material;
+            try {
+                bool edited = false;
+                var work = revitMaterial.Work;
+                string chapterName = GetChapterName(work, forAr);
 
-            foreach(var revitMaterial in revitMaterials) {
-                var material = revitMaterial.Material;
-                try {
-                    bool edited = false;
-                    var work = revitMaterial.Work;
-                    string chapterName = GetChapterName(work, forAr);
+                edited |= SetStringParam(material, _chapterParameter, chapterName);
+                edited |= SetStringParam(material, _workTitleParameter, work.Name);
+                edited |= SetStringParam(material, _unitParameter, work.Unit);
+                edited |= SetCalculationTypeParam(material, work.Unit);
+                edited |= SetStringParam(
+                    material,
+                    BuiltInParameter.ALL_MODEL_DESCRIPTION,
+                    revitMaterial.MaterialDescription);
 
-                    edited |= SetStringParam(material, _chapterParameter, chapterName);
-                    edited |= SetStringParam(material, _workTitleParameter, work.Name);
-                    edited |= SetStringParam(material, _unitParameter, work.Unit);
-                    edited |= SetCalculationTypeParam(material, work.Unit);
-                    edited |= SetStringParam(
-                        material,
-                        BuiltInParameter.ALL_MODEL_DESCRIPTION,
-                        revitMaterial.MaterialDescription);
-
-                    _reportService.Add(
-                        edited ? MaterialReportStatus.Edited : MaterialReportStatus.NotEdited,
-                        revitMaterial.Keynote,
-                        material.Name);
-                } catch {
-                    _reportService.Add(MaterialReportStatus.Error, revitMaterial.Keynote, material.Name);
-                }
+                _materialReportService.Add(
+                    edited ? MaterialReportStatus.Edited : MaterialReportStatus.NotEdited,
+                    revitMaterial.Keynote,
+                    material.Name);
+            } catch {
+                _materialReportService.Add(MaterialReportStatus.Error, revitMaterial.Keynote, material.Name);
             }
-
-            transaction.Commit();
         }
+
+        transaction.Commit();
     }
 
     /// <summary>
@@ -169,7 +168,7 @@ internal class MaterialParamSetter {
     /// forAr = false -> наименование главы самого верхнего уровня
     /// (поднимаемся по ParentWorkGroup, пока он не станет null).
     /// </summary>
-    private string GetChapterName(Work work, bool forAr) {
+    private string GetChapterName(Work.Work work, bool forAr) {
         var chapter = work.ParentWorkGroup;
         if(chapter is null) {
             return string.Empty;
