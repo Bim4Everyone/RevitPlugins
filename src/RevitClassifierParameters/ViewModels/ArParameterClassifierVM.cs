@@ -85,6 +85,11 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         private set => RaiseAndSetIfChanged(ref _facadeTypes, value);
     }
     
+    public string ExcelFacadeTypePath {
+        get => _excelFacadeTypePath;
+        set => RaiseAndSetIfChanged(ref _excelFacadeTypePath, value);
+    }
+    
     public Parameter ParamForFacadeType {
         get => _paramForFacadeType;
         set => RaiseAndSetIfChanged(ref _paramForFacadeType, value);
@@ -118,24 +123,24 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
     private void RereadFacadeTypeExcel() {
         if(OpenFileDialogService.ShowDialog()) {
             // Если пользователь выбрал файл при выборе файла
-            _excelFacadeTypePath = OpenFileDialogService.File.FullName;
+            ExcelFacadeTypePath = OpenFileDialogService.File.FullName;
         } else {
             // Если пользователь не выбрал файл
             MessageBoxService.Show("Не выбран файл правил заполнения типа фасада!");
             return;
         }
 
-        FacadeTypes = _facadeTypeExcelReader.Read(_excelFacadeTypePath);
+        FacadeTypes = _facadeTypeExcelReader.Read(ExcelFacadeTypePath);
         if(FacadeTypes is null || FacadeTypes.Count == 0) {
             MessageBoxService.Show("Не найдены типы фасадом в файле!");
         }
     }
     
     private void ReadFacadeTypeExcel() {
-        if(string.IsNullOrEmpty(_excelFacadeTypePath) || !File.Exists(_excelFacadeTypePath)) {
+        if(string.IsNullOrEmpty(ExcelFacadeTypePath) || !File.Exists(ExcelFacadeTypePath)) {
             if(OpenFileDialogService.ShowDialog()) {
                 // Если пользователь выбрал файл при выборе файла
-                _excelFacadeTypePath = OpenFileDialogService.File.FullName;
+                ExcelFacadeTypePath = OpenFileDialogService.File.FullName;
             } else {
                 // Если пользователь не выбрал файл
                 MessageBoxService.Show("Не выбран файл правил заполнения типа фасада!");
@@ -143,7 +148,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
             }
         }
 
-        FacadeTypes = _facadeTypeExcelReader.Read(_excelFacadeTypePath);
+        FacadeTypes = _facadeTypeExcelReader.Read(ExcelFacadeTypePath);
         if(FacadeTypes is null || FacadeTypes.Count == 0) {
             MessageBoxService.Show("Не найдены типы фасадом в файле!");
         }
@@ -164,13 +169,42 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
     }
 
     protected override bool CanAcceptView() {
+        // Если планируем работать с классификатором
+        if(WorkWithMasonryCode || WorkWithRoofCode || WorkWithFacadeType) {
+            if(string.IsNullOrEmpty(ExcelClassifierPath)) {
+                ErrorText = "Не выбран файл классификатора";
+                return false;
+            }
+            if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0){
+                ErrorText = "Не найдены работы в Классификатора";
+                return false;
+            }
+        }
+
+        // Если планируем работать с типами фасадов
+        if(WorkWithFacadeType) {
+            if(string.IsNullOrEmpty(ExcelFacadeTypePath)) {
+                ErrorText = "Не выбран файл типов фасадов";
+                return false;
+            }
+            if(FacadeTypes is null || FacadeTypes.Count == 0) {
+                ErrorText = "Не найдены типы фасадом в файле";
+                return false;
+            }
+            if(ParamForFacadeType is null) {
+                ErrorText = "Не выбран параметр для типов фасадов";
+                return false;
+            }
+        }
+        
+        ErrorText = string.Empty;
         return true;
     }
 
     private void LoadConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        _excelClassifierPath = setting?.ExcelClassifierPath ?? string.Empty;
+        ExcelClassifierPath = setting?.ExcelClassifierPath ?? string.Empty;
         WorkWithMasonryCode = setting?.WorkWithMasonryCode ?? true;
         WorkWithRoofCode = setting?.WorkWithRoofCode ?? true;
         WorkWithFacadeCode = setting?.WorkWithFacadeCode ?? true;
@@ -178,15 +212,15 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         
         // Для следующих есть стандартное значение, но пользователь может задать иное
         _facadeTypeParamName = setting?.ParamNameForFacadeType ?? _facadeTypeParamName;
-        _excelFacadeTypePath = setting?.ExcelFacadeTypePath ?? _excelFacadeTypePath;
+        ExcelFacadeTypePath = setting?.ExcelFacadeTypePath ?? _excelFacadeTypePath;
     }
 
     private void SaveConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                       ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.ExcelClassifierPath = _excelClassifierPath;
-        setting.ExcelFacadeTypePath = _excelFacadeTypePath;
+        setting.ExcelClassifierPath = ExcelClassifierPath;
+        setting.ExcelFacadeTypePath = ExcelFacadeTypePath;
         setting.WorkWithMasonryCode = WorkWithMasonryCode;
         setting.WorkWithRoofCode = WorkWithRoofCode;
         setting.WorkWithFacadeCode = WorkWithFacadeCode;

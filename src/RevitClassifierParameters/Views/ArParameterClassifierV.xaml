@@ -15,10 +15,9 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    MinHeight="600"
-    MinWidth="850"    
-    Height="600"
-    Width="850"
+    SizeToContent="Height"
+    ResizeMode="NoResize"
+    MaxWidth="900"
    
     d:DataContext="{d:DesignInstance vms:ArParameterClassifierVM, IsDesignTimeCreatable=False}">
     
@@ -61,7 +60,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -110,7 +109,7 @@
                         PlaceholderText="Путь к файлу"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Stretch"
-                        Text="{Binding Path=ExcelClassifierPath}" />
+                        Text="{Binding Path=ExcelClassifierPath, UpdateSourceTrigger=PropertyChanged}" />
                     
                     <ui:Button
                         Grid.Column="1"                    
@@ -131,7 +130,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -181,7 +180,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -231,7 +230,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -281,7 +280,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -348,7 +347,7 @@
                         PlaceholderText="Путь к файлу"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Stretch"
-                        Text="{Binding Path=ExcelClassifierPath}" />
+                        Text="{Binding Path=ExcelFacadeTypePath, UpdateSourceTrigger=PropertyChanged}" />
                     
                     <ui:Button
                         Grid.Column="1"
