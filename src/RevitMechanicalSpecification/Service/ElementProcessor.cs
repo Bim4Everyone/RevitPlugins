@@ -27,11 +27,6 @@ namespace RevitMechanicalSpecification.Service {
         private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
 
-        private readonly HashSet<BuiltInCategory> _possibleGenericCategories = new HashSet<BuiltInCategory>() {
-                        BuiltInCategory.OST_DuctAccessory,
-                        BuiltInCategory.OST_PipeAccessory,
-                        BuiltInCategory.OST_MechanicalEquipment
-    };
         private readonly HashSet<BuiltInCategory> _insulationCategories = new HashSet<BuiltInCategory>() {
                         BuiltInCategory.OST_DuctInsulations,
                         BuiltInCategory.OST_PipeInsulations
@@ -102,6 +97,7 @@ namespace RevitMechanicalSpecification.Service {
                         nextStepByPercents = percent * percentCount;
                     }
                     
+                    _maskReplacer.ExecuteReplacment(specificationElement);
                     ProcessElement(specificationElement, fillers);
                 }
 
@@ -116,6 +112,7 @@ namespace RevitMechanicalSpecification.Service {
                         percentCount += 1;
                         nextStepByPercents = percent * percentCount;
                     }
+                    _maskReplacer.ExecuteReplacment(manifoldElement);
                     ProcessElement(manifoldElement, fillers);
                 }
                 t.Commit();
@@ -276,16 +273,5 @@ namespace RevitMechanicalSpecification.Service {
             return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.IsOutSideOfManifold) == 1;
         }
 
-        /// <summary>
-        /// Если генерик - заполняет его и возвращает True. Иначе возвращает False.
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        private bool FillIfGeneric(Element element) {
-            if(element.InAnyCategory(_possibleGenericCategories)) {
-                return _maskReplacer.ExecuteReplacment(element);
-            }
-            return false;
-        }
     }
 }

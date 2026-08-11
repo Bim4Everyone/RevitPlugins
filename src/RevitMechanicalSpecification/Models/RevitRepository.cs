@@ -24,7 +24,6 @@ namespace RevitMechanicalSpecification.Models {
     internal class RevitRepository {
 
         private readonly ElementProcessor _elementProcessor;
-        private readonly ElementEditChecker _elementEditChecker;
         private readonly List<ElementParamFiller> _fillersSpecRefresh;
         private readonly List<ElementParamFiller> _fillersSystemRefresh;
         private readonly List<ElementParamFiller> _fillersFunctionRefresh;
@@ -33,21 +32,17 @@ namespace RevitMechanicalSpecification.Models {
         private readonly List<VisSystem> _visSystems;
         private readonly SpecConfiguration _specConfiguration;
         private readonly VisElementsCalculator _calculator;
-        private readonly MaskReplacer _maskReplacer;
 
 
         public RevitRepository(
             UIApplication uiApplication,
             SpecConfiguration specConfiguration,
-            ElementProcessor elementProcessor,
-            ElementEditChecker elementEditChecker) {
+            ElementProcessor elementProcessor) {
             UIApplication = uiApplication;
             _elementProcessor = elementProcessor;
-            _elementEditChecker = elementEditChecker;
             _specConfiguration = specConfiguration;
             _collector = new CollectionFactory(Document, _specConfiguration, ActiveUIDocument);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
-            _maskReplacer = new MaskReplacer(_specConfiguration);
             _visSystems = _collector.GetVisSystems();
 
             _fillersSpecRefresh = new List<ElementParamFiller>()
@@ -133,7 +128,6 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         public void SpecificationRefresh() {
             _elements = _collector.GetElementsByCategories();
-            ReplaceMask(_elements);
             _elementProcessor.ShowProcess(_fillersSpecRefresh, _elements);
         }
 
@@ -158,7 +152,6 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         public void FullRefresh() {
             _elements = _collector.GetElementsByCategories();
-            ReplaceMask(_elements);
             _elementProcessor.ShowProcess(FoldFillerLists(), _elements);
         }
 
@@ -167,7 +160,6 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         public void VisibleFullRefresh() {
             _elements = _collector.GetVisibleElementsByCategories();
-            ReplaceMask(_elements);
             _elementProcessor.ShowProcess(FoldFillerLists(), _elements);
         }
 
@@ -176,29 +168,7 @@ namespace RevitMechanicalSpecification.Models {
         /// </summary>
         public void SelectedFullRefresh() {
             _elements = _collector.GetSelectedElementsByCategories();
-            ReplaceMask(_elements);
             _elementProcessor.ShowProcess(FoldFillerLists(), _elements);
-        }
-
-        /// <summary>
-        /// Вызов замены маски в шаблонизированных семействах-генериках. Отдельный мини-плагин, который должен вызываться
-        /// вместе с спекой, поэтому проще его встроить сюда
-        /// </summary>
-        public void ReplaceMask(List<Element> elements = null) {
-            if(elements is null) {
-                elements = _collector.GetElementsByCategories();
-            }
-
-            List<Element> editableElements = elements
-                .Where(element => !_elementEditChecker.IsUnavailableForEdit(element))
-                .ToList();
-
-            using(var t = Document.StartTransaction("Сформировать имя")) {
-                foreach(Element element in editableElements) {
-                    _maskReplacer.ExecuteReplacment(element);
-                }
-                t.Commit();
-            }
         }
 
         private List<ElementParamFiller> FoldFillerLists() {
