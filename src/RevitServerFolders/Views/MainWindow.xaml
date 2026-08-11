@@ -247,17 +247,24 @@
                                 CanUserSort="True"
                                 Header="№"
                                 Binding="{Binding Index}" />
-                            <DataGridCheckBoxColumn
+                            <DataGridTemplateColumn
                                 CanUserReorder="False"
                                 CanUserResize="False"
                                 CanUserSort="False"
-                                Width="Auto"
-                                Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
-                                <DataGridCheckBoxColumn.Header>
+                                Width="Auto">
+                                <DataGridTemplateColumn.Header>
                                     <CheckBox
                                         IsChecked="{Binding DataContext.AllSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </DataGridCheckBoxColumn.Header>
-                            </DataGridCheckBoxColumn>
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTemplateColumn
                                 Width="180"
                                 MinWidth="180"

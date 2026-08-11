@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -22,6 +23,8 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
 
     private string _targetFolder;
     private string _sourceFolder;
+    private string _searchText;
+    private string _excludedObjectPatternText;
 
     private ModelObjectViewModel _selectedObject;
 
@@ -45,6 +48,13 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         _localization = localization
             ?? throw new ArgumentNullException(nameof(localization));
         ModelObjects = [];
+        SelectedObjects = [];
+        ModelObjectsView = new CollectionViewSource() { Source = ModelObjects };
+        ModelObjectsView.Filter += ModelObjectsFilterHandler;
+        ExcludedObjectPatterns = [
+            .. (_settings.ExcludedObjectPatterns ?? [])
+            .Select(item => new ExcludedObjectPatternViewModel(item))
+        ];
         TargetFolder = _settings.TargetFolder;
         SourceFolder = _settings.SourceFolder;
         ClearTargetFolder = _settings.ClearTargetFolder;
@@ -56,8 +66,15 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         OpenFromFoldersCommand = RelayCommand.CreateAsync(OpenFromFolder);
         OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog);
         SourceFolderChangedCommand = RelayCommand.CreateAsync(SourceFolderChanged);
+        ToggleSkipObjectCommand = RelayCommand.Create<ModelObjectViewModel>(ToggleSkipObject);
+        AddExcludedObjectPatternCommand
+            = RelayCommand.Create(AddExcludedObjectPattern, CanAddExcludedObjectPattern);
+        RemoveExcludedObjectPatternCommand = RelayCommand.Create<ExcludedObjectPatternViewModel>(
+            RemoveExcludedObjectPattern,
+            CanRemoveExcludedObjectPattern);
 
         PropertyChanged += OnSourceFolderChanged;
+        PropertyChanged += OnSearchTextChanged;
     }
 
     public IModelObjectService ObjectService { get; }
@@ -67,6 +84,12 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
     public ICommand OpenFolderDialogCommand { get; }
 
     public IAsyncCommand<object> SourceFolderChangedCommand { get; }
+
+    public ICommand ToggleSkipObjectCommand { get; }
+
+    public ICommand AddExcludedObjectPatternCommand { get; }
+
+    public ICommand RemoveExcludedObjectPatternCommand { get; }
 
     public IOpenFolderDialogService OpenFolderDialogService { get; }
 
@@ -111,12 +134,40 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
 
     public ObservableCollection<ModelObjectViewModel> ModelObjects { get; }
 
+    /// <summary>
+    /// Модели, выделенные в таблице
+    /// </summary>
+    public ObservableCollection<ModelObjectViewModel> SelectedObjects { get; }
+
+    /// <summary>
+    /// Отфильтрованное представление <see cref="ModelObjects"/>: поиск и скрытие по подстрокам
+    /// </summary>
+    public CollectionViewSource ModelObjectsView { get; }
+
+    public ObservableCollection<ExcludedObjectPatternViewModel> ExcludedObjectPatterns { get; }
+
+    /// <summary>
+    /// Подстрока для поиска по списку моделей
+    /// </summary>
+    public string SearchText {
+        get => _searchText;
+        set => RaiseAndSetIfChanged(ref _searchText, value);
+    }
+
+    /// <summary>
+    /// Подстрока для скрытия файлов, из которой создается карточка исключения
+    /// </summary>
+    public string ExcludedObjectPatternText {
+        get => _excludedObjectPatternText;
+        set => RaiseAndSetIfChanged(ref _excludedObjectPatternText, value);
+    }
+
     public bool SkipAll {
         get => _skipAll;
         set {
             if(_skipAll != value) {
                 RaiseAndSetIfChanged(ref _skipAll, value);
-                foreach(var item in ModelObjects) {
+                foreach(var item in GetVisibleObjects()) {
                     item.SkipObject = value;
                 }
             }
@@ -144,6 +195,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
             .Where(item => item.SkipObject)
             .Select(item => item.FullName)
             .ToArray();
+        _settings.ExcludedObjectPatterns = [.. ExcludedObjectPatterns.Select(item => item.GetSettings())];
         return _settings;
     }
 
@@ -164,7 +216,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
             return _localization.GetLocalizedString("MainWindow.Validation.SourceFolderEmpty");
         }
 
-        if(!ModelObjects.Any(item => !item.SkipObject)) {
+        if(ModelObjects.All(item => item.SkipObject)) {
             return _localization.GetLocalizedString("MainWindow.Validation.AllModelsSkipped");
         }
 
@@ -219,6 +271,76 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
             await Task.Delay(250);
             await SourceFolderChangedCommand.ExecuteAsync(default);
         }
+    }
+
+    private void OnSearchTextChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName == nameof(SearchText)) {
+            ModelObjectsView.View?.Refresh();
+        }
+    }
+
+    private void ModelObjectsFilterHandler(object sender, FilterEventArgs e) {
+        if(e.Item is ModelObjectViewModel item) {
+            e.Accepted = !IsExcluded(item) && MatchesSearch(item);
+        }
+    }
+
+    private bool IsExcluded(ModelObjectViewModel item) {
+        return ExcludedObjectPatterns.Any(pattern => Contains(item.FullName, pattern.Value));
+    }
+
+    private bool MatchesSearch(ModelObjectViewModel item) {
+        string searchText = SearchText?.Trim();
+        return string.IsNullOrEmpty(searchText)
+               || Contains(item.Name, searchText)
+               || Contains(item.FullName, searchText);
+    }
+
+    private bool Contains(string source, string value) {
+        return !string.IsNullOrEmpty(source)
+               && !string.IsNullOrEmpty(value)
+               && source.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) >= 0;
+    }
+
+    private ModelObjectViewModel[] GetVisibleObjects() {
+        var view = ModelObjectsView.View;
+        return view is null ? [] : [.. view.OfType<ModelObjectViewModel>()];
+    }
+
+    /// <summary>
+    /// Переносит признак пропуска кликнутой модели на все выделенные строки таблицы
+    /// </summary>
+    private void ToggleSkipObject(ModelObjectViewModel item) {
+        if(item is null
+           || !SelectedObjects.Contains(item)) {
+            return;
+        }
+
+        bool skipObject = item.SkipObject;
+        foreach(var selectedObject in SelectedObjects.ToArray()) {
+            selectedObject.SkipObject = skipObject;
+        }
+    }
+
+    private void AddExcludedObjectPattern() {
+        ExcludedObjectPatterns.Add(
+            new ExcludedObjectPatternViewModel(
+                new ExcludedObjectPattern() { Value = ExcludedObjectPatternText.Trim() }));
+        ExcludedObjectPatternText = null;
+        ModelObjectsView.View?.Refresh();
+    }
+
+    private bool CanAddExcludedObjectPattern() {
+        return !string.IsNullOrWhiteSpace(ExcludedObjectPatternText);
+    }
+
+    private void RemoveExcludedObjectPattern(ExcludedObjectPatternViewModel pattern) {
+        ExcludedObjectPatterns.Remove(pattern);
+        ModelObjectsView.View?.Refresh();
+    }
+
+    private bool CanRemoveExcludedObjectPattern(ExcludedObjectPatternViewModel pattern) {
+        return pattern is not null;
     }
 
     private async Task AddModelObjects(ModelObject modelObject) {
