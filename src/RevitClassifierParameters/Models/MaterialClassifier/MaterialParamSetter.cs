@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitClassifierParameters.Models.Work;
 
@@ -26,10 +27,15 @@ internal class MaterialParamSetter {
 
     private readonly RevitRepository _revitRepository;
     private readonly MaterialReportService _materialReportService;
+    private readonly ILocalizationService _localizationService;
 
-    public MaterialParamSetter(RevitRepository revitRepository, MaterialReportService materialReportService) {
+    public MaterialParamSetter(
+        RevitRepository revitRepository,
+        MaterialReportService materialReportService,
+        ILocalizationService localizationService) {
         _revitRepository = revitRepository;
         _materialReportService = materialReportService;
+        _localizationService = localizationService;
     }
 
     /// <summary>
@@ -133,7 +139,8 @@ internal class MaterialParamSetter {
     /// Заполняет параметры Классификатора у материалов в одной транзакции.
     /// </summary>
     private void SetClassifierParameters(List<RevitMaterial> revitMaterials, bool forAr) {
-        using var transaction = _revitRepository.Document.StartTransaction("Заполнение параметров классификатора");
+        using var transaction = _revitRepository.Document.StartTransaction(
+            _localizationService.GetLocalizedString("Transaction.SetClassifierParameters"));
         foreach(var revitMaterial in revitMaterials) {
             var material = revitMaterial.Material;
             try {

@@ -82,14 +82,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Файл с кодами классификатора" />                
+                    Text="{me:LocalizationSource MainWindow.ClassifierFileTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Необходимо выбрать актуальный для проекта excel-файл с кодами классификатора" />
+                    Text="{me:LocalizationSource MainWindow.ClassifierFileDescription}" />
                 
                 <Grid
                     Grid.Row="0"
@@ -106,7 +106,7 @@
                         IsReadOnly="True"
                         IsEnabled="False"
                         TextWrapping="WrapWithOverflow"
-                        PlaceholderText="Путь к файлу"
+                        PlaceholderText="{me:LocalizationSource MainWindow.FilePathPlaceholder}"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Stretch"
                         Text="{Binding Path=ExcelClassifierPath, UpdateSourceTrigger=PropertyChanged}" />
@@ -116,7 +116,7 @@
                         Margin="5"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Stretch"
-                        Content="Выбрать"
+                        Content="{me:LocalizationSource MainWindow.ButtonSelect}"
                         Command="{Binding RereadClassifierExcelCommand}" />
                 </Grid>
             </Grid>
@@ -152,14 +152,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Кладка" />                
+                    Text="{me:LocalizationSource MainWindow.MasonryTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Учитывает материалы с кодами, которые начинаются на г02.05" />
+                    Text="{me:LocalizationSource MainWindow.MasonryDescription}" />
                 
                 <CheckBox
                     Grid.Row="0"
@@ -202,14 +202,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Кровля" />                
+                    Text="{me:LocalizationSource MainWindow.RoofTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Учитывает материалы с кодами, которые начинаются на г02.06" />
+                    Text="{me:LocalizationSource MainWindow.RoofDescription}" />
                 
                 <CheckBox
                     Grid.Row="0"
@@ -252,14 +252,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Фасады" />                
+                    Text="{me:LocalizationSource MainWindow.FacadeTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Учитывает материалы с кодами, которые начинаются на г02.07" />
+                    Text="{me:LocalizationSource MainWindow.FacadeDescription}" />
                 
                 <CheckBox
                     Grid.Row="0"
@@ -304,14 +304,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Заполнить тип фасада" />                
+                    Text="{me:LocalizationSource MainWindow.FacadeTypeTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Заполнить тип фасада в заданный параметр" />
+                    Text="{me:LocalizationSource MainWindow.FacadeTypeDescription}" />
                 
                 <CheckBox
                     Grid.Row="0"
@@ -328,7 +328,7 @@
                     Margin="5 5 5 5"
                     VerticalAlignment="Center"
                     TextWrapping="Wrap"
-                    Text="Файл с правилами заполнения типа фасада" />
+                    Text="{me:LocalizationSource MainWindow.FacadeTypeFileLabel}" />
                 
                 <Grid
                     Grid.Row="2"
@@ -344,7 +344,7 @@
                         IsReadOnly="True"
                         IsEnabled="False"
                         TextWrapping="WrapWithOverflow"
-                        PlaceholderText="Путь к файлу"
+                        PlaceholderText="{me:LocalizationSource MainWindow.FilePathPlaceholder}"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Stretch"
                         Text="{Binding Path=ExcelFacadeTypePath, UpdateSourceTrigger=PropertyChanged}" />
@@ -354,7 +354,7 @@
                         Margin="5"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Stretch"
-                        Content="Выбрать"
+                        Content="{me:LocalizationSource MainWindow.ButtonSelect}"
                         Command="{Binding ReadFacadeTypeExcelCommand}" />
                 </Grid>
                 
@@ -364,7 +364,7 @@
                     Margin="5"
                     VerticalAlignment="Center"
                     TextWrapping="Wrap"
-                    Text="Параметр для типа фасада" />
+                    Text="{me:LocalizationSource MainWindow.FacadeTypeParamLabel}" />
                 
                 <ComboBox
                     Grid.Row="3"

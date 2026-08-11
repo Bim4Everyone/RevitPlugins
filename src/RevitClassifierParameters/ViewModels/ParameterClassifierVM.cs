@@ -110,12 +110,12 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
             ExcelClassifierPath = OpenFileDialogService.File.FullName;
         } else {
             // Если пользователь не выбрал файл
-            MessageBoxService.Show("Не выбран файл Классификатора!");
+            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoClassifierFileSelected"));
             return;
         }
         CurrentClassifierWorks = _classifierExcelReader.Read(ExcelClassifierPath);
         if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0){
-            MessageBoxService.Show("Не найдены работы в Классификатора!");
+            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoClassifierWorksFound"));
         }
     } 
     
@@ -126,14 +126,14 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         
         CurrentClassifierWorks = _classifierExcelReader.Read(ExcelClassifierPath);
         if(CurrentClassifierWorks.Count == 0){
-            MessageBoxService.Show("Не найдены работы в Классификатора!");
+            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoClassifierWorksFound"));
         }
     }
 
     protected void GetMaterials() {
         MaterialInPj = _revitRepository.GetElementMaterials();
         if(MaterialInPj is null || MaterialInPj.Count == 0) {
-            MessageBoxService.Show("Не найдено материалов!");
+            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoMaterialsFound"));
         }
     }
 

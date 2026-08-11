@@ -8,6 +8,55 @@
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="MainWindow.ButtonSelect">Select</system:String>
+
+    <system:String x:Key="MainWindow.SelectClassifierFile">Select classifier file</system:String>
+    <system:String x:Key="MainWindow.SelectFacadeTypeFile">Select facade type file</system:String>
+
+    <system:String x:Key="MainWindow.ClassifierFileTitle">File with classifier codes</system:String>
+    <system:String x:Key="MainWindow.ClassifierFileDescription">Select an up-to-date excel file with classifier codes for the project</system:String>
+    <system:String x:Key="MainWindow.FilePathPlaceholder">File path</system:String>
+
+    <system:String x:Key="MainWindow.MasonryTitle">Masonry</system:String>
+    <system:String x:Key="MainWindow.MasonryDescription">Processes materials with codes starting with г02.05</system:String>
+
+    <system:String x:Key="MainWindow.RoofTitle">Roof</system:String>
+    <system:String x:Key="MainWindow.RoofDescription">Processes materials with codes starting with г02.06</system:String>
+
+    <system:String x:Key="MainWindow.FacadeTitle">Facades</system:String>
+    <system:String x:Key="MainWindow.FacadeDescription">Processes materials with codes starting with г02.07</system:String>
+
+    <system:String x:Key="MainWindow.FacadeTypeTitle">Fill in facade type</system:String>
+    <system:String x:Key="MainWindow.FacadeTypeDescription">Fill in the facade type into the specified parameter</system:String>
+    <system:String x:Key="MainWindow.FacadeTypeFileLabel">File with facade type filling rules</system:String>
+    <system:String x:Key="MainWindow.FacadeTypeParamLabel">Parameter for facade type</system:String>
+
+    <system:String x:Key="MainWindow.NoClassifierFileSelected">Classifier file is not selected!</system:String>
+    <system:String x:Key="MainWindow.NoClassifierWorksFound">No works found in the Classifier!</system:String>
+    <system:String x:Key="MainWindow.NoMaterialsFound">No materials found!</system:String>
+    <system:String x:Key="MainWindow.NoFacadeTypeFileSelected">Facade type rules file is not selected!</system:String>
+    <system:String x:Key="MainWindow.NoFacadeTypesFound">No facade types found in the file!</system:String>
+
+    <system:String x:Key="MainWindow.ErrorNoClassifierFile">Classifier file is not selected</system:String>
+    <system:String x:Key="MainWindow.ErrorNoClassifierWorks">No works found in the Classifier</system:String>
+    <system:String x:Key="MainWindow.ErrorNoFacadeTypeFile">Facade type file is not selected</system:String>
+    <system:String x:Key="MainWindow.ErrorNoFacadeTypes">No facade types found in the file</system:String>
+    <system:String x:Key="MainWindow.ErrorNoFacadeTypeParam">Parameter for facade types is not selected</system:String>
+
+    <system:String x:Key="Repository.NoMaterialsForElements">No materials found for elements in the project!</system:String>
+    <system:String x:Key="Repository.NoElementsInProject">No elements found in the project!</system:String>
+
+    <system:String x:Key="Reader.ClassifierSheetEmpty">Classifier sheet is empty or contains no data.</system:String>
+    <system:String x:Key="Reader.FacadeTypeFileEmpty">Facade type rules file is empty or contains no data.</system:String>
+
+    <system:String x:Key="Transaction.SetClassifierParameters">Filling classifier parameters</system:String>
+    <system:String x:Key="Transaction.SetFacadeType">Filling facade type</system:String>
+
+    <system:String x:Key="MaterialReportStatus.Edited">EDITED</system:String>
+    <system:String x:Key="MaterialReportStatus.NotEdited">NOT CHANGED</system:String>
+    <system:String x:Key="MaterialReportStatus.NoWorkCode">NO WORK CODE</system:String>
+    <system:String x:Key="MaterialReportStatus.ClassifierCodeNotFound">CODE NOT FOUND</system:String>
+    <system:String x:Key="MaterialReportStatus.Error">WRITE ERROR</system:String>
 
     <system:String x:Key="ReportWindow.Title">Plugin execution report</system:String>
     <system:String x:Key="ReportWindow.ColumnStatus">Status</system:String>

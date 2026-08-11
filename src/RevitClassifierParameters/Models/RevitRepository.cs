@@ -65,7 +65,7 @@ internal class RevitRepository {
             .ToList();
 
         if (materials.Count == 0)
-            _messageBoxService.Show("Не найдено материалов у элементов в проекте!");
+            _messageBoxService.Show(_localizationService.GetLocalizedString("Repository.NoMaterialsForElements"));
         return materials;
     }
 
@@ -77,7 +77,7 @@ internal class RevitRepository {
         if(elements.Count != 0) {
             return elements;
         }
-        _messageBoxService.Show("Не найдено элементов в проекте!");
+        _messageBoxService.Show(_localizationService.GetLocalizedString("Repository.NoElementsInProject"));
         return [];
     }
 

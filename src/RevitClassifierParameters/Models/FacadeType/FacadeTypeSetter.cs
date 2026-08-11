@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitClassifierParameters.Models.FacadeType;
 
@@ -14,10 +15,12 @@ namespace RevitClassifierParameters.Models.FacadeType;
 /// </summary>
 internal class FacadeTypeSetter {
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
     private readonly FacadeTypeNameParser _facadeTypeNameParser = new();
 
-    public FacadeTypeSetter(RevitRepository revitRepository) {
+    public FacadeTypeSetter(RevitRepository revitRepository, ILocalizationService localizationService) {
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
     }
 
     /// <summary>
@@ -32,7 +35,8 @@ internal class FacadeTypeSetter {
             return;
         }
 
-        using var transaction = _revitRepository.Document.StartTransaction("Заполнение типа фасада");
+        using var transaction = _revitRepository.Document.StartTransaction(
+            _localizationService.GetLocalizedString("Transaction.SetFacadeType"));
 
         foreach(var wall in _revitRepository.GetWalls()) {
             string typeName = _revitRepository.Document.GetElement(wall.GetTypeId())?.Name ?? string.Empty;

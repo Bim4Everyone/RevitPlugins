@@ -8,9 +8,55 @@
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
-    
+    <system:String x:Key="MainWindow.ButtonSelect">Выбрать</system:String>
+
     <system:String x:Key="MainWindow.SelectClassifierFile">Выберите файл классификатора</system:String>
     <system:String x:Key="MainWindow.SelectFacadeTypeFile">Выберите файл типов фасадов</system:String>
+
+    <system:String x:Key="MainWindow.ClassifierFileTitle">Файл с кодами классификатора</system:String>
+    <system:String x:Key="MainWindow.ClassifierFileDescription">Необходимо выбрать актуальный для проекта excel-файл с кодами классификатора</system:String>
+    <system:String x:Key="MainWindow.FilePathPlaceholder">Путь к файлу</system:String>
+
+    <system:String x:Key="MainWindow.MasonryTitle">Кладка</system:String>
+    <system:String x:Key="MainWindow.MasonryDescription">Учитывает материалы с кодами, которые начинаются на г02.05</system:String>
+
+    <system:String x:Key="MainWindow.RoofTitle">Кровля</system:String>
+    <system:String x:Key="MainWindow.RoofDescription">Учитывает материалы с кодами, которые начинаются на г02.06</system:String>
+
+    <system:String x:Key="MainWindow.FacadeTitle">Фасады</system:String>
+    <system:String x:Key="MainWindow.FacadeDescription">Учитывает материалы с кодами, которые начинаются на г02.07</system:String>
+
+    <system:String x:Key="MainWindow.FacadeTypeTitle">Заполнить тип фасада</system:String>
+    <system:String x:Key="MainWindow.FacadeTypeDescription">Заполнить тип фасада в заданный параметр</system:String>
+    <system:String x:Key="MainWindow.FacadeTypeFileLabel">Файл с правилами заполнения типа фасада</system:String>
+    <system:String x:Key="MainWindow.FacadeTypeParamLabel">Параметр для типа фасада</system:String>
+
+    <system:String x:Key="MainWindow.NoClassifierFileSelected">Не выбран файл Классификатора!</system:String>
+    <system:String x:Key="MainWindow.NoClassifierWorksFound">Не найдены работы в Классификатора!</system:String>
+    <system:String x:Key="MainWindow.NoMaterialsFound">Не найдено материалов!</system:String>
+    <system:String x:Key="MainWindow.NoFacadeTypeFileSelected">Не выбран файл правил заполнения типа фасада!</system:String>
+    <system:String x:Key="MainWindow.NoFacadeTypesFound">Не найдены типы фасадом в файле!</system:String>
+
+    <system:String x:Key="MainWindow.ErrorNoClassifierFile">Не выбран файл классификатора</system:String>
+    <system:String x:Key="MainWindow.ErrorNoClassifierWorks">Не найдены работы в Классификатора</system:String>
+    <system:String x:Key="MainWindow.ErrorNoFacadeTypeFile">Не выбран файл типов фасадов</system:String>
+    <system:String x:Key="MainWindow.ErrorNoFacadeTypes">Не найдены типы фасадом в файле</system:String>
+    <system:String x:Key="MainWindow.ErrorNoFacadeTypeParam">Не выбран параметр для типов фасадов</system:String>
+
+    <system:String x:Key="Repository.NoMaterialsForElements">Не найдено материалов у элементов в проекте!</system:String>
+    <system:String x:Key="Repository.NoElementsInProject">Не найдено элементов в проекте!</system:String>
+
+    <system:String x:Key="Reader.ClassifierSheetEmpty">Лист классификатора пуст или не содержит данных.</system:String>
+    <system:String x:Key="Reader.FacadeTypeFileEmpty">Файл правил заполнения типа фасада пуст или не содержит данных.</system:String>
+
+    <system:String x:Key="Transaction.SetClassifierParameters">Заполнение параметров классификатора</system:String>
+    <system:String x:Key="Transaction.SetFacadeType">Заполнение типа фасада</system:String>
+
+    <system:String x:Key="MaterialReportStatus.Edited">ИЗМЕНЕН</system:String>
+    <system:String x:Key="MaterialReportStatus.NotEdited">БЕЗ ИЗМЕНЕНИЙ</system:String>
+    <system:String x:Key="MaterialReportStatus.NoWorkCode">НЕТ КОДА РАБОТЫ</system:String>
+    <system:String x:Key="MaterialReportStatus.ClassifierCodeNotFound">НЕ НАЙДЕН КОД</system:String>
+    <system:String x:Key="MaterialReportStatus.Error">ОШИБКА ПРИ ЗАПИСИ</system:String>
 
     <system:String x:Key="ReportWindow.Title">Отчет работы плагина</system:String>
     <system:String x:Key="ReportWindow.ColumnStatus">Статус</system:String>

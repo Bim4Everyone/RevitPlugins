@@ -46,7 +46,7 @@ public class FacadeTypeExcelReader {
 
             int lastRow = GetLastRow(worksheet);
             if(lastRow < _firstDataRow) {
-                _messageBoxService.Show("Файл правил заполнения типа фасада пуст или не содержит данных.");
+                _messageBoxService.Show(_localizationService.GetLocalizedString("Reader.FacadeTypeFileEmpty"));
                 return null;
             }
 
@@ -55,7 +55,7 @@ public class FacadeTypeExcelReader {
                 worksheet.Cells[lastRow, 3]];
 
             if(range.Value2 is not object[,] values) {
-                _messageBoxService.Show("Файл правил заполнения типа фасада пуст или не содержит данных.");
+                _messageBoxService.Show(_localizationService.GetLocalizedString("Reader.FacadeTypeFileEmpty"));
                 return null;
             }
 

@@ -10,6 +10,7 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:markupExtensions="clr-namespace:RevitClassifierParameters.MarkupExtensions"
 
     mc:Ignorable="d"
     WindowStartupLocation="CenterScreen"
@@ -67,7 +68,7 @@
 
                 <DataGrid.Columns>
                     <DataGridTextColumn
-                        Binding="{Binding Path=StatusText}"
+                        Binding="{Binding Path=Status, Converter={markupExtensions:EnumToLocale}}"
                         Header="{StaticResource ColumnStatusHeader}"
                         IsReadOnly="True" />
 

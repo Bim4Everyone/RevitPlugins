@@ -61,16 +61,4 @@ public class MaterialReportItem {
     /// Имя материала.
     /// </summary>
     public string MaterialName { get; }
-
-    /// <summary>
-    /// Человекочитаемое представление статуса (аналог меток из Python-плагина).
-    /// </summary>
-    public string StatusText => Status switch {
-        MaterialReportStatus.Edited => "ИЗМЕНЕН",
-        MaterialReportStatus.NotEdited => "БЕЗ ИЗМЕНЕНИЙ",
-        MaterialReportStatus.NoWorkCode => "НЕТ КОДА РАБОТЫ",
-        MaterialReportStatus.ClassifierCodeNotFound => "НЕ НАЙДЕН КОД",
-        MaterialReportStatus.Error => "ОШИБКА ПРИ ЗАПИСИ",
-        _ => string.Empty
-    };
 }

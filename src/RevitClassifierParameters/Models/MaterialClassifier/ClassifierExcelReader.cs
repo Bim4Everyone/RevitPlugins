@@ -41,7 +41,7 @@ public class ClassifierExcelReader {
 
             int lastRow = GetLastRow(worksheet);
             if(lastRow < _firstDataRow) {
-                _messageBoxService.Show("Лист классификатора пуст или не содержит данных.");
+                _messageBoxService.Show(_localizationService.GetLocalizedString("Reader.ClassifierSheetEmpty"));
                 return null;
             }
 
@@ -50,7 +50,7 @@ public class ClassifierExcelReader {
                 worksheet.Cells[lastRow, 3]];
 
             if(range.Value2 is not object[,] values) {
-                _messageBoxService.Show("Лист классификатора пуст или не содержит данных.");
+                _messageBoxService.Show(_localizationService.GetLocalizedString("Reader.ClassifierSheetEmpty"));
                 return null;
             }
 

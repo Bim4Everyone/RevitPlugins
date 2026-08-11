@@ -128,13 +128,13 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
             ExcelFacadeTypePath = OpenFileDialogService.File.FullName;
         } else {
             // Если пользователь не выбрал файл
-            MessageBoxService.Show("Не выбран файл правил заполнения типа фасада!");
+            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoFacadeTypeFileSelected"));
             return;
         }
 
         FacadeTypes = _facadeTypeExcelReader.Read(ExcelFacadeTypePath);
         if(FacadeTypes is null || FacadeTypes.Count == 0) {
-            MessageBoxService.Show("Не найдены типы фасадом в файле!");
+            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoFacadeTypesFound"));
         }
     }
     
@@ -147,14 +147,14 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
                 ExcelFacadeTypePath = OpenFileDialogService.File.FullName;
             } else {
                 // Если пользователь не выбрал файл
-                MessageBoxService.Show("Не выбран файл правил заполнения типа фасада!");
+                MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoFacadeTypeFileSelected"));
                 return;
             }
         }
 
         FacadeTypes = _facadeTypeExcelReader.Read(ExcelFacadeTypePath);
         if(FacadeTypes is null || FacadeTypes.Count == 0) {
-            MessageBoxService.Show("Не найдены типы фасадом в файле!");
+            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoFacadeTypesFound"));
         }
     }
 
@@ -176,11 +176,11 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         // Если планируем работать с классификатором
         if(WorkWithMasonryCode || WorkWithRoofCode || WorkWithFacadeType) {
             if(string.IsNullOrEmpty(ExcelClassifierPath)) {
-                ErrorText = "Не выбран файл классификатора";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoClassifierFile");
                 return false;
             }
             if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0){
-                ErrorText = "Не найдены работы в Классификатора";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoClassifierWorks");
                 return false;
             }
         }
@@ -188,15 +188,15 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         // Если планируем работать с типами фасадов
         if(WorkWithFacadeType) {
             if(string.IsNullOrEmpty(ExcelFacadeTypePath)) {
-                ErrorText = "Не выбран файл типов фасадов";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoFacadeTypeFile");
                 return false;
             }
             if(FacadeTypes is null || FacadeTypes.Count == 0) {
-                ErrorText = "Не найдены типы фасадом в файле";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoFacadeTypes");
                 return false;
             }
             if(ParamForFacadeType is null) {
-                ErrorText = "Не выбран параметр для типов фасадов";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoFacadeTypeParam");
                 return false;
             }
         }
