@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
 using dosymep.WPF.ViewModels;
 
-using RevitClassifierParameters.Models;
 using RevitClassifierParameters.Models.MaterialClassifier;
 
 namespace RevitClassifierParameters.ViewModels;

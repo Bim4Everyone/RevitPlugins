@@ -6,7 +6,6 @@ using System.Windows.Markup;
 
 using dosymep.SimpleServices;
 using dosymep.WpfCore;
-using dosymep.WpfCore.MarkupExtensions;
 
 namespace RevitClassifierParameters.MarkupExtensions;
 

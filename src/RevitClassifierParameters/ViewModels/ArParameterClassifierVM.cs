@@ -6,7 +6,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
@@ -24,8 +23,10 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
     /// <summary>
     /// Стандартный путь к файлу правил заполнения типа фасада.
     /// </summary>
-    private string _excelFacadeTypePath =
-        @"C:\Users\nikita\Desktop\Проекты\Параметры ВОР АР\XLS\Правила заполнения ФОП_Группировка.xlsx";
+    private string _excelFacadeTypePath = string.Empty;
+    /// <summary>
+    /// Стандартное наименование параметра стен на экземпляре, куда нужно заполнить тип фасада.
+    /// </summary>
     private string _facadeTypeParamName = "ФОП_Группирование";
     private bool _workWithMasonryCode;
     private bool _workWithRoofCode;
@@ -52,6 +53,10 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
             classifierExcelReader, facadeTypeExcelReader, reportV, openFileDialogService, messageBoxService) {
 
         _facadeTypeSetter = facadeTypeSetter;
+
+        _excelFacadeTypePath =
+            @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\"
+            + $@"{_revitRepository.Application.VersionNumber}\RevitClassifierParameters\Правила заполнения ФОП_Группировка.xlsx";
 
         ReadFacadeTypeExcelCommand = RelayCommand.Create(RereadFacadeTypeExcel);
     }

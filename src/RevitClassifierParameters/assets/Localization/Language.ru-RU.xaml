@@ -3,8 +3,6 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String x:Key="MainWindow.Title">Параметры ВОР АР</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
@@ -15,7 +13,7 @@
 
     <system:String x:Key="MainWindow.ClassifierFileTitle">Файл с кодами классификатора</system:String>
     <system:String x:Key="MainWindow.ClassifierFileDescription">Необходимо выбрать актуальный для проекта excel-файл с кодами классификатора</system:String>
-    <system:String x:Key="MainWindow.FilePathPlaceholder">Путь к файлу</system:String>
+    <system:String x:Key="MainWindow.FilePathPlaceholder">Путь к файлу не указан</system:String>
 
     <system:String x:Key="MainWindow.MasonryTitle">Кладка</system:String>
     <system:String x:Key="MainWindow.MasonryDescription">Учитывает материалы с кодами, которые начинаются на г02.05</system:String>

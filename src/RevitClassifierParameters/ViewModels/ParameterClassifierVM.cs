@@ -37,7 +37,8 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     /// <summary>
     /// Стандартная папка с файлом Классификатора, открываемая по умолчанию в диалоге выбора файла.
     /// </summary>
-    private const string _excelClassifierDirectoryPath = @"C:\Users\nikita\Desktop\Проекты\Параметры ВОР АР\XLS";
+    private const string _excelClassifierDirectoryPath =
+        @"W:\Проектный институт\Проектные Группы\Типовые ТЗ\BIM-стандарт A101";
 
     protected ParameterClassifierVM(
         PluginConfig pluginConfig,
@@ -159,7 +160,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
             .GetProperties()
             .Where(p => p.Name.StartsWith("WorkWith")
                         && p.PropertyType == typeof(bool)
-                        && (bool)p.GetValue(this)!)
+                        && (bool) p.GetValue(this)!)
             .Select(p => typeof(WorkGroupCode).GetProperty(p.Name.Replace("WorkWith", "")))
             .Where(p => p != null)
             .Select(p => p!.GetValue(_workGroupCode)!.ToString()!)
