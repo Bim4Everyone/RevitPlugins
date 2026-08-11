@@ -15,10 +15,10 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    MinHeight="550"
-    MinWidth="750"    
-    Height="550"
-    Width="750"
+    MinHeight="600"
+    MinWidth="850"    
+    Height="600"
+    Width="850"
    
     d:DataContext="{d:DesignInstance vms:ArParameterClassifierVM, IsDesignTimeCreatable=False}">
     
@@ -45,6 +45,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
@@ -58,8 +59,9 @@
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="ControlColumn"/>
+                    <ColumnDefinition Width="1.5*"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -67,29 +69,57 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 
+                <ui:SymbolIcon
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Margin="5"
+                    FontSize="24"
+                    HorizontalAlignment="Center"
+                    Symbol="DocumentAdd48"/>
+                
                 <ui:TextBlock
                     Grid.Row="0"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
                     Text="Файл с кодами классификатора" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
                     Text="Необходимо выбрать актуальный для проекта excel-файл с кодами классификатора" />
                 
-                <ui:Button
+                <Grid
                     Grid.Row="0"
                     Grid.RowSpan="2"
-                    Grid.Column="1"                    
-                    Margin="5"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Content="Выбрать"
-                    Command="{Binding RereadClassifierExcelCommand}" />
+                    Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ui:TextBox
+                        Grid.Column="0"
+                        Margin="5"
+                        IsReadOnly="True"
+                        IsEnabled="False"
+                        TextWrapping="WrapWithOverflow"
+                        PlaceholderText="Путь к файлу"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding Path=ExcelClassifierPath}" />
+                    
+                    <ui:Button
+                        Grid.Column="1"                    
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Content="Выбрать"
+                        Command="{Binding RereadClassifierExcelCommand}" />
+                </Grid>
             </Grid>
         </Border>
         
@@ -99,8 +129,9 @@
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="ControlColumn"/>
+                    <ColumnDefinition Width="1.5*"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -108,16 +139,25 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 
+                <ui:SymbolIcon
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Margin="5"
+                    FontSize="24"
+                    HorizontalAlignment="Center"
+                    Symbol="GridKanban20"/>
+                
                 <ui:TextBlock
                     Grid.Row="0"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
                     Text="Кладка" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
                     Text="Учитывает материалы с кодами, которые начинаются на г02.05" />
@@ -125,10 +165,10 @@
                 <CheckBox
                     Grid.Row="0"
                     Grid.RowSpan="2"
-                    Grid.Column="1"                    
-                    Margin="5"
+                    Grid.Column="2"  
+                    Margin="-5 5 5 5"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Left"
                     IsChecked="{Binding Path=WorkWithMasonryCode}"/>
             </Grid>
         </Border>
@@ -139,8 +179,9 @@
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="ControlColumn"/>
+                    <ColumnDefinition Width="1.5*"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
@@ -148,16 +189,25 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 
+                <ui:SymbolIcon
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Margin="5"
+                    FontSize="24"
+                    HorizontalAlignment="Center"
+                    Symbol="CaretUp24"/>
+                
                 <ui:TextBlock
                     Grid.Row="0"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
                     Text="Кровля" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
                     Text="Учитывает материалы с кодами, которые начинаются на г02.06" />
@@ -165,10 +215,10 @@
                 <CheckBox
                     Grid.Row="0"
                     Grid.RowSpan="2"
-                    Grid.Column="1"                    
-                    Margin="5"
+                    Grid.Column="2"                    
+                    Margin="-5 5 5 5"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Left"
                     IsChecked="{Binding Path=WorkWithRoofCode}"/>
             </Grid>
         </Border>
@@ -179,29 +229,35 @@
             Style="{StaticResource CustomBorder}">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="ControlColumn"/>
+                    <ColumnDefinition Width="1.5*"/>
                 </Grid.ColumnDefinitions>
                 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
+                
+                <ui:SymbolIcon
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Margin="5"
+                    FontSize="24"
+                    HorizontalAlignment="Center"
+                    Symbol="HomeMore32"/>
                 
                 <ui:TextBlock
                     Grid.Row="0"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
                     Text="Фасады" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
                     Text="Учитывает материалы с кодами, которые начинаются на г02.07" />
@@ -209,68 +265,115 @@
                 <CheckBox
                     Grid.Row="0"
                     Grid.RowSpan="2"
-                    Grid.Column="1"                    
-                    Margin="5"
+                    Grid.Column="2"                    
+                    Margin="-5 5 5 5"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Left"
                     IsChecked="{Binding Path=WorkWithFacadeCode}"/>
+            </Grid>
+        </Border>
+
+        <Border
+            Grid.Row="5"
+            Margin="10 5"
+            Style="{StaticResource CustomBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <ui:SymbolIcon
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Margin="5"
+                    FontSize="24"
+                    HorizontalAlignment="Center"
+                    Symbol="ScanType24"/>
                 
                 <ui:TextBlock
-                    Grid.Row="2"
-                    Grid.Column="0"
+                    Grid.Row="0"
+                    Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
                     Text="Заполнить тип фасада" />                
                 
                 <ui:TextBlock
-                    Grid.Row="3"
-                    Grid.Column="0"
+                    Grid.Row="1"
+                    Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
                     Text="Заполнить тип фасада в заданный параметр" />
                 
                 <CheckBox
-                    Grid.Row="2"
+                    Grid.Row="0"
                     Grid.RowSpan="2"
-                    Grid.Column="1"      
-                    Margin="5"
+                    Grid.Column="2"      
+                    Margin="-5 5 5 5"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    IsEnabled="{Binding Path=CanEditFacadeType}"
+                    HorizontalAlignment="Left"
                     IsChecked="{Binding Path=WorkWithFacadeType}"/>
                 
                 <ui:TextBlock
-                    Grid.Row="4"
-                    Grid.Column="0"
+                    Grid.Row="2"
+                    Grid.Column="1"
                     Margin="5 5 5 5"
+                    VerticalAlignment="Center"
                     TextWrapping="Wrap"
                     Text="Файл с правилами заполнения типа фасада" />
                 
-                <ui:Button
-                    Grid.Row="4"
-                    Grid.Column="1"
-                    Margin="5"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Content="Выбрать"
-                    Command="{Binding ReadFacadeTypeExcelCommand}" />
+                <Grid
+                    Grid.Row="2"
+                    Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ui:TextBox
+                        Grid.Column="0"
+                        Margin="5"
+                        IsReadOnly="True"
+                        IsEnabled="False"
+                        TextWrapping="WrapWithOverflow"
+                        PlaceholderText="Путь к файлу"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding Path=ExcelClassifierPath}" />
+                    
+                    <ui:Button
+                        Grid.Column="1"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Content="Выбрать"
+                        Command="{Binding ReadFacadeTypeExcelCommand}" />
+                </Grid>
                 
                 <ui:TextBlock
-                    Grid.Row="5"
-                    Grid.Column="0"
+                    Grid.Row="3"
+                    Grid.Column="1"
                     Margin="5"
                     VerticalAlignment="Center"
                     TextWrapping="Wrap"
                     Text="Параметр для типа фасада" />
                 
                 <ComboBox
-                    Grid.Row="5"
-                    Grid.Column="1"
+                    Grid.Row="3"
+                    Grid.Column="2"
                     Margin="5"
                     MinWidth="200"
                     VerticalAlignment="Center"
-                    HorizontalAlignment="Center" 
-                    IsEnabled="{Binding Path=CanEditFacadeType}"
+                    HorizontalAlignment="Stretch" 
                     DisplayMemberPath="Definition.Name"
                     SelectedItem="{Binding Path=ParamForFacadeType, UpdateSourceTrigger=PropertyChanged}"
                     ItemsSource="{Binding Path=ParamsForFacadeType, UpdateSourceTrigger=PropertyChanged}" />
@@ -278,7 +381,7 @@
         </Border>
 
         <StackPanel
-            Grid.Row="5"
+            Grid.Row="6"
             Orientation="Horizontal"
             VerticalAlignment="Bottom"
             HorizontalAlignment="Right">

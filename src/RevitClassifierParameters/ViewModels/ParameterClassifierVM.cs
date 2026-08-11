@@ -35,6 +35,11 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     private List<Material> _materialInPj;
     protected string _excelClassifierPath;
 
+    /// <summary>
+    /// Стандартный путь к файлу правил заполнения типа фасада.
+    /// </summary>
+    private const string _excelClassifierDirectoryPath = @"C:\Users\nikita\Desktop\Проекты\Параметры ВОР АР\XLS";
+
     protected ParameterClassifierVM(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
@@ -74,7 +79,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     public IOpenFileDialogService OpenFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
 
-    public List<WorkGroup> CurrentClassifierWorks {
+    protected List<WorkGroup> CurrentClassifierWorks {
         get => _currentClassifierWorks;
         private set => RaiseAndSetIfChanged(ref _currentClassifierWorks, value);
     }
@@ -84,38 +89,42 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _materialInPj, value);
     }
     
+    public string ExcelClassifierPath {
+        get => _excelClassifierPath;
+        set => RaiseAndSetIfChanged(ref _excelClassifierPath, value);
+    }
+    
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
     private void RereadClassifierExcel(){
+        if(!string.IsNullOrEmpty(_excelClassifierDirectoryPath) || Directory.Exists(_excelClassifierDirectoryPath)) {
+            OpenFileDialogService.InitialDirectory = _excelClassifierDirectoryPath;
+        }
+
+        OpenFileDialogService.Title = _localizationService.GetLocalizedString("MainWindow.SelectClassifierFile");
         if(OpenFileDialogService.ShowDialog()) {
             // Если пользователь выбрал файл при выборе файла
-            _excelClassifierPath = OpenFileDialogService.File.FullName;
+            ExcelClassifierPath = OpenFileDialogService.File.FullName;
         } else {
             // Если пользователь не выбрал файл
             MessageBoxService.Show("Не выбран файл Классификатора!");
             return;
         }
-        CurrentClassifierWorks = _classifierExcelReader.Read(_excelClassifierPath);
+        CurrentClassifierWorks = _classifierExcelReader.Read(ExcelClassifierPath);
         if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0){
             MessageBoxService.Show("Не найдены работы в Классификатора!");
         }
     } 
     
-    protected void ReadClassifierExcel(){
-        if(string.IsNullOrEmpty(_excelClassifierPath) || !File.Exists(_excelClassifierPath)) {
-            if(OpenFileDialogService.ShowDialog()) {
-                // Если пользователь выбрал файл при выборе файла
-                _excelClassifierPath = OpenFileDialogService.File.FullName;
-            } else {
-                // Если пользователь не выбрал файл
-                MessageBoxService.Show("Не выбран файл Классификатора!");
-                return;
-            }
+    protected void ReadClassifierExcel() {
+        if(string.IsNullOrEmpty(ExcelClassifierPath) || !File.Exists(ExcelClassifierPath)) {
+            return;
         }
-        CurrentClassifierWorks = _classifierExcelReader.Read(_excelClassifierPath);
+        
+        CurrentClassifierWorks = _classifierExcelReader.Read(ExcelClassifierPath);
         if(CurrentClassifierWorks.Count == 0){
             MessageBoxService.Show("Не найдены работы в Классификатора!");
         }
