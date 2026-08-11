@@ -39,8 +39,6 @@
         x:Key="Exceptions.CannotFind3dFamilyType">3D view family is missing in the exported document.</system:String>
     <system:String
         x:Key="Exceptions.ExportViewError">Error generating 3D view for NWC export. Path to view template file: "{0}", copied view template name: "{1}", strings for hiding worksets: "{2}". Error information: {3}.</system:String>
-    <system:String
-        x:Key="Exceptions.ElementsNotDeleted">While opening the document, elements causing errors were detected. These could not be automatically removed due to insufficient permissions to delete them. Revit canceled the export operation. The IDs of the elements causing the errors are: {0}. Error information: {1}.</system:String>
 
     <system:String
         x:Key="ErrorsWindow.ErrorGroupHeader">Export {0}</system:String>
@@ -115,7 +113,7 @@
     <system:String
         x:Key="NwcExportViewSettingsDialog.WorksetsLabel">Strings for hiding worksets</system:String>
     <system:String
-        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Worksets whose names contain any of the specified strings with ignore case will be hidden on the view exported to NWC.</system:String>
+        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Worksets whose names contain any of the specified strings with ignore case will not be opened when the exported document is opened and will be hidden on the view exported to NWC.</system:String>
     <system:String
         x:Key="NwcExportViewSettingsDialog.Validation.RvtPathNotSet">Specify the path to the rvt file.</system:String>
     <system:String
