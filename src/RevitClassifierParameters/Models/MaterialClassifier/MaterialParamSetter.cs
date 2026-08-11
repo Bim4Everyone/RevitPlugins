@@ -39,7 +39,7 @@ internal class MaterialParamSetter {
     }
 
     /// <summary>
-    /// Задает значения параметрам материалов 
+    /// Задает значения параметрам материалов
     /// </summary>
     /// <param name="activeCodes">Выбранные пользователем коды для обработки</param>
     /// <param name="classifierWorks">Работы из классификатора</param>
@@ -100,7 +100,7 @@ internal class MaterialParamSetter {
     /// Использует факт, что код работы включает код своей группы как префикс,
     /// поэтому заходит только в ту ветку, чей код группы является префиксом искомого кода.
     /// </summary>
-    private Work.Work FindWork(List<WorkGroup> workGroups, string code) {
+    private WorkItem FindWork(List<WorkGroup> workGroups, string code) {
         if(workGroups is null) {
             return null;
         }
@@ -175,7 +175,7 @@ internal class MaterialParamSetter {
     /// forAr = false -> наименование главы самого верхнего уровня
     /// (поднимаемся по ParentWorkGroup, пока он не станет null).
     /// </summary>
-    private string GetChapterName(Work.Work work, bool forAr) {
+    private string GetChapterName(WorkItem work, bool forAr) {
         var chapter = work.ParentWorkGroup;
         if(chapter is null) {
             return string.Empty;

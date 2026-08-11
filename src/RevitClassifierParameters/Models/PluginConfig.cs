@@ -58,7 +58,7 @@ internal class RevitSettings : ProjectSettings {
     /// Наименование проекта. Системное свойство. (Не трогать)
     /// </summary>
     public override string ProjectName { get; set; }
-    
+
     public string ExcelClassifierPath { get; set; }
     public string ExcelFacadeTypePath { get; set; }
     public bool WorkWithFoundationCode { get; set; }

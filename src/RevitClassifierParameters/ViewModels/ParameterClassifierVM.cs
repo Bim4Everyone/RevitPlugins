@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -36,7 +35,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     protected string _excelClassifierPath;
 
     /// <summary>
-    /// Стандартный путь к файлу правил заполнения типа фасада.
+    /// Стандартная папка с файлом Классификатора, открываемая по умолчанию в диалоге выбора файла.
     /// </summary>
     private const string _excelClassifierDirectoryPath = @"C:\Users\nikita\Desktop\Проекты\Параметры ВОР АР\XLS";
 
@@ -52,18 +51,18 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         ReportV reportV,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) {
-        
+
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
-        
+
         _workGroupCode = workGroupCode;
         _materialParamSetter = materialParamSetter;
         _materialReportService = materialReportService;
         _classifierExcelReader = classifierExcelReader;
         _facadeTypeExcelReader = facadeTypeExcelReader;
         _reportV = reportV;
-        
+
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
 
@@ -75,7 +74,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     public ICommand RereadClassifierExcelCommand { get; }
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
-    
+
     public IOpenFileDialogService OpenFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
 
@@ -88,19 +87,19 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         get => _materialInPj;
         set => RaiseAndSetIfChanged(ref _materialInPj, value);
     }
-    
+
     public string ExcelClassifierPath {
         get => _excelClassifierPath;
         set => RaiseAndSetIfChanged(ref _excelClassifierPath, value);
     }
-    
+
     public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    private void RereadClassifierExcel(){
-        if(!string.IsNullOrEmpty(_excelClassifierDirectoryPath) || Directory.Exists(_excelClassifierDirectoryPath)) {
+    private void RereadClassifierExcel() {
+        if(Directory.Exists(_excelClassifierDirectoryPath)) {
             OpenFileDialogService.InitialDirectory = _excelClassifierDirectoryPath;
         }
 
@@ -114,18 +113,18 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
             return;
         }
         CurrentClassifierWorks = _classifierExcelReader.Read(ExcelClassifierPath);
-        if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0){
+        if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0) {
             MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoClassifierWorksFound"));
         }
-    } 
-    
+    }
+
     protected void ReadClassifierExcel() {
         if(string.IsNullOrEmpty(ExcelClassifierPath) || !File.Exists(ExcelClassifierPath)) {
             return;
         }
-        
+
         CurrentClassifierWorks = _classifierExcelReader.Read(ExcelClassifierPath);
-        if(CurrentClassifierWorks.Count == 0){
+        if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0) {
             MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoClassifierWorksFound"));
         }
     }
@@ -158,8 +157,8 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     protected HashSet<string> GetActiveCodes() {
         return GetType()
             .GetProperties()
-            .Where(p => p.Name.StartsWith("WorkWith") 
-                        && p.PropertyType == typeof(bool) 
+            .Where(p => p.Name.StartsWith("WorkWith")
+                        && p.PropertyType == typeof(bool)
                         && (bool)p.GetValue(this)!)
             .Select(p => typeof(WorkGroupCode).GetProperty(p.Name.Replace("WorkWith", "")))
             .Where(p => p != null)

@@ -19,16 +19,14 @@ using RevitClassifierParameters.Views;
 namespace RevitClassifierParameters.ViewModels;
 
 internal class ArParameterClassifierVM : ParameterClassifierVM {
+    private readonly FacadeTypeSetter _facadeTypeSetter;
+
     /// <summary>
     /// Стандартный путь к файлу правил заполнения типа фасада.
     /// </summary>
     private string _excelFacadeTypePath =
         @"C:\Users\nikita\Desktop\Проекты\Параметры ВОР АР\XLS\Правила заполнения ФОП_Группировка.xlsx";
-    
     private string _facadeTypeParamName = "ФОП_Группирование";
-
-    private readonly FacadeTypeSetter _facadeTypeSetter;
-
     private bool _workWithMasonryCode;
     private bool _workWithRoofCode;
     private bool _workWithFacadeCode;
@@ -84,21 +82,21 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         get => _facadeTypes;
         private set => RaiseAndSetIfChanged(ref _facadeTypes, value);
     }
-    
+
     public string ExcelFacadeTypePath {
         get => _excelFacadeTypePath;
         set => RaiseAndSetIfChanged(ref _excelFacadeTypePath, value);
     }
-    
+
     public Parameter ParamForFacadeType {
         get => _paramForFacadeType;
         set => RaiseAndSetIfChanged(ref _paramForFacadeType, value);
-    }    
-    
+    }
+
     public ObservableCollection<Parameter> ParamsForFacadeType {
         get => _paramsForFacadeType;
         private set => RaiseAndSetIfChanged(ref _paramsForFacadeType, value);
-    } 
+    }
 
     protected override void LoadView() {
         LoadConfig();
@@ -107,12 +105,12 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         GetParamsForFacadeType();
         ReadFacadeTypeExcel();
     }
-    
+
     /// <summary>
     /// Получение параметров для заполнения типа фасада
     /// </summary>
     private void GetParamsForFacadeType() {
-        ParamsForFacadeType = new ObservableCollection<Parameter>(_revitRepository.GetParametersForFacadeType()); 
+        ParamsForFacadeType = new ObservableCollection<Parameter>(_revitRepository.GetParametersForFacadeType());
         ParamForFacadeType = ParamsForFacadeType.FirstOrDefault(p => p.Definition.Name == _facadeTypeParamName);
     }
 
@@ -137,7 +135,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
             MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoFacadeTypesFound"));
         }
     }
-    
+
     private void ReadFacadeTypeExcel() {
         if(string.IsNullOrEmpty(ExcelFacadeTypePath) || !File.Exists(ExcelFacadeTypePath)) {
             OpenFileDialogService.Title = _localizationService.GetLocalizedString("MainWindow.SelectFacadeTypeFile");
@@ -162,10 +160,10 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         SaveConfig();
         var activeCodes = GetActiveCodes();
         _materialParamSetter.SetParamValue(activeCodes, CurrentClassifierWorks, MaterialInPj, true);
-        if(WorkWithFacadeCode 
-           && WorkWithFacadeType 
-           && ParamForFacadeType != null 
-           && FacadeTypes != null 
+        if(WorkWithFacadeCode
+           && WorkWithFacadeType
+           && ParamForFacadeType != null
+           && FacadeTypes != null
            && FacadeTypes.Count != 0) {
             _facadeTypeSetter.SetFacadeType(ParamForFacadeType.Definition.Name, FacadeTypes);
         }
@@ -179,7 +177,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoClassifierFile");
                 return false;
             }
-            if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0){
+            if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoClassifierWorks");
                 return false;
             }
@@ -200,7 +198,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
                 return false;
             }
         }
-        
+
         ErrorText = string.Empty;
         return true;
     }
@@ -213,7 +211,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         WorkWithRoofCode = setting?.WorkWithRoofCode ?? true;
         WorkWithFacadeCode = setting?.WorkWithFacadeCode ?? true;
         WorkWithFacadeType = setting?.WorkWithFacadeType ?? true;
-        
+
         // Для следующих есть стандартное значение, но пользователь может задать иное
         _facadeTypeParamName = setting?.ParamNameForFacadeType ?? _facadeTypeParamName;
         ExcelFacadeTypePath = setting?.ExcelFacadeTypePath ?? _excelFacadeTypePath;

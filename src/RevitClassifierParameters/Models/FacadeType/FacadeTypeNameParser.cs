@@ -5,7 +5,7 @@ namespace RevitClassifierParameters.Models.FacadeType;
 /// <summary>
 /// Результат разбора имени типоразмера стены.
 /// </summary>
-public readonly struct FacadeTypeNameParts {
+internal readonly struct FacadeTypeNameParts {
     public FacadeTypeNameParts(string function, string material) {
         Function = function;
         Material = material;
@@ -34,7 +34,7 @@ public readonly struct FacadeTypeNameParts {
 /// характеристику функции в первых скобках ("(ФМ)")
 /// и сокращение основного материала после скобок до первого дефиса ("ОК").
 /// </summary>
-public class FacadeTypeNameParser {
+internal class FacadeTypeNameParser {
     // Захватывает первые круглые скобки с содержимым и весь остаток строки после них.
     private static readonly Regex _regex =
         new(@"^\s*(?<function>\([^)]*\))\s*(?<rest>.*)$", RegexOptions.Compiled);

@@ -64,15 +64,15 @@ public class RevitClassifierParametersCommand : BasePluginCommand {
         kernel.Bind<WorkGroupCode>()
             .ToSelf()
             .InSingletonScope();
-        
+
         kernel.Bind<MaterialParamSetter>()
             .ToSelf()
-            .InSingletonScope();   
-        
+            .InSingletonScope();
+
         kernel.Bind<MaterialReportService>()
             .ToSelf()
             .InSingletonScope();
-                
+
         kernel.Bind<ClassifierExcelReader>()
             .ToSelf()
             .InSingletonScope();
@@ -95,8 +95,8 @@ public class RevitClassifierParametersCommand : BasePluginCommand {
             .InSingletonScope()
             .WithPropertyValue(nameof(Window.DataContext),
                 c => c.Kernel.Get<ReportVM>());
-        
-        // Используем сервис обновления тем для WinUI
+
+        // Используем сервис обновления тем для WPF UI
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
@@ -121,7 +121,7 @@ public class RevitClassifierParametersCommand : BasePluginCommand {
         // Сервис открытия диалогового окна для чтения файла Классификатора
         kernel.UseWpfOpenFileDialog<ArParameterClassifierVM>(
             filter: "Excel files (*.xlsx;*.xls)|*.xlsx;*.xls|All files (*.*)|*.*");
-        
+
         // Вызывает стандартное уведомление
         Notification(kernel.Get<ArParameterClassifierV>());
     }

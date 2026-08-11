@@ -3,7 +3,7 @@ namespace RevitClassifierParameters.Models.MaterialClassifier;
 /// <summary>
 /// Статус обработки материала.
 /// </summary>
-public enum MaterialReportStatus {
+internal enum MaterialReportStatus {
     /// <summary>
     /// Параметры материала были изменены.
     /// </summary>
@@ -34,7 +34,7 @@ public enum MaterialReportStatus {
 /// Запись отчёта по обработке одного материала.
 /// Аналог строки отчёта из Python-плагина: [Статус, Код работы, Имя материала].
 /// </summary>
-public class MaterialReportItem {
+internal class MaterialReportItem {
     /// <summary>
     /// Создает запись отчёта.
     /// </summary>

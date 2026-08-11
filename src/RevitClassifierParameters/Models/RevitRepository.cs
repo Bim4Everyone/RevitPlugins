@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -26,7 +24,7 @@ internal class RevitRepository {
     /// </summary>
     /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
     public RevitRepository(
-        UIApplication uiApplication, 
+        UIApplication uiApplication,
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService) {
         UIApplication = uiApplication;
@@ -38,25 +36,24 @@ internal class RevitRepository {
     /// Класс доступа к интерфейсу Revit.
     /// </summary>
     public UIApplication UIApplication { get; }
-    
+
     /// <summary>
     /// Класс доступа к интерфейсу документа Revit.
     /// </summary>
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    
+
     /// <summary>
     /// Класс доступа к приложению Revit.
     /// </summary>
     public Application Application => UIApplication.Application;
-    
+
     /// <summary>
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
 
-    public List<Material> GetElementMaterials()
-    {
+    public List<Material> GetElementMaterials() {
         var materials = GetElementInPj()
             .SelectMany(elem => elem.GetMaterialIds(false))
             .Distinct()
@@ -64,8 +61,9 @@ internal class RevitRepository {
             .Where(material => material != null)
             .ToList();
 
-        if (materials.Count == 0)
+        if(materials.Count == 0) {
             _messageBoxService.Show(_localizationService.GetLocalizedString("Repository.NoMaterialsForElements"));
+        }
         return materials;
     }
 
@@ -87,9 +85,10 @@ internal class RevitRepository {
             .WhereElementIsNotElementType()
             .FirstOrDefault();
 
-        if(wall == null)
+        if(wall == null) {
             return [];
-        
+        }
+
         return wall.Parameters
             .Cast<Parameter>()
             .Where(p => p.StorageType == StorageType.String)
@@ -107,15 +106,5 @@ internal class RevitRepository {
             .WhereElementIsNotElementType()
             .Cast<Wall>()
             .ToList();
-    }
-
-    /// <summary>
-    /// Возвращает имя типоразмера стены.
-    /// </summary>
-    public string GetWallTypeName(Wall wall) {
-        if(wall == null) {
-            return string.Empty;
-        }
-        return Document.GetElement(wall.GetTypeId())?.Name ?? string.Empty;
     }
 }

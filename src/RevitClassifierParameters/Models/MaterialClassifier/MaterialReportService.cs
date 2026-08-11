@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace RevitClassifierParameters.Models.MaterialClassifier;
 
 /// <summary>
 /// Сервис сбора отчёта по обработке материалов.
 /// </summary>
-public class MaterialReportService {
+internal class MaterialReportService {
     private readonly List<MaterialReportItem> _items = [];
 
     /// <summary>

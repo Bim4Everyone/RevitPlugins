@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace RevitClassifierParameters.Models.Work;
 
-public class WorkGroup : Work{
+internal class WorkGroup : WorkItem {
     public List<WorkGroup> ChildWorkGroups { get; set; } = [];
-    public List<Models.Work.Work> ChildWorks { get; set; } = [];
+    public List<WorkItem> ChildWorks { get; set; } = [];
 }

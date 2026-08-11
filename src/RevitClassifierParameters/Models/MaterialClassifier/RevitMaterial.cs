@@ -1,11 +1,13 @@
 using Autodesk.Revit.DB;
 
+using RevitClassifierParameters.Models.Work;
+
 namespace RevitClassifierParameters.Models.MaterialClassifier;
 
 /// <summary>
 /// Класс-оболочка для хранения информации о материале Revit и связанной с ним работе из Классификатора.
 /// </summary>
-public class RevitMaterial {
+internal class RevitMaterial {
     private const char _mark = '_';
 
     /// <summary>
@@ -14,7 +16,7 @@ public class RevitMaterial {
     /// <param name="keynote">Ключевая заметка материала (код работы).</param>
     /// <param name="material">Материал Revit.</param>
     /// <param name="work">Работа из Классификатора, параметры которой нужно назначить.</param>
-    public RevitMaterial(string keynote, Material material, Work.Work work) {
+    public RevitMaterial(string keynote, Material material, WorkItem work) {
         Keynote = keynote;
         Material = material;
         Work = work;
@@ -34,7 +36,7 @@ public class RevitMaterial {
     /// <summary>
     /// Работа из Классификатора, параметры которой нужно назначить.
     /// </summary>
-    public Work.Work Work { get; }
+    public WorkItem Work { get; }
 
     /// <summary>
     /// Описание материала для параметра "Материал: Описание".

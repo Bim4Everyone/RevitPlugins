@@ -30,7 +30,7 @@ public partial class ArParameterClassifierV {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string PluginName => nameof(RevitClassifierParameters);
-    
+
     /// <summary>
     /// Наименование файла конфигурации.
     /// </summary>
@@ -38,7 +38,7 @@ public partial class ArParameterClassifierV {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string ProjectConfigName => nameof(ArParameterClassifierV);
-    
+
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;
     }

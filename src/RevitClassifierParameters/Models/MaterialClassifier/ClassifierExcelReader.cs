@@ -1,75 +1,26 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 using dosymep.SimpleServices;
-
-using Microsoft.Office.Interop.Excel;
 
 using RevitClassifierParameters.Models.Work;
 
 namespace RevitClassifierParameters.Models.MaterialClassifier;
 
-public class ClassifierExcelReader {
-    private const int _firstDataRow = 3;
-    
-    private readonly ILocalizationService _localizationService;
-    private readonly IMessageBoxService _messageBoxService;
-
+internal class ClassifierExcelReader : ExcelReaderBase<List<WorkGroup>> {
     public ClassifierExcelReader(
         ILocalizationService localizationService,
-        IMessageBoxService messageBoxService) {
-        _localizationService = localizationService;
-        _messageBoxService = messageBoxService;
-    }
-    
-    public List<WorkGroup> Read(string path) {
-        Application excel = null;
-        Workbook workbook = null;
-        Worksheet worksheet = null;
-        Range range = null;
-
-        try {
-            excel = new Application {
-                Visible = false,
-                DisplayAlerts = false,
-                ScreenUpdating = false
-            };
-            workbook = excel.Workbooks.Open(path, ReadOnly: true);
-            worksheet = (Worksheet) workbook.Worksheets[1];
-
-            int lastRow = GetLastRow(worksheet);
-            if(lastRow < _firstDataRow) {
-                _messageBoxService.Show(_localizationService.GetLocalizedString("Reader.ClassifierSheetEmpty"));
-                return null;
-            }
-
-            range = worksheet.Range[
-                worksheet.Cells[_firstDataRow, 1],
-                worksheet.Cells[lastRow, 3]];
-
-            if(range.Value2 is not object[,] values) {
-                _messageBoxService.Show(_localizationService.GetLocalizedString("Reader.ClassifierSheetEmpty"));
-                return null;
-            }
-
-            return BuildClassifier(values);
-        } finally {
-            workbook?.Close(false);
-            excel?.Quit();
-
-            Release(range);
-            Release(worksheet);
-            Release(workbook);
-            Release(excel);
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-        }
+        IMessageBoxService messageBoxService)
+        : base(localizationService, messageBoxService) {
     }
 
-    private List<WorkGroup> BuildClassifier(object[,] rows) {
+    protected override int FirstDataRow => 3;
+
+    protected override int ColumnCount => 3;
+
+    protected override string EmptySheetMessageKey => "Reader.ClassifierSheetEmpty";
+
+    protected override List<WorkGroup> BuildResult(object[,] rows) {
         var result = new List<WorkGroup>();
         var groups = new List<WorkGroup>();
 
@@ -77,8 +28,9 @@ public class ClassifierExcelReader {
 
         for(int row = 1; row <= rowCount; row++) {
             string code = GetString(rows[row, 1]);
-            if(string.IsNullOrWhiteSpace(code))
+            if(string.IsNullOrWhiteSpace(code)) {
                 continue;
+            }
 
             string name = GetString(rows[row, 2]);
             string unit = GetString(rows[row, 3]);
@@ -120,32 +72,12 @@ public class ClassifierExcelReader {
         string unit) {
         var parent = FindParentGroup(groups, code);
 
-        parent?.ChildWorks.Add(new Work.Work {
+        parent?.ChildWorks.Add(new WorkItem {
             Code = code,
             Name = name,
             Unit = unit,
             ParentWorkGroup = parent
         });
-    }
-
-    private int GetLastRow(Worksheet worksheet) {
-        var lastCell = worksheet.Cells.Find(
-            "*",
-            Type.Missing,
-            Type.Missing,
-            Type.Missing,
-            XlSearchOrder.xlByRows,
-            XlSearchDirection.xlPrevious,
-            false);
-        try {
-            return lastCell?.Row ?? 1;
-        } finally {
-            Release(lastCell);
-        }
-    }
-
-    private string GetString(object value) {
-        return value?.ToString()?.Trim();
     }
 
     private static WorkGroup FindParentGroup(
@@ -157,14 +89,10 @@ public class ClassifierExcelReader {
         while((separatorIndex = current.LastIndexOf('.')) >= 0) {
             current = current.Substring(0, separatorIndex);
             var parent = groups.FirstOrDefault(g => g.Code == current);
-            if(parent != null)
+            if(parent != null) {
                 return parent;
+            }
         }
         return null;
-    }
-
-    private void Release(object comObject) {
-        if(comObject != null && Marshal.IsComObject(comObject))
-            Marshal.ReleaseComObject(comObject);
     }
 }

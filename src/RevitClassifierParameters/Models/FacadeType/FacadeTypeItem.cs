@@ -3,7 +3,7 @@ namespace RevitClassifierParameters.Models.FacadeType;
 /// <summary>
 /// Строка правил заполнения типа фасада, прочитанная из Excel-файла.
 /// </summary>
-public class FacadeTypeItem {
+internal class FacadeTypeItem {
     /// <summary>
     /// Характеристика функции (столбец 1) хранится со скобками, например "(ФМ)".
     /// Приводится к нормализованному виду (Trim + верхний регистр) при чтении из Excel.

@@ -23,7 +23,7 @@ internal sealed class EnumToLocaleExtension : MarkupExtension, IValueConverter {
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-        throw new NotImplementedException();
+        return Binding.DoNothing;
     }
 
     public override object ProvideValue(IServiceProvider serviceProvider) {
@@ -41,7 +41,12 @@ internal sealed class EnumToLocaleExtension : MarkupExtension, IValueConverter {
     }
 
     private void FrameworkElementOnLoaded(object sender, RoutedEventArgs e) {
-        _hasLocalization = sender as IHasLocalization;
-        ((FrameworkElement) sender).Loaded -= FrameworkElementOnLoaded;
+        if(sender is IHasLocalization hasLocalization) {
+            _hasLocalization = hasLocalization;
+        }
+
+        if(sender is FrameworkElement frameworkElement) {
+            frameworkElement.Loaded -= FrameworkElementOnLoaded;
+        }
     }
 }

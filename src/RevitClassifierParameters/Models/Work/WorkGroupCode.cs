@@ -1,6 +1,6 @@
-﻿namespace RevitClassifierParameters.Models.Work;
+namespace RevitClassifierParameters.Models.Work;
 
-public class WorkGroupCode {
+internal class WorkGroupCode {
     public string FoundationCode { get; set; } = "г02.02";
     public string ConstrBelowZeroCode { get; set; } = "г02.03";
     public string ConstrAboveZeroCode { get; set; } = "г02.04";
