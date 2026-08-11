@@ -55,7 +55,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
 
         _facadeTypeSetter = facadeTypeSetter;
 
-        ReadFacadeTypeExcelCommand = RelayCommand.Create(ReadFacadeTypeExcel);
+        ReadFacadeTypeExcelCommand = RelayCommand.Create(RereadFacadeTypeExcel);
     }
 
     public ICommand ReadFacadeTypeExcelCommand { get; }
@@ -121,6 +121,8 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
     /// Если путь по умолчанию/из конфига существует — читает без диалога, иначе открывает диалог выбора файла.
     /// </summary>
     private void RereadFacadeTypeExcel() {
+        OpenFileDialogService.Title = _localizationService.GetLocalizedString("MainWindow.SelectFacadeTypeFile");
+
         if(OpenFileDialogService.ShowDialog()) {
             // Если пользователь выбрал файл при выборе файла
             ExcelFacadeTypePath = OpenFileDialogService.File.FullName;
@@ -138,6 +140,8 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
     
     private void ReadFacadeTypeExcel() {
         if(string.IsNullOrEmpty(ExcelFacadeTypePath) || !File.Exists(ExcelFacadeTypePath)) {
+            OpenFileDialogService.Title = _localizationService.GetLocalizedString("MainWindow.SelectFacadeTypeFile");
+
             if(OpenFileDialogService.ShowDialog()) {
                 // Если пользователь выбрал файл при выборе файла
                 ExcelFacadeTypePath = OpenFileDialogService.File.FullName;
