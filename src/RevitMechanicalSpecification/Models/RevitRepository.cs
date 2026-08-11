@@ -24,6 +24,7 @@ namespace RevitMechanicalSpecification.Models {
     internal class RevitRepository {
 
         private readonly ElementProcessor _elementProcessor;
+        private readonly ElementEditChecker _elementEditChecker;
         private readonly List<ElementParamFiller> _fillersSpecRefresh;
         private readonly List<ElementParamFiller> _fillersSystemRefresh;
         private readonly List<ElementParamFiller> _fillersFunctionRefresh;
@@ -38,9 +39,11 @@ namespace RevitMechanicalSpecification.Models {
         public RevitRepository(
             UIApplication uiApplication,
             SpecConfiguration specConfiguration,
-            ElementProcessor elementProcessor) {
+            ElementProcessor elementProcessor,
+            ElementEditChecker elementEditChecker) {
             UIApplication = uiApplication;
             _elementProcessor = elementProcessor;
+            _elementEditChecker = elementEditChecker;
             _specConfiguration = specConfiguration;
             _collector = new CollectionFactory(Document, _specConfiguration, ActiveUIDocument);
             _calculator = new VisElementsCalculator(_specConfiguration, Document);
@@ -182,12 +185,16 @@ namespace RevitMechanicalSpecification.Models {
         /// вместе с спекой, поэтому проще его встроить сюда
         /// </summary>
         public void ReplaceMask(List<Element> elements = null) {
-            using(var t = Document.StartTransaction("Сформировать имя")) {
+            if(elements is null) {
+                elements = _collector.GetElementsByCategories();
+            }
 
-                if (elements is null) { 
-                    elements = _collector.GetElementsByCategories();
-                }
-                foreach(Element element in elements) {
+            List<Element> editableElements = elements
+                .Where(element => !_elementEditChecker.IsUnavailableForEdit(element))
+                .ToList();
+
+            using(var t = Document.StartTransaction("Сформировать имя")) {
+                foreach(Element element in editableElements) {
                     _maskReplacer.ExecuteReplacment(element);
                 }
                 t.Commit();

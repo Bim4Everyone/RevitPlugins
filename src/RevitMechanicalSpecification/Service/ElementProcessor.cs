@@ -21,14 +21,12 @@ using System.Diagnostics;
 
 namespace RevitMechanicalSpecification.Service {
     internal class ElementProcessor {
-        private readonly string _userName;
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
-        private readonly IMessageBoxService _messageBoxService;
+        private readonly ElementEditChecker _elementEditChecker;
         private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
 
-        private readonly List<string> _editors = new List<string>();
         private readonly HashSet<BuiltInCategory> _possibleGenericCategories = new HashSet<BuiltInCategory>() {
                         BuiltInCategory.OST_DuctAccessory,
                         BuiltInCategory.OST_PipeAccessory,
@@ -42,13 +40,12 @@ namespace RevitMechanicalSpecification.Service {
         public ElementProcessor(
             Document document,
             SpecConfiguration specConfiguration,
-            IMessageBoxService messageBoxService) {
-            _userName = document.Application.Username;
+            ElementEditChecker elementEditChecker) {
             _document = document;
 
             _specConfiguration = specConfiguration;
-            _messageBoxService = messageBoxService;
-            _paramChecker = new ParamChecker();
+            _elementEditChecker = elementEditChecker;
+            _paramChecker = new ParamChecker(_elementEditChecker);
             _maskReplacer = new MaskReplacer(_specConfiguration);
         }
 
@@ -122,7 +119,7 @@ namespace RevitMechanicalSpecification.Service {
                     ProcessElement(manifoldElement, fillers);
                 }
                 t.Commit();
-                ShowReport();
+                _elementEditChecker.ShowReport();
             }
         }
 
@@ -134,43 +131,6 @@ namespace RevitMechanicalSpecification.Service {
         private void ProcessElement(SpecificationElement specificationElement, List<ElementParamFiller> fillers) {
             foreach(var filler in fillers) {
                 filler.Fill(specificationElement);
-            }
-        }
-
-        /// <summary>
-        /// Проверка на занятость элемента
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        private bool IsEditedBy(string userName, Element element) {
-            string editedBy = element.GetParamValueOrDefault<string>(BuiltInParameter.EDITED_BY);
-
-            if(string.IsNullOrEmpty(editedBy)) {
-                return false;
-            }
-
-            if(!string.Equals(editedBy, userName, StringComparison.OrdinalIgnoreCase)) {
-                if(!_editors.Contains(editedBy)) {
-                    _editors.Add(editedBy);
-                }
-                return true;
-            }
-
-            return false;
-        }
-        /// <summary>
-        /// Выводит отчет с занявшими элемент пользователями
-        /// </summary>
-        /// <param name="editors"></param>
-        private void ShowReport() {
-            if(_editors.Count != 0) {
-                _messageBoxService.Show(
-                    "Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
-                    + string.Join(", ", _editors.ToArray()),
-                    "Обновление спецификации",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
             }
         }
 
@@ -189,9 +149,8 @@ namespace RevitMechanicalSpecification.Service {
 
             foreach(Element element in elements) {
 
-                // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
-                // редактора в список
-                if(IsEditedBy(_userName, element)) {
+                // Это должна быть всегда первая обработка. Если элемент недоступен для редактирования - идем дальше
+                if(_elementEditChecker.IsUnavailableForEdit(element)) {
                     continue;
                 }
 
@@ -272,6 +231,10 @@ namespace RevitMechanicalSpecification.Service {
                 }
 
                 manifoldPartsIds.Add(subElement.Id);
+
+                if(_elementEditChecker.IsUnavailableForEdit(subElement)) {
+                    continue;
+                }
 
                 SpecificationElement subSpecificationElement = CreateSubSpecificationElement(subElement, familyInstance, specificationElement);
                 manifoldElements.Add(subSpecificationElement);

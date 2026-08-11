@@ -40,6 +40,10 @@ namespace RevitMechanicalSpecification {
                 .ToSelf()
                 .InSingletonScope();
 
+            kernel.Bind<ElementEditChecker>()
+                .ToSelf()
+                .InSingletonScope();
+
             kernel.Bind<ElementProcessor>()
                 .ToSelf()
                 .InSingletonScope();
