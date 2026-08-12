@@ -19,11 +19,12 @@ namespace RevitClassifierParameters.ViewModels;
 
 internal class ArParameterClassifierVM : ParameterClassifierVM {
     private readonly FacadeTypeSetter _facadeTypeSetter;
+    private readonly FacadeTypeExcelReader _facadeTypeExcelReader;
 
     /// <summary>
     /// Стандартный путь к файлу правил заполнения типа фасада.
     /// </summary>
-    private string _excelFacadeTypePath = string.Empty;
+    private string _excelFacadeTypePath;
     /// <summary>
     /// Стандартное наименование параметра стен на экземпляре, куда нужно заполнить тип фасада.
     /// </summary>
@@ -50,9 +51,10 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) :
         base(pluginConfig, revitRepository, localizationService, workGroupCode, materialParamSetter, materialReportService,
-            classifierExcelReader, facadeTypeExcelReader, reportV, openFileDialogService, messageBoxService) {
+            classifierExcelReader, reportV, openFileDialogService, messageBoxService) {
 
         _facadeTypeSetter = facadeTypeSetter;
+        _facadeTypeExcelReader = facadeTypeExcelReader;
 
         _excelFacadeTypePath =
             @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\"

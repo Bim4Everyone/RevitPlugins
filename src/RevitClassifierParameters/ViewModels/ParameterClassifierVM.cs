@@ -26,7 +26,6 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     protected readonly MaterialParamSetter _materialParamSetter;
     protected readonly MaterialReportService _materialReportService;
     protected readonly ClassifierExcelReader _classifierExcelReader;
-    protected readonly FacadeTypeExcelReader _facadeTypeExcelReader;
     protected readonly ReportV _reportV;
 
     private string _errorText;
@@ -48,7 +47,6 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         MaterialParamSetter materialParamSetter,
         MaterialReportService materialReportService,
         ClassifierExcelReader classifierExcelReader,
-        FacadeTypeExcelReader facadeTypeExcelReader,
         ReportV reportV,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) {
@@ -61,7 +59,6 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         _materialParamSetter = materialParamSetter;
         _materialReportService = materialReportService;
         _classifierExcelReader = classifierExcelReader;
-        _facadeTypeExcelReader = facadeTypeExcelReader;
         _reportV = reportV;
 
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
