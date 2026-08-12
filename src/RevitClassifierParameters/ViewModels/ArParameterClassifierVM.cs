@@ -56,7 +56,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
 
         _excelFacadeTypePath =
             @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\"
-            + $@"{_revitRepository.Application.VersionNumber}\RevitClassifierParameters\Правила заполнения ФОП_Группировка.xlsx";
+            + $@"{_revitRepository.Application.VersionNumber}\RevitClassifierParameters\Правила заполнения типа фасада.xlsx";
 
         ReadFacadeTypeExcelCommand = RelayCommand.Create(RereadFacadeTypeExcel);
     }
