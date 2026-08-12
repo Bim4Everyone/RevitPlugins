@@ -8,7 +8,6 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -30,11 +29,11 @@ namespace RevitClassifierParameters;
 /// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
 /// </remarks>
 [Transaction(TransactionMode.Manual)]
-public class RevitClassifierParametersCommand : BasePluginCommand {
+public class RevitArParameterClassifierCommand : BasePluginCommand {
     /// <summary>
     /// Инициализирует команду плагина.
     /// </summary>
-    public RevitClassifierParametersCommand() {
+    public RevitArParameterClassifierCommand() {
         PluginName = "RevitClassifierParameters";
     }
 
@@ -109,9 +108,6 @@ public class RevitClassifierParametersCommand : BasePluginCommand {
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
-
-        // Инициализируем extension для локализации ресурсов в файле ресурсов (без доступа к ресурсам окна)
-        var localizationService = kernel.Get<ILocalizationService>();
 
         // Настройка сервиса окошек сообщений
         kernel.UseWpfUIMessageBox<ArParameterClassifierVM>();
