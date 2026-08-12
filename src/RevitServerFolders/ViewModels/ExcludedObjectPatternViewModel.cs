@@ -6,7 +6,7 @@ using RevitServerFolders.Models;
 
 namespace RevitServerFolders.ViewModels;
 
-internal sealed class ExcludedObjectPatternViewModel : BaseViewModel, IEquatable<ExcludedObjectPatternViewModel> {
+internal class ExcludedObjectPatternViewModel : BaseViewModel, IEquatable<ExcludedObjectPatternViewModel> {
 
     private readonly ExcludedObjectPattern _excludedObjectPattern;
 

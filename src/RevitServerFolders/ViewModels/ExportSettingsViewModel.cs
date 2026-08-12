@@ -292,15 +292,15 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
 
     private bool MatchesSearch(ModelObjectViewModel item) {
         string searchText = SearchText?.Trim();
-        return string.IsNullOrEmpty(searchText)
+        return string.IsNullOrWhiteSpace(searchText)
                || Contains(item.Name, searchText)
                || Contains(item.FullName, searchText);
     }
 
     private bool Contains(string source, string value) {
-        return !string.IsNullOrEmpty(source)
-               && !string.IsNullOrEmpty(value)
-               && source.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) >= 0;
+        return !string.IsNullOrWhiteSpace(source)
+               && !string.IsNullOrWhiteSpace(value)
+               && source.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     private ModelObjectViewModel[] GetVisibleObjects() {
