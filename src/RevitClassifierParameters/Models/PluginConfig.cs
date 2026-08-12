@@ -68,4 +68,5 @@ internal class RevitSettings : ProjectSettings {
     public bool WorkWithFacadeCode { get; set; }
     public bool WorkWithFacadeType { get; set; }
     public string ParamNameForFacadeType { get; set; }
+    public bool WorkWithConcreteParams { get; set; }
 }

@@ -85,6 +85,7 @@ internal class KrParameterClassifierVM : ParameterClassifierVM {
         WorkWithFoundationCode = setting?.WorkWithFoundationCode ?? true;
         WorkWithConstrBelowZeroCode = setting?.WorkWithConstrBelowZeroCode ?? true;
         WorkWithConstrAboveZeroCode = setting?.WorkWithConstrAboveZeroCode ?? true;
+        WorkWithConcreteParams = setting?.WorkWithConcreteParams ?? true;
     }
 
     private void SaveConfig() {
@@ -95,6 +96,7 @@ internal class KrParameterClassifierVM : ParameterClassifierVM {
         setting.WorkWithFoundationCode = WorkWithFoundationCode;
         setting.WorkWithConstrBelowZeroCode = WorkWithConstrBelowZeroCode;
         setting.WorkWithConstrAboveZeroCode = WorkWithConstrAboveZeroCode;
+        setting.WorkWithConcreteParams = WorkWithConcreteParams;
 
         _pluginConfig.SaveProjectConfig();
     }
