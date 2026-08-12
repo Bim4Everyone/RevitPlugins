@@ -15,6 +15,7 @@
     xmlns:dosymepConverters="clr-namespace:dosymep.WPF.Converters"
     xmlns:pluginConverters="clr-namespace:RevitServerFolders.Converters"
     xmlns:pluginBehaviors="clr-namespace:RevitServerFolders.Behaviors"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="450"
@@ -48,6 +49,10 @@
                 x:Key="BooleanToVisibilityConverter" />
             <pluginConverters:MiddleEllipsisConverter
                 x:Key="MiddleEllipsisConverter" />
+            <!-- Ширина метки "Куда:/Откуда:" с отступами: вычитается из ширины колонки,
+                 чтобы получить место, доступное под путь -->
+            <system:Double
+                x:Key="TargetsLabelOffset">80</system:Double>
 
             <ui:TextBlock
                 x:Key="TargetsHeader"
@@ -258,8 +263,7 @@
                                                         </i:Interaction.Behaviors>
                                                         <ui:TextBlock.Text>
                                                             <MultiBinding
-                                                                Converter="{StaticResource MiddleEllipsisConverter}"
-                                                                ConverterParameter="85">
+                                                                Converter="{StaticResource MiddleEllipsisConverter}">
                                                                 <Binding
                                                                     Path="TargetFolder" />
                                                                 <Binding
@@ -267,6 +271,8 @@
                                                                 <Binding
                                                                     Path="Columns[2].ActualWidth"
                                                                     RelativeSource="{RelativeSource AncestorType=GridViewRowPresenter}" />
+                                                                <Binding
+                                                                    Source="{StaticResource TargetsLabelOffset}" />
                                                             </MultiBinding>
                                                         </ui:TextBlock.Text>
                                                     </ui:TextBlock>
@@ -285,8 +291,7 @@
                                                         </i:Interaction.Behaviors>
                                                         <ui:TextBlock.Text>
                                                             <MultiBinding
-                                                                Converter="{StaticResource MiddleEllipsisConverter}"
-                                                                ConverterParameter="85">
+                                                                Converter="{StaticResource MiddleEllipsisConverter}">
                                                                 <Binding
                                                                     Path="SourceFolder" />
                                                                 <Binding
@@ -294,6 +299,8 @@
                                                                 <Binding
                                                                     Path="Columns[2].ActualWidth"
                                                                     RelativeSource="{RelativeSource AncestorType=GridViewRowPresenter}" />
+                                                                <Binding
+                                                                    Source="{StaticResource TargetsLabelOffset}" />
                                                             </MultiBinding>
                                                         </ui:TextBlock.Text>
                                                     </ui:TextBlock>
