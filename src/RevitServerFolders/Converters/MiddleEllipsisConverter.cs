@@ -7,15 +7,25 @@ using System.Windows.Media;
 
 namespace RevitServerFolders.Converters;
 /// <summary>
-/// Конвертирует длинный текст из TextBlock в соответствии с текущей шириной этого TextBlock:
+/// Конвертирует длинный текст из TextBlock в соответствии с заданной шириной:
 /// "Очень длинная строка, которая не помещается на экран" => "Очень длинная...на экран"
 /// </summary>
+/// <remarks>
+/// Третье значение — доступная ширина. В параметре можно передать отступ в пикселях,
+/// который будет из нее вычтен: это нужно, когда ширина берется не у самого TextBlock,
+/// а у контейнера, в котором рядом с текстом лежат другие элементы.
+/// </remarks>
 internal class MiddleEllipsisConverter : IMultiValueConverter {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
         if(values[0] is not string text
             || values[1] is not TextBlock textBlock
             || values[2] is not double actualWidth) {
             return DependencyProperty.UnsetValue;
+        }
+
+        if(parameter is string offsetText
+           && double.TryParse(offsetText, NumberStyles.Any, CultureInfo.InvariantCulture, out double offset)) {
+            actualWidth -= offset;
         }
         if(string.IsNullOrWhiteSpace(text) || actualWidth <= 0) {
             return text;

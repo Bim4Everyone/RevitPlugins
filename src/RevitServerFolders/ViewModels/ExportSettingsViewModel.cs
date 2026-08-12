@@ -67,8 +67,9 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
         OpenFolderDialogCommand = RelayCommand.Create(OpenFolderDialog);
         SourceFolderChangedCommand = RelayCommand.CreateAsync(SourceFolderChanged);
         ToggleSkipObjectCommand = RelayCommand.Create<ModelObjectViewModel>(ToggleSkipObject);
-        AddExcludedObjectPatternCommand
-            = RelayCommand.Create(AddExcludedObjectPattern, CanAddExcludedObjectPattern);
+        AddExcludedObjectPatternCommand = RelayCommand.Create(
+            AddExcludedObjectPattern,
+            CanAddExcludedObjectPattern);
         RemoveExcludedObjectPatternCommand = RelayCommand.Create<ExcludedObjectPatternViewModel>(
             RemoveExcludedObjectPattern,
             CanRemoveExcludedObjectPattern);
@@ -325,13 +326,13 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
     private void AddExcludedObjectPattern() {
         ExcludedObjectPatterns.Add(
             new ExcludedObjectPatternViewModel(
-                new ExcludedObjectPattern() { Value = ExcludedObjectPatternText.Trim() }));
+                new ExcludedObjectPattern(ExcludedObjectPatternText.Trim())));
         ExcludedObjectPatternText = null;
         ModelObjectsView.View?.Refresh();
     }
 
     private bool CanAddExcludedObjectPattern() {
-        return !string.IsNullOrWhiteSpace(ExcludedObjectPatternText);
+        return !string.IsNullOrWhiteSpace(ExcludedObjectPatternText?.Trim());
     }
 
     private void RemoveExcludedObjectPattern(ExcludedObjectPatternViewModel pattern) {
