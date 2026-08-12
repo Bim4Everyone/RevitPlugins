@@ -13,7 +13,7 @@ internal abstract class ExportSettings {
     public bool IsSelected { get; set; } = true;
 
     /// <summary>
-    /// Подстроки, по которым файлы скрываются из списка моделей набора
+    /// Подстроки, по которым файлы скрываются из списка и снимаются с экспорта
     /// </summary>
     public ExcludedObjectPattern[] ExcludedObjectPatterns { get; set; } = [];
 }

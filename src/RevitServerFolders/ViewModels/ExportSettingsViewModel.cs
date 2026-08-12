@@ -324,11 +324,17 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
     }
 
     private void AddExcludedObjectPattern() {
-        ExcludedObjectPatterns.Add(
-            new ExcludedObjectPatternViewModel(
-                new ExcludedObjectPattern(ExcludedObjectPatternText.Trim())));
+        var excludedObjectPattern = new ExcludedObjectPattern(ExcludedObjectPatternText.Trim());
+        ExcludedObjectPatterns.Add(new ExcludedObjectPatternViewModel(excludedObjectPattern));
+        SkipObjects(item => Contains(item.FullName, excludedObjectPattern.Value));
         ExcludedObjectPatternText = null;
         ModelObjectsView.View?.Refresh();
+    }
+
+    private void SkipObjects(Func<ModelObjectViewModel, bool> predicate) {
+        foreach(var item in ModelObjects.Where(predicate)) {
+            item.SkipObject = true;
+        }
     }
 
     private bool CanAddExcludedObjectPattern() {
@@ -366,5 +372,7 @@ internal class ExportSettingsViewModel<T> : BaseViewModel where T : ExportSettin
             modelObjectViewModel.SkipObject = skippedObjects?
                 .Contains(modelObjectViewModel.FullName, StringComparer.OrdinalIgnoreCase) == true;
         }
+
+        SkipObjects(IsExcluded);
     }
 }

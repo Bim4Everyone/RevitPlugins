@@ -94,9 +94,9 @@
     <system:String
         x:Key="MainWindow.ExcludedObjectPatternPlaceholder">String for hiding files</system:String>
     <system:String
-        x:Key="MainWindow.ExcludedObjectPatternTooltip">Files whose full name contains the specified string with ignore case are hidden from the list. Hiding does not affect the export: a file with a checked box will be exported.</system:String>
+        x:Key="MainWindow.ExcludedObjectPatternTooltip">Files whose full name contains the specified string with ignore case are hidden from the list and get unchecked, so that a hidden file does not end up in the export. The list of strings is saved in the setting.</system:String>
     <system:String
-        x:Key="MainWindow.AddExcludedObjectPatternTooltip">Add exclusion</system:String>
+        x:Key="MainWindow.AddExcludedObjectPatternTooltip">Add exclusion and uncheck the files it hides</system:String>
     <system:String
         x:Key="MainWindow.RemoveExcludedObjectPatternTooltip">Remove exclusion</system:String>
 

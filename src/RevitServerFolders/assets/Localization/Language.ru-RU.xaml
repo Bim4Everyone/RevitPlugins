@@ -94,9 +94,9 @@
     <system:String
         x:Key="MainWindow.ExcludedObjectPatternPlaceholder">Подстрока для скрытия файлов</system:String>
     <system:String
-        x:Key="MainWindow.ExcludedObjectPatternTooltip">Файлы, в полном наименовании которых есть заданная подстрока без учета регистра, скрываются из списка. Скрытие не влияет на экспорт: файл со включенной галкой будет выгружен.</system:String>
+        x:Key="MainWindow.ExcludedObjectPatternTooltip">Файлы, в полном наименовании которых есть заданная подстрока без учета регистра, скрываются из списка и отключаются от экспорта. Список подстрок сохраняется в настройках.</system:String>
     <system:String
-        x:Key="MainWindow.AddExcludedObjectPatternTooltip">Добавить исключение</system:String>
+        x:Key="MainWindow.AddExcludedObjectPatternTooltip">Добавить исключение и выключить экспорт файлов</system:String>
     <system:String
         x:Key="MainWindow.RemoveExcludedObjectPatternTooltip">Удалить исключение</system:String>
 
