@@ -1,6 +1,7 @@
 ﻿using dosymep.SimpleServices;
 
 using RevitClassifierParameters.Models;
+using RevitClassifierParameters.Models.ConcreteParams;
 using RevitClassifierParameters.Models.MaterialClassifier;
 using RevitClassifierParameters.Models.Work;
 using RevitClassifierParameters.Views;
@@ -8,10 +9,13 @@ using RevitClassifierParameters.Views;
 namespace RevitClassifierParameters.ViewModels;
 
 internal class KrParameterClassifierVM : ParameterClassifierVM {
+    private readonly ConcreteParamsSetter _concreteParamsSetter;
+
     private bool _workWithFoundationCode;
     private bool _workWithConstrBelowZeroCode;
     private bool _workWithConstrAboveZeroCode;
     private bool _workWithConcreteParams;
+    private bool _workWithMaterialTypeParam;
 
     public KrParameterClassifierVM(
         PluginConfig pluginConfig,
@@ -21,11 +25,14 @@ internal class KrParameterClassifierVM : ParameterClassifierVM {
         MaterialParamSetter materialParamSetter,
         MaterialReportService materialReportService,
         ClassifierExcelReader classifierExcelReader,
+        ConcreteParamsSetter concreteParamsSetter,
         ReportV reportV,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) :
         base(pluginConfig, revitRepository, localizationService, workGroupCode, materialParamSetter, materialReportService,
             classifierExcelReader, reportV, openFileDialogService, messageBoxService) {
+
+        _concreteParamsSetter = concreteParamsSetter;
     }
 
     public bool WorkWithFoundationCode {
@@ -47,6 +54,11 @@ internal class KrParameterClassifierVM : ParameterClassifierVM {
         get => _workWithConcreteParams;
         set => RaiseAndSetIfChanged(ref _workWithConcreteParams, value);
     }
+
+    public bool WorkWithMaterialTypeParam {
+        get => _workWithMaterialTypeParam;
+        set => RaiseAndSetIfChanged(ref _workWithMaterialTypeParam, value);
+    }
     
     protected override void LoadView() {
         LoadConfig();
@@ -58,6 +70,7 @@ internal class KrParameterClassifierVM : ParameterClassifierVM {
         SaveConfig();
         var activeCodes = GetActiveCodes();
         _materialParamSetter.SetParamValue(activeCodes, CurrentClassifierWorks, MaterialInPj, false);
+        _concreteParamsSetter.SetConcreteParams(WorkWithConcreteParams, WorkWithMaterialTypeParam);
         ShowReport();
     }
 
@@ -86,6 +99,7 @@ internal class KrParameterClassifierVM : ParameterClassifierVM {
         WorkWithConstrBelowZeroCode = setting?.WorkWithConstrBelowZeroCode ?? true;
         WorkWithConstrAboveZeroCode = setting?.WorkWithConstrAboveZeroCode ?? true;
         WorkWithConcreteParams = setting?.WorkWithConcreteParams ?? true;
+        WorkWithMaterialTypeParam = setting?.WorkWithMaterialTypeParam ?? true;
     }
 
     private void SaveConfig() {
@@ -97,6 +111,7 @@ internal class KrParameterClassifierVM : ParameterClassifierVM {
         setting.WorkWithConstrBelowZeroCode = WorkWithConstrBelowZeroCode;
         setting.WorkWithConstrAboveZeroCode = WorkWithConstrAboveZeroCode;
         setting.WorkWithConcreteParams = WorkWithConcreteParams;
+        setting.WorkWithMaterialTypeParam = WorkWithMaterialTypeParam;
 
         _pluginConfig.SaveProjectConfig();
     }

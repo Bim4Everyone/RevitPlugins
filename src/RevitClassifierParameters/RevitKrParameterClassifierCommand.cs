@@ -14,7 +14,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitClassifierParameters.Models;
-using RevitClassifierParameters.Models.FacadeType;
+using RevitClassifierParameters.Models.ConcreteParams;
 using RevitClassifierParameters.Models.MaterialClassifier;
 using RevitClassifierParameters.Models.Work;
 using RevitClassifierParameters.ViewModels;
@@ -71,6 +71,10 @@ public class RevitKrParameterClassifierCommand : BasePluginCommand {
             .InSingletonScope();
 
         kernel.Bind<ClassifierExcelReader>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<ConcreteParamsSetter>()
             .ToSelf()
             .InSingletonScope();
 

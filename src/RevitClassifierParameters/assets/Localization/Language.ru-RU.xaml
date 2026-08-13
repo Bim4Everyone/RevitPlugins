@@ -49,6 +49,7 @@
 
     <system:String x:Key="Transaction.SetClassifierParameters">Заполнение параметров классификатора</system:String>
     <system:String x:Key="Transaction.SetFacadeType">Заполнение типа фасада</system:String>
+    <system:String x:Key="Transaction.SetConcreteParams">Заполнение параметров бетона</system:String>
 
     <system:String x:Key="MaterialReportStatus.Edited">ИЗМЕНЕН</system:String>
     <system:String x:Key="MaterialReportStatus.NotEdited">БЕЗ ИЗМЕНЕНИЙ</system:String>

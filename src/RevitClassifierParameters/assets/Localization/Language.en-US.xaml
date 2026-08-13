@@ -49,6 +49,7 @@
 
     <system:String x:Key="Transaction.SetClassifierParameters">Filling classifier parameters</system:String>
     <system:String x:Key="Transaction.SetFacadeType">Filling facade type</system:String>
+    <system:String x:Key="Transaction.SetConcreteParams">Filling concrete parameters</system:String>
 
     <system:String x:Key="MaterialReportStatus.Edited">EDITED</system:String>
     <system:String x:Key="MaterialReportStatus.NotEdited">NOT CHANGED</system:String>

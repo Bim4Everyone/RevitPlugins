@@ -45,6 +45,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
@@ -302,14 +303,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Заполнение параметров бетона" />                
+                    Text="Заполнение марок бетона" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Заполнение параметров обр_ФОП_Марка бетона B, обр_ФОП_Марка бетона F, обр_ФОП_Марка бетона W, ФОП_ТИП_Тип материала" />
+                    Text="Заполнение параметров обр_ФОП_Марка бетона B, обр_ФОП_Марка бетона F, обр_ФОП_Марка бетона W" />
                 
                 <CheckBox
                     Grid.Row="0"
@@ -322,8 +323,58 @@
             </Grid>
         </Border>
 
-        <StackPanel
+        <Border
             Grid.Row="6"
+            Margin="10 5"
+            Style="{StaticResource CustomBorder}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <ui:SymbolIcon
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Margin="5"
+                    FontSize="24"
+                    HorizontalAlignment="Center"
+                    Symbol="Tag24"/>
+                
+                <ui:TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Margin="5 5 5 0"
+                    FontWeight="Bold"
+                    Text="Заполнение типа материала" />                
+                
+                <ui:TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="5 0 5 5"
+                    TextWrapping="Wrap"
+                    Text="Заполнение параметра ФОП_ТИП_Тип материала" />
+                
+                <CheckBox
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="2"      
+                    Margin="-5 5 5 5"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding Path=WorkWithMaterialTypeParam}"/>
+            </Grid>
+        </Border>
+
+        <StackPanel
+            Grid.Row="7"
             Orientation="Horizontal"
             VerticalAlignment="Bottom"
             HorizontalAlignment="Right">
