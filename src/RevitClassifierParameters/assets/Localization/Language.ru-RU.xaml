@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Параметры ВОР АР</system:String>
+    <system:String x:Key="MainWindow.TitleAr">Параметры ВОР АР</system:String>
+    <system:String x:Key="MainWindow.TitleKr">Параметры ВОР КР</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
@@ -23,6 +24,21 @@
 
     <system:String x:Key="MainWindow.FacadeTitle">Фасады</system:String>
     <system:String x:Key="MainWindow.FacadeDescription">Учитывает материалы с кодами, которые начинаются на г02.07</system:String>
+
+    <system:String x:Key="MainWindow.FoundationTitle">Устройство фундамента</system:String>
+    <system:String x:Key="MainWindow.FoundationDescription">Учитывает материалы с кодами, которые начинаются на г02.02</system:String>
+
+    <system:String x:Key="MainWindow.ConstrBelowZeroTitle">Конструкции до отм. +/-0,000</system:String>
+    <system:String x:Key="MainWindow.ConstrBelowZeroDescription">Учитывает материалы с кодами, которые начинаются на г02.03</system:String>
+
+    <system:String x:Key="MainWindow.ConstrAboveZeroTitle">Конструкции выше отм. +/-0,000</system:String>
+    <system:String x:Key="MainWindow.ConstrAboveZeroDescription">Учитывает материалы с кодами, которые начинаются на г02.04</system:String>
+
+    <system:String x:Key="MainWindow.ConcreteGradeTitle">Заполнение марок бетона</system:String>
+    <system:String x:Key="MainWindow.ConcreteGradeDescription">Заполнение параметров обр_ФОП_Марка бетона B, обр_ФОП_Марка бетона F, обр_ФОП_Марка бетона W</system:String>
+
+    <system:String x:Key="MainWindow.MaterialTypeTitle">Заполнение типа материала</system:String>
+    <system:String x:Key="MainWindow.MaterialTypeDescription">Заполнение параметра ФОП_ТИП_Тип материала</system:String>
 
     <system:String x:Key="MainWindow.FacadeTypeTitle">Заполнить тип фасада</system:String>
     <system:String x:Key="MainWindow.FacadeTypeDescription">Заполнить тип фасада в заданный параметр</system:String>

@@ -13,7 +13,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
    
     mc:Ignorable="d"
-    Title="{me:LocalizationSource MainWindow.Title}"
+    Title="{me:LocalizationSource MainWindow.TitleAr}"
     
     SizeToContent="Height"
     ResizeMode="NoResize"
@@ -50,7 +50,7 @@
         
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />
+            Title="{me:LocalizationSource MainWindow.TitleAr}" />
 
         <Border
             Grid.Row="1"
@@ -81,6 +81,7 @@
                     Grid.Row="0"
                     Grid.Column="1"
                     Margin="5 5 5 0"
+                    VerticalAlignment="Bottom"
                     FontWeight="Bold"
                     Text="{me:LocalizationSource MainWindow.ClassifierFileTitle}" />                
                 
@@ -88,6 +89,7 @@
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
+                    VerticalAlignment="Top"
                     TextWrapping="Wrap"
                     Text="{me:LocalizationSource MainWindow.ClassifierFileDescription}" />
                 

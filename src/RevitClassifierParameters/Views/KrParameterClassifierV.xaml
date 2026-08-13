@@ -13,7 +13,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
    
     mc:Ignorable="d"
-    Title="{me:LocalizationSource MainWindow.Title}"
+    Title="{me:LocalizationSource MainWindow.TitleKr}"
     
     SizeToContent="Height"
     ResizeMode="NoResize"
@@ -51,7 +51,7 @@
         
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />
+            Title="{me:LocalizationSource MainWindow.TitleKr}" />
 
         <Border
             Grid.Row="1"
@@ -83,12 +83,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
+                    VerticalAlignment="Bottom"
                     Text="{me:LocalizationSource MainWindow.ClassifierFileTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
+                    VerticalAlignment="Top"
                     TextWrapping="Wrap"
                     Text="{me:LocalizationSource MainWindow.ClassifierFileDescription}" />
                 
@@ -153,14 +155,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Устройство фундамента" />                
+                    Text="{me:LocalizationSource MainWindow.FoundationTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Учитывает материалы с кодами, которые начинаются на г02.02" />
+                    Text="{me:LocalizationSource MainWindow.FoundationDescription}" />
                 
                 <CheckBox
                     Grid.Row="0"
@@ -203,14 +205,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Конструкции до отм. +/-0,000" />                
+                    Text="{me:LocalizationSource MainWindow.ConstrBelowZeroTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Учитывает материалы с кодами, которые начинаются на г02.03" />
+                    Text="{me:LocalizationSource MainWindow.ConstrBelowZeroDescription}" />
                 
                 <CheckBox
                     Grid.Row="0"
@@ -253,14 +255,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Конструкции выше отм. +/-0,000" />                
+                    Text="{me:LocalizationSource MainWindow.ConstrAboveZeroTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Учитывает материалы с кодами, которые начинаются на г02.04" />
+                    Text="{me:LocalizationSource MainWindow.ConstrAboveZeroDescription}" />
                 
                 <CheckBox
                     Grid.Row="0"
@@ -303,14 +305,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Заполнение марок бетона" />                
+                    Text="{me:LocalizationSource MainWindow.ConcreteGradeTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Заполнение параметров обр_ФОП_Марка бетона B, обр_ФОП_Марка бетона F, обр_ФОП_Марка бетона W" />
+                    Text="{me:LocalizationSource MainWindow.ConcreteGradeDescription}" />
                 
                 <CheckBox
                     Grid.Row="0"
@@ -353,14 +355,14 @@
                     Grid.Column="1"
                     Margin="5 5 5 0"
                     FontWeight="Bold"
-                    Text="Заполнение типа материала" />                
+                    Text="{me:LocalizationSource MainWindow.MaterialTypeTitle}" />                
                 
                 <ui:TextBlock
                     Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0 5 5"
                     TextWrapping="Wrap"
-                    Text="Заполнение параметра ФОП_ТИП_Тип материала" />
+                    Text="{me:LocalizationSource MainWindow.MaterialTypeDescription}" />
                 
                 <CheckBox
                     Grid.Row="0"

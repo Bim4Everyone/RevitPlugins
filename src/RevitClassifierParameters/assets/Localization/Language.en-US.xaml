@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Parameters BQW AR</system:String>
+    <system:String x:Key="MainWindow.TitleAr">Parameters BQW AR</system:String>
+    <system:String x:Key="MainWindow.TitleKr">Parameters BQW KR</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
@@ -23,6 +24,21 @@
 
     <system:String x:Key="MainWindow.FacadeTitle">Facades</system:String>
     <system:String x:Key="MainWindow.FacadeDescription">Processes materials with codes starting with г02.07</system:String>
+
+    <system:String x:Key="MainWindow.FoundationTitle">Foundation works</system:String>
+    <system:String x:Key="MainWindow.FoundationDescription">Processes materials with codes starting with г02.02</system:String>
+
+    <system:String x:Key="MainWindow.ConstrBelowZeroTitle">Structures below level +/-0.000</system:String>
+    <system:String x:Key="MainWindow.ConstrBelowZeroDescription">Processes materials with codes starting with г02.03</system:String>
+
+    <system:String x:Key="MainWindow.ConstrAboveZeroTitle">Structures above level +/-0.000</system:String>
+    <system:String x:Key="MainWindow.ConstrAboveZeroDescription">Processes materials with codes starting with г02.04</system:String>
+
+    <system:String x:Key="MainWindow.ConcreteGradeTitle">Filling concrete grades</system:String>
+    <system:String x:Key="MainWindow.ConcreteGradeDescription">Filling parameters обр_ФОП_Марка бетона B, обр_ФОП_Марка бетона F, обр_ФОП_Марка бетона W</system:String>
+
+    <system:String x:Key="MainWindow.MaterialTypeTitle">Filling material type</system:String>
+    <system:String x:Key="MainWindow.MaterialTypeDescription">Filling parameter ФОП_ТИП_Тип материала</system:String>
 
     <system:String x:Key="MainWindow.FacadeTypeTitle">Fill in facade type</system:String>
     <system:String x:Key="MainWindow.FacadeTypeDescription">Fill in the facade type into the specified parameter</system:String>
