@@ -26,11 +26,13 @@ namespace RevitOpeningSlopes.Models {
         }
 
         public XYZ GetOpeningVector(FamilyInstance opening) {
-            XYZ openingVector = null;
-            if(opening != null) {
-                openingVector = opening.FacingOrientation.Normalize();
+            if(opening == null) {
+                return null;
             }
-            return openingVector;
+
+            var v = opening.HandOrientation;
+            v = new XYZ(v.X, v.Y, 0.0);
+            return v.GetLength() < 1e-9 ? null : v.Normalize();
         }
 
         /// <summary>
@@ -49,14 +51,13 @@ namespace RevitOpeningSlopes.Models {
         }
 
         public FamilySymbol GetSlopeType(ElementId slopeTypeId) {
-            if(slopeTypeId.IsNull()) {
-                throw new ArgumentNullException(nameof(slopeTypeId));
-            }
-            return Document.GetElement(slopeTypeId) as FamilySymbol ?? throw new ArgumentException(nameof(slopeTypeId));
+            return slopeTypeId.IsNull()
+                ? throw new ArgumentNullException(nameof(slopeTypeId))
+                : Document.GetElement(slopeTypeId) as FamilySymbol ?? throw new ArgumentException(nameof(slopeTypeId));
         }
 
         public ICollection<FamilyInstance> SelectWindowsOnView() {
-            IList<Reference> pickedElementsReference = ActiveUIDocument
+            var pickedElementsReference = ActiveUIDocument
                 .Selection
                 .PickObjects(ObjectType.Element, _selectionFilter, "Выберите экземпляры окон");
 

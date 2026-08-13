@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 using RevitOpeningSlopes.Models.Enums;
 
@@ -33,6 +34,7 @@ namespace RevitOpeningSlopes.Models {
         private XYZ _topPoint;
         private XYZ _bottomPoint;
         private XYZ _verticalCenterPoint;
+        private OverallPoints _overallPoints;
 
         private double _openingHeight = 0;
         private double _openingWidth = 0;
@@ -427,7 +429,7 @@ namespace RevitOpeningSlopes.Models {
             if(points == null) {
                 return new List<XYZ>();
             }
-
+            //DebugOpeningOrientation(_opening);
             var ordered = points
                 .Select(p => new {
                     Point = p,
@@ -455,6 +457,40 @@ namespace RevitOpeningSlopes.Models {
             return splitIndex < 0 || maxRatio < gapRatioThreshold
                 ? ordered.Select(x => x.Point).ToList()
                 : ordered.Take(splitIndex + 1).Select(x => x.Point).ToList();
+        }
+
+        private static string V(XYZ p) {
+            return p == null ? "null" : string.Format("({0:F4}, {1:F4}, {2:F4})", p.X, p.Y, p.Z);
+        }
+        public void DebugOpeningOrientation(FamilyInstance opening) {
+            if(opening == null) {
+                return;
+            }
+
+            var facing = opening.FacingOrientation;
+            var hand = opening.HandOrientation;
+            var basisX = opening.GetTransform().BasisX;
+            var basisY = opening.GetTransform().BasisY;
+            XYZ wallN = null;
+            if(opening.Host is Wall w) {
+                wallN = w.Orientation;
+            }
+
+            double fhDeg = facing.AngleTo(hand) * 180.0 / Math.PI;
+            double fwDeg = (wallN != null) ? facing.AngleTo(wallN) * 180.0 / Math.PI : -1.0;
+            string msg =
+                "Id: " +
+                "\nFacing: " + V(facing) +
+                "\nHand: " + V(hand) +
+                "\nBasisX: " + V(basisX) +
+                "\nBasisY: " + V(basisY) +
+                "\nWall.Orientation: " + V(wallN) +
+                "\nFacingFlipped: " + opening.FacingFlipped +
+                "\nHandFlipped: " + opening.HandFlipped +
+                "\nMirrored: " + opening.Mirrored +
+                "\nAngle(Facing,Hand): " + fhDeg.ToString("F2") +
+                "\nAngle(Facing,WallN): " + fwDeg.ToString("F2");
+            TaskDialog.Show("Opening orientation debug", msg);
         }
 
         private XYZ GetClosestPointFromFacesByPoint(IList<PlanarFace> faces, Direction direction, bool closest = true) {
@@ -551,13 +587,14 @@ namespace RevitOpeningSlopes.Models {
             var nearestElementsSolid = GetNearestElementsSolid();
             _revitRepository.Document.Regenerate();
             var frontOffsetPoint = GetFrontOffsetPoint();
+            var backwardOffsetPoint = GetCentralBackwardOffsetPoint();
             var facesList = GetFacesBySolidAndDirection(nearestElementsSolid, direction);
 
             var closestPoint = GetClosestPointFromFacesByPoint(facesList, direction);
 
             try {
-                var testLine = Line.CreateBound(frontOffsetPoint, closestPoint);
-                //CreateTestModelLine(testLine);
+                var testLine = Line.CreateBound(frontOffsetPoint, backwardOffsetPoint);
+                CreateTestModelLine(testLine);
 
             } catch {
             }
@@ -843,36 +880,39 @@ namespace RevitOpeningSlopes.Models {
             if(_rightDepthPoint != null) {
                 return _rightDepthPoint;
             } else {
-                var depthPoint = GetDepthPoint();
-                var rightFrontPoint = GetRightFrontPoint();
-                var openingVector = GetOpeningVector();
+                var overallPoints = GetOverallPoints();
+                var depthPoint = overallPoints.Right;
+                //var depthPoint = GetDepthPoint();
+                //var rightFrontPoint = GetRightFrontPoint();
+                //var openingVector = GetOpeningVector();
 
-                if(depthPoint != null && rightFrontPoint != null) {
+                //if(depthPoint != null && rightFrontPoint != null) {
 
-                    // Создание линий из точки внешней границы фасада P6 в направлении внутрь здания и из точки
-                    // глубины P7 вправо для нахождения точки пересечения между ними - P8
-                    var depthLine = _linesFromOpening.CreateLineFromOpening(
-                        rightFrontPoint,
-                        openingVector,
-                        _depthLineLength,
-                        Direction.Backward);
+                //    // Создание линий из точки внешней границы фасада P6 в направлении внутрь здания и из точки
+                //    // глубины P7 вправо для нахождения точки пересечения между ними - P8
+                //    var depthLine = _linesFromOpening.CreateLineFromOpening(
+                //        rightFrontPoint,
+                //        openingVector,
+                //        _depthLineLength,
+                //        Direction.Backward);
 
-                    var lineFromClosestPoint = _linesFromOpening.CreateLineFromOpening(
-                        depthPoint,
-                        openingVector,
-                        _alongsideLineLength,
-                        Direction.Right);
+                //    var lineFromClosestPoint = _linesFromOpening.CreateLineFromOpening(
+                //        depthPoint,
+                //        openingVector,
+                //        _alongsideLineLength,
+                //        Direction.Right);
 
-                    IList<ClosestPointsPairBetweenTwoCurves> closestPoints =
-                        new List<ClosestPointsPairBetweenTwoCurves>();
+                //    IList<ClosestPointsPairBetweenTwoCurves> closestPoints =
+                //        new List<ClosestPointsPairBetweenTwoCurves>();
 
-                    depthLine.ComputeClosestPoints(lineFromClosestPoint,
-                        true,
-                        false,
-                        false,
-                        out closestPoints);
-                    _rightDepthPoint = closestPoints.First().XYZPointOnFirstCurve;
-                }
+                //    depthLine.ComputeClosestPoints(lineFromClosestPoint,
+                //        true,
+                //        false,
+                //        false,
+                //        out closestPoints);
+                //    _rightDepthPoint = closestPoints.First().XYZPointOnFirstCurve;
+                //}
+                _rightDepthPoint = depthPoint;
                 return _rightDepthPoint;
             }
         }
@@ -1091,8 +1131,9 @@ namespace RevitOpeningSlopes.Models {
             if(_verticalCenterPoint != null) {
                 return _verticalCenterPoint;
             } else {
-                var topPoint = GetTopPoint();
-                var bottomPoint = GetBottomPoint();
+                var overallPoints = GetOverallPoints();
+                var topPoint = overallPoints.Top;
+                var bottomPoint = overallPoints.Bottom;
 
                 if(topPoint != null && bottomPoint != null) {
                     double x = bottomPoint.X;
@@ -1104,6 +1145,23 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        ///// <summary>
+        ///// Функция находит высоту проема, используя верхнюю (P11) и нижнюю (P12) 
+        ///// точку соответственно
+        ///// </summary>
+        ///// <returns>Высота проема</returns>
+        ///// <exception cref="ArgumentException">Срабатывает, если не удалось рассчитать верхнюю 
+        ///// и нижнюю точку окна</exception>
+        //public double GetOpeningHeight() {
+        //    var topPoint = GetTopPoint();
+        //    var bottomPoint = GetBottomPoint();
+
+        //    _openingHeight = topPoint != null && bottomPoint != null
+        //        ? Math.Abs(bottomPoint.Z - topPoint.Z)
+        //        : throw new ArgumentException("Не удалось рассчитать высоту проема");
+        //    return _openingHeight;
+        //}
+
         /// <summary>
         /// Функция находит высоту проема, используя верхнюю (P11) и нижнюю (P12) 
         /// точку соответственно
@@ -1112,14 +1170,32 @@ namespace RevitOpeningSlopes.Models {
         /// <exception cref="ArgumentException">Срабатывает, если не удалось рассчитать верхнюю 
         /// и нижнюю точку окна</exception>
         public double GetOpeningHeight() {
-            var topPoint = GetTopPoint();
-            var bottomPoint = GetBottomPoint();
+            var overallPoints = GetOverallPoints();
+            var topPoint = overallPoints.Top;
+            var bottomPoint = overallPoints.Bottom;
 
             _openingHeight = topPoint != null && bottomPoint != null
                 ? Math.Abs(bottomPoint.Z - topPoint.Z)
                 : throw new ArgumentException("Не удалось рассчитать высоту проема");
             return _openingHeight;
         }
+
+        ///// <summary>
+        ///// Функция находит ширину проема, используя точки P13 и P8
+        ///// </summary>
+        ///// <returns>Ширина проема</returns>
+        ///// <exception cref="ArgumentException">Срабатывает, если не была найдена точка справа и 
+        ///// вертикальный центр окна</exception>
+        //public double GetOpeningWidth() {
+        //    var verticalCenterPoint = GetVerticalCenterPoint();
+        //    var rightDepthPoint = GetRightDepthPoint();
+
+        //    _openingWidth = verticalCenterPoint != null && rightDepthPoint != null
+        //        ? Math.Sqrt(Math.Pow(verticalCenterPoint.X - rightDepthPoint.X, 2)
+        //            + Math.Pow(verticalCenterPoint.Y - rightDepthPoint.Y, 2)) * 2
+        //        : throw new ArgumentException("не удалось рассчитать ширину проема");
+        //    return _openingWidth;
+        //}
 
         /// <summary>
         /// Функция находит ширину проема, используя точки P13 и P8
@@ -1128,6 +1204,7 @@ namespace RevitOpeningSlopes.Models {
         /// <exception cref="ArgumentException">Срабатывает, если не была найдена точка справа и 
         /// вертикальный центр окна</exception>
         public double GetOpeningWidth() {
+            var overallPoints = GetOverallPoints();
             var verticalCenterPoint = GetVerticalCenterPoint();
             var rightDepthPoint = GetRightDepthPoint();
 
@@ -1146,13 +1223,26 @@ namespace RevitOpeningSlopes.Models {
         /// вылета окна справа</exception>
         public double GetOpeningDepth() {
 
-            var rightDepthPoint = GetRightDepthPoint();
-            var rightFrontPoint = GetRightFrontPoint();
+            //var rightDepthPoint = GetRightDepthPoint();
+            //var rightFrontPoint = GetRightFrontPoint();
 
-            _openingDepth = rightDepthPoint != null && rightFrontPoint != null
-                ? rightDepthPoint.DistanceTo(rightFrontPoint)
-                : throw new ArgumentException("Не удалось рассчитать глубину проема");
+            //_openingDepth = rightDepthPoint != null && rightFrontPoint != null
+            //    ? rightDepthPoint.DistanceTo(rightFrontPoint)
+            //    : throw new ArgumentException("Не удалось рассчитать глубину проема");
+            _openingDepth = 200;
             return _openingDepth;
+        }
+
+        public OverallPoints GetOverallPoints() {
+            if(_overallPoints != null) {
+                return _overallPoints;
+            }
+            _overallPoints = new OverallPoints(
+                GetClosestPointByDirection(Direction.Left),
+                GetClosestPointByDirection(Direction.Right),
+                GetClosestPointByDirection(Direction.Top),
+                GetClosestPointByDirection(Direction.Down));
+            return _overallPoints;
         }
 
         /// <summary>
@@ -1160,19 +1250,21 @@ namespace RevitOpeningSlopes.Models {
         /// </summary>
         /// <returns>Угол поворота для откоса, в радианах</returns>
         public double GetRotationAngle() {
-            var openingVector = GetOpeningVector();
-
-            if(openingVector != null) {
-                var originVector = new XYZ(0, -1, 0);
-                double scalarMultiply = ScalarMultiply(originVector, openingVector);
-                double originMagnitude = Magnitude(originVector.X, originVector.Y);
-                double openingMagnitude = Magnitude(openingVector.X, openingVector.Y);
-                double cosTheta = scalarMultiply / (originMagnitude * openingMagnitude);
-
-                _rotationAngle = Math.Acos(cosTheta);
-                return openingVector.X < 0 ? -_rotationAngle : _rotationAngle;
+            var openingVector = _revitRepository.GetOpeningVector(_opening);
+            if(openingVector == null) {
+                return _rotationAngle;
             }
+
+            var originVector = new XYZ(0, -1, 0);
+            double angle = originVector.AngleOnPlaneTo(openingVector, XYZ.BasisZ); // 0..2PI
+            if(angle > Math.PI) {
+                angle -= 2.0 * Math.PI; // -PI..PI
+            }
+
+            _rotationAngle = angle;
             return _rotationAngle;
         }
+
+
     }
 }
