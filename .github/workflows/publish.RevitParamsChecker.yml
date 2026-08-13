@@ -8,6 +8,7 @@ on:
     paths:
       - '**RevitParamsChecker**.cs'
       - '**RevitParamsChecker**.xaml'
+      - '**RevitParamsChecker**.csproj'
 
 env:
   plugin-name: "RevitParamsChecker"
