@@ -45,7 +45,7 @@ namespace RevitOpeningSlopes.Models {
             if(_revitRepository.ConvertToMillimeters(depth) < 1) {
                 throw new ArgumentException("Глубина проема не может быть равна или меньше нуля");
             }
-            var center = openingParameters.GetVerticalCenterPoint();
+            var center = openingParameters.GetCenterPoint();
             double rotationAngle = openingParameters.GetRotationAngle();
 
             var slopeData = new SlopeCreationData() {

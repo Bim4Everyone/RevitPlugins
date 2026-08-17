@@ -33,7 +33,7 @@ namespace RevitOpeningSlopes.Models {
         private XYZ _horizontalDepthPoint;
         private XYZ _topPoint;
         private XYZ _bottomPoint;
-        private XYZ _verticalCenterPoint;
+        private XYZ _centerPoint;
         private OverallPoints _overallPoints;
 
         private double _openingHeight = 0;
@@ -130,17 +130,37 @@ namespace RevitOpeningSlopes.Models {
         private BoundingBoxXYZ GetOpeningGeometryBbox() {
             if(_openingBoundingBox != null) {
                 return _openingBoundingBox;
-            } else {
-                var openingSolid = GetOpeningSolid();
-                if(openingSolid != null) {
-                    var bbox = openingSolid.GetBoundingBox();
-                    _openingBoundingBox = new BoundingBoxXYZ() {
-                        Min = bbox.Transform.OfPoint(bbox.Min),
-                        Max = bbox.Transform.OfPoint(bbox.Max)
-                    };
-                }
+            }
+
+            var openingSolid = GetOpeningSolid();
+            if(openingSolid == null) {
                 return _openingBoundingBox;
             }
+
+            var bbox = openingSolid.GetBoundingBox();
+            var transform = bbox.Transform;
+            var worldCorners = new[] {
+                new XYZ(bbox.Min.X, bbox.Min.Y, bbox.Min.Z),
+                new XYZ(bbox.Min.X, bbox.Min.Y, bbox.Max.Z),
+                new XYZ(bbox.Min.X, bbox.Max.Y, bbox.Min.Z),
+                new XYZ(bbox.Min.X, bbox.Max.Y, bbox.Max.Z),
+                new XYZ(bbox.Max.X, bbox.Min.Y, bbox.Min.Z),
+                new XYZ(bbox.Max.X, bbox.Min.Y, bbox.Max.Z),
+                new XYZ(bbox.Max.X, bbox.Max.Y, bbox.Min.Z),
+                new XYZ(bbox.Max.X, bbox.Max.Y, bbox.Max.Z)
+            }.Select(c => transform.OfPoint(c)).ToList();
+
+            _openingBoundingBox = new BoundingBoxXYZ() {
+                Min = new XYZ(
+                    worldCorners.Min(p => p.X),
+                    worldCorners.Min(p => p.Y),
+                    worldCorners.Min(p => p.Z)),
+                Max = new XYZ(
+                    worldCorners.Max(p => p.X),
+                    worldCorners.Max(p => p.Y),
+                    worldCorners.Max(p => p.Z))
+            };
+            return _openingBoundingBox;
         }
 
         private Solid GetOpeningSolid() {
@@ -290,28 +310,37 @@ namespace RevitOpeningSlopes.Models {
             }
         }
 
+        /// <summary>
+        /// Возвращает плоские грани, расположенные с указанной стороны от центра окна
+        /// и направленные нормалью внутрь проема
+        /// </summary>
+        /// <param name="solid">Solid ближайших элементов</param>
+        /// <param name="direction">Сторона проема</param>
+        /// <returns>Грани указанной стороны проема</returns>
         private IList<PlanarFace> GetFacesBySolidAndDirection(Solid solid, Direction direction) {
-            var targetDirection = GetDirectionVectorFromOpening(direction);
-            double tolerance = 0.99;
+            var centerPoint = GetOpeningBoundingBoxOrigin();
+            var sideDirection = GetDirectionVectorFromOpening(direction);
+            const double normalTolerance = 0.99;
+            const double positionTolerance = 1e-6;
             var faceResultList = new List<PlanarFace>();
 
+            if(solid == null || centerPoint == null || sideDirection == null) {
+                return faceResultList;
+            }
+
+            var targetNormal = -sideDirection;
             foreach(Face face in solid.Faces) {
-
                 var planarFace = face as PlanarFace;
-
                 if(planarFace == null) {
                     continue;
                 }
 
                 var normal = planarFace.FaceNormal.Normalize();
-
-                double dot = normal.DotProduct(targetDirection);
-
-                if(dot >= tolerance) {
+                double sideOffset = (planarFace.Origin - centerPoint).DotProduct(sideDirection);
+                if(normal.DotProduct(targetNormal) >= normalTolerance
+                    && sideOffset > positionTolerance) {
                     faceResultList.Add(planarFace);
-
                 }
-
             }
             return faceResultList;
         }
@@ -493,93 +522,83 @@ namespace RevitOpeningSlopes.Models {
             TaskDialog.Show("Opening orientation debug", msg);
         }
 
-        private XYZ GetClosestPointFromFacesByPoint(IList<PlanarFace> faces, Direction direction, bool closest = true) {
-
+        /// <summary>
+        /// Возвращает ближайшую к FrontOffsetPoint точку на ребрах выбранных граней
+        /// </summary>
+        /// <param name="faces">Грани одной стороны проема</param>
+        /// <param name="direction">Сторона проема</param>
+        /// <returns>Ближайшая точка на ребре грани</returns>
+        private XYZ GetClosestPointFromFacesByPoint(IList<PlanarFace> faces, Direction direction) {
             var frontOffsetPoint = GetFrontOffsetPoint();
-            IList<XYZ> closestPoints = new List<XYZ>();
+            var centerPoint = GetOpeningBoundingBoxOrigin();
+            var sideDirection = GetDirectionVectorFromOpening(direction);
+            if(faces == null || frontOffsetPoint == null || centerPoint == null || sideDirection == null) {
+                return null;
+            }
+
+            XYZ closestPoint = null;
+            double minDistance = double.MaxValue;
             foreach(var face in faces) {
-                var bb = face.GetBoundingBox();
+                foreach(EdgeArray edgeLoop in face.EdgeLoops) {
+                    foreach(Edge edge in edgeLoop) {
+                        var curve = edge.AsCurve();
+                        UpdateClosestEdgePoint(
+                            curve.GetEndPoint(0),
+                            frontOffsetPoint,
+                            centerPoint,
+                            sideDirection,
+                            ref closestPoint,
+                            ref minDistance);
+                        UpdateClosestEdgePoint(
+                            curve.GetEndPoint(1),
+                            frontOffsetPoint,
+                            centerPoint,
+                            sideDirection,
+                            ref closestPoint,
+                            ref minDistance);
 
-                int steps = 3;
-                XYZ closestPoint = null;
-                double minDistance = double.MaxValue;
-                for(int i = 0; i <= steps; i++) {
-                    for(int j = 0; j <= steps; j++) {
-                        double u = bb.Min.U + (bb.Max.U - bb.Min.U) * i / steps;
-                        double v = bb.Min.V + (bb.Max.V - bb.Min.V) * j / steps;
-
-                        var currentPoint = face.Evaluate(new UV(u, v));
-
-                        double currentLength = currentPoint.DistanceTo(frontOffsetPoint);
-                        if(currentLength < minDistance) {
-                            minDistance = currentLength;
-                            closestPoint = currentPoint;
+                        var projection = curve.Project(frontOffsetPoint);
+                        if(projection != null && curve.IsInside(projection.Parameter)) {
+                            UpdateClosestEdgePoint(
+                                projection.XYZPoint,
+                                frontOffsetPoint,
+                                centerPoint,
+                                sideDirection,
+                                ref closestPoint,
+                                ref minDistance);
                         }
                     }
                 }
-                closestPoints.Add(closestPoint);
             }
-            if(direction == Direction.Top) {
-                IList<XYZ> nearestPoints = KeepNearestCluster(closestPoints, frontOffsetPoint);
-                IList<XYZ> resultPoints = new List<XYZ>();
-                foreach(var point in nearestPoints) {
-                    if(point.Z > frontOffsetPoint.Z) {
-                        continue;
-                    }
-                    resultPoints.Add(point);
-                }
-                var result = closest ? resultPoints.OrderByDescending(p => p.Z).FirstOrDefault() : resultPoints.OrderBy(p => p.Z).FirstOrDefault();
-                var testLine = Line.CreateBound(result, frontOffsetPoint);
-                //CreateTestModelLine(testLine);
-                return result;
+            return closestPoint;
+        }
+
+        /// <summary>
+        /// Обновляет ближайшую точку ребра, если она находится на требуемой стороне проема
+        /// </summary>
+        /// <param name="candidatePoint">Проверяемая точка ребра</param>
+        /// <param name="targetPoint">Точка, относительно которой измеряется расстояние</param>
+        /// <param name="centerPoint">Центр BoundingBox окна</param>
+        /// <param name="sideDirection">Направление стороны проема</param>
+        /// <param name="closestPoint">Текущая ближайшая точка</param>
+        /// <param name="minDistance">Текущее минимальное расстояние</param>
+        private void UpdateClosestEdgePoint(
+            XYZ candidatePoint,
+            XYZ targetPoint,
+            XYZ centerPoint,
+            XYZ sideDirection,
+            ref XYZ closestPoint,
+            ref double minDistance) {
+            if(candidatePoint == null
+                || (candidatePoint - centerPoint).DotProduct(sideDirection) <= 1e-6) {
+                return;
             }
-            if(direction == Direction.Down) {
-                IList<XYZ> nearestPoints = KeepNearestCluster(closestPoints, frontOffsetPoint);
-                IList<XYZ> resultPoints = new List<XYZ>();
-                foreach(var point in nearestPoints) {
-                    if(point.Z < frontOffsetPoint.Z) {
-                        continue;
-                    }
-                    resultPoints.Add(point);
-                }
-                var result = closest ? resultPoints.OrderBy(p => p.Z).FirstOrDefault() : resultPoints.OrderByDescending(p => p.Z).FirstOrDefault();
-                var testLine = Line.CreateBound(result, frontOffsetPoint);
-                //CreateTestModelLine(testLine);
-                return result;
+
+            double distance = candidatePoint.DistanceTo(targetPoint);
+            if(distance < minDistance) {
+                minDistance = distance;
+                closestPoint = candidatePoint;
             }
-            if(direction == Direction.Left) {
-                IList<XYZ> nearestPoints = KeepNearestCluster(closestPoints, frontOffsetPoint);
-                var resultPoints = nearestPoints;
-                //foreach(var point in nearestPoints) {
-                //    if(point.Z < frontOffsetPoint.Z) {
-                //        continue;
-                //    }
-                //    resultPoints.Add(point);
-                //}
-                var result = closest
-                    ? resultPoints.OrderBy(p => p.DistanceTo(frontOffsetPoint)).FirstOrDefault()
-                    : resultPoints.OrderByDescending(p => p.DistanceTo(frontOffsetPoint)).FirstOrDefault();
-                var testLine = Line.CreateBound(result, frontOffsetPoint);
-                //CreateTestModelLine(testLine);
-                return result;
-            }
-            if(direction == Direction.Right) {
-                IList<XYZ> nearestPoints = KeepNearestCluster(closestPoints, frontOffsetPoint);
-                var resultPoints = nearestPoints;
-                //foreach(var point in nearestPoints) {
-                //    if(point.Z < frontOffsetPoint.Z) {
-                //        continue;
-                //    }
-                //    resultPoints.Add(point);
-                //}
-                var result = closest
-                    ? resultPoints.OrderBy(p => p.DistanceTo(frontOffsetPoint)).FirstOrDefault()
-                    : resultPoints.OrderByDescending(p => p.DistanceTo(frontOffsetPoint)).FirstOrDefault();
-                var testLine = Line.CreateBound(result, frontOffsetPoint);
-                //CreateTestModelLine(testLine);
-                return result;
-            }
-            return null;
         }
 
 
@@ -593,7 +612,7 @@ namespace RevitOpeningSlopes.Models {
             var closestPoint = GetClosestPointFromFacesByPoint(facesList, direction);
 
             try {
-                var testLine = Line.CreateBound(frontOffsetPoint, backwardOffsetPoint);
+                var testLine = Line.CreateBound(frontOffsetPoint, closestPoint);
                 CreateTestModelLine(testLine);
 
             } catch {
@@ -815,60 +834,50 @@ namespace RevitOpeningSlopes.Models {
         }
 
         /// <summary>
-        /// Функция находит точку глубины (P7) - ближайшая точка в выпирающей геометрической части семейства 
-        /// окна в сторону от здания
+        /// Функция находит точку глубины по ближайшей плоской грани солида окна к FrontOffsetPoint
         /// </summary>
-        /// <returns>Точка глубины (P7)</returns>
+        /// <returns>Точка глубины с координатами XY грани</returns>
         private XYZ GetDepthPoint() {
             if(_depthPoint != null) {
                 return _depthPoint;
-            } else {
-                var rightFrontPoint = GetRightFrontPoint();
-                var openingSolid = GetOpeningSolid();
-                var openingVector = GetOpeningVector();
+            }
 
-                if(rightFrontPoint != null & openingSolid != null) {
-                    double closestDist = double.PositiveInfinity;
+            var frontOffsetPoint = GetFrontOffsetPoint();
+            var openingSolid = GetOpeningSolid();
+            var openingVector = GetOpeningVector();
 
-                    // Создание линии влево от точки P6 и разделение ее на точки для создания линий в направлении внутрь
-                    // здания
-                    var alongsideLine = _linesFromOpening.CreateLineFromOpening(
-                        rightFrontPoint,
-                        openingVector,
-                        _alongsideLineLength,
-                        Direction.Left);
-                    var points = _linesFromOpening.SplitCurveToPoints(alongsideLine, _step);
-                    var intersectOptOutside = new SolidCurveIntersectionOptions() {
-                        ResultType = SolidCurveIntersectionMode.CurveSegmentsOutside
-                    };
-
-                    foreach(var point in points) {
-                        var backwardLine = _linesFromOpening.CreateLineFromOpening(
-                            point,
-                            openingVector,
-                            _depthLineLength,
-                            Direction.Backward);
-
-                        var intersection = openingSolid.IntersectWithCurve(
-                                backwardLine,
-                                intersectOptOutside);
-
-                        if(intersection.SegmentCount > 0) {
-                            var intersectCoord = intersection.GetCurveSegment(0).GetEndPoint(1);
-                            double currentDist = _revitRepository
-                                .ConvertToMillimeters(point.DistanceTo(intersectCoord));
-                            if(currentDist < closestDist) {
-                                closestDist = currentDist;
-
-                                // Назначаем полю последнюю ближайшую точку пересечения к точке, откуда была запущена
-                                // линия
-                                _depthPoint = intersectCoord;
-                            }
-                        }
-                    }
-                }
+            if(frontOffsetPoint == null || openingSolid == null || openingVector == null) {
                 return _depthPoint;
             }
+
+            double minDistance = double.PositiveInfinity;
+            foreach(Face face in openingSolid.Faces) {
+                var planarFace = face as PlanarFace;
+                if(planarFace == null) {
+                    continue;
+                }
+
+                var normal = planarFace.FaceNormal.Normalize();
+                if(normal.DotProduct(openingVector) <= 0) {
+                    continue;
+                }
+
+                double denom = (-openingVector).DotProduct(normal);
+                if(Math.Abs(denom) < 1e-9) {
+                    continue;
+                }
+
+                double distance = (planarFace.Origin - frontOffsetPoint).DotProduct(normal) / denom;
+                if(distance <= 0 || distance >= minDistance) {
+                    continue;
+                }
+
+                minDistance = distance;
+                var hitPoint = frontOffsetPoint - openingVector * distance;
+                _depthPoint = new XYZ(hitPoint.X, hitPoint.Y, frontOffsetPoint.Z);
+            }
+
+            return _depthPoint;
         }
 
         /// <summary>
@@ -1123,26 +1132,36 @@ namespace RevitOpeningSlopes.Models {
         }
 
         /// <summary>
-        /// Функция находит точку центра проема по вертикали (P13), используя верхнюю (P11) и нижнюю (P12) 
-        /// точку соответственно
+        /// Функция находит центральную точку проема в плоскости DepthPoint
         /// </summary>
-        /// <returns>Точка центра проема по вертикали P13</returns>
-        public XYZ GetVerticalCenterPoint() {
-            if(_verticalCenterPoint != null) {
-                return _verticalCenterPoint;
-            } else {
-                var overallPoints = GetOverallPoints();
-                var topPoint = overallPoints.Top;
-                var bottomPoint = overallPoints.Bottom;
-
-                if(topPoint != null && bottomPoint != null) {
-                    double x = bottomPoint.X;
-                    double y = bottomPoint.Y;
-                    double z = (topPoint.Z + bottomPoint.Z) / 2;
-                    _verticalCenterPoint = new XYZ(x, y, z);
-                }
-                return _verticalCenterPoint;
+        /// <returns>Центральная точка проема для вставки семейства</returns>
+        public XYZ GetCenterPoint() {
+            if(_centerPoint != null) {
+                return _centerPoint;
             }
+
+            var overallPoints = GetOverallPoints();
+            var leftPoint = overallPoints.Left;
+            var rightPoint = overallPoints.Right;
+            var topPoint = overallPoints.Top;
+            var bottomPoint = overallPoints.Bottom;
+            var depthPoint = GetDepthPoint();
+            var widthDirection = GetDirectionVectorFromOpening(Direction.Right);
+            var openingVector = GetOpeningVector();
+
+            if(leftPoint == null || rightPoint == null || topPoint == null || bottomPoint == null
+                || depthPoint == null || widthDirection == null || openingVector == null) {
+                return _centerPoint;
+            }
+
+            double midWidth = (leftPoint.DotProduct(widthDirection) + rightPoint.DotProduct(widthDirection)) / 2;
+            double midDepth = depthPoint.DotProduct(openingVector);
+            double midHeight = (topPoint.Z + bottomPoint.Z) / 2;
+
+            _centerPoint = widthDirection * midWidth
+                + openingVector * midDepth
+                + XYZ.BasisZ * midHeight;
+            return _centerPoint;
         }
 
         ///// <summary>
@@ -1198,19 +1217,19 @@ namespace RevitOpeningSlopes.Models {
         //}
 
         /// <summary>
-        /// Функция находит ширину проема, используя точки P13 и P8
+        /// Функция находит ширину проема как ортогональное расстояние между левой и правой точкой вдоль окна
         /// </summary>
         /// <returns>Ширина проема</returns>
-        /// <exception cref="ArgumentException">Срабатывает, если не была найдена точка справа и 
-        /// вертикальный центр окна</exception>
+        /// <exception cref="ArgumentException">Срабатывает, если не удалось рассчитать левую 
+        /// и правую точку окна</exception>
         public double GetOpeningWidth() {
             var overallPoints = GetOverallPoints();
-            var verticalCenterPoint = GetVerticalCenterPoint();
-            var rightDepthPoint = GetRightDepthPoint();
+            var leftPoint = overallPoints.Left;
+            var rightPoint = overallPoints.Right;
+            var widthDirection = GetDirectionVectorFromOpening(Direction.Right);
 
-            _openingWidth = verticalCenterPoint != null && rightDepthPoint != null
-                ? Math.Sqrt(Math.Pow(verticalCenterPoint.X - rightDepthPoint.X, 2)
-                    + Math.Pow(verticalCenterPoint.Y - rightDepthPoint.Y, 2)) * 2
+            _openingWidth = leftPoint != null && rightPoint != null && widthDirection != null
+                ? Math.Abs((rightPoint - leftPoint).DotProduct(widthDirection))
                 : throw new ArgumentException("не удалось рассчитать ширину проема");
             return _openingWidth;
         }

@@ -1,4 +1,5 @@
 <base:PlatformWindow
+    x:Name="MainWindowRoot"
     x:Class="RevitOpeningSlopes.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -13,15 +14,17 @@
     WindowStartupLocation="CenterOwner"
     
     Title="MainWindow"
-    MinHeight="250"
-    MaxHeight="250"
+    MinHeight="300"
+    MaxHeight="300"
     MinWidth="600"
     MaxWidth="600"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadViewCommand}"/>
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}"
+                CommandParameter="{Binding ElementName=MainWindowRoot}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
@@ -31,6 +34,7 @@
         </Grid.RowDefinitions>
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
@@ -90,6 +94,15 @@
                         DisplayMemberPath="Name"
                         SelectedItem="{Binding SelectedWindowsGetter}"/>
             </Grid>
+            <Button
+                Grid.Row="2"
+                Width="270"
+                Height="25"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Content="{Binding WallTypeExclusionsButtonText}"
+                Command="{Binding OpenWallTypeExclusionsCommand}"
+                CommandParameter="{Binding ElementName=MainWindowRoot}" />
         </Grid>
         <StackPanel
             Grid.Row="1"

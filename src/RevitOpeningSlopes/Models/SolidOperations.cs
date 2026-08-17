@@ -11,6 +11,7 @@ using RevitOpeningSlopes.Models.Exceptions;
 namespace RevitOpeningSlopes.Models {
     internal class SolidOperations {
         private readonly RevitRepository _revitRepository;
+        private readonly PluginConfig _pluginConfig;
         private readonly ElementFilter _categoryFilter = new ElementMulticategoryFilter(
                 new BuiltInCategory[] {
                 BuiltInCategory.OST_Walls,
@@ -21,8 +22,13 @@ namespace RevitOpeningSlopes.Models {
         private readonly ElementCategoryFilter _openingCategoryFilter =
             new ElementCategoryFilter(BuiltInCategory.OST_Windows);
 
-        public SolidOperations(RevitRepository revitRepository) {
-            _revitRepository = revitRepository;
+        public SolidOperations(
+            RevitRepository revitRepository,
+            PluginConfig pluginConfig) {
+            _revitRepository = revitRepository
+                ?? throw new ArgumentNullException(nameof(revitRepository));
+            _pluginConfig = pluginConfig
+                ?? throw new ArgumentNullException(nameof(pluginConfig));
         }
 
         public Solid GetUnitedSolid(IEnumerable<Solid> solids) {
@@ -40,24 +46,23 @@ namespace RevitOpeningSlopes.Models {
         /// <exception cref="OpeningNullSolidException">Срабатывает, если внутри семейства окна не 
         /// обнаружена твердотельная геометрия (отверстия)</exception>
         public Solid GetUnitedSolidFromOpening(Element opening) {
-            if(opening == null)
+            if(opening == null) {
                 throw new ArgumentNullException(nameof(opening));
+            }
 
-            IList<ElementId> dependingElements = opening.GetDependentElements(_openingCategoryFilter);
+            var dependingElements = opening.GetDependentElements(_openingCategoryFilter);
             IList<Solid> totalSolids = new List<Solid>();
 
-            foreach(ElementId depEl in dependingElements) {
-                Solid openingSolid = GetUnitedSolid(_revitRepository.Document.GetElement(depEl).GetSolids());
+            foreach(var depEl in dependingElements) {
+                var openingSolid = GetUnitedSolid(_revitRepository.Document.GetElement(depEl).GetSolids());
                 if(openingSolid.Volume > 0) {
                     totalSolids.Add(openingSolid);
                 }
             }
 
-            if(totalSolids.Count > 0) {
-                return GetUnitedSolid(totalSolids);
-            } else {
-                throw new OpeningNullSolidException($"Отсутствует твердотельная геометрия в оконном проеме");
-            }
+            return totalSolids.Count > 0
+                ? GetUnitedSolid(totalSolids)
+                : throw new OpeningNullSolidException($"Отсутствует твердотельная геометрия в оконном проеме");
         }
 
         /// <summary>
@@ -68,14 +73,15 @@ namespace RevitOpeningSlopes.Models {
             Solid nearestElementSolid = null;
             if(outlineWithOffset != null) {
 
-                BoundingBoxIntersectsFilter bboxIntersectFilter =
+                var bboxIntersectFilter =
                 new BoundingBoxIntersectsFilter(outlineWithOffset);
 
-                IEnumerable<Element> nearestElements = new FilteredElementCollector(_revitRepository.Document)
+                var nearestElements = new FilteredElementCollector(_revitRepository.Document)
                     .WhereElementIsNotElementType()
                     .WherePasses(_categoryFilter)
                     .WherePasses(bboxIntersectFilter)
-                    .ToElements();
+                    .ToElements()
+                    .Where(el => !IsExcludedWallType(el));
 
                 IList<Solid> nearestSolids = nearestElements
                     .Select(el => GetUnitedSolid(el.GetSolids()))
@@ -87,11 +93,22 @@ namespace RevitOpeningSlopes.Models {
         }
 
         /// <summary>
+        /// Проверяет принадлежность стены к исключенному типоразмеру
+        /// </summary>
+        /// <param name="element">Проверяемый элемент</param>
+        /// <returns>True, если типоразмер стены исключен</returns>
+        private bool IsExcludedWallType(Element element) {
+            return element is Wall wall
+                && _pluginConfig.ExcludedWallTypeIds != null
+                && _pluginConfig.ExcludedWallTypeIds.Count != 0 && _pluginConfig.ExcludedWallTypeIds.Contains(wall.GetTypeId());
+        }
+
+        /// <summary>
         /// Вспомогательная функция для теста
         /// </summary>
         /// <param name="solid"></param>
         public void CreateDirectShape(Solid solid) {
-            DirectShape ds = DirectShape.CreateElement(_revitRepository.Document,
+            var ds = DirectShape.CreateElement(_revitRepository.Document,
                 new ElementId(BuiltInCategory.OST_GenericModel));
             ds.SetShape(new GeometryObject[] { solid });
         }

@@ -9,9 +9,12 @@ using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
 
+using RevitOpeningSlopes.Services;
+
 namespace RevitOpeningSlopes.Models {
     internal class RevitRepository {
         private readonly WindowSelectionFilter _selectionFilter;
+        private readonly WallSelectionFilter _wallSelectionFilter;
 
         public UIApplication UIApplication { get; }
         public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
@@ -23,6 +26,7 @@ namespace RevitOpeningSlopes.Models {
         public RevitRepository(UIApplication uiApplication) {
             UIApplication = uiApplication;
             _selectionFilter = new WindowSelectionFilter();
+            _wallSelectionFilter = new WallSelectionFilter();
         }
 
         public XYZ GetOpeningVector(FamilyInstance opening) {
@@ -30,7 +34,7 @@ namespace RevitOpeningSlopes.Models {
                 return null;
             }
 
-            var v = opening.HandOrientation;
+            var v = opening.FacingOrientation;
             v = new XYZ(v.X, v.Y, 0.0);
             return v.GetLength() < 1e-9 ? null : v.Normalize();
         }
@@ -56,6 +60,20 @@ namespace RevitOpeningSlopes.Models {
                 : Document.GetElement(slopeTypeId) as FamilySymbol ?? throw new ArgumentException(nameof(slopeTypeId));
         }
 
+        /// <summary>
+        /// Возвращает типоразмеры стен текущего проекта
+        /// </summary>
+        /// <returns>Типоразмеры стен</returns>
+        public IList<WallType> GetWallTypes() {
+            return new FilteredElementCollector(Document)
+                .WhereElementIsElementType()
+                .OfClass(typeof(WallType))
+                .Cast<WallType>()
+                .OrderBy(wt => wt.FamilyName)
+                .ThenBy(wt => wt.Name)
+                .ToList();
+        }
+
         public ICollection<FamilyInstance> SelectWindowsOnView() {
             var pickedElementsReference = ActiveUIDocument
                 .Selection
@@ -66,6 +84,22 @@ namespace RevitOpeningSlopes.Models {
                 .Select(r => Document.GetElement(r))
                 .Where(el => el is FamilyInstance)
                 .Cast<FamilyInstance>()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Предоставляет пользователю выбор экземпляров стен в модели
+        /// </summary>
+        /// <returns>Выбранные стены</returns>
+        public ICollection<Wall> SelectWallsOnView() {
+            return ActiveUIDocument.Selection
+                .PickObjects(
+                    ObjectType.Element,
+                    _wallSelectionFilter,
+                    "Выберите стены и нажмите \"Готово\"")
+                .Where(r => r != null)
+                .Select(r => Document.GetElement(r))
+                .OfType<Wall>()
                 .ToList();
         }
 

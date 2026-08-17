@@ -21,7 +21,7 @@ namespace RevitOpeningSlopes {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            using(IKernel kernel = uiApplication.CreatePlatformServices()) {
+            using(var kernel = uiApplication.CreatePlatformServices()) {
                 kernel.Bind<LinesFromOpening>()
                     .ToSelf()
                     .InSingletonScope();
@@ -38,7 +38,8 @@ namespace RevitOpeningSlopes {
                     .ToSelf()
                     .InSingletonScope();
                 kernel.Bind<PluginConfig>()
-                    .ToMethod(c => PluginConfig.GetPluginConfig());
+                    .ToMethod(c => PluginConfig.GetPluginConfig())
+                    .InSingletonScope();
                 kernel.Bind<AlreadySelectedWindowsGetter>()
                     .ToSelf()
                     .InSingletonScope();
@@ -54,13 +55,23 @@ namespace RevitOpeningSlopes {
                 kernel.Bind<SolidOperations>()
                     .ToSelf()
                     .InSingletonScope();
+                kernel.Bind<WallTypeExclusionsDialogService>()
+                    .ToSelf()
+                    .InSingletonScope();
 
                 kernel.Bind<MainViewModel>().ToSelf();
                 kernel.Bind<MainWindow>().ToSelf()
                     .WithPropertyValue(nameof(Window.Title), PluginName)
                     .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
 
-                Notification(kernel.Get<MainWindow>());
+                var wallTypeExclusionsDialogService = kernel.Get<WallTypeExclusionsDialogService>();
+                while(true) {
+                    Notification(kernel.Get<MainWindow>());
+                    if(!wallTypeExclusionsDialogService.SelectionInModelRequested) {
+                        break;
+                    }
+                    wallTypeExclusionsDialogService.SelectWallsInModel();
+                }
             }
         }
     }

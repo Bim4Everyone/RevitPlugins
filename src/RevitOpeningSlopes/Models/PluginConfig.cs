@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
@@ -14,6 +16,8 @@ namespace RevitOpeningSlopes.Models {
 
         public ElementId SlopeTypeId { get; set; } = ElementId.InvalidElementId;
         public double? SlopeFrontOffset { get; set; } = null; // Вылет откоса от фасада здания наружу, мм
+        public List<ElementId> ExcludedWallTypeIds { get; set; } = new List<ElementId>();
+
         public static PluginConfig GetPluginConfig() {
             return new ProjectConfigBuilder()
                 .SetSerializer(new ConfigSerializer())

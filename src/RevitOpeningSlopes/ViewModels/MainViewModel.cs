@@ -20,10 +20,12 @@ namespace RevitOpeningSlopes.ViewModels {
         private readonly PluginConfig _pluginConfig;
         private readonly RevitRepository _revitRepository;
         private readonly CreationOpeningSlopes _creationOpeningSlopes;
+        private readonly WallTypeExclusionsDialogService _wallTypeExclusionsDialogService;
         private readonly IMessageBoxService _messageBoxService;
         public MainViewModel(PluginConfig pluginConfig,
             RevitRepository revitRepository,
             CreationOpeningSlopes creationOpeningSlopes,
+            WallTypeExclusionsDialogService wallTypeExclusionsDialogService,
             AlreadySelectedWindowsGetter alreadySelectedWindowsGetter,
             ManuallySelectedWindowsGetter manuallySelectedWindowsGetter,
             OnActiveViewWindowsGetter onActiveViewWindowsGetter,
@@ -34,6 +36,8 @@ namespace RevitOpeningSlopes.ViewModels {
                 ?? throw new ArgumentNullException(nameof(revitRepository));
             _creationOpeningSlopes = creationOpeningSlopes
                 ?? throw new ArgumentNullException(nameof(creationOpeningSlopes));
+            _wallTypeExclusionsDialogService = wallTypeExclusionsDialogService
+                ?? throw new ArgumentNullException(nameof(wallTypeExclusionsDialogService));
             _pluginConfig = pluginConfig
                 ?? throw new ArgumentNullException(nameof(pluginConfig));
             _messageBoxService = messageBoxService
@@ -45,13 +49,23 @@ namespace RevitOpeningSlopes.ViewModels {
                 onActiveViewWindowsGetter
             };
             AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-            LoadViewCommand = RelayCommand.Create(LoadView);
+            LoadViewCommand = RelayCommand.Create<Window>(LoadView);
+            OpenWallTypeExclusionsCommand = RelayCommand.Create<Window>(OpenWallTypeExclusions);
         }
 
         public ICommand LoadViewCommand { get; }
         public ICommand AcceptViewCommand { get; }
+        public ICommand OpenWallTypeExclusionsCommand { get; }
         public IMessageBoxService MessageBoxService => _messageBoxService;
         public ObservableCollection<IWindowsGetter> WindowsGetters { get; }
+        public string WallTypeExclusionsButtonText {
+            get {
+                int count = _pluginConfig.ExcludedWallTypeIds?.Count ?? 0;
+                return count == 0
+                    ? "Добавить исключения"
+                    : $"Исключения типоразмеров стен ({count})";
+            }
+        }
 
         private string _errorText;
         public string ErrorText {
@@ -89,8 +103,17 @@ namespace RevitOpeningSlopes.ViewModels {
             }
         }
 
-        private void LoadView() {
-            LoadConfig();
+        private void LoadView(Window owner) {
+            LoadConfig(owner);
+        }
+
+        private void OpenWallTypeExclusions(Window owner) {
+            if(_wallTypeExclusionsDialogService.ShowDialog(owner)) {
+                OnPropertyChanged(nameof(WallTypeExclusionsButtonText));
+            } else if(_wallTypeExclusionsDialogService.SelectionInModelRequested) {
+                SaveConfigBeforeModelSelection();
+                _wallTypeExclusionsDialogService.CloseMainWindowForSelection();
+            }
         }
 
         private void AcceptView() {
@@ -124,7 +147,7 @@ namespace RevitOpeningSlopes.ViewModels {
             return true;
         }
 
-        private void LoadConfig() {
+        private void LoadConfig(Window owner) {
             SelectedWindowsGetter = WindowsGetters.First();
             SlopeTypes = new ObservableCollection<SlopeTypeViewModel>(
                 _revitRepository.GetSlopeTypes()
@@ -139,7 +162,22 @@ namespace RevitOpeningSlopes.ViewModels {
                 SelectedSlopeType = SlopeTypes.FirstOrDefault(slwp => slwp.SlopeTypeId == _pluginConfig.SlopeTypeId);
             }
 
+            OnPropertyChanged(nameof(WallTypeExclusionsButtonText));
             OnPropertyChanged(nameof(ErrorText));
+
+            if(_wallTypeExclusionsDialogService.ConsumeOpenExclusionsRequest()) {
+                OpenWallTypeExclusions(owner);
+            }
+        }
+
+        private void SaveConfigBeforeModelSelection() {
+            if(SelectedSlopeType != null) {
+                _pluginConfig.SlopeTypeId = SelectedSlopeType.SlopeTypeId;
+            }
+            if(double.TryParse(SlopeFrontOffset, out double slopeFrontOffset)) {
+                _pluginConfig.SlopeFrontOffset = slopeFrontOffset;
+            }
+            _pluginConfig.SaveProjectConfig();
         }
 
         private void SaveConfig() {
