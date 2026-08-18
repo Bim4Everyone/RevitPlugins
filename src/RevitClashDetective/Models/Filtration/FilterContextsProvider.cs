@@ -4,6 +4,8 @@ using System.Linq;
 
 using Bim4Everyone.RevitFiltration.Controls;
 
+using RevitClashDetective.Models.FilterModel;
+
 namespace RevitClashDetective.Models.Filtration;
 
 /// <summary>

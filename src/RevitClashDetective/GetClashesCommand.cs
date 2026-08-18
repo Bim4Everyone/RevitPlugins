@@ -18,6 +18,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;

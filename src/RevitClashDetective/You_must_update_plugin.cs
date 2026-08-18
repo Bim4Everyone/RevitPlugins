@@ -5,7 +5,7 @@ using Autodesk.Revit.DB;
 namespace RevitClashDetective;
 
 /// <summary>
-/// Заглушка параметра, которая записывается в устаревшее свойство <see cref="Models.Filtration.FiltersConfig.Filters"/>
+/// Заглушка параметра, которая записывается в устаревшее свойство <see cref="Models.FilterModel.FiltersConfig.Filters"/>
 /// при сохранении конфига поисковых наборов.
 /// <para/>
 /// Старые версии плагина не знают этот тип, поэтому падают при десериализации конфига

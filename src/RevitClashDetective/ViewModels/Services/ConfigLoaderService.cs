@@ -4,7 +4,7 @@ using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.Filtration;
+using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.ViewModels.Services;
 internal class ConfigLoaderService {

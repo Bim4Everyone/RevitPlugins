@@ -8,9 +8,18 @@ using dosymep.Bim4Everyone.ProjectConfigs;
 
 using pyRevitLabs.Json;
 
-using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Filtration;
 
-namespace RevitClashDetective.Models.Filtration;
+namespace RevitClashDetective.Models.FilterModel;
+
+/// <summary>
+/// Конфиг поисковых наборов.
+/// <para/>
+/// ВНИМАНИЕ: полное имя этого типа входит в формат конфига - оно записывается в "$type" корневого
+/// объекта, потому что сериализация идет с TypeNameHandling.Objects. Переименование класса или его
+/// пространства имен сделает нечитаемыми все сохраненные FiltersConfig.json:
+/// <see cref="RevitClashesSerializationBinder"/> ищет тип по имени в текущей сборке и вернет null.
+/// </summary>
 internal class FiltersConfig : ProjectConfig {
     public string RevitVersion { get; set; }
 
