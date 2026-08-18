@@ -141,7 +141,10 @@
     <system:String
         x:Key="FilterCreation.Validation.DuplicatedName">A search set with this name already exists.</system:String>
     <system:String
-        x:Key="FilterCreation.Validation.NotLoadedFilters">Failed to load search sets: "{0}". They contain categories or parameters that are not available in this file.</system:String>
+        xml:space="preserve"
+        x:Key="FilterCreation.Validation.NotLoadedFilters">Failed to load search sets:\
+{0}
+They may contain categories or parameters that are not available in this file.</system:String>
 
     <system:String
         x:Key="MainWindow.Title">Clash Checks</system:String>

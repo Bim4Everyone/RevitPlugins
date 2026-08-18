@@ -141,7 +141,10 @@
     <system:String
         x:Key="FilterCreation.Validation.DuplicatedName">Поисковый набор с таким именем уже существует.</system:String>
     <system:String
-        x:Key="FilterCreation.Validation.NotLoadedFilters">Не удалось загрузить поисковые наборы: "{0}". В них есть категории или параметры, недоступные в этом файле.</system:String>
+        xml:space="preserve"
+        x:Key="FilterCreation.Validation.NotLoadedFilters">Не удалось загрузить поисковые наборы:
+{0}
+Скорее всего в них есть категории или параметры, недоступные в этом файле.</system:String>
 
     <system:String
         x:Key="MainWindow.Title">Проверки на коллизии</system:String>
