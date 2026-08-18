@@ -13,4 +13,15 @@ internal static class FilterBuildOptions {
             FilterByType = false
         };
     }
+
+    /// <summary>
+    /// Создает настройки построения инвертированного фильтра.
+    /// </summary>
+    public static Bim4Everyone.RevitFiltration.Options CreateInverted() {
+        return new Bim4Everyone.RevitFiltration.Options() {
+            Tolerance = 0.001,
+            FilterByType = false,
+            Inverted = true
+        };
+    }
 }
