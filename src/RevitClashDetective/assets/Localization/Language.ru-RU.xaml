@@ -64,8 +64,6 @@
     <system:String
         x:Key="Transactions.IsolateClashElements">Изоляция элементов коллизии</system:String>
     <system:String
-        x:Key="Transactions.IsolateSearchSet">Изоляция элементов поискового набора</system:String>
-    <system:String
         x:Key="Transactions.ClashGraphicSettings">Настройка графики элементов коллизии</system:String>
     <system:String
         x:Key="Transactions.ClearFilters">Сброс фильтров элементов коллизии</system:String>
@@ -227,9 +225,6 @@
 
     <system:String
         x:Key="ConfigLoader.InvalidFile">Неверный файл конфигурации.</system:String>
-
-    <system:String
-        x:Key="SearchSet.EmptySet">В поисковый набор не попал ни один элемент.</system:String>
 
     <system:String
         x:Key="ClashStatus.Active">Активно</system:String>

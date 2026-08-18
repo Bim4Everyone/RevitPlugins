@@ -62,8 +62,6 @@
         x:Key="SettingsWindow.MoveParamDownTooltip">Move parameter down</system:String>
 
     <system:String
-        x:Key="Transactions.IsolateSearchSet">Search set elements isolation</system:String>
-    <system:String
         x:Key="Transactions.IsolateClashElements">Isolate clash elements</system:String>
     <system:String
         x:Key="Transactions.ClashGraphicSettings">Configure graphics of clash elements</system:String>
@@ -227,9 +225,6 @@ They may contain categories or parameters that are not available in this file.</
 
     <system:String
         x:Key="ConfigLoader.InvalidFile">Invalid configuration file.</system:String>
-
-    <system:String
-        x:Key="SearchSet.EmptySet">No elements match the search set.</system:String>
 
     <system:String
         x:Key="ClashStatus.Active">Active</system:String>
