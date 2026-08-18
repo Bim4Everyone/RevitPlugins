@@ -4,7 +4,7 @@ using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Filtration;
 
 namespace RevitClashDetective.ViewModels.Services;
 internal class ConfigLoaderService {
@@ -46,7 +46,9 @@ internal class ConfigLoaderService {
     }
 
     public void CheckConfig(FiltersConfig filtersConfig) {
-        if(filtersConfig.Filters.Count == 0 && string.IsNullOrEmpty(filtersConfig.RevitVersion)) {
+        if(filtersConfig.FilterSettings.Count == 0
+            && filtersConfig.Filters.Count == 0
+            && string.IsNullOrEmpty(filtersConfig.RevitVersion)) {
             ShowError();
             throw new OperationCanceledException();
         }
