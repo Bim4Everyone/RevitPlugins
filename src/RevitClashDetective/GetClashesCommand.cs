@@ -1,9 +1,13 @@
 using System.Globalization;
+using System.IO;
 using System.Reflection;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
+
+using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Ninject;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
@@ -14,6 +18,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitClashDetective.Models;
+using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.Navigator;
@@ -40,6 +45,26 @@ public class GetClashesCommand : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
+        kernel.UseLogicalFilterProviderFactory();
+        kernel.UseFilterContextParser();
+        kernel.Bind<DataProvider>()
+            .ToMethod(c => new FilterDataProvider(c.Kernel.Get<RevitRepository>()).CreateDataProvider())
+            .InSingletonScope();
+        kernel.Bind<LegacyFilterConverter>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<FiltersConfig>()
+            .ToMethod(c => {
+                var repo = c.Kernel.Get<RevitRepository>();
+                string path = Path.Combine(repo.GetObjectName(), repo.GetDocumentName());
+                return FiltersConfig.GetFiltersConfig(path, repo.Doc);
+            });
+        kernel.Bind<FilterContextsProvider>()
+            .ToSelf()
+            .InSingletonScope();
+
         kernel.Bind<NavigatorViewModel>()
             .ToSelf()
             .InSingletonScope()

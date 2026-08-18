@@ -5,6 +5,9 @@ using System.Reflection;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -14,7 +17,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.ClashDetective;
@@ -49,6 +52,20 @@ public class DetectiveClashesCommand : BasePluginCommand {
         kernel.Bind<IContentDialogService>()
             .To<ContentDialogService>()
             .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
+        kernel.UseLogicalFilterProviderFactory();
+        kernel.UseFilterContextParser();
+        kernel.Bind<DataProvider>()
+            .ToMethod(c => new FilterDataProvider(c.Kernel.Get<RevitRepository>()).CreateDataProvider())
+            .InSingletonScope();
+        kernel.Bind<LegacyFilterConverter>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<FilterContextsProvider>()
+            .ToSelf()
+            .InSingletonScope();
+
         kernel.Bind<FiltersConfig>()
             .ToMethod(c => {
                 var repo = c.Kernel.Get<RevitRepository>();

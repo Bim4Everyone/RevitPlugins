@@ -7,6 +7,9 @@ using System.Reflection;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
@@ -15,14 +18,11 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.Models.GraphicView;
 using RevitClashDetective.Models.Handlers;
 using RevitClashDetective.ViewModels.FilterCreatorViewModels;
-using RevitClashDetective.Views;
 
-using FilterCreatorView = RevitClashDetective.Views.Filters.FilterCreatorView;
-using FilterNameView = RevitClashDetective.Views.Filters.FilterNameView;
 
 namespace RevitClashDetective;
 
@@ -47,6 +47,17 @@ public class CreateFiltersCommand : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
+        kernel.UseLogicalFilterProviderFactory();
+        kernel.UseFilterContextParser();
+        kernel.Bind<DataProvider>()
+            .ToMethod(c => new FilterDataProvider(c.Kernel.Get<RevitRepository>()).CreateDataProvider())
+            .InSingletonScope();
+        kernel.Bind<LegacyFilterConverter>()
+            .ToSelf()
+            .InSingletonScope();
+
         kernel.Bind<FiltersConfig>()
             .ToMethod(c => {
                 var repo = c.Kernel.Get<RevitRepository>();
@@ -54,11 +65,11 @@ public class CreateFiltersCommand : BasePluginCommand {
                 return FiltersConfig.GetFiltersConfig(path, repo.Doc);
             });
 
-        kernel.Bind<FilterNameView>()
+        kernel.Bind<Views.Filters.FilterNameView>()
             .ToSelf()
             .InTransientScope();
 
-        kernel.BindMainWindow<FiltersViewModel, FilterCreatorView>();
+        kernel.BindMainWindow<FiltersViewModel, Views.Filters.FilterCreatorView>();
         kernel.UseWpfOpenFileDialog<FiltersViewModel>()
             .UseWpfSaveFileDialog<FiltersViewModel>()
             .UseWpfUIMessageBox<FiltersViewModel>();
@@ -76,6 +87,6 @@ public class CreateFiltersCommand : BasePluginCommand {
                 .Equals(selectedFilter, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        Notification(kernel.Get<FilterCreatorView>());
+        Notification(kernel.Get<Views.Filters.FilterCreatorView>());
     }
 }
