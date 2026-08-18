@@ -62,6 +62,8 @@
         x:Key="SettingsWindow.MoveParamDownTooltip">Move parameter down</system:String>
 
     <system:String
+        x:Key="Transactions.IsolateSearchSet">Search set elements isolation</system:String>
+    <system:String
         x:Key="Transactions.IsolateClashElements">Isolate clash elements</system:String>
     <system:String
         x:Key="Transactions.ClashGraphicSettings">Configure graphics of clash elements</system:String>
@@ -106,16 +108,6 @@
     <system:String
         x:Key="FilterCreation.SearchSets">Search sets</system:String>
     <system:String
-        x:Key="FilterCreation.Categories">Categories</system:String>
-    <system:String
-        x:Key="FilterCreation.CategoriesSearch">Search</system:String>
-    <system:String
-        x:Key="FilterCreation.CategoryNameHeader">Name</system:String>
-    <system:String
-        x:Key="FilterCreation.HideUncheckedCategories">Hide unchecked categories</system:String>
-    <system:String
-        x:Key="FilterCreation.Criteria">Filter criteria</system:String>
-    <system:String
         x:Key="FilterCreation.Load">Load search sets</system:String>
     <system:String
         x:Key="FilterCreation.AddSearchSet">Create search set</system:String>
@@ -129,10 +121,6 @@
         x:Key="FilterCreation.Save">Save</system:String>
     <system:String
         x:Key="FilterCreation.SaveAs">Save as</system:String>
-    <system:String
-        x:Key="FilterCreation.AddRule">Add rule</system:String>
-    <system:String
-        x:Key="FilterCreation.AddSet">Add set</system:String>
     <system:String
         x:Key="FilterCreation.CheckSetButton">Check</system:String>
     <system:String
@@ -148,15 +136,12 @@
     <system:String
         x:Key="FilterCreation.CannotSavePrompt">Unable to save current configuration, close window without saving?</system:String>
 
-
     <system:String
         x:Key="FilterCreation.Validation.SetName">Enter the name of the search set.</system:String>
     <system:String
         x:Key="FilterCreation.Validation.DuplicatedName">A search set with this name already exists.</system:String>
     <system:String
-        x:Key="FilterCreation.Validation.SelectCategories">Select categories in the search set "{0}".</system:String>
-    <system:String
-        x:Key="FilterCreation.Validation.EmptySet">All fields in the search set "{0}" must be filled.</system:String>
+        x:Key="FilterCreation.Validation.NotLoadedFilters">Failed to load search sets: "{0}". They contain categories or parameters that are not available in this file.</system:String>
 
     <system:String
         x:Key="MainWindow.Title">Clash Checks</system:String>
@@ -241,27 +226,8 @@
         x:Key="ConfigLoader.InvalidFile">Invalid configuration file.</system:String>
 
     <system:String
-        x:Key="SearchSet.FamilyType">Type name</system:String>
-    <system:String
-        x:Key="SearchSet.Family">Family name</system:String>
-    <system:String
-        x:Key="SearchSet.Category">Category</system:String>
-    <system:String
-        x:Key="SearchSet.File">File</system:String>
-    <system:String
-        x:Key="SearchSet.Parameter">Parameter: {0}</system:String>
+        x:Key="SearchSet.EmptySet">No elements match the search set.</system:String>
 
-    <system:String
-        x:Key="Parameter.InvalidStorageType">Parameter {0} has no defined data type.</system:String>
-    <system:String
-        x:Key="Parameter.CannotParseInt">Parameter value "{0}" must be an integer.</system:String>
-    <system:String
-        x:Key="Parameter.CannotParseDouble">Parameter value "{0}" must be a floating-point number.</system:String>
-
-    <system:String
-        x:Key="SetEvaluators.Or">Or</system:String>
-    <system:String
-        x:Key="SetEvaluators.And">And</system:String>
     <system:String
         x:Key="ClashStatus.Active">Active</system:String>
     <system:String
@@ -270,42 +236,4 @@
         x:Key="ClashStatus.Solved">Solved</system:String>
     <system:String
         x:Key="ClashStatus.Imaginary">No intersection</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringBeginsWith">Begins with</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringNotBeginsWith">Not begins with</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringContains">Contains</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringNotContains">Not contains</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringEndsWith">Ends with</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringNotEndsWith">Not ends with</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringEquals">Equals</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringGreater">Greater</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringGreaterOrEqual">Greater or equal</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringLess">Less</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringLessOrEqual">Less or equal</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNumericEquals">Equals</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNumericGreater">Greater</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNumericGreaterOrEqual">Greater or equal</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNumericLess">Less</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNumericLessOrEqual">Less or equal</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterHasNoValue">Has no value</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterHasValue">Has value</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNotEquals">Not equals</system:String>
 </ResourceDictionary>
