@@ -60,13 +60,12 @@ internal class RevitRepository {
 
     public static string ProfilePath {
         get {
-            // TODO
-            // string path = @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
-            // if(!Directory.Exists(path)) {
-            //    path = LocalProfilePath;
-            // }
-            // return path;
-            return LocalProfilePath;
+            string path = @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
+            if(!Directory.Exists(path)) {
+                path = LocalProfilePath;
+            }
+
+            return path;
         }
     }
 
