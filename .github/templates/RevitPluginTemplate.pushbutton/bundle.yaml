@@ -4,9 +4,19 @@ title:
 
 tooltip:
   ru: >- 
-    Please Write Description
+    Плагин делает это
+    Для запуска: 
+    
+    1. Запустить плагин;
+    
+    2. Нажать ОК;
   en_us: >- 
-    Please Write Description
+    Plugin does this
+    How to use:
+    
+    1. Start the plugin;
+    
+    2. Press OK;
   
 author: ${{ gen.author }}
 
