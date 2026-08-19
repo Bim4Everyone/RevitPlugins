@@ -5,11 +5,10 @@
         <NoWarn>1701;1702;MSB3246;MSB3277</NoWarn>
         <TargetFramework>net48</TargetFramework>
 
-        <!-- Нижняя граница версии языка для всех плагинов.
+        <!-- Версия языка по умолчанию для всех плагинов.
              Общие исходники src/dosymep содержат директиву "#nullable disable",
-             которая недоступна в C# 7.3 (версия net48 по умолчанию).
-             Отдельный плагин может поднять версию в своем .csproj. -->
-        <LangVersion>12</LangVersion>
+             которая недоступна в C# 7.3 (версия net48 по умолчанию) у старых плагинов. -->
+        <LangVersion>latest</LangVersion>
         
         <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
         <IncludePackageReferencesDuringMarkupCompilation>false</IncludePackageReferencesDuringMarkupCompilation>

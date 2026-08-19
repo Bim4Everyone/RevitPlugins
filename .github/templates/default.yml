@@ -26,7 +26,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Run './build.cmd '
         run: ./build.cmd publish --profile ${{ env.plugin-name }} --pull-request-merged ${{ github.event.pull_request.merged }} --extensions-app-token ${{ secrets.EXTENSIONS_APP_TOKEN }} --revit-plugins-app-token ${{ secrets.REVIT_PLUGINS_APP_TOKEN }}
