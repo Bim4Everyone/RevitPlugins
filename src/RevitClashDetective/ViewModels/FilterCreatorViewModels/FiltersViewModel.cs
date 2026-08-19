@@ -9,6 +9,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using Bim4Everyone.RevitFiltration.Controls;
+
 using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -19,13 +21,12 @@ using Ninject.Syntax;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.Resources;
 using RevitClashDetective.ViewModels.SearchSet;
 using RevitClashDetective.ViewModels.Services;
 using RevitClashDetective.Views;
 
-using FilterNameView = RevitClashDetective.Views.Filters.FilterNameView;
-using SearchSetView = RevitClashDetective.Views.Filters.SearchSetView;
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
 
@@ -34,6 +35,10 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     private readonly ILocalizationService _localization;
     private readonly IResolutionRoot _resolutionRoot;
     private readonly FiltersConfig _config;
+    private readonly ILogicalFilterProviderFactory _filterProviderFactory;
+    private readonly IFilterContextParser _filterContextParser;
+    private readonly DataProvider _dataProvider;
+    private readonly LegacyFilterConverter _legacyFilterConverter;
     private ObservableCollection<FilterViewModel> _filters;
     private string _errorText;
     private string _messageText;
@@ -43,19 +48,31 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     public FiltersViewModel(
         RevitRepository revitRepository,
         ILocalizationService localization,
+        ILanguageService languageService,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
         IResolutionRoot resolutionRoot,
-        FiltersConfig config) {
+        FiltersConfig config,
+        ILogicalFilterProviderFactory filterProviderFactory,
+        IFilterContextParser filterContextParser,
+        DataProvider dataProvider,
+        LegacyFilterConverter legacyFilterConverter) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
         _config = config ?? throw new ArgumentNullException(nameof(config));
+        _filterProviderFactory = filterProviderFactory
+                                 ?? throw new ArgumentNullException(nameof(filterProviderFactory));
+        _filterContextParser = filterContextParser ?? throw new ArgumentNullException(nameof(filterContextParser));
+        _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
+        _legacyFilterConverter = legacyFilterConverter
+                                 ?? throw new ArgumentNullException(nameof(legacyFilterConverter));
 
         InitializeFilters();
         InitializeTimer();
@@ -67,12 +84,9 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
         SaveCommand = RelayCommand.Create(Save, CanSave);
         SaveAsCommand = RelayCommand.Create(SaveAs, CanSave);
         LoadCommand = RelayCommand.Create(Load);
-        CheckSearchSetCommand = RelayCommand.Create(CheckSearchSet, CanSave);
+        CheckSearchSetCommand = RelayCommand.Create(CheckSearchSet, CanCheckSearchSet);
 
         SelectedFilter = Filters.FirstOrDefault();
-        SelectedFilter?.InitializeFilter();
-
-        PropertyChanged += OnSelectedFilterChanged;
     }
 
     public string ErrorText {
@@ -97,6 +111,10 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
 
+    /// <summary>
+    /// Сервис для установки локализации в контроле фильтрации
+    /// </summary>
+    public ILanguageService LanguageService { get; }
 
     public FilterViewModel SelectedFilter {
         get => _selectedFilter;
@@ -108,14 +126,11 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
         set => RaiseAndSetIfChanged(ref _filters, value);
     }
 
-    public IEnumerable<Filter> GetFilters() {
-        return Filters.Select(item => item.GetFilter());
-    }
-
-    private void OnSelectedFilterChanged(object sender, PropertyChangedEventArgs e) {
-        if(e.PropertyName == nameof(SelectedFilter)) {
-            SelectedFilter?.InitializeFilter();
-        }
+    public IEnumerable<FilterSettings> GetFilters() {
+        return Filters.Select(item => new FilterSettings() {
+            Name = item.Name,
+            FilterContext = _filterContextParser.Serialize(item.FilterProvider.GetFilter())
+        });
     }
 
     private void InitializeFilters() {
@@ -123,19 +138,62 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     }
 
     private IEnumerable<FilterViewModel> InitializeFilters(FiltersConfig config) {
-        foreach(var filter in config.Filters.OrderBy(item => item.Name)) {
-            filter.RevitRepository = _revitRepository;
-            filter.Set.SetRevitRepository(_revitRepository);
-            yield return new FilterViewModel(_revitRepository, _localization, filter);
+        var filters = (config.FilterSettings.Count > 0
+                ? CreateFilters(config.FilterSettings)
+                : CreateFilters(config.Filters))
+            .OrderBy(item => item.Name)
+            .ToArray();
+
+        string[] notLoadedFilters = [
+            .. filters
+                .Where(item => !item.FilterProvider.CanGetFilter(out _))
+                .Select(item => item.Name)
+        ];
+
+        if(notLoadedFilters.Length > 0) {
+            MessageBoxService.Show(
+                _localization.GetLocalizedString(
+                    "FilterCreation.Validation.NotLoadedFilters",
+                    string.Join("\n", notLoadedFilters)),
+                _localization.GetLocalizedString("BIM"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
+
+        return filters;
+    }
+
+    /// <summary>
+    /// Создает поисковые наборы из настроек Bim4Everyone.RevitFiltration
+    /// </summary>
+    private IEnumerable<FilterViewModel> CreateFilters(ICollection<FilterSettings> filterSettings) {
+        foreach(var settings in filterSettings) {
+            var provider = _filterContextParser.TryParse(settings.FilterContext, out var context)
+                ? _filterProviderFactory.Create(_dataProvider, context!)
+                : _filterProviderFactory.Create(_dataProvider);
+            yield return new FilterViewModel(settings.Name, provider);
+        }
+    }
+
+    /// <summary>
+    /// Создает поисковые наборы из устаревших настроек предыдущих версий плагина
+    /// </summary>
+    private IEnumerable<FilterViewModel> CreateFilters(ICollection<Filter> legacyFilters) {
+        foreach(var legacyFilter in legacyFilters) {
+            yield return new FilterViewModel(
+                legacyFilter.Name,
+                _legacyFilterConverter.Convert(legacyFilter));
         }
     }
 
     private void Create() {
         var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name));
-        var view = _resolutionRoot.Get<FilterNameView>();
+        var view = _resolutionRoot.Get<RevitClashDetective.Views.Filters.FilterNameView>();
         view.DataContext = newFilterName;
         if(view.ShowDialog() == true) {
-            var newFilter = new FilterViewModel(_revitRepository, _localization) { Name = newFilterName.Name, IsInitialized = true };
+            var newFilter = new FilterViewModel(
+                newFilterName.Name,
+                _filterProviderFactory.Create(_dataProvider));
             Filters.Add(newFilter);
 
             Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
@@ -168,7 +226,7 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
 
     private void Rename() {
         var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name), SelectedFilter.Name);
-        var view = _resolutionRoot.Get<FilterNameView>();
+        var view = _resolutionRoot.Get<RevitClashDetective.Views.Filters.FilterNameView>();
         view.DataContext = newFilterName;
         if(view.ShowDialog() == true) {
             SelectedFilter.Name = newFilterName.Name;
@@ -183,12 +241,10 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
 
     private void Copy() {
         var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name), SelectedFilter.Name);
-        var view = _resolutionRoot.Get<FilterNameView>();
+        var view = _resolutionRoot.Get<RevitClashDetective.Views.Filters.FilterNameView>();
         view.DataContext = newFilterName;
         if(view.ShowDialog() == true) {
-            var newFilter = new FilterViewModel(_revitRepository, _localization, SelectedFilter.GetFilter()) {
-                Name = newFilterName.Name
-            };
+            var newFilter = new FilterViewModel(newFilterName.Name, CopyFilterProvider(SelectedFilter));
             Filters.Add(newFilter);
 
             Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
@@ -197,24 +253,25 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     }
 
     private bool CanCopy() {
-        return SelectedFilter is not null;
+        return SelectedFilter is not null && SelectedFilter.FilterProvider.CanGetFilter(out _);
+    }
+
+    private ILogicalFilterProvider CopyFilterProvider(FilterViewModel filter) {
+        string filterContext = _filterContextParser.Serialize(filter.FilterProvider.GetFilter());
+        return _filterContextParser.TryParse(filterContext, out var context)
+            ? _filterProviderFactory.Create(_dataProvider, context!)
+            : _filterProviderFactory.Create(_dataProvider);
     }
 
     private void Save() {
-        string revitFilePath = Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName());
-        var filtersConfig = FiltersConfig.GetFiltersConfig(revitFilePath, _revitRepository.Doc);
-        filtersConfig.Filters = GetFilters().ToList();
-        filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
+        var filtersConfig = GetFiltersConfig();
         filtersConfig.SaveProjectConfig();
         MessageText = _localization.GetLocalizedString("FilterCreation.SuccessSave");
         RefreshMessage();
     }
 
     private void SaveAs() {
-        string revitFilePath = Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName());
-        var filtersConfig = FiltersConfig.GetFiltersConfig(revitFilePath, _revitRepository.Doc);
-        filtersConfig.Filters = GetFilters().ToList();
-        filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
+        var filtersConfig = GetFiltersConfig();
 
         var cs = new ConfigSaverService(_revitRepository, SaveFileDialogService);
         cs.Save(filtersConfig);
@@ -222,26 +279,25 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
         RefreshMessage();
     }
 
+    /// <summary>
+    /// Собирает конфиг для сохранения: поисковые наборы записываются в новые настройки,
+    /// а в устаревшие настройки записывается заглушка, ломающая чтение конфига старыми версиями плагина.
+    /// </summary>
+    private FiltersConfig GetFiltersConfig() {
+        string revitFilePath = Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName());
+        var filtersConfig = FiltersConfig.GetFiltersConfig(revitFilePath, _revitRepository.Doc);
+        filtersConfig.FilterSettings = [.. GetFilters()];
+        filtersConfig.Filters = LegacyConfigPoison.Create(_revitRepository);
+        filtersConfig.RevitVersion = ModuleEnvironment.RevitVersion;
+        return filtersConfig;
+    }
+
     private bool CanSave() {
-        var emptyCategoryFilter = Filters.FirstOrDefault(f => f.AllCategories.All(c => !c.IsSelected));
-        if(emptyCategoryFilter is not null) {
-            ErrorText = _localization.GetLocalizedString(
-                "FilterCreation.Validation.SelectCategories", emptyCategoryFilter.Name);
-            return false;
-        }
-
-        var emptyFilter = Filters.FirstOrDefault(f => f.Set.IsEmpty());
-        if(emptyFilter is not null) {
-            ErrorText = _localization.GetLocalizedString(
-                "FilterCreation.Validation.EmptySet", emptyFilter.Name);
-            return false;
-        }
-
-        string errorSetText = Filters.FirstOrDefault(s => !string.IsNullOrWhiteSpace(s.Set.GetErrorText()))
-            ?.Set.GetErrorText();
-        if(!string.IsNullOrWhiteSpace(errorSetText)) {
-            ErrorText = errorSetText;
-            return false;
+        foreach(var filter in Filters) {
+            if(!filter.FilterProvider.CanGetFilter(out var errors)) {
+                ErrorText = $"{filter.Name}: {errors.FirstOrDefault()?.Message}";
+                return false;
+            }
         }
         ErrorText = null;
         return true;
@@ -261,10 +317,18 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
 
     private void CheckSearchSet() {
         Save();
-        var filter = SelectedFilter.GetFilter();
-        var vm = new SearchSetsViewModel(_revitRepository, _localization, filter, MessageBoxService);
-        var view = new SearchSetView() { DataContext = vm };
+        var vm = new SearchSetsViewModel(
+            _revitRepository,
+            _localization,
+            SelectedFilter.Name,
+            SelectedFilter.FilterProvider.GetFilter(),
+            MessageBoxService);
+        var view = new RevitClashDetective.Views.Filters.SearchSetView() { DataContext = vm };
         view.Show();
+    }
+
+    private bool CanCheckSearchSet() {
+        return SelectedFilter is not null && CanSave();
     }
 
     private void InitializeTimer() {
