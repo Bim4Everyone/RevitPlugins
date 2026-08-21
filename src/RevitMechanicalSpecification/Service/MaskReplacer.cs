@@ -12,6 +12,7 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
@@ -94,7 +95,7 @@ namespace RevitMechanicalSpecification.Service {
             Element elemType = element.GetElementType();
 
             if(!elemType.IsExistsParam(maskName) && !element.IsExistsParam(maskName)) {
-                return string.Empty;
+                return null;
             }
 
             string mask = element.GetSharedParamValueOrDefault<string>(maskName) 
@@ -164,19 +165,14 @@ namespace RevitMechanicalSpecification.Service {
         }
 
         /// <summary>
-        /// Вызывает замену целевых параметров масками. Возвращает бул, 
-        /// чтоб в общей обработке понять была ли замена
+        /// Вызывает замену целевых параметров масками и сохраняет рассчитанные имя и марку.
         /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        public bool ExecuteReplacment(Element element) {
-            string markMask = ReplaceMarkMask(element);
-            string nameMask = ReplaceNameMask(element);
-            string shortNameMask = ReplaceShortNameMask(element);
-
-            return !string.IsNullOrEmpty(markMask) 
-                   || !string.IsNullOrEmpty(nameMask) 
-                   || !string.IsNullOrEmpty(shortNameMask);
+        /// <param name="specificationElement"></param>
+        public void ExecuteReplacment(SpecificationElement specificationElement) {
+            Element element = specificationElement.Element;
+            specificationElement.ReplacedMark = ReplaceMarkMask(element);
+            specificationElement.ReplacedName = ReplaceNameMask(element);
+            ReplaceShortNameMask(element);
         }
     }
 }

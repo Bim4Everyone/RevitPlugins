@@ -37,6 +37,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="specificationElement"></param>
         /// <returns></returns>
         private string GetMark(SpecificationElement specificationElement) {
+            if(specificationElement.ReplacedMark != null) {
+                specificationElement.ElementMark = specificationElement.ReplacedMark;
+                return specificationElement.ReplacedMark;
+            }
+
             if(specificationElement.BuiltInCategory == BuiltInCategory.OST_DuctFitting) {
                 string mark = _calculator.GetDuctFittingMark(specificationElement.Element);
                 specificationElement.ElementMark = mark;
