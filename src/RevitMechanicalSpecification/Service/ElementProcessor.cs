@@ -24,6 +24,7 @@ namespace RevitMechanicalSpecification.Service {
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
         private readonly ElementEditChecker _elementEditChecker;
+        private readonly DuctRotationCorrector _ductRotationCorrector;
         private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
 
@@ -35,11 +36,13 @@ namespace RevitMechanicalSpecification.Service {
         public ElementProcessor(
             Document document,
             SpecConfiguration specConfiguration,
-            ElementEditChecker elementEditChecker) {
+            ElementEditChecker elementEditChecker,
+            DuctRotationCorrector ductRotationCorrector) {
             _document = document;
 
             _specConfiguration = specConfiguration;
             _elementEditChecker = elementEditChecker;
+            _ductRotationCorrector = ductRotationCorrector;
             _paramChecker = new ParamChecker(_elementEditChecker);
             _maskReplacer = new MaskReplacer(_specConfiguration);
         }
@@ -80,6 +83,8 @@ namespace RevitMechanicalSpecification.Service {
             _paramChecker.ExecuteParamCheck(_document, _specConfiguration);
 
             using(var t = _document.StartTransaction("Обновление спецификации")) {
+                _ductRotationCorrector.Execute(splitResult);
+
                 var totalElements = splitResult.SingleElements.Count + splitResult.ManifoldElements.Count;
                 
                 var percent = totalElements * 0.01; //1 процент от элементов
@@ -117,6 +122,7 @@ namespace RevitMechanicalSpecification.Service {
                 }
                 t.Commit();
                 _elementEditChecker.ShowReport();
+                _ductRotationCorrector.ShowReport();
             }
         }
 
