@@ -20,12 +20,15 @@ namespace RevitMechanicalSpecification.Service {
             new ElementId(BuiltInParameter.RBS_CURVE_WIDTH_PARAM);
         private static readonly ElementId _heightParameterId =
             new ElementId(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM);
+        private static readonly ElementId _offsetParameterId =
+            new ElementId(BuiltInParameter.RBS_OFFSET_PARAM);
 
         private readonly Document _document;
         private readonly ElementEditChecker _elementEditChecker;
         private readonly IMessageBoxService _messageBoxService;
         private bool _hasFailedDuctRecreations;
         private bool _hasDuctsWithoutSystem;
+        private ElementId _firstFailedDuctId;
 
         public DuctRotationCorrector(
             Document document,
@@ -43,6 +46,7 @@ namespace RevitMechanicalSpecification.Service {
 
             _hasFailedDuctRecreations = false;
             _hasDuctsWithoutSystem = false;
+            _firstFailedDuctId = null;
 
             // Шаг 1. Берем одиночные элементы, среди которых могут находиться воздуховоды.
             List<SpecificationElement> specificationElements = splitResult.SingleElements;
@@ -65,6 +69,7 @@ namespace RevitMechanicalSpecification.Service {
                 .ToList();
 
             foreach(SpecificationElement specificationElement in ducts) {
+                ElementId ductId = specificationElement.Element.Id;
                 try {
                     // Шаг 4. Проверяем горизонтальность и поворот, затем при необходимости пересоздаем воздуховод.
                     var duct = (Duct) specificationElement.Element;
@@ -89,7 +94,7 @@ namespace RevitMechanicalSpecification.Service {
                         }
                     }
                 } catch(Exception) {
-                    _hasFailedDuctRecreations = true;
+                    RegisterFailedDuct(ductId);
                 }
             }
 
@@ -109,8 +114,13 @@ namespace RevitMechanicalSpecification.Service {
                 reports.Add("В модели существуют повернутые воздуховоды без системы.");
             }
 
+            if(_firstFailedDuctId != null) {
+                reports.Add($"ID воздуховода с ошибкой: {_firstFailedDuctId.GetIdValue()}.");
+            }
+
             _hasFailedDuctRecreations = false;
             _hasDuctsWithoutSystem = false;
+            _firstFailedDuctId = null;
 
             _messageBoxService.Show(
                 string.Join(Environment.NewLine, reports),
@@ -134,27 +144,21 @@ namespace RevitMechanicalSpecification.Service {
                 return null;
             }
 
-            try {
-                DuctData ductData = CaptureDuctData(duct, line, endConnectors);
-                if(ductData == null) {
-                    return null;
-                }
-
-                if(!CanEditRelatedElements(ductData)) {
-                    _hasFailedDuctRecreations = true;
-                    return null;
-                }
-
-                DuctReplacement replacement = RecreateDuct(ductData);
-                if(replacement == null) {
-                    _hasFailedDuctRecreations = true;
-                }
-
-                return replacement;
-            } catch(Exception) {
-                _hasFailedDuctRecreations = true;
+            DuctData ductData = CaptureDuctData(duct, line, endConnectors);
+            if(ductData == null) {
                 return null;
             }
+
+            if(!CanEditRelatedElements(ductData)) {
+                return null;
+            }
+
+            DuctReplacement replacement = RecreateDuct(ductData);
+            if(replacement == null) {
+                RegisterFailedDuct(duct.Id);
+            }
+
+            return replacement;
         }
 
         // Та же проверка горизонтальности, которая используется в RevitOpeningPlacement.
@@ -174,8 +178,9 @@ namespace RevitMechanicalSpecification.Service {
             IReadOnlyCollection<Connector> endConnectors) {
             Parameter widthParameter = duct.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM);
             Parameter heightParameter = duct.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM);
-            if(widthParameter == null || heightParameter == null) {
-                _hasFailedDuctRecreations = true;
+            Parameter offsetParameter = duct.GetParam(BuiltInParameter.RBS_OFFSET_PARAM);
+            if(widthParameter == null || heightParameter == null || offsetParameter == null) {
+                RegisterFailedDuct(duct.Id);
                 return null;
             }
 
@@ -189,6 +194,7 @@ namespace RevitMechanicalSpecification.Service {
                 EndPoint = line.GetEndPoint(1),
                 Width = widthParameter.AsDouble(),
                 Height = heightParameter.AsDouble(),
+                Offset = offsetParameter.AsDouble(),
                 IsPinned = duct.Pinned,
                 Parameters = CaptureParameters(duct),
                 Ends = endConnectors.Select(CaptureDuctEnd).ToList(),
@@ -201,13 +207,20 @@ namespace RevitMechanicalSpecification.Service {
                 }
 
                 if(IsInvalidId(ductData.LevelId)) {
-                    _hasFailedDuctRecreations = true;
+                    RegisterFailedDuct(duct.Id);
                 }
 
                 return null;
             }
 
             return ductData;
+        }
+
+        private void RegisterFailedDuct(ElementId ductId) {
+            _hasFailedDuctRecreations = true;
+            if(_firstFailedDuctId == null) {
+                _firstFailedDuctId = ductId;
+            }
         }
 
         private static ElementId GetSystemTypeId(Duct duct) {
@@ -327,7 +340,7 @@ namespace RevitMechanicalSpecification.Service {
                         ductData.EndPoint);
 
                     CopyParameters(ductData.Parameters, newDuct);
-                    SetDuctSize(newDuct, ductData.Height, ductData.Width);
+                    SetDuctGeometry(newDuct, ductData.Height, ductData.Width, ductData.Offset);
                     _document.Regenerate();
 
                     ReconnectDuct(newDuct, ductData.Ends);
@@ -361,16 +374,14 @@ namespace RevitMechanicalSpecification.Service {
             }
         }
 
-        private static void SetDuctSize(Duct duct, double width, double height) {
-            Parameter widthParameter = duct.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM);
-            Parameter heightParameter = duct.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM);
-            if(widthParameter == null || heightParameter == null
-               || widthParameter.IsReadOnly || heightParameter.IsReadOnly) {
-                throw new InvalidOperationException($"Duct {duct.Id} size cannot be changed.");
-            }
+        private static void SetDuctGeometry(Duct duct, double width, double height, double offset) {
+            Parameter widthParameter = duct.GetParam(BuiltInParameter.RBS_CURVE_WIDTH_PARAM);
+            Parameter heightParameter = duct.GetParam(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM);
+            Parameter offsetParameter = duct.GetParam(BuiltInParameter.RBS_OFFSET_PARAM);
 
             widthParameter.Set(width);
             heightParameter.Set(height);
+            offsetParameter.Set(offset);
         }
 
         private void ReconnectDuct(Duct duct, IEnumerable<DuctEnd> ductEnds) {
@@ -468,7 +479,7 @@ namespace RevitMechanicalSpecification.Service {
             var values = new List<ElementParameterValue>();
 
             foreach(Parameter parameter in element.Parameters) {
-                if(!parameter.HasValue || IsSizeParameter(parameter.Id)) {
+                if(!parameter.HasValue || IsAppliedSeparately(parameter.Id)) {
                     continue;
                 }
 
@@ -499,9 +510,10 @@ namespace RevitMechanicalSpecification.Service {
             }
         }
 
-        private static bool IsSizeParameter(ElementId parameterId) {
+        private static bool IsAppliedSeparately(ElementId parameterId) {
             return parameterId.Equals(_widthParameterId)
-                   || parameterId.Equals(_heightParameterId);
+                   || parameterId.Equals(_heightParameterId)
+                   || parameterId.Equals(_offsetParameterId);
         }
 
         private static bool IsInvalidId(ElementId elementId) {

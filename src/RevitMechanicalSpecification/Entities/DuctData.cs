@@ -14,6 +14,7 @@ namespace RevitMechanicalSpecification.Entities {
         public XYZ EndPoint { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
+        public double Offset { get; set; }
         public bool IsPinned { get; set; }
         public List<ElementParameterValue> Parameters { get; set; }
         public List<DuctEnd> Ends { get; set; }
