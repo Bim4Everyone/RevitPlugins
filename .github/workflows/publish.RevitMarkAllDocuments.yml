@@ -8,6 +8,7 @@ on:
     paths:
       - '**RevitMarkAllDocuments**.cs'
       - '**RevitMarkAllDocuments**.xaml'
+      - '**RevitMarkAllDocuments**.csproj'
 
 env:
   plugin-name: "RevitMarkAllDocuments"

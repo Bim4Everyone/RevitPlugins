@@ -60,9 +60,6 @@
             <ui:TextBlock
                 x:Key="FullNameHeader"
                 Text="{me:LocalizationSource MainWindow.FullNameHeader}" />
-            <ui:TextBlock
-                x:Key="TargetsHeader"
-                Text="{me:LocalizationSource MainWindow.TargetsHeader}" />
 
             <Style
                 x:Key="CustomDataGridTextDisabledStyle"
@@ -88,7 +85,7 @@
                 Height="*" />
         </Grid.RowDefinitions>
         <Border
-            Margin="0 0 10 5"
+            Margin="0 0 8 4"
             Grid.Row="0"
             Style="{StaticResource CustomBorder}">
             <StackPanel>
@@ -97,7 +94,7 @@
                         Width="130"
                         Text="{me:LocalizationSource MainWindow.LabelTarget}" />
                     <ui:ToggleSwitch
-                        Margin="5 0"
+                        Margin="8 0"
                         IsChecked="{Binding ClearTargetFolder}"
                         Content="{me:LocalizationSource MainWindow.ClearTarget}" />
                     <ui:ToggleSwitch
@@ -105,36 +102,36 @@
                         Content="{me:LocalizationSource MainWindow.OpenTargetWhenFinish}" />
                 </DockPanel>
                 <DockPanel
-                    Margin="0 5"
+                    Margin="0 4"
                     LastChildFill="True">
                     <ui:Button
                         DockPanel.Dock="Right"
                         Height="36"
-                        Margin="5 0 0 0"
+                        Margin="4 0 0 0"
                         Content="{ui:SymbolIcon Symbol=Folder20}"
                         Command="{Binding OpenFolderDialogCommand}" />
                     <ui:TextBox
                         Text="{Binding TargetFolder, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
                 <DockPanel
-                    Margin="0 5 0 0">
+                    Margin="0 4 0 0">
                     <ui:TextBlock
                         Width="130"
                         Text="{me:LocalizationSource MainWindow.LabelSource}" />
                     <ui:ToggleSwitch
-                        Margin="5 0"
+                        Margin="4 0"
                         Content="{me:LocalizationSource MainWindow.ExportRooms}"
                         IsChecked="{Binding IsExportRooms}"
                         Visibility="{Binding IsNwcExport, 
             Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </DockPanel>
                 <DockPanel
-                    Margin="0 5 0 0"
+                    Margin="0 4 0 0"
                     LastChildFill="True">
                     <ui:Button
                         DockPanel.Dock="Right"
                         Height="36"
-                        Margin="5 0 0 0"
+                        Margin="4 0 0 0"
                         Content="{ui:SymbolIcon Symbol=Folder20}"
                         IsEnabled="{Binding SourceFolderChangedCommand.IsExecuting,
                 Converter={StaticResource InverseBooleanConverter}}"
@@ -142,7 +139,7 @@
                     <ui:Button
                         DockPanel.Dock="Right"
                         Height="36"
-                        Margin="5 0 0 0"
+                        Margin="4 0 0 0"
                         Visibility="{Binding IsNwcExport, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                         Content="{ui:SymbolIcon Symbol=ArrowSync20}"
                         Command="{Binding SourceFolderChangedCommand}" />
@@ -154,58 +151,158 @@
         </Border>
 
         <Border
-            Margin="0 5 10 0"
+            Margin="0 4 8 0"
             Grid.Row="1"
             Style="{StaticResource CustomBorder}">
 
-            <ui:DataGrid
-                Grid.Row="5"
-                Margin="5"
-                RowHeight="33"
-                Style="{StaticResource CustomResizableDataGridStyle}"
-                CellStyle="{StaticResource CustomDataGridCell}"
-                ItemsSource="{Binding ModelObjects}"
-                SelectedItem="{Binding SelectedObject}">
+            <DockPanel
+                LastChildFill="True">
 
-                <ui:DataGrid.Columns>
-                    <DataGridCheckBoxColumn
-                        CanUserReorder="False"
-                        CanUserResize="False"
-                        CanUserSort="False"
-                        Width="Auto"
-                        Binding="{Binding SkipObject, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}">
-                        <DataGridCheckBoxColumn.Header>
-                            <CheckBox
-                                IsChecked="{Binding DataContext.SkipAll, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
-                        </DataGridCheckBoxColumn.Header>
-                    </DataGridCheckBoxColumn>
-                    <DataGridTemplateColumn
-                        CanUserReorder="False"
-                        CanUserResize="False"
-                        CanUserSort="False"
-                        Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <ui:SymbolIcon
-                                    Symbol="{Binding ., Converter={StaticResource CellImageConverter}}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn
+                <DockPanel
+                    DockPanel.Dock="Top"
+                    Margin="4 0 4 4"
+                    LastChildFill="False">
+                    <ui:TextBox
+                        DockPanel.Dock="Right"
+                        MinWidth="300"
+                        MaxWidth="300"
+                        Margin="8 0 0 0"
+                        HorizontalAlignment="Right"
+                        Icon="{ui:SymbolIcon Symbol=Search20}"
+                        PlaceholderText="{me:LocalizationSource MainWindow.SearchPlaceholder}"
+                        Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:TextBox
+                        DockPanel.Dock="Left"
                         Width="250"
-                        IsReadOnly="True"
-                        MinWidth="100"
-                        ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
-                        Binding="{Binding Name}"
-                        Header="{StaticResource NameHeader}" />
-                    <DataGridTextColumn
-                        IsReadOnly="True"
-                        MinWidth="100"
-                        ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
-                        Binding="{Binding FullName}"
-                        Header="{StaticResource FullNameHeader}" />
-                </ui:DataGrid.Columns>
-            </ui:DataGrid>
+                        ToolTip="{me:LocalizationSource MainWindow.ExcludedObjectPatternTooltip}"
+                        PlaceholderText="{me:LocalizationSource MainWindow.ExcludedObjectPatternPlaceholder}"
+                        Text="{Binding ExcludedObjectPatternText, UpdateSourceTrigger=PropertyChanged}">
+                        <ui:TextBox.InputBindings>
+                            <KeyBinding
+                                Key="Return"
+                                Command="{Binding AddExcludedObjectPatternCommand}" />
+                        </ui:TextBox.InputBindings>
+                    </ui:TextBox>
+                    <ui:Button
+                        DockPanel.Dock="Left"
+                        Width="Auto"
+                        Height="36"
+                        Margin="4 0 0 0"
+                        ToolTip="{me:LocalizationSource MainWindow.AddExcludedObjectPatternTooltip}"
+                        Content="{ui:SymbolIcon Symbol=Add20}"
+                        Command="{Binding AddExcludedObjectPatternCommand}" />
+                </DockPanel>
+
+                <ItemsControl
+                    DockPanel.Dock="Top"
+                    Margin="4 0 4 4"
+                    ItemsSource="{Binding ExcludedObjectPatterns}">
+                    <ItemsControl.Style>
+                        <Style
+                            TargetType="ItemsControl">
+                            <Style.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding ExcludedObjectPatterns.Count}"
+                                    Value="0">
+                                    <Setter
+                                        Property="Visibility"
+                                        Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ItemsControl.Style>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Margin="0 2 4 2"
+                                Style="{StaticResource CustomBorder}">
+                                <StackPanel
+                                    Orientation="Horizontal">
+                                    <ui:TextBlock
+                                        VerticalAlignment="Center"
+                                        ToolTip="{Binding Value}"
+                                        Text="{Binding Value}" />
+                                    <ui:Button
+                                        Margin="4 0 0 0"
+                                        Padding="4"
+                                        Width="Auto"
+                                        Appearance="Transparent"
+                                        ToolTip="{me:LocalizationSource MainWindow.RemoveExcludedObjectPatternTooltip}"
+                                        Content="{ui:SymbolIcon Symbol=Dismiss12}"
+                                        Command="{Binding DataContext.RemoveExcludedObjectPatternCommand,
+                        RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ui:DataGrid
+                    Margin="4"
+                    RowHeight="33"
+                    SelectionMode="Extended"
+                    Style="{StaticResource CustomResizableDataGridStyle}"
+                    CellStyle="{StaticResource CustomDataGridCell}"
+                    pluginBehaviors:DataGridSelectedItemsProperty.SelectedItems="{Binding SelectedObjects}"
+                    ItemsSource="{Binding ModelObjectsView.View}"
+                    SelectedItem="{Binding SelectedObject}">
+
+                    <ui:DataGrid.Columns>
+                        <DataGridTemplateColumn
+                            CanUserReorder="False"
+                            CanUserResize="False"
+                            CanUserSort="False"
+                            Width="Auto">
+                            <DataGridTemplateColumn.Header>
+                                <CheckBox
+                                    IsChecked="{Binding DataContext.SkipAll, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        IsChecked="{Binding SkipObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
+                                        Command="{Binding DataContext.ToggleSkipObjectCommand,
+                        RelativeSource={RelativeSource AncestorType=ui:DataGrid}}"
+                                        CommandParameter="{Binding}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            CanUserReorder="False"
+                            CanUserResize="False"
+                            CanUserSort="False"
+                            Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:SymbolIcon
+                                        Symbol="{Binding ., Converter={StaticResource CellImageConverter}}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            Width="250"
+                            IsReadOnly="True"
+                            MinWidth="100"
+                            ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
+                            Binding="{Binding Name}"
+                            Header="{StaticResource NameHeader}" />
+                        <DataGridTextColumn
+                            IsReadOnly="True"
+                            MinWidth="100"
+                            ElementStyle="{StaticResource CustomDataGridTextDisabledStyle}"
+                            Binding="{Binding FullName}"
+                            Header="{StaticResource FullNameHeader}" />
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
         </Border>
     </Grid>
 </core:WpfUIPlatformUserControl>
