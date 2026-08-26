@@ -26,14 +26,14 @@ internal class ClassifierExcelReader : ExcelReaderBase<List<WorkGroup>> {
 
         int rowCount = rows.GetLength(0);
 
-        for(int row = 1; row <= rowCount; row++) {
-            string code = GetString(rows[row, 1]);
+        for(int row = 0; row < rowCount; row++) {
+            string code = GetString(rows[row, 0]);
             if(string.IsNullOrWhiteSpace(code)) {
                 continue;
             }
 
-            string name = GetString(rows[row, 2]);
-            string unit = GetString(rows[row, 3]);
+            string name = GetString(rows[row, 1]);
+            string unit = GetString(rows[row, 2]);
 
             if(string.IsNullOrWhiteSpace(unit)) {
                 AddGroup(result, groups, code, name);

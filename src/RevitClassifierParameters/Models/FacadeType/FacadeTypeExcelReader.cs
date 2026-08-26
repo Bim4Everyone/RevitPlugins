@@ -30,10 +30,10 @@ internal class FacadeTypeExcelReader : ExcelReaderBase<List<FacadeTypeItem>> {
 
         int rowCount = rows.GetLength(0);
 
-        for(int row = 1; row <= rowCount; row++) {
-            string function = GetString(rows[row, 1]);
-            string material = GetString(rows[row, 2]);
-            string value = GetString(rows[row, 3]);
+        for(int row = 0; row < rowCount; row++) {
+            string function = GetString(rows[row, 0]);
+            string material = GetString(rows[row, 1]);
+            string value = GetString(rows[row, 2]);
 
             if(string.IsNullOrWhiteSpace(function)
                || string.IsNullOrWhiteSpace(material)

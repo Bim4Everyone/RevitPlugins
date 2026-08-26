@@ -30,15 +30,15 @@
     <system:String x:Key="MainWindow.FacadeTypeParamLabel">Параметр для типа фасада</system:String>
 
     <system:String x:Key="MainWindow.NoClassifierFileSelected">Не выбран файл Классификатора!</system:String>
-    <system:String x:Key="MainWindow.NoClassifierWorksFound">Не найдены работы в Классификатора!</system:String>
+    <system:String x:Key="MainWindow.NoClassifierWorksFound">Не найдены работы в Классификаторе!</system:String>
     <system:String x:Key="MainWindow.NoMaterialsFound">Не найдено материалов!</system:String>
     <system:String x:Key="MainWindow.NoFacadeTypeFileSelected">Не выбран файл правил заполнения типа фасада!</system:String>
-    <system:String x:Key="MainWindow.NoFacadeTypesFound">Не найдены типы фасадом в файле!</system:String>
+    <system:String x:Key="MainWindow.NoFacadeTypesFound">Не найдены типы фасадов в файле!</system:String>
 
     <system:String x:Key="MainWindow.ErrorNoClassifierFile">Не выбран файл классификатора</system:String>
-    <system:String x:Key="MainWindow.ErrorNoClassifierWorks">Не найдены работы в Классификатора</system:String>
+    <system:String x:Key="MainWindow.ErrorNoClassifierWorks">Не найдены работы в Классификаторе</system:String>
     <system:String x:Key="MainWindow.ErrorNoFacadeTypeFile">Не выбран файл типов фасадов</system:String>
-    <system:String x:Key="MainWindow.ErrorNoFacadeTypes">Не найдены типы фасадом в файле</system:String>
+    <system:String x:Key="MainWindow.ErrorNoFacadeTypes">Не найдены типы фасадов в файле</system:String>
     <system:String x:Key="MainWindow.ErrorNoFacadeTypeParam">Не выбран параметр для типов фасадов</system:String>
 
     <system:String x:Key="Repository.NoMaterialsForElements">Не найдено материалов у элементов в проекте!</system:String>

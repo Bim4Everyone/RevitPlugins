@@ -114,7 +114,7 @@ public class RevitArParameterClassifierCommand : BasePluginCommand {
 
         // Сервис открытия диалогового окна для чтения файла Классификатора
         kernel.UseWpfOpenFileDialog<ArParameterClassifierVM>(
-            filter: "Excel files (*.xlsx;*.xls)|*.xlsx;*.xls|All files (*.*)|*.*");
+            filter: "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*");
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<ArParameterClassifierV>());
