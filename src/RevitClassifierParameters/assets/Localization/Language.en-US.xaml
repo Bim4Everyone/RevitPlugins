@@ -47,6 +47,8 @@
     <system:String x:Key="Reader.ClassifierSheetEmpty">Classifier sheet is empty or contains no data.</system:String>
     <system:String x:Key="Reader.FacadeTypeFileEmpty">Facade type rules file is empty or contains no data.</system:String>
 
+    <system:String x:Key="CalculationType.Error">Error</system:String>
+
     <system:String x:Key="Transaction.SetClassifierParameters">Filling classifier parameters</system:String>
     <system:String x:Key="Transaction.SetFacadeType">Filling facade type</system:String>
 

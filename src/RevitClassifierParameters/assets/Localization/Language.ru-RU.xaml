@@ -47,6 +47,8 @@
     <system:String x:Key="Reader.ClassifierSheetEmpty">Лист классификатора пуст или не содержит данных.</system:String>
     <system:String x:Key="Reader.FacadeTypeFileEmpty">Файл правил заполнения типа фасада пуст или не содержит данных.</system:String>
 
+    <system:String x:Key="CalculationType.Error">Ошибка</system:String>
+
     <system:String x:Key="Transaction.SetClassifierParameters">Заполнение параметров классификатора</system:String>
     <system:String x:Key="Transaction.SetFacadeType">Заполнение типа фасада</system:String>
 

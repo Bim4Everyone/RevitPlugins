@@ -16,8 +16,6 @@ internal class MaterialParamSetter {
     private const string _unitParameter = "ФОП_МТР_Единица измерения";
     private const string _calculationTypeParameter = "ФОП_МТР_Тип подсчета";
 
-    private const string _calculationTypeError = "Ошибка";
-
     private static readonly Dictionary<string, int> _calculationTypeDict = new() {
         ["м"] = 1,
         ["м²"] = 2,
@@ -193,7 +191,7 @@ internal class MaterialParamSetter {
 
     /// <summary>
     /// Устанавливает значение параметра "Тип подсчета" по единице измерения.
-    /// При валидной единице пишется число, иначе - строка "Ошибка".
+    /// При валидной единице пишется число, иначе - локализованная строка ошибки.
     /// Возвращает true, если параметр был изменён.
     /// </summary>
     private bool SetCalculationTypeParam(Material material, string unit) {
@@ -207,10 +205,11 @@ internal class MaterialParamSetter {
             return true;
         }
 
-        if(param.AsValueString() == _calculationTypeError) {
+        string calculationTypeError = _localizationService.GetLocalizedString("CalculationType.Error");
+        if(param.AsValueString() == calculationTypeError) {
             return false;
         }
-        material.SetParamValue(_calculationTypeParameter, _calculationTypeError);
+        material.SetParamValue(_calculationTypeParameter, calculationTypeError);
         return true;
     }
 
