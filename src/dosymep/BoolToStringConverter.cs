@@ -6,6 +6,7 @@ using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace dosymep.WPF.Converters {
+    [Obsolete("Используйте dosymep.WpfCore.Converters.BoolToStringConverter")]
     public class BoolToStringConverter : MarkupExtension, IValueConverter {
         /// <summary> 
         /// Вывод, когда значение bool == True

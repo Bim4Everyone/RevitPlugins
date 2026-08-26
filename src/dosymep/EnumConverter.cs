@@ -8,6 +8,8 @@ using System.Windows.Data;
 using dosymep.WPF.Extensions;
 
 namespace dosymep.WPF.Converters {
+    [Obsolete(
+        "Вместо Description атрибута следует использовать локализованные строки через dosymep.SimpleServices.ILocalizationService")]
     internal class EnumConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             if(value == null || parameter == null) {

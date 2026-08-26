@@ -7,6 +7,7 @@ using System.Windows.Data;
 namespace dosymep.WPF.Converters {
     [ValueConversion(typeof(bool), typeof(bool))]
     [ValueConversion(typeof(bool), typeof(object))]
+    [Obsolete("Используйте dosymep.WpfCore.Converters.BoolNegationConverter")]
     public class InverseBooleanConverter : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             if(targetType != typeof(bool) && targetType != typeof(bool?) && targetType != typeof(object)) {
