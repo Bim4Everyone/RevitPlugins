@@ -12,7 +12,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     xmlns:res="clr-namespace:RevitClashDetective.Resources"
-    xmlns:filters="clr-namespace:RevitClashDetective.Views.Filters"
+    xmlns:filtration="clr-namespace:Bim4Everyone.RevitFiltration.Controls.Views;assembly=Bim4Everyone.RevitFiltration.Controls"
     mc:Ignorable="d"
     Height="600"
     Width="1000"
@@ -63,25 +63,20 @@
             <ColumnDefinition
                 Width="Auto" />
             <ColumnDefinition
-                Width="2*"
-                MinWidth="200" />
-            <ColumnDefinition
-                Width="Auto" />
-            <ColumnDefinition
-                Width="4*"
+                Width="6*"
                 MinWidth="200" />
         </Grid.ColumnDefinitions>
 
         <ui:TitleBar
             Grid.Row="0"
             Grid.Column="0"
-            Grid.ColumnSpan="5"
+            Grid.ColumnSpan="3"
             Title="{me:LocalizationSource FilterCreation.Title}" />
 
         <Border
             Grid.Row="1"
             Grid.Column="0"
-            Grid.ColumnSpan="5"
+            Grid.ColumnSpan="3"
             Margin="8 0"
             Style="{StaticResource CustomBorder}">
             <DockPanel>
@@ -163,51 +158,23 @@
             Grid.Column="1"
             Style="{StaticResource CustomGridSplitter}" />
 
-        <Border
+        <filtration:DynamicCategoriesFilterControl
             Grid.Row="2"
             Grid.Column="2"
-            Style="{StaticResource CustomBorder}">
-            <DockPanel
-                LastChildFill="True">
-                <Label
-                    DockPanel.Dock="Top"
-                    Content="{me:LocalizationSource FilterCreation.Categories}" />
-                <filters:CategoryView
-                    DataContext="{Binding SelectedFilter}" />
-            </DockPanel>
-        </Border>
-
-        <GridSplitter
-            Grid.Row="2"
-            Grid.Column="3"
-            Style="{StaticResource CustomGridSplitter}" />
-
-        <Border
-            Grid.Row="2"
-            Grid.Column="4"
             Margin="0 0 8 0"
-            Style="{StaticResource CustomBorder}">
-            <DockPanel
-                LastChildFill="True">
-                <Label
-                    DockPanel.Dock="Top"
-                    Content="{me:LocalizationSource FilterCreation.Criteria}" />
-                <ScrollViewer>
-                    <filters:CriterionView
-                        DataContext="{Binding SelectedFilter.Set}" />
-                </ScrollViewer>
-            </DockPanel>
-        </Border>
+            LanguageService="{Binding LanguageService}"
+            LogicalFilterProvider="{Binding SelectedFilter.FilterProvider}" />
 
         <StackPanel
             Grid.Column="0"
             Grid.Row="3"
-            Grid.ColumnSpan="5"
+            Grid.ColumnSpan="3"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
                 Margin="8"
                 Text="{Binding ErrorText}"
+                ToolTip="{Binding ErrorText}"
                 Style="{StaticResource CustomErrorText}" />
             <ui:TextBlock
                 Margin="8"

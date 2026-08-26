@@ -87,10 +87,10 @@ internal class RoomElement {
             : RevitRoom.GetParamValueOrDefault<int>(parameter.Definition.Name);
     }
 
-    public IReadOnlyList<ElementId> GetBoundaries() {
-        return RevitRoom.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
-            .SelectMany(item => item)
-            .Select(item => item.ElementId)
+    public IReadOnlyList<BoundarySegment> GetBoundaries() {
+        return RevitRoom
+            .GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
+            .SelectMany(x => x)
             .ToList();
     }
 

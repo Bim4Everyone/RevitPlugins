@@ -8,6 +8,7 @@ on:
     paths:
       - '**RevitMepTotals**.cs'
       - '**RevitMepTotals**.xaml'
+      - '**RevitMepTotals**.csproj'
 
 env:
   plugin-name: "RevitMepTotals"

@@ -1,15 +1,13 @@
 using System;
-using System.Linq;
 using System.Windows.Input;
 
-using dosymep.Revit;
+using Bim4Everyone.RevitFiltration.Controls;
+
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.FilterGenerators;
-using RevitClashDetective.Models.FilterModel;
 
 namespace RevitClashDetective.ViewModels.SearchSet;
 internal class SearchSetsViewModel : BaseViewModel {
@@ -21,18 +19,21 @@ internal class SearchSetsViewModel : BaseViewModel {
 
     public SearchSetsViewModel(RevitRepository revitRepository,
         ILocalizationService localization,
-        Filter filter,
+        string name,
+        ILogicalFilterContext filterContext,
         IMessageBoxService messageBoxService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-        Filter = filter ?? throw new ArgumentNullException(nameof(filter));
+        if(filterContext is null) {
+            throw new ArgumentNullException(nameof(filterContext));
+        }
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
 
-        _straightSearchSet = new SearchSetViewModel(_revitRepository, _localization, Filter, new StraightRevitFilterGenerator());
-        _invertedSearchSet = new SearchSetViewModel(_revitRepository, _localization, Filter, new InvertedRevitFilterGenerator());
+        _straightSearchSet = new SearchSetViewModel(_revitRepository, filterContext, false);
+        _invertedSearchSet = new SearchSetViewModel(_revitRepository, filterContext, true);
 
-        SearchSet = _straightSearchSet ?? throw new System.ArgumentNullException(nameof(_straightSearchSet));
-        Name = filter.Name;
+        SearchSet = _straightSearchSet;
+        Name = name;
 
         InversionChangedCommand = RelayCommand.Create(InversionChanged);
         ShowSetCommand = RelayCommand.Create(ShowSet);
@@ -55,31 +56,27 @@ internal class SearchSetsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _searchSet, value);
     }
 
-    public Filter Filter { get; }
-
     private void InversionChanged() {
         SearchSet = Inverted ? _invertedSearchSet : _straightSearchSet;
         ShowSet();
     }
 
     private void Close() {
-        void action() {
-            var command = new CreateFiltersCommand();
-            command.ExecuteCommand(_revitRepository.UiApplication, Filter.Name);
-        }
-        _revitRepository.DoAction(action);
+        _revitRepository.DoAction(ExecuteCreateFiltersCommand);
     }
 
+    private void ExecuteCreateFiltersCommand() {
+        var command = new CreateFiltersCommand();
+        command.ExecuteCommand(_revitRepository.UiApplication, Name);
+    }
+
+    /// <summary>
+    /// Показывает текущий набор на виде коллизий, скрывая элементы противоположного набора.
+    /// </summary>
     private void ShowSet() {
-        var invertedSelectedSet = Inverted ? _straightSearchSet : _invertedSearchSet;
+        var setToHide = Inverted ? _straightSearchSet : _invertedSearchSet;
         try {
-            _revitRepository.ShowElements(
-                invertedSelectedSet.Filter
-                    .GetRevitFilter(_revitRepository.Doc, invertedSelectedSet.FilterGenerator),
-                invertedSelectedSet.Filter
-                    .CategoryIds
-                    .Select(c => c.AsBuiltInCategory())
-                    .ToHashSet());
+            _revitRepository.ShowElements(setToHide.GetRevitFilter(), SearchSet.GetCategories());
         } catch(InvalidOperationException ex) {
             MessageBoxService.Show(
                 ex.Message,
