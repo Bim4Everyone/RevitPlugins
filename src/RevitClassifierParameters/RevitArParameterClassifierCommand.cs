@@ -34,7 +34,7 @@ public class RevitArParameterClassifierCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitArParameterClassifierCommand() {
-        PluginName = "RevitClassifierParameters";
+        PluginName = "Параметры ВОР АР";
     }
 
     /// <summary>
