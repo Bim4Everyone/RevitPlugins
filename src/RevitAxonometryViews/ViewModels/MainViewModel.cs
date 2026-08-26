@@ -31,6 +31,7 @@ internal class MainViewModel : BaseViewModel {
         RevitRepository revitRepository,
         ViewFactory viewFactory,
         CollectorOperator collectorOperator,
+        IMessageBoxService messageBoxService,
         ILocalizationService localizationService) {
         _revitRepository = revitRepository;
         _viewFactory = viewFactory;
@@ -39,6 +40,7 @@ internal class MainViewModel : BaseViewModel {
         _hvacSystems = GetHvacSystems();
         _selectedCriteria = _axonometryConfig.SystemName;
         _localizationService = localizationService;
+        MessageBoxService = messageBoxService;
 
         _filterValue = string.Empty;
         _selectedCriteria = _axonometryConfig.SharedVisSystemName;
@@ -58,6 +60,7 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand LoadViewCommand { get; }
     public ICommand AcceptViewCommand { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     /// <summary>
     /// Отфильтрованный список систем, выводящийся на ГУИ
@@ -101,8 +104,14 @@ internal class MainViewModel : BaseViewModel {
     public string SelectedCriteria {
         get => _selectedCriteria;
         set {
+            bool showSystemNameWarning = _selectedCriteria != value
+                                         && value == _axonometryConfig.SystemName;
             RaiseAndSetIfChanged(ref _selectedCriteria, value);
             UpdateFilteredView();
+
+            if(showSystemNameWarning) {
+                ShowSystemNameWarning();
+            }
         }
     }
 
@@ -126,6 +135,14 @@ internal class MainViewModel : BaseViewModel {
             SelectedCriteria,
             UseOneView,
             _revitRepository));
+    }
+
+    private void ShowSystemNameWarning() {
+        MessageBoxService.Show(
+            _localizationService.GetLocalizedString("MainWindow.SystemNameWarning"),
+            _localizationService.GetLocalizedString("MainWindow.WarningTitle"),
+            MessageBoxButton.OK,
+            MessageBoxImage.Warning);
     }
 
     /// <summary>
