@@ -12,11 +12,11 @@ namespace RevitLintelsManager.Views;
 /// <summary>
 /// Класс главного окна плагина.
 /// </summary>
-public partial class MainWindow {
+public partial class SettingsWindow {
     /// <summary>
     /// Иницализирует главное окно плагина.
     /// </summary>
-    public MainWindow(INavigationViewPageProvider navigationViewPageProvider,
+    public SettingsWindow(INavigationViewPageProvider navigationViewPageProvider,
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService,
@@ -41,7 +41,7 @@ public partial class MainWindow {
     
     public override string PluginName => nameof(RevitLintelsManager);
     
-    public override string ProjectConfigName => nameof(MainWindow);
+    public override string ProjectConfigName => nameof(SettingsWindow);
     
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;

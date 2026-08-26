@@ -7,7 +7,7 @@ internal class PluginConfigRepository {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
     
-    internal PluginConfigRepository(
+    public PluginConfigRepository(
         PluginConfig pluginConfig, 
         SystemPluginConfig systemPluginConfig, 
         RevitRepository revitRepository) {
@@ -16,17 +16,10 @@ internal class PluginConfigRepository {
         _revitRepository = revitRepository;
     }
     
-    public bool SettingsIsNull { get; private set; }
     
     public LintelManagerSettings LoadSettings() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        if(setting?.LintelManagerSettings is not null) {
-            return setting.LintelManagerSettings;
-        }
-
-        SettingsIsNull = true;
-        return GetDefaultLintelManagerSettings();
+        return setting?.LintelManagerSettings;
     }
     
     public void SaveSettings(LintelManagerSettings lintelManagerSettings) {
@@ -37,7 +30,7 @@ internal class PluginConfigRepository {
         _pluginConfig.SaveProjectConfig();
     }
     
-    private LintelManagerSettings GetDefaultLintelManagerSettings() {
+    public LintelManagerSettings GetDefaultLintelManagerSettings() {
         return new LintelManagerSettings {
             LintelFamilySettings = GetLintelFamilySettings(),
             OpeningFamilySettings = GetOpeningFamilySettings(),

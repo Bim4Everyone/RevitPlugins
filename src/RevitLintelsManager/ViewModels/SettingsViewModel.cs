@@ -12,8 +12,7 @@ namespace RevitLintelsManager.ViewModels;
 /// <summary>
 /// Основная ViewModel главного окна плагина.
 /// </summary>
-internal class MainViewModel : BaseViewModel {
-    private readonly PluginConfig _pluginConfig;
+internal class SettingsViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
@@ -23,12 +22,10 @@ internal class MainViewModel : BaseViewModel {
     private bool _hasFamilySettingsErrors;
     private FamilySettingsViewModel _familySettingsViewModel;
    
-    public MainViewModel(
-        PluginConfig pluginConfig,
+    public SettingsViewModel(
         RevitRepository revitRepository,
         ILocalizationService localizationService) {
         
-        _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
 
