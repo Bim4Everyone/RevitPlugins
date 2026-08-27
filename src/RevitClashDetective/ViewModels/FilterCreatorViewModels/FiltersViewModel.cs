@@ -23,9 +23,11 @@ using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
 using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.Resources;
+using RevitClashDetective.ViewModels.Common;
 using RevitClashDetective.ViewModels.SearchSet;
 using RevitClashDetective.ViewModels.Services;
 using RevitClashDetective.Views;
+using RevitClashDetective.Views.Common;
 
 
 namespace RevitClashDetective.ViewModels.FilterCreatorViewModels;
@@ -187,18 +189,28 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     }
 
     private void Create() {
-        var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name));
-        var view = _resolutionRoot.Get<RevitClashDetective.Views.Filters.FilterNameView>();
-        view.DataContext = newFilterName;
-        if(view.ShowDialog() == true) {
-            var newFilter = new FilterViewModel(
-                newFilterName.Name,
-                _filterProviderFactory.Create(_dataProvider));
-            Filters.Add(newFilter);
-
-            Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
-            SelectedFilter = newFilter;
+        string name = GetFilterName();
+        if(name is null) {
+            return;
         }
+
+        var newFilter = new FilterViewModel(name, _filterProviderFactory.Create(_dataProvider));
+        Filters.Add(newFilter);
+
+        Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
+        SelectedFilter = newFilter;
+    }
+
+    /// <summary>
+    /// Показывает окно ввода имени поискового набора
+    /// </summary>
+    /// <param name="currentName">Текущее имя поискового набора, если оно есть</param>
+    /// <returns>Введенное имя или null, если пользователь отменил ввод</returns>
+    private string GetFilterName(string currentName = null) {
+        var nameViewModel = new EntityNameViewModel(_localization, Filters.Select(f => f.Name), currentName);
+        var view = _resolutionRoot.Get<EntityNameView>();
+        view.DataContext = nameViewModel;
+        return view.ShowDialog() == true ? nameViewModel.Name : null;
     }
 
     private void Delete(IList selectedItems) {
@@ -225,14 +237,15 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     }
 
     private void Rename() {
-        var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name), SelectedFilter.Name);
-        var view = _resolutionRoot.Get<RevitClashDetective.Views.Filters.FilterNameView>();
-        view.DataContext = newFilterName;
-        if(view.ShowDialog() == true) {
-            SelectedFilter.Name = newFilterName.Name;
-            Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
-            SelectedFilter = Filters.FirstOrDefault(item => item.Name.Equals(newFilterName.Name, StringComparison.CurrentCultureIgnoreCase));
+        string name = GetFilterName(SelectedFilter.Name);
+        if(name is null) {
+            return;
         }
+
+        SelectedFilter.Name = name;
+        Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
+        SelectedFilter = Filters.FirstOrDefault(
+            item => item.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
     }
 
     private bool CanRename() {
@@ -240,16 +253,16 @@ internal class FiltersViewModel : BaseViewModel, IWindowClosingHandler {
     }
 
     private void Copy() {
-        var newFilterName = new FilterNameViewModel(_localization, Filters.Select(f => f.Name), SelectedFilter.Name);
-        var view = _resolutionRoot.Get<RevitClashDetective.Views.Filters.FilterNameView>();
-        view.DataContext = newFilterName;
-        if(view.ShowDialog() == true) {
-            var newFilter = new FilterViewModel(newFilterName.Name, CopyFilterProvider(SelectedFilter));
-            Filters.Add(newFilter);
-
-            Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
-            SelectedFilter = newFilter;
+        string name = GetFilterName(SelectedFilter.Name);
+        if(name is null) {
+            return;
         }
+
+        var newFilter = new FilterViewModel(name, CopyFilterProvider(SelectedFilter));
+        Filters.Add(newFilter);
+
+        Filters = new ObservableCollection<FilterViewModel>(Filters.OrderBy(item => item.Name));
+        SelectedFilter = newFilter;
     }
 
     private bool CanCopy() {

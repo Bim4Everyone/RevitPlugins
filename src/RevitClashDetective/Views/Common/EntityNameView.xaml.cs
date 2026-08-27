@@ -2,10 +2,10 @@ using System.Windows;
 
 using dosymep.SimpleServices;
 
-namespace RevitClashDetective.Views.Filters;
+namespace RevitClashDetective.Views.Common;
 
-public partial class FilterNameView {
-    public FilterNameView(
+public partial class EntityNameView {
+    public EntityNameView(
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService,
@@ -23,7 +23,7 @@ public partial class FilterNameView {
     }
 
     public override string PluginName => nameof(RevitClashDetective);
-    public override string ProjectConfigName => nameof(FilterNameView);
+    public override string ProjectConfigName => nameof(EntityNameView);
 
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;

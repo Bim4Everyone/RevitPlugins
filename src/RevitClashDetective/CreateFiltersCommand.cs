@@ -66,7 +66,7 @@ public class CreateFiltersCommand : BasePluginCommand {
                 return FiltersConfig.GetFiltersConfig(path, repo.Doc);
             });
 
-        kernel.Bind<Views.Filters.FilterNameView>()
+        kernel.Bind<Views.Common.EntityNameView>()
             .ToSelf()
             .InTransientScope();
 
