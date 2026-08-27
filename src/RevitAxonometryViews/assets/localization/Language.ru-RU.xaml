@@ -11,5 +11,9 @@
     <system:String x:Key="MainWindow.FilterParameterTooltip">Имя параметра, по которому будет выполняться фильтрация.</system:String>
     <system:String x:Key="MainWindow.VariantsString">&lt;Варианты&gt;</system:String>
     <system:String x:Key="MainWindow.EmptyName">Нет системы</system:String>
-
+    <system:String x:Key="MainWindow.WarningTitle">Предупреждение</system:String>
+    <system:String x:Key="MainWindow.SystemNameWarning" xml:space="preserve">
+ВНИМАНИЕ: Фильтры, построенные по системному параметру "Имя системы", не будут работать с вложенными в семейства элементами. 
+Используйте "{0}", если это возможно.
+    </system:String>
 </ResourceDictionary>

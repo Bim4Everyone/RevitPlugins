@@ -11,5 +11,9 @@
     <system:String x:Key="MainWindow.FilterParameterTooltip">The name of the parameter by which filtering will be performed</system:String>
     <system:String x:Key="MainWindow.VariantsString">&lt;Variants&gt;</system:String>
     <system:String x:Key="MainWindow.EmptyName">System name empty</system:String>
-   
+    <system:String x:Key="MainWindow.WarningTitle">Warning</system:String>
+    <system:String x:Key="MainWindow.SystemNameWarning" xml:space="preserve">
+WARNING: Filters based on the system parameter "System Name" will not work with elements nested in families.
+Use "{0}" whenever possible.
+    </system:String>
 </ResourceDictionary>
