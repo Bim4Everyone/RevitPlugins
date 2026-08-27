@@ -22,7 +22,7 @@ partial class Build {
                 .Replace("${{ gen.plugin_name }}", PluginName);
 
             // Параметр use-devexpress указывается только у плагинов с DevExpress,
-            // у остальных строка удаляется, чтобы в workflow работало значение по умолчанию.
+            // у остальных строка удаляется, чтобы в workflow работало значение false по умолчанию.
             content = useDevExpress
                 ? content.Replace("${{ gen.use_devexpress }}", "true")
                 : Regex.Replace(content, @"^.*\$\{\{ gen\.use_devexpress \}\}.*\r?\n", string.Empty,
