@@ -95,7 +95,9 @@ internal sealed class DraftRowsBuilder {
                     Unit = unit
                 };
 
-                string key = $"{config.Grouping}_{system}_{economicFunction}_{name}_{mark}_{code}_{maker}";
+                string key = 
+                    $"{smrParams.Block}_{smrParams.Section}_{smrParams.Floor}_{config.Grouping}_{system}"
+                    + $"_{economicFunction}_{name}_{mark}_{code}_{maker}";
                 if(!elementsByGrouping.TryGetValue(key, out List<NewRowElement> groupingElements)) {
                     groupingElements = new List<NewRowElement>();
                     elementsByGrouping[key] = groupingElements;
