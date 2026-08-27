@@ -104,14 +104,9 @@ internal class MainViewModel : BaseViewModel {
     public string SelectedCriteria {
         get => _selectedCriteria;
         set {
-            bool showSystemNameWarning = _selectedCriteria != value
-                                         && value == _axonometryConfig.SystemName;
+            string previousCriteria = _selectedCriteria;
             RaiseAndSetIfChanged(ref _selectedCriteria, value);
-            UpdateFilteredView();
-
-            if(showSystemNameWarning) {
-                ShowSystemNameWarning();
-            }
+            OnSelectedCriteriaChanged(previousCriteria);
         }
     }
 
@@ -139,10 +134,21 @@ internal class MainViewModel : BaseViewModel {
 
     private void ShowSystemNameWarning() {
         MessageBoxService.Show(
-            _localizationService.GetLocalizedString("MainWindow.SystemNameWarning"),
+            _localizationService.GetLocalizedString(
+                "MainWindow.SystemNameWarning",
+                _axonometryConfig.SharedVisSystemName),
             _localizationService.GetLocalizedString("MainWindow.WarningTitle"),
             MessageBoxButton.OK,
             MessageBoxImage.Warning);
+    }
+
+    private void OnSelectedCriteriaChanged(string previousCriteria) {
+        UpdateFilteredView();
+
+        if(previousCriteria != SelectedCriteria
+           && SelectedCriteria == _axonometryConfig.SystemName) {
+            ShowSystemNameWarning();
+        }
     }
 
     /// <summary>

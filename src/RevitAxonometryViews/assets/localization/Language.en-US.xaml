@@ -14,6 +14,6 @@
     <system:String x:Key="MainWindow.WarningTitle">Warning</system:String>
     <system:String x:Key="MainWindow.SystemNameWarning" xml:space="preserve">
 WARNING: Filters based on the system parameter "System Name" will not work with elements nested in families.
-Use "ФОП_ВИС_Имя системы" whenever possible.
+Use "{0}" whenever possible.
     </system:String>
 </ResourceDictionary>
