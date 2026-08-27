@@ -1,9 +1,12 @@
-﻿using System;
+﻿#nullable disable
+
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
 namespace dosymep.WPF.Converters {
+    [Obsolete("Используйте dosymep.WpfCore.Converters.BoolToVisibilityConverter")]
     [ValueConversion(typeof(bool), typeof(Visibility))]
     public sealed class BoolToVisibilityConverter : IValueConverter {
         public Visibility TrueValue { get; set; }
