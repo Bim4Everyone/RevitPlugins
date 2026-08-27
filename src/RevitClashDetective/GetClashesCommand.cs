@@ -47,6 +47,7 @@ public class GetClashesCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        // TODO test
         kernel.UseLogicalFilterFactory();
         kernel.UseLogicalFilterProviderFactory();
         kernel.UseFilterContextParser();

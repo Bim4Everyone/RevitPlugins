@@ -80,6 +80,7 @@ public class RevitApartmentPlansCommand : BasePluginCommand {
 
         kernel.UseWpfUIThemeUpdater();
 
+        // TODO test
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
 
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/Localization/Language.xaml",
