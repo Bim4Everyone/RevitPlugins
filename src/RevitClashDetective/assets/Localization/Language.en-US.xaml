@@ -98,9 +98,14 @@
         x:Key="ReportsResolver.CopyAndRename">Load with renaming</system:String>
 
     <system:String
-        x:Key="FilterNameView.Title">New search set name</system:String>
+        x:Key="EntityNameView.Title">Enter name</system:String>
     <system:String
-        x:Key="FilterNameView.Label">Name:</system:String>
+        x:Key="EntityNameView.Label">Name:</system:String>
+    <system:String
+        x:Key="EntityNameView.Validation.EmptyName">Enter the name.</system:String>
+    <system:String
+        x:Key="EntityNameView.Validation.DuplicatedName">This name already exists.</system:String>
+
     <system:String
         x:Key="FilterCreation.Title">Search sets</system:String>
     <system:String
@@ -135,10 +140,6 @@
         x:Key="FilterCreation.CannotSavePrompt">Unable to save current configuration, close window without saving?</system:String>
 
     <system:String
-        x:Key="FilterCreation.Validation.SetName">Enter the name of the search set.</system:String>
-    <system:String
-        x:Key="FilterCreation.Validation.DuplicatedName">A search set with this name already exists.</system:String>
-    <system:String
         xml:space="preserve"
         x:Key="FilterCreation.Validation.NotLoadedFilters">Failed to load search sets:\
 {0}
@@ -154,6 +155,10 @@ They may contain categories or parameters that are not available in this file.</
         x:Key="MainWindow.SaveAs">Save as</system:String>
     <system:String
         x:Key="MainWindow.AddCheck">Add check</system:String>
+    <system:String
+        x:Key="MainWindow.RenameCheck">Rename check</system:String>
+    <system:String
+        x:Key="MainWindow.CopyCheck">Copy check</system:String>
     <system:String
         x:Key="MainWindow.DeleteCheck">Delete check</system:String>
     <system:String
