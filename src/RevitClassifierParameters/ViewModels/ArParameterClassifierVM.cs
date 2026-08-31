@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
@@ -27,7 +28,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
     /// <summary>
     /// Стандартное наименование параметра стен на экземпляре, куда нужно заполнить тип фасада.
     /// </summary>
-    private string _facadeTypeParamName = "ФОП_Группирование";
+    private string _facadeTypeParamName = SharedParamsConfig.Instance.Grouping.Name;
     private bool _workWithMasonryCode;
     private bool _workWithRoofCode;
     private bool _workWithFacadeCode;
