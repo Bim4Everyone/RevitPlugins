@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -21,20 +22,31 @@ internal class ParamService(IRevitParamFactory revitParamFactory) {
         return symbolParams.Union(instanceParams);
     }
 
-    public IEnumerable<RevitParam> CreateRevitParams(Document document, Element element) {
-        return element
-            .GetOrderedParameters()
-            .Where(parameter => revitParamFactory.CanCreate(document, parameter.Id))
-            .Select(parameter => revitParamFactory.Create(document, parameter.Id));
-        
+    private IEnumerable<RevitParam> CreateRevitParams(Document document, Element element) {
+        return element.GetOrderedParameters()
+            .Select(parameter => TryCreateRevitParam(document, parameter))
+            .Where(revitParam => revitParam is not null);
     }
     
-    public static RevitParam GetLintelParam(RevitFamily revitLintelFamily, string paramName, StorageType storageType) {
+    private RevitParam TryCreateRevitParam(Document document, Parameter parameter) {
+        if(!revitParamFactory.CanCreate(document, parameter.Id)) {
+            return null;
+        }
+
+        try {
+            return revitParamFactory.Create(document, parameter.Id);
+        } catch(ArgumentOutOfRangeException) {
+            return null;
+        }
+    }
+    
+    
+    public RevitParam GetLintelParam(RevitFamily revitLintelFamily, string paramName, StorageType storageType) {
         return revitLintelFamily.OrderedParams
             .FirstOrDefault(param => param.Name.Equals(paramName) && param.StorageType == storageType);
     }
     
-    public static RevitParam GetOpeningParam(RevitFamily[] revitOpeningFamilies, string paramName, StorageType storageType) {
+    public RevitParam GetOpeningParam(RevitFamily[] revitOpeningFamilies, string paramName, StorageType storageType) {
         if (revitOpeningFamilies == null || revitOpeningFamilies.Length == 0) {
             return null;
         }

@@ -1,8 +1,12 @@
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Threading;
+
+using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 
+using RevitLintelsManager.ViewModels;
 using RevitLintelsManager.Views.Pages;
 
 using Wpf.Ui.Abstractions;
@@ -37,7 +41,6 @@ public partial class SettingsWindow {
             _rootNavigationView.Navigate(typeof(FamilySettingsPage));
         });
     }
-
     
     public override string PluginName => nameof(RevitLintelsManager);
     

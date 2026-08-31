@@ -39,7 +39,7 @@ internal class RevitSettings : ProjectSettings {
     public LintelManagerSettings LintelManagerSettings { get; set; }
 }
 
-internal class SystemPluginConfig {
+public class SystemPluginConfig {
     // Коллекция категорий допустимых семейств перемычек
     public readonly IEnumerable<BuiltInCategory> DefaultLintelCats = [
         BuiltInCategory.OST_GenericModel
@@ -58,8 +58,8 @@ internal class SystemPluginConfig {
     public string LintelLeftOffsetParamName  => "Опирание слева";
     public string LintelRightCornerParamName  => "Уголок справа";
     public string LintelLeftCornerParamName  => "Уголок слева";
-    public string LintelRightWeldingParamName  => "Крепления на металл справа";
-    public string LintelLeftWeldingParamName  => "Крепления на металл слева";
+    public string LintelRightWeldingParamName  => "Крепление на металл справа";
+    public string LintelLeftWeldingParamName  => "Крепление на металл слева";
     public IEnumerable<string> DefaultOpeningFamilyNames  => [
         "Двр_Двр_Однп", 
         "Двр_Двр_Двуп",

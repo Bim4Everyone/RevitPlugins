@@ -14,7 +14,9 @@ namespace RevitLintelsManager.ViewModels;
 /// </summary>
 internal class SettingsViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly ILocalizationService _localizationService;
+    private readonly LintelManagerConfig _lintelManagerConfig;
 
     private string _errorText;
     private string _saveProperty;
@@ -24,10 +26,14 @@ internal class SettingsViewModel : BaseViewModel {
    
     public SettingsViewModel(
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
+        SystemPluginConfig systemPluginConfig,
+        ILocalizationService localizationService,
+        LintelManagerConfig lintelManagerConfig) {
         
         _revitRepository = revitRepository;
+        _systemPluginConfig = systemPluginConfig;
         _localizationService = localizationService;
+        _lintelManagerConfig = lintelManagerConfig;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -60,7 +66,7 @@ internal class SettingsViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
         
-        FamilySettingsViewModel = new FamilySettingsViewModel(_revitRepository, _localizationService);
+        FamilySettingsViewModel = new FamilySettingsViewModel(_revitRepository, _systemPluginConfig, _localizationService);
     }
     
     private void AcceptView() {

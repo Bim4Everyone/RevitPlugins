@@ -4,7 +4,7 @@ namespace RevitLintelsManager.Views.Edits;
 
 public partial class ItemControl {
 
-    public static readonly DependencyProperty SlabNameProperty = DependencyProperty.Register(
+    public static readonly DependencyProperty ItemNameProperty = DependencyProperty.Register(
         nameof(ItemName), typeof(string), typeof(ItemControl), new PropertyMetadata(default(string)));
 
     public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register(
@@ -16,8 +16,8 @@ public partial class ItemControl {
     }
 
     public string ItemName {
-        get => (string) GetValue(SlabNameProperty);
-        set => SetValue(SlabNameProperty, value);
+        get => (string) GetValue(ItemNameProperty);
+        set => SetValue(ItemNameProperty, value);
     }
 
     public bool IsChecked {

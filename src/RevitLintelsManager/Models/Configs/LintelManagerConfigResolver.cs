@@ -14,7 +14,7 @@ internal class LintelManagerConfigResolver {
     
     private readonly ParamService _paramService;
     
-    internal LintelManagerConfigResolver(
+    public LintelManagerConfigResolver(
         RevitRepository revitRepository, 
         LintelConfigRuleResolver lintelConfigRuleResolver,
         ParamService paramService) {
@@ -57,14 +57,14 @@ internal class LintelManagerConfigResolver {
         if(revitLintelFamily is not null) {
             return new LintelFamilyConfig {
                 RevitLintelFamily = revitLintelFamily,
-                LintelWidth = ParamService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelWidth, StorageType.Double),
-                LintelThickness = ParamService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelThickness, StorageType.Double),
-                LintelRightOffset = ParamService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelRightOffset, StorageType.Double),
-                LintelLeftOffset = ParamService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelLeftOffset, StorageType.Double),
-                LintelRightCorner = ParamService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelRightCorner, StorageType.Double),
-                LintelLeftCorner = ParamService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelLeftCorner, StorageType.Double),
-                LintelRightWelding = ParamService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelRightWelding, StorageType.Double),
-                LintelLeftWelding = ParamService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelLeftWelding, StorageType.Double)
+                LintelWidth = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelWidth, StorageType.Double),
+                LintelThickness = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelThickness, StorageType.Double),
+                LintelRightOffset = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelRightOffset, StorageType.Double),
+                LintelLeftOffset = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelLeftOffset, StorageType.Double),
+                LintelRightCorner = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelRightCorner, StorageType.Double),
+                LintelLeftCorner = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelLeftCorner, StorageType.Double),
+                LintelRightWelding = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelRightWelding, StorageType.Double),
+                LintelLeftWelding = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelLeftWelding, StorageType.Double)
             };
         }
         return null;
@@ -84,8 +84,8 @@ internal class LintelManagerConfigResolver {
         if(revitOpeningFamilyInstances.Length != 0) {
             return new OpeningFamilyConfig {
                 RevitOpeningFamily = revitOpeningFamilyInstances,
-                LintelOpeningHeight = ParamService.GetOpeningParam(revitOpeningFamilyInstances, openingFamilySettings.LintelOpeningHeight, StorageType.Double),
-                LintelOpeningWidth = ParamService.GetOpeningParam(revitOpeningFamilyInstances, openingFamilySettings.LintelOpeningWidth, StorageType.Double)
+                LintelOpeningHeight = _paramService.GetOpeningParam(revitOpeningFamilyInstances, openingFamilySettings.LintelOpeningHeight, StorageType.Double),
+                LintelOpeningWidth = _paramService.GetOpeningParam(revitOpeningFamilyInstances, openingFamilySettings.LintelOpeningWidth, StorageType.Double)
             };
         }
         return null;

@@ -1,4 +1,8 @@
-﻿using dosymep.SimpleServices;
+﻿using System.Windows.Data;
+
+using Autodesk.Revit.DB;
+
+using dosymep.SimpleServices;
 
 using RevitLintelsManager.ViewModels;
 

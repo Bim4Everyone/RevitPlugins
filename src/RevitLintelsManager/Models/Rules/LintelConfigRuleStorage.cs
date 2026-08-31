@@ -13,7 +13,7 @@ public class LintelConfigRuleStorage {
     private readonly ILoggerService _loggerService;
     private readonly SystemPluginConfig _systemPluginConfig;
 
-    internal LintelConfigRuleStorage(ILoggerService loggerService, SystemPluginConfig systemPluginConfig) {
+    public LintelConfigRuleStorage(ILoggerService loggerService, SystemPluginConfig systemPluginConfig) {
         _loggerService = loggerService;
         _systemPluginConfig = systemPluginConfig;
     }

@@ -12,7 +12,7 @@ public class LintelConfigRuleResolver {
     private readonly LintelConfigRuleSerializer _lintelConfigRuleSerializer;
     private readonly LintelConfigRuleValidator _lintelConfigRuleValidator;
     
-    internal LintelConfigRuleResolver(
+    public LintelConfigRuleResolver(
         ILoggerService loggerService,
         LintelConfigRuleStorage lintelConfigRuleStorage, 
         LintelConfigRuleSerializer lintelConfigRuleSerializer,

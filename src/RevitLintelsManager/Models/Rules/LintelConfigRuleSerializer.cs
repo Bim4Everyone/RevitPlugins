@@ -8,7 +8,7 @@ namespace RevitLintelsManager.Models.Rules;
 public class LintelConfigRuleSerializer {
     private readonly IConfigSerializer _serializer;
     
-    internal LintelConfigRuleSerializer(IConfigSerializer serializer) {
+    public LintelConfigRuleSerializer(IConfigSerializer serializer) {
         _serializer = serializer;
     }
 

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace RevitLintelsManager.Models.Rules;
 
-internal class LintelConfigRuleValidator {
+public class LintelConfigRuleValidator {
     
     public bool Validate(LintelConfigRule templateConfigRule, LintelConfigRule configRule) {
         if(templateConfigRule is null || configRule is null) {

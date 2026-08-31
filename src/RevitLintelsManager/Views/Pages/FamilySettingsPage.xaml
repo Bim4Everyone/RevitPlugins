@@ -31,7 +31,7 @@
                     
                     <ScrollViewer
                         Grid.Column="0"
-                        MaxHeight="300">
+                        MaxHeight="350">
                         
                         <ListBox
                             ItemsSource="{Binding LintelFamilyViewModels}"
@@ -82,8 +82,58 @@
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                         </ListBox>
-                        
                     </ScrollViewer>
+                    
+                    <StackPanel
+                        Grid.Column="1">
+                        <edits:ComboBoxControl
+                            WidthTextBlock="250"
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelWidthParamLabel}" 
+                            ItemsSource="{Binding LintelParametersDouble}"
+                            SelectedValue="{Binding SelectedLintelWidthParam}"/>
+                        
+                        <edits:ComboBoxControl
+                            WidthTextBlock="250"
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelThicknessParamLabel}" 
+                            ItemsSource="{Binding LintelParametersDouble}"
+                            SelectedValue="{Binding SelectedLintelThicknessParam}"/>
+                        
+                        <edits:ComboBoxControl
+                            WidthTextBlock="250"
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelRightOffsetParamLabel}" 
+                            ItemsSource="{Binding LintelParametersDouble}"
+                            SelectedValue="{Binding SelectedLintelRightOffsetParam}"/>
+                        
+                        <edits:ComboBoxControl
+                            WidthTextBlock="250"
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelLeftOffsetParamLabel}" 
+                            ItemsSource="{Binding LintelParametersDouble}"
+                            SelectedValue="{Binding SelectedLintelLeftOffsetParam}"/>
+                        
+                        <edits:ComboBoxControl
+                            WidthTextBlock="250"
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelRightCornerParamLabel}" 
+                            ItemsSource="{Binding LintelParametersInteger}"
+                            SelectedValue="{Binding SelectedLintelRightCornerParam}"/>
+                        
+                        <edits:ComboBoxControl
+                            WidthTextBlock="250"
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelLeftCornerParamLabel}" 
+                            ItemsSource="{Binding LintelParametersInteger}"
+                            SelectedValue="{Binding SelectedLintelLeftCornerParam}"/>
+                        
+                        <edits:ComboBoxControl
+                            WidthTextBlock="250"
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelRightWeldingParamLabel}"
+                            ItemsSource="{Binding LintelParametersInteger}"
+                            SelectedValue="{Binding SelectedLintelRightWeldingParam}"/>
+                        
+                        <edits:ComboBoxControl
+                            WidthTextBlock="250"
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelLeftWeldingParamLabel}" 
+                            ItemsSource="{Binding LintelParametersInteger}"
+                            SelectedValue="{Binding SelectedLintelLeftWeldingParam}"/>
+                    </StackPanel>
                 </Grid>
                 
             </edits:CustomGroupEditControl.EditControl>
@@ -126,14 +176,24 @@
                         </ItemsControl>
                         
                     </ScrollViewer>
+                    
+                    <StackPanel
+                        Grid.Column="1">
+                        <edits:ComboBoxControl
+                            WidthTextBlock="250"
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.OpeningHeightParamLabel}" 
+                            ItemsSource="{Binding OpeningParameters}"
+                            SelectedValue="{Binding SelectedOpeningHeightParam}"/>
+                        
+                        <edits:ComboBoxControl
+                            WidthTextBlock="250"
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.OpeningWidthParamLabel}" 
+                            ItemsSource="{Binding OpeningParameters}"
+                            SelectedValue="{Binding SelectedOpeningWidthParam}"/>
+                    </StackPanel>
                 </Grid>
-                
             </edits:CustomGroupEditControl.EditControl>
         </edits:CustomGroupEditControl>
-            
-            
         </StackPanel>
-        
-        
     </ScrollViewer>
 </core:WpfUIPlatformPage>

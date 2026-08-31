@@ -6,9 +6,25 @@
     <system:String x:Key="MainWindow.Title">Настройки менеджера перемычек</system:String>
     <system:String x:Key="MainWindow.FamilySettings">Настройки семейств</system:String>
     
-    <system:String x:Key="FamilySettingsPage.LintelFamilies">Соответствие параметров плагина и перемычки </system:String>
-    <system:String x:Key="FamilySettingsPage.OpeningFamilies">Соответствие параметров плагина и проемов </system:String>
+    <system:String x:Key="FamilySettingsPage.LintelFamilies">Соответствие параметров плагина и перемычки</system:String>
+    <system:String x:Key="FamilySettingsPage.OpeningFamilies">Соответствие параметров плагина и проемов</system:String>
     
+    <system:String x:Key="FamilySettingsPage.LintelWidthParamLabel">Ширина перемычки</system:String>
+    <system:String x:Key="FamilySettingsPage.LintelThicknessParamLabel">Толщина перемычки</system:String>
+    <system:String x:Key="FamilySettingsPage.LintelRightOffsetParamLabel">Опирание справа</system:String>
+    <system:String x:Key="FamilySettingsPage.LintelLeftOffsetParamLabel">Опирание слева</system:String>
+    <system:String x:Key="FamilySettingsPage.LintelRightCornerParamLabel">Уголок справа</system:String>
+    <system:String x:Key="FamilySettingsPage.LintelLeftCornerParamLabel">Уголок слева</system:String>
+    <system:String x:Key="FamilySettingsPage.LintelRightWeldingParamLabel">Крепление на металл справа</system:String>
+    <system:String x:Key="FamilySettingsPage.LintelLeftWeldingParamLabel">Крепление на металл слева</system:String>
+    
+    <system:String x:Key="FamilySettingsPage.OpeningHeightParamLabel">Высота проема</system:String>
+    <system:String x:Key="FamilySettingsPage.OpeningWidthParamLabel">Ширина проема</system:String>
+    
+    
+    <system:String x:Key="FamilySettingsViewModel.ParamNoSelect">&lt; Параметр не выбран &gt;</system:String>
+    <system:String x:Key="FamilySettingsViewModel.NoLintelFamilies">&lt; Семейства перемычек отсутствует &gt;</system:String>
+    <system:String x:Key="FamilySettingsViewModel.NoOpeningFamilies">&lt; Семейства проемов отсутствует &gt;</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">Сохранить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
