@@ -157,7 +157,8 @@ internal class MepCategoryViewModel : BaseViewModel {
             return string.Format(_localizationService.GetLocalizedString(
                 "SleevePlacementSettings.Validation.FilterIsEmpty"), categoryName);
         }
-        return string.Join(Environment.NewLine, errors.Select(e => e.Message));
+        return string.Format(_localizationService.GetLocalizedString(
+            "SleevePlacementSettings.Validation.FilterError"), categoryName, errors[0].Message);
     }
 
     private void AddDiameterRange() {
