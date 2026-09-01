@@ -7,8 +7,7 @@
     xmlns:base="clr-namespace:dosymep.WPF.Views"
     xmlns:local="clr-namespace:RevitSleeves.Views.Settings"
     xmlns:vms="clr-namespace:RevitSleeves.ViewModels.Settings"
-    xmlns:filterViewModel="clr-namespace:RevitSleeves.ViewModels.Filtration"
-    xmlns:filterView="clr-namespace:RevitSleeves.Views.Filtration"
+    xmlns:filtration="clr-namespace:Bim4Everyone.RevitFiltration.Controls.Views;assembly=Bim4Everyone.RevitFiltration.Controls"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:b="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
@@ -216,8 +215,10 @@
                             <ScrollViewer
                                 x:Name="MepFilter"
                                 DockPanel.Dock="Bottom">
-                                <filterView:SetView
-                                    DataContext="{Binding PipeSettings.MepFilterViewModel}" />
+                                <filtration:PresetCategoriesFilterControl
+                                    LogicalFilterProvider="{Binding PipeSettings.MepFilterProvider}"
+                                    LanguageService="{Binding PipeSettings.LanguageService}"
+                                    LocalizationService="{Binding PipeSettings.LocalizationService}" />
                             </ScrollViewer>
                         </DockPanel>
                     </Border>
