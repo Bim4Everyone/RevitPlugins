@@ -4,9 +4,10 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using Bim4Everyone.RevitFiltration.Controls;
+
 using RevitClashDetective.Models.ClashDetection;
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.FilterModel;
 
 using RevitSleeves.Models;
 using RevitSleeves.Services.Core;
@@ -20,8 +21,9 @@ internal abstract class MepOpeningCollisionFinder : MepStructureCollisionFinder 
         RevitRepository revitRepository,
         IMepElementsProvider mepElementsProvider,
         IStructureLinksProvider structureLinksProvider,
-        IOpeningGeometryProvider openingGeometryProvider)
-        : base(revitRepository, mepElementsProvider, structureLinksProvider) {
+        IOpeningGeometryProvider openingGeometryProvider,
+        IFilterContextParser filterContextParser)
+        : base(revitRepository, mepElementsProvider, structureLinksProvider, filterContextParser) {
 
         _openingGeometryProvider = openingGeometryProvider
             ?? throw new ArgumentNullException(nameof(openingGeometryProvider));
@@ -29,21 +31,21 @@ internal abstract class MepOpeningCollisionFinder : MepStructureCollisionFinder 
 
 
     /// <summary>
-    /// Находит коллизии между элементами ВИС из активного файла 
+    /// Находит коллизии между элементами ВИС из активного файла
     /// и чистовыми отверстиями из связей в заданных конструкциях
     /// </summary>
     /// <param name="mepCategory">Категория элементов ВИС</param>
-    /// <param name="mepFilterSet">Фильтр элементов ВИС</param>
+    /// <param name="mepFilterContext">Сериализованный контекст фильтра элементов ВИС</param>
     /// <param name="structureCategory">Категория элементов конструкций, в которых находятся отверстия</param>
-    /// <param name="structureFilterSet">Фильтр конструкций, в которых находятся отверстия</param>
+    /// <param name="structureFilterContext">Сериализованный контекст фильтра конструкций, в которых находятся отверстия</param>
     /// <returns>Коллизии между элементами ВИС из активного файла и чистовыми отверстиями из связей</returns>
     protected ICollection<ClashModel> FindOpeningClashes(
         BuiltInCategory mepCategory,
-        Set mepFilterSet,
+        string mepFilterContext,
         BuiltInCategory structureCategory,
-        Set structureFilterSet) {
+        string structureFilterContext) {
 
-        var mepProvider = GetMepFilterProvider(mepCategory, mepFilterSet);
+        var mepProvider = GetMepFilterProvider(mepCategory, mepFilterContext);
         var structureLinks = _structureLinksProvider.GetLinks();
         if(structureLinks.Count == 0) {
             return Array.Empty<ClashModel>();
@@ -51,7 +53,7 @@ internal abstract class MepOpeningCollisionFinder : MepStructureCollisionFinder 
         var openingProviders = GetOpeningsProviders(
             structureLinks,
             structureCategory,
-            structureFilterSet,
+            structureFilterContext,
             _structureLinksProvider.GetOpeningFamilyNames());
 
         return [.. new ClashDetector(_revitRepository.GetClashRevitRepository(), [mepProvider], openingProviders)
@@ -61,19 +63,14 @@ internal abstract class MepOpeningCollisionFinder : MepStructureCollisionFinder 
     protected ICollection<OpeningsFilterProvider> GetOpeningsProviders(
         ICollection<RevitLinkInstance> structureLinks,
         BuiltInCategory structureCategory,
-        Set structureFilterSet,
+        string structureFilterContext,
         string[] openingFamilyNames) {
 
-        var clashRepo = _revitRepository.GetClashRevitRepository();
+        var filterContext = ParseFilterContext(structureFilterContext, structureCategory);
 
-        var structureFilter = new Filter(clashRepo) {
-            CategoryIds = [new ElementId(structureCategory)],
-            Name = structureCategory.ToString(),
-            Set = structureFilterSet
-        };
         return [.. structureLinks.Select(link => new OpeningsFilterProvider(
             link.GetLinkDocument(),
-            structureFilter,
+            filterContext,
             link.GetTransform(),
             openingFamilyNames,
             _openingGeometryProvider))];
