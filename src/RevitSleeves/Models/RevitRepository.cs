@@ -16,8 +16,6 @@ using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Placing;
 using RevitSleeves.Services.Core;
 
-using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
-
 namespace RevitSleeves.Models;
 
 internal class RevitRepository {
@@ -50,10 +48,6 @@ internal class RevitRepository {
 
     public View3D GetSleeve3dView() {
         return _sleeve3dView;
-    }
-
-    public IList<ParameterValueProvider> GetParameters(Document doc, Category category) {
-        return _clashRepository.GetParameters(doc, [category]);
     }
 
     public RevitClashDetective.Models.RevitRepository GetClashRevitRepository() {
