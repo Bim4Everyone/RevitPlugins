@@ -1,3 +1,5 @@
+using System.IO;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
@@ -68,4 +70,33 @@ internal class RevitSettings : ProjectSettings {
     public bool WorkWithFacadeCode { get; set; }
     public bool WorkWithFacadeType { get; set; }
     public string ParamNameForFacadeType { get; set; }
+}
+
+/// <summary>
+/// Системная конфигурация плагина.
+/// Содержит стандартные данные, которые некорректно хранить в конфигурации проекта.
+/// </summary>
+internal class SystemPluginConfig {
+    // Основная папка с ресурсами надстройки
+    private readonly string _mainFolder =
+        @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101";
+
+    // Папка с файлом Классификатора
+    private readonly string _classifierDirectory =
+        @"W:\Проектный институт\Проектные Группы\Типовые ТЗ\BIM-стандарт A101";
+
+    /// <summary>
+    /// Стандартный путь к файлу правил заполнения типа фасада.
+    /// </summary>
+    public string FacadeTypeFilePath => Path.Combine(
+        _mainFolder,
+        ModuleEnvironment.RevitVersion,
+        "RevitClassifierParameters",
+        "Правила заполнения типа фасада.xlsx");
+
+    /// <summary>
+    /// Стандартная папка с файлом Классификатора,
+    /// открываемая по умолчанию в диалоге выбора файла.
+    /// </summary>
+    public string ClassifierDirectoryPath => _classifierDirectory;
 }

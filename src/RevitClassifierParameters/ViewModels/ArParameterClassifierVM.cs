@@ -47,17 +47,17 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         ClassifierExcelReader classifierExcelReader,
         FacadeTypeExcelReader facadeTypeExcelReader,
         FacadeTypeSetter facadeTypeSetter,
+        SystemPluginConfig systemPluginConfig,
         ReportV reportV,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) :
         base(pluginConfig, revitRepository, localizationService, workGroupCode, materialParamSetter, materialReportService,
-            classifierExcelReader, facadeTypeExcelReader, reportV, openFileDialogService, messageBoxService) {
+            classifierExcelReader, facadeTypeExcelReader, systemPluginConfig, reportV, openFileDialogService,
+            messageBoxService) {
 
         _facadeTypeSetter = facadeTypeSetter;
 
-        _excelFacadeTypePath =
-            @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\"
-            + $@"{_revitRepository.Application.VersionNumber}\RevitClassifierParameters\Правила заполнения типа фасада.xlsx";
+        _excelFacadeTypePath = _systemPluginConfig.FacadeTypeFilePath;
 
         ReadFacadeTypeExcelCommand = RelayCommand.Create(RereadFacadeTypeExcel);
     }

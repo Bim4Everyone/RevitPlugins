@@ -82,6 +82,11 @@ public class RevitArParameterClassifierCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        // Системная конфигурация плагина
+        kernel.Bind<SystemPluginConfig>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Настройка окна отчёта
         kernel.Bind<ReportVM>()
             .ToSelf()

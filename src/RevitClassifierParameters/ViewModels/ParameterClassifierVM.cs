@@ -27,18 +27,13 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     protected readonly MaterialReportService _materialReportService;
     protected readonly ClassifierExcelReader _classifierExcelReader;
     protected readonly FacadeTypeExcelReader _facadeTypeExcelReader;
+    protected readonly SystemPluginConfig _systemPluginConfig;
     protected readonly ReportV _reportV;
 
     private string _errorText;
     private List<WorkGroup> _currentClassifierWorks;
     private List<Material> _materialInPj;
     protected string _excelClassifierPath;
-
-    /// <summary>
-    /// Стандартная папка с файлом Классификатора, открываемая по умолчанию в диалоге выбора файла.
-    /// </summary>
-    private const string _excelClassifierDirectoryPath =
-        @"W:\Проектный институт\Проектные Группы\Типовые ТЗ\BIM-стандарт A101";
 
     protected ParameterClassifierVM(
         PluginConfig pluginConfig,
@@ -49,6 +44,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         MaterialReportService materialReportService,
         ClassifierExcelReader classifierExcelReader,
         FacadeTypeExcelReader facadeTypeExcelReader,
+        SystemPluginConfig systemPluginConfig,
         ReportV reportV,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) {
@@ -62,6 +58,7 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
         _materialReportService = materialReportService;
         _classifierExcelReader = classifierExcelReader;
         _facadeTypeExcelReader = facadeTypeExcelReader;
+        _systemPluginConfig = systemPluginConfig;
         _reportV = reportV;
 
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
@@ -100,8 +97,9 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     }
 
     private void RereadClassifierExcel() {
-        if(Directory.Exists(_excelClassifierDirectoryPath)) {
-            OpenFileDialogService.InitialDirectory = _excelClassifierDirectoryPath;
+        string classifierDirectory = _systemPluginConfig.ClassifierDirectoryPath;
+        if(Directory.Exists(classifierDirectory)) {
+            OpenFileDialogService.InitialDirectory = classifierDirectory;
         }
 
         OpenFileDialogService.Title = _localizationService.GetLocalizedString("MainWindow.SelectClassifierFile");
