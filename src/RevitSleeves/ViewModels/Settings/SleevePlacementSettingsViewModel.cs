@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Input;
 
+using Bim4Everyone.RevitFiltration.Controls;
+
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -10,12 +12,9 @@ using dosymep.WPF.ViewModels;
 
 using pyRevitLabs.Json;
 
-using RevitClashDetective.Models.FilterModel;
-
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Services.Settings;
-using RevitSleeves.ViewModels.Filtration;
 
 namespace RevitSleeves.ViewModels.Settings;
 
@@ -23,6 +22,9 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
     private readonly SleevePlacementSettingsConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
+    private readonly ILogicalFilterProviderFactory _filterProviderFactory;
+    private readonly IFilterContextParser _filterContextParser;
     private readonly IConfigSerializer _configSerializer;
     private readonly IFilterChecker _filterChecker;
     private MepCategoryViewModel _activeMepCategorySettings;
@@ -34,6 +36,9 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
         SleevePlacementSettingsConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
+        ILanguageService languageService,
+        ILogicalFilterProviderFactory filterProviderFactory,
+        IFilterContextParser filterContextParser,
         IMessageBoxService messageBoxService,
         ISaveFileDialogService saveFileDialogService,
         IOpenFileDialogService openFileDialogService,
@@ -45,6 +50,12 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
             ?? throw new ArgumentNullException(nameof(revitRepository));
         _localizationService = localizationService
             ?? throw new ArgumentNullException(nameof(localizationService));
+        _languageService = languageService
+            ?? throw new ArgumentNullException(nameof(languageService));
+        _filterProviderFactory = filterProviderFactory
+            ?? throw new ArgumentNullException(nameof(filterProviderFactory));
+        _filterContextParser = filterContextParser
+            ?? throw new ArgumentNullException(nameof(filterContextParser));
         _configSerializer = _pluginConfig.Serializer;
         MessageBoxService = messageBoxService
             ?? throw new ArgumentNullException(nameof(messageBoxService));
@@ -142,6 +153,9 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
         PipeSettings = new MepCategoryViewModel(
             _revitRepository,
             _localizationService,
+            _languageService,
+            _filterProviderFactory,
+            _filterContextParser,
             config.PipeSettings);
         Name = config.Name;
         ShowPlacingErrors = config.ShowPlacingErrors;
@@ -214,24 +228,19 @@ internal class SleevePlacementSettingsViewModel : BaseViewModel {
     }
 
     private void ShowMepFilter() {
-        ShowFilter(PipeSettings.MepFilterViewModel);
+        ShowFilter(PipeSettings.MepFilterProvider);
     }
 
     private void ShowWallsFilter() {
-        ShowFilter(PipeSettings.WallSettings.StructureFilterViewModel);
+        ShowFilter(PipeSettings.WallSettings.FilterProvider);
     }
 
     private void ShowFloorsFilter() {
-        ShowFilter(PipeSettings.FloorSettings.StructureFilterViewModel);
+        ShowFilter(PipeSettings.FloorSettings.FilterProvider);
     }
 
-    private void ShowFilter(SetViewModel setViewModel) {
+    private void ShowFilter(ILogicalFilterProvider filterProvider) {
         SaveConfig();
-        var filter = new Filter(_revitRepository.GetClashRevitRepository()) {
-            CategoryIds = [setViewModel.CategoryInfo.Category.Id],
-            Name = setViewModel.CategoryInfo.Name,
-            Set = setViewModel.GetSet()
-        };
-        _filterChecker.ShowFilter(filter);
+        _filterChecker.ShowFilter(filterProvider.GetFilter());
     }
 }

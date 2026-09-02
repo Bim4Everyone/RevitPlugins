@@ -1,35 +1,43 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Windows.Input;
 
-using dosymep.Revit;
+using Bim4Everyone.RevitFiltration.Controls;
+
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitClashDetective.Models.FilterModel;
-
 using RevitSleeves.Models;
 using RevitSleeves.Services.Core;
 
+using DocInfo = RevitClashDetective.Models.DocInfo;
+
 namespace RevitSleeves.ViewModels.Filtration;
-internal abstract class FilterViewModel : BaseViewModel {
-    protected readonly RevitRepository _revitRepository;
-    protected readonly Filter _filter;
+
+internal class FilterViewModel : BaseViewModel {
+    private readonly RevitRepository _revitRepository;
+    private readonly ILogicalFilterContext _filterContext;
+    private readonly ICollection<DocInfo> _searchTargets;
     private SearchSetViewModel _activeSearchSet;
     private bool _inverted;
 
-    /// <summary>
-    /// Базовый конструктор, после вызова конструктора необходимо вызвать метод <see cref="Initialize"/>
-    /// </summary>
-    protected FilterViewModel(RevitRepository revitRepository, Filter filter, IMessageBoxService messageBoxService) {
+    public FilterViewModel(
+        RevitRepository revitRepository,
+        ILogicalFilterContext filterContext,
+        ICollection<DocInfo> searchTargets,
+        IMessageBoxService messageBoxService) {
+
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        _filter = filter ?? throw new ArgumentNullException(nameof(filter));
+        _filterContext = filterContext ?? throw new ArgumentNullException(nameof(filterContext));
+        _searchTargets = searchTargets ?? throw new ArgumentNullException(nameof(searchTargets));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
 
         InversionChangedCommand = RelayCommand.Create(InversionChanged);
         CloseCommand = RelayCommand.Create(Close);
         ShowSetCommand = RelayCommand.Create(ShowSet);
+
+        Initialize();
     }
 
 
@@ -56,34 +64,27 @@ internal abstract class FilterViewModel : BaseViewModel {
     private SearchSetViewModel InvertedSearchSet { get; set; }
 
 
-    public void Initialize() {
-        StraightSearchSet = GetStraightSearchSet();
-        InvertedSearchSet = GetInvertedSearchSet();
+    private void Initialize() {
+        StraightSearchSet = new SearchSetViewModel(_revitRepository, _filterContext, _searchTargets, inverted: false);
+        InvertedSearchSet = new SearchSetViewModel(_revitRepository, _filterContext, _searchTargets, inverted: true);
         ActiveSearchSet = StraightSearchSet;
     }
 
-    protected abstract SearchSetViewModel GetStraightSearchSet();
-
-    protected abstract SearchSetViewModel GetInvertedSearchSet();
-
     private void ShowSet() {
-        SearchSetViewModel invertedSet;
+        SearchSetViewModel setToHide;
         if(Inverted) {
-            invertedSet = StraightSearchSet;
+            setToHide = StraightSearchSet;
         } else {
-            invertedSet = InvertedSearchSet;
+            setToHide = InvertedSearchSet;
         }
-        HideSet(invertedSet);
+        HideSet(setToHide);
     }
 
     private void HideSet(SearchSetViewModel setToHide) {
         try {
             _revitRepository.GetClashRevitRepository().ShowElements(
-                setToHide.Filter.GetRevitFilter(_revitRepository.Document, setToHide.FilterGenerator),
-                setToHide.Filter
-                    .CategoryIds
-                    .Select(c => c.AsBuiltInCategory())
-                    .ToHashSet());
+                setToHide.GetRevitFilter(),
+                setToHide.GetCategories());
         } catch(InvalidOperationException ex) {
             MessageBoxService.Show(
                 ex.Message,
