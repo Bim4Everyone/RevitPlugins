@@ -12,6 +12,10 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration;
+using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
@@ -80,6 +84,10 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
+        kernel.UseFilterContextParser();
+
         kernel.Bind<LinksSelectorViewModel>()
             .ToSelf()
             .InTransientScope();
@@ -96,13 +104,21 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
         var revitRepository = kernel.Get<RevitRepository>();
-        PlaceOpeningTasks(uiApplication, revitRepository, kernel.Get<ILocalizationService>(), Array.Empty<ElementId>());
+        PlaceOpeningTasks(
+            uiApplication,
+            revitRepository,
+            kernel.Get<ILocalizationService>(),
+            kernel.Get<ILogicalFilterFactory>(),
+            kernel.Get<IFilterContextParser>(),
+            Array.Empty<ElementId>());
     }
 
     private protected void PlaceOpeningTasks(
         UIApplication uiApplication,
         RevitRepository revitRepository,
         ILocalizationService localization,
+        ILogicalFilterFactory filterFactory,
+        IFilterContextParser filterContextParser,
         ElementId[] mepElements) {
 
         _duplicatedInstancesToRemoveIds.Clear();
@@ -114,7 +130,8 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         }
         var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
         if(openingConfig.Categories.Count > 0) {
-            var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
+            var placementConfigurator = new PlacementConfigurator(
+                revitRepository, openingConfig.Categories, filterFactory, filterContextParser);
             var placers = placementConfigurator.GetPlacersMepOutcomingTasks(mepElements)
                                                .ToList();
             uiApplication.Application.FailuresProcessing += FailureProcessor;

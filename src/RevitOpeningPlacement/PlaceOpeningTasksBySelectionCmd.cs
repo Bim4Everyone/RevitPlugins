@@ -4,6 +4,10 @@ using System.Reflection;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration;
+using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
@@ -51,6 +55,10 @@ internal class PlaceOpeningTasksBySelectionCmd : PlaceOpeningTasksCmd {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
+        kernel.UseFilterContextParser();
+
         kernel.UseWpfUIThemeUpdater();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
@@ -62,6 +70,12 @@ internal class PlaceOpeningTasksBySelectionCmd : PlaceOpeningTasksCmd {
         var selectedMepElements = revitRepository
             .PickMepElements(OpeningConfig.GetOpeningConfig(revitRepository.Doc).Categories);
 
-        PlaceOpeningTasks(uiApplication, revitRepository, kernel.Get<ILocalizationService>(), selectedMepElements);
+        PlaceOpeningTasks(
+            uiApplication,
+            revitRepository,
+            kernel.Get<ILocalizationService>(),
+            kernel.Get<ILogicalFilterFactory>(),
+            kernel.Get<IFilterContextParser>(),
+            selectedMepElements);
     }
 }

@@ -8,6 +8,8 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
@@ -54,6 +56,8 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
         kernel.Bind<RevitClashDetective.Models.RevitRepository>()
             .ToSelf()
             .InSingletonScope();

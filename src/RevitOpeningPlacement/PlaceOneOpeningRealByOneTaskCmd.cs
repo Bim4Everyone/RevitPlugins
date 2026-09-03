@@ -5,6 +5,8 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
@@ -48,6 +50,8 @@ public class PlaceOneOpeningRealByOneTaskCmd : OpeningRealPlacerCmd {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
         kernel.Bind<RevitClashDetective.Models.RevitRepository>()
             .ToSelf()
             .InSingletonScope();

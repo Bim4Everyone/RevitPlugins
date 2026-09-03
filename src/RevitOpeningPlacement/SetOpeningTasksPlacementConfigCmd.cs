@@ -6,6 +6,8 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
@@ -52,6 +54,11 @@ public class SetOpeningTasksPlacementConfigCmd : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
+        kernel.UseLogicalFilterProviderFactory();
+        kernel.UseFilterContextParser();
+
         kernel.Bind<IDocTypesProvider>()
             .ToMethod(c => {
                 return new DocTypesProvider(new DocTypeEnum[] { DocTypeEnum.AR, DocTypeEnum.KR });
