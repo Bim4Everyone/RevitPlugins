@@ -276,7 +276,7 @@ internal class NavigatorKrViewModel : BaseViewModel {
                 ct.ThrowIfCancellationRequested();
                 progress.Report(i);
                 incomingTask.UpdateStatusAndHost(realOpenings, constructureElementsIds);
-                incomintTasksViewModels.Add(new OpeningArTaskIncomingViewModel(incomingTask));
+                incomintTasksViewModels.Add(new OpeningArTaskIncomingViewModel(incomingTask, _localization));
                 i++;
             }
         }
@@ -315,7 +315,7 @@ internal class NavigatorKrViewModel : BaseViewModel {
                     continue;
                 }
 
-                incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask));
+                incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask, _localization));
                 i++;
             }
         }
@@ -346,7 +346,7 @@ internal class NavigatorKrViewModel : BaseViewModel {
                 ct.ThrowIfCancellationRequested();
                 progress.Report(i);
                 updateStatus.Invoke(openingReal);
-                openingsRealViewModels.Add(new OpeningRealKrViewModel(openingReal));
+                openingsRealViewModels.Add(new OpeningRealKrViewModel(openingReal, _localization));
                 i++;
             }
         }

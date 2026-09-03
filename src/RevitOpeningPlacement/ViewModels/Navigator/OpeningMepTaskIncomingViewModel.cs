@@ -6,13 +6,15 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.WPF.Extensions;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// <summary>
@@ -27,7 +29,9 @@ internal class OpeningMepTaskIncomingViewModel : BaseViewModel,
     /// </summary>
     private readonly OpeningMepTaskIncoming _openingTask;
 
-    public OpeningMepTaskIncomingViewModel(OpeningMepTaskIncoming incomingOpeningTask) {
+    public OpeningMepTaskIncomingViewModel(
+        OpeningMepTaskIncoming incomingOpeningTask,
+        ILocalizationService localization) {
         if(incomingOpeningTask is null) {
             throw new ArgumentNullException(nameof(incomingOpeningTask));
         }
@@ -46,7 +50,7 @@ internal class OpeningMepTaskIncomingViewModel : BaseViewModel,
         Thickness = _openingTask.DisplayThickness;
         FamilyShortName = _openingTask.FamilyShortName;
         Host = _openingTask.Host is null ? new OpeningKrHost() : new OpeningKrHost(_openingTask.Host);
-        Status = _openingTask.Status.GetDescription();
+        Status = localization.GetLocalizedString($"{nameof(OpeningTaskIncomingStatus)}.{_openingTask.Status}");
         Comment = _openingTask.Comment;
         Username = _openingTask.Username;
     }
@@ -109,7 +113,7 @@ internal class OpeningMepTaskIncomingViewModel : BaseViewModel,
     }
 
     /// <summary>
-    /// Возвращает коллекцию элементов, в которой находится входящее задание на отверстие, которое надо выделить на виде
+    /// Возвращает коллекцию элементов, в которой находится входящее задание на отверстие для выделения на виде
     /// </summary>
     public ICollection<ElementModel> GetElementsToSelect() {
         return new ElementModel[] {

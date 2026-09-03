@@ -114,7 +114,7 @@ internal class NavigatorMepViewModel : BaseViewModel {
                 ct.ThrowIfCancellationRequested();
                 progress.Report(i);
                 service.UpdateInfo(outcomingTask);
-                openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask));
+                openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask, _localization));
                 i++;
             }
         }

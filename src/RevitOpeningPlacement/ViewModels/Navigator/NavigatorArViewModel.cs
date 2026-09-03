@@ -210,7 +210,7 @@ internal class NavigatorArViewModel : BaseViewModel {
                     continue;
                 }
 
-                incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask));
+                incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask, _localization));
                 i++;
             }
         }
@@ -241,7 +241,7 @@ internal class NavigatorArViewModel : BaseViewModel {
                 ct.ThrowIfCancellationRequested();
                 progress.Report(i);
                 openingReal.UpdateStatus(mepLinks);
-                openingsRealViewModels.Add(new OpeningRealArViewModel(openingReal));
+                openingsRealViewModels.Add(new OpeningRealArViewModel(openingReal, _localization));
                 i++;
             }
         }
