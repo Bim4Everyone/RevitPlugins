@@ -37,6 +37,53 @@
         x:Key="AllOpeningStatus.Unique">Unique</system:String>
 
     <system:String
+        x:Key="OpeningTaskIncomingStatus.New">New task</system:String>
+    <system:String
+        x:Key="OpeningTaskIncomingStatus.NotMatch">Partially completed task</system:String>
+    <system:String
+        x:Key="OpeningTaskIncomingStatus.Completed">Completed task</system:String>
+    <system:String
+        x:Key="OpeningTaskIncomingStatus.NoIntersection">No intersection</system:String>
+    <system:String
+        x:Key="OpeningTaskIncomingStatus.Invalid">Geometry processing error</system:String>
+    <system:String
+        x:Key="OpeningTaskIncomingStatus.DifferentConstructions">In different structures</system:String>
+    <system:String
+        x:Key="OpeningTaskIncomingStatus.UnacceptableConstructions">Unacceptable structures</system:String>
+
+    <system:String
+        x:Key="OpeningTaskOutcomingStatus.Correct">Correct</system:String>
+    <system:String
+        x:Key="OpeningTaskOutcomingStatus.TooSmall">Task is too small</system:String>
+    <system:String
+        x:Key="OpeningTaskOutcomingStatus.TooBig">Task is too big</system:String>
+    <system:String
+        x:Key="OpeningTaskOutcomingStatus.Intersects">Intersecting task</system:String>
+    <system:String
+        x:Key="OpeningTaskOutcomingStatus.NotActual">Outdated task</system:String>
+    <system:String
+        x:Key="OpeningTaskOutcomingStatus.Invalid">Geometry processing error</system:String>
+    <system:String
+        x:Key="OpeningTaskOutcomingStatus.ManuallyPlaced">Placed manually</system:String>
+    <system:String
+        x:Key="OpeningTaskOutcomingStatus.United">United</system:String>
+    <system:String
+        x:Key="OpeningTaskOutcomingStatus.DifferentConstructions">In different structures</system:String>
+    <system:String
+        x:Key="OpeningTaskOutcomingStatus.UnacceptableConstructions">Unacceptable structures</system:String>
+
+    <system:String
+        x:Key="OpeningRealStatus.Empty">Empty opening</system:String>
+    <system:String
+        x:Key="OpeningRealStatus.TooBig">Opening is too big</system:String>
+    <system:String
+        x:Key="OpeningRealStatus.NotActual">Outdated opening</system:String>
+    <system:String
+        x:Key="OpeningRealStatus.Correct">Correct</system:String>
+    <system:String
+        x:Key="OpeningRealStatus.Invalid">Geometry processing error</system:String>
+
+    <system:String
         x:Key="Transaction.PlaceSingleOpening">Placing single opening</system:String>
     <system:String
         x:Key="Transaction.PlaceSingleOpeningsInOneHost">Single openings in one host</system:String>
@@ -190,9 +237,9 @@ as well as for automatic merging of opening tasks,
 including in multilayer structures.</system:String>
 
     <system:String
-        x:Key="FilterCreation.AddRule">Add set</system:String>
+        x:Key="OpeningConfig.Validation.FilterIsEmpty">Fill in the filter of the "{0}" category.</system:String>
     <system:String
-        x:Key="FilterCreation.AddSet">Add rule</system:String>
+        x:Key="OpeningConfig.Validation.FilterError">Error in the filter of the "{0}" category: {1}</system:String>
 
     <system:String
         x:Key="LinksSelectorWindow.Title">Select Links for Processing</system:String>
@@ -221,48 +268,6 @@ including in multilayer structures.</system:String>
     <system:String
         x:Key="Parameter.CannotParseDouble">Parameter "{0}" value must be a real number.</system:String>
 
-    <system:String
-        x:Key="SetEvaluators.Or">Or</system:String>
-    <system:String
-        x:Key="SetEvaluators.And">And</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringBeginsWith">Begins with</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringNotBeginsWith">Does not begin with</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringContains">Contains</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringNotContains">Does not contain</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringEndsWith">Ends with</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringNotEndsWith">Does not end with</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringEquals">Equals</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringGreater">Greater than</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringGreaterOrEqual">Greater than or equal</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringLess">Less than</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterStringLessOrEqual">Less than or equal</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNumericEquals">Equals</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNumericGreater">Greater than</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNumericGreaterOrEqual">Greater than or equal</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNumericLess">Less than</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNumericLessOrEqual">Less than or equal</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterHasNoValue">Has no value</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterHasValue">Has value</system:String>
-    <system:String
-        x:Key="RuleEvaluators.FilterNotEquals">Not equal</system:String>
 
     <system:String
         x:Key="Ok">OK</system:String>
