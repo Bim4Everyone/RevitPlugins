@@ -4,11 +4,15 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using Bim4Everyone.RevitFiltration;
+using Bim4Everyone.RevitFiltration.Controls;
+
+using dosymep.Revit;
+
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.Evaluators;
-using RevitClashDetective.Models.FilterModel;
 
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Filtration;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.OpeningPlacement.Checkers.ClashCheckers;
 using RevitOpeningPlacement.Models.OpeningPlacement.PlacerInitializers;
@@ -17,28 +21,24 @@ namespace RevitOpeningPlacement.Models.OpeningPlacement;
 internal class PlacementConfigurator {
     private readonly RevitRepository _revitRepository;
     private readonly MepCategoryCollection _categories;
+    private readonly ILogicalFilterFactory _filterFactory;
+    private readonly IFilterContextParser _filterContextParser;
     private readonly List<UnplacedClashModel> _unplacedClashes = [];
 
-    private readonly Dictionary<MepCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, double, double, Filter>> _rectangleMepFilterProviders =
-        new() {
-            { MepCategoryEnum.RectangleDuct, FiltersInitializer.GetRectangleDuctFilter },
-            { MepCategoryEnum.CableTray, FiltersInitializer.GetTrayFilter },
-        };
+    private readonly MepCategoryEnum[] _rectangleMepCategories = [
+        MepCategoryEnum.RectangleDuct, MepCategoryEnum.CableTray,
+    ];
 
-    private readonly Dictionary<MepCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, double, Filter>> _roundMepFilterProviders =
-        new() {
-            { MepCategoryEnum.Pipe, FiltersInitializer.GetPipeFilter },
-            { MepCategoryEnum.RoundDuct, FiltersInitializer.GetRoundDuctFilter },
-            { MepCategoryEnum.Conduit, FiltersInitializer.GetConduitFilter },
-        };
+    private readonly MepCategoryEnum[] _roundMepCategories = [
+        MepCategoryEnum.Pipe, MepCategoryEnum.RoundDuct, MepCategoryEnum.Conduit,
+    ];
 
-    private readonly Dictionary<FittingCategoryEnum, Func<RevitClashDetective.Models.RevitRepository, Filter>> _fittingFilterProviders =
-        new() {
-            { FittingCategoryEnum.PipeFitting, FiltersInitializer.GetPipeFittingFilter },
-            { FittingCategoryEnum.CableTrayFitting, FiltersInitializer.GetTrayFittingFilter },
-            { FittingCategoryEnum.ConduitFitting, FiltersInitializer.GetConduitFittingFilter },
-            { FittingCategoryEnum.DuctFitting, FiltersInitializer.GetDuctFittingFilter },
-        };
+    private readonly FittingCategoryEnum[] _fittingCategories = [
+        FittingCategoryEnum.PipeFitting,
+        FittingCategoryEnum.CableTrayFitting,
+        FittingCategoryEnum.ConduitFitting,
+        FittingCategoryEnum.DuctFitting,
+    ];
 
     private readonly Dictionary<MepCategoryEnum, FittingCategoryEnum> _fittingCategoryByMep =
         new() {
@@ -49,10 +49,16 @@ internal class PlacementConfigurator {
             { MepCategoryEnum.Conduit, FittingCategoryEnum.ConduitFitting} ,
         };
 
-
-    public PlacementConfigurator(RevitRepository revitRepository, MepCategoryCollection categories) {
-        _revitRepository = revitRepository;
-        _categories = categories;
+    public PlacementConfigurator(
+        RevitRepository revitRepository,
+        MepCategoryCollection categories,
+        ILogicalFilterFactory filterFactory,
+        IFilterContextParser filterContextParser) {
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _categories = categories ?? throw new ArgumentNullException(nameof(categories));
+        _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
+        _filterContextParser = filterContextParser
+                               ?? throw new ArgumentNullException(nameof(filterContextParser));
     }
 
     public IEnumerable<OpeningPlacer> GetPlacersMepOutcomingTasks(ElementId[] mepElementsToFilter) {
@@ -64,10 +70,30 @@ internal class PlacementConfigurator {
 
         List<OpeningPlacer> placers =
         [
-            .. GetRoundMepPlacers(walls, mepCurveWallClashChecker, new RoundMepWallPlacerInitializer(), mepElementsToFilter),
-            .. GetRoundMepPlacers(floors, mepCurveFloorClashChecker, new RoundMepFloorPlacerInitializer(), mepElementsToFilter),
-            .. GetRectangleMepPlacers(walls, mepCurveWallClashChecker, new RectangleMepWallPlacerInitializer(), mepElementsToFilter),
-            .. GetRectangleMepPlacers(floors, mepCurveFloorClashChecker, new RectangleMepFloorPlacerInitializer(), mepElementsToFilter),
+            .. GetLinearMepPlacers(
+                _roundMepCategories,
+                walls,
+                mepCurveWallClashChecker,
+                new RoundMepWallPlacerInitializer(),
+                mepElementsToFilter),
+            .. GetLinearMepPlacers(
+                _roundMepCategories,
+                floors,
+                mepCurveFloorClashChecker,
+                new RoundMepFloorPlacerInitializer(),
+                mepElementsToFilter),
+            .. GetLinearMepPlacers(
+                _rectangleMepCategories,
+                walls,
+                mepCurveWallClashChecker,
+                new RectangleMepWallPlacerInitializer(),
+                mepElementsToFilter),
+            .. GetLinearMepPlacers(
+                _rectangleMepCategories,
+                floors,
+                mepCurveFloorClashChecker,
+                new RectangleMepFloorPlacerInitializer(),
+                mepElementsToFilter),
             .. GetFittingPlacers(
                 floors,
                 (categories) => ClashChecker.GetFittingFloorClashChecker(_revitRepository, categories),
@@ -91,18 +117,17 @@ internal class PlacementConfigurator {
     /// <param name="mepCategory">Настройки фильтрации элементов инженерной системы</param>
     /// <returns>Фильтр по линейным элементам из заданной конфигурации настроек</returns>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    public Filter GetLinearFilter(MepCategory mepCategory) {
+    public CategoryFilter GetLinearFilter(MepCategory mepCategory) {
         if(mepCategory is null) {
             throw new ArgumentNullException(nameof(mepCategory));
         }
 
-        var mepCategoryType = RevitRepository.MepCategoryNames.First(categoryNamePair => categoryNamePair.Value.Equals(mepCategory.Name)).Key;
-        var linearMepStandardFilter = mepCategory.IsRound
-            ? GetRoundMepFilter(mepCategoryType, _roundMepFilterProviders[mepCategoryType])
-            : GetRectangleMepFilter(mepCategoryType, _rectangleMepFilterProviders[mepCategoryType]);
-        var linearMepFilter = CreateMepCategoriesAndFilterSet(_revitRepository.GetClashRevitRepository(), linearMepStandardFilter, mepCategory);
-
-        return linearMepFilter;
+        var mepCategoryType = _revitRepository.GetMepCategoryEnum(mepCategory.Name);
+        return CreateMepFilter(
+            mepCategory.Name,
+            FiltersInitializer.GetLinearCategories(mepCategoryType),
+            withMinSizes: true,
+            mepCategory);
     }
 
     /// <summary>
@@ -111,77 +136,50 @@ internal class PlacementConfigurator {
     /// <param name="mepCategory">Настройки фильтрации элементов инженерной системы</param>
     /// <returns>Фильтр по нелинейным элементам из заданной конфигурации настроек</returns>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    public Filter GetFittingFilter(MepCategory mepCategory) {
+    public CategoryFilter GetFittingFilter(MepCategory mepCategory) {
         if(mepCategory is null) {
             throw new ArgumentNullException(nameof(mepCategory));
         }
 
-        var mepCategoryType = RevitRepository.MepCategoryNames.First(categoryNamePair => categoryNamePair.Value.Equals(mepCategory.Name)).Key;
+        var mepCategoryType = _revitRepository.GetMepCategoryEnum(mepCategory.Name);
         var fittingCategoryType = _fittingCategoryByMep[mepCategoryType];
-        var fittingMepStandardFilter = GetFittingFilter(_fittingFilterProviders[fittingCategoryType]);
-        var fittingFilter = CreateMepCategoriesAndFilterSet(_revitRepository.GetClashRevitRepository(), fittingMepStandardFilter, mepCategory);
-
-        return fittingFilter;
+        return CreateMepFilter(
+            RevitRepository.FittingCategoryNames[fittingCategoryType],
+            FiltersInitializer.GetFittingCategories(fittingCategoryType),
+            withMinSizes: false,
+            mepCategory);
     }
 
-
-    private List<OpeningPlacer> GetRoundMepPlacers(
+    private List<OpeningPlacer> GetLinearMepPlacers(
+        MepCategoryEnum[] mepCategoryTypes,
         StructureCategoryEnum structure,
         IClashChecker structureChecker,
         IMepCurvePlacerInitializer placerInitializer,
         ElementId[] mepElementsToFilter) {
 
         List<OpeningPlacer> placers = [];
-        foreach(var filterProvider in _roundMepFilterProviders) {
-            var mepCategory = _categories[filterProvider.Key];
-            if(mepCategory.IsSelected && IntersectionWithStructureEnabled(mepCategory, RevitRepository.StructureCategoryNames[structure])) {
-                //получение стандартного фильтра по категории и минимальным габаритам
-                var mepStandardFilter = GetRoundMepFilter(filterProvider.Key, filterProvider.Value);
-                //добавление к стандартному фильтру критериев по параметрам, созданных пользователем
-                var mepComplexFilter = CreateMepCategoriesAndFilterSet(
-                    _revitRepository.GetClashRevitRepository(),
-                    mepStandardFilter,
+        foreach(var mepCategoryType in mepCategoryTypes) {
+            var mepCategory = _categories[mepCategoryType];
+            if(mepCategory != null
+               && mepCategory.IsSelected
+               && IntersectionWithStructureEnabled(
+                   mepCategory,
+                   RevitRepository.StructureCategoryNames[structure])) {
+                // фильтр по категории, минимальным габаритам и критериям, созданным пользователем
+                var mepFilter = CreateMepFilter(
+                    mepCategory.Name,
+                    FiltersInitializer.GetLinearCategories(mepCategoryType),
+                    withMinSizes: true,
                     mepCategory);
                 placers.AddRange(GetMepPlacers(
-                    mepComplexFilter,
-                    CreateStructureCategoriesFilter(_revitRepository.GetClashRevitRepository(), structure, mepCategory),
+                    mepFilter,
+                    CreateStructureCategoriesFilter(structure, mepCategory),
                     structureChecker,
-                    _categories[filterProvider.Key],
+                    mepCategory,
                     placerInitializer,
                     mepElementsToFilter));
             }
         }
-        ;
-        return placers;
-    }
-
-    private List<OpeningPlacer> GetRectangleMepPlacers(
-        StructureCategoryEnum structure,
-        IClashChecker structureChecker,
-        IMepCurvePlacerInitializer placerInitializer,
-        ElementId[] mepElementsToFilter) {
-
-        List<OpeningPlacer> placers = [];
-        foreach(var filterProvider in _rectangleMepFilterProviders) {
-            var mepCategory = _categories[filterProvider.Key];
-            if(mepCategory.IsSelected && IntersectionWithStructureEnabled(mepCategory, RevitRepository.StructureCategoryNames[structure])) {
-                //получение стандартного фильтра по категории и минимальным габаритам
-                var mepStandardFilter = GetRectangleMepFilter(filterProvider.Key, filterProvider.Value);
-                //добавление к стандартному фильтру критериев по параметрам, созданных пользователем
-                var mepComplexFilter = CreateMepCategoriesAndFilterSet(
-                    _revitRepository.GetClashRevitRepository(),
-                    mepStandardFilter,
-                    mepCategory);
-                placers.AddRange(GetMepPlacers(
-                    mepComplexFilter,
-                    CreateStructureCategoriesFilter(_revitRepository.GetClashRevitRepository(), structure, mepCategory),
-                    structureChecker,
-                    _categories[filterProvider.Key],
-                    placerInitializer,
-                    mepElementsToFilter));
-            }
-        }
-        ;
         return placers;
     }
 
@@ -192,34 +190,34 @@ internal class PlacementConfigurator {
         ElementId[] mepElementsToFilter) {
 
         List<OpeningPlacer> placers = [];
-        foreach(var filterProvider in _fittingFilterProviders) {
-            var mepCategories = _categories.GetCategories(filterProvider.Key)
+        foreach(var fittingCategoryType in _fittingCategories) {
+            var mepCategories = _categories.GetCategories(fittingCategoryType)
                 .Where(category => category.IsSelected)
                 .ToArray();
-            if(mepCategories.Any(category => IntersectionWithStructureEnabled(category, RevitRepository.StructureCategoryNames[structure]))) {
-                //получение стандартного фильтра по категории
-                var mepStandardFilter = GetFittingFilter(filterProvider.Value);
-                //добавление к стандартному фильтру критериев по параметрам, созданных пользователем
-                var mepComplexFilter = CreateMepCategoriesAndFilterSet(
-                    _revitRepository.GetClashRevitRepository(),
-                    mepStandardFilter,
+            if(mepCategories.Any(category => IntersectionWithStructureEnabled(
+                   category,
+                   RevitRepository.StructureCategoryNames[structure]))) {
+                // фильтр по категориям соединительных деталей и критериям, созданным пользователем
+                var mepFilter = CreateMepFilter(
+                    RevitRepository.FittingCategoryNames[fittingCategoryType],
+                    FiltersInitializer.GetFittingCategories(fittingCategoryType),
+                    withMinSizes: false,
                     mepCategories);
                 placers.AddRange(GetFittingPlacers(
-                    mepComplexFilter,
-                    CreateStructureCategoriesFilter(_revitRepository.GetClashRevitRepository(), structure, mepCategories),
+                    mepFilter,
+                    CreateStructureCategoriesFilter(structure, mepCategories),
                     structureCheckerFunc.Invoke(mepCategories),
                     placerInitializer,
                     mepElementsToFilter,
                     mepCategories));
             }
         }
-        ;
         return placers;
     }
 
     private IEnumerable<OpeningPlacer> GetMepPlacers(
-        Filter mepFilter,
-        Filter structureFilter,
+        CategoryFilter mepFilter,
+        CategoryFilter structureFilter,
         IClashChecker clashChecker,
         MepCategory mepCategory,
         IMepCurvePlacerInitializer placerInitializer,
@@ -231,8 +229,8 @@ internal class PlacementConfigurator {
     }
 
     private IEnumerable<OpeningPlacer> GetFittingPlacers(
-        Filter mepFilter,
-        Filter structureFilter,
+        CategoryFilter mepFilter,
+        CategoryFilter structureFilter,
         IClashChecker clashChecker,
         IFittingPlacerInitializer placerInitializer,
         ElementId[] mepElements,
@@ -243,8 +241,8 @@ internal class PlacementConfigurator {
     }
 
     private IEnumerable<ClashModel> GetClashes(
-        Filter mepFilter,
-        Filter constructionFilter,
+        CategoryFilter mepFilter,
+        CategoryFilter constructionFilter,
         IClashChecker clashChecker,
         params ElementId[] mepElements) {
         var clashes = ClashInitializer.GetClashes(_revitRepository, mepFilter, constructionFilter, mepElements)
@@ -263,28 +261,6 @@ internal class PlacementConfigurator {
         return clashes.Where(item => string.IsNullOrEmpty(clashChecker.Check(item)));
     }
 
-    private Filter GetRoundMepFilter(MepCategoryEnum category, Func<RevitClashDetective.Models.RevitRepository, double, Filter> filterProvider) {
-        var minSize = _categories[category]?.MinSizes[Parameters.Diameter];
-        return minSize != null ? filterProvider.Invoke(_revitRepository.GetClashRevitRepository(), minSize.Value) : null;
-    }
-
-    private Filter GetRectangleMepFilter(MepCategoryEnum category, Func<RevitClashDetective.Models.RevitRepository, double, double, Filter> filterProvider) {
-        var minSizes = _categories[category]?.MinSizes;
-        if(minSizes != null) {
-            var height = minSizes[Parameters.Height];
-            var width = minSizes[Parameters.Width];
-            if(height != null && width != null) {
-                return filterProvider.Invoke(_revitRepository.GetClashRevitRepository(), height.Value, width.Value);
-            }
-        }
-        return null;
-    }
-
-    private Filter GetFittingFilter(Func<RevitClashDetective.Models.RevitRepository, Filter> filterProvider) {
-        return filterProvider.Invoke(_revitRepository.GetClashRevitRepository());
-    }
-
-
     /// <summary>
     /// Проверяет, включена ли расстановка отверстий в местах пересечений заданной категории элементов инженерных систем с элементами заданной категории конструкций
     /// </summary>
@@ -298,128 +274,82 @@ internal class PlacementConfigurator {
     }
 
     /// <summary>
-    /// Добавляет к заданному фильтру элементов инженерных систем поисковые наборы из настроек категории инженерных элементов.
-    /// Итоговый фильтр формируется как логическая сумма (ИЛИ) логических произведений (И) правила фильтрации изначального фильтра и правила фильтрации каждой категории
+    /// Создает поисковый набор элементов инженерных систем.
+    /// Итоговый фильтр формируется как логическая сумма (ИЛИ) логических произведений (И)
+    /// правил по минимальным габаритам и фильтра, настроенного пользователем, для каждой категории.
     /// </summary>
-    /// <param name="revitRepository">Репозиторий Revit, в котором будут расставляться отверстия</param>
-    /// <param name="mepFilterToAdd">Фильтр инженерных элементов, к которому нужно добавить поисковые наборы из настроек категорий инженерных элементов</param>
+    /// <param name="name">Название поискового набора</param>
+    /// <param name="categories">Категории элементов, среди которых происходит поиск</param>
+    /// <param name="withMinSizes">True, если нужно добавить правила по минимальным габаритам сечения</param>
     /// <param name="mepCategories">Настройки расстановки отверстий для категорий инженерных элементов</param>
-    private Filter CreateMepCategoriesAndFilterSet(RevitClashDetective.Models.RevitRepository revitRepository, Filter mepFilterToAdd, params MepCategory[] mepCategories) {
-        var mepCategoriesAndFilterSet = new Set() {
-            SetEvaluator = SetEvaluatorUtils.GetEvaluators().First(item => item.Evaluator == SetEvaluators.Or),
-            RevitRepository = revitRepository,
-            Criteria = []
-        };
-        foreach(var category in mepCategories) {
-            var mepCategoryAndFilterSet = new Set() {
-                SetEvaluator = SetEvaluatorUtils.GetEvaluators().First(item => item.Evaluator == SetEvaluators.And),
-                RevitRepository = revitRepository,
-                Criteria = [
-                    mepFilterToAdd.Set,
-                    GetMepFilterSet(revitRepository, category)
-                ]
-            };
-            mepCategoriesAndFilterSet.Criteria.Add(mepCategoryAndFilterSet);
+    private CategoryFilter CreateMepFilter(
+        string name,
+        ICollection<BuiltInCategory> categories,
+        bool withMinSizes,
+        params MepCategory[] mepCategories) {
+        var root = _filterFactory.CreateOrFilter();
+        foreach(var mepCategory in mepCategories) {
+            // правила по габаритам добавляются в отдельный фильтр "И" вместе с фильтром пользователя,
+            // т.к. корневой фильтр пользователя может быть настроен как "ИЛИ"
+            var categoryFilter = _filterFactory.CreateAndFilter();
+            if(withMinSizes) {
+                foreach(var minSizeRule in FiltersInitializer.GetMinSizeRules(mepCategory)) {
+                    categoryFilter.AddGreaterOrEqualRule(minSizeRule.Param, minSizeRule.Value);
+                }
+            }
+
+            categoryFilter.AddFilter(ParseUserFilter(mepCategory.MepFilterContext));
+            root.AddFilter(categoryFilter);
         }
-        return new Filter(revitRepository) {
-            CategoryIds = [.. mepFilterToAdd.CategoryIds],
-            Name = mepFilterToAdd.Name,
-            Set = mepCategoriesAndFilterSet
-        };
+
+        return new CategoryFilter(name, root, categories);
     }
 
     /// <summary>
-    /// Возвращает поисковые набор по запрашиваемым элементам конструкций из настроек категории инженерных элементов.<br/>
-    /// Итоговый фильтр формируется как логическая сумма (ИЛИ) логических произведений (И) правил фильтрации элементов<br/>
-    ///  запрашиваемой категории конструкций по каждой конфигурации настроек инженерных элементов.
+    /// Создает поисковый набор по запрашиваемым элементам конструкций из настроек категорий инженерных элементов.<br/>
+    /// Итоговый фильтр формируется как логическая сумма (ИЛИ) фильтров по конструкциям этой категории
+    /// из каждой настройки инженерных элементов.
     /// </summary>
-    /// <param name="revitRepository">Репозиторий Revit, в котором будут расставляться отверстия</param>
     /// <param name="structureCategory">Запрашиваемая категория конструкций</param>
     /// <param name="mepCategories">Настройки инженерных элементов</param>
-    /// <returns>Поисковый набор, в который попадают все элементы конструкций заданной категории,
-    /// и которые попадают в каждый фильтр по конструкциям этой категории из каждой настройки инженерных элементов</returns>
-    private Filter CreateStructureCategoriesFilter(
-        RevitClashDetective.Models.RevitRepository revitRepository,
+    private CategoryFilter CreateStructureCategoriesFilter(
         StructureCategoryEnum structureCategory,
         params MepCategory[] mepCategories) {
-
-        var structureCategoriesSet = new Set() {
-            SetEvaluator = SetEvaluatorUtils.GetEvaluators().First(item => item.Evaluator == SetEvaluators.Or),
-            RevitRepository = revitRepository,
-            Criteria = []
-        };
-        foreach(var category in mepCategories) {
-            var structureCategorySet = new Set() {
-                SetEvaluator = SetEvaluatorUtils.GetEvaluators().First(item => item.Evaluator == SetEvaluators.And),
-                RevitRepository = revitRepository,
-                Criteria = [
-                    GetStructureFilterSet(revitRepository, category, structureCategory)
-                ]
-            };
-            structureCategoriesSet.Criteria.Add(structureCategorySet);
-        }
-        return new Filter(revitRepository) {
-            CategoryIds = [.. _revitRepository.GetCategories(structureCategory).Select(c => c.Id)],
-            Name = RevitRepository.StructureCategoryNames[structureCategory],
-            Set = structureCategoriesSet
-        };
-    }
-
-    /// <summary>
-    /// Возвращает поисковый набор из заданной конфигурации настроек инженерной системы
-    /// </summary>
-    /// <param name="revitRepository">Репозиторий ревита</param>
-    /// <param name="mepCategory">Конфигурация настроек инженерной системы</param>
-    /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    private Set GetMepFilterSet(RevitClashDetective.Models.RevitRepository revitRepository, MepCategory mepCategory) {
-        if(mepCategory is null) {
-            throw new ArgumentNullException(nameof(mepCategory));
-        }
-        if(mepCategory.Set is null) {
-            throw new ArgumentNullException(nameof(mepCategory.Set));
-        }
-        var set = new Set() {
-            SetEvaluator = mepCategory.Set.SetEvaluator,
-            RevitRepository = revitRepository,
-            Criteria = []
-        };
-        foreach(var criterion in mepCategory.Set.Criteria) {
-            criterion.SetRevitRepository(revitRepository);
-            set.Criteria.Add(criterion);
-        }
-        return set;
-    }
-
-    /// <summary>
-    /// Возвращает поисковый набор запрашиваемой категории конструкций из заданной конфигурации настроек инженерной системы
-    /// </summary>
-    /// <param name="revitRepository">Репозиторий ревита</param>
-    /// <param name="mepCategory">Конфигурация настроек инженерной системы</param>
-    /// <param name="structureCategory">Запрашиваемая категория конструкций</param>
-    /// <returns>Поисковый набор по конструкциям</returns>
-    /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    private Set GetStructureFilterSet(
-        RevitClashDetective.Models.RevitRepository revitRepository,
-        MepCategory mepCategory,
-        StructureCategoryEnum structureCategory) {
-        if(revitRepository is null) {
-            throw new ArgumentNullException(nameof(revitRepository));
-        }
-        if(mepCategory is null) {
-            throw new ArgumentNullException(nameof(mepCategory));
-        }
         string structureName = RevitRepository.StructureCategoryNames[structureCategory];
-        var structure = mepCategory.Intersections
-            .First(c => c.Name.Equals(structureName, StringComparison.CurrentCultureIgnoreCase));
-        var set = new Set() {
-            SetEvaluator = structure.Set.SetEvaluator,
-            RevitRepository = revitRepository,
-            Criteria = []
-        };
-        foreach(var criterion in structure.Set.Criteria) {
-            criterion.SetRevitRepository(revitRepository);
-            set.Criteria.Add(criterion);
+        var root = _filterFactory.CreateOrFilter();
+        foreach(var mepCategory in mepCategories) {
+            root.AddFilter(ParseUserFilter(GetStructureFilterContext(mepCategory, structureName)));
         }
-        return set;
+
+        return new CategoryFilter(
+            structureName,
+            root,
+            [.. _revitRepository.GetCategories(structureCategory).Select(c => c.GetBuiltInCategory())]);
+    }
+
+    /// <summary>
+    /// Возвращает сериализованный контекст фильтра запрашиваемой категории конструкций
+    /// из заданной конфигурации настроек инженерной системы
+    /// </summary>
+    /// <param name="mepCategory">Конфигурация настроек инженерной системы</param>
+    /// <param name="structureName">Название запрашиваемой категории конструкций</param>
+    private string GetStructureFilterContext(MepCategory mepCategory, string structureName) {
+        return mepCategory.Intersections
+            .First(c => c.Name.Equals(structureName, StringComparison.CurrentCultureIgnoreCase))
+            .FilterContext;
+    }
+
+    /// <summary>
+    /// Читает фильтр, настроенный пользователем.
+    /// Если фильтр не задан или его не удалось прочитать, возвращает пустой фильтр,
+    /// в который проходят все элементы.
+    /// <para/>
+    /// Метод обязательно вызывать отдельно для каждого родительского фильтра:
+    /// один и тот же экземпляр <see cref="ILogicalFilter"/> нельзя добавлять в несколько фильтров.
+    /// </summary>
+    private ILogicalFilter ParseUserFilter(string filterContext) {
+        return _filterContextParser.TryParse(filterContext, out var context)
+            ? context!.GetFilter()
+            : _filterFactory.CreateAndFilter();
     }
 }

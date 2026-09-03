@@ -4,9 +4,12 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using Bim4Everyone.RevitFiltration;
+
 using dosymep.Revit;
 
-using RevitClashDetective.Models.Visiter;
+using RevitOpeningPlacement.Models.Filtration;
+
 namespace RevitOpeningPlacement.Models.RevitViews;
 internal class ParameterFilterInitializer {
     /// <summary>
@@ -81,19 +84,24 @@ internal class ParameterFilterInitializer {
     /// </summary>
     /// <param name="doc">Документ, в котором происходит фильтрация элементов</param>
     /// <param name="elementToHighlight">Элемент который нужно выделить</param>
+    /// <param name="filterFactory">Фабрика фильтров элементов</param>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
     /// <exception cref="ArgumentException">Исключение, если <paramref name="elementToHighlight"/> не стена или перекрытие</exception>
-    public static ICollection<ParameterFilterElement> GetHighlightFilters(Document doc, Element elementToHighlight) {
+    public static ICollection<ParameterFilterElement> GetHighlightFilters(
+        Document doc,
+        Element elementToHighlight,
+        ILogicalFilterFactory filterFactory) {
         if(elementToHighlight is null) { throw new ArgumentNullException(nameof(elementToHighlight)); }
+        if(filterFactory is null) { throw new ArgumentNullException(nameof(filterFactory)); }
 
         if(elementToHighlight is Wall wall) {
-            var wallFilter = GetWallHighlightFilter(doc, wall);
-            var floorFilter = GetFloorHighlightFilter(doc);
+            var wallFilter = GetWallHighlightFilter(doc, filterFactory, wall);
+            var floorFilter = GetFloorHighlightFilter(doc, filterFactory);
             return new ParameterFilterElement[] { wallFilter, floorFilter };
 
         } else if(elementToHighlight is Floor floor) {
-            var wallFilter = GetWallHighlightFilter(doc);
-            var floorFilter = GetFloorHighlightFilter(doc, floor);
+            var wallFilter = GetWallHighlightFilter(doc, filterFactory);
+            var floorFilter = GetFloorHighlightFilter(doc, filterFactory, floor);
             return new ParameterFilterElement[] { wallFilter, floorFilter };
 
         } else {
@@ -142,8 +150,12 @@ internal class ParameterFilterInitializer {
     /// Возвращает фильтр по стенам, которые не являются заданной стеной
     /// </summary>
     /// <param name="doc">Документ, в котором происходит фильтрация</param>
+    /// <param name="filterFactory">Фабрика фильтров элементов</param>
     /// <param name="wall">Заданная стена, которая не проходит фильтр</param>
-    private static ParameterFilterElement GetWallHighlightFilter(Document doc, Wall wall = null) {
+    private static ParameterFilterElement GetWallHighlightFilter(
+        Document doc,
+        ILogicalFilterFactory filterFactory,
+        Wall wall = null) {
         var wallsFilter = CreateFilter(doc,
             $"BIM_Стены_НЕ_Хост_Отверстия_{doc.Application.Username}",
             new BuiltInCategory[] { RevitRepository.WallCategory },
@@ -155,7 +167,7 @@ internal class ParameterFilterInitializer {
             // сбросить все существующие критерии фильтрации
             wallsFilter.ClearRules();
             if(wall != null) {
-                wallsFilter.SetElementFilter(GetHighlightElementFilter(wall));
+                wallsFilter.SetElementFilter(GetHighlightElementFilter(doc, filterFactory, wall));
             }
             t.Commit();
         }
@@ -166,8 +178,12 @@ internal class ParameterFilterInitializer {
     /// Возвращает фильтр по перекрытиям, которые не являются заданным перекрытием
     /// </summary>
     /// <param name="doc">Документ, в котором происходит фильтрация</param>
+    /// <param name="filterFactory">Фабрика фильтров элементов</param>
     /// <param name="floor">Заданное перекрытие</param>
-    private static ParameterFilterElement GetFloorHighlightFilter(Document doc, Floor floor = null) {
+    private static ParameterFilterElement GetFloorHighlightFilter(
+        Document doc,
+        ILogicalFilterFactory filterFactory,
+        Floor floor = null) {
         var floorsFilter = CreateFilter(doc,
             $"BIM_Перекрытия_НЕ_Хост_Отверстия_{doc.Application.Username}",
             new BuiltInCategory[] { RevitRepository.FloorCategory },
@@ -179,7 +195,7 @@ internal class ParameterFilterInitializer {
             // сбросить все существующие критерии фильтрации
             floorsFilter.ClearRules();
             if(floor != null) {
-                floorsFilter.SetElementFilter(GetHighlightElementFilter(floor));
+                floorsFilter.SetElementFilter(GetHighlightElementFilter(doc, filterFactory, floor));
             }
             t.Commit();
         }
@@ -189,74 +205,52 @@ internal class ParameterFilterInitializer {
     /// <summary>
     /// Создает фильтр, в который попадают все стены, кроме заданной
     /// </summary>
+    /// <param name="doc">Документ, в котором происходит фильтрация</param>
+    /// <param name="filterFactory">Фабрика фильтров элементов</param>
     /// <param name="wallToHighlight">Стена, которая не должна проходить фильтр</param>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    private static ElementFilter GetHighlightElementFilter(Wall wallToHighlight) {
+    private static ElementFilter GetHighlightElementFilter(
+        Document doc,
+        ILogicalFilterFactory filterFactory,
+        Wall wallToHighlight) {
         if(wallToHighlight is null) { throw new ArgumentNullException(nameof(wallToHighlight)); }
 
-        // имя типа стены
-        var typeNameParam = BuiltInParameter.ALL_MODEL_TYPE_NAME;
-        string wallTypeName = wallToHighlight.WallType.Name;
+        double wallLength = wallToHighlight.GetParamValue<double>(BuiltInParameter.CURVE_ELEM_LENGTH);
 
+        var filter = filterFactory.CreateOrFilter();
         // отсеиваем все стены, у которых название типа не равно заданному
-        var typeNameNotEqualsRule = new NotEqualsVisister().Create(new ElementId(typeNameParam), wallTypeName);
-        var typeNameNotEqualsFilter = new ElementParameterFilter(typeNameNotEqualsRule);
-
-
-        // длина стены
-        var lengthParam = BuiltInParameter.CURVE_ELEM_LENGTH;
-        double wallLength = wallToHighlight.GetParamValue<double>(lengthParam);
-        var lengthParamId = new ElementId(lengthParam);
-
+        filter.AddNotEqualsRule(BuiltInParameter.ALL_MODEL_TYPE_NAME, wallToHighlight.WallType.Name);
         // отсеиваем все стены, длина которых меньше заданной
-        var lengthLessRule = new LessVisister().Create(lengthParamId, wallLength);
-        var lengthLessFilter = new ElementParameterFilter(lengthLessRule);
-
+        filter.AddLessRule(BuiltInParameter.CURVE_ELEM_LENGTH, wallLength);
         // отсеиваем все стены, длина которых больше заданной
-        var lengthGreaterRule = new GreaterVisister().Create(lengthParamId, wallLength);
-        var lengthGreaterFilter = new ElementParameterFilter(lengthGreaterRule);
+        filter.AddGreaterRule(BuiltInParameter.CURVE_ELEM_LENGTH, wallLength);
 
-        return new LogicalOrFilter([
-            typeNameNotEqualsFilter,
-            lengthLessFilter,
-            lengthGreaterFilter
-        ]);
+        return filter.Build(doc, FilterBuildOptions.Create());
     }
 
     /// <summary>
     /// Создает фильтр, в который попадают все перекрытия, кроме заданного
     /// </summary>
+    /// <param name="doc">Документ, в котором происходит фильтрация</param>
+    /// <param name="filterFactory">Фабрика фильтров элементов</param>
     /// <param name="floorToHighlight">Перекрытие, которое не должно проходить фильтр</param>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    private static ElementFilter GetHighlightElementFilter(Floor floorToHighlight) {
+    private static ElementFilter GetHighlightElementFilter(
+        Document doc,
+        ILogicalFilterFactory filterFactory,
+        Floor floorToHighlight) {
         if(floorToHighlight is null) { throw new ArgumentNullException(nameof(floorToHighlight)); }
 
-        // имя типа перекрытия
-        var typeNameParam = BuiltInParameter.ALL_MODEL_TYPE_NAME;
-        string floorTypeName = floorToHighlight.FloorType.Name;
+        double floorPerimeter = floorToHighlight.GetParamValue<double>(BuiltInParameter.HOST_PERIMETER_COMPUTED);
 
+        var filter = filterFactory.CreateOrFilter();
         // отсеиваем все перекрытия, у которых название типа не равно заданному
-        var typeNameNotEqualsRule = new NotEqualsVisister().Create(new ElementId(typeNameParam), floorTypeName);
-        var typeNameNotEqualsFilter = new ElementParameterFilter(typeNameNotEqualsRule);
-
-
-        // периметр перекрытия
-        var perimeterParam = BuiltInParameter.HOST_PERIMETER_COMPUTED;
-        double floorPerimeter = floorToHighlight.GetParamValue<double>(perimeterParam);
-        var perimeterParamId = new ElementId(perimeterParam);
-
+        filter.AddNotEqualsRule(BuiltInParameter.ALL_MODEL_TYPE_NAME, floorToHighlight.FloorType.Name);
         // отсеиваем все перекрытия, периметр которых меньше заданного
-        var perimeterLessRule = new LessVisister().Create(perimeterParamId, floorPerimeter);
-        var perimeterLessFilter = new ElementParameterFilter(perimeterLessRule);
-
+        filter.AddLessRule(BuiltInParameter.HOST_PERIMETER_COMPUTED, floorPerimeter);
         // отсеиваем все перекрытия, периметр которых больше заданного
-        var perimeterGreaterRule = new GreaterVisister().Create(perimeterParamId, floorPerimeter);
-        var perimeterGreaterFilter = new ElementParameterFilter(perimeterGreaterRule);
+        filter.AddGreaterRule(BuiltInParameter.HOST_PERIMETER_COMPUTED, floorPerimeter);
 
-        return new LogicalOrFilter([
-            typeNameNotEqualsFilter,
-            perimeterLessFilter,
-            perimeterGreaterFilter
-        ]);
+        return filter.Build(doc, FilterBuildOptions.Create());
     }
 }

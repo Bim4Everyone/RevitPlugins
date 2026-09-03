@@ -5,7 +5,8 @@ using Autodesk.Revit.DB;
 
 using RevitClashDetective.Models.ClashDetection;
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.FilterModel;
+
+using RevitOpeningPlacement.Models.Filtration;
 
 namespace RevitOpeningPlacement.Models;
 internal class ClashInitializer {
@@ -19,18 +20,18 @@ internal class ClashInitializer {
     /// <returns>Перечисление коллизий элементов ВИС из активного файла с конструкциями из связей</returns>
     public static IEnumerable<ClashModel> GetClashes(
         RevitRepository revitRepository,
-        Filter mepFilter,
-        Filter architectureFilter,
+        CategoryFilter mepFilter,
+        CategoryFilter architectureFilter,
         params ElementId[] mepElements) {
 
-        var mainProvider = new FilterProvider(revitRepository.Doc, mepFilter, Transform.Identity, mepElements);
+        var mainProvider = new FilterableElementsProvider(revitRepository.Doc, mepFilter, Transform.Identity, mepElements);
         int mainCount = mainProvider.GetElements().Count;
         if(mainCount == 0) {
             return Enumerable.Empty<ClashModel>();
         }
         var otherProviders = revitRepository
             .GetSelectedRevitLinks()
-            .Select(item => new FilterProvider(item.GetLinkDocument(), architectureFilter, item.GetTransform()))
+            .Select(item => new FilterableElementsProvider(item.GetLinkDocument(), architectureFilter, item.GetTransform()))
             .Where(item => item.GetElements().Count > 0)
             .ToList();
         if(otherProviders.Count == 0) {

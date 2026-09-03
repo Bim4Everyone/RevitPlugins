@@ -10,6 +10,8 @@ using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using Bim4Everyone.RevitFiltration;
+
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
@@ -28,8 +30,6 @@ using RevitOpeningPlacement.Models.RevitViews;
 using RevitOpeningPlacement.Models.Selection;
 using RevitOpeningPlacement.OpeningModels;
 
-using ParameterValueProvider = RevitClashDetective.Models.FilterableValueProviders.ParameterValueProvider;
-
 namespace RevitOpeningPlacement.Models;
 internal class RevitRepository {
     public const string MepUniqueFamilyName = "ОбщМд_Отв_Отверстие_Уникальное_В перекрытии";
@@ -40,6 +40,7 @@ internal class RevitRepository {
 
     private readonly RevitClashDetective.Models.RevitRepository _clashRevitRepository;
     private readonly ILocalizationService _localization;
+    private readonly ILogicalFilterFactory _filterFactory;
     private readonly View3DProvider _view3DProvider;
     private readonly View3D _view;
     private readonly List<ElementId> _linkTypeIdsToUse;
@@ -47,11 +48,13 @@ internal class RevitRepository {
     public RevitRepository(
         UIApplication uiApplication,
         RevitClashDetective.Models.RevitRepository clashRepository,
-        ILocalizationService localization) {
+        ILocalizationService localization,
+        ILogicalFilterFactory filterFactory) {
 
         UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
         _clashRevitRepository = clashRepository ?? throw new ArgumentNullException(nameof(clashRepository));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
         _application = UIApplication.Application;
         _uiDocument = UIApplication.ActiveUIDocument;
         Doc = _uiDocument.Document;
@@ -396,7 +399,13 @@ internal class RevitRepository {
         var elementToHighlight = selectorAndHighlighter.GetElementToHighlight();
         if(elementToHighlight != null) {
             try {
-                new ElementHighlighter(this, _view, elementToHighlight, GetMessageBoxService(), _localization)
+                new ElementHighlighter(
+                        this,
+                        _view,
+                        elementToHighlight,
+                        GetMessageBoxService(),
+                        _localization,
+                        _filterFactory)
                     .HighlightElement();
             } catch(ArgumentException) {
                 // элемент для выделения не стена и не перекрытие
@@ -595,10 +604,6 @@ internal class RevitRepository {
 
     public void DoAction(Action action) {
         _clashRevitRepository.DoAction(action);
-    }
-
-    public List<ParameterValueProvider> GetParameters(Document doc, IEnumerable<Category> categories) {
-        return _clashRevitRepository.GetParameters(doc, categories);
     }
 
     /// <summary>
