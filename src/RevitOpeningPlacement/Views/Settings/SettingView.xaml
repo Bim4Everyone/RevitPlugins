@@ -9,6 +9,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:views="clr-namespace:RevitOpeningPlacement.Views.Settings"
+    xmlns:filtration="clr-namespace:Bim4Everyone.RevitFiltration.Controls.Views;assembly=Bim4Everyone.RevitFiltration.Controls"
     mc:Ignorable="d"
     d:DesignHeight="720"
     d:DesignWidth="1000"
@@ -173,8 +174,9 @@
                             Style="{StaticResource CustomLabel}"
                             Content="{me:LocalizationSource MepSettingsWindow.MepFiltration}" />
                         <ScrollViewer>
-                            <views:SetView
-                                DataContext="{Binding SetViewModel}" />
+                            <filtration:PresetCategoriesFilterControl
+                                LogicalFilterProvider="{Binding MepFilterProvider}"
+                                LanguageService="{Binding LanguageService}" />
                         </ScrollViewer>
                     </DockPanel>
                 </Border>
