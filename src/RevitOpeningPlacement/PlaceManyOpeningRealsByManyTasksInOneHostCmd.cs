@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -23,6 +24,7 @@ using RevitOpeningPlacement.Models.RealOpeningArPlacement.Checkers;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.Checkers;
 using RevitOpeningPlacement.Services;
+using RevitOpeningPlacement.Services.Utils;
 
 namespace RevitOpeningPlacement;
 /// <summary>
@@ -61,7 +63,24 @@ public class PlaceManyOpeningRealsByManyTasksInOneHostCmd : OpeningRealPlacerCmd
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<ISolidProviderUtils>()
+            .To<SolidProviderUtils>()
+            .InSingletonScope();
+        kernel.Bind<OpeningRealsArConfig>()
+            .ToMethod(c => OpeningRealsArConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document));
+        kernel.Bind<OpeningRealsKrConfig>()
+            .ToMethod(c => OpeningRealsKrConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document));
+        kernel.Bind<RealOpeningKrPlacer>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<RealOpeningArPlacer>()
+            .ToSelf()
+            .InSingletonScope();
         kernel.UseWpfUIThemeUpdater();
+        kernel.UseWpfWindowsTheme();
+        kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
+        kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
+        kernel.UseWpfUIMessageBox();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
@@ -69,14 +88,13 @@ public class PlaceManyOpeningRealsByManyTasksInOneHostCmd : OpeningRealPlacerCmd
         var revitRepository = kernel.Get<RevitRepository>();
         var bimPartsHandler = kernel.Get<IDocTypesHandler>();
         var docType = bimPartsHandler.GetDocType(revitRepository.Doc);
-        var localization = kernel.Get<ILocalizationService>();
         switch(docType) {
             case DocTypeEnum.AR: {
                 if(!ModelCorrect(new RealOpeningsArChecker(revitRepository))) {
                     return;
                 }
-                var placer = new RealOpeningArPlacer(revitRepository, localization);
-                placer.PlaceSingleOpeningsInOneHost();
+
+                kernel.Get<RealOpeningArPlacer>().PlaceSingleOpeningsInOneHost();
                 break;
             }
 
@@ -84,16 +102,19 @@ public class PlaceManyOpeningRealsByManyTasksInOneHostCmd : OpeningRealPlacerCmd
                 if(!ModelCorrect(new RealOpeningsKrChecker(revitRepository))) {
                     return;
                 }
-                var config = OpeningRealsKrConfig.GetOpeningConfig(revitRepository.Doc);
-                var placer = new RealOpeningKrPlacer(revitRepository, config, localization);
-                placer.PlaceSingleOpeningsInOneHost();
+
+                kernel.Get<RealOpeningKrPlacer>().PlaceSingleOpeningsInOneHost();
                 break;
             }
 
             default: {
-                revitRepository.ShowErrorMessage(
-                    "Команда предназначена только для АР/КР." +
-                    "\nПроверьте наименование файла на соответствие BIM-стандарту A101 или откройте другой файл.");
+                var localization = kernel.Get<ILocalizationService>();
+                kernel.Get<IMessageBoxService>()
+                    .Show(
+                        localization.GetLocalizedString("Errors.ArKrOnly"),
+                        localization.GetLocalizedString("OpeningTasks"),
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 break;
             }
         }

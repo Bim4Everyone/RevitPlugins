@@ -15,6 +15,7 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
+using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -73,6 +74,12 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<LinksSelectorViewModel>()
             .ToSelf()
             .InTransientScope();
+        kernel.Bind<ISolidProviderUtils>()
+            .To<SolidProviderUtils>()
+            .InSingletonScope();
+        kernel.Bind<IConstantsProvider>()
+            .To<ConstantsProvider>()
+            .InSingletonScope();
         kernel.Bind<LinksSelectorWindow>()
             .ToSelf()
             .InTransientScope()
@@ -130,9 +137,6 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<IRevitLinkTypesSetter>()
             .To<UserSelectedLinksSetter>()
             .InTransientScope();
-        kernel.Bind<IConstantsProvider>()
-            .To<ConstantsProvider>()
-            .InSingletonScope();
         kernel.Bind<NavigatorArViewModel>()
             .ToSelf()
             .InSingletonScope();
@@ -142,6 +146,8 @@ public class GetOpeningTasksCmd : BasePluginCommand {
             .WithPropertyValue(nameof(Window.DataContext),
                 c => c.Kernel.Get<NavigatorArViewModel>())
             .WithPropertyValue(nameof(Window.Title), PluginName);
+        kernel.UseXtraProgressDialog<NavigatorArViewModel>();
+        kernel.UseXtraMessageBox<NavigatorArViewModel>();
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
@@ -216,9 +222,6 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<IRevitLinkTypesSetter>()
             .To<UserSelectedLinksSetter>()
             .InTransientScope();
-        kernel.Bind<IConstantsProvider>()
-            .To<ConstantsProvider>()
-            .InSingletonScope();
         kernel.Bind<NavigatorKrViewModel>()
             .ToSelf()
             .InSingletonScope();
@@ -234,6 +237,8 @@ public class GetOpeningTasksCmd : BasePluginCommand {
             .WithPropertyValue(nameof(Window.DataContext),
                 c => c.Kernel.Get<NavigatorKrViewModel>())
             .WithPropertyValue(nameof(Window.Title), PluginName);
+        kernel.UseXtraProgressDialog<NavigatorKrViewModel>();
+        kernel.UseXtraMessageBox<NavigatorKrViewModel>();
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
@@ -259,12 +264,6 @@ public class GetOpeningTasksCmd : BasePluginCommand {
                 var repo = c.Kernel.Get<RevitRepository>();
                 return OpeningConfig.GetOpeningConfig(repo.Doc);
             });
-        kernel.Bind<IConstantsProvider>()
-            .To<ConstantsProvider>()
-            .InSingletonScope();
-        kernel.Bind<ISolidProviderUtils>()
-            .To<SolidProviderUtils>()
-            .InSingletonScope();
         kernel.Bind<IOpeningInfoUpdater<OpeningMepTaskOutcoming>>()
             .To<MepTaskOutcomingInfoUpdater>()
             .InTransientScope();
@@ -305,6 +304,8 @@ public class GetOpeningTasksCmd : BasePluginCommand {
             .WithPropertyValue(nameof(Window.DataContext),
                 c => c.Kernel.Get<NavigatorMepViewModel>())
             .WithPropertyValue(nameof(Window.Title), PluginName);
+        kernel.UseXtraProgressDialog<NavigatorMepViewModel>();
+        kernel.UseXtraMessageBox<NavigatorMepViewModel>();
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 

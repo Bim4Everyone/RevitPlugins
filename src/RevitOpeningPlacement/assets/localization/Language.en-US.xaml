@@ -32,6 +32,10 @@
         x:Key="Progress.CheckDuplicates">Checking duplicates... [{0}\{1}]</system:String>
     <system:String
         x:Key="Progress.UniteTouching">Merging touching... [{0}\{1}]</system:String>
+    <system:String
+        x:Key="Progress.TaskAnalysis">Task analysis... [{0}\{1}]</system:String>
+    <system:String
+        x:Key="Progress.OpeningAnalysis">Opening analysis... [{0}\{1}]</system:String>
 
     <system:String
         x:Key="AllOpeningStatus.Unique">Unique</system:String>
@@ -137,6 +141,19 @@
         x:Key="Errors.ClosedDocument">Plugin window was opened in another Revit document that has been closed, cannot show element.</system:String>
     <system:String
         x:Key="Errors.InactiveDocument">Plugin window was opened in another Revit document that is not currently active, cannot show element.</system:String>
+    <system:String
+        x:Key="Errors.ArKrOnly"
+        xml:space="preserve">
+This command is only for AR/KR.
+Check the file name for compliance with the BIM standard.
+</system:String>
+
+    <system:String
+        x:Key="Warnings.ContinueIfTaskFamiliesNotLatest"
+        xml:space="preserve">
+{0}
+Continue?
+</system:String>
 
     <system:String
         x:Key="Validation.MissingParametersInFamily">Family '{0}' is missing shared parameters: {1}</system:String>

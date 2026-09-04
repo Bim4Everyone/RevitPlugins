@@ -9,6 +9,7 @@ using Bim4Everyone.RevitFiltration.Ninject;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -19,6 +20,8 @@ using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Services;
+using RevitOpeningPlacement.Services.Utils;
 
 namespace RevitOpeningPlacement;
 /// <summary>
@@ -52,7 +55,14 @@ public class UniteOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<ISolidProviderUtils>()
+            .To<SolidProviderUtils>()
+            .InSingletonScope();
         kernel.UseWpfUIThemeUpdater();
+        kernel.UseWpfWindowsTheme();
+        kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
+        kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
+        kernel.UseWpfUIMessageBox();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
@@ -61,7 +71,7 @@ public class UniteOpeningTasksCmd : BasePluginCommand {
         var openingTasks = revitRepository.PickManyOpeningMepTasksOutcoming();
         var config = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
 
-        var placedOpeningTask = revitRepository.UniteOpenings(openingTasks, config);
+        var placedOpeningTask = revitRepository.UniteOpenings(kernel.Get<IMessageBoxService>(), openingTasks, config);
         uiApplication.ActiveUIDocument.Selection.SetElementIds(new ElementId[] { placedOpeningTask.Id });
     }
 }

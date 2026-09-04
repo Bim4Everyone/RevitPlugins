@@ -18,7 +18,7 @@ internal class DocsTitlesChecker : IChecker {
 
     public string GetErrorMessage() {
         var docs = _revitRepository.DocInfos;
-        var bimPartsService = RevitRepository.GetBimModelPartsService();
+        var bimPartsService = _revitRepository.BimModelPartsService;
         HashSet<string> notValidDocTitles = [];
         foreach(var doc in docs) {
             if(bimPartsService.GetBimModelPart(doc.Name) is null) {
@@ -30,7 +30,7 @@ internal class DocsTitlesChecker : IChecker {
 
     public bool IsCorrect() {
         var docs = _revitRepository.DocInfos;
-        var bimPartsService = RevitRepository.GetBimModelPartsService();
+        var bimPartsService = _revitRepository.BimModelPartsService;
         foreach(var doc in docs) {
             if(bimPartsService.GetBimModelPart(doc.Name) is null) {
                 return false;

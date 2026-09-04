@@ -32,9 +32,13 @@ internal class NavigatorMepViewModel : BaseViewModel {
     public NavigatorMepViewModel(
         Models.Configs.OpeningConfig openingConfig,
         RevitRepository revitRepository,
+        IMessageBoxService messageBoxService,
+        IProgressDialogFactory progressDialogFactory,
         IResolutionRoot resolutionRoot,
         IConstantsProvider constantsProvider,
         ILocalizationService localization) {
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        ProgressDialogFactory = progressDialogFactory ?? throw new ArgumentNullException(nameof(progressDialogFactory));
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
@@ -48,6 +52,9 @@ internal class NavigatorMepViewModel : BaseViewModel {
         LoadViewCommand = RelayCommand.Create(LoadView);
     }
 
+    public IMessageBoxService MessageBoxService { get; }
+    public IProgressDialogFactory ProgressDialogFactory { get; }
+
     public ObservableCollection<IOpeningMepTaskOutcomingViewModel> OpeningsMepTaskOutcoming { get; }
 
     public string ConfigName { get; }
@@ -60,7 +67,7 @@ internal class NavigatorMepViewModel : BaseViewModel {
 
 
     private void SelectElement(ISelectorAndHighlighter p) {
-        _revitRepository.SelectAndShowElement(p);
+        _revitRepository.SelectAndShowElement(p, MessageBoxService);
     }
 
     private bool CanSelect(ISelectorAndHighlighter p) {
@@ -101,23 +108,23 @@ internal class NavigatorMepViewModel : BaseViewModel {
 
         var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
 
-        using(var pb = GetPlatformService<IProgressDialogService>()) {
-            pb.StepValue = _constantsProvider.ProgressBarStepLarge;
-            pb.DisplayTitleFormat = "Анализ заданий... [{0}\\{1}]";
-            var progress = pb.CreateProgress();
-            pb.MaxValue = outcomingTasks.Count;
-            var ct = pb.CreateCancellationToken();
-            pb.Show();
+        using var pb = ProgressDialogFactory.CreateDialog();
+        pb.StepValue = _constantsProvider.ProgressBarStepLarge;
+        pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.TaskAnalysis");
+        var progress = pb.CreateProgress();
+        pb.MaxValue = outcomingTasks.Count;
+        var ct = pb.CreateCancellationToken();
+        pb.Show();
 
-            int i = 0;
-            foreach(var outcomingTask in outcomingTasks) {
-                ct.ThrowIfCancellationRequested();
-                progress.Report(i);
-                service.UpdateInfo(outcomingTask);
-                openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask, _localization));
-                i++;
-            }
+        int i = 0;
+        foreach(var outcomingTask in outcomingTasks) {
+            ct.ThrowIfCancellationRequested();
+            progress.Report(i);
+            service.UpdateInfo(outcomingTask);
+            openingTaskOutcomingViewModels.Add(new OpeningMepTaskOutcomingViewModel(outcomingTask, _localization));
+            i++;
         }
+
         return openingTaskOutcomingViewModels;
     }
 }

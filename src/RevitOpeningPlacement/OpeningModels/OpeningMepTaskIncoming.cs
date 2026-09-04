@@ -15,6 +15,7 @@ using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels.Enums;
+using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement.OpeningModels;
 /// <summary>
@@ -240,6 +241,7 @@ internal class OpeningMepTaskIncoming : IOpeningTaskIncoming, IEquatable<Opening
     /// <param name="realOpenings">Коллекция чистовых отверстий, размещенных в активном документе-получателе заданий на отверстия</param>
     /// <param name="constructureElementsIds">Коллекция элементов конструкций в активном документе-получателе заданий на отверстия</param>
     public void UpdateStatusAndHostName(
+        ISolidProviderUtils solidUtils,
         ICollection<IOpeningReal> realOpenings,
         ICollection<ElementId> constructureElementsIds) {
         try {
@@ -249,13 +251,18 @@ internal class OpeningMepTaskIncoming : IOpeningTaskIncoming, IEquatable<Opening
             var intersectingStructureElements = GetIntersectingStructureElementsIds(
                 thisOpeningSolid,
                 constructureElementsIds);
-            var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
+            var intersectingOpenings = GetIntersectingOpeningsIds(
+                solidUtils,
+                realOpenings,
+                thisOpeningSolid,
+                thisOpeningBBox);
 
             var hostId = GetOpeningTaskHostId(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
             SetOpeningTaskHost(hostId);
             if(GetIntersectingStructureElementsIds(thisOpeningSolid,
                 RevitRepository.UnacceptableStructureCategories.ToArray())
-                .Count() > 0) {
+                   .Count
+               > 0) {
                 Status = OpeningTaskIncomingStatus.UnacceptableConstructions;
                 return;
             }
@@ -382,17 +389,20 @@ internal class OpeningMepTaskIncoming : IOpeningTaskIncoming, IEquatable<Opening
     /// <param name="realOpenings">Коллекция чистовых отверстий из активного документа ревита</param>
     /// <param name="thisOpeningSolid">Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
     /// <param name="thisOpeningBBox">Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
-#pragma warning disable 0618
-    private ICollection<ElementId> GetIntersectingOpeningsIds(ICollection<IOpeningReal> realOpenings, Solid thisOpeningSolid, BoundingBoxXYZ thisOpeningBBox) {
+    private ICollection<ElementId> GetIntersectingOpeningsIds(
+        ISolidProviderUtils solidUtils,
+        ICollection<IOpeningReal> realOpenings,
+        Solid thisOpeningSolid,
+        BoundingBoxXYZ thisOpeningBBox) {
         if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
             return Array.Empty<ElementId>();
         } else {
             // для ускорения поиск первого пересечения
-            var opening = realOpenings.FirstOrDefault(realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox));
+            var opening = realOpenings.FirstOrDefault(realOpening =>
+                solidUtils.IntersectsSolid(realOpening, thisOpeningSolid, thisOpeningBBox));
             return opening != null ? (new ElementId[] { opening.Id }) : Array.Empty<ElementId>();
         }
     }
-#pragma warning restore 0618
 
     /// <summary>
     /// Возвращает Id элемента конструкции, который наиболее похож на хост для задания на отверстие.

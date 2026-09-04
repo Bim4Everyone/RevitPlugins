@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Structure;
@@ -30,6 +30,8 @@ using RevitOpeningPlacement.Models.RevitViews;
 using RevitOpeningPlacement.Models.Selection;
 using RevitOpeningPlacement.OpeningModels;
 
+using Application = Autodesk.Revit.ApplicationServices.Application;
+
 namespace RevitOpeningPlacement.Models;
 internal class RevitRepository {
     public const string MepUniqueFamilyName = "ОбщМд_Отв_Отверстие_Уникальное_В перекрытии";
@@ -48,10 +50,12 @@ internal class RevitRepository {
     public RevitRepository(
         UIApplication uiApplication,
         RevitClashDetective.Models.RevitRepository clashRepository,
+        IBimModelPartsService bimModelPartsService,
         ILocalizationService localization,
         ILogicalFilterFactory filterFactory) {
 
         UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
+        BimModelPartsService = bimModelPartsService ?? throw new ArgumentNullException(nameof(bimModelPartsService));
         _clashRevitRepository = clashRepository ?? throw new ArgumentNullException(nameof(clashRepository));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
@@ -65,6 +69,7 @@ internal class RevitRepository {
     }
 
     public UIApplication UIApplication { get; }
+    public IBimModelPartsService BimModelPartsService { get; }
     public List<DocInfo> DocInfos => _clashRevitRepository.DocInfos;
 
     public Document Doc { get; }
@@ -395,7 +400,7 @@ internal class RevitRepository {
         _clashRevitRepository.SelectAndShowElement(elements, additionalSize, _view);
     }
 
-    public void SelectAndShowElement(ISelectorAndHighlighter selectorAndHighlighter) {
+    public void SelectAndShowElement(ISelectorAndHighlighter selectorAndHighlighter, IMessageBoxService msgBox) {
         var elementToHighlight = selectorAndHighlighter.GetElementToHighlight();
         if(elementToHighlight != null) {
             try {
@@ -403,7 +408,7 @@ internal class RevitRepository {
                         this,
                         _view,
                         elementToHighlight,
-                        GetMessageBoxService(),
+                        msgBox,
                         _localization,
                         _filterFactory)
                     .HighlightElement();
@@ -425,13 +430,6 @@ internal class RevitRepository {
     /// </summary>
     public string GetDocumentName() {
         return _clashRevitRepository.GetDocumentName();
-    }
-
-    /// <summary>
-    /// Возвращает сервис для работы с разделами проектной документации
-    /// </summary>
-    public static IBimModelPartsService GetBimModelPartsService() {
-        return GetPlatformService<IBimModelPartsService>();
     }
 
     /// <summary>
@@ -520,29 +518,8 @@ internal class RevitRepository {
         return GetOpeningsMepTasks(Doc, floorTypes);
     }
 
-    public string GetFamilyName(Element element) {
-        if(element is ElementType type) {
-            return type.FamilyName;
-        }
-        var typeId = element.GetTypeId();
-        if(typeId.IsNotNull()) {
-            type = element.Document.GetElement(typeId) as ElementType;
-            return type?.FamilyName;
-        }
-        return null;
-    }
-
     public RevitClashDetective.Models.RevitRepository GetClashRevitRepository() {
         return _clashRevitRepository;
-    }
-
-    public Transform GetTransform(Element element) {
-        return DocInfos
-            .FirstOrDefault(
-                item => item.Name
-                    .Equals(GetDocumentName(element.Document), StringComparison.CurrentCultureIgnoreCase))
-            ?.Transform
-            ?? Transform.Identity;
     }
 
     public IEnumerable<Element> GetFilteredElements(
@@ -580,8 +557,11 @@ internal class RevitRepository {
     /// <param name="openingTasks">Коллекция объединяемых заданий на отверстия</param>
     /// <param name="config">Настройки расстановки заданий на отверстия</param>
     /// <exception cref="OperationCanceledException">Исключение, если пользователь отменил операцию</exception>
-    public FamilyInstance UniteOpenings(ICollection<OpeningMepTaskOutcoming> openingTasks, OpeningConfig config) {
-        var placer = GetOpeningPlacer(openingTasks, config);
+    public FamilyInstance UniteOpenings(
+        IMessageBoxService msgBox,
+        ICollection<OpeningMepTaskOutcoming> openingTasks,
+        OpeningConfig config) {
+        var placer = GetOpeningPlacer(msgBox, openingTasks, config);
         FamilyInstance createdOpening = null;
         try {
             using var t = GetTransaction(_localization.GetLocalizedString("Transaction.UniteTasks"));
@@ -589,13 +569,11 @@ internal class RevitRepository {
             t.Commit();
 
         } catch(OpeningNotPlacedException e) {
-            var dialog = GetMessageBoxService();
-            dialog.Show(
+            msgBox.Show(
                 e.Message,
-                "Задания на отверстия",
+                _localization.GetLocalizedString("OpeningTasks"),
                 System.Windows.MessageBoxButton.OK,
-                System.Windows.MessageBoxImage.Error,
-                System.Windows.MessageBoxResult.OK);
+                System.Windows.MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
         DeleteElements(openingTasks.Select(task => task.Id).ToHashSet());
@@ -690,15 +668,14 @@ internal class RevitRepository {
     /// Спрашивает у пользователя, нужно ли продолжать операцию, 
     /// если семейства заданий на отверстия не самой последней версии
     /// </summary>
-    public bool ContinueIfTaskFamiliesNotLatest() {
+    public bool ContinueIfTaskFamiliesNotLatest(IMessageBoxService msgBox) {
         var checker = new FamiliesParametersChecker(this, _localization);
         bool familiesLatest = checker.IsCorrect();
 
         if(!familiesLatest) {
-            var dialog = GetMessageBoxService();
-            return dialog.Show(
-                $"{checker.GetErrorMessage()}Хотите продолжить?",
-                "Задания на отверстия",
+            return msgBox.Show(
+                _localization.GetLocalizedString("Warnings.ContinueIfTaskFamiliesNotLatest", checker.GetErrorMessage()),
+                _localization.GetLocalizedString("OpeningTasks"),
                 System.Windows.MessageBoxButton.YesNo,
                 System.Windows.MessageBoxImage.Warning,
                 System.Windows.MessageBoxResult.No) == System.Windows.MessageBoxResult.Yes;
@@ -706,13 +683,6 @@ internal class RevitRepository {
         } else {
             return true;
         }
-    }
-
-    /// <summary>
-    /// Возвращает прогресс бар
-    /// </summary>
-    public IProgressDialogService GetProgressDialogService() {
-        return GetPlatformService<IProgressDialogService>();
     }
 
     /// <summary>
@@ -948,7 +918,7 @@ internal class RevitRepository {
     /// </summary>
     /// <returns>Выбранный пользователем элемент</returns>
     /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
-    public OpeningMepTaskIncoming PickSingleOpeningMepTaskIncoming() {
+    public OpeningMepTaskIncoming PickSingleOpeningMepTaskIncoming(IMessageBoxService msgBox) {
         ISelectionFilter filter = new SelectionFilterOpeningMepTasksIncoming(Doc);
         var reference = _uiDocument.Selection.PickObject(
             ObjectType.LinkedElement,
@@ -960,11 +930,19 @@ internal class RevitRepository {
             if(opening is not null and FamilyInstance famInst) {
                 return new OpeningMepTaskIncoming(famInst, this, link.GetTransform());
             } else {
-                ShowErrorMessage(_localization.GetLocalizedString("Errors.InvalidTaskFamily"));
+                msgBox.Show(
+                    _localization.GetLocalizedString("Errors.InvalidTaskFamily"),
+                    _localization.GetLocalizedString("OpeningTasks"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 throw new OperationCanceledException();
             }
         } else {
-            ShowErrorMessage(_localization.GetLocalizedString("Errors.InvalidElement"));
+            msgBox.Show(
+                _localization.GetLocalizedString("Errors.InvalidElement"),
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
     }
@@ -976,7 +954,7 @@ internal class RevitRepository {
     /// <returns>Выбранный пользователем элемент</returns>
     /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
     /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
-    public OpeningArTaskIncoming PickSingleOpeningArTaskIncoming() {
+    public OpeningArTaskIncoming PickSingleOpeningArTaskIncoming(IMessageBoxService msgBox) {
         ISelectionFilter filter = new SelectionFilterOpeningArTasksIncoming(Doc);
         var reference = _uiDocument.Selection.PickObject(
             ObjectType.LinkedElement,
@@ -988,11 +966,19 @@ internal class RevitRepository {
             if(opening is not null and FamilyInstance famInst) {
                 return new OpeningArTaskIncoming(this, famInst, link.GetTransform());
             } else {
-                ShowErrorMessage(_localization.GetLocalizedString("Errors.InvalidTaskFamily"));
+                msgBox.Show(
+                    _localization.GetLocalizedString("Errors.InvalidTaskFamily"),
+                    _localization.GetLocalizedString("OpeningTasks"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 throw new OperationCanceledException();
             }
         } else {
-            ShowErrorMessage(_localization.GetLocalizedString("Errors.InvalidElement"));
+            msgBox.Show(
+                _localization.GetLocalizedString("Errors.InvalidElement"),
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
     }
@@ -1110,20 +1096,6 @@ internal class RevitRepository {
     /// <exception cref="Autodesk.Revit.Exceptions.ForbiddenForDynamicUpdateException">Исключение, нельзя получить ссылку на документ</exception>
     public Document EditFamily(Family family) {
         return Doc.EditFamily(family);
-    }
-
-    /// <summary>
-    /// Выводит сообщение об ошибке
-    /// </summary>
-    /// <param name="message">Сообщение об ошибке</param>
-    public void ShowErrorMessage(string message) {
-        var dialog = GetMessageBoxService();
-        dialog.Show(
-            message,
-            _localization.GetLocalizedString("OpeningTasks"),
-            System.Windows.MessageBoxButton.OK,
-            System.Windows.MessageBoxImage.Error,
-            System.Windows.MessageBoxResult.OK);
     }
 
     /// <summary>
@@ -1281,20 +1253,35 @@ internal class RevitRepository {
     /// <param name="openingTasks">Задания на отверстия из активного документа, которые надо объединить</param>
     /// <param name="config">Настройки расстановки заданий на отверстия</param>
     /// <exception cref="System.OperationCanceledException">Исключение, операцию отменил пользователь</exception>
-    private OpeningPlacer GetOpeningPlacer(ICollection<OpeningMepTaskOutcoming> openingTasks, OpeningConfig config) {
+    private OpeningPlacer GetOpeningPlacer(
+        IMessageBoxService msgBox,
+        ICollection<OpeningMepTaskOutcoming> openingTasks,
+        OpeningConfig config) {
         try {
             var group = new OpeningsGroup(openingTasks);
             return group.GetOpeningPlacer(this, config);
 
         } catch(ArgumentNullException nullEx) {
-            ShowErrorMessage(nullEx.Message);
+            msgBox.Show(
+                nullEx.Message,
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
             throw new OperationCanceledException();
 
         } catch(ArgumentOutOfRangeException) {
-            ShowErrorMessage(_localization.GetLocalizedString("Errors.SelectTwoTasksAtLeast"));
+            msgBox.Show(
+                _localization.GetLocalizedString("Errors.SelectTwoTasksAtLeast"),
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
             throw new OperationCanceledException();
         } catch(InvalidOperationException) {
-            ShowErrorMessage(_localization.GetLocalizedString("Errors.CannotUniteTasks"));
+            msgBox.Show(
+                _localization.GetLocalizedString("Errors.CannotUniteTasks"),
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
     }
@@ -1317,17 +1304,6 @@ internal class RevitRepository {
                 OpeningTaskTypeName[type]));
         }
         return elements;
-    }
-
-    /// <summary>
-    /// Возвращает сервис диалоговых окон
-    /// </summary>
-    private IMessageBoxService GetMessageBoxService() {
-        return GetPlatformService<IMessageBoxService>();
-    }
-
-    private static T GetPlatformService<T>() {
-        return ServicesProvider.GetPlatformService<T>();
     }
 }
 

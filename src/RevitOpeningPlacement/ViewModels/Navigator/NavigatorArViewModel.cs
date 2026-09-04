@@ -23,14 +23,21 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// </summary>
 internal class NavigatorArViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
+    private readonly ISolidProviderUtils _solidUtils;
     private readonly IConstantsProvider _constantsProvider;
     private readonly ILocalizationService _localization;
 
     public NavigatorArViewModel(
         RevitRepository revitRepository,
+        ISolidProviderUtils solidUtils,
         IConstantsProvider constantsProvider,
+        IProgressDialogFactory progressDialogFactory,
+        IMessageBoxService messageBoxService,
         ILocalizationService localization) {
+        ProgressDialogFactory = progressDialogFactory ?? throw new ArgumentNullException(nameof(progressDialogFactory));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _solidUtils = solidUtils ?? throw new ArgumentNullException(nameof(solidUtils));
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         OpeningsMepTaskIncoming = [];
@@ -51,6 +58,9 @@ internal class NavigatorArViewModel : BaseViewModel {
         PlaceManyRealOpeningsByManyTasksInManyHostsCommand
             = RelayCommand.Create(PlaceManyRealOpeningsByManyTasksInManyHosts);
     }
+
+    public IProgressDialogFactory ProgressDialogFactory { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     // Входящие задания на отверстия
     public ObservableCollection<IOpeningMepTaskIncomingToArViewModel> OpeningsMepTaskIncoming { get; }
@@ -74,7 +84,7 @@ internal class NavigatorArViewModel : BaseViewModel {
     public ICommand PlaceManyRealOpeningsByManyTasksInManyHostsCommand { get; }
 
     private void SelectElement(ISelectorAndHighlighter famInstanceProvider) {
-        _revitRepository.SelectAndShowElement(famInstanceProvider);
+        _revitRepository.SelectAndShowElement(famInstanceProvider, MessageBoxService);
     }
 
     private bool CanSelect(ISelectorAndHighlighter p) {
@@ -191,28 +201,27 @@ internal class NavigatorArViewModel : BaseViewModel {
         ICollection<ElementId> constructureElementsIds) {
         var incomingTasksViewModels = new HashSet<OpeningMepTaskIncomingViewModel>();
 
-        using(var pb = GetPlatformService<IProgressDialogService>()) {
-            pb.StepValue = _constantsProvider.ProgressBarStepLarge;
-            pb.DisplayTitleFormat = "Анализ заданий... [{0}\\{1}]";
-            var progress = pb.CreateProgress();
-            pb.MaxValue = incomingTasks.Count;
-            var ct = pb.CreateCancellationToken();
-            pb.Show();
+        using var pb = ProgressDialogFactory.CreateDialog();
+        pb.StepValue = _constantsProvider.ProgressBarStepLarge;
+        pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.TaskAnalysis");
+        var progress = pb.CreateProgress();
+        pb.MaxValue = incomingTasks.Count;
+        var ct = pb.CreateCancellationToken();
+        pb.Show();
 
-            int i = 0;
-            foreach(var incomingTask in incomingTasks) {
-                ct.ThrowIfCancellationRequested();
-                progress.Report(i);
-                try {
-                    incomingTask.UpdateStatusAndHostName(realOpenings, constructureElementsIds);
-                } catch(ArgumentException) {
-                    // не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
-                    continue;
-                }
-
-                incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask, _localization));
-                i++;
+        int i = 0;
+        foreach(var incomingTask in incomingTasks) {
+            ct.ThrowIfCancellationRequested();
+            progress.Report(i);
+            try {
+                incomingTask.UpdateStatusAndHostName(_solidUtils, realOpenings, constructureElementsIds);
+            } catch(ArgumentException) {
+                // не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
+                continue;
             }
+
+            incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask, _localization));
+            i++;
         }
 
         return incomingTasksViewModels;
@@ -228,22 +237,21 @@ internal class NavigatorArViewModel : BaseViewModel {
         ICollection<OpeningRealAr> openingsReal) {
         var openingsRealViewModels = new HashSet<OpeningRealArViewModel>();
 
-        using(var pb = GetPlatformService<IProgressDialogService>()) {
-            pb.StepValue = _constantsProvider.ProgressBarStepSmall;
-            pb.DisplayTitleFormat = "Анализ отверстий... [{0}\\{1}]";
-            var progress = pb.CreateProgress();
-            pb.MaxValue = openingsReal.Count;
-            var ct = pb.CreateCancellationToken();
-            pb.Show();
+        using var pb = ProgressDialogFactory.CreateDialog();
+        pb.StepValue = _constantsProvider.ProgressBarStepSmall;
+        pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.OpeningAnalysis");
+        var progress = pb.CreateProgress();
+        pb.MaxValue = openingsReal.Count;
+        var ct = pb.CreateCancellationToken();
+        pb.Show();
 
-            int i = 0;
-            foreach(var openingReal in openingsReal) {
-                ct.ThrowIfCancellationRequested();
-                progress.Report(i);
-                openingReal.UpdateStatus(mepLinks);
-                openingsRealViewModels.Add(new OpeningRealArViewModel(openingReal, _localization));
-                i++;
-            }
+        int i = 0;
+        foreach(var openingReal in openingsReal) {
+            ct.ThrowIfCancellationRequested();
+            progress.Report(i);
+            openingReal.UpdateStatus(mepLinks);
+            openingsRealViewModels.Add(new OpeningRealArViewModel(openingReal, _localization));
+            i++;
         }
 
         return openingsRealViewModels;
