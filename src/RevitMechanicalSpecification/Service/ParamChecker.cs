@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
@@ -16,7 +17,7 @@ using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     internal class ParamChecker {
-        private readonly ElementEditChecker _elementEditChecker;
+        private readonly IElementEditorTracker _elementEditorTracker;
         private readonly List<RevitParam> _paramsToDataGroup = new List<RevitParam>() {
             SharedParamsConfig.Instance.VISHvacSystemFunction,
             SharedParamsConfig.Instance.VISSystemShortName,
@@ -106,8 +107,8 @@ namespace RevitMechanicalSpecification.Service {
         private SpecConfiguration _specConfiguration;
         private Document _document;
 
-        public ParamChecker(ElementEditChecker elementEditChecker) {
-            _elementEditChecker = elementEditChecker;
+        public ParamChecker(IElementEditorTracker elementEditorTracker) {
+            _elementEditorTracker = elementEditorTracker;
         }
 
         /// <summary>
@@ -138,7 +139,7 @@ namespace RevitMechanicalSpecification.Service {
                 return;
             }
 
-            if(_elementEditChecker.IsEditedByOtherUser(_document.ProjectInformation)) {
+            if(!_elementEditorTracker.IsEditAvailable(_document.ProjectInformation)) {
                 return;
             }
 
@@ -167,7 +168,7 @@ namespace RevitMechanicalSpecification.Service {
             return revitParams
                 .Where(revitParam => {
                     SharedParameterElement param = _document.GetSharedParam(revitParam.Name);
-                    return param == null || !_elementEditChecker.IsEditedByOtherUser(param);
+                    return param == null || _elementEditorTracker.IsEditAvailable(param);
                 })
                 .ToList();
         }

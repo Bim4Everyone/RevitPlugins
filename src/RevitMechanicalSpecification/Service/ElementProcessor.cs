@@ -23,7 +23,7 @@ namespace RevitMechanicalSpecification.Service {
     internal class ElementProcessor {
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
-        private readonly ElementEditChecker _elementEditChecker;
+        private readonly IElementEditorTracker _elementEditorTracker;
         private readonly DuctRotationCorrector _ductRotationCorrector;
         private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
@@ -36,14 +36,14 @@ namespace RevitMechanicalSpecification.Service {
         public ElementProcessor(
             Document document,
             SpecConfiguration specConfiguration,
-            ElementEditChecker elementEditChecker,
+            IElementEditorTracker elementEditorTracker,
             DuctRotationCorrector ductRotationCorrector) {
             _document = document;
 
             _specConfiguration = specConfiguration;
-            _elementEditChecker = elementEditChecker;
+            _elementEditorTracker = elementEditorTracker;
             _ductRotationCorrector = ductRotationCorrector;
-            _paramChecker = new ParamChecker(_elementEditChecker);
+            _paramChecker = new ParamChecker(_elementEditorTracker);
             _maskReplacer = new MaskReplacer(_specConfiguration);
         }
 
@@ -121,7 +121,7 @@ namespace RevitMechanicalSpecification.Service {
                     ProcessElement(manifoldElement, fillers);
                 }
                 t.Commit();
-                _elementEditChecker.ShowReport();
+                ShowElementEditorTrackerReport();
                 _ductRotationCorrector.ShowReport();
             }
         }
@@ -153,7 +153,7 @@ namespace RevitMechanicalSpecification.Service {
             foreach(Element element in elements) {
 
                 // Это должна быть всегда первая обработка. Если элемент недоступен для редактирования - идем дальше
-                if(_elementEditChecker.IsUnavailableForEdit(element)) {
+                if(!_elementEditorTracker.IsEditAvailable(element)) {
                     continue;
                 }
 
@@ -235,13 +235,39 @@ namespace RevitMechanicalSpecification.Service {
 
                 manifoldPartsIds.Add(subElement.Id);
 
-                if(_elementEditChecker.IsUnavailableForEdit(subElement)) {
+                if(!_elementEditorTracker.IsEditAvailable(subElement)) {
                     continue;
                 }
 
                 SpecificationElement subSpecificationElement = CreateSubSpecificationElement(subElement, familyInstance, specificationElement);
                 manifoldElements.Add(subSpecificationElement);
             }
+        }
+
+        private void ShowElementEditorTrackerReport() {
+            var (hasUpdatedInCentralElements, editors) = _elementEditorTracker.GetUnavailabilityInfo();
+            if(!hasUpdatedInCentralElements && editors.Count == 0) {
+                _elementEditorTracker.Reset();
+                return;
+            }
+
+            var reports = new List<string>();
+            if(hasUpdatedInCentralElements) {
+                reports.Add("Вы владеете элементами, но ваш файл устарел. Выполните синхронизацию.");
+            }
+
+            if(editors.Count > 0) {
+                reports.Add(
+                    "Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
+                    + string.Join(", ", editors.OrderBy(item => item, StringComparer.OrdinalIgnoreCase)));
+            }
+
+            ServicesProvider.GetPlatformService<IMessageBoxService>().Show(
+                string.Join(Environment.NewLine, reports),
+                "Обновление спецификации",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            _elementEditorTracker.Reset();
         }
 
         /// <summary>

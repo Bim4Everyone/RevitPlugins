@@ -6,6 +6,7 @@ using System.Windows;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
@@ -24,7 +25,7 @@ namespace RevitMechanicalSpecification.Service {
             new ElementId(BuiltInParameter.RBS_OFFSET_PARAM);
 
         private readonly Document _document;
-        private readonly ElementEditChecker _elementEditChecker;
+        private readonly IElementEditorTracker _elementEditorTracker;
         private readonly IMessageBoxService _messageBoxService;
         private bool _hasFailedDuctRecreations;
         private bool _hasDuctsWithoutSystem;
@@ -32,10 +33,10 @@ namespace RevitMechanicalSpecification.Service {
 
         public DuctRotationCorrector(
             Document document,
-            ElementEditChecker elementEditChecker,
+            IElementEditorTracker elementEditorTracker,
             IMessageBoxService messageBoxService) {
             _document = document;
-            _elementEditChecker = elementEditChecker;
+            _elementEditorTracker = elementEditorTracker;
             _messageBoxService = messageBoxService;
         }
 
@@ -313,7 +314,7 @@ namespace RevitMechanicalSpecification.Service {
                 .Concat(insulations)
                 .GroupBy(item => item.Id)
                 .Select(group => group.First())
-                .All(item => !_elementEditChecker.IsUnavailableForEdit(item));
+                .All(item => _elementEditorTracker.IsEditAvailable(item));
         }
 
         private DuctReplacement RecreateDuct(DuctData ductData) {

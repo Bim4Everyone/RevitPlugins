@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Bim4Everyone.SimpleServices.ElementEditorTracker;
 using dosymep.SimpleServices;
 
 using Ninject;
@@ -32,15 +33,17 @@ namespace RevitMechanicalSpecification {
                 .ToConstant(document)
                 .InSingletonScope();
 
+            kernel.UseElementEditorTracker();
+            IElementEditorTrackerFactory elementEditorTrackerFactory =
+                kernel.Get<IElementEditorTrackerFactory>();
+            kernel.Bind<IElementEditorTracker>()
+                .ToConstant(elementEditorTrackerFactory.Create(document));
+
             kernel.Bind<IMessageBoxService>()
                 .ToMethod(c => ServicesProvider.GetPlatformService<IMessageBoxService>())
                 .InSingletonScope();
 
             kernel.Bind<SpecConfiguration>()
-                .ToSelf()
-                .InSingletonScope();
-
-            kernel.Bind<ElementEditChecker>()
                 .ToSelf()
                 .InSingletonScope();
 
