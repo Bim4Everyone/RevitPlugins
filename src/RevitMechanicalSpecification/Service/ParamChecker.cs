@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
@@ -16,6 +17,7 @@ using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     internal class ParamChecker {
+        private readonly IElementEditorTracker _elementEditorTracker;
         private readonly List<RevitParam> _paramsToDataGroup = new List<RevitParam>() {
             SharedParamsConfig.Instance.VISHvacSystemFunction,
             SharedParamsConfig.Instance.VISSystemShortName,
@@ -105,6 +107,10 @@ namespace RevitMechanicalSpecification.Service {
         private SpecConfiguration _specConfiguration;
         private Document _document;
 
+        public ParamChecker(IElementEditorTracker elementEditorTracker) {
+            _elementEditorTracker = elementEditorTracker;
+        }
+
         /// <summary>
         /// Если параметр в сведениях о проекте пустой - ставим стандартное значение из согласованных инженерами
         /// </summary>
@@ -120,7 +126,23 @@ namespace RevitMechanicalSpecification.Service {
         /// <summary>
         /// Отдельная транзакция на проверку стандартных значений параметров
         /// </summary>
-        private void CheckParamterValues() {
+        private void CheckParameterValues() {
+            bool hasEmptyValues =
+                _document.ProjectInformation.GetSharedParamValueOrDefault<double>(
+                    _specConfiguration.ParamNameDuctInsulationStock, 0) == 0
+                || _document.ProjectInformation.GetSharedParamValueOrDefault<double>(
+                    _specConfiguration.ParamNameDuctPipeStock, 0) == 0
+                || _document.ProjectInformation.GetSharedParamValueOrDefault<double>(
+                    _specConfiguration.ParamNamePipeInsulationStock, 0) == 0;
+
+            if(!hasEmptyValues) {
+                return;
+            }
+
+            if(!_elementEditorTracker.IsEditAvailable(_document.ProjectInformation)) {
+                return;
+            }
+
             using(var t = _document.StartTransaction("Установка стандартных значений параметров")) {
                 // Цифры  по запасам получены получены письмом от 08.08.2024 на основании опыта стройки
                 FillInfoParamIfEmpty(_specConfiguration.ParamNameDuctInsulationStock, 20);
@@ -142,6 +164,15 @@ namespace RevitMechanicalSpecification.Service {
             definition.ReInsertToGroup(document, group);
         }
 
+        private List<RevitParam> GetEditableParams(IEnumerable<RevitParam> revitParams) {
+            return revitParams
+                .Where(revitParam => {
+                    SharedParameterElement param = _document.GetSharedParam(revitParam.Name);
+                    return param == null || _elementEditorTracker.IsEditAvailable(param);
+                })
+                .ToList();
+        }
+
         /// <summary>
         /// Создать недостающие параметры, устранить расхождения по галочкам
         /// </summary>
@@ -151,20 +182,23 @@ namespace RevitMechanicalSpecification.Service {
             _specConfiguration = specConfiguration;
 
             ProjectParameters projectParameters = ProjectParameters.Create(document.Application);
-            projectParameters.SetupRevitParams(document, _revitParams);
+            projectParameters.SetupRevitParams(document, GetEditableParams(_revitParams));
+
+            List<RevitParam> paramsToDataGroup = GetEditableParams(_paramsToDataGroup);
+            List<RevitParam> paramsToConstraints = GetEditableParams(_paramsToConstraints);
 
             using(var t = _document.StartTransaction("Смена групп параметров")) {
-                foreach(RevitParam revitParam in _paramsToDataGroup) {
+                foreach(RevitParam revitParam in paramsToDataGroup) {
                     SortParameterToGroup(document, revitParam.Name, GroupTypeId.Data);
                 }
 
-                foreach(RevitParam revitParam in _paramsToConstraints) {
+                foreach(RevitParam revitParam in paramsToConstraints) {
                     SortParameterToGroup(document, revitParam.Name, GroupTypeId.Constraints);
                 }
                 t.Commit();
             }
 
-            CheckParamterValues();
+            CheckParameterValues();
         }
     }
 }

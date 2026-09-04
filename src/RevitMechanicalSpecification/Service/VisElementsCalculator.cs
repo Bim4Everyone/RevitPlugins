@@ -157,7 +157,11 @@ namespace RevitMechanicalSpecification.Service {
             }
 
             double length = connectors[0].Origin.DistanceTo(connectors[1].Origin);
-            return UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(length));
+            double lengthInMillimeters = UnitConverter.DoubleToMilimeters(length);
+            double roundedLength = Math.Max(
+                50,
+                Math.Round(lengthInMillimeters / 50, MidpointRounding.AwayFromZero) * 50);
+            return UnitConverter.DoubleToString(roundedLength);
         }
 
         /// <summary>
