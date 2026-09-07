@@ -14,7 +14,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.ClashDetective;
 using RevitClashDetective.ViewModels.Services;
@@ -41,6 +41,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
     private readonly ILocalizationService _localization;
     private readonly IContentDialogService _contentDialogService;
     private readonly SettingsConfig _settingsConfig;
+    private readonly FilterContextsProvider _filterContextsProvider;
 
     public ReportViewModel(RevitRepository revitRepository,
         string name,
@@ -50,6 +51,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         IMessageBoxService messageBoxService,
         IContentDialogService contentDialogService,
         SettingsConfig settingsConfig,
+        FilterContextsProvider filterContextsProvider,
         ICollection<ClashModel> clashes) {
 
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
@@ -58,6 +60,8 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
+        _filterContextsProvider = filterContextsProvider
+            ?? throw new ArgumentNullException(nameof(filterContextsProvider));
 
         ClashStatuses = new ReadOnlyCollection<ClashStatusViewModel>([
             new ClashStatusViewModel(_localization, ClashStatus.Active),
@@ -288,7 +292,6 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
     private CheckViewModel GetCheckViewModel() {
         string path = Path.Combine(_revitRepository.GetObjectName(), _revitRepository.GetDocumentName());
         var checks = ChecksConfig.GetChecksConfig(path, _revitRepository.Doc);
-        var filters = FiltersConfig.GetFiltersConfig(path, _revitRepository.Doc);
 
         return checks.Checks
             .Select(c => new CheckViewModel(_revitRepository,
@@ -297,7 +300,7 @@ internal class ReportViewModel : BaseViewModel, INamedEntity, IEquatable<ReportV
             SaveFileDialogService,
             MessageBoxService,
             _settingsConfig,
-            filters,
+            _filterContextsProvider,
             _contentDialogService,
             c))
             .FirstOrDefault(c => c.ReportName.Equals(Name));

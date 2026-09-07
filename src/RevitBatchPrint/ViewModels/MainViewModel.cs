@@ -9,12 +9,11 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
-using dosymep.Revit;
-using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using RevitBatchPrint.Comparators;
 using RevitBatchPrint.Extensions;
 using RevitBatchPrint.Models;
 using RevitBatchPrint.Services;
@@ -337,10 +336,9 @@ internal class MainViewModel : BaseViewModel, IPrintContext, IExportContext {
     private SheetViewModel[] CreateSheetCollection(
         AlbumViewModel album,
         IEnumerable<(ViewSheet ViewSheet, FamilyInstance TitleBlock, Viewport[] Viewports)> sheetsInfo) {
-        LogicalStringComparer comparer = new();
         return sheetsInfo
             .Select(item => CreateSheet(album, item))
-            .OrderBy(item => item.SheetNumber, comparer)
+            .OrderBy(item => item.SheetNumber, new NamingComparator())
             .ToArray();
     }
 

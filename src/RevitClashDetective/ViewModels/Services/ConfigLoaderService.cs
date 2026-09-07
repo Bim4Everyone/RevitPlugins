@@ -46,7 +46,9 @@ internal class ConfigLoaderService {
     }
 
     public void CheckConfig(FiltersConfig filtersConfig) {
-        if(filtersConfig.Filters.Count == 0 && string.IsNullOrEmpty(filtersConfig.RevitVersion)) {
+        if(filtersConfig.FilterSettings.Count == 0
+            && filtersConfig.Filters.Count == 0
+            && string.IsNullOrEmpty(filtersConfig.RevitVersion)) {
             ShowError();
             throw new OperationCanceledException();
         }

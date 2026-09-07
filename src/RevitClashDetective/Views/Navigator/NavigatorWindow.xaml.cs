@@ -16,8 +16,8 @@ internal partial class NavigatorWindow {
 
         InitializeComponent();
         string[] paramNames = config.ParamNames;
-        int startFirst = 9;
-        int startSecond = 16;
+        int startFirst = 10;
+        int startSecond = 17;
         for(int i = 0; i < paramNames.Length; i++, startFirst++, startSecond += 2) {
             var firstElementColumn = new GridColumn() {
                 Header = $"{paramNames[i]} (1)",

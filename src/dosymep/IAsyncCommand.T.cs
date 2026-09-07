@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿#nullable disable
+
+using System.Threading.Tasks;
 
 namespace dosymep.WPF.Commands {
     internal interface IAsyncCommand<T> : IAsyncCommand {

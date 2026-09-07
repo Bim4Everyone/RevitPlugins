@@ -25,6 +25,7 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     private bool _clashDataIsValid;
     private ClashCommentViewModel _selectedComment;
     private bool _canEditComments = true;
+    private bool _visited;
 
     public ClashViewModel(RevitRepository revitRepository, ClashModel clash, ILocalizationService localizationService) {
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
@@ -86,6 +87,11 @@ internal class ClashViewModel : BaseViewModel, IClashViewModel, IEquatable<Clash
     public bool ClashDataIsValid {
         get => _clashDataIsValid;
         set => RaiseAndSetIfChanged(ref _clashDataIsValid, value);
+    }
+
+    public bool Visited {
+        get => _visited;
+        set => RaiseAndSetIfChanged(ref _visited, value);
     }
 
     public ClashCommentViewModel SelectedComment {

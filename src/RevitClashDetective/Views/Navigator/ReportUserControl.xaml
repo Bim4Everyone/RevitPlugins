@@ -36,6 +36,11 @@
                     Property="AllowEditing"
                     Value="False" />
             </Style>
+            <converters:BoolToVisibilityConverter
+                x:Key="VisitedConverter"
+                DefaultValue="Collapsed"
+                TrueValue="Visible"
+                FalseValue="Collapsed" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -140,6 +145,26 @@
             </res:CustomGridControl.View>
 
             <res:CustomGridControl.Columns>
+                <dxg:GridColumn
+                    Width="30"
+                    MinWidth="30"
+                    AllowResizing="False"
+                    AllowSorting="True"
+                    AllowGrouping="True"
+                    FieldName="Visited"
+                    Header=""
+                    Style="{StaticResource ReadOnlyColumn}">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image
+                                Width="16"
+                                Height="16"
+                                Visibility="{Binding Row.Visited, Converter={StaticResource VisitedConverter}}"
+                                Source="pack://application:,,,/DevExpress.Images.v21.2;component/Office2013/Actions/Show_16x16.png" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+
                 <dxg:GridColumn
                     ReadOnly="True"
                     Width="70"

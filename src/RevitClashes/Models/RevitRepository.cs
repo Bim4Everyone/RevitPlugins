@@ -64,6 +64,7 @@ internal class RevitRepository {
             if(!Directory.Exists(path)) {
                 path = LocalProfilePath;
             }
+
             return path;
         }
     }

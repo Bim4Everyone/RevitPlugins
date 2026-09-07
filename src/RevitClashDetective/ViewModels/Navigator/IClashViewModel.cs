@@ -70,6 +70,11 @@ internal interface IClashViewModel : INotifyPropertyChanged, ICommentable {
     bool ClashDataIsValid { get; }
 
     /// <summary>
+    /// Флаг, обозначающий, что пользователь переходил к этой коллизии в модели.
+    /// </summary>
+    bool Visited { get; set; }
+
+    /// <summary>
     /// Значения дополнительных параметров первого элемента коллизии.
     /// Названия генерируемых свойств должны быть в формате Field0, Field1 и так далее.
     /// </summary>

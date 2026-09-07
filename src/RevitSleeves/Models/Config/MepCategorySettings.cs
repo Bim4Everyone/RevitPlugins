@@ -2,8 +2,6 @@ using Autodesk.Revit.DB;
 
 using pyRevitLabs.Json;
 
-using RevitClashDetective.Models.FilterModel;
-
 namespace RevitSleeves.Models.Config;
 internal abstract class MepCategorySettings {
     protected MepCategorySettings() { }
@@ -12,7 +10,10 @@ internal abstract class MepCategorySettings {
     [JsonIgnore]
     public abstract BuiltInCategory Category { get; }
 
-    public Set MepFilterSet { get; set; } = new Set();
+    /// <summary>
+    /// Сериализованный контекст фильтра (<see cref="Bim4Everyone.RevitFiltration.Controls.ILogicalFilterContext"/>)
+    /// </summary>
+    public string MepFilterContext { get; set; }
 
     public Offset[] Offsets { get; set; } = [];
 
