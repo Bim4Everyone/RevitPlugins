@@ -292,6 +292,9 @@ internal class PlacementConfigurator {
             // правила по габаритам добавляются в отдельный фильтр "И" вместе с фильтром пользователя,
             // т.к. корневой фильтр пользователя может быть настроен как "ИЛИ"
             var categoryFilter = _filterFactory.CreateAndFilter();
+            // фильтр добавляется в корневой, пока он еще пустой,
+            // добавление непустого фильтра в непустой родительский вызывает бесконечную рекурсию в Bim4Everyone.RevitFiltration
+            root.AddFilter(categoryFilter);
             if(withMinSizes) {
                 foreach(var minSizeRule in FiltersInitializer.GetMinSizeRules(mepCategory)) {
                     categoryFilter.AddGreaterOrEqualRule(minSizeRule.Param, minSizeRule.Value);
@@ -299,7 +302,6 @@ internal class PlacementConfigurator {
             }
 
             categoryFilter.AddFilter(ParseUserFilter(mepCategory.MepFilterContext));
-            root.AddFilter(categoryFilter);
         }
 
         return new CategoryFilter(name, root, categories);
@@ -318,7 +320,11 @@ internal class PlacementConfigurator {
         string structureName = RevitRepository.StructureCategoryNames[structureCategory];
         var root = _filterFactory.CreateOrFilter();
         foreach(var mepCategory in mepCategories) {
-            root.AddFilter(ParseUserFilter(GetStructureFilterContext(mepCategory, structureName)));
+            // фильтр пользователя оборачивается в отдельный пустой фильтр "И",
+            // добавление непустого фильтра в непустой родительский вызывает бесконечную рекурсию в Bim4Everyone.RevitFiltration
+            var categoryFilter = _filterFactory.CreateAndFilter();
+            root.AddFilter(categoryFilter);
+            categoryFilter.AddFilter(ParseUserFilter(GetStructureFilterContext(mepCategory, structureName)));
         }
 
         return new CategoryFilter(
