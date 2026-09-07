@@ -108,6 +108,8 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
         kernel.UseWpfUIProgressDialog();
         kernel.UseWpfUIMessageBox();
+        kernel.UseWpfUIProgressDialog<ProgressDialogProxy>();
+        kernel.Bind<ProgressDialogProxy>().ToSelf().InSingletonScope();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
@@ -174,7 +176,7 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
 
         var localization = kernel.Get<ILocalizationService>();
 
-        using var pb = kernel.Get<IProgressDialogService>();
+        using var pb = kernel.Get<ProgressDialogProxy>().Create();
         pb.StepValue = _progressBarStepValue;
         pb.DisplayTitleFormat = localization.GetLocalizedString("Progress.TasksPlacing");
         var progress = pb.CreateProgress();
@@ -242,7 +244,7 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         IKernel kernel,
         ICollection<OpeningMepTaskOutcoming> newOpenings,
         ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings) {
-        using var pb = kernel.Get<IProgressDialogService>();
+        using var pb = kernel.Get<ProgressDialogProxy>().Create();
         pb.StepValue = _progressBarStepValue;
         pb.DisplayTitleFormat = kernel.Get<ILocalizationService>().GetLocalizedString("Progress.CheckDuplicates");
         var progressRemove = pb.CreateProgress();
@@ -298,7 +300,7 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
     private void InitializeUnion(
         IKernel kernel,
         ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion) {
-        using var pb = kernel.Get<IProgressDialogService>();
+        using var pb = kernel.Get<ProgressDialogProxy>().Create();
         pb.StepValue = _progressBarStepValue;
         pb.DisplayTitleFormat = kernel.Get<ILocalizationService>().GetLocalizedString("Progress.UniteTouching");
         var progressUnite = pb.CreateProgress();
