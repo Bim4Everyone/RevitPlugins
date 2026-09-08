@@ -26,11 +26,13 @@ internal class KrParameterClassifierVM : ParameterClassifierVM {
         MaterialReportService materialReportService,
         ClassifierExcelReader classifierExcelReader,
         ConcreteParamsSetter concreteParamsSetter,
+        SystemPluginConfig systemPluginConfig,
         ReportV reportV,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) :
         base(pluginConfig, revitRepository, localizationService, workGroupCode, materialParamSetter, materialReportService,
-            classifierExcelReader, reportV, openFileDialogService, messageBoxService) {
+            classifierExcelReader, systemPluginConfig, reportV, openFileDialogService,
+            messageBoxService) {
 
         _concreteParamsSetter = concreteParamsSetter;
     }

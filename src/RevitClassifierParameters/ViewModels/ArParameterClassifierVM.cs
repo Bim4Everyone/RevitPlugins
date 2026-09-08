@@ -20,6 +20,7 @@ namespace RevitClassifierParameters.ViewModels;
 
 internal class ArParameterClassifierVM : ParameterClassifierVM {
     private readonly FacadeTypeSetter _facadeTypeSetter;
+    protected readonly FacadeTypeExcelReader _facadeTypeExcelReader;
 
     /// <summary>
     /// Стандартный путь к файлу правил заполнения типа фасада.
@@ -52,9 +53,11 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) :
         base(pluginConfig, revitRepository, localizationService, workGroupCode, materialParamSetter, materialReportService,
-            classifierExcelReader, facadeTypeExcelReader, reportV, openFileDialogService, messageBoxService) {
+            classifierExcelReader, systemPluginConfig, reportV, openFileDialogService,
+            messageBoxService) {
 
         _facadeTypeSetter = facadeTypeSetter;
+        _facadeTypeExcelReader = facadeTypeExcelReader;
 
         _excelFacadeTypePath = _systemPluginConfig.FacadeTypeFilePath;
 
