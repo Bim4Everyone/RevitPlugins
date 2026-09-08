@@ -25,7 +25,6 @@ namespace RevitMechanicalSpecification.Service {
             new ElementId(BuiltInParameter.RBS_OFFSET_PARAM);
 
         private readonly Document _document;
-        private readonly IElementEditorTracker _elementEditorTracker;
         private readonly IMessageBoxService _messageBoxService;
         private bool _hasFailedDuctRecreations;
         private bool _hasDuctsWithoutSystem;
@@ -33,14 +32,14 @@ namespace RevitMechanicalSpecification.Service {
 
         public DuctRotationCorrector(
             Document document,
-            IElementEditorTracker elementEditorTracker,
             IMessageBoxService messageBoxService) {
             _document = document;
-            _elementEditorTracker = elementEditorTracker;
             _messageBoxService = messageBoxService;
         }
 
-        public void Execute(ElementSplitResult splitResult) {
+        public void Execute(
+            ElementSplitResult splitResult,
+            IElementEditorTracker elementEditorTracker) {
             if(splitResult == null) {
                 throw new ArgumentNullException(nameof(splitResult));
             }
@@ -74,7 +73,7 @@ namespace RevitMechanicalSpecification.Service {
                 try {
                     // Шаг 4. Проверяем горизонтальность и поворот, затем при необходимости пересоздаем воздуховод.
                     var duct = (Duct) specificationElement.Element;
-                    DuctReplacement replacement = ReplaceIfRequired(duct);
+                    DuctReplacement replacement = ReplaceIfRequired(duct, elementEditorTracker);
                     if(replacement == null) {
                         continue;
                     }
@@ -130,7 +129,9 @@ namespace RevitMechanicalSpecification.Service {
                 MessageBoxImage.Warning);
         }
 
-        private DuctReplacement ReplaceIfRequired(Duct duct) {
+        private DuctReplacement ReplaceIfRequired(
+            Duct duct,
+            IElementEditorTracker elementEditorTracker) {
             if(!(duct.Location is LocationCurve locationCurve)
                || !(locationCurve.Curve is Line line)
                || !IsHorizontal(line)) {
@@ -150,7 +151,7 @@ namespace RevitMechanicalSpecification.Service {
                 return null;
             }
 
-            if(!CanEditRelatedElements(ductData)) {
+            if(!CanEditRelatedElements(ductData, elementEditorTracker)) {
                 return null;
             }
 
@@ -304,7 +305,9 @@ namespace RevitMechanicalSpecification.Service {
             }
         }
 
-        private bool CanEditRelatedElements(DuctData ductData) {
+        private bool CanEditRelatedElements(
+            DuctData ductData,
+            IElementEditorTracker elementEditorTracker) {
             IEnumerable<Element> connectedElements = ductData.Ends
                 .SelectMany(item => item.Connections)
                 .Select(item => item.Owner);
@@ -314,7 +317,7 @@ namespace RevitMechanicalSpecification.Service {
                 .Concat(insulations)
                 .GroupBy(item => item.Id)
                 .Select(group => group.First())
-                .All(item => _elementEditorTracker.IsEditAvailable(item));
+                .All(item => elementEditorTracker.IsEditAvailable(item));
         }
 
         private DuctReplacement RecreateDuct(DuctData ductData) {

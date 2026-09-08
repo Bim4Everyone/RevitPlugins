@@ -36,12 +36,12 @@ namespace RevitMechanicalSpecification.Service {
         public ElementProcessor(
             Document document,
             SpecConfiguration specConfiguration,
-            IElementEditorTracker elementEditorTracker,
+            IElementEditorTrackerFactory elementEditorTrackerFactory,
             DuctRotationCorrector ductRotationCorrector) {
             _document = document;
 
             _specConfiguration = specConfiguration;
-            _elementEditorTracker = elementEditorTracker;
+            _elementEditorTracker = elementEditorTrackerFactory.Create(document);
             _ductRotationCorrector = ductRotationCorrector;
             _paramChecker = new ParamChecker(_elementEditorTracker);
             _maskReplacer = new MaskReplacer(_specConfiguration);
@@ -83,7 +83,7 @@ namespace RevitMechanicalSpecification.Service {
             _paramChecker.ExecuteParamCheck(_document, _specConfiguration);
 
             using(var t = _document.StartTransaction("Обновление спецификации")) {
-                _ductRotationCorrector.Execute(splitResult);
+                _ductRotationCorrector.Execute(splitResult, _elementEditorTracker);
 
                 var totalElements = splitResult.SingleElements.Count + splitResult.ManifoldElements.Count;
                 

@@ -34,10 +34,6 @@ namespace RevitMechanicalSpecification {
                 .InSingletonScope();
 
             kernel.UseElementEditorTracker();
-            IElementEditorTrackerFactory elementEditorTrackerFactory =
-                kernel.Get<IElementEditorTrackerFactory>();
-            kernel.Bind<IElementEditorTracker>()
-                .ToConstant(elementEditorTrackerFactory.Create(document));
 
             kernel.Bind<IMessageBoxService>()
                 .ToMethod(c => ServicesProvider.GetPlatformService<IMessageBoxService>())
