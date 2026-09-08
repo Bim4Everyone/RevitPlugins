@@ -59,14 +59,20 @@ internal class PlaceOpeningTasksBySelectionCmd : PlaceOpeningTasksCmd {
         kernel.Bind<ISolidProviderUtils>()
             .To<SolidProviderUtils>()
             .InSingletonScope();
+        kernel.Bind<OpeningConfig>()
+            .ToMethod(c => OpeningConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document));
 
         kernel.UseLogicalFilterFactory();
         kernel.UseFilterContextParser();
 
+        kernel.UseWpfUIThemeUpdater();
         kernel.UseWpfWindowsTheme();
         kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
         kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
         kernel.UseWpfUIProgressDialog();
+        kernel.UseWpfUIMessageBox();
+        kernel.UseWpfUIProgressDialog<ProgressDialogProxy>();
+        kernel.Bind<ProgressDialogProxy>().ToSelf().InSingletonScope();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
