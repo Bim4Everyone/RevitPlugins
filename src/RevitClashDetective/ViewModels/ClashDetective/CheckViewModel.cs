@@ -10,7 +10,7 @@ using dosymep.WPF.ViewModels;
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.ClashDetection;
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.ViewModels.Navigator;
 using RevitClashDetective.Views;
@@ -23,7 +23,7 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
     private readonly SettingsConfig _settingsConfig;
-    private readonly FiltersConfig _filtersConfig;
+    private readonly FilterContextsProvider _filterContextsProvider;
     private readonly IContentDialogService _contentDialogService;
     private string _name;
     private string _errorText;
@@ -38,7 +38,7 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
         SettingsConfig settingsConfig,
-        FiltersConfig filtersConfig,
+        FilterContextsProvider filterContextsProvider,
         IContentDialogService contentDialogService,
         Check check = null) {
 
@@ -48,7 +48,8 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
-        _filtersConfig = filtersConfig ?? throw new ArgumentNullException(nameof(filtersConfig));
+        _filterContextsProvider = filterContextsProvider
+                                  ?? throw new ArgumentNullException(nameof(filterContextsProvider));
         _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
         Name = check?.Name ?? _localizationService.GetLocalizedString("MainWindow.CheckDefaultName");
 
@@ -62,7 +63,6 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
         ShowClashesCommand = RelayCommand.Create(ShowClashes, CanShowClashes);
     }
 
-    public ICommand SelectMainProviderCommand { get; }
     public ICommand ShowClashesCommand { get; }
     public bool IsFilterSelected => FirstSelection.SelectedProviders.Any() && SecondSelection.SelectedProviders.Any();
     public bool IsFilesSelected => FirstSelection.SelectedFiles.Any() && SecondSelection.SelectedFiles.Any();
@@ -146,12 +146,12 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
 
     private void InitializeSelections(Check check = null) {
         FirstSelection = new SelectionViewModel(_revitRepository,
-            _filtersConfig,
+            _filterContextsProvider,
             _localizationService,
             _contentDialogService,
             check?.FirstSelection);
         SecondSelection = new SelectionViewModel(_revitRepository,
-            _filtersConfig,
+            _filterContextsProvider,
             _localizationService,
             _contentDialogService,
             check?.SecondSelection);
@@ -197,6 +197,7 @@ internal class CheckViewModel : BaseViewModel, INamedEntity {
             _localizationService,
             _contentDialogService,
             _settingsConfig,
+            _filterContextsProvider,
             ReportName) { OpenFromClashDetector = true }
         };
         view.Show();

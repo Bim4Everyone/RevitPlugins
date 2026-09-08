@@ -14,7 +14,6 @@ using RevitMechanicalSpecification.Entities;
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamUnitFiller : ElementParamFiller {
         private readonly List<BuiltInCategory> _linearElements = new List<BuiltInCategory>() {
-                BuiltInCategory.OST_DuctCurves,
                 BuiltInCategory.OST_PipeCurves,
                 BuiltInCategory.OST_FlexDuctCurves,
                 BuiltInCategory.OST_FlexPipeCurves,
@@ -92,6 +91,11 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 }
                 return Config.SquareUnit;
             }
+            
+            if(element.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
+                return DefaultCheck(Config.SquareUnit);
+            }
+            
             if(element.Category.IsId(BuiltInCategory.OST_DuctInsulations)) {
                 return DefaultCheck(Config.SquareUnit);
             }

@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
@@ -19,16 +20,15 @@ namespace RevitClassifierParameters.ViewModels;
 
 internal class ArParameterClassifierVM : ParameterClassifierVM {
     private readonly FacadeTypeSetter _facadeTypeSetter;
-    private readonly FacadeTypeExcelReader _facadeTypeExcelReader;
 
     /// <summary>
     /// Стандартный путь к файлу правил заполнения типа фасада.
     /// </summary>
-    private string _excelFacadeTypePath;
+    private string _excelFacadeTypePath = string.Empty;
     /// <summary>
     /// Стандартное наименование параметра стен на экземпляре, куда нужно заполнить тип фасада.
     /// </summary>
-    private string _facadeTypeParamName = "ФОП_Группирование";
+    private string _facadeTypeParamName = SharedParamsConfig.Instance.Grouping.Name;
     private bool _workWithMasonryCode;
     private bool _workWithRoofCode;
     private bool _workWithFacadeCode;
@@ -47,18 +47,16 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         ClassifierExcelReader classifierExcelReader,
         FacadeTypeExcelReader facadeTypeExcelReader,
         FacadeTypeSetter facadeTypeSetter,
+        SystemPluginConfig systemPluginConfig,
         ReportV reportV,
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) :
         base(pluginConfig, revitRepository, localizationService, workGroupCode, materialParamSetter, materialReportService,
-            classifierExcelReader, reportV, openFileDialogService, messageBoxService) {
+            classifierExcelReader, facadeTypeExcelReader, reportV, openFileDialogService, messageBoxService) {
 
         _facadeTypeSetter = facadeTypeSetter;
-        _facadeTypeExcelReader = facadeTypeExcelReader;
 
-        _excelFacadeTypePath =
-            @"W:\Проектный институт\Отд.стандарт.BIM и RD\BIM-Ресурсы\5-Надстройки\Bim4Everyone\A101\"
-            + $@"{_revitRepository.Application.VersionNumber}\RevitClassifierParameters\Правила заполнения типа фасада.xlsx";
+        _excelFacadeTypePath = _systemPluginConfig.FacadeTypeFilePath;
 
         ReadFacadeTypeExcelCommand = RelayCommand.Create(RereadFacadeTypeExcel);
     }

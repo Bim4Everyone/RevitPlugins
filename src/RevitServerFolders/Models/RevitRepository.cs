@@ -1,8 +1,13 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+
+using dosymep.Revit.FileInfo;
 
 namespace RevitServerFolders.Models;
 internal class RevitRepository {
@@ -18,14 +23,25 @@ internal class RevitRepository {
     public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
 
-    public Document OpenDocumentFile(string fileName) {
+    /// <summary>
+    /// Открывает документ отсоединенным от центральной модели
+    /// </summary>
+    /// <param name="fileName">Полный путь к документу</param>
+    /// <param name="worksetHideTemplates">
+    /// Рабочие наборы, в названиях которых содержится подстрока из коллекции, не будут открыты
+    /// </param>
+    public Document OpenDocumentFile(string fileName, string[] worksetHideTemplates = null) {
         var modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(fileName);
         var opts = new OpenOptions() {
             AllowOpeningLocalByWrongUser = true,
             OpenForeignOption = OpenForeignOption.Open,
-            DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets
+            Audit = false
         };
-        opts.SetOpenWorksetsConfiguration(new WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets));
+        if(modelPath.ServerPath
+           || IsWorkshared(fileName)) {
+            opts.DetachFromCentralOption = DetachFromCentralOption.DetachAndPreserveWorksets;
+            opts.SetOpenWorksetsConfiguration(GetWorksetConfiguration(modelPath, worksetHideTemplates));
+        }
         return Application.OpenDocumentFile(
             modelPath,
             opts);
@@ -66,5 +82,45 @@ internal class RevitRepository {
         exportOptions.ExportRoomAsAttribute = true;
 
         return exportOptions;
+    }
+
+    /// <summary>
+    /// Проверяет, является ли документ совместным.
+    /// </summary>
+    private bool IsWorkshared(string fileName) {
+        try {
+            return BasicFileInfo.Extract(fileName).IsWorkshared;
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+            try {
+                return new RevitFileInfo(fileName).BasicFileInfo.IsWorkshared;
+            } catch(ArgumentException) {
+                return false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Возвращает конфигурацию, в которой открыты все рабочие наборы,
+    /// кроме наборов с подстрокой из <paramref name="worksetHideTemplates"/> в названии
+    /// </summary>
+    private WorksetConfiguration GetWorksetConfiguration(ModelPath modelPath, string[] worksetHideTemplates) {
+        if(worksetHideTemplates is null
+           || worksetHideTemplates.Length == 0) {
+            return new WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets);
+        }
+
+        try {
+            IList<WorksetId> worksetsToOpen = WorksharingUtils.GetUserWorksetInfo(modelPath)
+                .Where(workset => !worksetHideTemplates.Any(template =>
+                    workset.Name.IndexOf(template, StringComparison.OrdinalIgnoreCase) >= 0))
+                .Select(workset => workset.Id)
+                .ToList();
+
+            var config = new WorksetConfiguration(WorksetConfigurationOption.CloseAllWorksets);
+            config.Open(worksetsToOpen);
+            return config;
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+            return new WorksetConfiguration(WorksetConfigurationOption.OpenAllWorksets);
+        }
     }
 }

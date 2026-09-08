@@ -15,6 +15,7 @@
     xmlns:dosymepConverters="clr-namespace:dosymep.WPF.Converters"
     xmlns:pluginConverters="clr-namespace:RevitServerFolders.Converters"
     xmlns:pluginBehaviors="clr-namespace:RevitServerFolders.Behaviors"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Height="450"
@@ -44,49 +45,28 @@
                     Source="../Resources/CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <ui:SymbolRegular
-                x:Key="DocumentIcon">Document20</ui:SymbolRegular>
-            <ui:SymbolRegular
-                x:Key="FolderIcon">Folder20</ui:SymbolRegular>
-            <ui:SymbolRegular
-                x:Key="BuildingIcon">Building20</ui:SymbolRegular>
-
-            <dosymepConverters:InverseBooleanConverter
-                x:Key="InverseBooleanConverter" />
             <converters:BoolToVisibilityConverter
                 x:Key="BooleanToVisibilityConverter" />
             <pluginConverters:MiddleEllipsisConverter
                 x:Key="MiddleEllipsisConverter" />
-            <pluginConverters:CellImageConverter
-                x:Key="CellImageConverter"
-                Empty="{StaticResource DocumentIcon}"
-                Model="{StaticResource BuildingIcon}"
-                Folder="{StaticResource FolderIcon}" />
+            <!-- Ширина метки "Куда:/Откуда:" с отступами: вычитается из ширины колонки,
+                 чтобы получить место, доступное под путь -->
+            <system:Double
+                x:Key="TargetsLabelOffset">80</system:Double>
 
-            <ui:TextBlock
-                x:Key="NameHeader"
-                Text="{me:LocalizationSource MainWindow.NameHeader}" />
-            <ui:TextBlock
-                x:Key="FullNameHeader"
-                Text="{me:LocalizationSource MainWindow.FullNameHeader}" />
             <ui:TextBlock
                 x:Key="TargetsHeader"
                 Text="{me:LocalizationSource MainWindow.TargetsHeader}" />
 
             <Style
-                x:Key="CustomDataGridTextDisabledStyle"
-                TargetType="TextBlock"
-                BasedOn="{StaticResource DefaultDataGridTextElementStyle}">
-                <Style.Triggers>
-                    <DataTrigger
-                        Value="True"
-                        Binding="{Binding Path=SkipObject}">
-                        <Setter
-                            Property="Foreground"
-                            Value="{DynamicResource TextFillColorDisabledBrush}" />
-                    </DataTrigger>
-                </Style.Triggers>
+                x:Key="NoResizeColumnHeaderStyle"
+                TargetType="GridViewColumnHeader"
+                BasedOn="{StaticResource UiGridViewColumnHeaderStyle}">
+                <Setter
+                    Property="pluginBehaviors:GridViewColumnHeaderProperty.CanUserResize"
+                    Value="False" />
             </Style>
+
             <Style
                 TargetType="DockPanel"
                 x:Key="VisibleOnExecutingPanel">
@@ -206,7 +186,7 @@
             LastChildFill="True"
             Grid.Row="1"
             Grid.Column="0"
-            Margin="10 0 0 0">
+            Margin="8 0 0 0">
             <Border
                 DockPanel.Dock="Bottom"
                 Visibility="{Binding SelectedSettings.IsNwcExport, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -228,120 +208,123 @@
                 <DockPanel
                     LastChildFill="True">
                     <ui:Button
-                        Margin="0 0 0 10"
+                        Margin="0 0 0 8"
                         DockPanel.Dock="Top"
                         Content="{ui:SymbolIcon Symbol=Add20}"
                         Command="{Binding AddSettingsCommand}" />
-                    <ui:DataGrid
-                        Grid.Row="5"
-                        Margin="5"
-                        Style="{StaticResource CustomResizableDataGridStyle}"
+                    <ui:ListView
+                        Margin="4"
+                        BorderThickness="0"
                         ItemsSource="{Binding SettingsCollection}"
                         SelectedItem="{Binding SelectedSettings}">
-                        <ui:DataGrid.Columns>
-                            <DataGridTextColumn
-                                Width="Auto"
-                                IsReadOnly="True"
-                                CanUserReorder="False"
-                                CanUserResize="False"
-                                CanUserSort="True"
-                                Header="№"
-                                Binding="{Binding Index}" />
-                            <DataGridCheckBoxColumn
-                                CanUserReorder="False"
-                                CanUserResize="False"
-                                CanUserSort="False"
-                                Width="Auto"
-                                Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}">
-                                <DataGridCheckBoxColumn.Header>
-                                    <CheckBox
-                                        IsChecked="{Binding DataContext.AllSelected, RelativeSource={RelativeSource AncestorType=ui:DataGrid}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </DataGridCheckBoxColumn.Header>
-                            </DataGridCheckBoxColumn>
-                            <DataGridTemplateColumn
-                                Width="180"
-                                MinWidth="180"
-                                Header="{StaticResource TargetsHeader}">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel
-                                            Height="50"
-                                            Margin="5 2">
-                                            <DockPanel
-                                                Margin="0 0 0 5">
-                                                <ui:TextBlock
-                                                    Width="55"
-                                                    Margin="0 0 5 0"
-                                                    Foreground="{DynamicResource LabelForeground}"
-                                                    Text="{Binding TargetToLabel}" />
-                                                <ui:TextBlock
-                                                    Foreground="{DynamicResource LabelForeground}"
-                                                    ToolTip="{Binding TargetFolder}">
-                                                    <i:Interaction.Behaviors>
-                                                        <pluginBehaviors:TextBlockResizeHelper />
-                                                    </i:Interaction.Behaviors>
-                                                    <ui:TextBlock.Text>
-                                                        <MultiBinding
-                                                            Converter="{StaticResource MiddleEllipsisConverter}">
-                                                            <Binding
-                                                                Path="TargetFolder" />
-                                                            <Binding
-                                                                RelativeSource="{RelativeSource Self}" />
-                                                            <Binding
-                                                                RelativeSource="{RelativeSource Self}"
-                                                                Path="ActualWidth" />
-                                                        </MultiBinding>
-                                                    </ui:TextBlock.Text>
-                                                </ui:TextBlock>
-                                            </DockPanel>
-                                            <DockPanel>
-                                                <ui:TextBlock
-                                                    Width="55"
-                                                    Margin="0 0 5 0"
-                                                    Foreground="{DynamicResource LabelForeground}"
-                                                    Text="{Binding TargetFromLabel}" />
-                                                <ui:TextBlock
-                                                    Foreground="{DynamicResource LabelForeground}"
-                                                    ToolTip="{Binding SourceFolder}">
-                                                    <i:Interaction.Behaviors>
-                                                        <pluginBehaviors:TextBlockResizeHelper />
-                                                    </i:Interaction.Behaviors>
-                                                    <ui:TextBlock.Text>
-                                                        <MultiBinding
-                                                            Converter="{StaticResource MiddleEllipsisConverter}">
-                                                            <Binding
-                                                                Path="SourceFolder" />
-                                                            <Binding
-                                                                RelativeSource="{RelativeSource Self}" />
-                                                            <Binding
-                                                                RelativeSource="{RelativeSource Self}"
-                                                                Path="ActualWidth" />
-                                                        </MultiBinding>
-                                                    </ui:TextBlock.Text>
-                                                </ui:TextBlock>
-                                            </DockPanel>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn
-                                CanUserReorder="False"
-                                CanUserResize="False"
-                                CanUserSort="False"
-                                Width="Auto">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:Button
-                                            Appearance="Danger"
-                                            Content="{ui:SymbolIcon Symbol=Delete20}"
-                                            Command="{Binding DataContext.RemoveSettingsCommand,
+                        <ui:ListView.View>
+                            <GridView
+                                ColumnHeaderContainerStyle="{StaticResource UiGridViewColumnHeaderStyle}">
+                                <GridViewColumn
+                                    Header="№"
+                                    Width="30"
+                                    HeaderContainerStyle="{StaticResource NoResizeColumnHeaderStyle}"
+                                    DisplayMemberBinding="{Binding Index}" />
+                                <GridViewColumn
+                                    HeaderContainerStyle="{StaticResource NoResizeColumnHeaderStyle}">
+                                    <GridViewColumn.Header>
+                                        <CheckBox
+                                            IsChecked="{Binding DataContext.AllSelected, RelativeSource={RelativeSource AncestorType=ui:ListView}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </GridViewColumn.Header>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn
+                                    Width="180"
+                                    Header="{StaticResource TargetsHeader}">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel
+                                                Height="50"
+                                                Margin="4 2">
+                                                <DockPanel
+                                                    Margin="0 0 0 4">
+                                                    <ui:TextBlock
+                                                        Width="55"
+                                                        Margin="0 0 4 0"
+                                                        Foreground="{DynamicResource LabelForeground}"
+                                                        Text="{Binding TargetToLabel}" />
+                                                    <ui:TextBlock
+                                                        Foreground="{DynamicResource LabelForeground}"
+                                                        ToolTip="{Binding TargetFolder}">
+                                                        <i:Interaction.Behaviors>
+                                                            <pluginBehaviors:TextBlockResizeHelper />
+                                                        </i:Interaction.Behaviors>
+                                                        <ui:TextBlock.Text>
+                                                            <MultiBinding
+                                                                Converter="{StaticResource MiddleEllipsisConverter}">
+                                                                <Binding
+                                                                    Path="TargetFolder" />
+                                                                <Binding
+                                                                    RelativeSource="{RelativeSource Self}" />
+                                                                <Binding
+                                                                    Path="Columns[2].ActualWidth"
+                                                                    RelativeSource="{RelativeSource AncestorType=GridViewRowPresenter}" />
+                                                                <Binding
+                                                                    Source="{StaticResource TargetsLabelOffset}" />
+                                                            </MultiBinding>
+                                                        </ui:TextBlock.Text>
+                                                    </ui:TextBlock>
+                                                </DockPanel>
+                                                <DockPanel>
+                                                    <ui:TextBlock
+                                                        Width="55"
+                                                        Margin="0 0 4 0"
+                                                        Foreground="{DynamicResource LabelForeground}"
+                                                        Text="{Binding TargetFromLabel}" />
+                                                    <ui:TextBlock
+                                                        Foreground="{DynamicResource LabelForeground}"
+                                                        ToolTip="{Binding SourceFolder}">
+                                                        <i:Interaction.Behaviors>
+                                                            <pluginBehaviors:TextBlockResizeHelper />
+                                                        </i:Interaction.Behaviors>
+                                                        <ui:TextBlock.Text>
+                                                            <MultiBinding
+                                                                Converter="{StaticResource MiddleEllipsisConverter}">
+                                                                <Binding
+                                                                    Path="SourceFolder" />
+                                                                <Binding
+                                                                    RelativeSource="{RelativeSource Self}" />
+                                                                <Binding
+                                                                    Path="Columns[2].ActualWidth"
+                                                                    RelativeSource="{RelativeSource AncestorType=GridViewRowPresenter}" />
+                                                                <Binding
+                                                                    Source="{StaticResource TargetsLabelOffset}" />
+                                                            </MultiBinding>
+                                                        </ui:TextBlock.Text>
+                                                    </ui:TextBlock>
+                                                </DockPanel>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn
+                                    HeaderContainerStyle="{StaticResource NoResizeColumnHeaderStyle}">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:Button
+                                                Appearance="Danger"
+                                                Content="{ui:SymbolIcon Symbol=Delete20}"
+                                                Command="{Binding DataContext.RemoveSettingsCommand,
                         RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </ui:DataGrid.Columns>
-                    </ui:DataGrid>
+                                                CommandParameter="{Binding}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ui:ListView.View>
+                    </ui:ListView>
                 </DockPanel>
             </Border>
         </DockPanel>
@@ -376,12 +359,12 @@
             Orientation="Horizontal"
             HorizontalAlignment="Right">
             <ui:TextBlock
-                Margin="10"
+                Margin="8"
                 Style="{StaticResource CustomErrorText}"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
-                Margin="10"
+                Margin="8"
                 Width="80"
                 Appearance="Info"
                 IsDefault="True"
@@ -390,7 +373,7 @@
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
-                Margin="10"
+                Margin="8"
                 Width="80"
                 IsCancel="True"
                 Click="ButtonCancel_Click"

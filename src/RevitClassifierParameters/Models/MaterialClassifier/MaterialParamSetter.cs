@@ -3,6 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
@@ -11,12 +13,10 @@ using RevitClassifierParameters.Models.Work;
 namespace RevitClassifierParameters.Models.MaterialClassifier;
 
 internal class MaterialParamSetter {
-    private const string _chapterParameter = "ФОП_МТР_Наименование главы";
-    private const string _workTitleParameter = "ФОП_МТР_Наименование работы";
-    private const string _unitParameter = "ФОП_МТР_Единица измерения";
-    private const string _calculationTypeParameter = "ФОП_МТР_Тип подсчета";
-
-    private const string _calculationTypeError = "Ошибка";
+    private static readonly RevitParam _chapterParameter = SharedParamsConfig.Instance.MtrChapterTitle;
+    private static readonly RevitParam _workTitleParameter = SharedParamsConfig.Instance.MtrWorkTitle;
+    private static readonly RevitParam _unitParameter = SharedParamsConfig.Instance.MtrMeasurementUnit;
+    private static readonly RevitParam _calculationTypeParameter = SharedParamsConfig.Instance.MtrCountingType;
 
     private static readonly Dictionary<string, int> _calculationTypeDict = new() {
         ["м"] = 1,
@@ -193,7 +193,7 @@ internal class MaterialParamSetter {
 
     /// <summary>
     /// Устанавливает значение параметра "Тип подсчета" по единице измерения.
-    /// При валидной единице пишется число, иначе - строка "Ошибка".
+    /// При валидной единице пишется число, иначе - локализованная строка ошибки.
     /// Возвращает true, если параметр был изменён.
     /// </summary>
     private bool SetCalculationTypeParam(Material material, string unit) {
@@ -207,10 +207,11 @@ internal class MaterialParamSetter {
             return true;
         }
 
-        if(param.AsValueString() == _calculationTypeError) {
+        string calculationTypeError = _localizationService.GetLocalizedString("CalculationType.Error");
+        if(param.AsValueString() == calculationTypeError) {
             return false;
         }
-        material.SetParamValue(_calculationTypeParameter, _calculationTypeError);
+        material.SetParamValue(_calculationTypeParameter, calculationTypeError);
         return true;
     }
 
@@ -218,12 +219,12 @@ internal class MaterialParamSetter {
     /// Устанавливает строковое значение параметра, только если оно отличается от текущего.
     /// Возвращает true, если параметр был изменён.
     /// </summary>
-    private bool SetStringParam(Material material, string paramName, string value) {
-        var param = material.GetParam(paramName);
+    private bool SetStringParam(Material material, RevitParam revitParam, string value) {
+        var param = material.GetParam(revitParam);
         if(param.AsValueString() == value) {
             return false;
         }
-        material.SetParamValue(paramName, value ?? string.Empty);
+        material.SetParamValue(revitParam, value ?? string.Empty);
         return true;
     }
 

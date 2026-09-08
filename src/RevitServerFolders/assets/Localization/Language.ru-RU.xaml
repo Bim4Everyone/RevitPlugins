@@ -39,8 +39,6 @@
         x:Key="Exceptions.CannotFind3dFamilyType">В экспортируемом документе отсутствует семейство 3D вида.</system:String>
     <system:String
         x:Key="Exceptions.ExportViewError">Ошибка генерации 3D вида для экспорта в NWC. Путь к файлу с шаблоном вида: "{0}", название копируемого шаблона вида: "{1}", строки для скрытия рабочих наборов: "{2}". Информация об ошибке: {3}.</system:String>
-    <system:String
-        x:Key="Exceptions.ElementsNotDeleted">В процессе открытия документа были обнаружены элементы, вызывающие ошибки. Автоматически удалить их не удалось из-за отсутствия прав на их удаление, Revit отменил операцию экспорта. Id элементов, вызвавших ошибки: {0}. Информация об ошибке: {1}.</system:String>
 
     <system:String
         x:Key="ErrorsWindow.ErrorGroupHeader">Экспорт {0}</system:String>
@@ -91,6 +89,16 @@
         x:Key="MainWindow.TargetsFrom">Откуда:</system:String>
     <system:String
         x:Key="MainWindow.TargetsTo">Куда:</system:String>
+    <system:String
+        x:Key="MainWindow.SearchPlaceholder">Поиск по файлам</system:String>
+    <system:String
+        x:Key="MainWindow.ExcludedObjectPatternPlaceholder">Подстрока для скрытия файлов</system:String>
+    <system:String
+        x:Key="MainWindow.ExcludedObjectPatternTooltip">Файлы, в полном наименовании которых есть заданная подстрока без учета регистра, скрываются из списка и отключаются от экспорта. Список подстрок сохраняется в настройках.</system:String>
+    <system:String
+        x:Key="MainWindow.AddExcludedObjectPatternTooltip">Добавить исключение и выключить экспорт файлов</system:String>
+    <system:String
+        x:Key="MainWindow.RemoveExcludedObjectPatternTooltip">Удалить исключение</system:String>
 
     <system:String
         x:Key="NwcExportViewSettingsDialog.Title">Настройки вида для экспорта в NWC</system:String>
@@ -115,7 +123,7 @@
     <system:String
         x:Key="NwcExportViewSettingsDialog.WorksetsLabel">Строки для скрытия рабочих наборов</system:String>
     <system:String
-        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Рабочие наборы, в названии которых есть какая-то из заданных строк без учета регистра, будут скрыты на экспортируемом в NWC виде.</system:String>
+        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Рабочие наборы, в названии которых есть какая-то из заданных строк без учета регистра, не будут открыты при открытии экспортируемого документа и будут скрыты на экспортируемом в NWC виде.</system:String>
     <system:String
         x:Key="NwcExportViewSettingsDialog.Validation.RvtPathNotSet">Задайте путь к rvt файлу.</system:String>
     <system:String

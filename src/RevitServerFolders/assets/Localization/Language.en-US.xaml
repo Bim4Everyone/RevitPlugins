@@ -39,8 +39,6 @@
         x:Key="Exceptions.CannotFind3dFamilyType">3D view family is missing in the exported document.</system:String>
     <system:String
         x:Key="Exceptions.ExportViewError">Error generating 3D view for NWC export. Path to view template file: "{0}", copied view template name: "{1}", strings for hiding worksets: "{2}". Error information: {3}.</system:String>
-    <system:String
-        x:Key="Exceptions.ElementsNotDeleted">While opening the document, elements causing errors were detected. These could not be automatically removed due to insufficient permissions to delete them. Revit canceled the export operation. The IDs of the elements causing the errors are: {0}. Error information: {1}.</system:String>
 
     <system:String
         x:Key="ErrorsWindow.ErrorGroupHeader">Export {0}</system:String>
@@ -91,6 +89,16 @@
         x:Key="MainWindow.TargetsFrom">From:</system:String>
     <system:String
         x:Key="MainWindow.TargetsTo">To:</system:String>
+    <system:String
+        x:Key="MainWindow.SearchPlaceholder">Search files</system:String>
+    <system:String
+        x:Key="MainWindow.ExcludedObjectPatternPlaceholder">String for hiding files</system:String>
+    <system:String
+        x:Key="MainWindow.ExcludedObjectPatternTooltip">Files whose full name contains the specified string with ignore case are hidden from the list and get unchecked, so that a hidden file does not end up in the export. The list of strings is saved in the setting.</system:String>
+    <system:String
+        x:Key="MainWindow.AddExcludedObjectPatternTooltip">Add exclusion and uncheck the files it hides</system:String>
+    <system:String
+        x:Key="MainWindow.RemoveExcludedObjectPatternTooltip">Remove exclusion</system:String>
 
     <system:String
         x:Key="NwcExportViewSettingsDialog.Title">View Settings for NWC Export</system:String>
@@ -115,7 +123,7 @@
     <system:String
         x:Key="NwcExportViewSettingsDialog.WorksetsLabel">Strings for hiding worksets</system:String>
     <system:String
-        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Worksets whose names contain any of the specified strings with ignore case will be hidden on the view exported to NWC.</system:String>
+        x:Key="NwcExportViewSettingsDialog.WorksetsTooltip">Worksets whose names contain any of the specified strings with ignore case will not be opened when the exported document is opened and will be hidden on the view exported to NWC.</system:String>
     <system:String
         x:Key="NwcExportViewSettingsDialog.Validation.RvtPathNotSet">Specify the path to the rvt file.</system:String>
     <system:String

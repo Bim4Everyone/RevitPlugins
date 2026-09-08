@@ -9,6 +9,7 @@ on:
       - '**RevitClashes**.cs'
       - '**RevitClashDetective**.cs'
       - '**RevitClashDetective**.xaml'
+      - '**RevitClashDetective**.csproj'
 
 env:
   plugin-name: "RevitClashDetective"

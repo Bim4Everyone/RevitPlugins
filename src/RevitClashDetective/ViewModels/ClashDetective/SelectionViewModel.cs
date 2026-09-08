@@ -12,6 +12,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.Models.Interfaces;
 using RevitClashDetective.Views;
 using RevitClashDetective.Views.Checks;
@@ -21,7 +22,7 @@ using Wpf.Ui;
 namespace RevitClashDetective.ViewModels.ClashDetective;
 internal class SelectionViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
-    private readonly FiltersConfig _filterConfig;
+    private readonly FilterContextsProvider _filterContextsProvider;
     private readonly ILocalizationService _localizationService;
     private readonly IContentDialogService _contentDialogService;
     private readonly SelectionConfig _selectionConfig;
@@ -31,13 +32,14 @@ internal class SelectionViewModel : BaseViewModel {
     private ObservableCollection<FilterProviderViewModel> _selectedProviders = [];
 
     public SelectionViewModel(RevitRepository revitRepository,
-        FiltersConfig filterConfig,
+        FilterContextsProvider filterContextsProvider,
         ILocalizationService localizationService,
         IContentDialogService contentDialogService,
         SelectionConfig selectionConfig = null) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        _filterConfig = filterConfig ?? throw new ArgumentNullException(nameof(filterConfig));
+        _filterContextsProvider = filterContextsProvider
+                                  ?? throw new ArgumentNullException(nameof(filterContextsProvider));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
         _selectionConfig = selectionConfig;
@@ -65,7 +67,7 @@ internal class SelectionViewModel : BaseViewModel {
 
     public ObservableCollection<FileViewModel> SelectedFiles {
         get => _selectedFiles;
-        set => RaiseAndSetIfChanged(ref _selectedFiles, value);
+        private set => RaiseAndSetIfChanged(ref _selectedFiles, value);
     }
 
     public ObservableCollection<FilterProviderViewModel> AllProviders {
@@ -75,7 +77,7 @@ internal class SelectionViewModel : BaseViewModel {
 
     public ObservableCollection<FilterProviderViewModel> SelectedProviders {
         get => _selectedProviders;
-        set => RaiseAndSetIfChanged(ref _selectedProviders, value);
+        private set => RaiseAndSetIfChanged(ref _selectedProviders, value);
     }
 
     public IEnumerable<IProvider> GetProviders() {
@@ -122,7 +124,7 @@ internal class SelectionViewModel : BaseViewModel {
 
     private void InitializeProviders() {
         AllProviders = new ObservableCollection<FilterProviderViewModel>(
-            _filterConfig.Filters
+            _filterContextsProvider.GetFilterContexts()
             .Select(item => new FilterProviderViewModel(item)));
     }
 

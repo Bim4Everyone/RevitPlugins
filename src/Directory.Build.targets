@@ -4,4 +4,6 @@
     <Import Condition="'$(UseWpfUI)' == 'true'" Project="_ProjectProps\WpfUI.props"/>
     <Import Condition="'$(UseDevExpress)' == 'true'" Project="_ProjectProps\DevExpress.props"/>
     <Import Condition="'$(UseRevitClashes)' == 'true'" Project="_ProjectProps\RevitClashes.props"/>
+    <Import Condition="'$(UseClosedXML)' == 'true'" Project="_ProjectProps\ClosedXML.props"/>
+    <Import Condition="'$(UseRevitFiltration)' == 'true'" Project="_ProjectProps\RevitFiltration.props"/>
 </Project>

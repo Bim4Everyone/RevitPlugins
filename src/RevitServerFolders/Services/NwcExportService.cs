@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
+using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 
 using dosymep.Revit;
@@ -12,6 +14,7 @@ using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
 using RevitServerFolders.Models;
+using RevitServerFolders.Services.FailureHandlers;
 
 namespace RevitServerFolders.Services;
 /// <summary>
@@ -19,11 +22,12 @@ namespace RevitServerFolders.Services;
 /// </summary>
 internal class NwcExportService : IModelsExportService<FileModelObjectExportSettings> {
     private const string _nwcSearchPattern = "*.nwc";
+    private const string _backupFolderSuffix = "_backup";
     private readonly RevitRepository _revitRepository;
     private readonly ILoggerService _loggerService;
     private readonly ILocalizationService _localization;
     private readonly IErrorsService _errorsService;
-    private FileModelObjectExportSettings _currentSettings;
+    private NwcFailuresPreprocessor _failuresPreprocessor;
 
     public NwcExportService(
         RevitRepository revitRepository,
@@ -34,7 +38,7 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
         _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _errorsService = errorsService ?? throw new ArgumentNullException(nameof(errorsService));
-        _currentSettings = null;
+        _failuresPreprocessor = null;
     }
 
 
@@ -50,77 +54,195 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
         if(modelFiles is null) {
             throw new ArgumentNullException(nameof(modelFiles));
         }
-        _currentSettings = settings;
-
-        Directory.CreateDirectory(settings.TargetFolder);
-
-        if(settings.ClearTargetFolder) {
-            string[] navisFiles = Directory.GetFiles(settings.TargetFolder, _nwcSearchPattern);
-            foreach(string navisFile in navisFiles) {
-                File.SetAttributes(navisFile, FileAttributes.Normal);
-                File.Delete(navisFile);
-            }
-        }
 
         var viewSettings = settings.GetNwcExportViewSettings();
-        Document viewTemplateDoc;
+        _failuresPreprocessor = new NwcFailuresPreprocessor(viewSettings, _loggerService);
+        PrepareTargetFolder(settings);
+
+        // снимок делается до первого обращения к моделям, чтобы не удалить ранее созданные backup папки
+        string[] existingBackupFolders = GetBackupFolders(modelFiles);
+
+        _revitRepository.Application.FailuresProcessing += ApplicationOnFailuresProcessing;
+        _revitRepository.UIApplication.DialogBoxShowing += UIApplicationOnDialogBoxShowing;
         try {
-            viewTemplateDoc = _revitRepository.OpenDocumentFile(viewSettings.RvtFilePath);
-        } catch(Autodesk.Revit.Exceptions.ApplicationException ex) {
-            _loggerService.Warning(ex, "Не удалось открыть файл с шаблоном вида: {@Path}", viewSettings.RvtFilePath);
-            _errorsService.AddError(viewSettings.RvtFilePath,
-                _localization.GetLocalizedString("Exceptions.CannotOpenView3dTemplateFile",
-                    viewSettings.RvtFilePath, ex.Message),
-                settings);
+            ExportModelFiles(modelFiles, settings, viewSettings, progress, ct, processStart);
+        } finally {
+            _revitRepository.Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
+            _revitRepository.UIApplication.DialogBoxShowing -= UIApplicationOnDialogBoxShowing;
+            _failuresPreprocessor = null;
+            DeleteNewBackupFolders(modelFiles, existingBackupFolders);
+        }
+    }
+
+    private void PrepareTargetFolder(FileModelObjectExportSettings settings) {
+        Directory.CreateDirectory(settings.TargetFolder);
+
+        if(!settings.ClearTargetFolder) {
             return;
         }
-        View3D sourceViewTemplate;
-        try {
-            sourceViewTemplate = GetView3dTemplate(viewTemplateDoc, viewSettings.ViewTemplateName);
-        } catch(InvalidOperationException ex) {
-            _loggerService.Warning(ex, "Не найден шаблон вида. Настройки генерации 3D вида: {@Settings}.",
-                viewSettings);
-            _errorsService.AddError(viewSettings.RvtFilePath,
-                _localization.GetLocalizedString("Exceptions.CannotFindView3dTemplate",
-                viewSettings.RvtFilePath,
-                viewSettings.ViewTemplateName),
-                settings);
+
+        string[] navisFiles = Directory.GetFiles(settings.TargetFolder, _nwcSearchPattern);
+        foreach(string navisFile in navisFiles) {
+            File.SetAttributes(navisFile, FileAttributes.Normal);
+            File.Delete(navisFile);
+        }
+    }
+
+    /// <summary>
+    /// Возвращает backup папки, лежащие рядом с заданными моделями
+    /// </summary>
+    private string[] GetBackupFolders(string[] modelFiles) {
+        string[] modelFolders = [
+            .. modelFiles
+                .Select(Path.GetDirectoryName)
+                .Where(folder => !string.IsNullOrWhiteSpace(folder) && Directory.Exists(folder))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+        ];
+
+        var backupFolders = new List<string>();
+        foreach(string modelFolder in modelFolders) {
+            try {
+                backupFolders.AddRange(Directory.GetDirectories(modelFolder).Where(IsBackupFolder));
+            } catch(Exception ex) when(ex is IOException or UnauthorizedAccessException) {
+                _loggerService.Warning(ex, "Не удалось получить backup папки в директории: {@Path}", modelFolder);
+            }
+        }
+        return [.. backupFolders];
+    }
+
+    /// <summary>
+    /// Удаляет backup папки, которые Revit создал рядом с моделями в процессе экспорта.
+    /// Папки, лежавшие рядом с моделями до экспорта, не удаляются.
+    /// </summary>
+    private void DeleteNewBackupFolders(string[] modelFiles, string[] existingBackupFolders) {
+        var existingFolders = new HashSet<string>(existingBackupFolders, StringComparer.OrdinalIgnoreCase);
+        string[] newBackupFolders = [.. GetBackupFolders(modelFiles).Where(f => !existingFolders.Contains(f))];
+
+        foreach(string backupFolder in newBackupFolders) {
+            try {
+                Directory.Delete(backupFolder, true);
+                _loggerService.Information("Удалена backup папка: {@Path}", backupFolder);
+            } catch(Exception ex) when(ex is IOException or UnauthorizedAccessException) {
+                _loggerService.Warning(ex, "Не удалось удалить backup папку: {@Path}", backupFolder);
+            }
+        }
+    }
+
+    private bool IsBackupFolder(string folder) {
+        return Path.GetFileName(folder).EndsWith(_backupFolderSuffix, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void ExportModelFiles(
+        string[] modelFiles,
+        FileModelObjectExportSettings settings,
+        NwcExportViewSettings viewSettings,
+        IProgress<int> progress,
+        CancellationToken ct,
+        int processStart) {
+        var viewTemplateDoc = OpenViewTemplateDoc(viewSettings, settings);
+        if(viewTemplateDoc is null) {
             return;
         }
+
         try {
+            var sourceViewTemplate = FindView3dTemplate(viewTemplateDoc, viewSettings, settings);
+            if(sourceViewTemplate is null) {
+                return;
+            }
+
             foreach(string modelFile in modelFiles) {
                 progress?.Report(processStart++);
                 ct.ThrowIfCancellationRequested();
 
-                try {
-                    ExportDocument(modelFile, settings, viewSettings, sourceViewTemplate);
-                } catch(Autodesk.Revit.Exceptions.OperationCanceledException exCancel) {
-                    _loggerService.Warning(exCancel, "Отмена экспорта в nwc в файле: {@DocPath}", modelFile);
-                    _errorsService.AddError(modelFile,
-                        _localization.GetLocalizedString("Exceptions.NwcExportCancel"),
-                        settings);
-                } catch(InvalidOperationException exInv) {
-                    _loggerService.Warning(exInv, "Ошибка генерации 3D вида для экспорта в nwc в файле: {@DocPath}. " +
-                        "Настройки генерации 3D вида: {@Settings}", modelFile, viewSettings);
-                    _errorsService.AddError(modelFile,
-                        _localization.GetLocalizedString("Exceptions.ExportViewError",
-                        viewSettings.RvtFilePath,
-                        viewSettings.ViewTemplateName,
-                        viewSettings.WorksetHideTemplates,
-                        exInv.Message),
-                        settings);
-                } catch(Exception ex) {
-                    _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFile);
-                    _errorsService.AddError(modelFile,
-                        _localization.GetLocalizedString("Exceptions.NwcExportError", ex.Message),
-                        settings);
-                }
+                ExportModelFile(modelFile, settings, viewSettings, sourceViewTemplate);
             }
         } finally {
-            viewTemplateDoc?.Close(false);
-            viewTemplateDoc?.Dispose();
+            viewTemplateDoc.Close(false);
+            viewTemplateDoc.Dispose();
         }
-        _currentSettings = null;
+    }
+
+    private Document OpenViewTemplateDoc(
+        NwcExportViewSettings viewSettings,
+        FileModelObjectExportSettings settings) {
+        try {
+            return _revitRepository.OpenDocumentFile(
+                viewSettings.RvtFilePath,
+                viewSettings.WorksetHideTemplates);
+        } catch(Autodesk.Revit.Exceptions.ApplicationException ex) {
+            _loggerService.Warning(
+                ex,
+                "Не удалось открыть файл с шаблоном вида: {@Path}",
+                viewSettings.RvtFilePath);
+            _errorsService.AddError(
+                viewSettings.RvtFilePath,
+                _localization.GetLocalizedString(
+                    "Exceptions.CannotOpenView3dTemplateFile",
+                    viewSettings.RvtFilePath,
+                    ex.Message),
+                settings);
+            return null;
+        }
+    }
+
+    private View3D FindView3dTemplate(
+        Document viewTemplateDoc,
+        NwcExportViewSettings viewSettings,
+        FileModelObjectExportSettings settings) {
+        try {
+            return GetView3dTemplate(viewTemplateDoc, viewSettings.ViewTemplateName);
+        } catch(InvalidOperationException ex) {
+            _loggerService.Warning(
+                ex,
+                "Не найден шаблон вида. Настройки генерации 3D вида: {@Settings}.",
+                viewSettings);
+            _errorsService.AddError(
+                viewSettings.RvtFilePath,
+                _localization.GetLocalizedString(
+                    "Exceptions.CannotFindView3dTemplate",
+                    viewSettings.RvtFilePath,
+                    viewSettings.ViewTemplateName),
+                settings);
+            return null;
+        }
+    }
+
+    private void ExportModelFile(
+        string modelFile,
+        FileModelObjectExportSettings settings,
+        NwcExportViewSettings viewSettings,
+        View3D sourceViewTemplate) {
+        try {
+            ExportDocument(modelFile, settings, viewSettings, sourceViewTemplate);
+        } catch(Autodesk.Revit.Exceptions.OperationCanceledException exCancel) {
+            _loggerService.Warning(exCancel, "Отмена экспорта в nwc в файле: {@DocPath}", modelFile);
+            _errorsService.AddError(
+                modelFile,
+                _localization.GetLocalizedString("Exceptions.NwcExportCancel"),
+                settings);
+        } catch(InvalidOperationException exInv) {
+            _loggerService.Warning(
+                exInv,
+                "Ошибка генерации 3D вида для экспорта в nwc в файле: {@DocPath}. "
+                + "Настройки генерации 3D вида: {@Settings}",
+                modelFile,
+                viewSettings);
+            _errorsService.AddError(
+                modelFile,
+                _localization.GetLocalizedString(
+                    "Exceptions.ExportViewError",
+                    viewSettings.RvtFilePath,
+                    viewSettings.ViewTemplateName,
+                    viewSettings.WorksetHideTemplates,
+                    exInv.Message),
+                settings);
+        } catch(Exception ex) {
+            _loggerService.Warning(ex, "Ошибка экспорта в nwc в файле: {@DocPath}", modelFile);
+            _errorsService.AddError(
+                modelFile,
+                _localization.GetLocalizedString("Exceptions.NwcExportError", ex.Message),
+                settings);
+        }
     }
 
 
@@ -128,77 +250,71 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
         FileModelObjectExportSettings settings,
         NwcExportViewSettings exportViewSettings,
         View3D sourceTemplate) {
-        _revitRepository.Application.FailuresProcessing += ApplicationOnFailuresProcessing;
-        _revitRepository.UIApplication.DialogBoxShowing += UIApplicationOnDialogBoxShowing;
-
         string targetFolder = settings.TargetFolder;
         bool isExportRooms = settings.IsExportRooms;
 
+        DocumentExtensions.UnloadAllLinks(fileName);
+        using var document = _revitRepository.OpenDocumentFile(fileName, exportViewSettings.WorksetHideTemplates);
         try {
-            DocumentExtensions.UnloadAllLinks(fileName);
-            using var document = _revitRepository.OpenDocumentFile(fileName);
-            try {
-                var exportView = CreateExportView3d(document, sourceTemplate, exportViewSettings.WorksetHideTemplates);
+            var exportView = CreateExportView3d(document, sourceTemplate, exportViewSettings.WorksetHideTemplates);
 
-                var elementsOnView = new FilteredElementCollector(document, exportView.Id)
-                    .WhereElementIsNotElementType();
+            var elementsOnView = new FilteredElementCollector(document, exportView.Id)
+                .WhereElementIsNotElementType();
 #if REVIT_2021_OR_LESS
-                var visibleElements = elementsOnView.Where(item =>
-                        item.get_Geometry(new Options() { View = exportView })?.Any() == true)
-                    .ToArray();
+            var visibleElements = elementsOnView.Where(item =>
+                    item.get_Geometry(new Options() { View = exportView })?.Any() == true)
+                .ToArray();
 #else
-                var visibleElements = elementsOnView.WherePasses(new VisibleInViewFilter(document, exportView.Id));
+            var visibleElements = elementsOnView.WherePasses(new VisibleInViewFilter(document, exportView.Id));
 #endif
-                bool hasElements =
-                    visibleElements.Any(e => e.Category != null && ElementHasGeometry(e)); // Ищем геометрию на виде
+            bool hasElements =
+                visibleElements.Any(e => e.Category != null && ElementHasGeometry(e)); // Ищем геометрию на виде
 
-                if(!hasElements) {
-                    _loggerService.Warning(
-                        "Экспортируемый вид в файле {@FileName} не содержит элементы с геометрией. "
-                        + "Элементов на виде: {@viewCount}, видимых элементов на виде: {@visibleElements} "
-                        + "Настройки генерации 3D вида: {@Settings}",
-                        fileName,
-                        elementsOnView.Count(),
-                        visibleElements.Count(),
-                        exportViewSettings);
-                    _errorsService.AddError(fileName,
-                        _localization.GetLocalizedString("Exceptions.ViewWithoutElements",
-                            exportViewSettings.RvtFilePath,
-                            exportViewSettings.ViewTemplateName,
-                            string.Join(", ", exportViewSettings.WorksetHideTemplates)),
-                        settings);
-                    return;
-                }
+            if(!hasElements) {
+                _loggerService.Warning(
+                    "Экспортируемый вид в файле {@FileName} не содержит элементы с геометрией. "
+                    + "Элементов на виде: {@viewCount}, видимых элементов на виде: {@visibleElements} "
+                    + "Настройки генерации 3D вида: {@Settings}",
+                    fileName,
+                    elementsOnView.Count(),
+                    visibleElements.Count(),
+                    exportViewSettings);
+                _errorsService.AddError(
+                    fileName,
+                    _localization.GetLocalizedString(
+                        "Exceptions.ViewWithoutElements",
+                        exportViewSettings.RvtFilePath,
+                        exportViewSettings.ViewTemplateName,
+                        string.Join(", ", exportViewSettings.WorksetHideTemplates)),
+                    settings);
+                return;
+            }
 
-                var projectLocations = document.ProjectLocations
-                    .OfType<ProjectLocation>()
-                    .ToArray();
+            var projectLocations = document.ProjectLocations
+                .OfType<ProjectLocation>()
+                .ToArray();
 
-                if(projectLocations.Length == 1) {
-                    ExportDocument(fileName, exportView, document, targetFolder, isExportRooms);
-                } else if(projectLocations.Length > 1) {
-                    foreach(var projectLocation in projectLocations) {
-                        using(var transaction = document.StartTransaction(
-                            _localization.GetLocalizedString("Transaction.ChangeSite"))) {
-                            document.ActiveProjectLocation = projectLocation;
-                            transaction.Commit();
-                        }
-
-                        ExportDocument(fileName, exportView, document, targetFolder, isExportRooms, projectLocation);
+            if(projectLocations.Length == 1) {
+                ExportDocument(fileName, exportView, document, targetFolder, isExportRooms);
+            } else if(projectLocations.Length > 1) {
+                foreach(var projectLocation in projectLocations) {
+                    using(var transaction = document.StartTransaction(
+                              _localization.GetLocalizedString("Transaction.ChangeSite"))) {
+                        document.ActiveProjectLocation = projectLocation;
+                        transaction.Commit(GetFailureHandlingOptions(transaction));
                     }
+
+                    ExportDocument(fileName, exportView, document, targetFolder, isExportRooms, projectLocation);
                 }
-            } finally {
-                document.Close(false);
             }
         } finally {
-            _revitRepository.Application.FailuresProcessing -= ApplicationOnFailuresProcessing;
-            _revitRepository.UIApplication.DialogBoxShowing -= UIApplicationOnDialogBoxShowing;
+            document.Close(false);
         }
     }
 
     private bool ElementHasGeometry(Element element) {
         try {
-            return element.GetSolids().Any(s => s?.Volume > 0);
+            return element.GetSolids().Any(s => s?.GetVolumeOrDefault(0) > 0);
         } catch(Exception ex) when(
         ex is System.ArgumentNullException
         or System.NullReferenceException
@@ -288,8 +404,15 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
         }
 
         destinationDocument.Regenerate();
-        t.Commit();
+        t.Commit(GetFailureHandlingOptions(t));
         return view;
+    }
+
+    private FailureHandlingOptions GetFailureHandlingOptions(Transaction transaction) {
+        return transaction.GetFailureHandlingOptions()
+            .SetFailuresPreprocessor(_failuresPreprocessor)
+            .SetForcedModalHandling(false)
+            .SetDelayedMiniWarnings(true);
     }
 
     private ElementId GetLatestPhaseId(Document document) {
@@ -304,7 +427,26 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
         _loggerService.Information(
             "Event handler: {@EventHandler}; DialogId: {@DialogId}",
             nameof(UIApplicationOnDialogBoxShowing), e.DialogId);
-        e.OverrideResult(1);
+
+        string dialogId = e.DialogId ?? string.Empty;
+
+        // диалогу с предупреждениями при открытии документа нужен Ok:
+        // от CommandLink1 Revit отменяет открытие
+        if(ContainsTemplate(dialogId, "DocWarnDialog")
+           || ContainsTemplate(dialogId, "TaskDialog_Review_Warnings")
+           || ContainsTemplate(dialogId, "TaskDialog_Opening")) {
+            e.OverrideResult((int) TaskDialogResult.Ok);
+            return;
+        }
+
+        // диалогам про удаление элементов нужна первая команда
+        if(ContainsTemplate(dialogId, "Dimension")
+           || ContainsTemplate(dialogId, "Delete")) {
+            e.OverrideResult((int) TaskDialogResult.CommandLink1);
+            return;
+        }
+
+        e.OverrideResult((int) TaskDialogResult.Ok);
     }
 
     private void ApplicationOnFailuresProcessing(object sender, FailuresProcessingEventArgs e) {
@@ -325,31 +467,10 @@ internal class NwcExportService : IModelsExportService<FileModelObjectExportSett
             "Event handler: {@EventHandler}; title: {@DocTitle}; Failures: {@Failures}",
             nameof(ApplicationOnFailuresProcessing), accessor.GetDocument().Title, failureMessages);
 
-        accessor.DeleteAllWarnings();
-        accessor.ResolveFailures(accessor.GetFailureMessages());
+        e.SetProcessingResult(_failuresPreprocessor.PreprocessFailures(accessor));
+    }
 
-        var elementIds = accessor.GetFailureMessages()
-            .SelectMany(item => item.GetFailingElementIds())
-            .ToArray();
-
-        if(elementIds.Length > 0) {
-            try {
-                accessor.DeleteElements(elementIds);
-            } catch(Exception ex) {
-                _loggerService.Warning(ex, $"Не удалось удалить элементы, вызывающие ошибки");
-                e.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
-                if(_currentSettings is not null) {
-                    string[] ids = [.. elementIds.Select(id => id.ToString())];
-                    _errorsService.AddError(accessor.GetDocument().Title,
-                        _localization.GetLocalizedString(
-                            "Exceptions.ElementsNotDeleted", string.Join(", ", ids), ex.Message),
-                        _currentSettings);
-                }
-                return;
-            }
-            e.SetProcessingResult(FailureProcessingResult.ProceedWithCommit);
-        } else {
-            e.SetProcessingResult(FailureProcessingResult.Continue);
-        }
+    private bool ContainsTemplate(string value, string template) {
+        return value.IndexOf(template, StringComparison.OrdinalIgnoreCase) >= 0;
     }
 }

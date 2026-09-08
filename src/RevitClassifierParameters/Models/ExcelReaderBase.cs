@@ -1,16 +1,15 @@
-using System;
-using System.Runtime.InteropServices;
+using System.IO;
+
+using ClosedXML.Excel;
 
 using dosymep.SimpleServices;
-
-using Microsoft.Office.Interop.Excel;
 
 namespace RevitClassifierParameters.Models;
 
 /// <summary>
-/// Базовый класс для чтения данных из Excel-файла через COM-интероп.
-/// Инкапсулирует открытие книги, чтение диапазона первого листа
-/// и корректное освобождение COM-объектов.
+/// Базовый класс для чтения данных из Excel-файла (.xlsx) через ClosedXML.
+/// Инкапсулирует открытие книги и чтение диапазона первого листа
+/// в двумерный массив значений ячеек.
 /// </summary>
 /// <typeparam name="TResult">Тип результата разбора данных листа.</typeparam>
 internal abstract class ExcelReaderBase<TResult> {
@@ -40,50 +39,28 @@ internal abstract class ExcelReaderBase<TResult> {
     protected abstract string EmptySheetMessageKey { get; }
 
     public TResult Read(string path) {
-        Application excel = null;
-        Workbook workbook = null;
-        Worksheet worksheet = null;
-        Range range = null;
+        using var stream = File.OpenRead(path);
+        using var workbook = new XLWorkbook(stream);
 
-        try {
-            excel = new Application {
-                Visible = false,
-                DisplayAlerts = false,
-                ScreenUpdating = false
-            };
-            workbook = excel.Workbooks.Open(path, ReadOnly: true);
-            worksheet = (Worksheet) workbook.Worksheets[1];
+        var worksheet = workbook.Worksheet(1);
 
-            int lastRow = GetLastRow(worksheet);
-            if(lastRow < FirstDataRow) {
-                _messageBoxService.Show(_localizationService.GetLocalizedString(EmptySheetMessageKey));
-                return default;
-            }
+        var lastUsedRow = worksheet.LastRowUsed(XLCellsUsedOptions.AllContents);
+        int lastRow = lastUsedRow?.RowNumber() ?? 0;
 
-            range = worksheet.Range[
-                worksheet.Cells[FirstDataRow, 1],
-                worksheet.Cells[lastRow, ColumnCount]];
-
-            if(range.Value2 is not object[,] values) {
-                _messageBoxService.Show(_localizationService.GetLocalizedString(EmptySheetMessageKey));
-                return default;
-            }
-
-            return BuildResult(values);
-        } finally {
-            workbook?.Close(false);
-            excel?.Quit();
-
-            Release(range);
-            Release(worksheet);
-            Release(workbook);
-            Release(excel);
+        if(lastRow < FirstDataRow) {
+            _messageBoxService.Show(_localizationService.GetLocalizedString(EmptySheetMessageKey));
+            return default;
         }
+
+        var values = ReadValues(worksheet, lastRow);
+        return BuildResult(values);
     }
 
     /// <summary>
     /// Строит результат разбора из прочитанного двумерного массива значений ячеек.
-    /// Индексация массива начинается с 1 по обоим измерениям.
+    /// Индексация массива начинается с 0 по обоим измерениям:
+    /// первое измерение — строки данных (0..rowCount-1),
+    /// второе — столбцы (0..ColumnCount-1).
     /// </summary>
     protected abstract TResult BuildResult(object[,] rows);
 
@@ -91,25 +68,25 @@ internal abstract class ExcelReaderBase<TResult> {
         return value?.ToString()?.Trim();
     }
 
-    private int GetLastRow(Worksheet worksheet) {
-        var lastCell = worksheet.Cells.Find(
-            "*",
-            Type.Missing,
-            Type.Missing,
-            Type.Missing,
-            XlSearchOrder.xlByRows,
-            XlSearchDirection.xlPrevious,
-            false);
-        try {
-            return lastCell?.Row ?? 1;
-        } finally {
-            Release(lastCell);
+    /// <summary>
+    /// Читает диапазон данных листа в двумерный массив с 0-based индексацией.
+    /// Размерности массива равны фактическому числу строк данных и <see cref="ColumnCount"/>.
+    /// </summary>
+    private object[,] ReadValues(IXLWorksheet worksheet, int lastRow) {
+        int rowCount = lastRow - FirstDataRow + 1;
+        var values = new object[rowCount, ColumnCount];
+
+        for(int r = 0; r < rowCount; r++) {
+            int sheetRow = FirstDataRow + r;
+            for(int c = 0; c < ColumnCount; c++) {
+                var cell = worksheet.Cell(sheetRow, c + 1);
+                values[r, c] = GetCellValue(cell);
+            }
         }
+        return values;
     }
 
-    private static void Release(object comObject) {
-        if(comObject != null && Marshal.IsComObject(comObject)) {
-            Marshal.ReleaseComObject(comObject);
-        }
+    private static string GetCellValue(IXLCell cell) {
+        return cell.IsEmpty() ? null : cell.GetString();
     }
 }

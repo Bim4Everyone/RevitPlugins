@@ -18,6 +18,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.Models.RevitClashReport;
 using RevitClashDetective.Services.ReportsMerging;
 using RevitClashDetective.Services.RevitViewSettings;
@@ -35,6 +36,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
     private readonly ILocalizationService _localizationService;
     private readonly IContentDialogService _contentDialogService;
     private readonly SettingsConfig _settingsConfig;
+    private readonly FilterContextsProvider _filterContextsProvider;
     private bool _openFromClashDetector;
     private ReportViewModel _selectedFile;
     private ObservableCollection<ReportViewModel> _reports;
@@ -49,6 +51,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         ILocalizationService localizationService,
         IContentDialogService contentDialogService,
         SettingsConfig settingsConfig,
+        FilterContextsProvider filterContextsProvider,
         string reportName = null) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -58,6 +61,8 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
+        _filterContextsProvider = filterContextsProvider
+            ?? throw new ArgumentNullException(nameof(filterContextsProvider));
         Reports = [];
 
         if(reportName == null) {
@@ -180,6 +185,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
                 MessageBoxService,
                 _contentDialogService,
                 _settingsConfig,
+                _filterContextsProvider,
                 r.Clashes?.ToArray() ?? []))
             .ToArray();
     }

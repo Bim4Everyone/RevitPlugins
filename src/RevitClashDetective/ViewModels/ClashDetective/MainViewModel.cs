@@ -15,7 +15,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
-using RevitClashDetective.Models.FilterModel;
+using RevitClashDetective.Models.Filtration;
 using RevitClashDetective.ViewModels.Services;
 
 using Wpf.Ui;
@@ -25,7 +25,7 @@ internal class MainViewModel : BaseViewModel {
     private string _errorText;
 
     private readonly ChecksConfig _checksConfig;
-    private readonly FiltersConfig _filtersConfig;
+    private readonly FilterContextsProvider _filterContextsProvider;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localization;
     private readonly IContentDialogService _contentDialogService;
@@ -46,9 +46,10 @@ internal class MainViewModel : BaseViewModel {
         IContentDialogService contentDialogService,
         SettingsConfig settingsConfig,
         ChecksConfig checksConfig,
-        FiltersConfig filtersConfig) {
+        FilterContextsProvider filterContextsProvider) {
 
-        _filtersConfig = filtersConfig ?? throw new ArgumentNullException(nameof(filtersConfig));
+        _filterContextsProvider = filterContextsProvider
+            ?? throw new ArgumentNullException(nameof(filterContextsProvider));
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localization = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
@@ -134,7 +135,7 @@ internal class MainViewModel : BaseViewModel {
                 SaveFileDialogService,
                 MessageBoxService,
                 _settingsConfig,
-                _filtersConfig,
+                _filterContextsProvider,
                 _contentDialogService,
                 check);
         }
@@ -154,7 +155,7 @@ internal class MainViewModel : BaseViewModel {
             SaveFileDialogService,
             MessageBoxService,
             _settingsConfig,
-            _filtersConfig,
+            _filterContextsProvider,
             _contentDialogService)]);
     }
 
@@ -190,7 +191,7 @@ internal class MainViewModel : BaseViewModel {
             SaveFileDialogService,
             MessageBoxService,
             _settingsConfig,
-            _filtersConfig,
+            _filterContextsProvider,
             _contentDialogService));
     }
 
