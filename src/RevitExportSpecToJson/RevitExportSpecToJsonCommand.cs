@@ -30,7 +30,7 @@ public class RevitExportSpecToJsonCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitExportSpecToJsonCommand() {
-        PluginName = "RevitExportSpecToJson";
+        PluginName = "Спеки в JSON";
     }
 
     /// <summary>

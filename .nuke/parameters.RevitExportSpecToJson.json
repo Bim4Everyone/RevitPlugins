@@ -8,8 +8,8 @@
     "Rv2023",
     "Rv2024"
   ],
-  "IconUrl": "https://img.icons8.ru/fluency-systems-regular/96/data-sheet.png",
-  "BundleName": "Экспорт ВОР в JSON",
+  "IconUrl": "https://icons8.ru/icon/FDyn4HTbw577/json",
+  "BundleName": "Спеки в JSON",
   "BundleType": "InvokeButton",
   "BundleOutput": "01.BIM.extension\\BIM.tab\\Экспорт.panel\\экспорт 1.stack\\Спеки в XLSX.pulldown"
 }
