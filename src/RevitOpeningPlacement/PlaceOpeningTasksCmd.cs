@@ -12,6 +12,10 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration;
+using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
@@ -32,6 +36,7 @@ using RevitOpeningPlacement.Models.OpeningPlacement.Checkers;
 using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.Services;
+using RevitOpeningPlacement.Services.Utils;
 using RevitOpeningPlacement.ViewModels.Links;
 using RevitOpeningPlacement.ViewModels.ReportViewModel;
 using RevitOpeningPlacement.Views.Utils;
@@ -80,6 +85,15 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<ISolidProviderUtils>()
+            .To<SolidProviderUtils>()
+            .InSingletonScope();
+        kernel.Bind<OpeningConfig>()
+            .ToMethod(c => OpeningConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document));
+
+        kernel.UseLogicalFilterFactory();
+        kernel.UseFilterContextParser();
+
         kernel.Bind<LinksSelectorViewModel>()
             .ToSelf()
             .InTransientScope();
@@ -89,37 +103,45 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
             .WithPropertyValue(nameof(Window.DataContext),
                 c => c.Kernel.Get<LinksSelectorViewModel>());
         kernel.UseWpfUIThemeUpdater();
+        kernel.UseWpfWindowsTheme();
+        kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
+        kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
+        kernel.UseWpfUIProgressDialog();
+        kernel.UseWpfUIMessageBox();
+        kernel.UseWpfUIProgressDialog<ProgressDialogProxy>();
+        kernel.Bind<ProgressDialogProxy>().ToSelf().InSingletonScope();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
-        var revitRepository = kernel.Get<RevitRepository>();
-        PlaceOpeningTasks(uiApplication, revitRepository, kernel.Get<ILocalizationService>(), Array.Empty<ElementId>());
+        PlaceOpeningTasks(kernel, []);
     }
 
-    private protected void PlaceOpeningTasks(
-        UIApplication uiApplication,
-        RevitRepository revitRepository,
-        ILocalizationService localization,
-        ElementId[] mepElements) {
-
+    private protected void PlaceOpeningTasks(IKernel kernel, ElementId[] mepElements) {
+        UIApplication uiApplication = kernel.Get<UIApplication>();
+        RevitRepository revitRepository = kernel.Get<RevitRepository>();
+        ILogicalFilterFactory filterFactory = kernel.Get<ILogicalFilterFactory>();
+        IFilterContextParser filterContextParser = kernel.Get<IFilterContextParser>();
+        
         _duplicatedInstancesToRemoveIds.Clear();
-        if(!ModelCorrect(revitRepository)) {
+        if(!ModelCorrect(kernel)) {
             throw new OperationCanceledException();
         }
-        if(!revitRepository.ContinueIfTaskFamiliesNotLatest()) {
+
+        if(!revitRepository.ContinueIfTaskFamiliesNotLatest(kernel.Get<IMessageBoxService>())) {
             throw new OperationCanceledException();
         }
         var openingConfig = OpeningConfig.GetOpeningConfig(revitRepository.Doc);
         if(openingConfig.Categories.Count > 0) {
-            var placementConfigurator = new PlacementConfigurator(revitRepository, openingConfig.Categories);
+            var placementConfigurator = new PlacementConfigurator(
+                revitRepository, openingConfig.Categories, filterFactory, filterContextParser);
             var placers = placementConfigurator.GetPlacersMepOutcomingTasks(mepElements)
-                                               .ToList();
+                .ToArray();
             uiApplication.Application.FailuresProcessing += FailureProcessor;
             try {
-                var unplacedClashes = InitializePlacing(revitRepository, placers, openingConfig, localization)
+                var unplacedClashes = InitializePlacing(kernel, placers)
                     .Concat(placementConfigurator.GetUnplacedClashes());
                 if(openingConfig.ShowPlacingErrors) {
                     InitializeReport(revitRepository, unplacedClashes);
@@ -131,49 +153,53 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         _duplicatedInstancesToRemoveIds.Clear();
     }
 
-    private bool ModelCorrect(RevitRepository revitRepository) {
-        var checker = new Checkers(revitRepository);
+    private bool ModelCorrect(IKernel kernel) {
+        var checker = new Checkers(kernel.Get<RevitRepository>());
         var errors = checker.GetErrorTexts();
         if(errors == null || errors.Count == 0) {
             return true;
         }
 
-        TaskDialog.Show("BIM", $"{string.Join($"{Environment.NewLine}", errors)}");
+        kernel.Get<IMessageBoxService>()
+            .Show(
+                $"{string.Join($"{Environment.NewLine}", errors)}",
+                kernel.Get<ILocalizationService>().GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         return false;
     }
 
-    private IList<UnplacedClashModel> InitializePlacing(RevitRepository revitRepository,
-        IEnumerable<OpeningPlacer> placers,
-        OpeningConfig config,
-        ILocalizationService localization) {
-        if(placers.Count() == 0) {
+    private IList<UnplacedClashModel> InitializePlacing(IKernel kernel, ICollection<OpeningPlacer> placers) {
+        if(placers.Count == 0) {
             return [];
         }
-        using var pb = GetPlatformService<IProgressDialogService>();
+
+        var localization = kernel.Get<ILocalizationService>();
+
+        using var pb = kernel.Get<ProgressDialogProxy>().Create();
         pb.StepValue = _progressBarStepValue;
         pb.DisplayTitleFormat = localization.GetLocalizedString("Progress.TasksPlacing");
         var progress = pb.CreateProgress();
-        pb.MaxValue = placers.Count();
+        pb.MaxValue = placers.Count;
         var ct = pb.CreateCancellationToken();
         pb.Show();
 
-        return PlaceOpenings(revitRepository, placers, config, localization, progress, ct);
+        return PlaceOpenings(kernel, placers, progress, ct);
     }
 
     private IList<UnplacedClashModel> PlaceOpenings(
-        RevitRepository revitRepository,
-        IEnumerable<OpeningPlacer> placers,
-        OpeningConfig config,
-        ILocalizationService localization,
+        IKernel kernel,
+        ICollection<OpeningPlacer> placers,
         IProgress<int> progress = null,
         CancellationToken ct = default) {
-
-        var placedOpeningTasks = revitRepository.GetPlacedOutcomingTasks();
+        var repo = kernel.Get<RevitRepository>();
+        var localization = kernel.Get<ILocalizationService>();
+        var placedOpeningTasks = repo.GetPlacedOutcomingTasks();
         HashSet<FamilyInstance> placedFamInstances = [];
         List<UnplacedClashModel> unplacedClashes = [];
 
-        using(var t = revitRepository.GetTransaction(
-            localization.GetLocalizedString("Transaction.TaskPlacing"))) {
+        using(var t = repo.GetTransaction(
+                  localization.GetLocalizedString("Transaction.TaskPlacing"))) {
             int count = 0;
             foreach(var p in placers) {
                 ct.ThrowIfCancellationRequested();
@@ -202,42 +228,42 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         //т.к. свойство Location у элемента FamilyInstance, созданного внутри транзакции, может быть не актуально (установлено в (0,0,0) несмотря на реальное расположение),
         //а после завершения транзакции актуализируется
         if(placedOpeningTasks.Count > 0) {
-            var newOpeningsNotDeleted = InitializeRemoving(revitRepository, newOpenings, placedOpeningTasks, localization);
+            var newOpeningsNotDeleted = InitializeRemoving(kernel, newOpenings, placedOpeningTasks);
             if(newOpeningsNotDeleted.Count > 1) {
-                InitializeUnion(revitRepository, newOpeningsNotDeleted, config, localization);
+                InitializeUnion(kernel, newOpeningsNotDeleted);
             }
         } else {
             // инициализация удаления дубликатов только что созданных заданий на отверстия здесь не запускается,
             // потому что дубликаты будут объединены в одно задание
-            InitializeUnion(revitRepository, newOpenings, config, localization);
+            InitializeUnion(kernel, newOpenings);
         }
         return unplacedClashes;
     }
 
     private ICollection<OpeningMepTaskOutcoming> InitializeRemoving(
-        RevitRepository revitRepository,
+        IKernel kernel,
         ICollection<OpeningMepTaskOutcoming> newOpenings,
-        ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings,
-        ILocalizationService localization) {
-
-        using var pb = GetPlatformService<IProgressDialogService>();
+        ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings) {
+        using var pb = kernel.Get<ProgressDialogProxy>().Create();
         pb.StepValue = _progressBarStepValue;
-        pb.DisplayTitleFormat = localization.GetLocalizedString("Progress.CheckDuplicates");
+        pb.DisplayTitleFormat = kernel.Get<ILocalizationService>().GetLocalizedString("Progress.CheckDuplicates");
         var progressRemove = pb.CreateProgress();
         pb.MaxValue = newOpenings.Count;
         var ctRemove = pb.CreateCancellationToken();
         pb.Show();
 
         return RemoveAlreadyPlacedOpenings(
-            revitRepository,
+            kernel.Get<ISolidProviderUtils>(),
+            kernel.Get<RevitRepository>(),
             newOpenings,
             alreadyPlacedOpenings,
-            localization,
+            kernel.Get<ILocalizationService>(),
             progressRemove,
             ctRemove);
     }
 
     private ICollection<OpeningMepTaskOutcoming> RemoveAlreadyPlacedOpenings(
+        ISolidProviderUtils solidUtils,
         RevitRepository revitRepository,
         ICollection<OpeningMepTaskOutcoming> newOpenings,
         ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings,
@@ -253,7 +279,8 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
                 foreach(var newOpening in newOpenings) {
                     ct.ThrowIfCancellationRequested();
                     progress?.Report(count);
-                    bool deleteNewOpening = _duplicatedInstancesToRemoveIds.Contains(newOpening.Id) || newOpening.IsAlreadyPlaced(alreadyPlacedOpenings);
+                    bool deleteNewOpening = _duplicatedInstancesToRemoveIds.Contains(newOpening.Id)
+                                            || newOpening.IsAlreadyPlaced(solidUtils, alreadyPlacedOpenings);
                     if(deleteNewOpening) {
                         revitRepository.DeleteElement(newOpening.Id);
                     } else {
@@ -271,44 +298,40 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
     }
 
     private void InitializeUnion(
-        RevitRepository revitRepository,
-        ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion,
-        OpeningConfig config,
-        ILocalizationService localization) {
-        using var pb = GetPlatformService<IProgressDialogService>();
+        IKernel kernel,
+        ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion) {
+        using var pb = kernel.Get<ProgressDialogProxy>().Create();
         pb.StepValue = _progressBarStepValue;
-        pb.DisplayTitleFormat = localization.GetLocalizedString("Progress.UniteTouching");
+        pb.DisplayTitleFormat = kernel.Get<ILocalizationService>().GetLocalizedString("Progress.UniteTouching");
         var progressUnite = pb.CreateProgress();
         pb.MaxValue = newOpeningsForUnion.Count;
         var ctUnite = pb.CreateCancellationToken();
         pb.Show();
 
-        UniteTouchingOpenings(revitRepository, newOpeningsForUnion, config, localization, progressUnite, ctUnite);
+        UniteTouchingOpenings(kernel, newOpeningsForUnion, progressUnite, ctUnite);
     }
 
     private void UniteTouchingOpenings(
-        RevitRepository revitRepository,
+        IKernel kernel,
         ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion,
-        OpeningConfig config,
-        ILocalizationService localization,
         IProgress<int> progress = null,
         CancellationToken ct = default) {
-
-        var groups = new MultilayerOpeningsGroupsProvider(revitRepository).GetOpeningsGroups(newOpeningsForUnion);
-        using var t = revitRepository.GetTransaction(
-            localization.GetLocalizedString("Transaction.UniteMultilayers"));
+        var repo = kernel.Get<RevitRepository>();
+        var groups = new MultilayerOpeningsGroupsProvider(repo).GetOpeningsGroups(newOpeningsForUnion);
+        using var t = repo.GetTransaction(
+            kernel.Get<ILocalizationService>().GetLocalizedString("Transaction.UniteMultilayers"));
 
         int count = 0;
         foreach(var group in groups) {
             ct.ThrowIfCancellationRequested();
-            progress.Report(count);
+            progress?.Report(count);
             try {
-                var placer = group.GetOpeningPlacer(revitRepository, config);
+                var placer = group.GetOpeningPlacer(repo, kernel.Get<OpeningConfig>());
                 var unitedOpening = placer.Place();
 
                 if(unitedOpening != null) {
                     foreach(var openingTask in group.Elements) {
-                        revitRepository.DeleteElement(openingTask.Id);
+                        repo.DeleteElement(openingTask.Id);
                     }
                 }
 

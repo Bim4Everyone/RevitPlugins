@@ -14,6 +14,7 @@ using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels.Enums;
+using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement.OpeningModels;
 /// <summary>
@@ -160,8 +161,7 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
     /// </summary>
     /// <param name="placedOpenings">Существующие задания на отверстия в проекте</param>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-#pragma warning disable 0618
-    public bool IsAlreadyPlaced(ICollection<OpeningMepTaskOutcoming> placedOpenings) {
+    public bool IsAlreadyPlaced(ISolidProviderUtils solidUtils, ICollection<OpeningMepTaskOutcoming> placedOpenings) {
         if(IsRemoved || placedOpenings.Count == 0) {
             return false;
         }
@@ -174,13 +174,12 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
             placedOpening.Location
             .DistanceTo(placedOpening.Location) <= _distance3dTolerance);
         foreach(var placedOpening in similarOpenings) {
-            if(placedOpening.EqualsSolid(GetSolid(), XYZExtension.FeetRound)) {
+            if(solidUtils.EqualsSolid(placedOpening, GetSolid(), XYZExtension.FeetRound)) {
                 return true;
             }
         }
         return false;
     }
-#pragma warning restore 0618
 
     public override bool Equals(object obj) {
         return !IsRemoved && (obj is OpeningMepTaskOutcoming otherTask) && Equals(otherTask);

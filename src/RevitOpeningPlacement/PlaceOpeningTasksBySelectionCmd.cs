@@ -4,6 +4,10 @@ using System.Reflection;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration;
+using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
@@ -17,6 +21,7 @@ using RevitClashDetective.Models.Handlers;
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Services;
+using RevitOpeningPlacement.Services.Utils;
 
 namespace RevitOpeningPlacement;
 [Transaction(TransactionMode.Manual)]
@@ -51,7 +56,17 @@ internal class PlaceOpeningTasksBySelectionCmd : PlaceOpeningTasksCmd {
         kernel.Bind<ParameterFilterProvider>()
             .ToSelf()
             .InSingletonScope();
-        kernel.UseWpfUIThemeUpdater();
+        kernel.Bind<ISolidProviderUtils>()
+            .To<SolidProviderUtils>()
+            .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
+        kernel.UseFilterContextParser();
+
+        kernel.UseWpfWindowsTheme();
+        kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
+        kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
+        kernel.UseWpfUIProgressDialog();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
@@ -62,6 +77,6 @@ internal class PlaceOpeningTasksBySelectionCmd : PlaceOpeningTasksCmd {
         var selectedMepElements = revitRepository
             .PickMepElements(OpeningConfig.GetOpeningConfig(revitRepository.Doc).Categories);
 
-        PlaceOpeningTasks(uiApplication, revitRepository, kernel.Get<ILocalizationService>(), selectedMepElements);
+        PlaceOpeningTasks(kernel, selectedMepElements);
     }
 }

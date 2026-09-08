@@ -4,9 +4,6 @@ using System.Linq;
 
 using pyRevitLabs.Json;
 
-using RevitClashDetective.Models.Evaluators;
-using RevitClashDetective.Models.FilterModel;
-
 namespace RevitOpeningPlacement.Models.Configs;
 /// <summary>
 /// Класс для обертки настроек расстановки заданий на отверстия для элементов категории инженерных систем
@@ -112,12 +109,10 @@ internal class MepCategory : IEquatable<MepCategory> {
     public int ElevationRounding { get; set; } = DefaultElevationRoundingMm;
 
     /// <summary>
-    /// Правила фильтрации элементов данной категории
+    /// Сериализованный контекст фильтра элементов данной категории
+    /// (<see cref="Bim4Everyone.RevitFiltration.Controls.ILogicalFilterContext"/>)
     /// </summary>
-    public Set Set { get; set; } = new Set() {
-        SetEvaluator = SetEvaluatorUtils.GetEvaluators().First(),
-        Criteria = []
-    };
+    public string MepFilterContext { get; set; }
 
 
     /// <summary>
