@@ -22,10 +22,10 @@
     <File Path="src/Directory.Build.targets" />
   </Folder>
   <Folder Name="/Solution Items/Project Props/">
-    <File Path="src/_ProjectProps/ClosedXML.props"/>
+    <File Path="src/_ProjectProps/ClosedXML.props" />
     <File Path="src/_ProjectProps/DevExpress.props" />
     <File Path="src/_ProjectProps/RevitClashes.props" />
-    <File Path="src/_ProjectProps/RevitFiltration.props"/>
+    <File Path="src/_ProjectProps/RevitFiltration.props" />
     <File Path="src/_ProjectProps/WpfUI.props" />
   </Folder>
   <Project Path="build/_build.csproj">
@@ -104,6 +104,9 @@
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitExportSpecToExcel/RevitExportSpecToExcel.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitExportSpecToJson/RevitExportSpecToJson.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitFamilyExplorer/RevitFamilyExplorer.csproj">
