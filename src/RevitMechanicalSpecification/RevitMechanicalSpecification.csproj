@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<UseDevExpress>false</UseDevExpress>
+        <LangVersion>12</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="Models\Fillers\ElementParamNameFiller.cs~RF5ecabb3.TMP" />
