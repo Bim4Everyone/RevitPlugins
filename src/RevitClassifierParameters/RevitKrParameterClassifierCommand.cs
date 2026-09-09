@@ -34,7 +34,7 @@ public class RevitKrParameterClassifierCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitKrParameterClassifierCommand() {
-        PluginName = "RevitClassifierParameters";
+        PluginName = "Параметры ВОР КР";
     }
 
     /// <summary>
@@ -78,6 +78,11 @@ public class RevitKrParameterClassifierCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        // Системная конфигурация плагина
+        kernel.Bind<SystemPluginConfig>()
+            .ToSelf()
+            .InSingletonScope();
+        
         // Настройка окна отчёта
         kernel.Bind<ReportVM>()
             .ToSelf()

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -94,24 +95,17 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
     }
 
     private void RereadClassifierExcel() {
-        string classifierDirectory = _systemPluginConfig.ClassifierDirectoryPath;
-        if(Directory.Exists(classifierDirectory)) {
-            OpenFileDialogService.InitialDirectory = classifierDirectory;
-        }
-
-        OpenFileDialogService.Title = _localizationService.GetLocalizedString("MainWindow.SelectClassifierFile");
-        if(OpenFileDialogService.ShowDialog()) {
-            // Если пользователь выбрал файл при выборе файла
-            ExcelClassifierPath = OpenFileDialogService.File.FullName;
-        } else {
-            // Если пользователь не выбрал файл
-            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoClassifierFileSelected"));
+        string filePath = SelectFile(
+            "MainWindow.SelectClassifierFile",
+            "MainWindow.NoClassifierFileSelected",
+            _systemPluginConfig.ClassifierDirectoryPath);
+        if(filePath is null) {
             return;
         }
-        CurrentClassifierWorks = _classifierExcelReader.Read(ExcelClassifierPath);
-        if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0) {
-            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoClassifierWorksFound"));
-        }
+
+        ExcelClassifierPath = filePath;
+        CurrentClassifierWorks = ReadExcel(
+            _classifierExcelReader, ExcelClassifierPath, "MainWindow.NoClassifierWorksFound");
     }
 
     protected void ReadClassifierExcel() {
@@ -119,10 +113,50 @@ internal abstract class ParameterClassifierVM : BaseViewModel {
             return;
         }
 
-        CurrentClassifierWorks = _classifierExcelReader.Read(ExcelClassifierPath);
-        if(CurrentClassifierWorks is null || CurrentClassifierWorks.Count == 0) {
-            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoClassifierWorksFound"));
+        CurrentClassifierWorks = ReadExcel(
+            _classifierExcelReader, ExcelClassifierPath, "MainWindow.NoClassifierWorksFound");
+    }
+
+    /// <summary>
+    /// Показывает диалог выбора файла.
+    /// </summary>
+    /// <param name="titleKey">Ключ локализации заголовка диалога.</param>
+    /// <param name="noFileMessageKey">Ключ локализации сообщения о том, что файл не выбран.</param>
+    /// <param name="initialDirectory"> Папка, открываемая в диалоге по умолчанию. Если не задана или не существует, не подставляется.
+    /// </param>
+    /// <returns>
+    /// Путь к выбранному файлу, либо <see langword="null" />, если пользователь не выбрал файл.
+    /// </returns>
+    protected string SelectFile(string titleKey, string noFileMessageKey, string initialDirectory = null) {
+        if(!string.IsNullOrEmpty(initialDirectory) && Directory.Exists(initialDirectory)) {
+            OpenFileDialogService.InitialDirectory = initialDirectory;
         }
+
+        OpenFileDialogService.Title = _localizationService.GetLocalizedString(titleKey);
+        if(OpenFileDialogService.ShowDialog()) {
+            return OpenFileDialogService.File.FullName;
+        }
+
+        MessageBoxService.Show(_localizationService.GetLocalizedString(noFileMessageKey));
+        return null;
+    }
+
+    /// <summary>
+    /// Читает Excel-файл по указанному пути и сообщает пользователю, если данных не найдено.
+    /// </summary>
+    /// <param name="reader">Ридер Excel-файла.</param>
+    /// <param name="filePath">Путь к читаемому файлу.</param>
+    /// <param name="noDataMessageKey">Ключ локализации сообщения о том, что данные не найдены.</param>
+    protected TResult ReadExcel<TResult>(
+        ExcelReaderBase<TResult> reader,
+        string filePath,
+        string noDataMessageKey) where TResult : class, ICollection {
+
+        var result = reader.Read(filePath);
+        if(result is null || result.Count == 0) {
+            MessageBoxService.Show(_localizationService.GetLocalizedString(noDataMessageKey));
+        }
+        return result;
     }
 
     protected void GetMaterials() {
