@@ -61,8 +61,6 @@ internal class InstancesAssembly {
             if (resultScheduleName is not null)
                 break;
         }
-        
-        System.Windows.MessageBox.Show(resultScheduleName);
 
         // Если в шапке ничего подходящего нет, проверяем название самой спецификации
         if(resultScheduleName is null && _approvedLines.Any(x => schedule.Name.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0)) {
