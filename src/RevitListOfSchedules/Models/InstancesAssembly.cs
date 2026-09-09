@@ -36,12 +36,14 @@ internal class InstancesAssembly {
         var headData = tableData.GetSectionData(SectionType.Header);
 
         // Спецификации без шапки не учитываем
-        if(headData is null || headData.HideSection)
+        if(headData is null || headData.HideSection) {
             continue;
+        }
 
         // Шапка должна содержать хотя бы одну ячейку
-        if(headData.NumberOfRows < 1 || headData.NumberOfColumns < 1)
+        if(headData.NumberOfRows < 1 || headData.NumberOfColumns < 1) {
             continue;
+        }
 
         string resultScheduleName = null;
 
@@ -58,8 +60,9 @@ internal class InstancesAssembly {
                 break;
             }
 
-            if (resultScheduleName is not null)
+            if(resultScheduleName is not null) {
                 break;
+            }
         }
 
         // Если в шапке ничего подходящего нет, проверяем название самой спецификации
