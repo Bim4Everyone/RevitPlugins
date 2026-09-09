@@ -27,41 +27,51 @@ internal class InstancesAssembly {
     }
 
     public void PlaceFamilyInstances(
-        string sheetNumber,
-        string sheetRevNumber,
-        IList<ViewSchedule> listOfSchedules,
-        FamilySymbol familySymbol,
-        ViewDrafting viewDrafting,
-        string albumName) {
-        foreach(var schedule in listOfSchedules) {
-            var tableData = schedule.GetTableData();
-            var headData = tableData.GetSectionData(SectionType.Header);
+    string sheetNumber,
+    string sheetRevNumber,
+    IList<ViewSchedule> listOfSchedules,
+    FamilySymbol familySymbol,
+    ViewDrafting viewDrafting,
+    string albumName) {
+        
+    foreach(var schedule in listOfSchedules) {
+        var tableData = schedule.GetTableData();
+        var headData = tableData.GetSectionData(SectionType.Header);
 
-            if(headData != null && !headData.HideSection) {
-                string resultScheduleName = null;
-                bool found = false;
+        // Спецификации без шапки не учитываем
+        if(headData == null || headData.HideSection)
+            continue;
 
-                for(int i = headData.FirstRowNumber; i < headData.NumberOfRows && !found; i++) {
-                    for(int j = headData.FirstColumnNumber; j < headData.NumberOfColumns && !found; j++) {
-                        string cellText = headData.GetCellText(i, j);
-                        if(_approvedLines.Any(cellText.ToLower().Contains)) {
-                            resultScheduleName = cellText;
-                            found = true;
-                        }
-                    }
-                }
-                if(found) {
-                    PlaceFamilyInstance(sheetNumber, sheetRevNumber, resultScheduleName, familySymbol, viewDrafting, albumName);
-                } else if(!found
-                    && headData.NumberOfRows == 1
-                    && headData.NumberOfColumns == 1
-                    && string.IsNullOrEmpty(headData.GetCellText(0, 0))) {
+        // Шапка должна содержать хотя бы одну ячейку
+        if(headData.NumberOfRows < 1 || headData.NumberOfColumns < 1)
+            continue;
 
-                    PlaceFamilyInstance(sheetNumber, sheetRevNumber, schedule.Name, familySymbol, viewDrafting, albumName);
+        string resultScheduleName = null;
+
+        // Сначала ищем подходящее имя среди ячеек шапки
+        for(int i = headData.FirstRowNumber; 
+            i < headData.FirstRowNumber + headData.NumberOfRows && resultScheduleName == null; i++) {
+            for(int j = headData.FirstColumnNumber; j < headData.FirstColumnNumber + headData.NumberOfColumns && resultScheduleName == null; j++) {
+                string cellText = headData.GetCellText(i, j);
+
+                if(!string.IsNullOrEmpty(cellText) && _approvedLines.Any(x => cellText.ToLower().Contains(x.ToLower()))) {
+                    resultScheduleName = cellText;
                 }
             }
         }
+
+        // Если в шапке ничего подходящего нет,
+        // проверяем название самой спецификации
+        if(resultScheduleName == null && _approvedLines.Any(x => schedule.Name.ToLower().Contains(x.ToLower()))) {
+            resultScheduleName = schedule.Name;
+        }
+
+        // Если нашли подходящее имя — размещаем
+        if(resultScheduleName != null) {
+            PlaceFamilyInstance(sheetNumber, sheetRevNumber, resultScheduleName, familySymbol, viewDrafting, albumName);
+        }
     }
+}
 
     public void PlaceFamilyInstance(
         string sheetNumber,
