@@ -4,22 +4,19 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
 namespace RevitListOfSchedules.Models;
 internal class InstancesAssembly {
-    private readonly ILocalizationService _localizationService;
     private readonly IList<string> _approvedLines;
     private readonly RevitRepository _revitRepository;
 
     public InstancesAssembly(
         ILocalizationService localizationService,
         RevitRepository revitRepository) {
-        _localizationService = localizationService;
         _revitRepository = revitRepository;
-        string localizedApprovedLines = _localizationService.GetLocalizedString("InstancesAssembly.ApprovedLines");
+        string localizedApprovedLines = localizationService.GetLocalizedString("InstancesAssembly.ApprovedLines");
         _approvedLines = localizedApprovedLines
             .Split([','], StringSplitOptions.RemoveEmptyEntries)
             .Select(s => s.Trim())
@@ -39,7 +36,7 @@ internal class InstancesAssembly {
         var headData = tableData.GetSectionData(SectionType.Header);
 
         // Спецификации без шапки не учитываем
-        if(headData == null || headData.HideSection)
+        if(headData is null || headData.HideSection)
             continue;
 
         // Шапка должна содержать хотя бы одну ячейку
@@ -48,26 +45,32 @@ internal class InstancesAssembly {
 
         string resultScheduleName = null;
 
-        // Сначала ищем подходящее имя среди ячеек шапки
-        for(int i = headData.FirstRowNumber; 
-            i < headData.FirstRowNumber + headData.NumberOfRows && resultScheduleName == null; i++) {
-            for(int j = headData.FirstColumnNumber; j < headData.FirstColumnNumber + headData.NumberOfColumns && resultScheduleName == null; j++) {
-                string cellText = headData.GetCellText(i, j);
+        for (int rowIndex = headData.FirstRowNumber; rowIndex <= headData.LastRowNumber; rowIndex++) {
+            for (int columnIndex = headData.FirstColumnNumber; columnIndex <= headData.LastColumnNumber; columnIndex++) {
+                
+                string cellText = schedule.GetCellText(SectionType.Header, rowIndex, columnIndex);
 
-                if(!string.IsNullOrEmpty(cellText) && _approvedLines.Any(x => cellText.ToLower().Contains(x.ToLower()))) {
-                    resultScheduleName = cellText;
+                if(string.IsNullOrEmpty(cellText) || !_approvedLines.Any(x => cellText.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                    continue;
                 }
-            }
-        }
 
-        // Если в шапке ничего подходящего нет,
-        // проверяем название самой спецификации
-        if(resultScheduleName == null && _approvedLines.Any(x => schedule.Name.ToLower().Contains(x.ToLower()))) {
+                resultScheduleName = cellText;
+                break;
+            }
+
+            if (resultScheduleName is not null)
+                break;
+        }
+        
+        System.Windows.MessageBox.Show(resultScheduleName);
+
+        // Если в шапке ничего подходящего нет, проверяем название самой спецификации
+        if(resultScheduleName is null && _approvedLines.Any(x => schedule.Name.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0)) {
             resultScheduleName = schedule.Name;
         }
 
         // Если нашли подходящее имя — размещаем
-        if(resultScheduleName != null) {
+        if(resultScheduleName is not null) {
             PlaceFamilyInstance(sheetNumber, sheetRevNumber, resultScheduleName, familySymbol, viewDrafting, albumName);
         }
     }

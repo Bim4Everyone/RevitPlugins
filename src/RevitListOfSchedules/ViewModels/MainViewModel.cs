@@ -391,7 +391,7 @@ internal class MainViewModel : BaseViewModel {
             }
             if(_isCreateScheduleChecked) {
                 _revitRepository.CreateSchedule($"{ParamFactory.DefaultScheduleName}_{albumName}");
-                _revitRepository.ActiveUIDocument.GetActiveUIView().Close();
+                //_revitRepository.ActiveUIDocument.GetActiveUIView().Close();
             }
         }
         t.Commit();
