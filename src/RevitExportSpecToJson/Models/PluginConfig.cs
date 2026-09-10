@@ -58,8 +58,6 @@ internal class RevitSettings : ProjectSettings {
     /// </summary>
     public override string ProjectName { get; set; } = string.Empty;
     
-    /// <summary>
-    /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
-    /// </summary>
-    public string SaveProperty { get; set; } = string.Empty;
+    public string? SaveFolder { get; set; }
+    public bool ClearSaveFolder { get; set; }
 }

@@ -2,10 +2,25 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+    <system:String x:Key="MainWindow.Title">Спеки в JSON</system:String>
+    <system:String x:Key="ProgressDialog.Title">Пожалуйста, подождите... [{0}/{1}]</system:String>
+    <system:String x:Key="OpenFolderDialog.Title">Выберите папку JSON файлов</system:String>
+    
+    <system:String x:Key="MainWindow.SaveFolder">Выбрать папку</system:String>
+    <system:String x:Key="MainWindow.ClearSaveFolder">Очистить папку</system:String>
+    <system:String x:Key="MainWindow.SaveFolderPrompt">Выберите папку JSON файлов</system:String>
+    <system:String x:Key="MainWindow.SearchPrompt">Поиск</system:String>
+
+    <system:String x:Key="MainWindow.CaptionName">Наименование</system:String>
+    <system:String x:Key="MainWindow.CaptionTypeSchedule">Тип спецификации</system:String>
+    <system:String x:Key="MainWindow.CaptionStatus">Статус</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+    <system:String x:Key="MainWindow.SaveFolderError">Необходимо указать папку</system:String>
+    <system:String x:Key="MainWindow.SaveFolderInvalidCharsError">Некорректные символы в папке</system:String>
+    
+    <system:String x:Key="MainWindow.SaveSelectedSchedules">Необходимо выбрать хотя бы одну спецификацию</system:String>
+    <system:String x:Key="MainWindow.EmptyTypeSchedule">Необходимо указать тип спецификации для "{0}"</system:String>
 </ResourceDictionary>

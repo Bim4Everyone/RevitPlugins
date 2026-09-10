@@ -7,12 +7,14 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
 using Ninject;
 
 using RevitExportSpecToJson.Models;
+using RevitExportSpecToJson.Services;
 using RevitExportSpecToJson.ViewModels;
 using RevitExportSpecToJson.Views;
 
@@ -69,6 +71,23 @@ public class RevitExportSpecToJsonCommand : BasePluginCommand {
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+
+
+        var localization = kernel.Get<ILocalizationService>();
+
+        kernel.UseWpfUIProgressDialog<MainViewModel>(
+            stepValue: 1,
+            displayTitleFormat: localization.GetLocalizedString("ProgressDialog.Title"));
+
+        kernel.UseWpfOpenFolderDialog<MainViewModel>(
+            title: localization.GetLocalizedString("OpenFolderDialog.Title"),
+            initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+        
+        
+        kernel.Bind<ISaveToJsonService>()
+            .To<SaveToJsonService>()
+            .InTransientScope();
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());

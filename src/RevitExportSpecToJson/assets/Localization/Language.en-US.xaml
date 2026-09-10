@@ -4,10 +4,25 @@
 
     <!-- Пример перевода на американский английский язык (google translate) -->
 
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
+    <system:String x:Key="MainWindow.Title">Schedule to JSON</system:String>
+    <system:String x:Key="ProgressDialog.Title">Please wait... [{0}/{1}]</system:String>
+    <system:String x:Key="OpenFolderDialog.Title">Select a folder to save JSON</system:String>
+
+    <system:String x:Key="MainWindow.SaveFolder">Select a folder path</system:String>
+    <system:String x:Key="MainWindow.ClearSaveFolder">Clear safe folder</system:String>
+    <system:String x:Key="MainWindow.SaveFolderPrompt">Select a folder to save JSON</system:String>
+    <system:String x:Key="MainWindow.SearchPrompt">Search</system:String>
+
+    <system:String x:Key="MainWindow.CaptionName">Name</system:String>
+    <system:String x:Key="MainWindow.CaptionTypeSchedule">Schedule type</system:String>
+    <system:String x:Key="MainWindow.CaptionStatus">Status</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="MainWindow.SaveFolderError">You must specify a folder path</system:String>
+    <system:String x:Key="MainWindow.SaveFolderInvalidCharsError">Incorrect characters in the folder path</system:String>
+    
+    <system:String x:Key="MainWindow.SaveSelectedSchedules">You must select at least one schedule</system:String>
+    <system:String x:Key="MainWindow.EmptyTypeSchedule">You must write a type schedule for "{0}"</system:String>
 </ResourceDictionary>

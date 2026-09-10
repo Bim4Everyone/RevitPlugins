@@ -11,16 +11,17 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-   
+    xmlns:behaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
+
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    
+
     Height="500"
     Width="700"
-    
+
     MinHeight="500"
     MinWidth="700"
-   
+
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
@@ -28,27 +29,134 @@
             <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
+    
+    <i:Interaction.Behaviors>
+        <behaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}" />
+        <behaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFolderDialogService}" />
+    </i:Interaction.Behaviors>
+
+    <Window.Resources>
+        <TextBlock
+            x:Key="CaptionName"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource MainWindow.CaptionName}" />
+
+        <TextBlock
+            x:Key="CaptionTypeSchedule"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource MainWindow.CaptionTypeSchedule}" />
+
+        <TextBlock
+            x:Key="CaptionStatus"
+            TextWrapping="Wrap"
+            Text="{me:LocalizationSource MainWindow.CaptionStatus}" />
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
-
-        <ui:TextBox
+        
+        <CheckBox
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            IsChecked="{Binding ClearSaveFolder}"
+            Content="{me:LocalizationSource MainWindow.ClearSaveFolder}"/>
+
+        <DockPanel
+            Grid.Row="2"
+            LastChildFill="True"
+            Margin="8 4">
+
+            <ui:Button
+                DockPanel.Dock="Right"
+                Height="35"
+                Margin="4 0 0 0 "
+                Icon="{ui:SymbolIcon Folder24}"
+                Command="{Binding SelectSaveFolderCommand}"
+                Content="{me:LocalizationSource MainWindow.SaveFolder}"
+                ToolTip="{me:LocalizationSource MainWindow.SaveFolderPrompt}" />
+
+            <ui:TextBox
+                Text="{Binding SaveFolder, UpdateSourceTrigger=PropertyChanged}"
+                PlaceholderText="{me:LocalizationSource MainWindow.SaveFolderPrompt}" />
+
+        </DockPanel>
+        
+        <Border
+            Grid.Row="3"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch"
+            SnapsToDevicePixels="True"
+            OverridesDefaultStyle="True"
+            Margin="8,0 8 4"
+            Padding="{DynamicResource CardControlPadding}"
+            Background="{DynamicResource CardBackground}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            BorderThickness="{DynamicResource CardControlBorderThemeThickness}"
+            FocusVisualStyle="{DynamicResource DefaultControlFocusVisualStyle}"
+            CornerRadius="{DynamicResource ControlCornerRadius}">
+
+            <DockPanel LastChildFill="True">
+                <ui:TextBox
+                    DockPanel.Dock="Top"
+                    Margin="0 0 0 8"
+                    IconPlacement="Right"
+                    Icon="{ui:SymbolIcon Search24}"
+                    Text="{Binding FilterSchedulesText, UpdateSourceTrigger=PropertyChanged}"
+                    PlaceholderText="{me:LocalizationSource MainWindow.SearchPrompt}">
+                    
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="TextChanged">
+                            <i:InvokeCommandAction Command="{Binding FilterSchedulesCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    
+                </ui:TextBox>
+
+                <ui:DataGrid
+                    ColumnWidth="*"
+                    AutoGenerateColumns="False"
+                    CanUserResizeColumns="True"
+                    ItemsSource="{Binding FilteredSchedules}">
+                    <ui:DataGrid.Columns>
+
+                        <DataGridCheckBoxColumn
+                            Header=""
+                            Width="Auto"
+                            Binding="{Binding Checked, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <DataGridTextColumn
+                            IsReadOnly="True"
+                            Header="{StaticResource CaptionName}"
+                            Binding="{Binding Name}" />
+
+                        <DataGridTextColumn
+                            Header="{StaticResource CaptionTypeSchedule}"
+                            Binding="{Binding TypeSchedule, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <DataGridTextColumn
+                            IsReadOnly="True"
+                            Header="{StaticResource CaptionStatus}"
+                            Binding="{Binding Status}" />
+
+                    </ui:DataGrid.Columns>
+                </ui:DataGrid>
+            </DockPanel>
+
+        </Border>
 
         <StackPanel
-            Grid.Row="2"
+            Grid.Row="4"
             Orientation="Horizontal"
             HorizontalAlignment="Right">
 
