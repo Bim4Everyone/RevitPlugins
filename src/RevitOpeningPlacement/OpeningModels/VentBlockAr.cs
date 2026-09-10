@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using Autodesk.Revit.DB;
 
@@ -141,7 +142,11 @@ internal class VentBlockAr : IOpeningTaskIncoming, IEquatable<VentBlockAr> {
             return _solid;
         }
 
-        var famInstSolid = _familyInstance.GetSolid();
+        // геометрия вентблока находится во вложенном семействе
+        var famInstSolid = _familyInstance.GetSubComponentIds()
+            .Select(s => _familyInstance.Document.GetElement(s))
+            .First(element => element is FamilyInstance inst && inst.Symbol.FamilyName == "_Корпус вентаблока")
+            .GetSolid();
         if(famInstSolid?.GetVolumeOrDefault() > 0) {
             return _solid ??= SolidUtils.CreateTransformed(famInstSolid, Transform);
         } else {
