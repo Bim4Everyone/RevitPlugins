@@ -92,7 +92,7 @@ internal class NavigatorMepViewModel : BaseViewModel {
             OpeningsMepTaskOutcoming.Add(item);
         }
 
-        var uniqueTasks = _revitRepository.GetOpeningsOutcomingUnique(
+        var uniqueTasks = _revitRepository.GetFamilyInstances(
             RevitRepository.MepUniqueFamilyName,
             BuiltInCategory.OST_GenericModel);
         foreach(var item in uniqueTasks) {
@@ -103,11 +103,6 @@ internal class NavigatorMepViewModel : BaseViewModel {
 
     private ICollection<OpeningMepTaskOutcomingViewModel> GetMepTaskOutcomingViewModels(
         ICollection<OpeningMepTaskOutcoming> outcomingTasks) {
-
-        var service = _resolutionRoot.Get<IOpeningInfoUpdater<OpeningMepTaskOutcoming>>();
-
-        var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
-
         using var pb = ProgressDialogFactory.CreateDialog();
         pb.StepValue = _constantsProvider.ProgressBarStepLarge;
         pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.TaskAnalysis");
@@ -117,6 +112,8 @@ internal class NavigatorMepViewModel : BaseViewModel {
         pb.Show();
 
         int i = 0;
+        var service = _resolutionRoot.Get<IOpeningInfoUpdater<OpeningMepTaskOutcoming>>();
+        var openingTaskOutcomingViewModels = new List<OpeningMepTaskOutcomingViewModel>();
         foreach(var outcomingTask in outcomingTasks) {
             ct.ThrowIfCancellationRequested();
             progress.Report(i);

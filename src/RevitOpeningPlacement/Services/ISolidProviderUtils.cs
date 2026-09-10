@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Autodesk.Revit.DB;
 
 using RevitOpeningPlacement.Models.Interfaces;
@@ -24,4 +26,13 @@ internal interface ISolidProviderUtils {
     /// <param name="otherSolidBBox">Бокс второго тела.</param>
     /// <returns>True, если тела пересекаются, иначе False</returns>
     bool IntersectsSolid(ISolidProvider solidProvider, Solid otherSolid, BoundingBoxXYZ otherSolidBBox);
+
+    /// <summary>
+    /// Вычитает из заданного тела коллекцию тел.
+    /// <para>Тела, которые вычесть не удалось, пропускаются.</para>
+    /// </summary>
+    /// <param name="source">Исходное тело.</param>
+    /// <param name="solidsToSubtract">Тела, которые надо вычесть из исходного.</param>
+    /// <returns>Тело, оставшееся после вычитания.</returns>
+    Solid SubtractSolids(Solid source, ICollection<Solid> solidsToSubtract);
 }

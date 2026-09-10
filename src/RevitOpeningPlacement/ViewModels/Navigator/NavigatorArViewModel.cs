@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Data;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
@@ -10,6 +8,9 @@ using Autodesk.Revit.DB;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
+
+using Ninject;
+using Ninject.Syntax;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Interfaces;
@@ -23,23 +24,23 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// </summary>
 internal class NavigatorArViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
-    private readonly ISolidProviderUtils _solidUtils;
     private readonly IConstantsProvider _constantsProvider;
     private readonly ILocalizationService _localization;
+    private readonly IResolutionRoot _resolutionRoot;
 
     public NavigatorArViewModel(
         RevitRepository revitRepository,
-        ISolidProviderUtils solidUtils,
         IConstantsProvider constantsProvider,
         IProgressDialogFactory progressDialogFactory,
         IMessageBoxService messageBoxService,
+        IResolutionRoot resolutionRoot,
         ILocalizationService localization) {
         ProgressDialogFactory = progressDialogFactory ?? throw new ArgumentNullException(nameof(progressDialogFactory));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        _solidUtils = solidUtils ?? throw new ArgumentNullException(nameof(solidUtils));
         _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
         OpeningsMepTaskIncoming = [];
         OpeningsReal = [];
 
@@ -137,53 +138,52 @@ internal class NavigatorArViewModel : BaseViewModel {
     }
 
     private void LoadView() {
-        var realOpenings = _revitRepository.GetRealOpeningsAr();
-
-        LoadIncomingTasks(realOpenings);
-        LoadOpeningsReal(realOpenings);
+        LoadIncomingTasks();
+        LoadOpeningsReal();
     }
 
-    private void LoadIncomingTasks(ICollection<OpeningRealAr> realOpenings) {
-        var incomingTasks = _revitRepository.GetOpeningsMepTasksIncoming();
-        var constructureElementsIds = _revitRepository.GetConstructureElementsIds();
+    private void LoadIncomingTasks() {
         var incomingTasksViewModels = GetOpeningsMepIncomingTasksViewModels(
-            incomingTasks,
-            realOpenings.ToArray<IOpeningReal>(),
-            constructureElementsIds);
+            _revitRepository.GetOpeningsMepTasksIncoming());
         OpeningsMepTaskIncoming.Clear();
         foreach(var incomingTask in incomingTasksViewModels) {
             OpeningsMepTaskIncoming.Add(incomingTask);
         }
 
-        ICollection<(FamilyInstance Opening, Transform Transform)> uniqueTasks =
-            _revitRepository.GetOpeningsIncomingUnique(
-                RevitRepository.MepUniqueFamilyName,
-                BuiltInCategory.OST_GenericModel);
+        var uniqueTasks = _revitRepository.GetFamilyInstancesFromLinks(
+            RevitRepository.MepUniqueFamilyName,
+            BuiltInCategory.OST_GenericModel);
         foreach(var item in uniqueTasks) {
             OpeningsMepTaskIncoming.Add(
                 new OpeningMepTaskIncomingUniqueViewModel(
-                    item.Opening,
+                    item.Instance,
                     item.Transform,
                     _localization.GetLocalizedString("AllOpeningStatus.Unique")));
         }
     }
 
-    private void LoadOpeningsReal(ICollection<OpeningRealAr> realOpenings) {
-        ICollection<IMepLinkElementsProvider> mepLinks = _revitRepository
-            .GetSelectedRevitLinks()
-            .Select(link => new MepLinkElementsProvider(link) as IMepLinkElementsProvider)
-            .ToArray();
-        var openingsRealViewModels = GetOpeningsRealArViewModels(mepLinks, realOpenings);
+    private void LoadOpeningsReal() {
+        var openingsRealViewModels = GetOpeningsRealArViewModels(_revitRepository.GetRealOpeningsAr());
         OpeningsReal.Clear();
         foreach(var openingReal in openingsRealViewModels) {
             OpeningsReal.Add(openingReal);
         }
 
-        var uniqueOpenings = _revitRepository.GetOpeningsOutcomingUnique(
+        var uniqueOpenings = _revitRepository.GetFamilyInstances(
             RevitRepository.ArUniqueFamilyName,
             BuiltInCategory.OST_Windows);
         foreach(var item in uniqueOpenings) {
             OpeningsReal.Add(new OpeningRealArUniqueViewModel(item, _localization.GetLocalizedString("AllOpeningStatus.Unique")));
+        }
+
+        var ventBlocks = _revitRepository.GetFamilyInstances(
+            RevitRepository.VentBlockArFamilyName,
+            RevitRepository.VentBlockCategory);
+        foreach(var item in ventBlocks) {
+            OpeningsReal.Add(
+                new VentBlockArViewModel(
+                    item,
+                    _localization.GetLocalizedString("AllOpeningStatus.VentBlock")));
         }
 
         OnPropertyChanged(nameof(ShowOpeningsReal));
@@ -193,14 +193,8 @@ internal class NavigatorArViewModel : BaseViewModel {
     /// Возвращает коллекцию моделей представления для входящих заданий на отверстия из ВИС
     /// </summary>
     /// <param name="incomingTasks">Входящие задания на отверстия из связей</param>
-    /// <param name="realOpenings">Чистовые отверстия из текущего документа</param>
-    /// <param name="constructureElementsIds">Элементы конструкций из текущего документа</param>
     private ICollection<OpeningMepTaskIncomingViewModel> GetOpeningsMepIncomingTasksViewModels(
-        ICollection<OpeningMepTaskIncoming> incomingTasks,
-        ICollection<IOpeningReal> realOpenings,
-        ICollection<ElementId> constructureElementsIds) {
-        var incomingTasksViewModels = new HashSet<OpeningMepTaskIncomingViewModel>();
-
+        ICollection<OpeningMepTaskIncoming> incomingTasks) {
         using var pb = ProgressDialogFactory.CreateDialog();
         pb.StepValue = _constantsProvider.ProgressBarStepLarge;
         pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.TaskAnalysis");
@@ -210,11 +204,13 @@ internal class NavigatorArViewModel : BaseViewModel {
         pb.Show();
 
         int i = 0;
+        var incomingTasksViewModels = new HashSet<OpeningMepTaskIncomingViewModel>();
+        var infoUpdater = _resolutionRoot.Get<IOpeningInfoUpdater<IOpeningTaskIncoming>>();
         foreach(var incomingTask in incomingTasks) {
             ct.ThrowIfCancellationRequested();
             progress.Report(i);
             try {
-                incomingTask.UpdateStatusAndHostName(_solidUtils, realOpenings, constructureElementsIds);
+                infoUpdater.UpdateInfo(incomingTask);
             } catch(ArgumentException) {
                 // не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
                 continue;
@@ -230,13 +226,8 @@ internal class NavigatorArViewModel : BaseViewModel {
     /// <summary>
     /// Возвращает коллекцию моделей представления чистовых отверстий, размещенных в активном документа АР
     /// </summary>
-    /// <param name="mepLinks">Связи ВИС</param>
     /// <param name="openingsReal">Чистовые отверстия, размещенные в активном документе АР</param>
-    private ICollection<OpeningRealArViewModel> GetOpeningsRealArViewModels(
-        ICollection<IMepLinkElementsProvider> mepLinks,
-        ICollection<OpeningRealAr> openingsReal) {
-        var openingsRealViewModels = new HashSet<OpeningRealArViewModel>();
-
+    private ICollection<OpeningRealArViewModel> GetOpeningsRealArViewModels(ICollection<OpeningRealAr> openingsReal) {
         using var pb = ProgressDialogFactory.CreateDialog();
         pb.StepValue = _constantsProvider.ProgressBarStepSmall;
         pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.OpeningAnalysis");
@@ -246,10 +237,12 @@ internal class NavigatorArViewModel : BaseViewModel {
         pb.Show();
 
         int i = 0;
+        var infoUpdater = _resolutionRoot.Get<IOpeningInfoUpdater<OpeningRealAr>>();
+        var openingsRealViewModels = new HashSet<OpeningRealArViewModel>();
         foreach(var openingReal in openingsReal) {
             ct.ThrowIfCancellationRequested();
             progress.Report(i);
-            openingReal.UpdateStatus(mepLinks);
+            infoUpdater.UpdateInfo(openingReal);
             openingsRealViewModels.Add(new OpeningRealArViewModel(openingReal, _localization));
             i++;
         }

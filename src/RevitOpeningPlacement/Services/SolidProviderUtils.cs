@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -58,6 +59,25 @@ internal class SolidProviderUtils : ISolidProviderUtils {
         return SolidsIntersect(thisSolid, thisBBox, otherSolid, otherSolidBBox);
     }
 
+    public Solid SubtractSolids(Solid source, ICollection<Solid> solidsToSubtract) {
+        if(solidsToSubtract is null) {
+            throw new ArgumentNullException(nameof(solidsToSubtract));
+        }
+
+        var result = source;
+        foreach(var solid in solidsToSubtract) {
+            try {
+                result = BooleanOperationsUtils.ExecuteBooleanOperation(
+                    result,
+                    solid,
+                    BooleanOperationsType.Difference);
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                continue;
+            }
+        }
+
+        return result;
+    }
 
     private bool SolidsIntersect(Solid firstSolid, BoundingBoxXYZ firstBBox, Solid secondSolid, BoundingBoxXYZ secondBBox) {
         if((firstSolid is null) || (secondSolid is null)) {

@@ -21,7 +21,7 @@ namespace RevitOpeningPlacement.Services;
 /// <summary>
 /// Класс для обновления информации по исходящим заданиям на отверстия от ВИС из активного файла
 /// </summary>
-internal class MepTaskOutcomingInfoUpdater : IOpeningInfoUpdater<OpeningMepTaskOutcoming> {
+internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningMepTaskOutcoming> {
     /// <summary>
     /// Репозиторий активного файла
     /// </summary>
@@ -81,7 +81,7 @@ internal class MepTaskOutcomingInfoUpdater : IOpeningInfoUpdater<OpeningMepTaskO
     private Solid _openingSolidCache;
 
 
-    public MepTaskOutcomingInfoUpdater(
+    public OpeningTaskOutcomingMepInfoUpdater(
         RevitRepository revitRepository,
         ISolidProviderUtils solidProviderUtils,
         IConstantsProvider constantsProvider,

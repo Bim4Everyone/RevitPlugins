@@ -29,6 +29,7 @@ using RevitOpeningPlacement.Models.OpeningUnion;
 using RevitOpeningPlacement.Models.RevitViews;
 using RevitOpeningPlacement.Models.Selection;
 using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.Services;
 
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
@@ -37,6 +38,8 @@ internal class RevitRepository {
     public const string MepUniqueFamilyName = "ОбщМд_Отв_Отверстие_Уникальное_В перекрытии";
     public const string ArUniqueFamilyName = "Окн_Отв_Уникальное_Перекрытие";
     public const string KrUniqueFamilyName = "ОбщМд_Отверстие_Перекрытие_Уникальное";
+    public const string VentBlockArFamilyName = "Обр_Вентаблок А-блок";
+
     private readonly Application _application;
     private readonly UIDocument _uiDocument;
 
@@ -46,19 +49,32 @@ internal class RevitRepository {
     private readonly View3DProvider _view3DProvider;
     private readonly View3D _view;
     private readonly List<ElementId> _linkTypeIdsToUse;
+    private readonly IFamilyGeometryProvider _geometryProvider;
+
+    /// <summary>
+    /// Кэш чистовых отверстий АР из активного документа
+    /// </summary>
+    private ICollection<OpeningRealAr> _realOpeningsArCache;
+
+    /// <summary>
+    /// Кэш чистовых отверстий КР из активного документа
+    /// </summary>
+    private ICollection<OpeningRealKr> _realOpeningsKrCache;
 
     public RevitRepository(
         UIApplication uiApplication,
         RevitClashDetective.Models.RevitRepository clashRepository,
         IBimModelPartsService bimModelPartsService,
         ILocalizationService localization,
-        ILogicalFilterFactory filterFactory) {
+        ILogicalFilterFactory filterFactory,
+        IFamilyGeometryProvider geometryProvider) {
 
         UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
         BimModelPartsService = bimModelPartsService ?? throw new ArgumentNullException(nameof(bimModelPartsService));
         _clashRevitRepository = clashRepository ?? throw new ArgumentNullException(nameof(clashRepository));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
+        _geometryProvider = geometryProvider ?? throw new ArgumentNullException(nameof(geometryProvider));
         _application = UIApplication.Application;
         _uiDocument = UIApplication.ActiveUIDocument;
         Doc = _uiDocument.Document;
@@ -179,6 +195,11 @@ internal class RevitRepository {
             BuiltInCategory.OST_StructuralColumns,
             BuiltInCategory.OST_StructuralFraming
         });
+
+    /// <summary>
+    /// Категория семейства вентблока из файла АР
+    /// </summary>
+    public static BuiltInCategory VentBlockCategory { get; } = BuiltInCategory.OST_MechanicalEquipment;
 
     /// <summary>
     /// Используемые в плагине категории для стен: Стены
@@ -487,18 +508,30 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Возвращает коллекцию экземпляров уникальных отверстий
-    /// из активного файла
+    /// Возвращает коллекцию экземпляров заданного семейства заданной категории из активного файла
     /// </summary>
-    /// <param name="famName">Название семейства</param>
+    /// <param name="familyName">Название семейства</param>
     /// <param name="category">Категория семейства</param>
-    public ICollection<FamilyInstance> GetOpeningsOutcomingUnique(string famName, BuiltInCategory category) {
-        return new FilteredElementCollector(Doc)
+    public ICollection<FamilyInstance> GetFamilyInstances(string familyName, BuiltInCategory category) {
+        return GetFamilyInstances(Doc, familyName, category);
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию экземпляров заданного семейства заданной категории из заданного файла
+    /// </summary>
+    /// <param name="document">Документ Revit</param>
+    /// <param name="familyName">Название семейства</param>
+    /// <param name="category">Категория семейства</param>
+    public ICollection<FamilyInstance> GetFamilyInstances(
+        Document document,
+        string familyName,
+        BuiltInCategory category) {
+        return new FilteredElementCollector(document)
             .WhereElementIsNotElementType()
             .OfClass(typeof(FamilyInstance))
             .OfCategory(category)
             .OfType<FamilyInstance>()
-            .Where(f => f.Symbol.FamilyName.Equals(famName, StringComparison.CurrentCultureIgnoreCase))
+            .Where(f => f.Symbol.FamilyName.Equals(familyName, StringComparison.CurrentCultureIgnoreCase))
             .ToArray();
     }
 
@@ -507,7 +540,7 @@ internal class RevitRepository {
     /// </summary>
     public List<FamilyInstance> GetWallOpeningsMepTasksOutcoming() {
         var wallTypes = new[] { OpeningType.WallRectangle, OpeningType.WallRound };
-        return GetOpeningsMepTasks(Doc, wallTypes);
+        return GetOpeningTasks(Doc, wallTypes);
     }
 
     /// <summary>
@@ -515,7 +548,7 @@ internal class RevitRepository {
     /// </summary>
     public List<FamilyInstance> GetFloorOpeningsMepTasksOutcoming() {
         var floorTypes = new[] { OpeningType.FloorRectangle, OpeningType.FloorRound };
-        return GetOpeningsMepTasks(Doc, floorTypes);
+        return GetOpeningTasks(Doc, floorTypes);
     }
 
     public RevitClashDetective.Models.RevitRepository GetClashRevitRepository() {
@@ -534,7 +567,7 @@ internal class RevitRepository {
     /// Возвращает коллекцию исходящих заданий на отверстия, размещенных в текущем файле Revit
     /// </summary>
     public ICollection<OpeningMepTaskOutcoming> GetPlacedOutcomingTasks() {
-        return GetOpeningsTasks(Doc).Select(f => new OpeningMepTaskOutcoming(f)).ToHashSet();
+        return GetOpeningTasks(Doc).Select(f => new OpeningMepTaskOutcoming(f)).ToHashSet();
     }
 
     public void DeleteElements(ICollection<ElementId> elements) {
@@ -686,10 +719,15 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего АР документа Revit
+    /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего АР документа Revit.
+    /// <para>
+    /// Результат кэшируется на время жизни репозитория, чтобы навигатор и сервисы обновления информации
+    /// работали с одними и теми же обертками и не пересобирали их геометрию.
+    /// </para>
     /// </summary>
     public ICollection<OpeningRealAr> GetRealOpeningsAr() {
-        return GetRealOpeningsAr(Doc);
+        _realOpeningsArCache ??= GetRealOpeningsAr(Doc);
+        return _realOpeningsArCache;
     }
 
     /// <summary>
@@ -698,15 +736,20 @@ internal class RevitRepository {
     public ICollection<OpeningRealAr> GetRealOpeningsAr(Document document) {
         return GetOpeningsAr(document)
             .Where(famInst => famInst.Host != null)
-            .Select(famInst => new OpeningRealAr(famInst))
+            .Select(famInst => new OpeningRealAr(famInst, _geometryProvider))
             .ToHashSet();
     }
 
     /// <summary>
-    /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего КР документа Revit
+    /// Возвращает коллекцию чистовых экземпляров семейств отверстий из текущего КР документа Revit.
+    /// <para>
+    /// Результат кэшируется на время жизни репозитория, чтобы навигатор и сервисы обновления информации
+    /// работали с одними и теми же обертками и не пересобирали их геометрию.
+    /// </para>
     /// </summary>
     public ICollection<OpeningRealKr> GetRealOpeningsKr() {
-        return GetRealOpeningsKr(Doc);
+        _realOpeningsKrCache ??= GetRealOpeningsKr(Doc);
+        return _realOpeningsKrCache;
     }
 
     /// <summary>
@@ -715,7 +758,7 @@ internal class RevitRepository {
     public ICollection<OpeningRealKr> GetRealOpeningsKr(Document document) {
         return GetOpeningsKr(document)
             .Where(famInst => famInst.Host != null)
-            .Select(famInst => new OpeningRealKr(famInst))
+            .Select(famInst => new OpeningRealKr(famInst, _geometryProvider))
             .ToHashSet();
     }
 
@@ -757,8 +800,8 @@ internal class RevitRepository {
         foreach(var link in links) {
             var linkDoc = link.GetLinkDocument();
             var transform = link.GetTransform();
-            var genericModelsInLink = GetOpeningsTasks(linkDoc)
-                .Select(famInst => new OpeningMepTaskIncoming(famInst, this, transform))
+            var genericModelsInLink = GetOpeningTasks(linkDoc)
+                .Select(famInst => new OpeningMepTaskIncoming(famInst, transform))
                 .ToHashSet();
             genericModelsInLinks.UnionWith(genericModelsInLink);
         }
@@ -766,29 +809,23 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Возвращает коллекцию экземпляров уникальных входящих заданий на отверстия
-    /// из связанных файлов
+    /// Возвращает коллекцию экземпляров заданного семейства заданной категории
+    /// из выбранных пользователем связанных файлов вместе с трансформацией связи
     /// </summary>
-    /// <param name="famName">Название семейства уникального задания на отверстие</param>
-    /// <param name="category">Категория семейства уникального задания на отверстие</param>
-    public ICollection<(FamilyInstance Opening, Transform Transform)> GetOpeningsIncomingUnique(
-        string famName,
+    /// <param name="familyName">Название семейства</param>
+    /// <param name="category">Категория семейства</param>
+    public ICollection<(FamilyInstance Instance, Transform Transform)> GetFamilyInstancesFromLinks(
+        string familyName,
         BuiltInCategory category) {
         var links = GetSelectedRevitLinks();
-        List<(FamilyInstance, Transform)> openings = [];
+        List<(FamilyInstance, Transform)> instances = [];
         foreach(var link in links) {
             var transform = link.GetTransform();
-            var instances = new FilteredElementCollector(link.GetLinkDocument())
-                .WhereElementIsNotElementType()
-                .OfClass(typeof(FamilyInstance))
-                .OfCategory(category)
-                .OfType<FamilyInstance>()
-                .Where(f => f.Symbol.FamilyName.Equals(famName, StringComparison.CurrentCultureIgnoreCase))
-                .ToArray();
-            openings.AddRange(instances.Select(i => (i, transform)));
+            var instancesInLink = GetFamilyInstances(link.GetLinkDocument(), familyName, category);
+            instances.AddRange(instancesInLink.Select(i => (i, transform)));
         }
 
-        return openings;
+        return instances;
     }
 
     /// <summary>
@@ -801,14 +838,23 @@ internal class RevitRepository {
             var linkDoc = link.GetLinkDocument();
             var transform = link.GetTransform();
             var openingsArInLink = GetOpeningsAr(linkDoc)
-                .Select(famInst => new OpeningArTaskIncoming(this, famInst, transform));
+                .Select(famInst => new OpeningArTaskIncoming(famInst, transform, _geometryProvider));
             openingsArInLinks.UnionWith(openingsArInLink);
         }
         return openingsArInLinks;
     }
 
     /// <summary>
-    /// Находит экземпляры связей из активного документа, 
+    /// Возвращает коллекцию вентблоков из связанных файлов АР как входящих заданий на отверстия
+    /// </summary>
+    public ICollection<VentBlockAr> GetVentBlocksArTasksIncoming() {
+        return GetFamilyInstancesFromLinks(VentBlockArFamilyName, VentBlockCategory)
+            .Select(item => new VentBlockAr(item.Instance, item.Transform))
+            .ToHashSet();
+    }
+
+    /// <summary>
+    /// Находит экземпляры связей из активного документа,
     /// типоразмеры которых были настроены через метод <see cref="SetRevitLinkTypesToUse"/>
     /// </summary>
     /// <returns>Коллекция экземпляров связей, в которой находятся связи, выбранные пользователем</returns>
@@ -883,7 +929,7 @@ internal class RevitRepository {
             if((reference != null) && (Doc.GetElement(reference) is RevitLinkInstance link)) {
                 var opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
                 if(opening is not null and FamilyInstance famInst) {
-                    openingTasks.Add(new OpeningMepTaskIncoming(famInst, this, link.GetTransform()));
+                    openingTasks.Add(new OpeningMepTaskIncoming(famInst, link.GetTransform()));
                 }
             }
         }
@@ -928,7 +974,7 @@ internal class RevitRepository {
         if((reference != null) && (Doc.GetElement(reference) is RevitLinkInstance link)) {
             var opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
             if(opening is not null and FamilyInstance famInst) {
-                return new OpeningMepTaskIncoming(famInst, this, link.GetTransform());
+                return new OpeningMepTaskIncoming(famInst, link.GetTransform());
             } else {
                 msgBox.Show(
                     _localization.GetLocalizedString("Errors.InvalidTaskFamily"),
@@ -954,7 +1000,7 @@ internal class RevitRepository {
     /// <returns>Выбранный пользователем элемент</returns>
     /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
     /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
-    public OpeningArTaskIncoming PickSingleOpeningArTaskIncoming(IMessageBoxService msgBox) {
+    public IOpeningTaskIncoming PickSingleOpeningArTaskIncoming(IMessageBoxService msgBox) {
         ISelectionFilter filter = new SelectionFilterOpeningArTasksIncoming(Doc);
         var reference = _uiDocument.Selection.PickObject(
             ObjectType.LinkedElement,
@@ -964,7 +1010,7 @@ internal class RevitRepository {
         if((reference != null) && (Doc.GetElement(reference) is RevitLinkInstance link)) {
             var opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
             if(opening is not null and FamilyInstance famInst) {
-                return new OpeningArTaskIncoming(this, famInst, link.GetTransform());
+                return CreateArTaskIncoming(famInst, link.GetTransform());
             } else {
                 msgBox.Show(
                     _localization.GetLocalizedString("Errors.InvalidTaskFamily"),
@@ -990,7 +1036,7 @@ internal class RevitRepository {
     /// <returns>Выбранная пользователем коллекция элементов</returns>
     /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
     /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
-    public ICollection<OpeningArTaskIncoming> PickManyOpeningArTasksIncoming() {
+    public ICollection<IOpeningTaskIncoming> PickManyOpeningArTasksIncoming() {
         ISelectionFilter filter = new SelectionFilterOpeningArTasksIncoming(Doc);
         var references = _uiDocument.Selection
             .PickObjects(
@@ -998,12 +1044,12 @@ internal class RevitRepository {
             filter,
             _localization.GetLocalizedString("RevitUI.PickOpeningArTasks"));
 
-        HashSet<OpeningArTaskIncoming> openingTasks = [];
+        HashSet<IOpeningTaskIncoming> openingTasks = [];
         foreach(var reference in references) {
             if((reference != null) && (Doc.GetElement(reference) is RevitLinkInstance link)) {
                 var opening = link.GetLinkDocument().GetElement(reference.LinkedElementId);
                 if(opening is not null and FamilyInstance famInst) {
-                    openingTasks.Add(new OpeningArTaskIncoming(this, famInst, link.GetTransform()));
+                    openingTasks.Add(CreateArTaskIncoming(famInst, link.GetTransform()));
                 }
             }
         }
@@ -1138,16 +1184,18 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает коллекцию чистовых экземпляров семейств отверстий КР из документа Revit
     /// </summary>
-    public ICollection<FamilyInstance> GetOpeningsKr(Document document) {
+    private ICollection<FamilyInstance> GetOpeningsKr(Document document) {
         List<FamilyInstance> elements = [];
         foreach(var openingType in Enum.GetValues(typeof(OpeningType))
-            .OfType<OpeningType>()
-            .Where(t => t != OpeningType.FloorRound)) {
+                    .OfType<OpeningType>()
+                    .Where(t => t != OpeningType.FloorRound)) {
             elements.AddRange(
-                GetFamilyInstances(document,
-                OpeningRealKrFamilyName[openingType],
-                OpeningRealKrTypeName[openingType]));
+                GetFamilyInstances(
+                    document,
+                    OpeningRealKrFamilyName[openingType],
+                    OpeningRealKrTypeName[openingType]));
         }
+
         return elements;
     }
 
@@ -1170,8 +1218,9 @@ internal class RevitRepository {
     /// </summary>
     /// <param name="doc">Документ, в котором будет происходить поиск экземпляров семейств</param>
     /// <returns>Коллекция экземпляров семейств заданий на отверстия от ВИС</returns>
-    private ICollection<FamilyInstance> GetOpeningsTasks(Document doc) {
-        return GetOpeningsMepTasks(doc,
+    private ICollection<FamilyInstance> GetOpeningTasks(Document doc) {
+        return GetOpeningTasks(
+            doc,
             Enum.GetValues(typeof(OpeningType))
             .OfType<OpeningType>()
             .ToArray());
@@ -1293,9 +1342,9 @@ internal class RevitRepository {
     }
 
     /// <summary>
-    /// Возвращает задания на отверстия от инженера из текущего файла Revit
+    /// Возвращает задания на отверстия от ВИС
     /// </summary>
-    private List<FamilyInstance> GetOpeningsMepTasks(Document document, ICollection<OpeningType> types) {
+    private List<FamilyInstance> GetOpeningTasks(Document document, ICollection<OpeningType> types) {
         List<FamilyInstance> elements = [];
         foreach(var type in types) {
             elements.AddRange(
@@ -1304,6 +1353,17 @@ internal class RevitRepository {
                 OpeningTaskTypeName[type]));
         }
         return elements;
+    }
+
+    /// <summary>
+    /// Создает обертку входящего задания на отверстие от АР по названию семейства экземпляра
+    /// </summary>
+    /// <param name="famInst">Экземпляр семейства из связанного файла АР</param>
+    /// <param name="transform">Трансформация связанного файла АР</param>
+    private IOpeningTaskIncoming CreateArTaskIncoming(FamilyInstance famInst, Transform transform) {
+        return VentBlockArFamilyName.Equals(famInst.Symbol.FamilyName)
+            ? new VentBlockAr(famInst, transform)
+            : new OpeningArTaskIncoming(famInst, transform, _geometryProvider);
     }
 }
 

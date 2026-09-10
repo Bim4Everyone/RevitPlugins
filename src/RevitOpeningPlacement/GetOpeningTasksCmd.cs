@@ -24,6 +24,7 @@ using RevitClashDetective.Models.Handlers;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.Navigator.Checkers;
 using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.Services;
@@ -51,11 +52,11 @@ public class GetOpeningTasksCmd : BasePluginCommand {
 
     protected override void Execute(UIApplication uiApplication) {
         using var kernel = uiApplication.CreatePlatformServices();
-        kernel.Bind<UIApplication>()
-            .ToSelf()
-            .InSingletonScope();
         kernel.Bind<RevitRepository>()
             .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<IFamilyGeometryProvider>()
+            .To<FamilyGeometryProvider>()
             .InSingletonScope();
 
         kernel.UseLogicalFilterFactory();
@@ -79,6 +80,12 @@ public class GetOpeningTasksCmd : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<IConstantsProvider>()
             .To<ConstantsProvider>()
+            .InSingletonScope();
+        kernel.Bind<IIntersectingElementsFinder>()
+            .To<IntersectingElementsFinder>()
+            .InSingletonScope();
+        kernel.Bind<IHostFinder>()
+            .To<HostFinder>()
             .InSingletonScope();
         kernel.Bind<LinksSelectorWindow>()
             .ToSelf()
@@ -136,6 +143,12 @@ public class GetOpeningTasksCmd : BasePluginCommand {
             .InSingletonScope();
         kernel.Bind<IRevitLinkTypesSetter>()
             .To<UserSelectedLinksSetter>()
+            .InTransientScope();
+        kernel.Bind<IOpeningInfoUpdater<IOpeningTaskIncoming>>()
+            .To<OpeningTaskIncomingMepInfoUpdater>()
+            .InTransientScope();
+        kernel.Bind<IOpeningInfoUpdater<OpeningRealAr>>()
+            .To<OpeningRealArInfoUpdater>()
             .InTransientScope();
         kernel.Bind<NavigatorArViewModel>()
             .ToSelf()
@@ -222,6 +235,18 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<IRevitLinkTypesSetter>()
             .To<UserSelectedLinksSetter>()
             .InTransientScope();
+        if(navigatorMode == KrNavigatorMode.IncomingAr) {
+            kernel.Bind<IOpeningInfoUpdater<IOpeningTaskIncoming>>()
+                .To<OpeningTaskIncomingArInfoUpdater>()
+                .InTransientScope();
+        } else {
+            kernel.Bind<IOpeningInfoUpdater<IOpeningTaskIncoming>>()
+                .To<OpeningTaskIncomingMepInfoUpdater>()
+                .InTransientScope();
+        }
+        kernel.Bind<IOpeningInfoUpdater<OpeningRealKr>>()
+            .To<OpeningRealKrInfoUpdater>()
+            .InTransientScope();
         kernel.Bind<NavigatorKrViewModel>()
             .ToSelf()
             .InSingletonScope();
@@ -265,7 +290,7 @@ public class GetOpeningTasksCmd : BasePluginCommand {
                 return OpeningConfig.GetOpeningConfig(repo.Doc);
             });
         kernel.Bind<IOpeningInfoUpdater<OpeningMepTaskOutcoming>>()
-            .To<MepTaskOutcomingInfoUpdater>()
+            .To<OpeningTaskOutcomingMepInfoUpdater>()
             .InTransientScope();
         kernel.Bind<ILengthConverter>()
             .To<LengthConverterService>()

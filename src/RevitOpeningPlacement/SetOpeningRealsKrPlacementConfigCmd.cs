@@ -21,6 +21,8 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
 using RevitOpeningPlacement.Views.Settings;
 
+using RevitOpeningPlacement.Services;
+
 namespace RevitOpeningPlacement;
 /// <summary>
 /// Команда для задания настроек расстановки чистовых отверстий в файле КР
@@ -41,6 +43,9 @@ internal class SetOpeningRealsKrPlacementConfigCmd : BasePluginCommand {
         using var kernel = uiApplication.CreatePlatformServices();
         kernel.Bind<RevitRepository>()
             .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<IFamilyGeometryProvider>()
+            .To<FamilyGeometryProvider>()
             .InSingletonScope();
 
         kernel.UseLogicalFilterFactory();

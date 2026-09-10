@@ -47,6 +47,9 @@ internal class PlaceOpeningTasksBySelectionCmd : PlaceOpeningTasksCmd {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<IFamilyGeometryProvider>()
+            .To<FamilyGeometryProvider>()
+            .InSingletonScope();
         kernel.Bind<RevitClashDetective.Models.RevitRepository>()
             .ToSelf()
             .InSingletonScope();

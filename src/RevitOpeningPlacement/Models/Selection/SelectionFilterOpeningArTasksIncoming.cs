@@ -35,12 +35,27 @@ internal class SelectionFilterOpeningArTasksIncoming : ISelectionFilter {
             var linkDocument = link.GetLinkDocument();
             var element = linkDocument.GetElement(reference.LinkedElementId);
 
-            return (element != null)
-                && (element is FamilyInstance famInst)
-                && (famInst.Category.GetBuiltInCategory() == BuiltInCategory.OST_Windows)
-                && RevitRepository.OpeningRealArTypeName.Any(n => n.Value.Equals(famInst.Name))
-                && RevitRepository.OpeningRealArFamilyName.Any(n => n.Value.Equals(famInst.Symbol?.Name));
+            return (element is FamilyInstance famInst)
+                && (IsOpeningRealAr(famInst) || IsVentBlockAr(famInst));
         }
         return false;
+    }
+
+
+    /// <summary>
+    /// Проверяет, является ли экземпляр семейства чистовым отверстием АР
+    /// </summary>
+    private bool IsOpeningRealAr(FamilyInstance famInst) {
+        return (famInst.Category.GetBuiltInCategory() == BuiltInCategory.OST_Windows)
+            && RevitRepository.OpeningRealArTypeName.Any(n => n.Value.Equals(famInst.Name))
+            && RevitRepository.OpeningRealArFamilyName.Any(n => n.Value.Equals(famInst.Symbol?.Name));
+    }
+
+    /// <summary>
+    /// Проверяет, является ли экземпляр семейства вентблоком АР
+    /// </summary>
+    private bool IsVentBlockAr(FamilyInstance famInst) {
+        return (famInst.Category.GetBuiltInCategory() == RevitRepository.VentBlockCategory)
+            && RevitRepository.VentBlockArFamilyName.Equals(famInst.Symbol?.FamilyName);
     }
 }

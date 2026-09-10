@@ -43,14 +43,14 @@ public class PlaceOneOpeningRealByOneTaskCmd : OpeningRealPlacerCmd {
 
     protected override void Execute(UIApplication uiApplication) {
         using var kernel = uiApplication.CreatePlatformServices();
-        kernel.Bind<UIApplication>()
-            .ToSelf()
-            .InSingletonScope();
         kernel.Bind<IDocTypesHandler>()
             .To<DocTypesHandler>()
             .InSingletonScope();
         kernel.Bind<RevitRepository>()
             .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<IFamilyGeometryProvider>()
+            .To<FamilyGeometryProvider>()
             .InSingletonScope();
         kernel.Bind<ISolidProviderUtils>()
             .To<SolidProviderUtils>()
