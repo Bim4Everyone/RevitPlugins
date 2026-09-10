@@ -1,10 +1,12 @@
 using Autodesk.Revit.DB;
 
+using RevitOpeningPlacement.OpeningModels.Enums;
+
 namespace RevitOpeningPlacement.Models.Interfaces;
 /// <summary>
 /// Интерфейс для входящих заданий на отверстия
 /// </summary>
-internal interface IOpeningTaskIncoming : ISolidProvider {
+internal interface IOpeningTaskIncoming : ISolidProvider, IFamilyInstanceProvider {
     /// <summary>
     /// Ширина задания на отверстие в единицах Revit
     /// </summary>
@@ -45,4 +47,14 @@ internal interface IOpeningTaskIncoming : ISolidProvider {
     /// в который подгружена связь с заданием на отверстие
     /// </summary>
     double Rotation { get; }
+
+    /// <summary>
+    /// Статус входящего задания на отверстие
+    /// </summary>
+    OpeningTaskIncomingStatus Status { get; set; }
+
+    /// <summary>
+    /// Хост входящего задания на отверстие из активного документа - получателя заданий
+    /// </summary>
+    Element Host { get; set; }
 }

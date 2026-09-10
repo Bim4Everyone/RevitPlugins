@@ -7,17 +7,7 @@ namespace RevitOpeningPlacement.Models.Interfaces;
 /// Интерфейс, представляющий обертку над связанным файлом ВИС для получения из него элементов инженерных систем и входящих заданий на отверстия.
 /// <para>Использовать для обертки связей АР и КР</para>
 /// </summary>
-internal interface IMepLinkElementsProvider {
-    /// <summary>
-    /// Документ связанного файла с элементами ВИС
-    /// </summary>
-    Document Document { get; }
-
-    /// <summary>
-    /// Трансформация <see cref="Document">связанного файла</see> относительно активного документа ревита
-    /// </summary>
-    Transform DocumentTransform { get; }
-
+internal interface IMepLinkElementsProvider : ILinkElementsProvider {
     /// <summary>
     /// Возвращает коллекцию Id элементов инженерных систем из <see cref="Document">связанного файла</see>
     /// </summary>

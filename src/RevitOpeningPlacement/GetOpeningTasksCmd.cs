@@ -78,6 +78,9 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<ISolidProviderUtils>()
             .To<SolidProviderUtils>()
             .InSingletonScope();
+        kernel.Bind<ILengthConverter>()
+            .To<LengthConverterService>()
+            .InSingletonScope();
         kernel.Bind<IConstantsProvider>()
             .To<ConstantsProvider>()
             .InSingletonScope();
@@ -292,9 +295,6 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<IOpeningInfoUpdater<OpeningMepTaskOutcoming>>()
             .To<OpeningTaskOutcomingMepInfoUpdater>()
             .InTransientScope();
-        kernel.Bind<ILengthConverter>()
-            .To<LengthConverterService>()
-            .InSingletonScope();
         kernel.Bind<OutcomingTaskGeometryProvider>()
             .ToSelf()
             .InSingletonScope();
