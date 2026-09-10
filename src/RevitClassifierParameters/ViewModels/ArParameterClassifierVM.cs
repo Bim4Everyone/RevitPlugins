@@ -20,6 +20,7 @@ namespace RevitClassifierParameters.ViewModels;
 
 internal class ArParameterClassifierVM : ParameterClassifierVM {
     private readonly FacadeTypeSetter _facadeTypeSetter;
+    protected readonly FacadeTypeExcelReader _facadeTypeExcelReader;
 
     /// <summary>
     /// Стандартный путь к файлу правил заполнения типа фасада.
@@ -52,10 +53,11 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
         IOpenFileDialogService openFileDialogService,
         IMessageBoxService messageBoxService) :
         base(pluginConfig, revitRepository, localizationService, workGroupCode, materialParamSetter, materialReportService,
-            classifierExcelReader, facadeTypeExcelReader, systemPluginConfig, reportV, openFileDialogService,
+            classifierExcelReader, systemPluginConfig, reportV, openFileDialogService,
             messageBoxService) {
 
         _facadeTypeSetter = facadeTypeSetter;
+        _facadeTypeExcelReader = facadeTypeExcelReader;
 
         _excelFacadeTypePath = _systemPluginConfig.FacadeTypeFilePath;
 
@@ -121,45 +123,31 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
     }
 
     /// <summary>
-    /// Считывает файл правил заполнения типа фасада.
-    /// Если путь по умолчанию/из конфига существует — читает без диалога, иначе открывает диалог выбора файла.
+    /// Открывает диалог выбора файла правил заполнения типа фасада и считывает выбранный файл.
     /// </summary>
     private void RereadFacadeTypeExcel() {
-        OpenFileDialogService.Title = _localizationService.GetLocalizedString("MainWindow.SelectFacadeTypeFile");
-
-        if(OpenFileDialogService.ShowDialog()) {
-            // Если пользователь выбрал файл при выборе файла
-            ExcelFacadeTypePath = OpenFileDialogService.File.FullName;
-        } else {
-            // Если пользователь не выбрал файл
-            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoFacadeTypeFileSelected"));
+        string filePath = SelectFile(
+            "MainWindow.SelectFacadeTypeFile",
+            "MainWindow.NoFacadeTypeFileSelected");
+        if(filePath is null) {
             return;
         }
 
-        FacadeTypes = _facadeTypeExcelReader.Read(ExcelFacadeTypePath);
-        if(FacadeTypes is null || FacadeTypes.Count == 0) {
-            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoFacadeTypesFound"));
-        }
+        ExcelFacadeTypePath = filePath;
+        FacadeTypes = ReadExcel(_facadeTypeExcelReader, ExcelFacadeTypePath, "MainWindow.NoFacadeTypesFound");
     }
 
+    /// <summary>
+    /// Считывает файл правил заполнения типа фасада.
+    /// Если путь по умолчанию/из конфига существует — читает без диалога, иначе открывает диалог выбора файла.
+    /// </summary>
     private void ReadFacadeTypeExcel() {
         if(string.IsNullOrEmpty(ExcelFacadeTypePath) || !File.Exists(ExcelFacadeTypePath)) {
-            OpenFileDialogService.Title = _localizationService.GetLocalizedString("MainWindow.SelectFacadeTypeFile");
-
-            if(OpenFileDialogService.ShowDialog()) {
-                // Если пользователь выбрал файл при выборе файла
-                ExcelFacadeTypePath = OpenFileDialogService.File.FullName;
-            } else {
-                // Если пользователь не выбрал файл
-                MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoFacadeTypeFileSelected"));
-                return;
-            }
+            RereadFacadeTypeExcel();
+            return;
         }
 
-        FacadeTypes = _facadeTypeExcelReader.Read(ExcelFacadeTypePath);
-        if(FacadeTypes is null || FacadeTypes.Count == 0) {
-            MessageBoxService.Show(_localizationService.GetLocalizedString("MainWindow.NoFacadeTypesFound"));
-        }
+        FacadeTypes = ReadExcel(_facadeTypeExcelReader, ExcelFacadeTypePath, "MainWindow.NoFacadeTypesFound");
     }
 
     protected override void AcceptView() {
@@ -178,7 +166,7 @@ internal class ArParameterClassifierVM : ParameterClassifierVM {
 
     protected override bool CanAcceptView() {
         // Если планируем работать с классификатором
-        if(WorkWithMasonryCode || WorkWithRoofCode || WorkWithFacadeType) {
+        if(WorkWithMasonryCode || WorkWithRoofCode || WorkWithFacadeCode) {
             if(string.IsNullOrEmpty(ExcelClassifierPath)) {
                 ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoClassifierFile");
                 return false;

@@ -18,6 +18,21 @@ namespace RevitClassifierParameters.Models;
 internal class RevitRepository {
     private readonly ILocalizationService _localizationService;
     private readonly IMessageBoxService _messageBoxService;
+    
+    /// <summary>
+    /// Категории элементов, участвующих в заполнении параметров бетона.
+    /// </summary>
+    private readonly List<BuiltInCategory> _categoriesForConcreteParams = [
+        BuiltInCategory.OST_Walls,
+        BuiltInCategory.OST_Floors,
+        BuiltInCategory.OST_StructuralFoundation,
+        BuiltInCategory.OST_GenericModel,
+        BuiltInCategory.OST_StructuralFraming,
+        BuiltInCategory.OST_StructuralColumns,
+        BuiltInCategory.OST_Stairs,
+        BuiltInCategory.OST_StructConnections,
+        BuiltInCategory.OST_Roofs
+    ];
 
     /// <summary>
     /// Создает экземпляр репозитория.
@@ -105,6 +120,20 @@ internal class RevitRepository {
             .OfClass(typeof(Wall))
             .WhereElementIsNotElementType()
             .Cast<Wall>()
+            .ToList();
+    }
+
+    /// <summary>
+    /// Возвращает экземпляры элементов нужных категорий по всему проекту.
+    /// Используется для заполнения параметров бетона.
+    /// </summary>
+    public List<Element> GetElementsForConcreteParams() {
+        var filter = new ElementMulticategoryFilter(_categoriesForConcreteParams);
+
+        return new FilteredElementCollector(Document)
+            .WhereElementIsNotElementType()
+            .WherePasses(filter)
+            .ToElements()
             .ToList();
     }
 }
