@@ -56,10 +56,10 @@ internal class VentBlockAr : IOpeningTaskIncoming, IEquatable<VentBlockAr> {
         // габарит вдоль локальной оси OX вентблока соответствует ширине задания на отверстие,
         // габарит вдоль локальной оси OY - высоте задания на отверстие в перекрытии
         Width = _familyInstance.Symbol.GetParamValue<double>(SharedParamsConfig.Instance.SizeLength);
-        Height = _familyInstance.Symbol.GetParamValue<double>(SharedParamsConfig.Instance.SizeHeight);
+        Height = _familyInstance.Symbol.GetParamValue<double>(SharedParamsConfig.Instance.SizeWidth);
 
         DisplayWidth = _familyInstance.Symbol.GetParam(SharedParamsConfig.Instance.SizeLength).AsValueString();
-        DisplayHeight = _familyInstance.Symbol.GetParam(SharedParamsConfig.Instance.SizeHeight).AsValueString();
+        DisplayHeight = _familyInstance.Symbol.GetParam(SharedParamsConfig.Instance.SizeWidth).AsValueString();
         Comment = _familyInstance.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
     }
 
