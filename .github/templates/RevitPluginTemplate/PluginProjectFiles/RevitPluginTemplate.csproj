@@ -6,6 +6,10 @@
         <UseWPF>true</UseWPF>
         <Platforms>x64</Platforms>
         <Configurations>D2020;D2021;D2022;D2023;D2024;R2020;R2021;R2022;R2023;R2024</Configurations>
+
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
         
         <!-- Чтобы студия не переименовывала гуиды проекта
          когда меняется структура решения, гуид для С# .NET Core Project -->

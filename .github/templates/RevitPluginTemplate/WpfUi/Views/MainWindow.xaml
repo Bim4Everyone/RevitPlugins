@@ -53,13 +53,13 @@
             HorizontalAlignment="Right">
 
             <ui:TextBlock
-                Margin="10"
+                Margin="8"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
-                Margin="10"
+                Margin="8"
                 Width="80"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
@@ -67,7 +67,7 @@
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
-                Margin="10"
+                Margin="8"
                 Width="80"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"

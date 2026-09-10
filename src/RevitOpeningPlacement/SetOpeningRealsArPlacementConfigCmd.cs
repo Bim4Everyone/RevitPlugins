@@ -4,6 +4,8 @@ using System.Reflection;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
@@ -40,6 +42,8 @@ internal class SetOpeningRealsArPlacementConfigCmd : BasePluginCommand {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
         kernel.Bind<RevitClashDetective.Models.RevitRepository>()
             .ToSelf()
             .InSingletonScope();

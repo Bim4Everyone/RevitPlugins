@@ -13,6 +13,8 @@ namespace RevitMechanicalSpecification.Entities {
         private BuiltInCategory _builtInCategory;
         private string _elementName;
         private string _elementMark;
+        private string _replacedName;
+        private string _replacedMark;
         private FamilyInstance _manifoldInstance = null;
         private SpecificationElement _manifoldSpElement;
         private SpecificationElement _insulationSpHost;
@@ -50,6 +52,16 @@ namespace RevitMechanicalSpecification.Entities {
         public string ElementMark {
             get => _elementMark;
             set => _elementMark = value;
+        }
+
+        public string ReplacedName {
+            get => _replacedName;
+            set => _replacedName = value;
+        }
+
+        public string ReplacedMark {
+            get => _replacedMark;
+            set => _replacedMark = value;
         }
 
         public FamilyInstance ManifoldInstance {

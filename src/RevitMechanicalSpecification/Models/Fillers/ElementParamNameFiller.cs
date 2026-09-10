@@ -65,6 +65,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="specificationElement"></param>
         /// <returns></returns>
         private string GetName(SpecificationElement specificationElement) {
+            if(specificationElement.ReplacedName != null) {
+                return specificationElement.ReplacedName;
+            }
+
             _name = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameName);
             _nameAddon = specificationElement.GetTypeOrInstanceParamStringValue(Config.NameAddition);
             

@@ -259,6 +259,7 @@ internal class NavigatorViewModel : BaseViewModel, ISupportServices {
         var settings = new ClashViewSettings(_revitRepository, _localizationService, clash, _settingsConfig);
         var elements = clash.GetElements();
         _revitRepository.SelectAndShowElement(elements, settings);
+        clash.Visited = true;
     }
 
     private bool CanSelectClash(IClashViewModel p) {

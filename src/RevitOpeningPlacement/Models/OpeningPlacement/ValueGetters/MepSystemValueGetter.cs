@@ -3,6 +3,7 @@ using System;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
 
 using RevitClashDetective.Models.Value;
@@ -59,7 +60,8 @@ internal class MepSystemValueGetter : IValueGetter<StringParamValue> {
         if(string.IsNullOrWhiteSpace(title)) {
             return false;
         }
-        var service = RevitRepository.GetBimModelPartsService();
+
+        var service = ServicesProvider.GetPlatformService<IBimModelPartsService>();
         return service.InAnyBimModelParts(
             title,
             new BimModelPart[]{
@@ -73,7 +75,8 @@ internal class MepSystemValueGetter : IValueGetter<StringParamValue> {
         if(string.IsNullOrWhiteSpace(title)) {
             return false;
         }
-        var service = RevitRepository.GetBimModelPartsService();
+
+        var service = ServicesProvider.GetPlatformService<IBimModelPartsService>();
         return service.GetBimModelPart(title) == BimModelPart.SSPart;
     }
 }

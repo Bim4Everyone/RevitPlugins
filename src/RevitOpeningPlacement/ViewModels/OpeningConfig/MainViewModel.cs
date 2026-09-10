@@ -7,6 +7,10 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using Bim4Everyone.RevitFiltration;
+using Bim4Everyone.RevitFiltration.Controls;
+
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -14,10 +18,9 @@ using dosymep.WPF.ViewModels;
 using Ninject;
 using Ninject.Syntax;
 
-using RevitClashDetective.Models.FilterModel;
-
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Filtration;
 using RevitOpeningPlacement.Models.OpeningPlacement;
 using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.Services;
@@ -34,6 +37,10 @@ internal class MainViewModel : BaseViewModel {
     private readonly ConfigFileService _configFileService;
     private readonly IResolutionRoot _root;
     private readonly ILocalizationService _localization;
+    private readonly ILanguageService _languageService;
+    private readonly ILogicalFilterProviderFactory _filterProviderFactory;
+    private readonly IFilterContextParser _filterContextParser;
+    private readonly ILogicalFilterFactory _filterFactory;
     private string _configName;
 
     public MainViewModel(
@@ -42,6 +49,10 @@ internal class MainViewModel : BaseViewModel {
         Models.Configs.OpeningConfig openingConfig,
         IResolutionRoot root,
         ILocalizationService localization,
+        ILanguageService languageService,
+        ILogicalFilterProviderFactory filterProviderFactory,
+        IFilterContextParser filterContextParser,
+        ILogicalFilterFactory filterFactory,
         IOpenFileDialogService openFileDialogService,
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService) {
@@ -50,6 +61,12 @@ internal class MainViewModel : BaseViewModel {
         _configFileService = configFileService ?? throw new ArgumentNullException(nameof(configFileService));
         _root = root ?? throw new ArgumentNullException(nameof(root));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _languageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
+        _filterProviderFactory = filterProviderFactory
+                                 ?? throw new ArgumentNullException(nameof(filterProviderFactory));
+        _filterContextParser = filterContextParser
+                               ?? throw new ArgumentNullException(nameof(filterContextParser));
+        _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
         OpenFileDialogService = openFileDialogService ?? throw new ArgumentNullException(nameof(openFileDialogService));
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
@@ -57,7 +74,7 @@ internal class MainViewModel : BaseViewModel {
             throw new ArgumentNullException(nameof(openingConfig));
         }
         MepCategories = new ObservableCollection<MepCategoryViewModel>(
-            openingConfig.Categories.Select(item => new MepCategoryViewModel(_revitRepository, _localization, item)));
+            openingConfig.Categories.Select(item => CreateMepCategoryViewModel(item)));
         ConfigName = openingConfig.Name;
         RoundUnitedTaskSize = openingConfig.UnitedTasksSizeRounding > 0;
         SelectedSizeRoundForUnitedTask = openingConfig.UnitedTasksSizeRounding;
@@ -194,7 +211,11 @@ internal class MainViewModel : BaseViewModel {
         SaveConfig();
 
         var categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
-        var configurator = new PlacementConfigurator(_revitRepository, categories);
+        var configurator = new PlacementConfigurator(
+            _revitRepository,
+            categories,
+            _filterFactory,
+            _filterContextParser);
 
         var mepCategory = SelectedMepCategoryViewModel.GetMepCategory();
         var linearFilter = configurator.GetLinearFilter(mepCategory);
@@ -222,17 +243,30 @@ internal class MainViewModel : BaseViewModel {
         view.Show();
     }
 
-    private Filter GetCurrentStructureFilter(StructureCategoryEnum structureCategory) {
+    private CategoryFilter GetCurrentStructureFilter(StructureCategoryEnum structureCategory) {
         var mepCategory = SelectedMepCategoryViewModel.GetMepCategory();
         string structureName = RevitRepository.StructureCategoryNames[structureCategory];
-        return new Filter(_revitRepository.GetClashRevitRepository()) {
-            CategoryIds = [.. _revitRepository.GetCategories(structureCategory)
-                .Select(c => c.Id)],
-            Name = structureName,
-            Set = mepCategory.Intersections
-                .First(c => c.Name.Equals(structureName, StringComparison.CurrentCultureIgnoreCase))
-                .Set
-        };
+        string filterContext = mepCategory.Intersections
+            .First(c => c.Name.Equals(structureName, StringComparison.CurrentCultureIgnoreCase))
+            .FilterContext;
+        var filter = _filterContextParser.TryParse(filterContext, out var context)
+            ? context!.GetFilter()
+            : _filterFactory.CreateAndFilter();
+        return new CategoryFilter(
+            structureName,
+            filter,
+            [.. _revitRepository.GetCategories(structureCategory).Select(c => c.GetBuiltInCategory())]);
+    }
+
+    private MepCategoryViewModel CreateMepCategoryViewModel(MepCategory mepCategory) {
+        return new MepCategoryViewModel(
+            _revitRepository,
+            _localization,
+            _languageService,
+            _filterProviderFactory,
+            _filterContextParser,
+            _filterFactory,
+            mepCategory);
     }
 
     private Models.Configs.OpeningConfig GetOpeningConfig() {
@@ -268,7 +302,7 @@ internal class MainViewModel : BaseViewModel {
         if(config != null) {
             ShowPlacingErrors = config.ShowPlacingErrors;
             MepCategories = new ObservableCollection<MepCategoryViewModel>(
-                config.Categories.Select(item => new MepCategoryViewModel(_revitRepository, _localization, item)));
+                config.Categories.Select(item => CreateMepCategoryViewModel(item)));
             SelectedMepCategoryViewModel = MepCategories.FirstOrDefault(category => category.IsSelected)
                 ?? MepCategories.First();
             ConfigName = config.Name;
@@ -318,7 +352,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void OpenConfigFolder() {
-        string path = GetOpeningConfig().ProjectConfigPath;
+        string path = Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc).ProjectConfigPath;
         string dir = Path.GetDirectoryName(path);
         _configFileService.OpenFolder(dir, path);
     }

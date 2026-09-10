@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <LangVersion>12</LangVersion>
+        <LangVersion>latest</LangVersion>
         <UseDevExpress>true</UseDevExpress>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 </Project>
