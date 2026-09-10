@@ -21,7 +21,7 @@ internal abstract class OpeningInfoUpdaterBase<T> : IOpeningInfoUpdater<T> where
             UpdateInfoCore(opening);
         } catch(Exception ex) when(
             ex is NullReferenceException
-            or ArgumentNullException
+            or ArgumentException
             or InvalidOperationException
             or Autodesk.Revit.Exceptions.ApplicationException) {
             SetInvalidStatus(opening);

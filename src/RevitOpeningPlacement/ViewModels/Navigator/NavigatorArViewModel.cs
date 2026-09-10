@@ -209,13 +209,7 @@ internal class NavigatorArViewModel : BaseViewModel {
         foreach(var incomingTask in incomingTasks) {
             ct.ThrowIfCancellationRequested();
             progress.Report(i);
-            try {
-                infoUpdater.UpdateInfo(incomingTask);
-            } catch(ArgumentException) {
-                // не удалось получить солид у задания на отверстие. Например, если его толщина равна 0
-                continue;
-            }
-
+            infoUpdater.UpdateInfo(incomingTask);
             incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask, _localization));
             i++;
         }

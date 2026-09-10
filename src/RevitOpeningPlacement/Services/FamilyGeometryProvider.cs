@@ -25,6 +25,11 @@ namespace RevitOpeningPlacement.Services;
 /// </para>
 /// </summary>
 internal class FamilyGeometryProvider : IFamilyGeometryProvider {
+    /// <summary>
+    /// Минимальный габарит, при котором можно построить геометрию: 1 мм в футах
+    /// </summary>
+    private const double _minSize = 1 / 304.8;
+
     public FamilyGeometryProvider() {
     }
 
@@ -105,7 +110,7 @@ internal class FamilyGeometryProvider : IFamilyGeometryProvider {
         string heightName,
         string thicknessName,
         double inflation) {
-        (var frontNormal, var upDir, var leftDir) = GetOrientationVectors(instance);
+        (var frontNormal, var upDir, var leftDir) = GetWallOrientationVectors(instance);
         double width = GetSharedParamValue(instance, widthName) + 2 * inflation;
         double height = GetSharedParamValue(instance, heightName) + 2 * inflation;
         double thickness = GetSharedParamValue(instance, thicknessName);
@@ -142,7 +147,7 @@ internal class FamilyGeometryProvider : IFamilyGeometryProvider {
         string diameterName,
         string thicknessName,
         double inflation) {
-        (var frontNormal, var upDir, var leftDir) = GetOrientationVectors(instance);
+        (var frontNormal, var upDir, var leftDir) = GetWallOrientationVectors(instance);
         double diameter = GetSharedParamValue(instance, diameterName) + 2 * inflation;
         double thickness = GetSharedParamValue(instance, thicknessName);
 
@@ -157,6 +162,7 @@ internal class FamilyGeometryProvider : IFamilyGeometryProvider {
     /// <summary>
     /// Находит солид прямоугольного отверстия в перекрытии.
     /// Точка вставки экземпляра семейства - центр верхней грани параллелепипеда.
+    /// <para>Ширина откладывается вдоль локальной оси OX, высота - вдоль локальной оси OY.</para>
     /// </summary>
     /// <returns>Параллелепипед, построенный в соответствии с семейством.</returns>
     private Solid GetFloorRectangleSolid(
@@ -165,18 +171,18 @@ internal class FamilyGeometryProvider : IFamilyGeometryProvider {
         string heightName,
         string thicknessName,
         double inflation) {
-        (var frontDir, var upDir, var leftDir) = GetOrientationVectors(instance);
+        (var dirX, var dirY) = GetFloorOrientationVectors(instance);
         double width = GetSharedParamValue(instance, widthName) + 2 * inflation;
         double height = GetSharedParamValue(instance, heightName) + 2 * inflation;
         double thickness = GetSharedParamValue(instance, thicknessName);
 
         var origin = GetLocationPoint(instance);
         var loopLeftUpperCorner = origin
-                                  + leftDir * width / 2
-                                  + frontDir * height / 2;
-        var loopRightUpperCorner = loopLeftUpperCorner - leftDir * width;
-        var loopRightBottomCorner = loopRightUpperCorner - frontDir * height;
-        var loopLeftBottomCorner = loopRightBottomCorner + leftDir * width;
+                                  + dirX * width / 2
+                                  + dirY * height / 2;
+        var loopRightUpperCorner = loopLeftUpperCorner - dirX * width;
+        var loopRightBottomCorner = loopRightUpperCorner - dirY * height;
+        var loopLeftBottomCorner = loopRightBottomCorner + dirX * width;
 
         var rectangle = CurveLoop.Create(
         [
@@ -187,7 +193,7 @@ internal class FamilyGeometryProvider : IFamilyGeometryProvider {
         ]);
         return GeometryCreationUtilities.CreateExtrusionGeometry(
             [rectangle],
-            -upDir,
+            -XYZ.BasisZ,
             thickness);
     }
 
@@ -201,14 +207,14 @@ internal class FamilyGeometryProvider : IFamilyGeometryProvider {
         string diameterName,
         string thicknessName,
         double inflation) {
-        (var frontDir, var upDir, var leftDir) = GetOrientationVectors(instance);
+        (var dirX, var dirY) = GetFloorOrientationVectors(instance);
         double diameter = GetSharedParamValue(instance, diameterName) + 2 * inflation;
         double thickness = GetSharedParamValue(instance, thicknessName);
 
-        var circle = CreateCircle(GetLocationPoint(instance), leftDir, frontDir, diameter);
+        var circle = CreateCircle(GetLocationPoint(instance), dirX, dirY, diameter);
         return GeometryCreationUtilities.CreateExtrusionGeometry(
             [circle],
-            -upDir,
+            -XYZ.BasisZ,
             thickness);
     }
 
@@ -230,14 +236,37 @@ internal class FamilyGeometryProvider : IFamilyGeometryProvider {
     }
 
     /// <summary>
-    /// Возвращает нормализованные векторы ориентации экземпляра семейства.
+    /// Возвращает векторы ориентации экземпляра семейства отверстия в стене.
+    /// <para>Направление выдавливания отверстия - нормаль стены, то есть FacingOrientation.</para>
     /// </summary>
     /// <returns>Вперед, вверх, влево.</returns>
-    private (XYZ frontDir, XYZ upDir, XYZ leftDir) GetOrientationVectors(FamilyInstance instance) {
+    /// <exception cref="InvalidOperationException">
+    /// Исключение, если FacingOrientation экземпляра семейства не горизонтален
+    /// и оси отверстия определить нельзя.</exception>
+    private (XYZ frontDir, XYZ upDir, XYZ leftDir) GetWallOrientationVectors(FamilyInstance instance) {
         var frontNormal = instance.FacingOrientation;
         var upDir = XYZ.BasisZ;
         var leftDir = upDir.CrossProduct(frontNormal).Normalize();
-        return (frontNormal, upDir, leftDir);
+        return leftDir.IsZeroLength()
+            ? throw new InvalidOperationException(
+                $"Не удалось определить оси отверстия в стене с Id {instance.Id} "
+                + $"из файла {instance.Document.Title}: FacingOrientation не горизонтален")
+            : (frontNormal, upDir, leftDir);
+    }
+
+    /// <summary>
+    /// Возвращает горизонтальные оси экземпляра семейства отверстия в перекрытии
+    /// по его углу поворота вокруг оси OZ.
+    /// <para>
+    /// Через FacingOrientation определять нельзя: у семейства, размещенного на горизонтальной грани,
+    /// он вертикален, и расчет осей вырождается в нулевой вектор.
+    /// </para>
+    /// </summary>
+    /// <returns>Локальные оси OX и OY экземпляра семейства в координатах документа.</returns>
+    private (XYZ dirX, XYZ dirY) GetFloorOrientationVectors(FamilyInstance instance) {
+        double rotation = ((LocationPoint) instance.Location).Rotation;
+        return (new XYZ(Math.Cos(rotation), Math.Sin(rotation), 0),
+            new XYZ(-Math.Sin(rotation), Math.Cos(rotation), 0));
     }
 
     /// <summary>
@@ -248,14 +277,23 @@ internal class FamilyGeometryProvider : IFamilyGeometryProvider {
     }
 
     /// <summary>
-    /// Возвращает значение общего параметра экземпляра семейства в единицах длины Revit.
+    /// Возвращает значение габарита из общего параметра экземпляра семейства в единицах длины Revit.
     /// </summary>
     /// <exception cref="InvalidOperationException">
-    /// Исключение, если у экземпляра семейства нет заданного общего параметра.</exception>
+    /// Исключение, если у экземпляра семейства нет заданного общего параметра,
+    /// либо его значение слишком мало для построения геометрии.</exception>
     private double GetSharedParamValue(Element element, string paramName) {
-        return element.IsExistsSharedParam(paramName)
-            ? element.GetSharedParamValue<double>(paramName)
+        if(!element.IsExistsSharedParam(paramName)) {
+            throw new InvalidOperationException(
+                $"У элемента с Id {element.Id} из файла {element.Document.Title} "
+                + $"отсутствует общий параметр \"{paramName}\"");
+        }
+
+        double value = element.GetSharedParamValue<double>(paramName);
+        return value > _minSize
+            ? value
             : throw new InvalidOperationException(
-                $"У элемента с Id {element.Id} из файла {element.Document.Title} отсутствует общий параметр \"{paramName}\"");
+                $"У элемента с Id {element.Id} из файла {element.Document.Title} "
+                + $"значение общего параметра \"{paramName}\" слишком мало для построения геометрии");
     }
 }

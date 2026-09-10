@@ -57,8 +57,6 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
     /// </summary>
     private readonly ICollection<OpeningRealKr> _realOpenings;
 
-    private readonly IFamilyGeometryProvider _geometryProvider;
-
     /// <summary>
     /// Кэш Id вентблоков по связям АР
     /// </summary>
@@ -69,8 +67,7 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
         OpeningRealsKrConfig config,
         ILengthConverter lengthConverter,
         ISolidProviderUtils solidUtils,
-        IIntersectingElementsFinder intersectingElementsFinder,
-        IFamilyGeometryProvider geometryProvider)
+        IIntersectingElementsFinder intersectingElementsFinder)
         : base(solidUtils, intersectingElementsFinder) {
         if(config is null) {
             throw new ArgumentNullException(nameof(config));
@@ -78,7 +75,6 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _lengthConverter = lengthConverter ?? throw new ArgumentNullException(nameof(lengthConverter));
-        _geometryProvider = geometryProvider ?? throw new ArgumentNullException(nameof(geometryProvider));
         _placementType = config.PlacementType;
         _minDistance = _lengthConverter.ConvertToInternal(config.MinDistanceBetweenOpenings);
         _realOpenings = _minDistance > 0 ? revitRepository.GetRealOpeningsKr() : [];
@@ -258,7 +254,18 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
                 continue;
             }
 
-            yield return link.ToActiveDocCoordinates(_geometryProvider.GetSolid(ventBlock));
+            Solid solid;
+            try {
+                solid = new VentBlockAr(ventBlock, link.DocumentTransform).GetSolid();
+            } catch(Exception ex) when(
+                ex is NullReferenceException
+                    or ArgumentException
+                    or InvalidOperationException
+                    or Autodesk.Revit.Exceptions.ApplicationException) {
+                continue;
+            }
+
+            yield return solid;
         }
     }
 

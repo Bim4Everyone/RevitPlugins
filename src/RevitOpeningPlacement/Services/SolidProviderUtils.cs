@@ -54,8 +54,19 @@ internal class SolidProviderUtils : ISolidProviderUtils {
     }
 
     public bool IntersectsSolid(ISolidProvider thisSolidProvider, Solid otherSolid, BoundingBoxXYZ otherSolidBBox) {
-        var thisSolid = thisSolidProvider.GetSolid();
-        var thisBBox = thisSolidProvider.GetTransformedBBoxXYZ();
+        Solid thisSolid;
+        BoundingBoxXYZ thisBBox;
+        try {
+            thisSolid = thisSolidProvider.GetSolid();
+            thisBBox = thisSolidProvider.GetTransformedBBoxXYZ();
+        } catch(Exception ex) when(
+            ex is NullReferenceException
+                or ArgumentException
+                or InvalidOperationException
+                or Autodesk.Revit.Exceptions.ApplicationException) {
+            // геометрию элемента построить не удалось - считаем, что пересечения нет
+            return false;
+        }
         return SolidsIntersect(thisSolid, thisBBox, otherSolid, otherSolidBBox);
     }
 

@@ -20,6 +20,9 @@ internal interface ISolidProviderUtils {
 
     /// <summary>
     /// Метод проверяет тела на пересечение.
+    /// <para>
+    /// Если геометрию <paramref name="solidProvider"/> построить не удалось, возвращается False.
+    /// </para>
     /// </summary>
     /// <param name="solidProvider">Первое тело.</param>
     /// <param name="otherSolid">Второе тело.</param>
