@@ -1361,9 +1361,16 @@ internal class RevitRepository {
     /// <param name="famInst">Экземпляр семейства из связанного файла АР</param>
     /// <param name="transform">Трансформация связанного файла АР</param>
     private IOpeningTaskIncoming CreateArTaskIncoming(FamilyInstance famInst, Transform transform) {
-        return VentBlockArFamilyName.Equals(famInst.Symbol.FamilyName)
-            ? new VentBlockAr(famInst, transform)
-            : new OpeningArTaskIncoming(famInst, transform, _geometryProvider);
+        if(VentBlockArFamilyName.Equals(famInst.Symbol.FamilyName)) {
+            return new VentBlockAr(famInst, transform);
+        }
+
+        if(famInst.SuperComponent is FamilyInstance root
+           && VentBlockArFamilyName.Equals(root.Symbol.FamilyName)) {
+            return new VentBlockAr(root, transform);
+        }
+
+        return new OpeningArTaskIncoming(famInst, transform, _geometryProvider);
     }
 }
 

@@ -56,6 +56,8 @@ internal class SelectionFilterOpeningArTasksIncoming : ISelectionFilter {
     /// </summary>
     private bool IsVentBlockAr(FamilyInstance famInst) {
         return (famInst.Category.GetBuiltInCategory() == RevitRepository.VentBlockCategory)
-            && RevitRepository.VentBlockArFamilyName.Equals(famInst.Symbol?.FamilyName);
+               && RevitRepository.VentBlockArFamilyName.Equals(famInst.Symbol?.FamilyName)
+               || (famInst.SuperComponent is FamilyInstance root
+                   && RevitRepository.VentBlockArFamilyName.Equals(root.Symbol?.FamilyName));
     }
 }
