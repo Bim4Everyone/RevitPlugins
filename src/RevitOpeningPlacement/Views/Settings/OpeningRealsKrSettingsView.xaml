@@ -13,8 +13,8 @@
     mc:Ignorable="d"
     MinWidth="350"
     MaxWidth="350"
-    MinHeight="295"
-    MaxHeight="295"
+    MinHeight="410"
+    MaxHeight="410"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:OpeningRealsKrConfigViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
@@ -27,6 +27,10 @@
     </core:WpfUIPlatformWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
@@ -103,8 +107,44 @@
             </StackPanel>
         </Border>
 
-        <DockPanel
+        <Border
             Grid.Row="3"
+            Margin="8 10 8 0"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center">
+                <DockPanel
+                    HorizontalAlignment="Stretch">
+                    <ui:ToggleSwitch
+                        Content="{me:LocalizationSource OpeningRealsKrSettingsView.CheckDistance}"
+                        IsChecked="{Binding CheckDistance, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="0 5 0 0"
+                    HorizontalAlignment="Stretch">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource OpeningRealsKrSettingsView.DistanceValue}" />
+                    <ui:TextBox
+                        HorizontalAlignment="Right"
+                        MinWidth="{StaticResource SmallInputWidth}"
+                        Width="{StaticResource SmallInputWidth}"
+                        IsEnabled="{Binding CheckDistance}"
+                        Text="{Binding MinDistance, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </StackPanel>
+        </Border>
+
+        <ui:TextBlock
+            Grid.Row="4"
+            Margin="8 10 8 0"
+            TextWrapping="Wrap"
+            Text="{Binding ErrorText}"
+            Style="{StaticResource CustomErrorText}" />
+
+        <DockPanel
+            Grid.Row="5"
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom">
             <ui:Button

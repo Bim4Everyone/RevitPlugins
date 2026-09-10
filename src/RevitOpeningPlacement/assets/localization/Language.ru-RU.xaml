@@ -39,6 +39,8 @@
 
     <system:String
         x:Key="AllOpeningStatus.Unique">Уникальное</system:String>
+    <system:String
+        x:Key="AllOpeningStatus.VentBlock">Вентблок</system:String>
 
     <system:String
         x:Key="OpeningTaskIncomingStatus.New">Новое задание</system:String>
@@ -80,6 +82,8 @@
         x:Key="OpeningRealStatus.Empty">Пустое отверстие</system:String>
     <system:String
         x:Key="OpeningRealStatus.TooBig">Слишком большое отверстие</system:String>
+    <system:String
+        x:Key="OpeningRealStatus.TooClose">Слишком близко друг к другу</system:String>
     <system:String
         x:Key="OpeningRealStatus.NotActual">Неактуальное отверстие</system:String>
     <system:String
@@ -170,6 +174,14 @@
         x:Key="OpeningRealsKrSettingsView.RoundElevation">Округлять отметку</system:String>
     <system:String
         x:Key="OpeningRealsKrSettingsView.RoundValues">Значение округления, мм</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.CheckDistance">Проверять расстояние между отверстиями</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.DistanceValue">Минимальное расстояние, мм</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.Validation.DistanceRange">Минимальное расстояние должно быть от 0 до {0} мм</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.Validation.CannotParseInt">Введите число</system:String>
 
     <system:String
         x:Key="UnionTaskSettingsView.Title">Настройки объединения</system:String>
@@ -277,14 +289,6 @@
 
     <system:String
         x:Key="LinksSelectorWindow.Validation.SelectAnyLink">Выберите связи для обработки</system:String>
-
-    <system:String
-        x:Key="Parameter.InvalidStorageType">У параметра {0} не определен тип данных.</system:String>
-    <system:String
-        x:Key="Parameter.CannotParseInt">Значение параметра "{0}" должно быть целым числом.</system:String>
-    <system:String
-        x:Key="Parameter.CannotParseDouble">Значение параметра "{0}" должно быть вещественным числом.</system:String>
-
 
     <system:String
         x:Key="Ok">ОК</system:String>

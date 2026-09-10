@@ -39,6 +39,8 @@
 
     <system:String
         x:Key="AllOpeningStatus.Unique">Unique</system:String>
+    <system:String
+        x:Key="AllOpeningStatus.VentBlock">Vent block</system:String>
 
     <system:String
         x:Key="OpeningTaskIncomingStatus.New">New task</system:String>
@@ -80,6 +82,8 @@
         x:Key="OpeningRealStatus.Empty">Empty opening</system:String>
     <system:String
         x:Key="OpeningRealStatus.TooBig">Opening is too big</system:String>
+    <system:String
+        x:Key="OpeningRealStatus.TooClose">Openings are too close to each other</system:String>
     <system:String
         x:Key="OpeningRealStatus.NotActual">Outdated opening</system:String>
     <system:String
@@ -170,6 +174,14 @@ Continue?
         x:Key="OpeningRealsKrSettingsView.RoundElevation">Round elevation</system:String>
     <system:String
         x:Key="OpeningRealsKrSettingsView.RoundValues">Rounding value, mm</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.CheckDistance">Check distance between openings</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.DistanceValue">Minimum distance, mm</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.Validation.DistanceRange">Minimum distance must be from 0 to {0} mm.</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.Validation.CannotParseInt">Enter a number</system:String>
 
     <system:String
         x:Key="UnionTaskSettingsView.Title">Merge Settings</system:String>
@@ -277,14 +289,6 @@ including in multilayer structures.</system:String>
 
     <system:String
         x:Key="LinksSelectorWindow.Validation.SelectAnyLink">Select links for processing</system:String>
-
-    <system:String
-        x:Key="Parameter.InvalidStorageType">Parameter {0} has no defined data type.</system:String>
-    <system:String
-        x:Key="Parameter.CannotParseInt">Parameter "{0}" value must be an integer.</system:String>
-    <system:String
-        x:Key="Parameter.CannotParseDouble">Parameter "{0}" value must be a real number.</system:String>
-
 
     <system:String
         x:Key="Ok">OK</system:String>
