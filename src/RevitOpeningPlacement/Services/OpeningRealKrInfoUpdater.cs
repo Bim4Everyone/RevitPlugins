@@ -6,6 +6,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit.Geometry;
 
+using RevitClashDetective.Models.Extensions;
+
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
@@ -36,6 +38,7 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
 
     private readonly RevitRepository _revitRepository;
     private readonly ILengthConverter _lengthConverter;
+    private readonly IConstantsProvider _constantsProvider;
 
     /// <summary>
     /// Минимальное допустимое расстояние между чистовыми отверстиями КР в единицах длины Revit (футах).
@@ -66,6 +69,7 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
         RevitRepository revitRepository,
         OpeningRealsKrConfig config,
         ILengthConverter lengthConverter,
+        IConstantsProvider constantsProvider,
         ISolidProviderUtils solidUtils,
         IIntersectingElementsFinder intersectingElementsFinder)
         : base(solidUtils, intersectingElementsFinder) {
@@ -75,6 +79,7 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _lengthConverter = lengthConverter ?? throw new ArgumentNullException(nameof(lengthConverter));
+        _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
         _placementType = config.PlacementType;
         _minDistance = _lengthConverter.ConvertToInternal(config.MinDistanceBetweenOpenings);
         _realOpenings = _minDistance > 0 ? revitRepository.GetRealOpeningsKr() : [];
@@ -219,11 +224,12 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
                 openingSolidInLinkCoordinates,
                 openingBBoxInLinkCoordinates))
             .Select(task => link.ToActiveDocCoordinates(task.GetSolid()))
-            .Concat(GetIntersectingVentBlockSolids(link, openingSolidInLinkCoordinates))
+            .Concat(GetIntersectingVentBlockSolids(opening, link, openingSolidInLinkCoordinates))
             .ToHashSet();
 
+        var hostSolid = opening.GetHost().GetSolid();
         linkOpeningsIntersectConstructions = intersectingTasksSolids
-            .Any(solid => TaskIsNotCoveredByOpening(solid, openingSolid));
+            .Any(taskSolid => TaskIntersectsHost(taskSolid, hostSolid));
 
         return _solidUtils.SubtractSolids(solidForSubtraction, intersectingTasksSolids);
     }
@@ -240,6 +246,7 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
     /// <param name="openingSolidInLinkCoordinates">
     /// Солид чистового отверстия КР в координатах связи</param>
     private IEnumerable<Solid> GetIntersectingVentBlockSolids(
+        OpeningRealKr opening,
         IConstructureLinkElementsProvider link,
         Solid openingSolidInLinkCoordinates) {
         var ventBlockIds = GetVentBlockIds(link);
@@ -247,25 +254,27 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
             yield break;
         }
 
-        var intersectingIds = _intersectingElementsFinder
-            .GetIntersectingElementIds(link.Document, ventBlockIds, openingSolidInLinkCoordinates);
-        foreach(var id in intersectingIds) {
-            if(link.Document.GetElement(id) is not FamilyInstance ventBlock) {
+        // грубый отбор по боксу. ElementIntersectsSolidFilter здесь неприменим:
+        // он проверяет собственную геометрию экземпляра, а у вентблока ее нет -
+        // тело лежит во вложенном общем семействе, то есть в отдельном элементе связи
+        var candidateIds = new FilteredElementCollector(link.Document, ventBlockIds)
+            .WherePasses(new BoundingBoxIntersectsFilter(openingSolidInLinkCoordinates.GetOutline()))
+            .ToElementIds();
+
+        // точная проверка пересечением солидов.
+        // VentBlockAr.GetSolid уже применяет трансформацию связи,
+        // поэтому сравнение идет в координатах активного документа
+        var openingSolid = opening.GetSolid();
+        var openingBBox = opening.GetTransformedBBoxXYZ();
+        foreach(var id in candidateIds) {
+            if(link.Document.GetElement(id) is not FamilyInstance instance) {
                 continue;
             }
 
-            Solid solid;
-            try {
-                solid = new VentBlockAr(ventBlock, link.DocumentTransform).GetSolid();
-            } catch(Exception ex) when(
-                ex is NullReferenceException
-                    or ArgumentException
-                    or InvalidOperationException
-                    or Autodesk.Revit.Exceptions.ApplicationException) {
-                continue;
+            var ventBlock = new VentBlockAr(instance, link.DocumentTransform);
+            if(_solidUtils.IntersectsSolid(ventBlock, openingSolid, openingBBox)) {
+                yield return ventBlock.GetSolid();
             }
-
-            yield return solid;
         }
     }
 
@@ -287,18 +296,18 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
     }
 
     /// <summary>
-    /// Проверяет, выходит ли задание на отверстие за габариты чистового отверстия
+    /// Проверяет, пересекает ли задание из связи основу чистового отверстия КР.
     /// </summary>
     /// <param name="taskSolid">Солид задания на отверстие в координатах активного файла</param>
-    /// <param name="openingSolid">Солид чистового отверстия</param>
-    private bool TaskIsNotCoveredByOpening(Solid taskSolid, Solid openingSolid) {
+    /// <param name="hostSolid">Солид основы чистового отверстия, то есть конструкции с вырезом</param>
+    private bool TaskIntersectsHost(Solid taskSolid, Solid hostSolid) {
         try {
             return BooleanOperationsUtils.ExecuteBooleanOperation(
                            taskSolid,
-                           openingSolid,
-                           BooleanOperationsType.Difference)
+                           hostSolid,
+                           BooleanOperationsType.Intersect)
                        ?.Volume
-                   > 0;
+                   > _constantsProvider.ToleranceVolumeFeetCube;
         } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
             return false;
         }
