@@ -4,14 +4,16 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.WPF.Extensions;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement;
 using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// <summary>
@@ -21,15 +23,14 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 internal class OpeningRealArViewModel : BaseViewModel, IOpeningRealArViewModel, IEquatable<OpeningRealArViewModel> {
     private readonly OpeningRealAr _openingReal;
 
-
-    public OpeningRealArViewModel(OpeningRealAr openingReal) {
+    public OpeningRealArViewModel(OpeningRealAr openingReal, ILocalizationService localization) {
         _openingReal = openingReal ?? throw new System.ArgumentNullException(nameof(openingReal));
 
         OpeningId = _openingReal.Id;
         Diameter = _openingReal.Diameter;
         Width = _openingReal.Width;
         Height = _openingReal.Height;
-        Status = _openingReal.Status.GetDescription();
+        Status = localization.GetLocalizedString($"{nameof(OpeningRealStatus)}.{_openingReal.Status}");
         Comment = _openingReal.Comment;
         LevelName = GetLevelName(openingReal);
         TaskInfo = GetTaskInfo(openingReal);
@@ -78,7 +79,7 @@ internal class OpeningRealArViewModel : BaseViewModel, IOpeningRealArViewModel, 
     }
 
     /// <summary>
-    /// Возвращает коллекцию, в которой находится чистовое отверстие, которое надо выделить на виде
+    /// Возвращает коллекцию, в которой находится чистовое отверстие для выделения на виде
     /// </summary>
     public ICollection<ElementModel> GetElementsToSelect() {
         return new ElementModel[] {

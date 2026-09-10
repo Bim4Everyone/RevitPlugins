@@ -2,6 +2,8 @@ using System;
 
 using Autodesk.Revit.DB;
 
+using Bim4Everyone.RevitFiltration;
+
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
@@ -15,6 +17,7 @@ internal class ElementHighlighter {
     private readonly View3D _view3D;
     private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localization;
+    private readonly ILogicalFilterFactory _filterFactory;
 
     /// <summary>
     /// Конструктор класса для графического выделения заданного элемента (стены или перекрытия) на 3D виде
@@ -27,18 +30,21 @@ internal class ElementHighlighter {
     /// <param name="revitRepository">Репозиторий активного документа, в котором нужно выделить элемент на 3D виде</param>
     /// <param name="view3D">3D вид, на котором нужно выделить элемент</param>
     /// <param name="elementToHighlight">Элемент, который нужно выделить. Это должна быть стена или перекрытие</param>
+    /// <param name="filterFactory">Фабрика фильтров элементов</param>
     /// <exception cref="ArgumentNullException">Элемент должен быть стеной или перекрытием</exception>
     /// <exception cref="ArgumentException">Исключение, если класс элемента не поддерживается</exception>
     public ElementHighlighter(RevitRepository revitRepository,
         View3D view3D,
         Element elementToHighlight,
         IMessageBoxService messageBoxService,
-        ILocalizationService localization) {
+        ILocalizationService localization,
+        ILogicalFilterFactory filterFactory) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _view3D = view3D ?? throw new ArgumentNullException(nameof(view3D));
         _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
         var element = elementToHighlight ?? throw new ArgumentNullException(nameof(elementToHighlight));
         _elementToHighlight = element is Wall or Floor
             ? element
@@ -72,7 +78,7 @@ internal class ElementHighlighter {
     /// </summary>
     private void ApplyGraphicSettings() {
         var doc = _view3D.Document;
-        var filters = ParameterFilterInitializer.GetHighlightFilters(doc, _elementToHighlight);
+        var filters = ParameterFilterInitializer.GetHighlightFilters(doc, _elementToHighlight, _filterFactory);
         var graphicsSettings = GraphicSettingsInitializer.GetNotInterestingConstructionsGraphicSettings();
         using var t = doc.StartTransaction(_localization.GetLocalizedString("Transaction.HighlightHost"));
 

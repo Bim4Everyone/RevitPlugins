@@ -82,6 +82,10 @@ public class DetectiveClashesCommand : BasePluginCommand {
         kernel.Bind<SettingsConfig>()
             .ToMethod(c => SettingsConfig.GetSettingsConfig(c.Kernel.Get<IConfigSerializer>()));
 
+        kernel.Bind<Views.Common.EntityNameView>()
+            .ToSelf()
+            .InTransientScope();
+
         kernel.BindMainWindow<MainViewModel, MainWindow>();
         kernel.UseWpfOpenFileDialog<MainViewModel>()
             .UseWpfSaveFileDialog<MainViewModel>()

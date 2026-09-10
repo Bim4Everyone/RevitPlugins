@@ -85,11 +85,12 @@
                     Command="{Binding LoadCommand}"
                     Content="{ui:SymbolIcon Symbol=ArrowDownload20}" />
                 <ui:Button
-                    Margin="8 0"
+                    Margin="8 0 0 0"
                     ToolTip="{me:LocalizationSource FilterCreation.Save}"
                     Command="{Binding SaveCommand}"
                     Content="{ui:SymbolIcon Symbol=Save20}" />
                 <ui:Button
+                    Margin="8 0 0 0"
                     ToolTip="{me:LocalizationSource FilterCreation.SaveAs}"
                     Command="{Binding SaveAsCommand}"
                     Content="{ui:SymbolIcon Symbol=SaveEdit20}" />
@@ -115,17 +116,18 @@
                         Command="{Binding CreateCommand}"
                         Content="{ui:SymbolIcon Symbol=Add20}" />
                     <ui:Button
-                        Margin="4 0"
+                        Margin="8 0 0 0"
                         ToolTip="{me:LocalizationSource FilterCreation.RenameSearchSet}"
                         Command="{Binding RenameCommand}"
                         Content="{ui:SymbolIcon Symbol=Rename20}" />
                     <ui:Button
+                        Margin="8 0 0 0"
                         ToolTip="{me:LocalizationSource FilterCreation.CopySearchSet}"
                         Command="{Binding CopyCommand}"
                         Content="{ui:SymbolIcon Symbol=Copy20}" />
                     <ui:Button
                         Appearance="Danger"
-                        Margin="4 0 0 0"
+                        Margin="8 0 0 0"
                         ToolTip="{me:LocalizationSource FilterCreation.DeleteSearchSet}"
                         Command="{Binding DeleteCommand}"
                         CommandParameter="{Binding Path=SelectedItems, ElementName=_filtersList}"

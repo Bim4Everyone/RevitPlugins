@@ -1,25 +1,49 @@
+using System;
+using System.Linq;
+
+using Bim4Everyone.RevitFiltration;
+using Bim4Everyone.RevitFiltration.Controls;
+
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Filtration;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class StructureCategoryViewModel : BaseViewModel {
-    private readonly RevitRepository _revitRepository;
-    private readonly StructureCategory _structureCategory;
-    private readonly ILocalizationService _localization;
-
-    public StructureCategoryViewModel(RevitRepository revitRepository,
+    public StructureCategoryViewModel(
+        RevitRepository revitRepository,
         StructureCategory structureCategory,
-        ILocalizationService localization) {
-        _revitRepository = revitRepository ?? throw new System.ArgumentNullException(nameof(revitRepository));
-        _structureCategory = structureCategory ?? throw new System.ArgumentNullException(nameof(structureCategory));
-        _localization = localization ?? throw new System.ArgumentNullException(nameof(localization));
-        _name = _structureCategory.Name;
-        _isSelected = _structureCategory.IsSelected;
-        var categoriesInfo = GetCategoriesInfoViewModel(_revitRepository, _name);
-        _setViewModel = new SetViewModel(_revitRepository, _localization, categoriesInfo, _structureCategory.Set);
+        ILocalizationService localizationService,
+        ILanguageService languageService,
+        ILogicalFilterProviderFactory filterProviderFactory,
+        IFilterContextParser filterContextParser,
+        ILogicalFilterFactory filterFactory) {
+        if(revitRepository is null) {
+            throw new ArgumentNullException(nameof(revitRepository));
+        }
+
+        if(structureCategory is null) {
+            throw new ArgumentNullException(nameof(structureCategory));
+        }
+
+        if(filterProviderFactory is null) {
+            throw new ArgumentNullException(nameof(filterProviderFactory));
+        }
+
+        LocalizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+        LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
+        FilterContextParser = filterContextParser ?? throw new ArgumentNullException(nameof(filterContextParser));
+        if(filterFactory is null) {
+            throw new ArgumentNullException(nameof(filterFactory));
+        }
+
+        _name = structureCategory.Name;
+        _isSelected = structureCategory.IsSelected;
+        InitializeFilterProvider(revitRepository, filterProviderFactory, filterFactory, structureCategory);
     }
 
 
@@ -35,19 +59,39 @@ internal class StructureCategoryViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _name, value);
     }
 
-    private SetViewModel _setViewModel;
-    public SetViewModel SetViewModel {
-        get => _setViewModel;
-        set => RaiseAndSetIfChanged(ref _setViewModel, value);
+    /// <summary>
+    /// Фильтр элементов данной категории конструкций
+    /// </summary>
+    public ILogicalFilterProvider FilterProvider { get; private set; }
+
+    public ILanguageService LanguageService { get; }
+
+    public ILocalizationService LocalizationService { get; }
+
+    public IFilterContextParser FilterContextParser { get; }
+
+    public StructureCategory GetStructureCategory() {
+        return new StructureCategory() {
+            Name = Name,
+            IsSelected = IsSelected,
+            FilterContext = FilterContextParser.Serialize(FilterProvider.GetFilter())
+        };
     }
 
-
-    private CategoriesInfoViewModel GetCategoriesInfoViewModel(
+    private void InitializeFilterProvider(
         RevitRepository revitRepository,
-        string structureCategoryName) {
-
-        var revitCategories = revitRepository.GetCategories(
-            revitRepository.GetStructureCategoryEnum(structureCategoryName));
-        return new CategoriesInfoViewModel(revitRepository, _localization, revitCategories);
+        ILogicalFilterProviderFactory filterProviderFactory,
+        ILogicalFilterFactory filterFactory,
+        StructureCategory structureCategory) {
+        var categories = revitRepository.GetCategories(revitRepository.GetStructureCategoryEnum(Name));
+        var dataProvider = new FilterDataProvider(categories, [revitRepository.Doc]).CreateDataProvider();
+        // если фильтр не задан, создается пустой фильтр по заданным категориям,
+        // иначе фильтр останется в состоянии ошибки, пока пользователь не откроет его в интерфейсе
+        FilterProvider = FilterContextParser.TryParse(structureCategory.FilterContext, out var context)
+            ? filterProviderFactory.Create(dataProvider, context!)
+            : filterProviderFactory.Create(
+                dataProvider,
+                filterFactory.CreateAndFilter(),
+                [.. categories.Select(c => c.GetBuiltInCategory())]);
     }
 }

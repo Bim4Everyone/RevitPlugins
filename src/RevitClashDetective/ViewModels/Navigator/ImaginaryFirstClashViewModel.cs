@@ -23,6 +23,7 @@ internal class ImaginaryFirstClashViewModel
     : BaseViewModel, IClashViewModel, IEquatable<ImaginaryFirstClashViewModel> {
     private readonly RevitRepository _revitRepository;
     private readonly ElementViewModel _firstElement;
+    private bool _visited;
 
     public ImaginaryFirstClashViewModel(
         RevitRepository revitRepository,
@@ -114,6 +115,11 @@ internal class ImaginaryFirstClashViewModel
     public double SecondElementVolume => 0;
 
     public bool ClashDataIsValid => true;
+
+    public bool Visited {
+        get => _visited;
+        set => RaiseAndSetIfChanged(ref _visited, value);
+    }
 
 
     public ElementModel GetFirstElement() {

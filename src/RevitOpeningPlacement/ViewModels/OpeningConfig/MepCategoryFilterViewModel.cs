@@ -1,17 +1,12 @@
 using System;
-using System.Linq;
 using System.Windows.Input;
 
-using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitClashDetective.Models.FilterGenerators;
-
-using RevitClashDetective.Models.FilterModel;
-
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Filtration;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 /// <summary>
@@ -20,12 +15,10 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class MepCategoryFilterViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
 
-    private readonly Filter _linearElementsFilter;
     private readonly SearchSetViewModel _straightSearchSetLinearElements;
     private readonly SearchSetViewModel _invertedSearchSetLinearElements;
     private SearchSetViewModel _searchSetLinearElements;
 
-    private readonly Filter _nonLinearElementsFilter;
     private readonly SearchSetViewModel _straightSearchSetNonLinearElements;
     private readonly SearchSetViewModel _invertedSearchSetNonLinearElements;
     private SearchSetViewModel _searchSetNonLinearElements;
@@ -37,19 +30,32 @@ internal class MepCategoryFilterViewModel : BaseViewModel {
     /// <param name="revitRepository">Репозиторий активного документа, в котором находятся элементы инженерных систем</param>
     /// <param name="linearElementsFilter">Фильтр для линейных элементов инженерных систем (воздуховоды, трубы и т.п.)</param>
     /// <param name="nonLinearElementsFilter">Фильтр для нелинейных элементов инженерных систем (соединительные детали воздуховодов, соединительные детали трубопроводов и т.п.)</param>
-    public MepCategoryFilterViewModel(RevitRepository revitRepository, Filter linearElementsFilter, Filter nonLinearElementsFilter, IMessageBoxService messageBoxService) {
+    /// <param name="messageBoxService">Сервис вывода сообщений</param>
+    public MepCategoryFilterViewModel(
+        RevitRepository revitRepository,
+        CategoryFilter linearElementsFilter,
+        CategoryFilter nonLinearElementsFilter,
+        IMessageBoxService messageBoxService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        if(linearElementsFilter is null) {
+            throw new ArgumentNullException(nameof(linearElementsFilter));
+        }
+        if(nonLinearElementsFilter is null) {
+            throw new ArgumentNullException(nameof(nonLinearElementsFilter));
+        }
 
-        _linearElementsFilter = linearElementsFilter ?? throw new ArgumentNullException(nameof(linearElementsFilter));
-        _straightSearchSetLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _linearElementsFilter, new StraightRevitFilterGenerator());
-        _invertedSearchSetLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _linearElementsFilter, new InvertedRevitFilterGenerator());
-        LinearElementsSearchSet = _straightSearchSetLinearElements ?? throw new ArgumentNullException(nameof(_straightSearchSetLinearElements));
+        _straightSearchSetLinearElements =
+            new ActiveDocSearchSetViewModel(_revitRepository, linearElementsFilter, inverted: false);
+        _invertedSearchSetLinearElements =
+            new ActiveDocSearchSetViewModel(_revitRepository, linearElementsFilter, inverted: true);
+        LinearElementsSearchSet = _straightSearchSetLinearElements;
 
-        _nonLinearElementsFilter = nonLinearElementsFilter ?? throw new ArgumentNullException(nameof(nonLinearElementsFilter));
-        _straightSearchSetNonLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new StraightRevitFilterGenerator());
-        _invertedSearchSetNonLinearElements = new ActiveDocSearchSetViewModel(_revitRepository, _nonLinearElementsFilter, new InvertedRevitFilterGenerator());
-        NonLinearElementsSearchSet = _straightSearchSetNonLinearElements ?? throw new ArgumentNullException(nameof(_straightSearchSetNonLinearElements));
+        _straightSearchSetNonLinearElements =
+            new ActiveDocSearchSetViewModel(_revitRepository, nonLinearElementsFilter, inverted: false);
+        _invertedSearchSetNonLinearElements =
+            new ActiveDocSearchSetViewModel(_revitRepository, nonLinearElementsFilter, inverted: true);
+        NonLinearElementsSearchSet = _straightSearchSetNonLinearElements;
 
         InversionChangedCommand = RelayCommand.Create(InversionChanged);
         CloseCommand = RelayCommand.Create(Close);
@@ -101,11 +107,8 @@ internal class MepCategoryFilterViewModel : BaseViewModel {
     private void HideSet(SearchSetViewModel setToHide) {
         try {
             _revitRepository.GetClashRevitRepository().ShowElements(
-                setToHide.Filter.GetRevitFilter(_revitRepository.Doc, setToHide.FilterGenerator),
-                setToHide.Filter
-                    .CategoryIds
-                    .Select(c => c.AsBuiltInCategory())
-                    .ToHashSet());
+                setToHide.GetRevitFilter(),
+                setToHide.GetCategories());
         } catch(InvalidOperationException ex) {
             MessageBoxService.Show(
                 ex.Message,

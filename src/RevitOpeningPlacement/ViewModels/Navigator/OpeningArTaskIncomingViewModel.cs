@@ -5,13 +5,15 @@ using System.IO;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.WPF.Extensions;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// <summary>
@@ -25,8 +27,9 @@ internal class OpeningArTaskIncomingViewModel : BaseViewModel,
     /// </summary>
     private readonly OpeningArTaskIncoming _openingTask;
 
-
-    public OpeningArTaskIncomingViewModel(OpeningArTaskIncoming incomingOpeningTask) {
+    public OpeningArTaskIncomingViewModel(
+        OpeningArTaskIncoming incomingOpeningTask,
+        ILocalizationService localization) {
         _openingTask = incomingOpeningTask ?? throw new ArgumentNullException(nameof(incomingOpeningTask));
 
         OpeningId = _openingTask.Id;
@@ -34,40 +37,39 @@ internal class OpeningArTaskIncomingViewModel : BaseViewModel,
         Diameter = _openingTask.DisplayDiameter;
         Height = _openingTask.DisplayHeight;
         Width = _openingTask.DisplayWidth;
-        Status = _openingTask.Status.GetDescription();
+        Status = localization.GetLocalizedString($"{nameof(OpeningTaskIncomingStatus)}.{_openingTask.Status}");
         Comment = _openingTask.Comment;
         Host = _openingTask.Host is null ? new OpeningKrHost() : new OpeningKrHost(_openingTask.Host);
     }
 
+    public ElementId OpeningId { get; }
 
-    public ElementId OpeningId { get; } = ElementId.InvalidElementId;
-
-    public string FileName { get; } = string.Empty;
+    public string FileName { get; }
 
     /// <summary>
     /// Диаметр
     /// </summary>
-    public string Diameter { get; } = string.Empty;
+    public string Diameter { get; } 
 
     /// <summary>
     /// Ширина
     /// </summary>
-    public string Width { get; } = string.Empty;
+    public string Width { get; }
 
     /// <summary>
     /// Высота
     /// </summary>
-    public string Height { get; } = string.Empty;
+    public string Height { get; }
 
     /// <summary>
     /// Статус задания на отверстие
     /// </summary>
-    public string Status { get; } = string.Empty;
+    public string Status { get; }
 
     /// <summary>
     /// Комментарий экземпляра семейства задания на отверстие
     /// </summary>
-    public string Comment { get; } = string.Empty;
+    public string Comment { get; } 
 
     public IOpeningKrHost Host { get; }
 
@@ -104,7 +106,7 @@ internal class OpeningArTaskIncomingViewModel : BaseViewModel,
     }
 
     /// <summary>
-    /// Возвращает коллекцию элементов, в которой находится входящее задание на отверстие, которое надо выделить на виде
+    /// Возвращает коллекцию элементов, в которой находится входящее задание на отверстие для выделения на виде
     /// </summary>
     public ICollection<ElementModel> GetElementsToSelect() {
         return new ElementModel[] {

@@ -16,8 +16,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
-    private string _errorText;
-    private string _saveProperty;
+    private string? _errorText;
+    private string _saveProperty = string.Empty;
     
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -52,7 +52,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
     /// </summary>
-    public string ErrorText {
+    public string? ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }

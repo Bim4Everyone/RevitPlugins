@@ -98,9 +98,14 @@
         x:Key="ReportsResolver.CopyAndRename">Загрузить с переименованием</system:String>
 
     <system:String
-        x:Key="FilterNameView.Title">Имя нового поискового набора</system:String>
+        x:Key="EntityNameView.Title">Ввод имени</system:String>
     <system:String
-        x:Key="FilterNameView.Label">Имя:</system:String>
+        x:Key="EntityNameView.Label">Имя:</system:String>
+    <system:String
+        x:Key="EntityNameView.Validation.EmptyName">Введите имя.</system:String>
+    <system:String
+        x:Key="EntityNameView.Validation.DuplicatedName">Такое имя уже существует.</system:String>
+
     <system:String
         x:Key="FilterCreation.Title">Поисковые наборы</system:String>
     <system:String
@@ -135,10 +140,6 @@
         x:Key="FilterCreation.CannotSavePrompt">Нельзя сохранить текущую конфигурацию, закрыть окно без сохранения?</system:String>
 
     <system:String
-        x:Key="FilterCreation.Validation.SetName">Введите имя поискового набора.</system:String>
-    <system:String
-        x:Key="FilterCreation.Validation.DuplicatedName">Поисковый набор с таким именем уже существует.</system:String>
-    <system:String
         xml:space="preserve"
         x:Key="FilterCreation.Validation.NotLoadedFilters">Не удалось загрузить поисковые наборы:
 {0}
@@ -154,6 +155,10 @@
         x:Key="MainWindow.SaveAs">Сохранить как</system:String>
     <system:String
         x:Key="MainWindow.AddCheck">Добавить проверку</system:String>
+    <system:String
+        x:Key="MainWindow.RenameCheck">Изменить имя проверки</system:String>
+    <system:String
+        x:Key="MainWindow.CopyCheck">Копировать проверку</system:String>
     <system:String
         x:Key="MainWindow.DeleteCheck">Удалить проверку</system:String>
     <system:String

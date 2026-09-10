@@ -2,6 +2,7 @@
     <PropertyGroup>
         <UseWpfUI>true</UseWpfUI>
         <UseRevitClashes>true</UseRevitClashes>
+        <UseRevitFiltration>true</UseRevitFiltration>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
 </Project>

@@ -13,6 +13,7 @@
     xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
     x:Name="_this"
     mc:Ignorable="d"
     Title="NavigatorArIncomingView"
@@ -30,6 +31,10 @@
         <dxmvvm:EventToCommand
             EventName="Loaded"
             Command="{Binding LoadViewCommand}" />
+        <common:AttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+        <common:AttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}" />
     </dxmvvm:Interaction.Behaviors>
 
     <base:ThemedPlatformWindow.Resources>

@@ -2,11 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
+
+using Ninject;
+using Ninject.Syntax;
 
 using RevitClashDetective.Models.Extensions;
 
@@ -16,15 +20,19 @@ using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.PointFinders;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement.Providers;
+using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement.Models.RealOpeningKrPlacement;
 /// <summary>
 /// Класс для размещения чистовых отверстий КР в активном документе в местах расположений заданий на отверстия из связанных файлов АР или ВИС
 /// </summary>
 internal class RealOpeningKrPlacer {
+    private readonly IResolutionRoot _root;
     private readonly RevitRepository _revitRepository;
     private readonly OpeningRealsKrConfig _config;
     private readonly ILocalizationService _localization;
+    private readonly IMessageBoxService _msgBox;
+    private readonly ISolidProviderUtils _solidUtils;
     public const string RealOpeningKrDiameter = "ФОП_РАЗМ_Диаметр";
     public const string RealOpeningKrInWallWidth = "ФОП_РАЗМ_Ширина";
     public const string RealOpeningKrInWallHeight = "ФОП_РАЗМ_Высота";
@@ -33,21 +41,17 @@ internal class RealOpeningKrPlacer {
     public const string RealOpeningKrInFloorWidth = "мод_ФОП_Габарит Б";
     public const string RealOpeningTaskId = "ФОП_ID задания";
 
-    private const string _configErrorMessage = "Настройки расстановки отверстий КР некорректны. Пересохраните их.";
-
 
     /// <summary>
     /// Конструктор класса для размещения чистовых отверстий КР в активном документе в местах расположений заданий на отверстия из связанных файлов АР или ВИС
     /// </summary>
-    /// <param name="revitRepository">Репозиторий активного КР документа ревита, в котором будет происходить размещение чистовых отверстий</param>
-    /// <param name="config">Конфигурация расстановки заданий на отверстия в файле КР, в которой задается обработка заданий ВИС или АР</param>
-    /// <exception cref="System.ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    public RealOpeningKrPlacer(RevitRepository revitRepository,
-        OpeningRealsKrConfig config,
-        ILocalizationService localization) {
-        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        _config = config ?? throw new ArgumentNullException(nameof(config));
-        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+    public RealOpeningKrPlacer(IResolutionRoot root) {
+        _root = root ?? throw new ArgumentNullException(nameof(root));
+        _revitRepository = _root.Get<RevitRepository>();
+        _config = _root.Get<OpeningRealsKrConfig>();
+        _msgBox = _root.Get<IMessageBoxService>();
+        _localization = _root.Get<ILocalizationService>();
+        _solidUtils = _root.Get<ISolidProviderUtils>();
     }
 
 
@@ -57,27 +61,25 @@ internal class RealOpeningKrPlacer {
         PlaceSingleOpeningByOneIncomingTask(host, openingTask);
     }
 
-#pragma warning disable 0618
     public void PlaceUnitedOpeningByManyTasks() {
         var host = _revitRepository.PickHostForRealOpening();
         var openingTasks = PickOpeningsTaskIncoming(_config);
         PlaceUnitedOpeningByManyIncomingTasks(
             host,
-            openingTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToArray()
+            openingTasks.Where(opening => _solidUtils.IntersectsSolid(opening, host.GetSolid(), host.GetBoundingBox()))
+                .ToArray()
             );
     }
-#pragma warning restore 0618
 
-#pragma warning disable 0618
     public void PlaceSingleOpeningsInOneHost() {
         var host = _revitRepository.PickHostForRealOpening();
         var openingTasks = PickOpeningsTaskIncoming(_config);
         PlaceSingleOpeningsInOneHostByIncomingTasks(
             host,
-            openingTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToArray()
+            openingTasks.Where(opening => _solidUtils.IntersectsSolid(opening, host.GetSolid(), host.GetBoundingBox()))
+                .ToArray()
             );
     }
-#pragma warning restore 0618
 
     public void PlaceSingleOpeningsInManyHosts() {
         var hosts = _revitRepository.PickHostsForRealOpenings();
@@ -91,13 +93,10 @@ internal class RealOpeningKrPlacer {
     /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
     private IOpeningTaskIncoming PickOpeningTaskIncoming(OpeningRealsKrConfig config) {
         if(config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
-            return _revitRepository.PickSingleOpeningArTaskIncoming();
-        } else if(config.PlacementType == OpeningRealKrPlacementType.PlaceByMep) {
-            return _revitRepository.PickSingleOpeningMepTaskIncoming();
-        } else {
-            _revitRepository.ShowErrorMessage(_configErrorMessage);
-            throw new OperationCanceledException();
+            return _revitRepository.PickSingleOpeningArTaskIncoming(_msgBox);
         }
+
+        return _revitRepository.PickSingleOpeningMepTaskIncoming(_msgBox);
     }
 
     /// <summary>
@@ -107,12 +106,9 @@ internal class RealOpeningKrPlacer {
     private ICollection<IOpeningTaskIncoming> PickOpeningsTaskIncoming(OpeningRealsKrConfig config) {
         if(config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
             return _revitRepository.PickManyOpeningArTasksIncoming().ToArray<IOpeningTaskIncoming>();
-        } else if(config.PlacementType == OpeningRealKrPlacementType.PlaceByMep) {
-            return _revitRepository.PickManyOpeningMepTasksIncoming().ToArray<IOpeningTaskIncoming>();
-        } else {
-            _revitRepository.ShowErrorMessage(_configErrorMessage);
-            throw new OperationCanceledException();
         }
+
+        return _revitRepository.PickManyOpeningMepTasksIncoming().ToArray<IOpeningTaskIncoming>();
     }
 
     /// <summary>
@@ -122,37 +118,39 @@ internal class RealOpeningKrPlacer {
     private ICollection<IOpeningTaskIncoming> GetAllOpeningsTaskIncoming(OpeningRealsKrConfig config) {
         if(config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
             return _revitRepository.GetOpeningsArTasksIncoming().ToArray<IOpeningTaskIncoming>();
-        } else if(config.PlacementType == OpeningRealKrPlacementType.PlaceByMep) {
-            return _revitRepository.GetOpeningsMepTasksIncoming().ToArray<IOpeningTaskIncoming>();
-        } else {
-            _revitRepository.ShowErrorMessage(_configErrorMessage);
-            throw new OperationCanceledException();
         }
+
+        return _revitRepository.GetOpeningsMepTasksIncoming().ToArray<IOpeningTaskIncoming>();
     }
 
 
     /// <summary>
     /// Размещение чистового отверстия КР по одному заданию на отверстие из связи в одном хосте
     /// </summary>
-#pragma warning disable 0618
     private void PlaceSingleOpeningByOneIncomingTask(Element host, IOpeningTaskIncoming openingTask) {
         using var transaction = _revitRepository.GetTransaction(
             _localization.GetLocalizedString("Transaction.PlaceSingleOpening"));
         try {
-            if(openingTask.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())) {
+            if(_solidUtils.IntersectsSolid(openingTask, host.GetSolid(), host.GetBoundingBox())) {
                 PlaceByOneTask(host, openingTask);
             } else {
-                _revitRepository.ShowErrorMessage(
-                    _localization.GetLocalizedString("Errors.TaskNotIntersectConstruction"));
+                _msgBox.Show(
+                    _localization.GetLocalizedString("Errors.TaskNotIntersectConstruction"),
+                    _localization.GetLocalizedString("OpeningTasks"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 throw new OperationCanceledException();
             }
         } catch(OpeningNotPlacedException e) {
-            _revitRepository.ShowErrorMessage(e.Message);
+            _msgBox.Show(
+                e.Message,
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
         transaction.Commit();
     }
-#pragma warning restore 0618
 
     /// <summary>
     /// Размещение объединенного чистового отверстия КР по одному или нескольким заданиям на отверстия из связи(ей) в одном хосте
@@ -165,12 +163,19 @@ internal class RealOpeningKrPlacer {
                 PlaceUnitedByManyTasks(host, openingTasks);
                 transaction.Commit();
             } else {
-                _revitRepository.ShowErrorMessage(
-                    _localization.GetLocalizedString("Errors.TasksNotIntersectConstruction"));
+                _msgBox.Show(
+                    _localization.GetLocalizedString("Errors.TasksNotIntersectConstruction"),
+                    _localization.GetLocalizedString("OpeningTasks"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 throw new OperationCanceledException();
             }
         } catch(OpeningNotPlacedException e) {
-            _revitRepository.ShowErrorMessage(e.Message);
+            _msgBox.Show(
+                e.Message,
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
     }
@@ -194,19 +199,24 @@ internal class RealOpeningKrPlacer {
             transaction.Commit();
         }
         if(sb.Length > 0) {
-            _revitRepository.ShowErrorMessage(sb.ToString());
+            _msgBox.Show(
+                sb.ToString(),
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
     }
 
     /// <summary>
     /// Размещение нескольких одиночных чистовых отверстий КР в выбранных хостах по всем заданиям на отверстия из связи(ей), которые пересекаются с этими хостами
     /// </summary>
-#pragma warning disable 0618
-    private void PlaceSingleOpeningsInManyHostsByIncomingTasks(ICollection<Element> hosts, ICollection<IOpeningTaskIncoming> allOpeningTasks) {
+    private void PlaceSingleOpeningsInManyHostsByIncomingTasks(
+        ICollection<Element> hosts,
+        ICollection<IOpeningTaskIncoming> allOpeningTasks) {
         var sb = new StringBuilder();
         using(var transaction = _revitRepository.GetTransaction(
             _localization.GetLocalizedString("Transaction.PlaceSingleOpeningsInManyHosts"))) {
-            using(var progressBar = _revitRepository.GetProgressDialogService()) {
+            using(var progressBar = _root.Get<IProgressDialogService>()) {
                 progressBar.StepValue = 1;
                 progressBar.DisplayTitleFormat = _localization.GetLocalizedString("Progress.ProcessConstructions");
                 var progress = progressBar.CreateProgress();
@@ -218,7 +228,9 @@ internal class RealOpeningKrPlacer {
                 foreach(var host in hosts) {
                     ct.ThrowIfCancellationRequested();
 
-                    ICollection<IOpeningTaskIncoming> openingTasks = allOpeningTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+                    ICollection<IOpeningTaskIncoming> openingTasks = allOpeningTasks.Where(opening =>
+                            _solidUtils.IntersectsSolid(opening, host.GetSolid(), host.GetBoundingBox()))
+                        .ToHashSet();
                     if(openingTasks.Count == 0) {
                         sb.AppendLine(
                             _localization.GetLocalizedString("Errors.StructureNotIntersectTask", host.Id));
@@ -240,10 +252,13 @@ internal class RealOpeningKrPlacer {
             transaction.Commit();
         }
         if(sb.Length > 0) {
-            _revitRepository.ShowErrorMessage(sb.ToString());
+            _msgBox.Show(
+                sb.ToString(),
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
     }
-#pragma warning restore 0618
 
 
     /// <summary>

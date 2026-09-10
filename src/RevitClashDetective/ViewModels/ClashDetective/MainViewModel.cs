@@ -14,9 +14,14 @@ using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Ninject;
+using Ninject.Syntax;
+
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Filtration;
+using RevitClashDetective.ViewModels.Common;
 using RevitClashDetective.ViewModels.Services;
+using RevitClashDetective.Views.Common;
 
 using Wpf.Ui;
 
@@ -29,6 +34,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localization;
     private readonly IContentDialogService _contentDialogService;
+    private readonly IResolutionRoot _resolutionRoot;
     private readonly SettingsConfig _settingsConfig;
     private bool _canCancel = true;
     private string _messageText;
@@ -44,6 +50,7 @@ internal class MainViewModel : BaseViewModel {
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
         IContentDialogService contentDialogService,
+        IResolutionRoot resolutionRoot,
         SettingsConfig settingsConfig,
         ChecksConfig checksConfig,
         FilterContextsProvider filterContextsProvider) {
@@ -56,6 +63,7 @@ internal class MainViewModel : BaseViewModel {
         SaveFileDialogService = saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _contentDialogService = contentDialogService ?? throw new ArgumentNullException(nameof(contentDialogService));
+        _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
         _settingsConfig = settingsConfig ?? throw new ArgumentNullException(nameof(settingsConfig));
         _checksConfig = checksConfig ?? throw new ArgumentNullException(nameof(checksConfig));
 
@@ -65,6 +73,8 @@ internal class MainViewModel : BaseViewModel {
             InitializeEmptyCheck();
         }
         AddCheckCommand = RelayCommand.Create(AddCheck);
+        RenameCheckCommand = RelayCommand.Create(RenameCheck, CanRenameCheck);
+        CopyCheckCommand = RelayCommand.Create(CopyCheck, CanCopyCheck);
         RemoveCheckCommand = RelayCommand.Create<IList>(RemoveCheck, CanRemove);
         FindClashesCommand = RelayCommand.Create(FindClashes, CanFindClashes);
 
@@ -103,6 +113,8 @@ internal class MainViewModel : BaseViewModel {
 
     public ICommand AskForSaveCommand { get; }
     public ICommand AddCheckCommand { get; }
+    public ICommand RenameCheckCommand { get; }
+    public ICommand CopyCheckCommand { get; }
     public ICommand RemoveCheckCommand { get; }
     public ICommand FindClashesCommand { get; }
     public ICommand SaveAsClashesCommand { get; }
@@ -185,14 +197,71 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AddCheck() {
-        AllChecks.Add(new CheckViewModel(_revitRepository,
+        string name = GetCheckName();
+        if(name is null) {
+            return;
+        }
+
+        var newCheck = new CheckViewModel(
+            _revitRepository,
             _localization,
             OpenFileDialogService,
             SaveFileDialogService,
             MessageBoxService,
             _settingsConfig,
             _filterContextsProvider,
-            _contentDialogService));
+            _contentDialogService) { Name = name };
+        AllChecks.Add(newCheck);
+        SelectedCheck = newCheck;
+    }
+
+    private void RenameCheck() {
+        string name = GetCheckName(SelectedCheck.Name);
+        if(name is null) {
+            return;
+        }
+
+        SelectedCheck.Name = name;
+    }
+
+    private bool CanRenameCheck() {
+        return SelectedCheck is not null;
+    }
+
+    private void CopyCheck() {
+        string name = GetCheckName(SelectedCheck.Name);
+        if(name is null) {
+            return;
+        }
+
+        var check = new Check() {
+            Name = name,
+            FirstSelection = SelectedCheck.FirstSelection.GetCheckSettings(),
+            SecondSelection = SelectedCheck.SecondSelection.GetCheckSettings()
+        };
+        var newCheck = new CheckViewModel(
+            _revitRepository,
+            _localization,
+            OpenFileDialogService,
+            SaveFileDialogService,
+            MessageBoxService,
+            _settingsConfig,
+            _filterContextsProvider,
+            _contentDialogService,
+            check);
+        AllChecks.Add(newCheck);
+        SelectedCheck = newCheck;
+    }
+
+    private bool CanCopyCheck() {
+        return SelectedCheck is not null;
+    }
+
+    private string GetCheckName(string currentName = null) {
+        var nameViewModel = new EntityNameViewModel(_localization, AllChecks.Select(c => c.Name), currentName);
+        var view = _resolutionRoot.Get<EntityNameView>();
+        view.DataContext = nameViewModel;
+        return view.ShowDialog() == true ? nameViewModel.Name : null;
     }
 
     private void RemoveCheck(IList selectedItems) {

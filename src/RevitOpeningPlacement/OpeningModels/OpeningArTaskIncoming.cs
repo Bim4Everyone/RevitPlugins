@@ -16,6 +16,7 @@ using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement;
 using RevitOpeningPlacement.OpeningModels.Enums;
+using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement.OpeningModels;
 /// <summary>
@@ -156,6 +157,7 @@ internal class OpeningArTaskIncoming : OpeningRealBase, IEquatable<OpeningArTask
     /// <param name="constructureElementsIds">
     /// Коллекция элементов конструкций из активного документа-получателя заданий</param>
     public void UpdateStatusAndHost(
+        ISolidProviderUtils solidUtils,
         ICollection<OpeningRealKr> realOpenings,
         ICollection<ElementId> constructureElementsIds) {
         try {
@@ -165,12 +167,17 @@ internal class OpeningArTaskIncoming : OpeningRealBase, IEquatable<OpeningArTask
             var intersectingStructureElements = GetIntersectingStructureElementsIds(
                 thisOpeningSolid,
                 constructureElementsIds);
-            var intersectingOpenings = GetIntersectingOpeningsIds(realOpenings, thisOpeningSolid, thisOpeningBBox);
+            var intersectingOpenings = GetIntersectingOpeningsIds(
+                solidUtils,
+                realOpenings,
+                thisOpeningSolid,
+                thisOpeningBBox);
 
             Host = FindHost(thisOpeningSolid, intersectingStructureElements, intersectingOpenings);
             if(GetIntersectingStructureElementsIds(thisOpeningSolid,
                 RevitRepository.UnacceptableStructureCategories.ToArray())
-                .Count() > 0) {
+                   .Count
+               > 0) {
                 Status = OpeningTaskIncomingStatus.UnacceptableConstructions;
                 return;
             }
@@ -319,18 +326,17 @@ internal class OpeningArTaskIncoming : OpeningRealBase, IEquatable<OpeningArTask
     /// Солид текущего задания на отверстие в координатах активного файла - получателя заданий</param>
     /// <param name="thisOpeningBBox">
     /// Бокс текущего задания на отверстие в координатах активного файла - получателя заданий</param>
-#pragma warning disable 0618
     private ICollection<ElementId> GetIntersectingOpeningsIds(
+        ISolidProviderUtils solidUtils,
         ICollection<OpeningRealKr> realOpenings,
         Solid thisOpeningSolid,
         BoundingBoxXYZ thisOpeningBBox) {
         if((thisOpeningSolid is null) || (thisOpeningSolid.Volume <= 0)) {
             return Array.Empty<ElementId>();
         } else {
-            var opening = realOpenings.FirstOrDefault(
-                realOpening => realOpening.IntersectsSolid(thisOpeningSolid, thisOpeningBBox));
+            var opening = realOpenings.FirstOrDefault(realOpening =>
+                solidUtils.IntersectsSolid(realOpening, thisOpeningSolid, thisOpeningBBox));
             return opening != null ? (new ElementId[] { opening.Id }) : Array.Empty<ElementId>();
         }
     }
-#pragma warning restore 0618
 }

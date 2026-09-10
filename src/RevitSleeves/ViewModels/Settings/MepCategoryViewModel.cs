@@ -1,6 +1,9 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+
+using Bim4Everyone.RevitFiltration.Controls;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -8,27 +11,38 @@ using dosymep.WPF.ViewModels;
 
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
-using RevitSleeves.ViewModels.Filtration;
+using RevitSleeves.Models.Filtration;
 
 namespace RevitSleeves.ViewModels.Settings;
 internal class MepCategoryViewModel : BaseViewModel {
-    private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
-    private readonly MepCategorySettings _mepCategorySettings;
+    private readonly IFilterContextParser _filterContextParser;
     private DiameterRangeViewModel _selectedDiameterRange;
 
     public MepCategoryViewModel(RevitRepository revitRepository,
         ILocalizationService localizationService,
+        ILanguageService languageService,
+        ILogicalFilterProviderFactory filterProviderFactory,
+        IFilterContextParser filterContextParser,
         MepCategorySettings mepCategorySettings) {
 
-        _revitRepository = revitRepository
-            ?? throw new System.ArgumentNullException(nameof(revitRepository));
+        if(revitRepository is null) {
+            throw new ArgumentNullException(nameof(revitRepository));
+        }
+        if(filterProviderFactory is null) {
+            throw new ArgumentNullException(nameof(filterProviderFactory));
+        }
+        if(mepCategorySettings is null) {
+            throw new ArgumentNullException(nameof(mepCategorySettings));
+        }
         _localizationService = localizationService
-            ?? throw new System.ArgumentNullException(nameof(localizationService));
-        _mepCategorySettings = mepCategorySettings
-            ?? throw new System.ArgumentNullException(nameof(mepCategorySettings));
+            ?? throw new ArgumentNullException(nameof(localizationService));
+        LanguageService = languageService
+            ?? throw new ArgumentNullException(nameof(languageService));
+        _filterContextParser = filterContextParser
+            ?? throw new ArgumentNullException(nameof(filterContextParser));
 
-        InitializeCategory(_revitRepository, _localizationService, _mepCategorySettings);
+        InitializeCategory(revitRepository, localizationService, filterProviderFactory, mepCategorySettings);
         AddDiameterRangeCommand = RelayCommand.Create(AddDiameterRange);
         RemoveDiameterRangeCommand = RelayCommand.Create<DiameterRangeViewModel>(
             RemoveDiameterRange, CanRemoveDiameterRange);
@@ -46,7 +60,11 @@ internal class MepCategoryViewModel : BaseViewModel {
 
     public string Name { get; private set; }
 
-    public SetViewModel MepFilterViewModel { get; private set; }
+    public ILogicalFilterProvider MepFilterProvider { get; private set; }
+
+    public ILanguageService LanguageService { get; }
+
+    public ILocalizationService LocalizationService => _localizationService;
 
     public ObservableCollection<DiameterRangeViewModel> DiameterRanges { get; } = [];
 
@@ -59,17 +77,14 @@ internal class MepCategoryViewModel : BaseViewModel {
 
     private void InitializeCategory(RevitRepository revitRepository,
         ILocalizationService localizationService,
+        ILogicalFilterProviderFactory filterProviderFactory,
         MepCategorySettings mepCategorySettings) {
 
         var category = revitRepository.GetCategory(mepCategorySettings.Category);
-        MepFilterViewModel = new SetViewModel(
-            revitRepository,
-            localizationService,
-            new CategoryInfoViewModel(
-                revitRepository,
-                localizationService,
-                category),
-            mepCategorySettings.MepFilterSet);
+        var dataProvider = new FilterDataProvider(category, [revitRepository.Document]).CreateDataProvider();
+        MepFilterProvider = _filterContextParser.TryParse(mepCategorySettings.MepFilterContext, out var context)
+            ? filterProviderFactory.Create(dataProvider, context)
+            : filterProviderFactory.Create(dataProvider);
         Name = category.Name;
         foreach(var diamRange in mepCategorySettings.DiameterRanges) {
             DiameterRanges.Add(new DiameterRangeViewModel(_localizationService, diamRange));
@@ -79,10 +94,10 @@ internal class MepCategoryViewModel : BaseViewModel {
                 new Offset() { OffsetType = pair.OffsetType, Value = pair.Value }));
         }
         WallSettings = new StructureCategoryViewModel(revitRepository,
-            localizationService,
+            localizationService, LanguageService, filterProviderFactory, _filterContextParser,
             mepCategorySettings.WallSettings);
         FloorSettings = new StructureCategoryViewModel(revitRepository,
-            localizationService,
+            localizationService, LanguageService, filterProviderFactory, _filterContextParser,
             mepCategorySettings.FloorSettings);
     }
 
@@ -109,27 +124,15 @@ internal class MepCategoryViewModel : BaseViewModel {
             return _localizationService.GetLocalizedString(
                 "SleevePlacementSettings.Validation.StructureCategoriesNotEnabled");
         }
-        if(MepFilterViewModel.IsEmpty()) {
-            return string.Format(_localizationService.GetLocalizedString(
-                "SleevePlacementSettings.Validation.FilterIsEmpty"), Name);
-        }
-        if(WallSettings.StructureFilterViewModel.IsEmpty()) {
-            return string.Format(_localizationService.GetLocalizedString(
-                "SleevePlacementSettings.Validation.FilterIsEmpty"), WallSettings.Name);
-        }
-        if(FloorSettings.StructureFilterViewModel.IsEmpty()) {
-            return string.Format(_localizationService.GetLocalizedString(
-                "SleevePlacementSettings.Validation.FilterIsEmpty"), FloorSettings.Name);
-        }
-        string mepFilterError = MepFilterViewModel.GetErrorText();
+        string mepFilterError = GetFilterErrorText(MepFilterProvider, Name);
         if(!string.IsNullOrWhiteSpace(mepFilterError)) {
             return mepFilterError;
         }
-        string wallFilterError = WallSettings.StructureFilterViewModel.GetErrorText();
+        string wallFilterError = GetFilterErrorText(WallSettings.FilterProvider, WallSettings.Name);
         if(!string.IsNullOrWhiteSpace(wallFilterError)) {
             return wallFilterError;
         }
-        string floorFilterError = FloorSettings.StructureFilterViewModel.GetErrorText();
+        string floorFilterError = GetFilterErrorText(FloorSettings.FilterProvider, FloorSettings.Name);
         if(!string.IsNullOrWhiteSpace(floorFilterError)) {
             return floorFilterError;
         }
@@ -142,8 +145,20 @@ internal class MepCategoryViewModel : BaseViewModel {
             Offsets = [.. Offsets.Select(item => item.GetOffset())],
             FloorSettings = FloorSettings.GetStructureSettings<FloorSettings>(),
             WallSettings = WallSettings.GetStructureSettings<WallSettings>(),
-            MepFilterSet = MepFilterViewModel.GetSet(),
+            MepFilterContext = _filterContextParser.Serialize(MepFilterProvider.GetFilter()),
         };
+    }
+
+    private string GetFilterErrorText(ILogicalFilterProvider filterProvider, string categoryName) {
+        if(filterProvider.CanGetFilter(out var errors)) {
+            return string.Empty;
+        }
+        if(errors.Length == 0) {
+            return string.Format(_localizationService.GetLocalizedString(
+                "SleevePlacementSettings.Validation.FilterIsEmpty"), categoryName);
+        }
+        return string.Format(_localizationService.GetLocalizedString(
+            "SleevePlacementSettings.Validation.FilterError"), categoryName, errors[0].Message);
     }
 
     private void AddDiameterRange() {

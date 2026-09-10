@@ -6,8 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitSleeves.Views.Settings"
     xmlns:vms="clr-namespace:RevitSleeves.ViewModels.Settings"
-    xmlns:filterViewModel="clr-namespace:RevitSleeves.ViewModels.Filtration"
-    xmlns:filterView="clr-namespace:RevitSleeves.Views.Filtration"
+    xmlns:filtration="clr-namespace:Bim4Everyone.RevitFiltration.Controls.Views;assembly=Bim4Everyone.RevitFiltration.Controls"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     mc:Ignorable="d"
     d:Background="White"
@@ -31,10 +30,12 @@
         <ScrollViewer
             x:Name="Filter"
             DockPanel.Dock="Bottom">
-            <filterView:SetView
-                IsEnabled="{Binding DataContext.IsEnabled, 
+            <filtration:PresetCategoriesFilterControl
+                IsEnabled="{Binding DataContext.IsEnabled,
                 RelativeSource={RelativeSource AncestorType=UserControl}}"
-                DataContext="{Binding StructureFilterViewModel}" />
+                LogicalFilterProvider="{Binding FilterProvider}"
+                LanguageService="{Binding LanguageService}"
+                LocalizationService="{Binding LocalizationService}" />
         </ScrollViewer>
     </DockPanel>
 </UserControl>

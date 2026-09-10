@@ -5,13 +5,15 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.WPF.Extensions;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// <summary>
@@ -26,8 +28,9 @@ internal class OpeningMepTaskOutcomingViewModel : BaseViewModel,
     /// </summary>
     private readonly OpeningMepTaskOutcoming _openingTask;
 
-
-    public OpeningMepTaskOutcomingViewModel(OpeningMepTaskOutcoming incomingOpeningTask) {
+    public OpeningMepTaskOutcomingViewModel(
+        OpeningMepTaskOutcoming incomingOpeningTask,
+        ILocalizationService localization) {
         if(incomingOpeningTask is null) {
             throw new ArgumentNullException(nameof(incomingOpeningTask));
         }
@@ -42,7 +45,7 @@ internal class OpeningMepTaskOutcomingViewModel : BaseViewModel,
         Comment = _openingTask.Comment;
         Username = _openingTask.Username;
 
-        Status = _openingTask.Status.GetDescription();
+        Status = localization.GetLocalizedString($"{nameof(OpeningTaskOutcomingStatus)}.{_openingTask.Status}");
     }
 
     public string OpeningId { get; }
@@ -86,7 +89,7 @@ internal class OpeningMepTaskOutcomingViewModel : BaseViewModel,
     }
 
     /// <summary>
-    /// Возвращает коллекцию элементов, в которой находится исходящее задание на отверстие, которое надо выделить на виде
+    /// Возвращает коллекцию элементов, в которой находится исходящее задание на отверстие для выделения на виде
     /// </summary>
     public ICollection<ElementModel> GetElementsToSelect() {
         return new ElementModel[] {

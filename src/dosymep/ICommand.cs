@@ -1,4 +1,6 @@
-﻿using System.Windows.Input;
+﻿#nullable disable
+
+using System.Windows.Input;
 
 namespace dosymep.WPF.Commands {
     internal interface ICommand<T> : ICommand {

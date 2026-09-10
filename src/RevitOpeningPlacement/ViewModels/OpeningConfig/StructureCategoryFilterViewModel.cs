@@ -1,21 +1,16 @@
 using System;
-using System.Linq;
 using System.Windows.Input;
 
-using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitClashDetective.Models.FilterGenerators;
-using RevitClashDetective.Models.FilterModel;
-
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Filtration;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class StructureCategoryFilterViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
-    private readonly Filter _elementsFilter;
     private readonly SearchSetViewModel _straightSearchSetElements;
     private readonly SearchSetViewModel _invertedSearchSetElements;
     private SearchSetViewModel _searchSetElements;
@@ -27,19 +22,25 @@ internal class StructureCategoryFilterViewModel : BaseViewModel {
     /// </summary>
     /// <param name="revitRepository">Репозиторий активного документа</param>
     /// <param name="structureElementsFilter">Фильтр для элементов конструкций</param>
-    public StructureCategoryFilterViewModel(RevitRepository revitRepository, Filter structureElementsFilter, IMessageBoxService messageBoxService) {
+    /// <param name="messageBoxService">Сервис вывода сообщений</param>
+    public StructureCategoryFilterViewModel(
+        RevitRepository revitRepository,
+        CategoryFilter structureElementsFilter,
+        IMessageBoxService messageBoxService) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        if(structureElementsFilter is null) {
+            throw new ArgumentNullException(nameof(structureElementsFilter));
+        }
 
-        _elementsFilter = structureElementsFilter ?? throw new ArgumentNullException(nameof(structureElementsFilter));
         _straightSearchSetElements = new StructureLinksSearchSetViewModel(
             _revitRepository,
-            _elementsFilter,
-            new StraightRevitFilterGenerator());
+            structureElementsFilter,
+            inverted: false);
         _invertedSearchSetElements = new StructureLinksSearchSetViewModel(
             _revitRepository,
-            _elementsFilter,
-            new InvertedRevitFilterGenerator());
+            structureElementsFilter,
+            inverted: true);
         ElementsSearchSet = _straightSearchSetElements;
 
         InversionChangedCommand = RelayCommand.Create(InversionChanged);
@@ -74,11 +75,8 @@ internal class StructureCategoryFilterViewModel : BaseViewModel {
     private void HideSet(SearchSetViewModel setToHide) {
         try {
             _revitRepository.GetClashRevitRepository().ShowElements(
-                setToHide.Filter.GetRevitFilter(_revitRepository.Doc, setToHide.FilterGenerator),
-                setToHide.Filter
-                    .CategoryIds
-                    .Select(c => c.AsBuiltInCategory())
-                    .ToHashSet());
+                setToHide.GetRevitFilter(),
+                setToHide.GetCategories());
         } catch(InvalidOperationException ex) {
             MessageBoxService.Show(
                 ex.Message,

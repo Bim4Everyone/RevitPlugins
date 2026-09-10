@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable disable
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -8,7 +10,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace dosymep.WPF.Extensions {
+    [Obsolete(
+        "Вместо Description атрибута следует использовать локализованные строки через dosymep.SimpleServices.ILocalizationService")]
     internal static class ConvertibleExtension {
+        [Obsolete(
+            "Вместо Description атрибута следует использовать локализованные строки через dosymep.SimpleServices.ILocalizationService")]
         public static string GetDescription<T>(this T e) where T : IConvertible {
             if(e is Enum) {
                 Type type = e.GetType();

@@ -14,6 +14,7 @@ using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningKrPlacement;
 using RevitOpeningPlacement.OpeningModels.Enums;
+using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement.OpeningModels;
 /// <summary>
@@ -32,22 +33,22 @@ internal class OpeningRealKr : OpeningRealByMep, IEquatable<OpeningRealKr> {
     /// <summary>
     /// Диаметр в мм, если есть
     /// </summary>
-    public string Diameter { get; } = string.Empty;
+    public string Diameter { get; }
 
     /// <summary>
     /// Ширина в мм, если есть
     /// </summary>
-    public string Width { get; } = string.Empty;
+    public string Width { get; }
 
     /// <summary>
     /// Высота в мм, если есть
     /// </summary>
-    public string Height { get; } = string.Empty;
+    public string Height { get; }
 
     /// <summary>
     /// Комментарий
     /// </summary>
-    public string Comment { get; } = string.Empty;
+    public string Comment { get; }
 
     /// <summary>
     /// Статус текущего отверстия относительно полученных заданий
@@ -95,13 +96,16 @@ internal class OpeningRealKr : OpeningRealByMep, IEquatable<OpeningRealKr> {
     /// Обновляет свойство <see cref="Status"/>
     /// </summary>
     /// <param name="arLinkElementsProviders">АР связи с входящими заданиями</param>
-    public void UpdateStatus(ICollection<IConstructureLinkElementsProvider> arLinkElementsProviders) {
+    public void UpdateStatus(
+        ISolidProviderUtils solidUtils,
+        ICollection<IConstructureLinkElementsProvider> arLinkElementsProviders) {
         try {
             var thisOpeningRealSolid = GetSolid();
             var thisOpeningRealSolidAfterIntersection = thisOpeningRealSolid;
 
             foreach(var link in arLinkElementsProviders) {
                 thisOpeningRealSolidAfterIntersection = SubtractLinkOpenings(
+                    solidUtils,
                     link,
                     thisOpeningRealSolidAfterIntersection,
                     out bool openingIsNotActual);
@@ -146,8 +150,8 @@ internal class OpeningRealKr : OpeningRealByMep, IEquatable<OpeningRealKr> {
     /// <param name="linkOpeningsIntersectConstructions">
     /// Флаг, показывающий, 
     /// полностью ли текущее чистовое отверстие закрывает собой пересекающие его задания на отверстия</param>
-#pragma warning disable 0618
     private Solid SubtractLinkOpenings(
+        ISolidProviderUtils solidUtils,
         IConstructureLinkElementsProvider link,
         Solid thisOpeningSolidForSubtraction,
         out bool linkOpeningsIntersectConstructions) {
@@ -160,7 +164,8 @@ internal class OpeningRealKr : OpeningRealByMep, IEquatable<OpeningRealKr> {
 
         ICollection<Solid> intersectingTasksSolidsInActiveDocCoordinates = link
             .GetOpeningsReal()
-            .Where(openingTask => openingTask.IntersectsSolid(
+            .Where(openingTask => solidUtils.IntersectsSolid(
+                openingTask,
                 thisOpeningSolidInLinkCoordinates,
                 thisBBoxInLinkCoordinates))
             .Select(task => SolidUtils.CreateTransformed(task.GetSolid(), link.DocumentTransform))
@@ -186,7 +191,6 @@ internal class OpeningRealKr : OpeningRealByMep, IEquatable<OpeningRealKr> {
         }
         return solidAfterSubtraction;
     }
-#pragma warning restore 0618
 
     /// <summary>
     /// Возвращает статус текущего чистового отверстия по коэффициенту пересекаемого объема.
