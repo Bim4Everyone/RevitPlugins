@@ -38,7 +38,6 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
 
     private readonly RevitRepository _revitRepository;
     private readonly ILengthConverter _lengthConverter;
-    private readonly IConstantsProvider _constantsProvider;
 
     /// <summary>
     /// Минимальное допустимое расстояние между чистовыми отверстиями КР в единицах длины Revit (футах).
@@ -69,7 +68,6 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
         RevitRepository revitRepository,
         OpeningRealsKrConfig config,
         ILengthConverter lengthConverter,
-        IConstantsProvider constantsProvider,
         ISolidProviderUtils solidUtils,
         IIntersectingElementsFinder intersectingElementsFinder)
         : base(solidUtils, intersectingElementsFinder) {
@@ -79,7 +77,6 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _lengthConverter = lengthConverter ?? throw new ArgumentNullException(nameof(lengthConverter));
-        _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
         _placementType = config.PlacementType;
         _minDistance = _lengthConverter.ConvertToInternal(config.MinDistanceBetweenOpenings);
         _realOpenings = _minDistance > 0 ? revitRepository.GetRealOpeningsKr() : [];
@@ -307,7 +304,7 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
                            hostSolid,
                            BooleanOperationsType.Intersect)
                        ?.Volume
-                   > _constantsProvider.ToleranceVolumeFeetCube;
+                   > ConstantsProvider.ToleranceVolumeFeetCube;
         } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
             return false;
         }

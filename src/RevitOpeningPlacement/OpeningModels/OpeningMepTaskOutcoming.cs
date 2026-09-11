@@ -4,14 +4,11 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models;
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels.Enums;
 using RevitOpeningPlacement.Services;
@@ -26,16 +23,6 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
     /// Экземпляр семейства задания на отверстие
     /// </summary>
     private readonly FamilyInstance _familyInstance;
-
-    /// <summary>
-    /// Допустимое расстояние между экземплярами семейств заданий на отверстия, при котором считается, что они размещены в одном и том же месте
-    /// </summary>
-    private static readonly double _distance3dTolerance = Math.Sqrt(3 * XYZExtension.FeetRound * XYZExtension.FeetRound);
-
-    /// <summary>
-    /// Допустимый объем, равный кубу <see cref="_distance3dTolerance"/>
-    /// </summary>
-    private static readonly double _volumeTolerance = _distance3dTolerance * _distance3dTolerance * _distance3dTolerance;
 
 
     /// <summary>
@@ -172,9 +159,10 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
 
         var similarOpenings = closestPlacedOpenings.Where(placedOpening =>
             placedOpening.Location
-            .DistanceTo(placedOpening.Location) <= _distance3dTolerance);
+                .DistanceTo(placedOpening.Location)
+            <= ConstantsProvider.ToleranceDistance3dFeet);
         foreach(var placedOpening in similarOpenings) {
-            if(solidUtils.EqualsSolid(placedOpening, GetSolid(), XYZExtension.FeetRound)) {
+            if(solidUtils.EqualsSolid(placedOpening, GetSolid(), ConstantsProvider.CoordinateRoundFeet)) {
                 return true;
             }
         }
@@ -225,11 +213,13 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
             return false;
         }
         var thisSolid = GetSolid();
-        if((thisSolid is null) || (thisSolid.Volume <= _volumeTolerance)) {
+        if((thisSolid is null)
+           || (thisSolid.Volume <= ConstantsProvider.ToleranceVolume3dFeetCube)) {
             return false;
         }
         var otherSolid = otherOpening.GetSolid();
-        if((otherSolid is null) || (otherSolid.Volume <= _volumeTolerance)) {
+        if((otherSolid is null)
+           || (otherSolid.Volume <= ConstantsProvider.ToleranceVolume3dFeetCube)) {
             return false;
         }
         try {
@@ -316,7 +306,7 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
     private bool ThisOpeningIsCompletelyInsideOther(ICollection<OpeningMepTaskOutcoming> othersOpeningTasks) {
         var thisOpeningSolid = GetSolid();
         double thisOpeningSolidVolume = thisOpeningSolid.Volume;
-        double intersectionVolumeTolerance = thisOpeningSolidVolume - _volumeTolerance;
+        double intersectionVolumeTolerance = thisOpeningSolidVolume - ConstantsProvider.ToleranceVolume3dFeetCube;
         foreach(var openingTask in othersOpeningTasks) {
             var otherSolid = openingTask.GetSolid();
             try {

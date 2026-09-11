@@ -25,11 +25,6 @@ namespace RevitOpeningPlacement.Services;
 /// </para>
 /// </summary>
 internal class FamilyGeometryProvider : IFamilyGeometryProvider {
-    /// <summary>
-    /// Минимальный габарит, при котором можно построить геометрию: 1 мм в футах
-    /// </summary>
-    private const double _minSize = 1 / 304.8;
-
     public FamilyGeometryProvider() {
     }
 
@@ -290,7 +285,7 @@ internal class FamilyGeometryProvider : IFamilyGeometryProvider {
         }
 
         double value = element.GetSharedParamValue<double>(paramName);
-        return value > _minSize
+        return value > ConstantsProvider.ToleranceDistanceFeet
             ? value
             : throw new InvalidOperationException(
                 $"У элемента с Id {element.Id} из файла {element.Document.Title} "

@@ -81,9 +81,6 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<ILengthConverter>()
             .To<LengthConverterService>()
             .InSingletonScope();
-        kernel.Bind<IConstantsProvider>()
-            .To<ConstantsProvider>()
-            .InSingletonScope();
         kernel.Bind<IIntersectingElementsFinder>()
             .To<IntersectingElementsFinder>()
             .InSingletonScope();

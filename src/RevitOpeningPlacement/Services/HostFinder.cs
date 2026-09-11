@@ -13,13 +13,6 @@ namespace RevitOpeningPlacement.Services;
 /// Сервис поиска основы (хоста) отверстия или задания на отверстие среди элементов конструкций
 /// </summary>
 internal class HostFinder : IHostFinder {
-    private readonly IConstantsProvider _constantsProvider;
-
-    public HostFinder(IConstantsProvider constantsProvider) {
-        _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
-    }
-
-
     public Element FindBestHost(Solid solid, ICollection<Element> hostCandidates) {
         if(hostCandidates is null) {
             throw new ArgumentNullException(nameof(hostCandidates));
@@ -35,7 +28,7 @@ internal class HostFinder : IHostFinder {
         var hostCandidate = hostCandidates.FirstOrDefault();
         foreach(var element in hostCandidates) {
             var structureSolid = element?.GetSolid();
-            if((structureSolid is null) || (structureSolid.Volume <= _constantsProvider.ToleranceVolumeFeetCube)) {
+            if((structureSolid is null) || (structureSolid.Volume <= ConstantsProvider.ToleranceVolumeFeetCube)) {
                 continue;
             }
             try {

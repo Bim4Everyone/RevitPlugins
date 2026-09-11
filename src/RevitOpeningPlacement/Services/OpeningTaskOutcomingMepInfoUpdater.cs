@@ -31,7 +31,6 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
     /// Обработчик геометрии солидов
     /// </summary>
     private readonly ISolidProviderUtils _solidProviderUtils;
-    private readonly IConstantsProvider _constantsProvider;
 
     /// <summary>
     /// Обработчик отступов для элементов ВИС, проходящих через задания на отверстия
@@ -54,17 +53,6 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
     private readonly ICollection<IConstructureLinkElementsProvider> _constructureLinks;
 
     /// <summary>
-    /// Допустимое расстояние между экземплярами семейств заданий на отверстия, 
-    /// при котором считается, что они размещены в одном и том же месте
-    /// </summary>
-    private readonly double _distance3dTolerance = Math.Sqrt(3 * XYZExtension.FeetRound * XYZExtension.FeetRound);
-
-    /// <summary>
-    /// Допустимый объем, равный кубу <see cref="_distance3dTolerance"/>
-    /// </summary>
-    private readonly double _volumeTolerance;
-
-    /// <summary>
     /// Кэш для хранения коллекции id элементов ВИС из активного файла, 
     /// которые пересекаются с обрабатываемым исходящим заданием на отверстие
     /// </summary>
@@ -84,19 +72,15 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
     public OpeningTaskOutcomingMepInfoUpdater(
         RevitRepository revitRepository,
         ISolidProviderUtils solidProviderUtils,
-        IConstantsProvider constantsProvider,
         IOutcomingTaskOffsetFinder offsetFinder) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _solidProviderUtils = solidProviderUtils ?? throw new ArgumentNullException(nameof(solidProviderUtils));
-        _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
         _offsetFinder = offsetFinder ?? throw new ArgumentNullException(nameof(offsetFinder));
         _outcomingTasksIds = GetOpeningsMepTasksOutcoming(_revitRepository);
         _mepElementsIds = revitRepository.GetMepElementsIds();
         _constructureLinks = GetLinkProviders(revitRepository);
         ClearCache();
-
-        _volumeTolerance = _distance3dTolerance * _distance3dTolerance * _distance3dTolerance;
     }
 
 
@@ -181,7 +165,7 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
     /// <returns>True, если задание не валидно, иначе False.</returns>
     private bool OpeningTaskIsInvalid(OpeningMepTaskOutcoming opening) {
         var solid = GetOpeningSolid(opening);
-        return opening.IsRemoved || (solid is null) || (solid.Volume < _volumeTolerance);
+        return opening.IsRemoved || (solid is null) || (solid.Volume < ConstantsProvider.ToleranceVolume3dFeetCube);
     }
 
     /// <summary>
@@ -228,13 +212,13 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
 
     /// <summary>
     /// Округляет заданное расстояние кратно допуску на расстояние, 
-    /// определенному в <see cref="IConstantsProvider.ToleranceDistanceFeet"/>
+    /// определенному в <see cref="ConstantsProvider.ToleranceDistanceFeet"/>
     /// </summary>
     /// <param name="distance">Расстояние в единицах Revit</param>
     /// <returns>Расстояние в единицах Revit, кратное допуску.</returns>
     private double GetRoundDistance(double distance) {
-        return Math.Round(distance / _constantsProvider.ToleranceDistanceFeet, MidpointRounding.AwayFromZero)
-            * _constantsProvider.ToleranceDistanceFeet;
+        return Math.Round(distance / ConstantsProvider.ToleranceDistanceFeet, MidpointRounding.AwayFromZero)
+            * ConstantsProvider.ToleranceDistanceFeet;
     }
 
     /// <summary>
@@ -687,7 +671,7 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
             double intersectingVolumePrevious = 0;
             foreach(var element in elements) {
                 var structureSolid = element?.GetSolid();
-                if((structureSolid != null) && (structureSolid.Volume > _volumeTolerance)) {
+                if((structureSolid != null) && (structureSolid.Volume > ConstantsProvider.ToleranceVolume3dFeetCube)) {
                     try {
                         double intersectingVolumeCurrent
                             = BooleanOperationsUtils.ExecuteBooleanOperation(

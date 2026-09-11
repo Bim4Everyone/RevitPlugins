@@ -7,16 +7,12 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
 internal class HeightValueGetter : RoundValueGetter, IValueGetter<DoubleParamValue> {
     private readonly MEPCurve _curve;
     private readonly MepCategory _categoryOptions;
-
-    /// <summary>
-    /// Минимальное значение габарита задания на отверстие в футах (5 мм)
-    /// </summary>
-    private const double _minGeometryFeetSize = 0.015;
 
     public HeightValueGetter(MEPCurve curve, MepCategory categoryOptions) {
         _curve = curve;
@@ -32,7 +28,7 @@ internal class HeightValueGetter : RoundValueGetter, IValueGetter<DoubleParamVal
         double roundHeight = RoundFeetToMillimeters(height, _categoryOptions.Rounding);
 
         //проверка на недопустимо малые габариты
-        return roundHeight < _minGeometryFeetSize
+        return roundHeight < ConstantsProvider.OpeningTaskSizeMinValueFeet
             ? throw new SizeTooSmallException("Заданный габарит отверстия слишком мал")
             : new DoubleParamValue(roundHeight);
     }

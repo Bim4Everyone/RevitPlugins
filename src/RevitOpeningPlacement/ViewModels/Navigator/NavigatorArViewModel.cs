@@ -24,13 +24,11 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// </summary>
 internal class NavigatorArViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
-    private readonly IConstantsProvider _constantsProvider;
     private readonly ILocalizationService _localization;
     private readonly IResolutionRoot _resolutionRoot;
 
     public NavigatorArViewModel(
         RevitRepository revitRepository,
-        IConstantsProvider constantsProvider,
         IProgressDialogFactory progressDialogFactory,
         IMessageBoxService messageBoxService,
         IResolutionRoot resolutionRoot,
@@ -38,7 +36,6 @@ internal class NavigatorArViewModel : BaseViewModel {
         ProgressDialogFactory = progressDialogFactory ?? throw new ArgumentNullException(nameof(progressDialogFactory));
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
         OpeningsMepTaskIncoming = [];
@@ -196,7 +193,7 @@ internal class NavigatorArViewModel : BaseViewModel {
     private ICollection<OpeningMepTaskIncomingViewModel> GetOpeningsMepIncomingTasksViewModels(
         ICollection<OpeningMepTaskIncoming> incomingTasks) {
         using var pb = ProgressDialogFactory.CreateDialog();
-        pb.StepValue = _constantsProvider.ProgressBarStepLarge;
+        pb.StepValue = 100;
         pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.TaskAnalysis");
         var progress = pb.CreateProgress();
         pb.MaxValue = incomingTasks.Count;
@@ -223,7 +220,7 @@ internal class NavigatorArViewModel : BaseViewModel {
     /// <param name="openingsReal">Чистовые отверстия, размещенные в активном документе АР</param>
     private ICollection<OpeningRealArViewModel> GetOpeningsRealArViewModels(ICollection<OpeningRealAr> openingsReal) {
         using var pb = ProgressDialogFactory.CreateDialog();
-        pb.StepValue = _constantsProvider.ProgressBarStepSmall;
+        pb.StepValue = 50;
         pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.OpeningAnalysis");
         var progress = pb.CreateProgress();
         pb.MaxValue = openingsReal.Count;

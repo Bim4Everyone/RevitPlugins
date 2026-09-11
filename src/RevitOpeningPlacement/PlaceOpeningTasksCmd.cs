@@ -47,8 +47,6 @@ namespace RevitOpeningPlacement;
 /// </summary>
 [Transaction(TransactionMode.Manual)]
 public class PlaceOpeningTasksCmd : BasePluginCommand {
-    private readonly int _progressBarStepValue = 25;
-
     /// <summary>
     /// Id элементов которые выдают предупреждение дублирования в Revit и которые нужно удалить
     /// </summary>
@@ -180,7 +178,7 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         var localization = kernel.Get<ILocalizationService>();
 
         using var pb = kernel.Get<ProgressDialogProxy>().Create();
-        pb.StepValue = _progressBarStepValue;
+        pb.StepValue = 50;
         pb.DisplayTitleFormat = localization.GetLocalizedString("Progress.TasksPlacing");
         var progress = pb.CreateProgress();
         pb.MaxValue = placers.Count;
@@ -248,7 +246,7 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         ICollection<OpeningMepTaskOutcoming> newOpenings,
         ICollection<OpeningMepTaskOutcoming> alreadyPlacedOpenings) {
         using var pb = kernel.Get<ProgressDialogProxy>().Create();
-        pb.StepValue = _progressBarStepValue;
+        pb.StepValue = 50;
         pb.DisplayTitleFormat = kernel.Get<ILocalizationService>().GetLocalizedString("Progress.CheckDuplicates");
         var progressRemove = pb.CreateProgress();
         pb.MaxValue = newOpenings.Count;
@@ -304,7 +302,7 @@ public class PlaceOpeningTasksCmd : BasePluginCommand {
         IKernel kernel,
         ICollection<OpeningMepTaskOutcoming> newOpeningsForUnion) {
         using var pb = kernel.Get<ProgressDialogProxy>().Create();
-        pb.StepValue = _progressBarStepValue;
+        pb.StepValue = 50;
         pb.DisplayTitleFormat = kernel.Get<ILocalizationService>().GetLocalizedString("Progress.UniteTouching");
         var progressUnite = pb.CreateProgress();
         pb.MaxValue = newOpeningsForUnion.Count;

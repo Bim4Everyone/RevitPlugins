@@ -1,39 +1,56 @@
+using System;
+
+using Autodesk.Revit.DB;
+
 namespace RevitOpeningPlacement.Services;
-internal class ConstantsProvider : IConstantsProvider {
+
+/// <summary>
+/// Константы и допуски, которые использует плагин
+/// </summary>
+internal static class ConstantsProvider {
     /// <summary>
-    /// Точность для определения расстояний и координат 1 мм в футах
+    /// Точность для определения расстояний и координат: 1 мм в футах
     /// </summary>
-    private const double _toleranceDistance = 1 / 304.8;
+    public const double ToleranceDistanceFeet = 1 / 304.8;
 
     /// <summary>
-    /// Точность для определения объемов 1 см3 в футах
+    /// Точность для определения объемов: 1 см3 в футах
     /// </summary>
-    private const double _toleranceVolume = 10 / 304.8 * (10 / 304.8) * (10 / 304.8);
+    public const double ToleranceVolumeFeetCube = 10 / 304.8 * (10 / 304.8) * (10 / 304.8);
+
+    /// <summary>
+    /// Допуск процента объема в расчетах в долях от 1
+    /// </summary>
+    public const double ToleranceVolumePercentage = 0.01;
 
     /// <summary>
     /// Минимальное значение габарита задания на отверстие в футах (~5 мм)
     /// </summary>
-    private const double _minGeometryFeetSize = 0.015;
+    public const double OpeningTaskSizeMinValueFeet = 0.015;
 
     /// <summary>
-    /// Процент толерантности объемов солидов
+    /// Значение округления координат в мм
     /// </summary>
-    private const double _toleranceVolumePercentage = 0.01;
+    public const int CoordinateRoundMm = 5;
 
-    private const int _progressBarStepLarge = 100;
+    /// <summary>
+    /// Значение округления координат в единицах длины Revit (футах),
+    /// равное конвертированному <see cref="CoordinateRoundMm"/>
+    /// </summary>
+    public static readonly double CoordinateRoundFeet =
+        UnitUtils.ConvertToInternalUnits(CoordinateRoundMm, UnitTypeId.Millimeters);
 
-    private const int _progressBarStepSmall = 25;
+    /// <summary>
+    /// Допустимое расстояние между экземплярами семейств заданий на отверстия,
+    /// при котором считается, что они размещены в одном и том же месте.
+    /// Равно диагонали куба со стороной шага округления координат
+    /// </summary>
+    public static readonly double ToleranceDistance3dFeet =
+        Math.Sqrt(3 * CoordinateRoundFeet * CoordinateRoundFeet);
 
-
-    public double ToleranceDistanceFeet => _toleranceDistance;
-
-    public double ToleranceVolumeFeetCube => _toleranceVolume;
-
-    public double ToleranceVolumePercentage => _toleranceVolumePercentage;
-
-    public double OpeningTaskSizeMinValueFeet => _minGeometryFeetSize;
-
-    public int ProgressBarStepLarge => _progressBarStepLarge;
-
-    public int ProgressBarStepSmall => _progressBarStepSmall;
+    /// <summary>
+    /// Допустимый объем, равный кубу <see cref="ToleranceDistance3dFeet"/>
+    /// </summary>
+    public static readonly double ToleranceVolume3dFeetCube =
+        ToleranceDistance3dFeet * ToleranceDistance3dFeet * ToleranceDistance3dFeet;
 }

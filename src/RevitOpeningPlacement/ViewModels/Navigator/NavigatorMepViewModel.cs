@@ -25,7 +25,6 @@ namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// </summary>
 internal class NavigatorMepViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
-    private readonly IConstantsProvider _constantsProvider;
     private readonly ILocalizationService _localization;
     private readonly IResolutionRoot _resolutionRoot;
 
@@ -35,12 +34,10 @@ internal class NavigatorMepViewModel : BaseViewModel {
         IMessageBoxService messageBoxService,
         IProgressDialogFactory progressDialogFactory,
         IResolutionRoot resolutionRoot,
-        IConstantsProvider constantsProvider,
         ILocalizationService localization) {
         MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
         ProgressDialogFactory = progressDialogFactory ?? throw new ArgumentNullException(nameof(progressDialogFactory));
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        _constantsProvider = constantsProvider ?? throw new ArgumentNullException(nameof(constantsProvider));
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
 
@@ -104,7 +101,7 @@ internal class NavigatorMepViewModel : BaseViewModel {
     private ICollection<OpeningMepTaskOutcomingViewModel> GetMepTaskOutcomingViewModels(
         ICollection<OpeningMepTaskOutcoming> outcomingTasks) {
         using var pb = ProgressDialogFactory.CreateDialog();
-        pb.StepValue = _constantsProvider.ProgressBarStepLarge;
+        pb.StepValue = 100;
         pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.TaskAnalysis");
         var progress = pb.CreateProgress();
         pb.MaxValue = outcomingTasks.Count;
