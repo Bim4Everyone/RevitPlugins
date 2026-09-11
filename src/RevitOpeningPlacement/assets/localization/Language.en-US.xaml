@@ -182,6 +182,8 @@ Continue?
         x:Key="OpeningRealsKrSettingsView.Validation.DistanceRange">Minimum distance must be from 0 to {0} mm.</system:String>
     <system:String
         x:Key="OpeningRealsKrSettingsView.Validation.CannotParseInt">Enter a number</system:String>
+    <system:String
+        x:Key="OpeningRealsKrSettingsView.NavigatorSettings">Navigator KR settings</system:String>
 
     <system:String
         x:Key="UnionTaskSettingsView.Title">Merge Settings</system:String>

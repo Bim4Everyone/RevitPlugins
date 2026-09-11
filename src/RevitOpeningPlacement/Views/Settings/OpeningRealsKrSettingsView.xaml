@@ -13,8 +13,8 @@
     mc:Ignorable="d"
     MinWidth="400"
     MaxWidth="400"
-    MinHeight="410"
-    MaxHeight="410"
+    MinHeight="450"
+    MaxHeight="450"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:OpeningRealsKrConfigViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
@@ -27,8 +27,6 @@
     </core:WpfUIPlatformWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto" />
             <RowDefinition
                 Height="Auto" />
             <RowDefinition
@@ -114,6 +112,9 @@
             <StackPanel
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center">
+                <Label
+                    Margin="0 0 0 4"
+                    Content="{me:LocalizationSource OpeningRealsKrSettingsView.NavigatorSettings}" />
                 <DockPanel
                     HorizontalAlignment="Stretch">
                     <ui:ToggleSwitch
@@ -133,18 +134,16 @@
                         IsEnabled="{Binding CheckDistance}"
                         Text="{Binding MinDistance, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
+                <ui:TextBlock
+                    Margin="0 8 0 0"
+                    TextWrapping="Wrap"
+                    Text="{Binding ErrorText}"
+                    Style="{StaticResource CustomErrorText}" />
             </StackPanel>
         </Border>
 
-        <ui:TextBlock
-            Grid.Row="4"
-            Margin="8 10 8 0"
-            TextWrapping="Wrap"
-            Text="{Binding ErrorText}"
-            Style="{StaticResource CustomErrorText}" />
-
         <DockPanel
-            Grid.Row="5"
+            Grid.Row="4"
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom">
             <ui:Button
