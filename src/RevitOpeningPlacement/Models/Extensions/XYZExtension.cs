@@ -4,24 +4,6 @@ using Autodesk.Revit.DB;
 
 namespace RevitOpeningPlacement.Models.Extensions;
 internal static class XYZExtension {
-    /// <summary>
-    /// Значение округления координат в мм = 5 мм
-    /// </summary>
-    private static int MmRound => 5;
-
-#if REVIT_2020_OR_LESS
-    /// <summary>
-    /// Значение округления координат в футах (единицах длины в Revit), равное конвертированному <see cref="MmRound"/>
-    /// </summary>
-    public static double FeetRound => UnitUtils.ConvertToInternalUnits(MmRound, DisplayUnitType.DUT_MILLIMETERS);
-#else
-    /// <summary>
-    /// Значение округления координат в футах (единицах длины в Revit), равное конвертированному <see cref="MmRound"/>
-    /// </summary>
-    public static double FeetRound => UnitUtils.ConvertToInternalUnits(MmRound, UnitTypeId.Millimeters);
-#endif
-
-
     internal static bool IsParallel(this XYZ vector1, XYZ vector2) {
         return Math.Abs(Math.Abs(Math.Cos(vector1.AngleTo(vector2))) - 1) < 0.0001;
     }

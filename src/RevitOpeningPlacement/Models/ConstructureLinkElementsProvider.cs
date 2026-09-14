@@ -10,7 +10,8 @@ using dosymep.Bim4Everyone.SimpleServices;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models;
-internal class ConstructureLinkElementsProvider : IConstructureLinkElementsProvider {
+
+internal class ConstructureLinkElementsProvider : LinkElementsProvider, IConstructureLinkElementsProvider {
     private readonly RevitRepository _revitRepository;
     private readonly ICollection<ElementId> _elementIds;
     private readonly ICollection<IOpeningReal> _openingsReal;
@@ -20,23 +21,18 @@ internal class ConstructureLinkElementsProvider : IConstructureLinkElementsProvi
     /// </summary>
     /// <param name="linkDocument">Связанный файл с конструкциями</param>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    public ConstructureLinkElementsProvider(RevitRepository revitRepository, RevitLinkInstance linkDocument) {
+    public ConstructureLinkElementsProvider(RevitRepository revitRepository, RevitLinkInstance linkDocument)
+        : base(linkDocument) {
         if(linkDocument is null) {
             throw new ArgumentNullException(nameof(linkDocument));
         }
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
 
-        Document = linkDocument.GetLinkDocument();
-        DocumentTransform = linkDocument.GetTransform();
         _elementIds = GetElementIds(revitRepository, Document);
         _openingsReal = GetOpeningsReal(revitRepository, Document);
     }
 
-
-    public Document Document { get; }
-
-    public Transform DocumentTransform { get; }
 
     public ICollection<ElementId> GetConstructureElementIds() {
         return _elementIds;

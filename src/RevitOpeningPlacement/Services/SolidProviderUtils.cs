@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -8,22 +9,6 @@ using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Services;
 internal class SolidProviderUtils : ISolidProviderUtils {
-    /// <summary>
-    /// Точность для определения расстояний и координат 1 мм.
-    /// </summary>
-    private const double _toleranceDistance = 1 / 304.8;
-
-    /// <summary>
-    /// Точность для определения объемов 1 см3
-    /// </summary>
-    private const double _toleranceVolume = 10 / 304.8 * (10 / 304.8) * (10 / 304.8);
-
-    /// <summary>
-    /// Процент толерантности объемов солидов
-    /// </summary>
-    private const double _toleranceVolumePercentage = 0.01;
-
-
     public SolidProviderUtils() {
     }
 
@@ -53,11 +38,41 @@ internal class SolidProviderUtils : ISolidProviderUtils {
     }
 
     public bool IntersectsSolid(ISolidProvider thisSolidProvider, Solid otherSolid, BoundingBoxXYZ otherSolidBBox) {
-        var thisSolid = thisSolidProvider.GetSolid();
-        var thisBBox = thisSolidProvider.GetTransformedBBoxXYZ();
+        Solid thisSolid;
+        BoundingBoxXYZ thisBBox;
+        try {
+            thisSolid = thisSolidProvider.GetSolid();
+            thisBBox = thisSolidProvider.GetTransformedBBoxXYZ();
+        } catch(Exception ex) when(
+            ex is NullReferenceException
+                or ArgumentException
+                or InvalidOperationException
+                or Autodesk.Revit.Exceptions.ApplicationException) {
+            // геометрию элемента построить не удалось - считаем, что пересечения нет
+            return false;
+        }
         return SolidsIntersect(thisSolid, thisBBox, otherSolid, otherSolidBBox);
     }
 
+    public Solid SubtractSolids(Solid source, ICollection<Solid> solidsToSubtract) {
+        if(solidsToSubtract is null) {
+            throw new ArgumentNullException(nameof(solidsToSubtract));
+        }
+
+        var result = source;
+        foreach(var solid in solidsToSubtract) {
+            try {
+                result = BooleanOperationsUtils.ExecuteBooleanOperation(
+                    result,
+                    solid,
+                    BooleanOperationsType.Difference);
+            } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+                continue;
+            }
+        }
+
+        return result;
+    }
 
     private bool SolidsIntersect(Solid firstSolid, BoundingBoxXYZ firstBBox, Solid secondSolid, BoundingBoxXYZ secondBBox) {
         if((firstSolid is null) || (secondSolid is null)) {
@@ -85,7 +100,7 @@ internal class SolidProviderUtils : ISolidProviderUtils {
         // Итоговая проверка на пересечение объектов
         try {
             var intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation(firstSolid, secondSolid, BooleanOperationsType.Intersect);
-            if(intersectSolid?.Volume > _toleranceVolume) {
+            if(intersectSolid?.Volume > ConstantsProvider.ToleranceVolumeFeetCube) {
                 return true;
             }
         } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
@@ -115,18 +130,18 @@ internal class SolidProviderUtils : ISolidProviderUtils {
     /// </summary>
     /// <param name="solid1">Первый солид</param>
     /// <param name="solid2">Второй солид</param>
-    /// <returns>True, если разница объемов не превышает процент объема <see cref="_toleranceVolumePercentage"/> меньшего солида</returns>
+    /// <returns>True, если разница объемов не превышает процент объема <see cref="ConstantsProvider.ToleranceVolumePercentage"/> меньшего солида</returns>
     private bool SolidsVolumesEqual(Solid solid1, Solid solid2) {
         if((solid1 is null) || (solid2 is null)) {
             return false;
         }
         double minVolume = Math.Min(solid1.Volume, solid2.Volume);
-        double volumeTolerance = minVolume * _toleranceVolumePercentage;
+        double volumeTolerance = minVolume * ConstantsProvider.ToleranceVolumePercentage;
         return Math.Abs(solid1.Volume - solid2.Volume) <= volumeTolerance;
     }
 
     private bool BBoxesEqual(BoundingBoxXYZ bbox1, BoundingBoxXYZ bbox2) {
-        return BBoxesEqual(bbox1, bbox2, _toleranceDistance);
+        return BBoxesEqual(bbox1, bbox2, ConstantsProvider.ToleranceDistanceFeet);
     }
 
     private bool BBoxesEqual(BoundingBoxXYZ bbox1, BoundingBoxXYZ bbox2, double tolerance) {

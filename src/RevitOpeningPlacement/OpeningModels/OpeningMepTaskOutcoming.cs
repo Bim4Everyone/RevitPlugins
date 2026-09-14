@@ -4,14 +4,11 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models;
-using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels.Enums;
 using RevitOpeningPlacement.Services;
@@ -27,16 +24,6 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
     /// </summary>
     private readonly FamilyInstance _familyInstance;
 
-    /// <summary>
-    /// Допустимое расстояние между экземплярами семейств заданий на отверстия, при котором считается, что они размещены в одном и том же месте
-    /// </summary>
-    private static readonly double _distance3dTolerance = Math.Sqrt(3 * XYZExtension.FeetRound * XYZExtension.FeetRound);
-
-    /// <summary>
-    /// Допустимый объем, равный кубу <see cref="_distance3dTolerance"/>
-    /// </summary>
-    private static readonly double _volumeTolerance = _distance3dTolerance * _distance3dTolerance * _distance3dTolerance;
-
 
     /// <summary>
     /// Создает экземпляр класса <see cref="OpeningMepTaskOutcoming"/>
@@ -47,42 +34,42 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
     public OpeningMepTaskOutcoming(FamilyInstance openingTaskOutcoming) {
         _familyInstance = openingTaskOutcoming;
         Id = _familyInstance.Id;
-        Location = (_familyInstance.Location as LocationPoint).Point;
+        Location = ((LocationPoint) _familyInstance.Location).Point;
         OpeningType = RevitRepository.GetOpeningType(openingTaskOutcoming.Symbol.Family.Name);
 
-        Date = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDate);
-        MepSystem = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningMepSystem);
-        Description = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningDescription);
-        CenterOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetCenter);
-        BottomOffset = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningOffsetBottom);
+        Date = GetStringParamValue(RevitRepository.OpeningDate);
+        MepSystem = GetStringParamValue(RevitRepository.OpeningMepSystem);
+        Description = GetStringParamValue(RevitRepository.OpeningDescription);
+        CenterOffset = GetStringParamValue(RevitRepository.OpeningOffsetCenter);
+        BottomOffset = GetStringParamValue(RevitRepository.OpeningOffsetBottom);
         Comment = _familyInstance.GetParamValueOrDefault(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS, string.Empty);
-        Username = GetFamilyInstanceStringParamValueOrEmpty(RevitRepository.OpeningAuthor);
+        Username = GetStringParamValue(RevitRepository.OpeningAuthor);
     }
 
     /// <summary>
     /// Дата создания
     /// </summary>
-    public string Date { get; } = string.Empty;
+    public string Date { get; }
 
     /// <summary>
     /// Название инженерной системы, для элемента которой создано задание на отверстие
     /// </summary>
-    public string MepSystem { get; } = string.Empty;
+    public string MepSystem { get; }
 
     /// <summary>
     /// Описание задания на отверстие
     /// </summary>
-    public string Description { get; } = string.Empty;
+    public string Description { get; }
 
     /// <summary>
     /// Отметка центра
     /// </summary>
-    public string CenterOffset { get; } = string.Empty;
+    public string CenterOffset { get; }
 
     /// <summary>
     /// Отметка низа
     /// </summary>
-    public string BottomOffset { get; } = string.Empty;
+    public string BottomOffset { get; }
 
     /// <summary>
     /// Id экземпляра семейства задания на отверстие
@@ -92,12 +79,12 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
     /// <summary>
     /// Комментарий
     /// </summary>
-    public string Comment { get; } = string.Empty;
+    public string Comment { get; }
 
     /// <summary>
     /// Имя пользователя, создавшего задание на отверстие
     /// </summary>
-    public string Username { get; } = string.Empty;
+    public string Username { get; }
 
     /// <summary>
     /// Точка расположения экземпляра семейства задания на отверстие
@@ -125,7 +112,7 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
     /// <summary>
     /// Тип проема
     /// </summary>
-    public OpeningType OpeningType { get; } = OpeningType.WallRectangle;
+    public OpeningType OpeningType { get; }
 
 
     /// <summary>
@@ -172,9 +159,10 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
 
         var similarOpenings = closestPlacedOpenings.Where(placedOpening =>
             placedOpening.Location
-            .DistanceTo(placedOpening.Location) <= _distance3dTolerance);
+                .DistanceTo(placedOpening.Location)
+            <= ConstantsProvider.ToleranceDistance3dFeet);
         foreach(var placedOpening in similarOpenings) {
-            if(solidUtils.EqualsSolid(placedOpening, GetSolid(), XYZExtension.FeetRound)) {
+            if(solidUtils.EqualsSolid(placedOpening, GetSolid(), ConstantsProvider.CoordinateRoundFeet)) {
                 return true;
             }
         }
@@ -225,11 +213,13 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
             return false;
         }
         var thisSolid = GetSolid();
-        if((thisSolid is null) || (thisSolid.Volume <= _volumeTolerance)) {
+        if((thisSolid is null)
+           || (thisSolid.Volume <= ConstantsProvider.ToleranceVolume3dFeetCube)) {
             return false;
         }
         var otherSolid = otherOpening.GetSolid();
-        if((otherSolid is null) || (otherSolid.Volume <= _volumeTolerance)) {
+        if((otherSolid is null)
+           || (otherSolid.Volume <= ConstantsProvider.ToleranceVolume3dFeetCube)) {
             return false;
         }
         try {
@@ -268,11 +258,6 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
                     }
                 }
             }
-            //var projection = first.Project(second.Origin);
-            //if(projection is null || Math.Abs(projection.Distance) < 0.00005 && first.IsInside(projection.UVPoint)) {
-            //    // вторая поверхность полностью внутри первой или наоборот
-            //    return true;
-            //}
         }
         return false;
     }
@@ -321,7 +306,7 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
     private bool ThisOpeningIsCompletelyInsideOther(ICollection<OpeningMepTaskOutcoming> othersOpeningTasks) {
         var thisOpeningSolid = GetSolid();
         double thisOpeningSolidVolume = thisOpeningSolid.Volume;
-        double intersectionVolumeTolerance = thisOpeningSolidVolume - _volumeTolerance;
+        double intersectionVolumeTolerance = thisOpeningSolidVolume - ConstantsProvider.ToleranceVolume3dFeetCube;
         foreach(var openingTask in othersOpeningTasks) {
             var otherSolid = openingTask.GetSolid();
             try {
@@ -365,17 +350,9 @@ internal class OpeningMepTaskOutcoming : ISolidProvider, IEquatable<OpeningMepTa
     /// Возвращает строковое значение параметра по названию или пустую строку, если параметр отсутствует у текущего экземпляра семейства задания на отверстие
     /// </summary>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    private string GetFamilyInstanceStringParamValueOrEmpty(string paramName) {
-        if(_familyInstance is null) {
-            throw new ArgumentNullException(nameof(_familyInstance));
-        }
-        string value = string.Empty;
-        if(_familyInstance.GetParameters(paramName).FirstOrDefault(item => item.IsShared) != null) {
-            object paramValue = _familyInstance.GetParamValue(paramName);
-            if(paramValue is not null) {
-                value = paramValue.ToString();
-            }
-        }
-        return value;
+    private string GetStringParamValue(string paramName) {
+        return _familyInstance.IsExistsSharedParam(paramName)
+            ? _familyInstance.GetSharedParam(paramName).AsValueString()
+            : string.Empty;
     }
 }

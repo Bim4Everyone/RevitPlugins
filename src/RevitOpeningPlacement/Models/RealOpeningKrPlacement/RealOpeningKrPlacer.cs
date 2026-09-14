@@ -117,7 +117,10 @@ internal class RealOpeningKrPlacer {
     /// <exception cref="OperationCanceledException">Исключение, если пользователь прервал операцию</exception>
     private ICollection<IOpeningTaskIncoming> GetAllOpeningsTaskIncoming(OpeningRealsKrConfig config) {
         if(config.PlacementType == OpeningRealKrPlacementType.PlaceByAr) {
-            return _revitRepository.GetOpeningsArTasksIncoming().ToArray<IOpeningTaskIncoming>();
+            return _revitRepository.GetOpeningsArTasksIncoming()
+                .ToArray<IOpeningTaskIncoming>()
+                .Concat(_revitRepository.GetVentBlocksArTasksIncoming())
+                .ToArray();
         }
 
         return _revitRepository.GetOpeningsMepTasksIncoming().ToArray<IOpeningTaskIncoming>();

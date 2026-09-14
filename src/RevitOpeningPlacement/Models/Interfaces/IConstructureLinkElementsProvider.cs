@@ -7,17 +7,7 @@ namespace RevitOpeningPlacement.Models.Interfaces;
 /// Интерфейс, представляющий обертку над связанным файлом ревита для получения из него элементов конструкций - стен и перекрытий.
 /// <para>Использовать для обертки связей АР и КР</para>
 /// </summary>
-internal interface IConstructureLinkElementsProvider {
-    /// <summary>
-    /// Документ связанного файла с конструкциями (АР или КР)
-    /// </summary>
-    Document Document { get; }
-
-    /// <summary>
-    /// Трансформация <see cref="Document">связанного файла</see> относительно активного документа ревита
-    /// </summary>
-    Transform DocumentTransform { get; }
-
+internal interface IConstructureLinkElementsProvider : ILinkElementsProvider {
     /// <summary>
     /// Возвращает коллекцию Id элементов категорий "Стены" и "Перекрытия" из <see cref="Document">связанного файла</see>
     /// </summary>

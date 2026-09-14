@@ -11,10 +11,10 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d"
-    MinWidth="350"
-    MaxWidth="350"
-    MinHeight="295"
-    MaxHeight="295"
+    MinWidth="400"
+    MaxWidth="400"
+    MinHeight="450"
+    MaxHeight="450"
     ResizeMode="NoResize"
     d:DataContext="{d:DesignInstance vms:OpeningRealsKrConfigViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformWindow.Resources>
@@ -35,6 +35,8 @@
                 Height="Auto" />
             <RowDefinition
                 Height="Auto" />
+            <RowDefinition
+                Height="*" />
         </Grid.RowDefinitions>
 
         <ui:TitleBar
@@ -103,8 +105,45 @@
             </StackPanel>
         </Border>
 
-        <DockPanel
+        <Border
             Grid.Row="3"
+            Margin="8 10 8 0"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center">
+                <Label
+                    Margin="0 0 0 4"
+                    Content="{me:LocalizationSource OpeningRealsKrSettingsView.NavigatorSettings}" />
+                <DockPanel
+                    HorizontalAlignment="Stretch">
+                    <ui:ToggleSwitch
+                        Content="{me:LocalizationSource OpeningRealsKrSettingsView.CheckDistance}"
+                        IsChecked="{Binding CheckDistance, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="0 5 0 0"
+                    HorizontalAlignment="Stretch">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource OpeningRealsKrSettingsView.DistanceValue}" />
+                    <ui:TextBox
+                        HorizontalAlignment="Right"
+                        MinWidth="{StaticResource SmallInputWidth}"
+                        Width="{StaticResource SmallInputWidth}"
+                        IsEnabled="{Binding CheckDistance}"
+                        Text="{Binding MinDistance, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <ui:TextBlock
+                    Margin="0 8 0 0"
+                    TextWrapping="Wrap"
+                    Text="{Binding ErrorText}"
+                    Style="{StaticResource CustomErrorText}" />
+            </StackPanel>
+        </Border>
+
+        <DockPanel
+            Grid.Row="4"
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom">
             <ui:Button
@@ -113,12 +152,14 @@
                 Margin="8"
                 IsDefault="True"
                 Click="ButtonOk_Click"
+                VerticalAlignment="Bottom"
                 Content="{me:LocalizationSource Ok}"
                 Command="{Binding SaveConfigCommand}" />
             <ui:Button
                 Width="80"
                 Margin="8"
                 IsCancel="True"
+                VerticalAlignment="Bottom"
                 Click="ButtonCancel_Click"
                 Content="{me:LocalizationSource Cancel}" />
         </DockPanel>
