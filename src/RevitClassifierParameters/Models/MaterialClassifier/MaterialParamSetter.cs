@@ -198,6 +198,9 @@ internal class MaterialParamSetter {
     /// </summary>
     private bool SetCalculationTypeParam(Material material, string unit) {
         var param = material.GetParam(_calculationTypeParameter);
+        if(param is null) {
+            return false;
+        }
 
         if(unit != null && _calculationTypeDict.TryGetValue(unit, out int value)) {
             if(param.AsValueString() == value.ToString()) {
@@ -221,7 +224,7 @@ internal class MaterialParamSetter {
     /// </summary>
     private bool SetStringParam(Material material, RevitParam revitParam, string value) {
         var param = material.GetParam(revitParam);
-        if(param.AsValueString() == value) {
+        if(param is null || param.AsValueString() == value) {
             return false;
         }
         material.SetParamValue(revitParam, value ?? string.Empty);
@@ -234,7 +237,7 @@ internal class MaterialParamSetter {
     /// </summary>
     private bool SetStringParam(Material material, BuiltInParameter builtInParameter, string value) {
         var param = material.GetParam(builtInParameter);
-        if(param.AsValueString() == value) {
+        if(param is null || param.AsValueString() == value) {
             return false;
         }
         material.SetParamValue(builtInParameter, value ?? string.Empty);
