@@ -78,6 +78,22 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     private readonly double _maxGapLength = UnitUtilsHelper.ConvertToInternalValue(300);
 
     /// <summary>
+    /// Отступ линии размера ступени от угла в миллиметрах на бумаге.
+    /// </summary>
+    /// <remarks>
+    /// Размер ступени по построению встает в угол, где стороны сходятся, и его линия ложится
+    /// на перпендикулярную стену. Отступ уводит линию от стены вдоль оси направления.
+    /// Модельная величина получается умножением на масштаб вида, поэтому на листе
+    /// зазор выглядит одинаково при любом масштабе.
+    /// </remarks>
+    private readonly double _stepOffsetInPaperMm = 2;
+
+    /// <summary>
+    /// Высота над низом помещения, на которой проверяется принадлежность точки этому помещению.
+    /// </summary>
+    private readonly double _roomTestHeight = UnitUtilsHelper.ConvertToInternalValue(300);
+
+    /// <summary>
     /// Количество направлений, по которым проставляются размеры в одном помещении.
     /// </summary>
     /// <remarks>
@@ -200,7 +216,7 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
                 }
 
                 // Размер строится для каждой пары сторон - и для габаритных, и для ступеней
-                foreach(var sidePair in GetSidePairs(directionGroup, wallSides)) {
+                foreach(var sidePair in GetSidePairs(room, directionGroup, wallSides)) {
                     CreateDimension(
                         sidePair, elevation, dimensionCreator, referenceAnalizeService, existingDimensionRefs);
                 }
@@ -395,14 +411,15 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     /// получает столько размеров, сколько у него сторон в этом направлении.
     /// Заслоненные пары (когда между сторонами стоит третья) не отбрасываются - общий габарит нужен.
     /// </remarks>
-    private List<WallPair> GetSidePairs(DirectionGroup directionGroup, List<WallSide> wallSides) {
+    private List<WallPair> GetSidePairs(Room room, DirectionGroup directionGroup, List<WallSide> wallSides) {
+        room.ThrowIfNull();
         directionGroup.ThrowIfNull();
         wallSides.ThrowIfNull();
 
         var wallPairs = new List<WallPair>();
         for(int i = 0; i < wallSides.Count - 1; i++) {
             for(int j = i + 1; j < wallSides.Count; j++) {
-                var wallPair = CreateWallPair(directionGroup, wallSides[i], wallSides[j]);
+                var wallPair = CreateWallPair(room, directionGroup, wallSides[i], wallSides[j]);
                 if(wallPair != null) {
                     wallPairs.Add(wallPair);
                 }
@@ -416,7 +433,7 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     /// и их проекции либо перекрываются, либо сближаются в пределах допустимого зазора.
     /// </summary>
     /// <returns>Пара сторон, либо null, если стороны не удовлетворяют условиям.</returns>
-    private WallPair CreateWallPair(DirectionGroup directionGroup, WallSide first, WallSide second) {
+    private WallPair CreateWallPair(Room room, DirectionGroup directionGroup, WallSide first, WallSide second) {
         // Расстояние между сторонами постоянно - стороны параллельны
         double distance = Math.Abs(first.Offset - second.Offset);
         if(distance < _minDistanceBetweenSides || distance > _maxDistanceBetweenSides) {
@@ -449,6 +466,12 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
             return null;
         }
 
+        // Размер ступени по построению встает в угол - отодвигаем его от перпендикулярной стены.
+        // Сдвиг считается до выбора стен сторон, иначе выбор был бы сделан по старой позиции
+        if(bestLength < _minOverlapLength) {
+            position = GetStepPosition(room, directionGroup, first, second, position);
+        }
+
         var firstWallLine = first.GetNearestWallLine(position);
         var secondWallLine = second.GetNearestWallLine(position);
         if(firstWallLine is null || secondWallLine is null) {
@@ -456,6 +479,132 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
         }
 
         return new WallPair(directionGroup, first, second, firstWallLine, secondWallLine, position, distance);
+    }
+
+    #endregion
+
+
+    #region Отступ размера ступени
+
+    /// <summary>
+    /// Отодвигает линию размера ступени от угла, в котором сходятся стороны.
+    /// </summary>
+    /// <param name="room">Помещение, которому принадлежат стороны.</param>
+    /// <param name="directionGroup">Направление, которому принадлежит пара.</param>
+    /// <param name="first">Первая сторона пары.</param>
+    /// <param name="second">Вторая сторона пары.</param>
+    /// <param name="cornerPosition">Позиция угла на оси направления.</param>
+    /// <returns>Позиция линии размера с отступом, либо позиция угла, если отодвинуть некуда.</returns>
+    private double GetStepPosition(
+        Room room,
+        DirectionGroup directionGroup,
+        WallSide first,
+        WallSide second,
+        double cornerPosition) {
+
+        double stepOffset = GetStepOffset();
+        if(stepOffset <= 0) {
+            return cornerPosition;
+        }
+
+        // Направления вдоль оси не равноценны: с одной стороны от угла полоса между сторонами
+        // лежит внутри помещения, с другой - уже снаружи. Какое именно направление верное,
+        // зависит от планировки, поэтому спрашиваем у помещения
+        bool isForwardInRoom = IsPositionInRoom(room, directionGroup, first, second, cornerPosition + stepOffset);
+        bool isBackwardInRoom = IsPositionInRoom(room, directionGroup, first, second, cornerPosition - stepOffset);
+
+        int direction;
+        if(isForwardInRoom && isBackwardInRoom) {
+            // Помещение обходит угол с двух сторон (пилон, выступ) - уходим туда, где участок длиннее
+            direction = GetLongerSideDirection(first, second, cornerPosition);
+        } else if(isForwardInRoom) {
+            direction = 1;
+        } else if(isBackwardInRoom) {
+            direction = -1;
+        } else {
+            // Ни одно направление не остается внутри помещения - оставляем размер в углу
+            return cornerPosition;
+        }
+
+        // Если участок короче двух отступов, садимся в его середину - дальше всего от обоих концов
+        double availableLength = GetAvailableLength(first, second, cornerPosition, direction);
+        stepOffset = Math.Min(stepOffset, availableLength / 2);
+
+        return cornerPosition + direction * stepOffset;
+    }
+
+    /// <summary>
+    /// Возвращает отступ линии размера ступени в единицах модели.
+    /// </summary>
+    /// <remarks>Отступ задан в миллиметрах на бумаге, поэтому пересчитывается через масштаб вида.</remarks>
+    private double GetStepOffset() {
+        int scale = _revitRepository.Document.ActiveView.Scale;
+        return scale <= 0 ? 0 : UnitUtilsHelper.ConvertToInternalValue(_stepOffsetInPaperMm * scale);
+    }
+
+    /// <summary>
+    /// Проверяет, что линия размера в переданной позиции остается внутри помещения.
+    /// </summary>
+    /// <remarks>
+    /// Концы линии лежат на базовых линиях стен, то есть внутри их тела, и проверка концов
+    /// всегда давала бы "снаружи". Поэтому проверяется середина линии.
+    /// </remarks>
+    private bool IsPositionInRoom(
+        Room room,
+        DirectionGroup directionGroup,
+        WallSide first,
+        WallSide second,
+        double position) {
+
+        var middlePoint = directionGroup.Origin
+                          + directionGroup.Axis * position
+                          + directionGroup.Normal * ((first.Offset + second.Offset) / 2);
+
+        return room.IsPointInRoom(new XYZ(middlePoint.X, middlePoint.Y, GetRoomTestElevation(room)));
+    }
+
+    /// <summary>
+    /// Возвращает отметку, на которой проверяется принадлежность точки помещению.
+    /// </summary>
+    /// <remarks>Берется низ помещения с небольшим подъемом, чтобы точка попала в его объем.</remarks>
+    private double GetRoomTestElevation(Room room) {
+        double levelElevation = room.Level?.Elevation ?? 0;
+        double lowerOffset = room.get_Parameter(BuiltInParameter.ROOM_LOWER_OFFSET)?.AsDouble() ?? 0;
+        return levelElevation + lowerOffset + _roomTestHeight;
+    }
+
+    /// <summary>
+    /// Возвращает направление вдоль оси в сторону более длинного участка, примыкающего к углу.
+    /// </summary>
+    private int GetLongerSideDirection(WallSide first, WallSide second, double cornerPosition) {
+        double forwardLength = GetAvailableLength(first, second, cornerPosition, 1);
+        double backwardLength = GetAvailableLength(first, second, cornerPosition, -1);
+        return forwardLength >= backwardLength ? 1 : -1;
+    }
+
+    /// <summary>
+    /// Возвращает длину участка стороны, уходящего от угла в переданном направлении.
+    /// </summary>
+    /// <remarks>
+    /// Участок должен начинаться у самого угла: стороны ступени сходятся в нем встык,
+    /// поэтому допуск на примыкание берется тот же, что и на зазор между их проекциями.
+    /// </remarks>
+    private double GetAvailableLength(WallSide first, WallSide second, double cornerPosition, int direction) {
+        double availableLength = 0;
+
+        foreach(var segment in first.Segments.Concat(second.Segments)) {
+            double nearEdge = direction > 0 ? segment.Start : segment.End;
+            double farEdge = direction > 0 ? segment.End : segment.Start;
+
+            if(Math.Abs(nearEdge - cornerPosition) > _maxGapLength) {
+                continue;
+            }
+            double length = (farEdge - cornerPosition) * direction;
+            if(length > availableLength) {
+                availableLength = length;
+            }
+        }
+        return availableLength;
     }
 
     #endregion
