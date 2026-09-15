@@ -27,6 +27,14 @@ internal class FilterDataProvider {
         return new DataProvider(GetCategories(), GetParams, GetParamValues);
     }
 
+    /// <summary>
+    /// Создает провайдер данных для фильтра по параметрам материалов элементов.
+    /// </summary>
+    /// <returns>Провайдер данных с единственной категорией - "Материалы".</returns>
+    public DataProvider CreateMaterialsDataProvider() {
+        return new DataProvider(GetMaterialsCategories(), GetMaterialParams, GetMaterialParamValues);
+    }
+
     private ICollection<RevitParam> GetParams(ICollection<Category> categories) {
         return ParameterFilterUtilities
             .GetFilterableParametersInCommon(_revitRepository.Document, [..categories.Select(c => c.Id)])
@@ -40,6 +48,52 @@ internal class FilterDataProvider {
             .Select(c => Category.GetCategory(_revitRepository.Document, c))
             .Where(category => category != null)
             .Where(c => c.CategoryType == CategoryType.Model && c.IsVisibleInUI)
+            .ToArray();
+    }
+
+    private ICollection<Category> GetMaterialsCategories() {
+        var category = Category.GetCategory(_revitRepository.Document, BuiltInCategory.OST_Materials);
+        return category is null ? [] : [category];
+    }
+
+    /// <summary>
+    /// Возвращает параметры, доступные для фильтрации материалов.
+    /// </summary>
+    /// <remarks>
+    /// Материалы не входят в фильтруемые категории видов Revit, поэтому,
+    /// если получить параметры штатным способом не удалось,
+    /// они берутся из первого попавшегося материала документа.
+    /// </remarks>
+    private ICollection<RevitParam> GetMaterialParams(ICollection<Category> categories) {
+        ICollection<ElementId> paramIds;
+        try {
+            paramIds = ParameterFilterUtilities.GetFilterableParametersInCommon(
+                _revitRepository.Document,
+                [..categories.Select(c => c.Id)]);
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+            paramIds = [];
+        }
+
+        var revitParams = paramIds
+            .Select(GetFilterableParam)
+            .Where(p => p != null)
+            .ToArray();
+        return revitParams.Length > 0 ? revitParams : GetFirstMaterialParams();
+    }
+
+    private ICollection<RevitParam> GetFirstMaterialParams() {
+        var material = new FilteredElementCollector(_revitRepository.Document)
+            .OfClass(typeof(Material))
+            .FirstElement();
+        if(material is null) {
+            return [];
+        }
+
+        return material.Parameters
+            .OfType<Parameter>()
+            .Select(p => p.Id)
+            .Select(GetFilterableParam)
+            .Where(p => p != null)
             .ToArray();
     }
 
@@ -92,6 +146,25 @@ internal class FilterDataProvider {
             return new FilteredElementCollector(doc)
                 .WhereElementIsNotElementType()
                 .WherePasses(new ElementMulticategoryFilter(categories.Select(c => c.GetBuiltInCategory()).ToArray()))
+                .Where(e => e.IsExistsParamValue(param.Name))
+                .Select(e => e.GetParamValueString(param))
+                .ToArray();
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+            return [];
+        }
+    }
+
+    private ICollection<string> GetMaterialParamValues(ICollection<Category> categories, RevitParam param) {
+        return _revitRepository.GetDocuments()
+            .SelectMany(d => GetMaterialParamValues(d.Document, param))
+            .Distinct()
+            .ToArray();
+    }
+
+    private ICollection<string> GetMaterialParamValues(Document doc, RevitParam param) {
+        try {
+            return new FilteredElementCollector(doc)
+                .OfClass(typeof(Material))
                 .Where(e => e.IsExistsParamValue(param.Name))
                 .Select(e => e.GetParamValueString(param))
                 .ToArray();

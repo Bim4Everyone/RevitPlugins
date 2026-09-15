@@ -6,7 +6,9 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration;
 using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Extensions.Materials;
 
 using RevitParamsChecker.Models.Filtration;
 
@@ -14,11 +16,17 @@ namespace RevitParamsChecker.Models.Revit;
 
 internal class RevitRepository {
     private readonly IFilterContextParser _filterParser;
+    private readonly ILogicalFilterFactory _filterFactory;
     private DocumentModel[] _documentsCache;
     private readonly Bim4Everyone.RevitFiltration.Options _filterBuildOptions = new() { Tolerance = 0.001 };
+    private readonly MaterialOptions _materialsBuildOptions = new() { Tolerance = 0.001 };
 
-    public RevitRepository(UIApplication uiApplication, IFilterContextParser filterParser) {
+    public RevitRepository(
+        UIApplication uiApplication,
+        IFilterContextParser filterParser,
+        ILogicalFilterFactory filterFactory) {
         _filterParser = filterParser ?? throw new ArgumentNullException(nameof(filterParser));
+        _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
         UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
     }
 
@@ -57,10 +65,12 @@ internal class RevitRepository {
 
         var paramsFilter = context!.GetFilter().Build(doc.Document, _filterBuildOptions);
         var categoriesFilter = new ElementMulticategoryFilter(context.SelectedCategories);
+        var materialsFilter = GetMaterialsFilter(doc.Document, filter.MaterialsFilterContext);
         return new FilteredElementCollector(doc.Document)
             .WhereElementIsNotElementType()
             .WherePasses(categoriesFilter)
             .WherePasses(paramsFilter)
+            .PassesFilter(materialsFilter)
             .Select(e => new ElementModel(
                 e,
                 doc.IsLink ? new Reference(e).CreateLinkReference(doc.Link) : new Reference(e)))
@@ -102,6 +112,24 @@ internal class RevitRepository {
                 .Select(e => e.Element.Id)
                 .ToArray());
 #endif
+    }
+
+    /// <summary>
+    /// Создает фильтр элементов по параметрам их материалов.
+    /// </summary>
+    /// <param name="doc">Документ, в котором отбираются материалы.</param>
+    /// <param name="serializedContext">Сериализованный контекст фильтра по материалам.</param>
+    /// <returns>
+    /// Фильтр по материалам. Если контекст не задан либо его не удалось прочитать,
+    /// возвращается фильтр без правил, пропускающий все элементы.
+    /// </returns>
+    private MaterialsFilter GetMaterialsFilter(Document doc, string serializedContext) {
+        if(!string.IsNullOrWhiteSpace(serializedContext)
+           && _filterParser.TryParse(serializedContext, out var context)) {
+            return context!.GetFilter().BuildMaterialsFilter(doc, _materialsBuildOptions);
+        }
+
+        return _filterFactory.CreateAndFilter().BuildMaterialsFilter(doc, _materialsBuildOptions);
     }
 
     private ICollection<RevitLinkInstance> GetRevitLinkInstances() {

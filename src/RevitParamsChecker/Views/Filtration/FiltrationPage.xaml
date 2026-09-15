@@ -79,6 +79,21 @@
             Grid.Row="1"
             Grid.Column="2"
             LanguageService="{Binding LanguageService}"
-            LogicalFilterProvider="{Binding SelectedFilter.FilterProvider}" />
+            LocalizationService="{Binding LocalizationService}"
+            LogicalFilterProvider="{Binding SelectedFilter.FilterProvider}">
+            <filtration:DynamicCategoriesFilterControl.AdditionalContent>
+                <DockPanel
+                    LastChildFill="False">
+                    <Label
+                        DockPanel.Dock="Top"
+                        Content="{me:LocalizationSource FiltrationPage.MaterialsRootSetHeader}" />
+                    <filtration:PresetCategoriesFilterControl
+                        DockPanel.Dock="Top"
+                        LanguageService="{Binding LanguageService}"
+                        LocalizationService="{Binding LocalizationService}"
+                        LogicalFilterProvider="{Binding SelectedFilter.MaterialsFilterProvider}" />
+                </DockPanel>
+            </filtration:DynamicCategoriesFilterControl.AdditionalContent>
+        </filtration:DynamicCategoriesFilterControl>
     </Grid>
 </core:WpfUIPlatformPage>
