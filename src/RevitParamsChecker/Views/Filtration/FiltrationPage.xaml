@@ -82,14 +82,16 @@
             LocalizationService="{Binding LocalizationService}"
             LogicalFilterProvider="{Binding SelectedFilter.FilterProvider}">
             <filtration:DynamicCategoriesFilterControl.AdditionalContent>
-                <StackPanel>
-                    <Label
-                        Content="{me:LocalizationSource FiltrationPage.MaterialsRootSetHeader}" />
-                    <filtration:PresetCategoriesFilterControl
-                        LanguageService="{Binding LanguageService}"
-                        LocalizationService="{Binding LocalizationService}"
-                        LogicalFilterProvider="{Binding SelectedFilter.MaterialsFilterProvider}" />
-                </StackPanel>
+                <ScrollViewer>
+                    <StackPanel>
+                        <Label
+                            Content="{me:LocalizationSource FiltrationPage.MaterialsRootSetHeader}" />
+                        <filtration:PresetCategoriesFilterControl
+                            LanguageService="{Binding LanguageService}"
+                            LocalizationService="{Binding LocalizationService}"
+                            LogicalFilterProvider="{Binding SelectedFilter.MaterialsFilterProvider}" />
+                    </StackPanel>
+                </ScrollViewer>
             </filtration:DynamicCategoriesFilterControl.AdditionalContent>
         </filtration:DynamicCategoriesFilterControl>
     </Grid>
