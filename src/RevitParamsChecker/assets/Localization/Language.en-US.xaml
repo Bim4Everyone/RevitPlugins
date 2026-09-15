@@ -149,6 +149,14 @@ Previously selected checks are missing:
         x:Key="FiltrationPage.SaveFileDefaultName">Search Sets Configuration</system:String>
     <system:String
         x:Key="FiltrationPage.Error.CannotLoadFilters">Failed to load search sets</system:String>
+    <system:String
+        x:Key="FiltrationPage.MaterialsRootSetHeader">Element materials parameters filter criteria</system:String>
+    <system:String
+        x:Key="FiltrationPage.Error.ElementsFilter">Element parameters filter: {0}</system:String>
+    <system:String
+        x:Key="FiltrationPage.Error.MaterialsFilter">Element materials parameters filter: {0}</system:String>
+    <system:String
+        x:Key="B4E.Filtration.Ui.RootSetHeader">Element parameters filter criteria</system:String>
 
     <system:String
         x:Key="PageMenu.Tooltip.Load">Load</system:String>

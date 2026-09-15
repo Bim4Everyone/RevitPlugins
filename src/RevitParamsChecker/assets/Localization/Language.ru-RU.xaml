@@ -149,6 +149,14 @@
         x:Key="FiltrationPage.SaveFileDefaultName">Настройка поисковых наборов</system:String>
     <system:String
         x:Key="FiltrationPage.Error.CannotLoadFilters">Не удалось загрузить поисковые наборы</system:String>
+    <system:String
+        x:Key="FiltrationPage.MaterialsRootSetHeader">Критерии фильтрации по параметрам материалов элементов</system:String>
+    <system:String
+        x:Key="FiltrationPage.Error.ElementsFilter">Фильтр по параметрам элементов: {0}</system:String>
+    <system:String
+        x:Key="FiltrationPage.Error.MaterialsFilter">Фильтр по параметрам материалов элементов: {0}</system:String>
+    <system:String
+        x:Key="B4E.Filtration.Ui.RootSetHeader">Критерии фильтрации по параметрам элементов</system:String>
 
     <system:String
         x:Key="PageMenu.Tooltip.Load">Загрузить</system:String>

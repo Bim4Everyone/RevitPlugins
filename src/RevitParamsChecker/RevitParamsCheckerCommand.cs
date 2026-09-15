@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
-using Bim4Everyone.RevitFiltration.Controls;
 using Bim4Everyone.RevitFiltration.Ninject;
 
 using dosymep.Bim4Everyone;
@@ -62,8 +61,8 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.UseLogicalFilterFactory();
         kernel.UseLogicalFilterProviderFactory();
         kernel.UseFilterContextParser();
-        kernel.Bind<DataProvider>()
-            .ToMethod(c => new FilterDataProvider(c.Kernel.Get<RevitRepository>()).CreateDataProvider())
+        kernel.Bind<FilterDataProvider>()
+            .ToSelf()
             .InSingletonScope();
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()

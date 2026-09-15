@@ -7,6 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Windows.Input;
 
+using Autodesk.Revit.DB;
+
+using Bim4Everyone.RevitFiltration;
 using Bim4Everyone.RevitFiltration.Controls;
 
 using dosymep.SimpleServices;
@@ -21,8 +24,10 @@ namespace RevitParamsChecker.ViewModels.Filtration;
 internal class FiltrationPageViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly ILogicalFilterProviderFactory _filterProviderFactory;
+    private readonly ILogicalFilterFactory _filterFactory;
     private readonly IFilterContextParser _filterContextParser;
     private readonly DataProvider _dataProvider;
+    private readonly DataProvider _materialsDataProvider;
     private readonly FiltersRepository _filtersRepo;
     private readonly FiltersConverter _filtersConverter;
     private readonly NamesService _namesService;
@@ -38,8 +43,9 @@ internal class FiltrationPageViewModel : BaseViewModel {
         ISaveFileDialogService saveFileDialogService,
         IMessageBoxService messageBoxService,
         ILogicalFilterProviderFactory filterProviderFactory,
+        ILogicalFilterFactory filterFactory,
         IFilterContextParser filterContextParser,
-        DataProvider dataProvider,
+        FilterDataProvider dataProviderFactory,
         FiltersRepository filtersRepo,
         FiltersConverter filtersConverter,
         NamesService namesService) {
@@ -50,8 +56,14 @@ internal class FiltrationPageViewModel : BaseViewModel {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _filterProviderFactory =
             filterProviderFactory ?? throw new ArgumentNullException(nameof(filterProviderFactory));
+        _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
         _filterContextParser = filterContextParser ?? throw new ArgumentNullException(nameof(filterContextParser));
-        _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
+        if(dataProviderFactory is null) {
+            throw new ArgumentNullException(nameof(dataProviderFactory));
+        }
+
+        _dataProvider = dataProviderFactory.CreateDataProvider();
+        _materialsDataProvider = dataProviderFactory.CreateMaterialsDataProvider();
         _filtersRepo = filtersRepo ?? throw new ArgumentNullException(nameof(filtersRepo));
         _filtersConverter = filtersConverter ?? throw new ArgumentNullException(nameof(filtersConverter));
         _namesService = namesService ?? throw new ArgumentNullException(nameof(namesService));
@@ -104,7 +116,11 @@ internal class FiltrationPageViewModel : BaseViewModel {
             string newName = _namesService.CreateNewName(
                 _localization.GetLocalizedString("FiltersPage.NewFilterPrompt"),
                 Filters.Select(f => f.Name).ToArray());
-            var vm = new FilterViewModel(newName, GetFilterProvider());
+            var vm = new FilterViewModel(
+                newName,
+                GetFilterProvider(),
+                GetMaterialsFilterProvider(),
+                _filterContextParser);
             vm.PropertyChanged += OnFilterChanged;
             Filters.Add(vm);
             SelectedFilter = vm;
@@ -134,7 +150,9 @@ internal class FiltrationPageViewModel : BaseViewModel {
                 Filters.Select(f => f.Name).ToArray(),
                 filter.Name);
             var copyContext = GetFilterProvider(_filterContextParser.Serialize(filter.FilterProvider.GetFilter()));
-            var vm = new FilterViewModel(copyName, copyContext);
+            var copyMaterialsContext = GetMaterialsFilterProvider(
+                _filterContextParser.Serialize(filter.MaterialsFilterProvider.GetFilter()));
+            var vm = new FilterViewModel(copyName, copyContext, copyMaterialsContext, _filterContextParser);
             vm.PropertyChanged += OnFilterChanged;
             Filters.Add(vm);
             SelectedFilter = vm;
@@ -144,7 +162,9 @@ internal class FiltrationPageViewModel : BaseViewModel {
     }
 
     private bool CanCopyFilter(FilterViewModel filter) {
-        return filter is not null && filter.FilterProvider.CanGetFilter(out _);
+        return filter is not null
+               && filter.FilterProvider.CanGetFilter(out _)
+               && filter.MaterialsFilterProvider.CanGetFilter(out _);
     }
 
     private void RemoveFilters(IList items) {
@@ -166,7 +186,7 @@ internal class FiltrationPageViewModel : BaseViewModel {
     private void Save() {
         _filtersRepo.SetFilters(GetFilterModels(Filters));
         foreach(var vm in Filters) {
-            vm.Modified = false;
+            vm.AcceptChanges();
         }
 
         FiltersModified = false;
@@ -186,7 +206,18 @@ internal class FiltrationPageViewModel : BaseViewModel {
     private bool CanSave() {
         foreach(var vm in Filters) {
             if(!vm.FilterProvider.CanGetFilter(out var errors)) {
-                ErrorText = $"{vm.Name}: {errors.FirstOrDefault()?.Message}";
+                ErrorText = $"{vm.Name}: "
+                            + _localization.GetLocalizedString(
+                                "FiltrationPage.Error.ElementsFilter",
+                                errors.FirstOrDefault()?.Message ?? string.Empty);
+                return false;
+            }
+
+            if(!vm.MaterialsFilterProvider.CanGetFilter(out var materialsErrors)) {
+                ErrorText = $"{vm.Name}: "
+                            + _localization.GetLocalizedString(
+                                "FiltrationPage.Error.MaterialsFilter",
+                                materialsErrors.FirstOrDefault()?.Message ?? string.Empty);
                 return false;
             }
         }
@@ -198,7 +229,8 @@ internal class FiltrationPageViewModel : BaseViewModel {
     private Filter[] GetFilterModels(IEnumerable<FilterViewModel> filterViewModels) {
         return filterViewModels.Select(f => new Filter() {
                 Name = f.Name,
-                FilterContext = _filterContextParser.Serialize(f.FilterProvider.GetFilter())
+                FilterContext = _filterContextParser.Serialize(f.FilterProvider.GetFilter()),
+                MaterialsFilterContext = _filterContextParser.Serialize(f.MaterialsFilterProvider.GetFilter())
             })
             .ToArray();
     }
@@ -249,7 +281,11 @@ internal class FiltrationPageViewModel : BaseViewModel {
     }
 
     private FilterViewModel GetFilterViewModel(Filter filter) {
-        return new FilterViewModel(filter.Name, GetFilterProvider(filter.FilterContext)) { Modified = false };
+        return new FilterViewModel(
+            filter.Name,
+            GetFilterProvider(filter.FilterContext),
+            GetMaterialsFilterProvider(filter.MaterialsFilterContext),
+            _filterContextParser) { Modified = false };
     }
 
     private ILogicalFilterProvider GetFilterProvider(string serializedContext = "") {
@@ -263,5 +299,24 @@ internal class FiltrationPageViewModel : BaseViewModel {
         } else {
             return _filterProviderFactory.Create(_dataProvider);
         }
+    }
+
+    /// <summary>
+    /// Создает провайдер фильтра по параметрам материалов элементов.
+    /// </summary>
+    /// <param name="serializedContext">Сериализованный контекст фильтра.</param>
+    /// <remarks>
+    /// Если контекст не задан, либо его не удалось прочитать, создается провайдер с пустым набором правил.
+    /// </remarks>
+    private ILogicalFilterProvider GetMaterialsFilterProvider(string serializedContext = "") {
+        if(!string.IsNullOrWhiteSpace(serializedContext)
+           && _filterContextParser.TryParse(serializedContext, out var context)) {
+            return _filterProviderFactory.Create(_materialsDataProvider, context!);
+        }
+
+        return _filterProviderFactory.Create(
+            _materialsDataProvider,
+            _filterFactory.CreateAndFilter(),
+            [BuiltInCategory.OST_Materials]);
     }
 }
