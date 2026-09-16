@@ -273,4 +273,15 @@
     </system:String>
     <system:String x:Key="ToolTip.RoomAreaParamToolTip"> Numeric parameter whose value is output to the column with the room area without coefficient.</system:String>
     <system:String x:Key="ToolTip.RoomAreaCoefParamToolTip">Numeric parameter whose value is output to the column with the room area with coefficient.</system:String>
+    
+    <system:String x:Key="UtpCalculator.ValueYes">Yes</system:String>
+    <system:String x:Key="UtpCalculator.ValueNo">No</system:String>
+    <system:String x:Key="UtpCalculator.ErrorRoomNames">Room name error</system:String>
+    <system:String x:Key="UtpCalculator.ErrorNullAreas">Zero-area error</system:String>
+    
+    <system:String x:Key="UtpCalculator.ContourCheckEnum.Error">Contour error</system:String>
+    <system:String x:Key="UtpCalculator.ContourCheckEnum.YesCheck">Yes (verify)</system:String>
+    <system:String x:Key="UtpCalculator.ContourCheckEnum.Yes">Yes</system:String>
+    <system:String x:Key="UtpCalculator.ContourCheckEnum.NoCheck">No (verify)</system:String>
+    <system:String x:Key="UtpCalculator.ContourCheckEnum.No">No</system:String>
 </ResourceDictionary>
