@@ -51,6 +51,13 @@ internal class ViewPreparer {
         view.ThrowIfNull();
         mappingStepInFeet.ThrowIfLessOrEqualThan();
 
+        // Без активной подрезки CropBox возвращает габариты всей модели: количество шагов
+        // становится огромным, а изображение вырождается. Карту по такому виду строить нельзя
+        if(!view.CropBoxActive) {
+            throw new InvalidOperationException(
+                "Для анализа вида требуется включенная область подрезки (Crop View).");
+        }
+
         var viewMax = ProjectPointToViewPlan(view, view.CropBox.Max);
         var viewMin = ProjectPointToViewPlan(view, view.CropBox.Min);
 

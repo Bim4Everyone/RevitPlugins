@@ -137,8 +137,8 @@ internal class ViewMapService {
         // Проходим по всем SquareInfo в прямоугольнике
         for(int x = minX; x <= maxX; x++) {
             for(int y = minY; y <= maxY; y++) {
-                if(!mapInfo.Map[y, x].AllPixelsWhite) {
-                    // Нашли не белый квадрат
+                // Клетка за пределами карты считается занятой: там неизвестно, что на виде
+                if(!IsInsideMap(mapInfo, x, y) || !mapInfo.Map[y, x].AllPixelsWhite) {
                     return false;
                 }
             }
@@ -166,13 +166,41 @@ internal class ViewMapService {
         // Проходим по всем SquareInfo в прямоугольнике
         for(int x = minX; x <= maxX; x++) {
             for(int y = minY; y <= maxY; y++) {
-                if(!mapInfo.Map[y, x].AllPixelsWhite) {
-                    // Нашли не белый квадрат
+                // Клетка за пределами карты считается занятой: там неизвестно, что на виде
+                if(!IsInsideMap(mapInfo, x, y) || !mapInfo.Map[y, x].AllPixelsWhite) {
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    /// <summary>
+    /// Считает количество занятых квадратов в прямоугольнике между точками
+    /// </summary>
+    /// <remarks>Квадраты за пределами карты считаются занятыми - там неизвестно, что на виде</remarks>
+    public int CountOccupiedSquares(MapInfo mapInfo, XYZ point1, XYZ point2) {
+        mapInfo.ThrowIfNull();
+        point1.ThrowIfNull();
+        point2.ThrowIfNull();
+
+        (int indexX1, int indexY1) = GetMapIndexes(mapInfo, point1);
+        (int indexX2, int indexY2) = GetMapIndexes(mapInfo, point2);
+
+        int minX = Math.Min(indexX1, indexX2);
+        int maxX = Math.Max(indexX1, indexX2);
+        int minY = Math.Min(indexY1, indexY2);
+        int maxY = Math.Max(indexY1, indexY2);
+
+        int occupiedCount = 0;
+        for(int x = minX; x <= maxX; x++) {
+            for(int y = minY; y <= maxY; y++) {
+                if(!IsInsideMap(mapInfo, x, y) || !mapInfo.Map[y, x].AllPixelsWhite) {
+                    occupiedCount++;
+                }
+            }
+        }
+        return occupiedCount;
     }
 
     public (int indexX, int indexY) GetMapIndexes(MapInfo mapInfo, XYZ point) {
@@ -197,14 +225,22 @@ internal class ViewMapService {
         mapInfo.ThrowIfNull();
         point.ThrowIfNull();
 
-        var difVector = point - mapInfo.StartPointInRevit;
-        double x = difVector.X;
-        double y = difVector.Y;
+        (int indexX, int indexY) = GetMapIndexes(mapInfo, point);
 
-        int stepsForX = (int) Math.Floor(x / mapInfo.MappingStepInFeet);
-        int stepsForY = (int) Math.Floor(y / mapInfo.MappingStepInFeet);
+        // Клетка за пределами карты считается занятой
+        return IsInsideMap(mapInfo, indexX, indexY) && mapInfo.Map[indexY, indexX].AllPixelsWhite;
+    }
 
-        return mapInfo.Map[stepsForY, stepsForX].AllPixelsWhite;
+    /// <summary>
+    /// Проверяет, что индексы клетки лежат в пределах карты
+    /// </summary>
+    public bool IsInsideMap(MapInfo mapInfo, int indexX, int indexY) {
+        mapInfo.ThrowIfNull();
+
+        return indexX >= 0
+            && indexY >= 0
+            && indexY < mapInfo.Map.GetLength(0)
+            && indexX < mapInfo.Map.GetLength(1);
     }
 
 
@@ -226,7 +262,9 @@ internal class ViewMapService {
         // Проходим по всем SquareInfo в прямоугольнике
         for(int x = minX; x <= maxX; x++) {
             for(int y = minY; y <= maxY; y++) {
-                mapInfo.Map[y, x].AllPixelsWhite = false;
+                if(IsInsideMap(mapInfo, x, y)) {
+                    mapInfo.Map[y, x].AllPixelsWhite = false;
+                }
             }
         }
     }
@@ -248,7 +286,9 @@ internal class ViewMapService {
         // Проходим по всем SquareInfo в прямоугольнике
         for(int x = minX; x <= maxX; x++) {
             for(int y = minY; y <= maxY; y++) {
-                mapInfo.Map[y, x].AllPixelsWhite = false;
+                if(IsInsideMap(mapInfo, x, y)) {
+                    mapInfo.Map[y, x].AllPixelsWhite = false;
+                }
             }
         }
     }
@@ -263,13 +303,10 @@ internal class ViewMapService {
         mapInfo.ThrowIfNull();
         point.ThrowIfNull();
 
-        var difVector = point - mapInfo.StartPointInRevit;
-        double x = difVector.X;
-        double y = difVector.Y;
+        (int indexX, int indexY) = GetMapIndexes(mapInfo, point);
 
-        int stepsForX = (int) Math.Floor(x / mapInfo.MappingStepInFeet);
-        int stepsForY = (int) Math.Floor(y / mapInfo.MappingStepInFeet);
-
-        mapInfo.Map[stepsForY, stepsForX].AllPixelsWhite = false;
+        if(IsInsideMap(mapInfo, indexX, indexY)) {
+            mapInfo.Map[indexY, indexX].AllPixelsWhite = false;
+        }
     }
 }
