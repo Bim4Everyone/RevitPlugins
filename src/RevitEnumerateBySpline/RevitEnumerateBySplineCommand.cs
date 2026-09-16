@@ -13,8 +13,11 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitEnumerateBySpline.Models;
+using RevitEnumerateBySpline.Providers;
 using RevitEnumerateBySpline.ViewModels;
 using RevitEnumerateBySpline.Views;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitEnumerateBySpline;
 
@@ -30,7 +33,7 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitEnumerateBySplineCommand() {
-        PluginName = "RevitEnumerateBySpline";
+        PluginName = "Нумератор по линии";
     }
 
     /// <summary>
@@ -53,6 +56,11 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+        
+        // Настройка доступа к провайдеру по навигации страниц
+        kernel.Bind<INavigationViewPageProvider>()
+            .To<NavigationViewPageProvider>()
+            .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
