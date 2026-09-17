@@ -3,10 +3,27 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:RevitEnumerateBySpline.Views.Pages"
+      xmlns:controls="clr-namespace:RevitEnumerateBySpline.Views.Controls"
+      xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d"
       Title="CommonSettingsPage" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+    
+    <ScrollViewer
+        Margin="10,0,10,0"
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+                <controls:LabeledControl
+                    Icon="{ui:SymbolIcon fullScreenMaximize24}"
+                    Header="{me:LocalizationSource CommonSettingsPage.RangeElements}"
+                    Description="{me:LocalizationSource CommonSettingsPage.RangeElementsDescription}">
+                        <controls:ModeSwitcherControl                        
+                            DisplayMemberPath="Name"
+                            SelectedItem="{Binding SelectedRange}"
+                            ItemsSource="{Binding Range}" />
+                </controls:LabeledControl>
+            </StackPanel>
+    </ScrollViewer>       
+    
 </Page>
