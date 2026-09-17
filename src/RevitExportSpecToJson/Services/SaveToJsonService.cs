@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 
 using Autodesk.Revit.DB;
@@ -39,6 +40,8 @@ internal sealed class SaveToJsonService : ISaveToJsonService {
 
             var elements = GetElements(schedule.ViewSchedule);
             var jsonSchedule = new JObject {
+                ["time_stamp"] = DateTimeOffset.Now.ToString("o", CultureInfo.InvariantCulture),
+                ["document_name"] = _revitRepository.GetDocumentName(),
                 ["schedule_name"] = schedule.Name,
                 ["schedule_type"] = schedule.TypeSchedule,
                 ["elements"] = elements

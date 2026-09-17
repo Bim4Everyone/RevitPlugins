@@ -72,8 +72,6 @@ public class RevitExportSpecToJsonCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-
-
         var localization = kernel.Get<ILocalizationService>();
 
         kernel.UseWpfUIProgressDialog<MainViewModel>(
@@ -83,7 +81,6 @@ public class RevitExportSpecToJsonCommand : BasePluginCommand {
         kernel.UseWpfOpenFolderDialog<MainViewModel>(
             title: localization.GetLocalizedString("OpenFolderDialog.Title"),
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
-        
         
         kernel.Bind<ISaveToJsonService>()
             .To<SaveToJsonService>()

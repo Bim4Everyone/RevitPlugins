@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -57,6 +58,20 @@ internal class RevitRepository {
             .Select(viewSchedule => new Schedule(viewSchedule) { Status = GetStatus(viewSchedule) })
             .OrderBy(item => item.Status)
             .ThenBy(item => item.Name, new NamingComparator());
+    }
+
+    public string GetDocumentName() {
+        if(Document.IsWorkshared) {
+            string visiblePath = ModelPathUtils.ConvertModelPathToUserVisiblePath(Document.GetWorksharingCentralModelPath());
+            return Path.GetFileName(visiblePath);
+        }
+
+        if(Document.IsModelInCloud) {
+            string visiblePath = ModelPathUtils.ConvertModelPathToUserVisiblePath(Document.GetCloudModelPath());
+            return Path.GetFileName(visiblePath);
+        }
+        
+        return Path.GetFileName(Document.PathName);
     }
 
     private ScheduleStatus GetStatus(ViewSchedule viewSchedule) {
