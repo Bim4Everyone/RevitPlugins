@@ -5,7 +5,6 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
-using dosymep.WPF.Extensions;
 using dosymep.Revit;
 
 using RevitDeclarations.ViewModels;
@@ -28,10 +27,10 @@ internal class UtpCalculator {
     private readonly bool _hasBannedNames;
     private readonly IEnumerable<ElementId> _roomsWithBathFamily;
 
-    private const string _utpYes = "Да";
-    private const string _utpNo = "Нет";
-    private const string _utpNamesError = "Ошибка имен помещений";
-    private const string _utpNullAreasError = "Ошибка нулевых площадей";
+    private readonly string _utpYes;
+    private readonly string _utpNo;
+    private readonly string _utpNamesError;
+    private readonly string _utpNullAreasError;
 
     public UtpCalculator(ApartmentsProject project, DeclarationSettings settings, ILocalizationService localizationService) {
         _project = project;
@@ -45,6 +44,11 @@ internal class UtpCalculator {
         _priorities = _settings.PrioritiesConfig;
 
         _roomConnectionAnalyzer = new RoomConnectionAnalyzer(project, _priorities);
+        
+        _utpYes = localizationService.GetLocalizedString("UtpCalculator.ValueYes");
+        _utpNo = localizationService.GetLocalizedString("UtpCalculator.ValueNo");
+        _utpNamesError = localizationService.GetLocalizedString("UtpCalculator.ErrorRoomNames");
+        _utpNullAreasError = localizationService.GetLocalizedString("UtpCalculator.ErrorNullAreas");
     }
 
     public void CalculateRoomsForUtp() {
@@ -52,18 +56,18 @@ internal class UtpCalculator {
     }
 
     public IReadOnlyCollection<WarningViewModel> CheckProjectForUtp() {
-        var areaErrorListVM = new WarningViewModel(_localizationService) {
+        var areaErrorListVm = new WarningViewModel(_localizationService) {
             WarningType = _localizationService.GetLocalizedString("WarningWindow.Warning"),
             Description = _localizationService.GetLocalizedString("WarningWindow.NullAreas"),
             DocumentName = _project.Document.Name
         };
 
         if(_hasNullAreas) {
-            areaErrorListVM.Elements.Add(new WarningElementViewModel(_project.Document.Name,
+            areaErrorListVm.Elements.Add(new WarningElementViewModel(_project.Document.Name,
                 _localizationService.GetLocalizedString("WarningWindow.NullAreasInfo")));
         }
 
-        var namesErrorListVM = new WarningViewModel(_localizationService) {
+        var namesErrorListVm = new WarningViewModel(_localizationService) {
             WarningType = _localizationService.GetLocalizedString("WarningWindow.Warning"),
             Description = _localizationService.GetLocalizedString("WarningsWindow.RoomNameErrors"),
             DocumentName = _project.Document.Name
@@ -72,22 +76,22 @@ internal class UtpCalculator {
         if(_hasBannedNames) {
             string names = string.Join(",", GetBannedUtpRoomNames());
 
-            namesErrorListVM.Elements.Add(new WarningElementViewModel(_project.Document.Name,
+            namesErrorListVm.Elements.Add(new WarningElementViewModel(_project.Document.Name,
                 _localizationService.GetLocalizedString("WarningsWindow.RoomNameErrorsInfo", names)));
         }
 
-        var bathesErrorListVM = new WarningViewModel(_localizationService) {
+        var bathesErrorListVm = new WarningViewModel(_localizationService) {
             WarningType = _localizationService.GetLocalizedString("WarningWindow.Warning"),
             Description = _localizationService.GetLocalizedString("WarningsWindow.BathErrors"),
             DocumentName = _project.Document.Name
         };
 
         if(_project.GetBathInstances().Count == 0) {
-            bathesErrorListVM.Elements.Add(new WarningElementViewModel(_project.Document.Name,
+            bathesErrorListVm.Elements.Add(new WarningElementViewModel(_project.Document.Name,
                 _localizationService.GetLocalizedString("WarningsWindow.BathErrorsInfo")));
         }
 
-        return [areaErrorListVM, namesErrorListVM, bathesErrorListVM];
+        return [areaErrorListVm, namesErrorListVm, bathesErrorListVm];
     }
 
     // УТП Хайфлет.
@@ -104,7 +108,7 @@ internal class UtpCalculator {
 
     // УТП Две ванны.
     // В квартире две и более ванны (или душевые) в разных помещениях санузлов.
-    // Помещения санузлов, которые относятся к мастер-спальням не учитываются.
+    // Помещения санузлов, которые относятся к мастер-спальням, не учитываются.
     public string CalculateTwoBathes(Apartment apartment) {
         if(_hasBannedNames) {
             return _utpNamesError;
@@ -179,16 +183,15 @@ internal class UtpCalculator {
         var summerRevitRooms = summerRooms.Select(x => x.RevitRoom).ToList();
 
         return summerRooms.Any()
-            ? ContourChecker
-                .CheckAnyRoomSizes(summerRevitRooms, _settings.AccuracyForArea, 0, _minBalconyDepth)
-                .GetDescription()
+            ? GetLocalizedDescription(ContourChecker
+                .CheckAnyRoomSizes(summerRevitRooms, _settings.AccuracyForArea, 0, _minBalconyDepth))
             : _utpNo;
     }
 
     // УТП Гардеробная.
     // Наличие в квартире минимум одного помещения с именем "Гардеробная".
     // Одна сторона помещения должна быть не менее 1000 мм, площадь от 1,8 м2.
-    // Помещения, которые связаны дверью с жилой комнатой не учитываются.
+    // Помещения, которые связаны дверью с жилой комнатой, не учитываются.
     public string CalculatePantry(Apartment apartment) {
         if(_hasNullAreas) {
             return _utpNullAreasError;
@@ -205,9 +208,8 @@ internal class UtpCalculator {
             .ToList();
 
         return pantriesWithoutBedrooms.Any()
-            ? ContourChecker
-                .CheckAnyRoomSizes(pantriesWithoutBedrooms, _settings.AccuracyForArea, _minPantryDepth)
-                .GetDescription()
+            ? GetLocalizedDescription(ContourChecker
+                .CheckAnyRoomSizes(pantriesWithoutBedrooms, _settings.AccuracyForArea, _minPantryDepth))
             : _utpNo;
     }
 
@@ -250,12 +252,15 @@ internal class UtpCalculator {
 
         return hasBalconyWithoutGlazing ? _utpYes : _utpNo;
     }
+    
+    private string GetLocalizedDescription(ContourCheckEnum contourCheckEnum) {
+        return _localizationService.GetLocalizedString($"UtpCalculator.ContourCheckEnum.{contourCheckEnum}"); 
+    }
 
     private bool CheckUtpNullAreas() {
         return _project
             .Rooms
-            .Where(x => x.AreaRevit < 0.1)
-            .Any();
+            .Any(x => x.AreaRevit < 0.1);
     }
 
     private IEnumerable<string> GetBannedUtpRoomNames() {

@@ -273,4 +273,15 @@
     </system:String>
     <system:String x:Key="ToolTip.RoomAreaParamToolTip">Числовой параметр, значение которого выводится в столбец с площадью помещения без коэффициента.</system:String>
     <system:String x:Key="ToolTip.RoomAreaCoefParamToolTip">Числовой параметр, значение которого выводится в столбец с площадью помещения с коэффициентом.</system:String>
+    
+    <system:String x:Key="UtpCalculator.ValueYes">Да</system:String>
+    <system:String x:Key="UtpCalculator.ValueNo">Нет</system:String>
+    <system:String x:Key="UtpCalculator.ErrorRoomNames">Ошибка имен помещений</system:String>
+    <system:String x:Key="UtpCalculator.ErrorNullAreas">Ошибка нулевых площадей</system:String>
+    
+    <system:String x:Key="UtpCalculator.ContourCheckEnum.Error">Ошибка контура</system:String>
+    <system:String x:Key="UtpCalculator.ContourCheckEnum.YesCheck">Да (проверить)</system:String>
+    <system:String x:Key="UtpCalculator.ContourCheckEnum.Yes">Да</system:String>
+    <system:String x:Key="UtpCalculator.ContourCheckEnum.NoCheck">Нет (проверить)</system:String>
+    <system:String x:Key="UtpCalculator.ContourCheckEnum.No">Нет</system:String>
 </ResourceDictionary>
