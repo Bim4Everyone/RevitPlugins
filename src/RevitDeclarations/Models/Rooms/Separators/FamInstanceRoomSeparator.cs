@@ -1,7 +1,7 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
-namespace RevitDeclarations.Models;
+namespace RevitDeclarations.Models.Rooms.Separators;
 internal class FamInstanceRoomSeparator : RoomSeparator {
     public FamInstanceRoomSeparator(ApartmentsProject project, FamilyInstance door) {
         AddRoom(door.get_FromRoom(project.Phase));

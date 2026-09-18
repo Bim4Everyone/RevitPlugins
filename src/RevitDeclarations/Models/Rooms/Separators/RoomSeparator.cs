@@ -6,9 +6,9 @@ using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Revit;
 
-namespace RevitDeclarations.Models;
+namespace RevitDeclarations.Models.Rooms.Separators;
 internal abstract class RoomSeparator {
-    public List<Room> Rooms { get; set; } = [];
+    public List<Room> Rooms { get; } = [];
 
     public bool CheckIsValid() {
         return Rooms.Count > 1;
@@ -16,7 +16,6 @@ internal abstract class RoomSeparator {
 
     public Room GetRoom(RoomPriority priority) {
         return Rooms
-            .Where(x => priority.CheckName(x.GetParamValue<string>(BuiltInParameter.ROOM_NAME)))
-            .FirstOrDefault();
+            .FirstOrDefault(x => priority.CheckName(x.GetParamValue<string>(BuiltInParameter.ROOM_NAME)));
     }
 }
