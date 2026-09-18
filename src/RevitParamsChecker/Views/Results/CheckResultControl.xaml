@@ -68,10 +68,19 @@
             VerticalScrollBarVisibility="Disabled">
             <DockPanel
                 LastChildFill="True">
-                <Label
+                <StackPanel
                     DockPanel.Dock="Top"
-                    FontSize="{StaticResource HeaderLabelFontSize}"
-                    Content="{Binding Name}" />
+                    Orientation="Horizontal">
+                    <Label
+                        FontSize="{StaticResource HeaderLabelFontSize}"
+                        Content="{Binding Name}" />
+                    <ui:Button
+                        Margin="8 0 0 0"
+                        VerticalAlignment="Center"
+                        ToolTip="{me:LocalizationSource ResultsPage.ExportReportTooltip}"
+                        Command="{Binding ExportReportCommand}"
+                        Content="{ui:SymbolIcon Symbol=ArrowExportUp20}" />
+                </StackPanel>
                 <DockPanel
                     Margin="0 0 0 4"
                     Dock="Top">
@@ -150,7 +159,6 @@
                                         Height="20"
                                         Width="6"
                                         VerticalAlignment="Center"
-                                        ToolTip="{Binding ElementResult.Error}"
                                         Fill="{Binding ElementResult.Status, Converter={StaticResource StatusToColorConverter}}">
                                     </Rectangle>
                                 </DataTemplate>
@@ -197,6 +205,17 @@
                             <DataGridTextColumn.Header>
                                 <ui:TextBlock
                                     Text="{DynamicResource ResultsPage.FileNameHeader}" />
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            MinWidth="50"
+                            Width="250"
+                            IsReadOnly="True"
+                            Binding="{Binding Info}">
+                            <DataGridTextColumn.Header>
+                                <ui:TextBlock
+                                    Text="{DynamicResource ResultsPage.DescriptionHeader}" />
                             </DataGridTextColumn.Header>
                         </DataGridTextColumn>
                     </ui:DataGrid.Columns>

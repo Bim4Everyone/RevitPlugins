@@ -137,6 +137,19 @@ Previously selected checks are missing:
         x:Key="ResultsPage.UserMarkHeader">Marks</system:String>
     <system:String
         x:Key="ResultsPage.ElementsSearchPlaceholder">Search</system:String>
+    <system:String
+        x:Key="ResultsPage.DescriptionHeader">Description</system:String>
+    <system:String
+        x:Key="ResultsPage.ExportReportTooltip">Export report</system:String>
+
+    <system:String
+        x:Key="HtmlReport.Title">Report: {0}</system:String>
+    <system:String
+        x:Key="HtmlReport.IdHeader">Id</system:String>
+    <system:String
+        x:Key="HtmlReport.GroupHeader">{0}: {1} - {2} items</system:String>
+    <system:String
+        x:Key="HtmlReport.GroupHeaderNoProperty">{0} - {1} items</system:String>
 
     <system:String
         x:Key="GroupsEditor.Label">Grouping</system:String>

@@ -16,6 +16,9 @@ using RevitParamsChecker.Services;
 namespace RevitParamsChecker.ViewModels.Rules;
 
 internal class RulesPageViewModel : BaseViewModel {
+    private const string _jsonFilter = "JSON files (*.json)|*.json";
+    private const string _jsonExtension = ".json";
+
     private readonly ILocalizationService _localization;
     private readonly RulesRepository _rulesRepo;
     private readonly RulesConverter _rulesConverter;
@@ -192,6 +195,8 @@ internal class RulesPageViewModel : BaseViewModel {
     }
 
     private void Export() {
+        SaveFileDialogService.Filter = _jsonFilter;
+        SaveFileDialogService.DefaultExt = _jsonExtension;
         if(SaveFileDialogService.ShowDialog(
                _dirPath,
                _localization.GetLocalizedString("RulesPage.SaveFileDefaultName"))) {

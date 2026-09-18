@@ -137,6 +137,19 @@
         x:Key="ResultsPage.UserMarkHeader">Пометки</system:String>
     <system:String
         x:Key="ResultsPage.ElementsSearchPlaceholder">Поиск</system:String>
+    <system:String
+        x:Key="ResultsPage.DescriptionHeader">Описание</system:String>
+    <system:String
+        x:Key="ResultsPage.ExportReportTooltip">Экспорт отчета</system:String>
+
+    <system:String
+        x:Key="HtmlReport.Title">Отчет: {0}</system:String>
+    <system:String
+        x:Key="HtmlReport.IdHeader">Id</system:String>
+    <system:String
+        x:Key="HtmlReport.GroupHeader">{0}: {1} - {2} элементов</system:String>
+    <system:String
+        x:Key="HtmlReport.GroupHeaderNoProperty">{0} - {1} элементов</system:String>
 
     <system:String
         x:Key="GroupsEditor.Label">Группировка</system:String>

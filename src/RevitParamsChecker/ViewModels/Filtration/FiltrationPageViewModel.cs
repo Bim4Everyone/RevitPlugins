@@ -22,6 +22,9 @@ using RevitParamsChecker.Services;
 namespace RevitParamsChecker.ViewModels.Filtration;
 
 internal class FiltrationPageViewModel : BaseViewModel {
+    private const string _jsonFilter = "JSON files (*.json)|*.json";
+    private const string _jsonExtension = ".json";
+
     private readonly ILocalizationService _localization;
     private readonly ILogicalFilterProviderFactory _filterProviderFactory;
     private readonly ILogicalFilterFactory _filterFactory;
@@ -193,6 +196,8 @@ internal class FiltrationPageViewModel : BaseViewModel {
     }
 
     private void Export() {
+        SaveFileDialogService.Filter = _jsonFilter;
+        SaveFileDialogService.DefaultExt = _jsonExtension;
         if(SaveFileDialogService.ShowDialog(
                _dirPath,
                _localization.GetLocalizedString("FiltrationPage.SaveFileDefaultName"))) {
