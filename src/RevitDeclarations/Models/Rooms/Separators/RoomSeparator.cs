@@ -8,7 +8,7 @@ using dosymep.Revit;
 
 namespace RevitDeclarations.Models.Rooms.Separators;
 internal abstract class RoomSeparator {
-    protected List<Room> Rooms { get; } = [];
+    public List<Room> Rooms { get; } = [];
 
     public bool CheckIsValid() {
         return Rooms.Count > 1;
