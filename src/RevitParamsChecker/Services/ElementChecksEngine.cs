@@ -23,9 +23,10 @@ internal class ElementChecksEngine : ChecksEngine {
 
     protected override ElementResult EvaluateElement(ElementModel element, Rule rule) {
         try {
-            bool success = rule.RootRule.Evaluate(element.Element);
-            var status = success ? StatusCode.Valid : StatusCode.Invalid;
-            return new ElementResult(element, status, rule.Name);
+            var result = rule.RootRule.Evaluate(element.Element);
+            return result.Success
+                ? new ElementResult(element, StatusCode.Valid, rule.Name)
+                : new ElementResult(element, StatusCode.Invalid, rule.Name, FormatFailures(result.Failures));
         } catch(ParamNotFoundException exParam) {
             return new ElementResult(
                 element,

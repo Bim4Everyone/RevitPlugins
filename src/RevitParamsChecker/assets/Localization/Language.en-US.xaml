@@ -22,6 +22,14 @@
         x:Key="Exceptions.MaterialParamNotFound">Material parameter missing: {0}</system:String>
     <system:String
         x:Key="Exceptions.NoMaterials">Element has no materials</system:String>
+    <system:String
+        x:Key="Results.InvalidParam">{0}: {1}, expected {2} "{3}"</system:String>
+    <system:String
+        x:Key="Results.InvalidParamNoValue">{0}: {1}, expected {2}</system:String>
+    <system:String
+        x:Key="Results.ActualValue">value is "{0}"</system:String>
+    <system:String
+        x:Key="Results.EmptyValue">value is empty</system:String>
 
     <system:String
         x:Key="NamesSelectionDialog.NamesHeader">Name</system:String>

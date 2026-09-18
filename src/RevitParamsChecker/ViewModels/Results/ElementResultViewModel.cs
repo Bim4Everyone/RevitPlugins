@@ -21,7 +21,7 @@ internal class ElementResultViewModel : BaseViewModel {
         FileName = ElementResult.ElementModel.Element.Document.Title;
         FamilyTypeName = ElementResult.ElementModel.Element.Name ?? string.Empty;
         Status = _localization.GetLocalizedString($"{nameof(StatusCode)}.{ElementResult.Status}");
-        Error = ElementResult.Error;
+        Info = ElementResult.Info;
         RuleName = ElementResult.RuleName;
         CategoryName = ElementResult.ElementModel.Element.Category?.Name ?? string.Empty;
     }
@@ -46,7 +46,7 @@ internal class ElementResultViewModel : BaseViewModel {
 
     public string Status { get; }
 
-    public string Error { get; }
+    public string Info { get; }
 
     public string RuleName { get; }
 

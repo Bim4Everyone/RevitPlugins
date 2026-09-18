@@ -15,7 +15,7 @@ internal class LogicalRule : ValidationRule {
 
     public LogicalOperator Operator { get; set; } = new AndOperator();
 
-    public override bool Evaluate(Element element) {
+    public override EvaluationResult Evaluate(Element element) {
         if(ChildRules is null) {
             throw new InvalidOperationException($"Перед вызовом метода надо назначить {nameof(ChildRules)}");
         }
@@ -24,7 +24,12 @@ internal class LogicalRule : ValidationRule {
             throw new InvalidOperationException($"Перед вызовом метода надо назначить {nameof(Operator)}");
         }
 
-        return Operator.Combine(ChildRules.Select(r => r.Evaluate(element)));
+        var results = ChildRules.Select(r => r.Evaluate(element)).ToArray();
+        if(Operator.Combine(results.Select(r => r.Success))) {
+            return EvaluationResult.CreateSuccessResult();
+        }
+
+        return EvaluationResult.CreateUnsuccessResult([.. results.Where(r => !r.Success).SelectMany(r => r.Failures)]);
     }
 
     public override ValidationRule Copy() {

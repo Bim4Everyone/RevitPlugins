@@ -20,7 +20,7 @@ internal class ParameterRule : ValidationRule {
 
     public ComparisonOperator Operator { get; set; } = new EqualsOperator();
 
-    public override bool Evaluate(Element element) {
+    public override EvaluationResult Evaluate(Element element) {
         if(string.IsNullOrWhiteSpace(ParameterName)) {
             throw new InvalidOperationException($"Перед вызовом метода необходимо назначить {nameof(ParameterName)}");
         }
@@ -40,7 +40,10 @@ internal class ParameterRule : ValidationRule {
         var parameter = element.GetParam(ParameterName);
         string actualValue = GetParamActualValue(parameter);
 
-        return Operator.Evaluate(actualValue, ExpectedValue);
+        return Operator.Evaluate(actualValue, ExpectedValue)
+            ? EvaluationResult.CreateSuccessResult()
+            : EvaluationResult.CreateUnsuccessResult(
+                [new ParameterFailure(ParameterName, actualValue, Operator, ExpectedValue)]);
     }
 
     public override ValidationRule Copy() {

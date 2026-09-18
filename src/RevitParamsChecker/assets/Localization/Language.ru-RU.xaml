@@ -22,6 +22,14 @@
         x:Key="Exceptions.MaterialParamNotFound">Параметр материала отсутствует: {0}</system:String>
     <system:String
         x:Key="Exceptions.NoMaterials">У элемента нет материалов</system:String>
+    <system:String
+        x:Key="Results.InvalidParam">{0}: {1}, ожидается {2} "{3}"</system:String>
+    <system:String
+        x:Key="Results.InvalidParamNoValue">{0}: {1}, ожидается {2}</system:String>
+    <system:String
+        x:Key="Results.ActualValue">значение "{0}"</system:String>
+    <system:String
+        x:Key="Results.EmptyValue">значение пустое</system:String>
 
     <system:String
         x:Key="NamesSelectionDialog.NamesHeader">Название</system:String>

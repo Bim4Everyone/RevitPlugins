@@ -35,25 +35,26 @@ internal class MaterialChecksEngine : ChecksEngine {
         }
 
         StatusCode status = StatusCode.Valid;
-        string error = string.Empty;
+        string info = string.Empty;
         foreach(var material in materials) {
             try {
-                bool success = rule.RootRule.Evaluate(material);
-                if(!success) {
+                var result = rule.RootRule.Evaluate(material);
+                if(!result.Success) {
                     status = StatusCode.Invalid;
+                    info = FormatFailures(result.Failures);
                     break;
                 }
             } catch(ParamNotFoundException exParam) {
                 status = StatusCode.ParamNotFound;
-                error = _localization.GetLocalizedString("Exceptions.MaterialParamNotFound", exParam.Message);
+                info = _localization.GetLocalizedString("Exceptions.MaterialParamNotFound", exParam.Message);
                 break;
             } catch(Autodesk.Revit.Exceptions.ApplicationException exRevit) {
                 status = StatusCode.Error;
-                error = exRevit.Message;
+                info = exRevit.Message;
                 break;
             }
         }
 
-        return new ElementResult(element, status, rule.Name, error);
+        return new ElementResult(element, status, rule.Name, info);
     }
 }
