@@ -44,11 +44,11 @@ td.status{width:8px;padding:0;border-left:none;border-right:none}
 ";
 
     private readonly ILocalizationService _localization;
-    private string _dirPath;
+    private readonly ReportExportConfig _config;
 
-    public HtmlReportExportService(ILocalizationService localization) {
+    public HtmlReportExportService(ILocalizationService localization, ReportExportConfig config) {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-        _dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        _config = config ?? throw new ArgumentNullException(nameof(config));
     }
 
     /// <inheritdoc/>
@@ -61,15 +61,15 @@ td.status{width:8px;padding:0;border-left:none;border-right:none}
             throw new ArgumentNullException(nameof(checkResult));
         }
 
-        // сервис диалога сохранения один на весь плагин, фильтр надо задавать перед каждым показом
         saveFileDialogService.Filter = _filter;
         saveFileDialogService.DefaultExt = _extension;
-        if(!saveFileDialogService.ShowDialog(_dirPath, GetDefaultFileName(checkResult.Name))) {
+        if(!saveFileDialogService.ShowDialog(_config.DirPath, GetDefaultFileName(checkResult.Name))) {
             return;
         }
 
         WriteFile(saveFileDialogService.File.FullName, checkResult);
-        _dirPath = saveFileDialogService.File.DirectoryName;
+        _config.DirPath = saveFileDialogService.File.DirectoryName;
+        _config.SaveProjectConfig();
     }
 
     private string GetDefaultFileName(string title) {
@@ -81,11 +81,8 @@ td.status{width:8px;padding:0;border-left:none;border-right:none}
     }
 
     private void WriteFile(string path, CheckResultViewModel checkResult) {
-        // пишем во временный файл, чтобы при ошибке посреди записи
-        // не оставить пользователю наполовину сгенерированный отчет
         string tempPath = path + ".tmp";
         try {
-            // StreamWriter по умолчанию пишет в utf-8 без BOM
             using(var writer = new StreamWriter(tempPath)) {
                 Write(checkResult, writer);
             }
@@ -145,10 +142,18 @@ td.status{width:8px;padding:0;border-left:none;border-right:none}
         }
 
         foreach(var group in view.Groups.OfType<CollectionViewGroup>()) {
-            WriteGroup(group, 1, visibleLevels, context, writer);
+            WriteGroup(group, 0, visibleLevels, context, writer);
         }
     }
 
+    /// <summary>
+    /// Записывает группу элементов и все вложенные в нее группы
+    /// </summary>
+    /// <param name="group">Группа элементов</param>
+    /// <param name="level">Индекс текущего уровня группировки, начинается с 0</param>
+    /// <param name="visibleLevels">Общее количество уровней группировки, которые надо показать в отчете</param>
+    /// <param name="context">Данные отчета</param>
+    /// <param name="writer">Поток записи отчета</param>
     private void WriteGroup(
         CollectionViewGroup group,
         int level,
@@ -158,7 +163,7 @@ td.status{width:8px;padding:0;border-left:none;border-right:none}
         writer.Write("<details><summary>");
         writer.Write(GetGroupHeader(group, level, context));
         writer.WriteLine("</summary>");
-        if(level >= visibleLevels) {
+        if(level >= visibleLevels - 1) {
             // самый глубокий видимый уровень: пишем все элементы поддерева одной таблицей,
             // тем самым схлопывая служебный уровень частей
             WriteTable(GetLeafElements(group), context, writer);
@@ -171,6 +176,12 @@ td.status{width:8px;padding:0;border-left:none;border-right:none}
         writer.WriteLine("</details>");
     }
 
+    /// <summary>
+    /// Возвращает готовый заголовок группы для тега summary
+    /// </summary>
+    /// <param name="group">Группа элементов</param>
+    /// <param name="level">Номер уровня группировки, нумерация начинается с 0</param>
+    /// <param name="context">Данные отчета</param>
     private string GetGroupHeader(CollectionViewGroup group, int level, HtmlReportContext context) {
         string value = HttpUtility.HtmlEncode(group.Name?.ToString() ?? string.Empty);
         string propertyName = GetGroupPropertyName(context.CheckResult, level);
@@ -180,15 +191,22 @@ td.status{width:8px;padding:0;border-left:none;border-right:none}
                 context.GroupHeaderFormat, HttpUtility.HtmlEncode(propertyName), value, group.ItemCount);
     }
 
+    /// <summary>
+    /// Возвращает название свойства, по которому сгруппированы элементы на заданном уровне,
+    /// или null, если на этом уровне его определить нельзя
+    /// </summary>
+    /// <param name="checkResult">Результат проверки</param>
+    /// <param name="level">Номер уровня группировки, нумерация начинается с 0</param>
     private string GetGroupPropertyName(CheckResultViewModel checkResult, int level) {
         var groupDescriptions = checkResult.GroupingProperties.GroupDescriptions;
         // пользователь мог поменять комбобоксы, не применив изменения,
         // тогда настройки группировки и само представление временно рассинхронизированы
-        if(level < 1 || level > groupDescriptions.Count) {
+        if(level < 0
+           || level >= groupDescriptions.Count) {
             return null;
         }
 
-        return groupDescriptions[level - 1].SelectedProperty?.DisplayName;
+        return groupDescriptions[level].SelectedProperty?.DisplayName;
     }
 
     /// <summary>

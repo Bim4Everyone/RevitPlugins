@@ -176,6 +176,9 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.Bind<CheckResultsRepository>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.Bind<ReportExportConfig>()
+            .ToMethod(c => ReportExportConfig.GetConfig(c.Kernel.Get<JsonSerializationService>()));
     }
 
     private void BindConverters(IKernel kernel) {

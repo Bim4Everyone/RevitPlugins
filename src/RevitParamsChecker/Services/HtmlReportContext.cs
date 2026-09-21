@@ -9,7 +9,7 @@ using RevitParamsChecker.ViewModels.Results;
 namespace RevitParamsChecker.Services;
 
 /// <summary>
-/// Данные html отчета, которые считаются один раз и нужны на всем протяжении записи
+/// Данные html отчета, которые нужны на всем протяжении записи
 /// </summary>
 internal class HtmlReportContext {
     public HtmlReportContext(CheckResultViewModel checkResult, ILocalizationService localization) {
@@ -33,9 +33,6 @@ internal class HtmlReportContext {
 
     public string GroupHeaderNoPropertyFormat { get; }
 
-    /// <summary>
-    /// Готовая строка заголовка таблицы: она одинакова для всех групп
-    /// </summary>
     public string TableHeader { get; }
 
     /// <summary>
@@ -43,9 +40,10 @@ internal class HtmlReportContext {
     /// </summary>
     public IReadOnlyDictionary<string, string> RuleAnchors { get; }
 
+    /// <summary>
+    /// Создает html якорь правила по его индексу
+    /// </summary>
     public string GetRuleAnchor(int index) {
-        // якорь по индексу, а не по имени: имена правил могут повторяться
-        // и содержать символы, недопустимые в идентификаторе html
         return $"rule-{index}";
     }
 
@@ -65,12 +63,14 @@ internal class HtmlReportContext {
         return "<th>" + HttpUtility.HtmlEncode(localization.GetLocalizedString(localizationKey)) + "</th>";
     }
 
+    /// <summary>
+    /// Создает словарь с именами правил и их html якорями на эти правила по id
+    /// </summary>
     private IReadOnlyDictionary<string, string> GetRuleAnchors(CheckResultViewModel checkResult) {
-        var anchors = new Dictionary<string, string>(StringComparer.Ordinal);
+        var anchors = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
         int index = 0;
         foreach(var rule in checkResult.RulesStamp) {
             string name = rule.Name ?? string.Empty;
-            // при дубликатах имен выигрывает первое правило, как и в SelectedElementResult
             if(!anchors.ContainsKey(name)) {
                 anchors.Add(name, GetRuleAnchor(index));
             }
