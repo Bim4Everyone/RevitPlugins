@@ -10,6 +10,7 @@ using RevitParamsChecker.Models.Filtration;
 using RevitParamsChecker.Models.Results;
 using RevitParamsChecker.Models.Revit;
 using RevitParamsChecker.Models.Rules;
+using RevitParamsChecker.Models.Rules.ComparisonOperators;
 
 namespace RevitParamsChecker.Services;
 
@@ -58,6 +59,31 @@ internal abstract class ChecksEngine {
     }
 
     protected abstract ElementResult EvaluateElement(ElementModel element, Rule rule);
+
+    protected string FormatFailures(ICollection<ParameterFailure> failures) {
+        return string.Join("; ", failures.Select(FormatFailure));
+    }
+
+    private string FormatFailure(ParameterFailure failure) {
+        string actualValue = string.IsNullOrEmpty(failure.ActualValue)
+            ? _localization.GetLocalizedString("Results.EmptyValue")
+            : _localization.GetLocalizedString("Results.ActualValue", failure.ActualValue);
+        bool expectedValueNeeded = failure.Operator is not HasValueOperator
+                                   && failure.Operator is not HasNoValueOperator;
+        string operatorName = _localization.GetLocalizedString(failure.Operator.GetType().Name);
+        return expectedValueNeeded
+            ? _localization.GetLocalizedString(
+                "Results.InvalidParam",
+                failure.ParameterName,
+                actualValue,
+                operatorName,
+                failure.ExpectedValue)
+            : _localization.GetLocalizedString(
+                "Results.InvalidParamNoValue",
+                failure.ParameterName,
+                actualValue,
+                operatorName);
+    }
 
     private ICollection<ElementModel> GetElements(Check check) {
         var filters = check.Filters.Select(f => _filtersRepo.GetFilter(f)).ToArray();

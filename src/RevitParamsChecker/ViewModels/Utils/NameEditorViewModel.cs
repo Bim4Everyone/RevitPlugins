@@ -45,7 +45,7 @@ internal class NameEditorViewModel : BaseViewModel {
             return false;
         }
 
-        if(_existingNames.Contains(Name)) {
+        if(_existingNames.Contains(Name, StringComparer.CurrentCultureIgnoreCase)) {
             ErrorText = _localization.GetLocalizedString("NameEditor.Validation.DuplicatedName");
             return false;
         }

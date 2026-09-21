@@ -22,6 +22,14 @@
         x:Key="Exceptions.MaterialParamNotFound">Material parameter missing: {0}</system:String>
     <system:String
         x:Key="Exceptions.NoMaterials">Element has no materials</system:String>
+    <system:String
+        x:Key="Results.InvalidParam">{0}: {1}, expected {2} "{3}"</system:String>
+    <system:String
+        x:Key="Results.InvalidParamNoValue">{0}: {1}, expected {2}</system:String>
+    <system:String
+        x:Key="Results.ActualValue">value is "{0}"</system:String>
+    <system:String
+        x:Key="Results.EmptyValue">value is empty</system:String>
 
     <system:String
         x:Key="NamesSelectionDialog.NamesHeader">Name</system:String>
@@ -129,6 +137,19 @@ Previously selected checks are missing:
         x:Key="ResultsPage.UserMarkHeader">Marks</system:String>
     <system:String
         x:Key="ResultsPage.ElementsSearchPlaceholder">Search</system:String>
+    <system:String
+        x:Key="ResultsPage.DescriptionHeader">Description</system:String>
+    <system:String
+        x:Key="ResultsPage.ExportReportTooltip">Export report</system:String>
+
+    <system:String
+        x:Key="HtmlReport.Title">Report: {0}</system:String>
+    <system:String
+        x:Key="HtmlReport.IdHeader">Id</system:String>
+    <system:String
+        x:Key="HtmlReport.GroupHeader">{0}: {1} - {2} items</system:String>
+    <system:String
+        x:Key="HtmlReport.GroupHeaderNoProperty">{0} - {1} items</system:String>
 
     <system:String
         x:Key="GroupsEditor.Label">Grouping</system:String>

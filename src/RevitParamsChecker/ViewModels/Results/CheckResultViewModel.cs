@@ -27,15 +27,25 @@ internal class CheckResultViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly DelayAction _refreshViewDelay;
     private readonly RevitRepository _revitRepo;
+    private readonly IReportExportService _reportExportService;
+    private readonly ISaveFileDialogService _saveFileDialogService;
     private readonly ObservableCollection<ElementResultViewModel> _allElementResults;
     private readonly PropertyGroupDescription _chunkGroupDescription;
     private string _elementsFilter;
     private ElementResultViewModel _selectedElementResult;
     private RuleViewModel _selectedRuleStamp;
 
-    public CheckResultViewModel(ILocalizationService localization, CheckResult checkResult, RevitRepository revitRepo) {
+    public CheckResultViewModel(
+        ILocalizationService localization,
+        CheckResult checkResult,
+        RevitRepository revitRepo,
+        IReportExportService reportExportService,
+        ISaveFileDialogService saveFileDialogService) {
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
         _revitRepo = revitRepo ?? throw new ArgumentNullException(nameof(revitRepo));
+        _reportExportService = reportExportService ?? throw new ArgumentNullException(nameof(reportExportService));
+        _saveFileDialogService =
+            saveFileDialogService ?? throw new ArgumentNullException(nameof(saveFileDialogService));
         CheckResult = checkResult ?? throw new ArgumentNullException(nameof(checkResult));
         Name = CheckResult.CheckCopy.Name;
         RulesStamp = GetRulesStamp(CheckResult, _localization);
@@ -44,6 +54,7 @@ internal class CheckResultViewModel : BaseViewModel {
         ElementResults.Filter += ElementResultsFilterHandler;
         SelectElementsCommand = RelayCommand.Create<IList>(SelectElements, CanSelectElements);
         RegroupElementsCommand = RelayCommand.Create(RegroupElements);
+        ExportReportCommand = RelayCommand.Create(ExportReport);
         _refreshViewDelay = new DelayAction(300, () => ElementResults.View.Refresh());
         var availableProperties = GetEditableGroupProperties(_localization);
         GroupingProperties = new GroupDescriptionsViewModel(availableProperties, [availableProperties.First()]);
@@ -61,6 +72,7 @@ internal class CheckResultViewModel : BaseViewModel {
 
     public ICommand SelectElementsCommand { get; }
     public ICommand RegroupElementsCommand { get; }
+    public ICommand ExportReportCommand { get; }
     public string Name { get; }
     public CheckResult CheckResult { get; }
     public IReadOnlyCollection<RuleViewModel> RulesStamp { get; }
@@ -102,6 +114,10 @@ internal class CheckResultViewModel : BaseViewModel {
         return items != null && items.OfType<ElementResultViewModel>().Count() != 0;
     }
 
+    private void ExportReport() {
+        _reportExportService.Export(_saveFileDialogService, this);
+    }
+
     private void ElementsFilterPropertyChanged(object sender, PropertyChangedEventArgs e) {
         if(e.PropertyName == nameof(ElementsFilter)) {
             _refreshViewDelay.Action();
@@ -120,7 +136,7 @@ internal class CheckResultViewModel : BaseViewModel {
                          || result.FamilyTypeName?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
                          || result.RuleName?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
                          || result.Status?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
-                         || result.Error?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
+                         || result.Info?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0
                          || result.CategoryName?.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
     }

@@ -21,6 +21,9 @@ using RevitParamsChecker.Services;
 namespace RevitParamsChecker.ViewModels.Checks;
 
 internal class ChecksPageViewModel : BaseViewModel {
+    private const string _jsonFilter = "JSON files (*.json)|*.json";
+    private const string _jsonExtension = ".json";
+
     private readonly ILocalizationService _localization;
     private readonly FiltersRepository _filtersRepo;
     private readonly RulesRepository _rulesRepo;
@@ -293,6 +296,8 @@ internal class ChecksPageViewModel : BaseViewModel {
     }
 
     private void Export() {
+        SaveFileDialogService.Filter = _jsonFilter;
+        SaveFileDialogService.DefaultExt = _jsonExtension;
         if(SaveFileDialogService.ShowDialog(
                _dirPath,
                _localization.GetLocalizedString("ChecksPage.SaveFileDefaultName"))) {

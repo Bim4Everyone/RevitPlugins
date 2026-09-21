@@ -130,7 +130,8 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
             .WithConstructorArgument("messageBoxService", c => c.Kernel.Get<MainViewModel>().MessageBoxService);
         kernel.Bind<ResultsPageViewModel>()
             .ToSelf()
-            .InSingletonScope();
+            .InSingletonScope()
+            .WithConstructorArgument("saveFileDialogService", c => c.Kernel.Get<MainViewModel>().SaveFileDialogService);
     }
 
     private void BindUtilsViews(IKernel kernel) {
@@ -175,6 +176,9 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
         kernel.Bind<CheckResultsRepository>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.Bind<ReportExportConfig>()
+            .ToMethod(c => ReportExportConfig.GetConfig(c.Kernel.Get<JsonSerializationService>()));
     }
 
     private void BindConverters(IKernel kernel) {
@@ -193,6 +197,10 @@ public class RevitParamsCheckerCommand : BasePluginCommand {
     }
 
     private void BindServices(IKernel kernel) {
+        kernel.Bind<IReportExportService>()
+            .To<HtmlReportExportService>()
+            .InSingletonScope();
+
         kernel.Bind<NamesService>()
             .ToSelf()
             .InSingletonScope();
