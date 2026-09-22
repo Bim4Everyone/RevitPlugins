@@ -87,10 +87,22 @@ internal class ImageService {
 
             // Масштабируем изображение под нужный размер в пикселях, чтобы шаги соответствовали Revit
             return ScaledImageByPixels(imagePath, pixelsX, pixelsY);
-        } catch(Exception) {
-            // Незавершенная выгрузка не должна оставаться во временной папке
-            Delete(imagePath);
-            throw;
+        } catch(Exception exception) {
+            // Диагностика: незавершенная выгрузка остается на диске, чтобы было видно,
+            // куда на изображении попали якорные линии.
+            // Носит временный характер, убирается вместе с настройкой алгоритма
+            throw new InvalidOperationException(
+                exception.Message
+                + Environment.NewLine + Environment.NewLine
+                + "Пикселей на клетку: " + pixelPerSquare
+                + Environment.NewLine
+                + "Расчетный размер изображения: " + pixelsX + " x " + pixelsY
+                + Environment.NewLine + Environment.NewLine
+                + (exportOption.Diagnostics ?? string.Empty)
+                + Environment.NewLine + Environment.NewLine
+                + "Изображение оставлено для проверки:"
+                + Environment.NewLine + imagePath,
+                exception);
         }
     }
 
@@ -169,7 +181,20 @@ internal class ImageService {
         if(Math.Abs(actualRatio - expectedRatio) > expectedRatio * _aspectTolerance) {
             throw new InvalidOperationException(
                 "Пропорции подрезанного изображения не совпадают с габаритами вида: "
-                + "якорные линии определены неверно.");
+                + "якорные линии определены неверно."
+                + Environment.NewLine + Environment.NewLine
+                + "Выгруженный PNG: " + width + " x " + height
+                + Environment.NewLine
+                + "Габарит якорей в пикселях: X " + minX + ".." + maxX
+                + ", Y " + minY + ".." + maxY
+                + Environment.NewLine
+                + "Размер габарита: " + newWidth + " x " + newHeight
+                + Environment.NewLine
+                + "Пропорции: ожидалась " + expectedRatio.ToString("F3")
+                + ", фактическая " + actualRatio.ToString("F3")
+                + Environment.NewLine
+                + "Вырожденный по одной оси габарит означает, что найдена только одна "
+                + "из двух якорных линий.");
         }
 
         byte[] croppedBytes;
@@ -228,7 +253,14 @@ internal class ImageService {
         return maxX < 0
             ? throw new InvalidOperationException(
                 "На изображении вида не найдены якорные линии. "
-                + "Возможная причина - переопределение графики вида, из-за которого их цвет изменился.")
+                + "Возможная причина - переопределение графики вида, из-за которого их цвет изменился."
+                + Environment.NewLine + Environment.NewLine
+                + "Выгруженный PNG: " + width + " x " + height
+                + Environment.NewLine
+                + "Искомый цвет: R" + colorForFind.Red
+                + " G" + colorForFind.Green
+                + " B" + colorForFind.Blue
+                + ", допуск " + _colorTolerance)
             : (minX, minY, maxX, maxY);
     }
 

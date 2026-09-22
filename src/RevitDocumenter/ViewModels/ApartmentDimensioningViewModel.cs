@@ -41,7 +41,7 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     /// <summary>
     /// Имя типоразмера размера, выбираемого по умолчанию.
     /// </summary>
-    private readonly string _defSelectedDimensionTypeName = "GOST Common_2.5 мм_0.9";
+    private readonly string _defSelectedDimensionTypeName = "GOST Common_2.0 мм_0.9";
 
     /// <summary>
     /// Допуск на параллельность направлений в радианах (1 градус).
@@ -62,12 +62,6 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     /// </summary>
     /// <remarks>Стороны, стоящие ближе, считаются одной конструкцией и не образмериваются.</remarks>
     private readonly double _minDistanceBetweenSides = UnitUtilsHelper.ConvertToInternalValue(100);
-
-    /// <summary>
-    /// Максимальное расстояние между сторонами помещения.
-    /// </summary>
-    /// <remarks>Ограничение не дает связать размером стены на противоположных краях квартиры.</remarks>
-    private readonly double _maxDistanceBetweenSides = UnitUtilsHelper.ConvertToInternalValue(8000);
 
     /// <summary>
     /// Минимальная длина перекрытия проекций сторон, при которой размер считается габаритным.
@@ -113,7 +107,7 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     /// Задает гранулярность анализа занятости вида. Модельная величина получается умножением
     /// на масштаб вида, поэтому клетка относительно текста одинакова при любом масштабе.
     /// </remarks>
-    private readonly double _mappingStepInPaperMm = 2;
+    private readonly double _mappingStepInPaperMm = 1;
 
     /// <summary>
     /// Цвет якорных линий, по которым изображение вида сопоставляется с координатами модели.
@@ -126,29 +120,32 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     private readonly int _weightForAnchorLines = 1;
 
     /// <summary>
-    /// Отступ проверяемой полосы от концов размерной линии в миллиметрах на бумаге.
-    /// </summary>
-    /// <remarks>
-    /// У концов линия обязана заходить в тело стен - это норма. Занятая клетка в середине
-    /// означает, что между сторонами что-то стоит, и размер пройдет насквозь.
-    /// </remarks>
-    private readonly double _dimensionLineInsetInPaperMm = 4;
-
-    /// <summary>
     /// Ширина символа значения размера относительно высоты текста.
     /// </summary>
-    private readonly double _textWidthFactor = 0.6;
+    /// <remarks>
+    /// Оценка с запасом: недооценка ширины дает касания, которые проверка не видит.
+    /// Замер на широком шрифте (Century Gothic) дал 0.7-0.85 высоты на цифру.
+    /// </remarks>
+    private readonly double _textWidthFactor = 0.8;
 
     /// <summary>
-    /// Высота проверяемой по карте зоны относительно высоты текста.
+    /// Зазор между подписью размера и занятой графикой в миллиметрах на бумаге.
     /// </summary>
-    /// <remarks>Текст стоит над размерной линией, поэтому зона берется с запасом в обе стороны.</remarks>
-    private readonly double _textZoneHeightFactor = 2.0;
+    /// <remarks>
+    /// Подпись не должна касаться ни стен, ни подписей других размеров, поэтому проверяемая
+    /// зона берется шире текста на этот зазор со всех четырех сторон. Модельная величина
+    /// получается умножением на масштаб вида, поэтому на листе зазор одинаков при любом масштабе.
+    /// </remarks>
+    private readonly double _textClearanceInPaperMm = 2;
 
     /// <summary>
-    /// Максимальное количество шагов при подборе положения подписи готового размера.
+    /// Запас предела сдвига подписи сверх половины значения размера, в миллиметрах на бумаге.
     /// </summary>
-    private readonly int _maxTextSearchSteps = 8;
+    /// <remarks>
+    /// Подпись короткого размера между гранями стен не влезает и обязана выехать за засечки.
+    /// Предел не дает ей при этом уехать настолько далеко, что связь с размером теряется.
+    /// </remarks>
+    private readonly double _maxTextShiftExtraInPaperMm = 10;
 
     /// <summary>
     /// Количество направлений, по которым проставляются размеры в одном помещении.
@@ -170,6 +167,10 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     private int _createdCount;
     private int _positionMovedCount;
     private int _textMovedCount;
+    // Размеры, подпись которых так и осталась на занятом месте: сдвиг не нашел свободной позиции
+    private readonly List<string> _unresolvedDimensions = [];
+    // Наибольшее расхождение прогноза положения подписи с фактом, в единицах модели
+    private double _maxPredictionError;
 
     private string _errorText;
     private DimensionType _selectedDimensionType;
@@ -281,13 +282,15 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
         string title = "Размеры квартир";
 
         if(mapInfo is null) {
-            Autodesk.Revit.UI.TaskDialog.Show(
-                title,
-                "Карта свободных зон не построена - размеры расставлены только по геометрии."
-                + Environment.NewLine + Environment.NewLine
-                + "Причина: " + (_mapFailureReason ?? "не определена")
-                + Environment.NewLine + Environment.NewLine
-                + "Размеров создано: " + _createdCount);
+            // Причина уходит в MainContent, а не в заголовок: она многострочная и с числами,
+            // а крупный текст заголовка длинное сообщение обрезает
+            var failureDialog = new Autodesk.Revit.UI.TaskDialog(title) {
+                MainInstruction = "Карта свободных зон не построена - размеры расставлены только по геометрии.",
+                MainContent = "Размеров создано: " + _createdCount
+                              + Environment.NewLine + Environment.NewLine
+                              + (_mapFailureReason ?? "Причина не определена.")
+            };
+            failureDialog.Show();
             return;
         }
 
@@ -295,13 +298,28 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
             string markedImagePath = _paintSquaresByMapService.MarkWhiteSquaresOnImage(mapInfo, _markedImageName);
             _imageService.OpenImage(markedImagePath);
 
-            Autodesk.Revit.UI.TaskDialog.Show(
-                title,
-                "Размеров создано: " + _createdCount
-                + Environment.NewLine
-                + "Сдвинуто подбором позиции: " + _positionMovedCount
-                + Environment.NewLine
-                + "Сдвинуто переносом подписи: " + _textMovedCount);
+            string unresolvedText = _unresolvedDimensions.Count == 0
+                ? string.Empty
+                : Environment.NewLine + Environment.NewLine
+                  + "Подпись не удалось развести:"
+                  + Environment.NewLine
+                  + string.Join(Environment.NewLine, _unresolvedDimensions);
+
+            var resultDialog = new Autodesk.Revit.UI.TaskDialog(title) {
+                MainInstruction = "Размеров создано: " + _createdCount,
+                MainContent = "Линий сдвинуто с исходной позиции: " + _positionMovedCount
+                              + Environment.NewLine
+                              + "Сдвинуто переносом подписи: " + _textMovedCount
+                              + Environment.NewLine
+                              + "Осталось с наложением: " + _unresolvedDimensions.Count
+                              + Environment.NewLine
+                              + "Макс. расхождение прогноза подписи с фактом вдоль линии: "
+                              + Math.Round(UnitUtilsHelper.ConvertFromInternalValue(_maxPredictionError)) + " мм"
+                              + Environment.NewLine
+                              + GetDimensionTypeDiagnostics()
+                              + unresolvedText
+            };
+            resultDialog.Show();
         } catch(Exception exception) {
             Autodesk.Revit.UI.TaskDialog.Show(title, "Не удалось показать карту: " + exception.Message);
         } finally {
@@ -359,6 +377,8 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
         _createdCount = 0;
         _positionMovedCount = 0;
         _textMovedCount = 0;
+        _unresolvedDimensions.Clear();
+        _maxPredictionError = 0;
 
         // Стены вида, приведенные к горизонтальным базовым линиям на нулевой отметке
         var wallLines = GetWallLines();
@@ -396,11 +416,12 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
             }
         }
 
-        // Место занимают первыми те, у кого выбора меньше: ступени с вырожденным коридором,
-        // затем узкие коридоры, затем короткие размеры. Иначе тесный узел достается тому,
-        // кто просто оказался раньше в обходе по помещениям
+        // Место занимают первыми те, у кого выбора меньше. Сначала размеры, подпись которых
+        // не влезает между гранями: ей деваться некуда, кроме выезда за засечку, и выезд
+        // должен успеть занять место раньше соседей. Внутри группы - от коротких к длинным:
+        // короткому уезжать дальше всех. Затем влезающие - они обтекают то, что уже стоит
         var orderedPairs = wallPairs
-            .OrderBy(p => p.RangeEnd - p.RangeStart)
+            .OrderBy(p => FitsInline(p.Distance))
             .ThenBy(p => p.Distance);
 
         foreach(var wallPair in orderedPairs) {
@@ -626,7 +647,7 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     private WallPair CreateWallPair(Room room, DirectionGroup directionGroup, WallSide first, WallSide second) {
         // Расстояние между сторонами постоянно - стороны параллельны
         double distance = Math.Abs(first.Offset - second.Offset);
-        if(distance < _minDistanceBetweenSides || distance > _maxDistanceBetweenSides) {
+        if(distance < _minDistanceBetweenSides) {
             return null;
         }
 
@@ -634,8 +655,12 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
         // Положительная длина - перекрытие проекций, отрицательная - зазор между ними
         double bestLength = double.MinValue;
         double position = 0;
-        double bestStart = 0;
-        double bestEnd = 0;
+
+        // Объединение всех перекрытий: стороны, разрезанные проемами, перекрываются кусками,
+        // и линии разрешено вставать и напротив проема - размер идет по граням, а грань
+        // продолжается и там, где стены нет
+        double unionStart = double.MaxValue;
+        double unionEnd = double.MinValue;
 
         foreach(var firstSegment in first.Segments) {
             foreach(var secondSegment in second.Segments) {
@@ -643,10 +668,13 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
                 double end = Math.Min(firstSegment.End, secondSegment.End);
                 double length = end - start;
 
+                if(length > 0) {
+                    unionStart = Math.Min(unionStart, start);
+                    unionEnd = Math.Max(unionEnd, end);
+                }
+
                 if(length > bestLength) {
                     bestLength = length;
-                    bestStart = start;
-                    bestEnd = end;
                     // Для перекрытия это его центр, для зазора - середина между проекциями
                     position = (start + end) / 2;
                 }
@@ -670,12 +698,12 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
         // У размера ступени коридора нет - он привязан к внутреннему углу
         double rangeStart = position;
         double rangeEnd = position;
-        if(!isStep && bestEnd - bestStart > 2 * _dimensionLineMargin) {
-            rangeStart = bestStart + _dimensionLineMargin;
-            rangeEnd = bestEnd - _dimensionLineMargin;
+        if(!isStep && unionEnd - unionStart > 2 * _dimensionLineMargin) {
+            rangeStart = unionStart + _dimensionLineMargin;
+            rangeEnd = unionEnd - _dimensionLineMargin;
         }
 
-        return new WallPair(directionGroup, first, second, position, distance, isStep, rangeStart, rangeEnd);
+        return new WallPair(room, directionGroup, first, second, position, distance, isStep, rangeStart, rangeEnd);
     }
 
     #endregion
@@ -810,150 +838,61 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     #region Подбор места по бинарной карте
 
     /// <summary>
-    /// Подбирает положение линии размера так, чтобы зона его подписи не пересекала занятые места вида.
+    /// Подбирает позицию размерной линии и сдвиг подписи вдоль нее так, чтобы прогнозная
+    /// зона подписи оказалась свободной.
     /// </summary>
     /// <remarks>
-    /// Позиции перебираются от центра коридора наружу с шагом карты, симметрично в обе стороны.
-    /// Если свободного места в коридоре нет, позиция остается прежней, а подпись двигается
-    /// уже у готового размера.
+    /// Варианты перебираются от лучшего к худшему. Линия сначала стоит в исходной позиции,
+    /// а подпись сдвигается вдоль нее от середины наружу; следующая позиция линии пробуется
+    /// только тогда, когда при текущей места для подписи нет. Так линия уходит с исходной
+    /// позиции лишь в безвыходных случаях, и размеры не расползаются лесенкой.
+    /// Подпись, которая влезает между гранями, не покидает свое помещение.
     /// </remarks>
-    private bool FindBestPosition(WallPair wallPair, MapInfo mapInfo) {
+    /// <param name="linePosition">Найденная позиция линии на оси направления.</param>
+    /// <param name="textShift">Найденный сдвиг подписи вдоль линии от ее середины.</param>
+    /// <returns>true, если свободный вариант найден.</returns>
+    private bool TryFindPlacement(WallPair wallPair, MapInfo mapInfo, out double linePosition, out double textShift) {
         wallPair.ThrowIfNull();
         mapInfo.ThrowIfNull();
 
-        double centerPosition = wallPair.Position;
-        int bestScore = GetPositionScore(wallPair, centerPosition, mapInfo);
-        if(bestScore == 0) {
-            return false;
-        }
-
-        double step = mapInfo.MappingStepInFeet;
-        if(step <= 0) {
-            return false;
-        }
-        int maxSteps = (int) Math.Floor((wallPair.RangeEnd - wallPair.RangeStart) / 2 / step);
-        double bestPosition = centerPosition;
-        bool isMoved = false;
-
-        for(int stepIndex = 1; stepIndex <= maxSteps; stepIndex++) {
-            foreach(int directionFactor in new[] { 1, -1 }) {
-                double position = centerPosition + directionFactor * stepIndex * step;
-                if(position < wallPair.RangeStart || position > wallPair.RangeEnd) {
-                    continue;
-                }
-
-                int score = GetPositionScore(wallPair, position, mapInfo);
-                if(score >= bestScore) {
-                    continue;
-                }
-                bestScore = score;
-                bestPosition = position;
-                isMoved = true;
-
-                // Совсем чистое место - дальше искать нечего
-                if(bestScore == 0) {
-                    wallPair.Position = bestPosition;
-                    return true;
-                }
-            }
-        }
-
-        if(!isMoved) {
-            return false;
-        }
-        wallPair.Position = bestPosition;
-        return true;
-    }
-
-    /// <summary>
-    /// Возвращает количество занятых клеток карты, которые заденет размер в переданной позиции.
-    /// </summary>
-    /// <remarks>Ноль означает полностью чистое место. Чем меньше, тем лучше позиция.</remarks>
-    private int GetPositionScore(WallPair wallPair, double position, MapInfo mapInfo) {
-        (var firstCorner, var secondCorner) = GetTextZone(wallPair, position, XYZ.Zero);
-        int score = _mapService.CountOccupiedSquares(mapInfo, firstCorner, secondCorner);
-
-        if(TryGetLineBand(wallPair, position, out var bandStart, out var bandEnd)) {
-            score += _mapService.CountOccupiedSquares(mapInfo, bandStart, bandEnd);
-        }
-        return score;
-    }
-
-    /// <summary>
-    /// Возвращает полосу вдоль размерной линии, отступив от ее концов.
-    /// </summary>
-    /// <returns>false, если размер короче двух отступов и проверять в нем нечего.</returns>
-    private bool TryGetLineBand(WallPair wallPair, double position, out XYZ bandStart, out XYZ bandEnd) {
-        bandStart = null;
-        bandEnd = null;
-
-        double inset = UnitUtilsHelper.ConvertToInternalValue(
-            _dimensionLineInsetInPaperMm * Math.Max(_revitRepository.Document.ActiveView.Scale, 1));
-
-        double fromOffset = Math.Min(wallPair.First.Offset, wallPair.Second.Offset) + inset;
-        double toOffset = Math.Max(wallPair.First.Offset, wallPair.Second.Offset) - inset;
-        if(toOffset <= fromOffset) {
-            return false;
-        }
-
-        var directionGroup = wallPair.DirectionGroup;
-        var alongAxis = directionGroup.Origin + directionGroup.Axis * position;
-
-        bandStart = alongAxis + directionGroup.Normal * fromOffset;
-        bandEnd = alongAxis + directionGroup.Normal * toOffset;
-        return true;
-    }
-
-    /// <summary>
-    /// Двигает подпись готового размера, если ее зона занята.
-    /// </summary>
-    /// <remarks>
-    /// Подпись едет только вдоль размерной линии и только в пределах засечек. Уход вбок или
-    /// за засечки Revit оформляет выноской, а выноска недопустима, поэтому таких вариантов нет.
-    /// Сама размерная линия не трогается: она обязана идти между гранями стен.
-    /// </remarks>
-    private bool MoveDimensionText(Dimension dimension, WallPair wallPair, MapInfo mapInfo) {
-        dimension.ThrowIfNull();
-        wallPair.ThrowIfNull();
-        mapInfo.ThrowIfNull();
-
-        if(IsTextZoneFree(wallPair, wallPair.Position, mapInfo)) {
-            return false;
-        }
+        linePosition = wallPair.Position;
+        textShift = 0;
 
         double step = mapInfo.MappingStepInFeet;
         if(step <= 0) {
             return false;
         }
 
-        // Предел сдвига считается от фактического значения размера, а не от расстояния между
-        // осями сторон: разница в половины толщин стен, и на узких размерах ее хватает,
-        // чтобы текст вылез за засечки и получил выноску
-        double dimensionValue = dimension.Value ?? 0;
-        double alongLimit = (dimensionValue - GetTextWidth(dimensionValue)) / 2 - GetTextHeight();
-        if(alongLimit <= 0) {
-            return false;
-        }
+        // До создания размера значение неизвестно - берется расстояние между осями сторон
+        double dimensionValue = wallPair.Distance;
+        bool mustStayInRoom = FitsInline(dimensionValue);
+        double shiftLimit = GetMaxTextShift(dimensionValue);
+        var alongLine = wallPair.DirectionGroup.Normal;
 
-        var shiftDirection = wallPair.DirectionGroup.Normal;
-
-        for(int stepIndex = 1; stepIndex <= _maxTextSearchSteps; stepIndex++) {
-            double shiftLength = stepIndex * step;
-            if(shiftLength > alongLimit) {
-                break;
+        foreach(double candidateLine in GetLinePositions(wallPair, step)) {
+            // Коридор включает участки напротив проемов - сдвинутая линия не должна при этом
+            // выйти из помещения. Исходную позицию не проверяем: она в центре перекрытия
+            if(Math.Abs(candidateLine - wallPair.Position) > 1e-9
+               && !IsPositionInRoom(wallPair.Room, wallPair.DirectionGroup, wallPair.First, wallPair.Second, candidateLine)) {
+                continue;
             }
 
-            foreach(int directionFactor in new[] { 1, -1 }) {
-                var shift = shiftDirection * (directionFactor * shiftLength);
-                (var firstCorner, var secondCorner) = GetTextZone(wallPair, wallPair.Position, shift);
+            var textCenter = GetPredictedTextCenter(wallPair, candidateLine);
 
+            foreach(double candidateShift in GetTextShifts(shiftLimit, step)) {
+                var shiftedCenter = textCenter + alongLine * candidateShift;
+                if(mustStayInRoom && !IsPointInRoom(wallPair.Room, shiftedCenter)) {
+                    continue;
+                }
+
+                (var firstCorner, var secondCorner) =
+                    GetTextRect(wallPair.DirectionGroup, shiftedCenter, dimensionValue);
                 if(!_mapService.CheckInRectangle(mapInfo, firstCorner, secondCorner)) {
                     continue;
                 }
 
-                dimension.TextPosition += shift;
-
-                _mapService.PaintInRectangle(mapInfo, firstCorner, secondCorner);
+                linePosition = candidateLine;
+                textShift = candidateShift;
                 return true;
             }
         }
@@ -961,33 +900,337 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Проверяет, свободна ли по карте зона подписи размера в переданной позиции.
+    /// Возвращает позиции размерной линии на оси направления в порядке предпочтения.
     /// </summary>
-    private bool IsTextZoneFree(WallPair wallPair, double position, MapInfo mapInfo) {
-        (var firstCorner, var secondCorner) = GetTextZone(wallPair, position, XYZ.Zero);
-        return _mapService.CheckInRectangle(mapInfo, firstCorner, secondCorner);
+    /// <remarks>
+    /// Сначала исходная позиция, затем попеременно в обе стороны с шагом карты в пределах
+    /// коридора. У размера ступени коридора нет - он привязан к внутреннему углу.
+    /// </remarks>
+    private IEnumerable<double> GetLinePositions(WallPair wallPair, double step) {
+        double center = wallPair.Position;
+        yield return center;
+
+        if(wallPair.IsStep) {
+            yield break;
+        }
+
+        for(int stepIndex = 1; ; stepIndex++) {
+            double forward = center + stepIndex * step;
+            double backward = center - stepIndex * step;
+            bool isAnyInside = false;
+
+            if(forward <= wallPair.RangeEnd) {
+                isAnyInside = true;
+                yield return forward;
+            }
+            if(backward >= wallPair.RangeStart) {
+                isAnyInside = true;
+                yield return backward;
+            }
+            if(!isAnyInside) {
+                yield break;
+            }
+        }
     }
 
     /// <summary>
-    /// Возвращает два противоположных угла зоны, которую займет подпись размера.
+    /// Возвращает сдвиги подписи вдоль размерной линии в порядке предпочтения.
+    /// </summary>
+    /// <remarks>Сначала без сдвига, затем попеременно в обе стороны с шагом карты до предела.</remarks>
+    private static IEnumerable<double> GetTextShifts(double shiftLimit, double step) {
+        yield return 0;
+        for(double shift = step; shift <= shiftLimit; shift += step) {
+            yield return shift;
+            yield return -shift;
+        }
+    }
+
+    /// <summary>
+    /// Ставит подпись созданного размера на запланированный сдвиг от середины линии.
     /// </summary>
     /// <remarks>
-    /// Зона строится вокруг середины размерной линии: вдоль линии - на ширину значения,
-    /// поперек - на высоту текста с запасом в обе стороны, потому что сторона, с которой
-    /// Revit поставит подпись, заранее не известна.
+    /// Меняется только координата вдоль линии. Положение поперек линии остается тем,
+    /// что выбрал Revit: сдвиг поперек он оформил бы Z-образной выноской.
     /// </remarks>
-    private (XYZ, XYZ) GetTextZone(WallPair wallPair, double position, XYZ shift) {
-        var directionGroup = wallPair.DirectionGroup;
+    private void ApplyPlannedTextShift(Dimension dimension, WallPair wallPair, double textShift) {
+        dimension.ThrowIfNull();
+        wallPair.ThrowIfNull();
 
+        var alongLine = wallPair.DirectionGroup.Normal;
+        var predictedCenter = GetPredictedTextCenter(wallPair, wallPair.Position);
+        var actualPosition = dimension.TextPosition;
+
+        double plannedAlong = predictedCenter.DotProduct(alongLine) + textShift;
+        double actualAlong = actualPosition.DotProduct(alongLine);
+
+        dimension.TextPosition = actualPosition + alongLine * (plannedAlong - actualAlong);
+    }
+
+    /// <summary>
+    /// Двигает подпись готового размера, если ее фактическая зона занята.
+    /// </summary>
+    /// <remarks>
+    /// Подпись едет только вдоль размерной линии: сдвиг поперек Revit оформляет Z-образной
+    /// выноской, а она недопустима. Выезд за засечки разрешен - подпись короткого размера
+    /// между гранями стен физически не влезает, ей приходится выходить наружу.
+    /// Позиции перебираются от фактического положения подписи наружу, поэтому первая
+    /// свободная и есть ближайшая: подпись уезжает ровно настолько, насколько пришлось.
+    /// Сама размерная линия не трогается - она обязана идти между гранями стен.
+    /// </remarks>
+    /// <returns>true, если подпись сдвинута.</returns>
+    private bool TryMoveDimensionText(Dimension dimension, WallPair wallPair, MapInfo mapInfo) {
+        dimension.ThrowIfNull();
+        wallPair.ThrowIfNull();
+        mapInfo.ThrowIfNull();
+
+        (var firstCorner, var secondCorner) = GetActualTextRect(dimension, wallPair);
+        if(_mapService.CheckInRectangle(mapInfo, firstCorner, secondCorner)) {
+            return false;
+        }
+
+        double step = mapInfo.MappingStepInFeet;
+        if(step <= 0) {
+            return false;
+        }
+
+        // Зона строится от центра текста, а двигается точка TextPosition - на тот же вектор
+        var textPosition = dimension.TextPosition;
+        var textCenter = GetActualTextCenter(dimension, wallPair);
+        double dimensionValue = GetDimensionValue(dimension, wallPair);
+        double shiftLimit = GetMaxTextShift(dimensionValue);
+        var shiftDirection = wallPair.DirectionGroup.Normal;
+
+        // Подпись, которая влезает между гранями, покидать свое помещение не должна: снаружи
+        // квартиры карта почти пустая, и без этого ограничения подпись уезжала бы туда первой.
+        // Подписи, которая не влезает, выезд за засечку необходим - ее не ограничиваем
+        bool mustStayInRoom = FitsInline(dimensionValue);
+
+        for(double shiftLength = step; shiftLength <= shiftLimit; shiftLength += step) {
+            foreach(int directionFactor in new[] { 1, -1 }) {
+                var shift = shiftDirection * (directionFactor * shiftLength);
+                var shiftedCenter = textCenter + shift;
+                if(mustStayInRoom && !IsPointInRoom(wallPair.Room, shiftedCenter)) {
+                    continue;
+                }
+
+                (var shiftedFirst, var shiftedSecond) =
+                    GetTextRect(wallPair.DirectionGroup, shiftedCenter, dimensionValue);
+
+                if(!_mapService.CheckInRectangle(mapInfo, shiftedFirst, shiftedSecond)) {
+                    continue;
+                }
+
+                dimension.TextPosition = textPosition + shift;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Проверяет, помещается ли подпись между гранями стен вместе с зазорами.
+    /// </summary>
+    /// <param name="dimensionValue">Значение размера в единицах модели.</param>
+    private bool FitsInline(double dimensionValue) {
+        return GetTextWidth(dimensionValue) + 2 * GetTextClearance() <= dimensionValue;
+    }
+
+    /// <summary>
+    /// Проверяет, что точка в плане лежит внутри помещения.
+    /// </summary>
+    /// <remarks>Высота точки подменяется на отметку внутри объема помещения.</remarks>
+    private bool IsPointInRoom(Room room, XYZ point) {
+        if(room is null || point is null) {
+            return false;
+        }
+        return room.IsPointInRoom(new XYZ(point.X, point.Y, GetRoomTestElevation(room)));
+    }
+
+    /// <summary>
+    /// Запоминает размер, подпись которого не удалось развести, для итогового отчета.
+    /// </summary>
+    private void RegisterUnresolved(Dimension dimension, WallPair wallPair) {
+        double valueInMm = Math.Round(UnitUtilsHelper.ConvertFromInternalValue(
+            GetDimensionValue(dimension, wallPair)));
+        string roomName = wallPair.Room?.Name ?? "?";
+        _unresolvedDimensions.Add(valueInMm + " мм, помещение \"" + roomName + "\", Id " + dimension.Id);
+    }
+
+    /// <summary>
+    /// Возвращает фактическую зону подписи созданного размера.
+    /// </summary>
+    /// <param name="withClearance">Расширять ли зону на зазор - для проверки да, для закраски нет.</param>
+    private (XYZ, XYZ) GetActualTextRect(Dimension dimension, WallPair wallPair, bool withClearance = true) {
+        dimension.ThrowIfNull();
+        wallPair.ThrowIfNull();
+
+        return GetTextRect(
+            wallPair.DirectionGroup,
+            GetActualTextCenter(dimension, wallPair),
+            GetDimensionValue(dimension, wallPair),
+            withClearance);
+    }
+
+    /// <summary>
+    /// Возвращает фактический центр подписи созданного размера.
+    /// </summary>
+    /// <remarks>
+    /// Точка TextPosition - не центр текста, а опорная точка ближе к размерной линии.
+    /// Поэтому координата вдоль линии берется из нее: вдоль линии подпись и двигается,
+    /// и Revit это честно отражает. А поперек линии подпись стоит на постоянном расстоянии,
+    /// заданном типоразмером, и никогда не двигается - там центр берется по той же формуле,
+    /// что и прогноз.
+    /// </remarks>
+    private XYZ GetActualTextCenter(Dimension dimension, WallPair wallPair) {
+        dimension.ThrowIfNull();
+        wallPair.ThrowIfNull();
+
+        var alongLine = wallPair.DirectionGroup.Normal;
+        var predictedCenter = GetPredictedTextCenter(wallPair, wallPair.Position);
+        double alongDifference = (dimension.TextPosition - predictedCenter).DotProduct(alongLine);
+
+        return predictedCenter + alongLine * alongDifference;
+    }
+
+    /// <summary>
+    /// Возвращает предполагаемую зону подписи размера, который еще не создан.
+    /// </summary>
+    /// <remarks>
+    /// До создания фактическое положение подписи неизвестно, поэтому оно прогнозируется
+    /// по тому же правилу, по которому Revit ставит влезающую подпись: над серединой линии.
+    /// Оценка нужна для подбора позиции самой линии, окончательная проверка идет уже
+    /// по фактическому положению подписи готового размера.
+    /// </remarks>
+    private (XYZ, XYZ) GetPredictedTextRect(WallPair wallPair, double position) {
+        wallPair.ThrowIfNull();
+
+        return GetTextRect(wallPair.DirectionGroup, GetPredictedTextCenter(wallPair, position), wallPair.Distance);
+    }
+
+    /// <summary>
+    /// Прогнозирует центр подписи размера, который еще не создан.
+    /// </summary>
+    /// <remarks>
+    /// Revit ставит подпись не на размерную линию, а над ней: низ текста отстоит от линии
+    /// на отступ из типоразмера, значит центр - на отступ плюс половину высоты текста.
+    /// "Над" определяется правилом чтения: текст читается слева направо, а вертикальный -
+    /// снизу вверх, поэтому у горизонтального размера подпись сверху, у вертикального - слева.
+    /// </remarks>
+    private XYZ GetPredictedTextCenter(WallPair wallPair, double position) {
+        wallPair.ThrowIfNull();
+
+        var directionGroup = wallPair.DirectionGroup;
         var middlePoint = directionGroup.Origin
                           + directionGroup.Axis * position
-                          + directionGroup.Normal * ((wallPair.First.Offset + wallPair.Second.Offset) / 2)
-                          + shift;
+                          + directionGroup.Normal * ((wallPair.First.Offset + wallPair.Second.Offset) / 2);
 
-        var halfWidth = directionGroup.Normal * (GetTextWidth(wallPair.Distance) / 2);
-        var halfHeight = directionGroup.Axis * (GetTextHeight() * _textZoneHeightFactor / 2);
+        var view = _revitRepository.Document.ActiveView;
 
-        return (middlePoint - halfWidth - halfHeight, middlePoint + halfWidth + halfHeight);
+        // Направление чтения: вдоль линии размера, но так, чтобы текст не читался задом наперед
+        var readingDirection = directionGroup.Normal;
+        double alongRight = readingDirection.DotProduct(view.RightDirection);
+        bool isVerticalInView = Math.Abs(alongRight) < Math.Sin(_angleTolerance);
+        if(isVerticalInView
+               ? readingDirection.DotProduct(view.UpDirection) < 0
+               : alongRight < 0) {
+            readingDirection = readingDirection.Negate();
+        }
+
+        // Поворот направления чтения на 90 градусов в плоскости вида - сторона над текстом
+        var textUp = view.ViewDirection.CrossProduct(readingDirection).Normalize();
+
+        return middlePoint + textUp * (GetTextHeight() / 2 + GetTextOffset());
+    }
+
+    /// <summary>
+    /// Возвращает сводку по параметрам текста выбранного типоразмера для итогового отчета.
+    /// </summary>
+    /// <remarks>
+    /// Диагностика носит временный характер: проверяет, что высота и отступ текста, от которых
+    /// считается положение подписи поперек линии, читаются из типоразмера верно.
+    /// </remarks>
+    private string GetDimensionTypeDiagnostics() {
+        return "Типоразмер \"" + SelectedDimensionType.Name + "\" (на бумаге): высота текста "
+               + FormatPaperMm(SelectedDimensionType.get_Parameter(BuiltInParameter.TEXT_SIZE))
+               + ", отступ текста "
+               + FormatPaperMm(SelectedDimensionType.get_Parameter(BuiltInParameter.TEXT_DIST_TO_LINE));
+    }
+
+    private static string FormatPaperMm(Parameter parameter) {
+        return parameter is null
+            ? "параметр не найден"
+            : Math.Round(UnitUtilsHelper.ConvertFromInternalValue(parameter.AsDouble()), 2) + " мм";
+    }
+
+    /// <summary>
+    /// Возвращает отступ подписи от размерной линии в единицах модели.
+    /// </summary>
+    /// <remarks>Отступ задан в типоразмере на бумаге, поэтому пересчитывается через масштаб вида.</remarks>
+    private double GetTextOffset() {
+        int scale = _revitRepository.Document.ActiveView.Scale;
+        double offset = SelectedDimensionType.get_Parameter(BuiltInParameter.TEXT_DIST_TO_LINE)?.AsDouble() ?? 0;
+        return offset * Math.Max(scale, 1);
+    }
+
+    /// <summary>
+    /// Возвращает два противоположных угла зоны, занимаемой подписью размера.
+    /// </summary>
+    /// <param name="directionGroup">Направление, которому принадлежит размер.</param>
+    /// <param name="textPosition">Положение подписи - центр текста.</param>
+    /// <param name="dimensionValue">Значение размера, от которого зависит ширина подписи.</param>
+    /// <remarks>
+    /// Подпись читается вдоль размерной линии, поэтому ширина откладывается по нормали
+    /// направления, а высота - по его оси. Зона расширена на зазор со всех четырех сторон:
+    /// подпись не должна касаться ни стен, ни подписей других размеров.
+    /// </remarks>
+    private (XYZ, XYZ) GetTextRect(
+        DirectionGroup directionGroup,
+        XYZ textPosition,
+        double dimensionValue,
+        bool withClearance = true) {
+
+        directionGroup.ThrowIfNull();
+        textPosition.ThrowIfNull();
+
+        double clearance = withClearance ? GetTextClearance() : 0;
+        var halfWidth = directionGroup.Normal * (GetTextWidth(dimensionValue) / 2 + clearance);
+        var halfHeight = directionGroup.Axis * (GetTextHeight() / 2 + clearance);
+
+        return (textPosition - halfWidth - halfHeight, textPosition + halfWidth + halfHeight);
+    }
+
+    /// <summary>
+    /// Возвращает значение размера, а при его отсутствии - расстояние между осями сторон.
+    /// </summary>
+    /// <remarks>
+    /// Значение отличается от расстояния между осями на половины толщин стен, поэтому
+    /// для ширины подписи и для предела сдвига берется именно оно.
+    /// </remarks>
+    private double GetDimensionValue(Dimension dimension, WallPair wallPair) {
+        double value = dimension.Value ?? 0;
+        return value > 0 ? value : wallPair.Distance;
+    }
+
+    /// <summary>
+    /// Возвращает зазор вокруг подписи размера в единицах модели.
+    /// </summary>
+    /// <remarks>Зазор задан в миллиметрах на бумаге, поэтому пересчитывается через масштаб вида.</remarks>
+    private double GetTextClearance() {
+        int scale = _revitRepository.Document.ActiveView.Scale;
+        return UnitUtilsHelper.ConvertToInternalValue(_textClearanceInPaperMm * Math.Max(scale, 1));
+    }
+
+    /// <summary>
+    /// Возвращает предел сдвига подписи вдоль размерной линии в единицах модели.
+    /// </summary>
+    /// <remarks>
+    /// Половина значения размера плюс запас на бумаге: подпись может выйти за засечку,
+    /// но не может уехать от своего размера на непрочитываемое расстояние.
+    /// </remarks>
+    private double GetMaxTextShift(double dimensionValue) {
+        int scale = _revitRepository.Document.ActiveView.Scale;
+        return dimensionValue / 2
+               + UnitUtilsHelper.ConvertToInternalValue(_maxTextShiftExtraInPaperMm * Math.Max(scale, 1));
     }
 
     /// <summary>
@@ -1030,9 +1273,13 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
         ReferenceAnalizeService referenceAnalizeService,
         List<ReferenceArray> existingDimensionRefs) {
 
-        // Этап 1. Подбор позиции по карте до создания размера: двигаем линию вдоль стен
-        // внутри коридора, пока зона будущей подписи не окажется свободной
-        if(mapInfo != null && !wallPair.IsStep && FindBestPosition(wallPair, mapInfo)) {
+        // Этап 1. Совместный подбор по прогнозу до создания размера: позиция линии и сдвиг
+        // подписи вдоль нее, при которых прогнозная зона подписи свободна
+        double plannedTextShift = 0;
+        if(mapInfo != null
+           && TryFindPlacement(wallPair, mapInfo, out double plannedLinePosition, out plannedTextShift)
+           && Math.Abs(plannedLinePosition - wallPair.Position) > 1e-9) {
+            wallPair.Position = plannedLinePosition;
             _positionMovedCount++;
         }
 
@@ -1074,15 +1321,43 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
         existingDimensionRefs.Add(references);
         _createdCount++;
 
+        // Диагностика: насколько прогноз подписи разошелся с фактом. Считается только для
+        // влезающих подписей - невлезающую Revit выносит за засечку, и прогноз к ней не относится.
+        // Сравнение в плане: прогноз строится на нулевой отметке, а размер на отметке вида
+        if(FitsInline(GetDimensionValue(dimension, wallPair))) {
+            // Поперек линии центр теперь берется по формуле, поэтому ошибка меряется только вдоль
+            var predictedCenter = GetPredictedTextCenter(wallPair, wallPair.Position);
+            double predictionError = Math.Abs(
+                (dimension.TextPosition - predictedCenter).DotProduct(wallPair.DirectionGroup.Normal));
+            _maxPredictionError = Math.Max(_maxPredictionError, predictionError);
+        }
+
         if(mapInfo != null) {
-            // Этап 2. Если зона подписи все равно занята, двигаем саму подпись.
-            // Размерная линия при этом остается на месте - она должна идти между гранями стен
-            if(MoveDimensionText(dimension, wallPair, mapInfo)) {
+            // Этап 2. Подпись встает туда, куда ее запланировал подбор
+            bool isTextMoved = false;
+            if(Math.Abs(plannedTextShift) > 1e-9) {
+                ApplyPlannedTextShift(dimension, wallPair, plannedTextShift);
+                isTextMoved = true;
+            }
+
+            // Этап 3. Прогноз мог разойтись с фактом - тогда досдвигаем подпись вдоль линии
+            // уже от ее фактического положения. Сама линия остается на месте
+            if(TryMoveDimensionText(dimension, wallPair, mapInfo)) {
+                isTextMoved = true;
+            }
+            if(isTextMoved) {
                 _textMovedCount++;
             }
 
-            // Занятые клетки закрашиваем, чтобы следующие размеры видели этот
-            PaintDimension(wallPair, mapInfo);
+            // Контроль по факту: подпись осталась на занятом месте - сдвиг сдался.
+            // Проверка до закраски, иначе размер нашел бы занятой собственную зону
+            (var textFirst, var textSecond) = GetActualTextRect(dimension, wallPair);
+            if(!_mapService.CheckInRectangle(mapInfo, textFirst, textSecond)) {
+                RegisterUnresolved(dimension, wallPair);
+            }
+
+            // Занятые клетки закрашиваем по факту, чтобы следующие размеры видели этот
+            PaintDimension(dimension, wallPair, mapInfo);
         }
     }
 
@@ -1090,16 +1365,19 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     /// Отмечает в карте место, занятое поставленным размером.
     /// </summary>
     /// <remarks>
-    /// Закрашивается и зона подписи, и полоса вдоль размерной линии - иначе следующий размер
-    /// видел бы только подпись и мог пройти сквозь линию этого.
+    /// Закрашивается фактическая зона подписи - там, где она в итоге встала, а не середина
+    /// размерной линии: иначе занятым помечалось бы место, с которого подпись уже уехала.
+    /// Зона закрашивается без зазора: зазор добавляется при проверке следующей подписи,
+    /// и если закрасить его еще и здесь, между подписями получится двойной зазор.
+    /// Размерная линия не закрашивается: пересечение подписи чужой линией допустимо.
     /// </remarks>
-    private void PaintDimension(WallPair wallPair, MapInfo mapInfo) {
-        (var firstCorner, var secondCorner) = GetTextZone(wallPair, wallPair.Position, XYZ.Zero);
-        _mapService.PaintInRectangle(mapInfo, firstCorner, secondCorner);
+    private void PaintDimension(Dimension dimension, WallPair wallPair, MapInfo mapInfo) {
+        dimension.ThrowIfNull();
+        wallPair.ThrowIfNull();
+        mapInfo.ThrowIfNull();
 
-        if(TryGetLineBand(wallPair, wallPair.Position, out var bandStart, out var bandEnd)) {
-            _mapService.PaintInRectangle(mapInfo, bandStart, bandEnd);
-        }
+        (var firstCorner, var secondCorner) = GetActualTextRect(dimension, wallPair, withClearance: false);
+        _mapService.PaintInRectangle(mapInfo, firstCorner, secondCorner);
     }
 
     /// <summary>
@@ -1485,6 +1763,7 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
     /// </summary>
     private class WallPair {
         public WallPair(
+            Room room,
             DirectionGroup directionGroup,
             WallSide first,
             WallSide second,
@@ -1494,6 +1773,7 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
             double rangeStart,
             double rangeEnd) {
 
+            Room = room;
             DirectionGroup = directionGroup;
             First = first;
             Second = second;
@@ -1503,6 +1783,12 @@ internal class ApartmentDimensioningViewModel : BaseViewModel {
             RangeStart = rangeStart;
             RangeEnd = rangeEnd;
         }
+
+        /// <summary>
+        /// Помещение, которому принадлежит пара.
+        /// </summary>
+        /// <remarks>Нужно при разводке подписи: влезающая подпись не должна покидать свое помещение.</remarks>
+        public Room Room { get; }
 
         /// <summary>
         /// Направление, которому принадлежит пара.
