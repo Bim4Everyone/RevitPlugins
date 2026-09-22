@@ -16,14 +16,11 @@
             x:Key="MainEditControlVisible"
             TrueValue="Visible"
             FalseValue="Collapsed" />
-        
         <converters:BoolToObjectConverter
             x:Key="BorderThickness"
             TrueValue="1"
             FalseValue="0" />
     </UserControl.Resources>
-    
-    
     
     <StackPanel>
         <Border
@@ -35,53 +32,51 @@
         CornerRadius="{DynamicResource ControlCornerRadius}"
         BorderThickness="{Binding HeaderEditControlBorderVisible, ElementName=_this, 
                 Converter={StaticResource BorderThickness}}">
-            
-        
             <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <ContentControl
-                Grid.Column="0"
-                Grid.Row="0" 
-                Focusable="False"
-                FontSize="24"
-                VerticalAlignment="Center"
-                Margin="{DynamicResource CardControlIconMargin}"
-                Foreground="{DynamicResource CardForeground}"
-                Content="{Binding Icon, ElementName=_this}" />
+                <ContentControl
+                    Grid.Column="0"
+                    Grid.Row="0" 
+                    Focusable="False"
+                    FontSize="24"
+                    VerticalAlignment="Center"
+                    Margin="{DynamicResource CardControlIconMargin}"
+                    Foreground="{DynamicResource CardForeground}"
+                    Content="{Binding Icon, ElementName=_this}" />
 
-            <StackPanel
-                Grid.Column="1"
-                Grid.Row="0" >
-                <ui:TextBlock
-                    Margin="0"
-                    FontTypography="BodyStrong"
-                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                    Text="{Binding Header, ElementName=_this}"
-                    TextWrapping="WrapWithOverflow" />
-                <ui:TextBlock
-                    Appearance="Secondary"
-                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                    Text="{Binding Description, ElementName=_this}"
-                    TextWrapping="WrapWithOverflow" />
-            </StackPanel>
+                <StackPanel
+                    Grid.Column="1"
+                    Grid.Row="0" >
+                    <ui:TextBlock
+                        Margin="0"
+                        FontTypography="BodyStrong"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Text="{Binding Header, ElementName=_this}"
+                        TextWrapping="WrapWithOverflow" />
+                    <ui:TextBlock
+                        Appearance="Secondary"
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        Text="{Binding Description, ElementName=_this}"
+                        TextWrapping="WrapWithOverflow" />
+                </StackPanel>
 
-            <ContentControl
-                Grid.Column="2"
-                Grid.Row="0" 
-                Width="500"
-                VerticalAlignment="Center"
-                Margin="{DynamicResource CardControlContentMargin}"
-                Content="{Binding HeaderEditControl, ElementName=_this}" />
+                <ContentControl
+                    Grid.Column="2"
+                    Grid.Row="0" 
+                    Width="500"
+                    VerticalAlignment="Center"
+                    Margin="{DynamicResource CardControlContentMargin}"
+                    Content="{Binding HeaderEditControl, ElementName=_this}" />
             </Grid>
         </Border>
         
@@ -94,7 +89,6 @@
             BorderBrush="{DynamicResource CardBorderBrush}"
             CornerRadius="0,0,5,5"
             BorderThickness="1,0,1,1">
-            
             <ContentControl
                 VerticalAlignment="Top"
                 Margin="{DynamicResource CardControlContentMargin}"

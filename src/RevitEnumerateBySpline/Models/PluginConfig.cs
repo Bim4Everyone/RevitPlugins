@@ -63,3 +63,15 @@ internal class RevitSettings : ProjectSettings {
     /// </summary>
     public string SaveProperty { get; set; } = string.Empty;
 }
+
+internal class SystemPluginConfig {
+    // Название стадии по умолчанию
+    public string DefaultPhaseName => "Основная планировка";
+
+    // Количество вариантов знаков по умолчанию
+    public int DefaultAccuracyRange => 3;
+    
+    // Количество знаков по умолчанию 
+    public int DefaultAccuracy => 1;
+    
+}

@@ -111,7 +111,6 @@
                             TextWrapping="WrapWithOverflow" />
                     </controls:LabeledControl.MainEditControl>
                 </controls:LabeledControl>
-                
             </StackPanel>
     </ScrollViewer>
 </core:WpfUIPlatformPage>
