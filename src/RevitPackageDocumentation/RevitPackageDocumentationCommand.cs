@@ -33,7 +33,7 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitPackageDocumentationCommand() {
-        PluginName = "RevitPackageDocumentation";
+        PluginName = "Документация комплекта";
     }
 
     /// <summary>
