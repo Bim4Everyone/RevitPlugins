@@ -1,10 +1,18 @@
-﻿using System.Windows.Controls;
+﻿using dosymep.SimpleServices;
+
+using RevitEnumerateBySpline.ViewModels;
 
 namespace RevitEnumerateBySpline.Views.Pages;
 
-public partial class CommonSettingsPage : Page {
-    public CommonSettingsPage() {
+internal partial class CommonSettingsPage {
+    public CommonSettingsPage(MainViewModel viewModel, ILoggerService loggerService,
+        ILanguageService languageService, ILocalizationService localizationService,
+        IUIThemeService uiThemeService, IUIThemeUpdaterService themeUpdaterService) 
+        : base(loggerService,
+            languageService, localizationService,
+            uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        DataContext = viewModel.CommonSettingsViewModel;
     }
 }
 

@@ -18,21 +18,24 @@ internal class MainViewModel : BaseViewModel {
 
     private string? _errorText;
     private string _saveProperty = string.Empty;
-    
+
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
     /// <param name="pluginConfig">Настройки плагина.</param>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
+    /// <param name="commonSettingsViewModel"></param>
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        ILocalizationService localizationService) {
+        ILocalizationService localizationService,
+        CommonSettingsViewModel commonSettingsViewModel) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+        CommonSettingsViewModel = commonSettingsViewModel;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -64,6 +67,8 @@ internal class MainViewModel : BaseViewModel {
         get => _saveProperty;
         set => RaiseAndSetIfChanged(ref _saveProperty, value);
     }
+
+    public CommonSettingsViewModel CommonSettingsViewModel { get; set; }
 
     /// <summary>
     /// Метод загрузки главного окна.

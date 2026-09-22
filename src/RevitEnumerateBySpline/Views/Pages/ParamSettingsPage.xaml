@@ -1,12 +1,119 @@
-﻿<Page x:Class="RevitEnumerateBySpline.Views.Pages.ParamSettingsPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:RevitEnumerateBySpline.Views.Pages"
-      mc:Ignorable="d"
-      Title="ParamSettingsPage" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
-</Page>
+﻿<core:WpfUIPlatformPage 
+    x:Class="RevitEnumerateBySpline.Views.Pages.ParamSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:controls="clr-namespace:RevitEnumerateBySpline.Views.Controls"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitEnumerateBySpline.ViewModels"
+    d:DataContext="{d:DesignInstance vms:CommonSettingsViewModel, IsDesignTimeCreatable=False}"
+    ScrollViewer.CanContentScroll="False"
+    mc:Ignorable="d" x:ClassModifier="internal">
+    
+    <ScrollViewer
+        Padding="{DynamicResource CardControlPadding}"
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+                <controls:LabeledControl
+                    Icon="{ui:SymbolIcon numberRow24}"
+                    Header="{me:LocalizationSource CommonSettingsPage.NumericParameters}"
+                    Description="{me:LocalizationSource CommonSettingsPage.NumericParametersDescription}"
+                    MainEditControlVisible="True">
+
+                    <controls:LabeledControl.MainEditControl>
+                        <StackPanel>
+                            <controls:LabeledControl
+                                Icon="{ui:SymbolIcon numberRow24}"
+                                Header="{me:LocalizationSource CommonSettingsPage.NumericParameter}"
+                                Description="{me:LocalizationSource CommonSettingsPage.NumericParameterDescription}"
+                                HeaderEditControlBorderVisible="False">
+                                <controls:LabeledControl.HeaderEditControl>
+                                    <ComboBox
+                                        ItemsSource="{Binding FilterParameterVeiwModels}"
+                                        SelectedValue="{Binding SelectedFilterParameterVeiwModel}"
+                                        DisplayMemberPath="Name" />
+                                </controls:LabeledControl.HeaderEditControl>
+                            </controls:LabeledControl>
+                            
+                            <controls:LabeledControl
+                                Icon="{ui:SymbolIcon skipForward1024}"
+                                Header="{me:LocalizationSource CommonSettingsPage.StartNumber}"
+                                Description="{me:LocalizationSource CommonSettingsPage.StartNumberDescription}"
+                                HeaderEditControlBorderVisible="False">
+                                <controls:LabeledControl.HeaderEditControl>
+                                    <ui:TextBox
+                                        Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                </controls:LabeledControl.HeaderEditControl>
+                            </controls:LabeledControl>
+                            
+                            <controls:LabeledControl
+                                Icon="{ui:SymbolIcon decimalArrowLeft24}"
+                                Header="{me:LocalizationSource CommonSettingsPage.Prefix}"
+                                Description="{me:LocalizationSource CommonSettingsPage.PrefixDescription}"
+                                HeaderEditControlBorderVisible="False">
+                                <ui:TextBox
+                                    Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </controls:LabeledControl>
+                            
+                            <controls:LabeledControl
+                                Icon="{ui:SymbolIcon decimalArrowRight24}"
+                                Header="{me:LocalizationSource CommonSettingsPage.Suffix}"
+                                Description="{me:LocalizationSource CommonSettingsPage.SuffixDescription}"
+                                HeaderEditControlBorderVisible="False">
+                                <ui:TextBox
+                                    Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </controls:LabeledControl>
+                            
+                        </StackPanel>
+                    </controls:LabeledControl.MainEditControl>
+                </controls:LabeledControl>
+                
+                <controls:LabeledControl
+                    Margin="0,14,0,0"
+                    Icon="{ui:SymbolIcon vehicleCarParking24}"
+                    Header="{me:LocalizationSource CommonSettingsPage.NumericParkParameter}"
+                    Description="{me:LocalizationSource CommonSettingsPage.NumericParkParameterDescription}"
+                    MainEditControlVisible="True">
+                    <controls:LabeledControl.MainEditControl>
+                        <StackPanel>
+                            <controls:LabeledControl
+                                Icon="{ui:SymbolIcon searchInfo24}"
+                                Header="{me:LocalizationSource CommonSettingsPage.SearchDependentParkParameter}"
+                                Description="{me:LocalizationSource CommonSettingsPage.SearchDependentParkParameterDescription}"
+                                HeaderEditControlBorderVisible="False">
+                                <ComboBox
+                                    ItemsSource="{Binding FilterParameterVeiwModels}"
+                                    SelectedValue="{Binding SelectedFilterParameterVeiwModel}"
+                                    DisplayMemberPath="Name" />
+                            </controls:LabeledControl>
+                            
+                            <controls:LabeledControl
+                                Icon="{ui:SymbolIcon check24}"
+                                Header="{me:LocalizationSource CommonSettingsPage.Key}"
+                                Description="{me:LocalizationSource CommonSettingsPage.KeyDescription}"
+                                HeaderEditControlBorderVisible="False">
+                                <ui:TextBox
+                                    Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </controls:LabeledControl>
+                            
+                            <controls:LabeledControl
+                                Icon="{ui:SymbolIcon vehicleCarParking24}"
+                                Header="{me:LocalizationSource CommonSettingsPage.MainParkParameter}"
+                                Description="{me:LocalizationSource CommonSettingsPage.MainParkParameterDescription}"
+                                HeaderEditControlBorderVisible="False">
+                                <ComboBox
+                                    ItemsSource="{Binding FilterParameterVeiwModels}"
+                                    SelectedValue="{Binding SelectedFilterParameterVeiwModel}"
+                                    DisplayMemberPath="Name" />
+                            </controls:LabeledControl>
+                        </StackPanel>
+                    </controls:LabeledControl.MainEditControl>
+                </controls:LabeledControl>
+                
+            </StackPanel>
+    </ScrollViewer>
+</core:WpfUIPlatformPage>

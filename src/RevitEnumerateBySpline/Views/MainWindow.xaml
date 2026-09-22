@@ -16,11 +16,11 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
     
-    Height="500"
-    Width="700"
+    Height="850"
+    Width="1300"
     
-    MinHeight="500"
-    MinWidth="700"
+    MinHeight="850"
+    MinWidth="1300"
    
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -92,7 +92,7 @@
                     HorizontalAlignment="Stretch"
                     TargetPageType="{x:Type pages:ParamSettingsPage}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="subGrid24" FontSize="25" />
+                        <ui:SymbolIcon Symbol="textBulletListSquareEdit24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>
                     <ui:NavigationViewItem.InfoBadge>
                         <ui:InfoBadge
@@ -118,15 +118,15 @@
 
             <ui:Button
                 Margin="8"
-                Width="80"
-                Appearance="Info"
+                Width="130"
+                Appearance="Primary"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
                 Margin="8"
-                Width="80"
+                Width="130"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />

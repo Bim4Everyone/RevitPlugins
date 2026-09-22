@@ -5,21 +5,39 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Margin="5"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     x:Name="_this"
     mc:Ignorable="d"
     d:DesignHeight="50"
     d:DesignWidth="300">
-
-    <Border
+    
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="MainEditControlVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+        
+        <converters:BoolToObjectConverter
+            x:Key="BorderThickness"
+            TrueValue="1"
+            FalseValue="0" />
+    </UserControl.Resources>
+    
+    
+    
+    <StackPanel>
+        <Border
         VerticalAlignment="Center"
         HorizontalAlignment="Stretch"
         Padding="{DynamicResource CardControlPadding}"
         Background="{DynamicResource CardBackground}"
         BorderBrush="{DynamicResource CardBorderBrush}"
         CornerRadius="{DynamicResource ControlCornerRadius}"
-        BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
-        <Grid>
+        BorderThickness="{Binding HeaderEditControlBorderVisible, ElementName=_this, 
+                Converter={StaticResource BorderThickness}}">
+            
+        
+            <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -33,6 +51,7 @@
 
             <ContentControl
                 Grid.Column="0"
+                Grid.Row="0" 
                 Focusable="False"
                 FontSize="24"
                 VerticalAlignment="Center"
@@ -41,8 +60,8 @@
                 Content="{Binding Icon, ElementName=_this}" />
 
             <StackPanel
-                Grid.Column="1">
-                
+                Grid.Column="1"
+                Grid.Row="0" >
                 <ui:TextBlock
                     Margin="0"
                     FontTypography="BodyStrong"
@@ -58,10 +77,28 @@
 
             <ContentControl
                 Grid.Column="2"
+                Grid.Row="0" 
                 Width="500"
                 VerticalAlignment="Center"
                 Margin="{DynamicResource CardControlContentMargin}"
-                Content="{Binding EditControl, ElementName=_this}" />
-        </Grid>
-    </Border>
+                Content="{Binding HeaderEditControl, ElementName=_this}" />
+            </Grid>
+        </Border>
+        
+        <Border
+            VerticalAlignment="Center"
+            HorizontalAlignment="Stretch"
+            Visibility="{Binding MainEditControlVisible, ElementName=_this, 
+                Converter={StaticResource MainEditControlVisible}}"
+            Background="{DynamicResource CardBackground}"
+            BorderBrush="{DynamicResource CardBorderBrush}"
+            CornerRadius="0,0,5,5"
+            BorderThickness="1,0,1,1">
+            
+            <ContentControl
+                VerticalAlignment="Top"
+                Margin="{DynamicResource CardControlContentMargin}"
+                Content="{Binding MainEditControl, ElementName=_this}" />
+        </Border>
+    </StackPanel>
 </UserControl>

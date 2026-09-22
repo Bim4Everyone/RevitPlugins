@@ -1,16 +1,20 @@
-﻿<Page x:Class="RevitEnumerateBySpline.Views.Pages.CommonSettingsPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:controls="clr-namespace:RevitEnumerateBySpline.Views.Controls"
-      xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-      mc:Ignorable="d"
-      Title="CommonSettingsPage" Height="450" Width="800">
+﻿<core:WpfUIPlatformPage  
+    x:Class="RevitEnumerateBySpline.Views.Pages.CommonSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:controls="clr-namespace:RevitEnumerateBySpline.Views.Controls"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:vms="clr-namespace:RevitEnumerateBySpline.ViewModels"
+    d:DataContext="{d:DesignInstance vms:CommonSettingsViewModel, IsDesignTimeCreatable=False}"
+    ScrollViewer.CanContentScroll="False"
+    mc:Ignorable="d" x:ClassModifier="internal">
     
     <ScrollViewer
-        Margin="10,0,10,0"
+        Padding="{DynamicResource CardControlPadding}"
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Disabled">
             <StackPanel>
@@ -18,12 +22,96 @@
                     Icon="{ui:SymbolIcon fullScreenMaximize24}"
                     Header="{me:LocalizationSource CommonSettingsPage.RangeElements}"
                     Description="{me:LocalizationSource CommonSettingsPage.RangeElementsDescription}">
-                        <controls:ModeSwitcherControl                        
+                    
+                    <controls:LabeledControl.HeaderEditControl>
+                        <controls:ModeSwitcherControl
                             DisplayMemberPath="Name"
                             SelectedItem="{Binding SelectedRange}"
                             ItemsSource="{Binding Range}" />
+                    </controls:LabeledControl.HeaderEditControl>
+
+                    <controls:LabeledControl.MainEditControl>
+                        <ui:TextBlock
+                            Margin="10,10,10,10"
+                            Appearance="Secondary"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Text="Content"
+                            TextWrapping="WrapWithOverflow" />
+                    </controls:LabeledControl.MainEditControl>
                 </controls:LabeledControl>
+                
+                <controls:LabeledControl
+                    Margin="0,14,0,0"
+                    Icon="{ui:SymbolIcon multiselectLtr24}"
+                    Header="{me:LocalizationSource CommonSettingsPage.FilterElements}"
+                    Description="{me:LocalizationSource CommonSettingsPage.FilterElementsDescription}">
+                    
+                    <controls:LabeledControl.HeaderEditControl>
+                        <StackPanel
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+
+                            <ui:Button
+                                Margin="0,0,14,0"
+                                Height="37"
+                                Width="130"
+                                Content="{me:LocalizationSource CommonSettingsPage.ResetFilter}"
+                                Command="{Binding ResetFilterCommand}" />
+
+                            <ComboBox
+                                Width="260"
+                                ItemsSource="{Binding FilterParameterVeiwModels}"
+                                SelectedValue="{Binding SelectedFilterParameterVeiwModel}"
+                                DisplayMemberPath="Name" />
+                        </StackPanel>
+                    </controls:LabeledControl.HeaderEditControl>
+
+                    <controls:LabeledControl.MainEditControl>
+                        <ui:TextBlock
+                            Margin="10,10,10,10"
+                            Appearance="Secondary"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Text="Content"
+                            TextWrapping="WrapWithOverflow" />
+                    </controls:LabeledControl.MainEditControl>
+                </controls:LabeledControl>
+                
+                <controls:LabeledControl
+                    Margin="0,14,0,0"
+                    Icon="{ui:SymbolIcon streamInput20}"
+                    Header="{me:LocalizationSource CommonSettingsPage.LineSet}"
+                    Description="{me:LocalizationSource CommonSettingsPage.LineSetDescription}"
+                    MainEditControlVisible="True">
+                    
+                    <controls:LabeledControl.HeaderEditControl>
+                        <StackPanel
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                            <ui:Button
+                                Margin="0,0,14,0"
+                                Height="37"
+                                Width="130"
+                                Content="{me:LocalizationSource CommonSettingsPage.DeleteAllLines}"
+                                Command="{Binding ResetFilterCommand}" />
+                            <ui:Button
+                                Height="37"
+                                Width="260"
+                                Appearance="Primary"
+                                Content="{me:LocalizationSource CommonSettingsPage.SelectLines}"
+                                Command="{Binding SelectLinesCommand}" />
+                        </StackPanel>
+                    </controls:LabeledControl.HeaderEditControl>
+
+                    <controls:LabeledControl.MainEditControl>
+                        <ui:TextBlock
+                            Margin="10,10,10,10"
+                            Appearance="Secondary"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Text="Content"
+                            TextWrapping="WrapWithOverflow" />
+                    </controls:LabeledControl.MainEditControl>
+                </controls:LabeledControl>
+                
             </StackPanel>
-    </ScrollViewer>       
-    
-</Page>
+    </ScrollViewer>
+</core:WpfUIPlatformPage>

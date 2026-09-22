@@ -6,11 +6,51 @@
     <system:String x:Key="MainWindow.Settings">Настройки плагина</system:String>
     <system:String x:Key="MainWindow.CommonSettings">Общие настройки</system:String>
     <system:String x:Key="MainWindow.ParamSettings">Настройки параметров</system:String>
-
+    
+    <system:String x:Key="CommonSettingsPage.RangeElements">Диапазон обработки помещений</system:String>
+    <system:String x:Key="CommonSettingsPage.RangeElementsDescription">Выбор варианта обработки помещений</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.FilterElements">Фильтрация помещений по параметру</system:String>
+    <system:String x:Key="CommonSettingsPage.FilterElementsDescription">Выбор параметра и фильтрация по его значению</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.LineSet">Линии / сплайны для нумерации</system:String>
+    <system:String x:Key="CommonSettingsPage.LineSetDescription">Выбор линии ли сплайнов для нумерации</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.ResetFilter">Сбросить все</system:String>
+    <system:String x:Key="CommonSettingsPage.DeleteAllLines">Удалить все</system:String>
+    <system:String x:Key="CommonSettingsPage.SelectLines">Выбрать линии в модели</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParameters">Параметры нумерации</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParametersDescription">Настройки, влияющие на отображения итогового номера</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParkParameter">Параметры нумерации машино-мест</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParkParameterDescription">Выбор параметров для нумерации зависимых машино-мест</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParameter">Параметр нумерации</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParameterDescription">Параметр, в которое будет записано значение</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.StartNumber">Стартовый номер</system:String>
+    <system:String x:Key="CommonSettingsPage.StartNumberDescription">Номер, с которого начинается нумерация</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Prefix">Префикс</system:String>
+    <system:String x:Key="CommonSettingsPage.PrefixDescription">Символ до числа нумерации</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Suffix">Суффикс</system:String>
+    <system:String x:Key="CommonSettingsPage.SuffixDescription">Символ после числа нумерации</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.SearchDependentParkParameter">Искать признак в параметре</system:String>
+    <system:String x:Key="CommonSettingsPage.SearchDependentParkParameterDescription">Параметр, в значении которого будет производиться поиск ключевого слова</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Key">Ключевое слово</system:String>
+    <system:String x:Key="CommonSettingsPage.KeyDescription">Параметр, в значении которого будет производиться поиск ключевого слова</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.MainParkParameter">Параметр основного машино-места</system:String>
+    <system:String x:Key="CommonSettingsPage.MainParkParameterDescription">Параметр, в значение которого будет записано основное машино-место</system:String>
+    
     
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">Нумеровать</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>
