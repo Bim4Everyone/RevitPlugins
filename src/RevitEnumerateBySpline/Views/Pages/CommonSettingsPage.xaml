@@ -26,18 +26,9 @@
                     <controls:LabeledControl.HeaderEditControl>
                         <controls:ModeSwitcherControl
                             DisplayMemberPath="Name"
-                            SelectedItem="{Binding SelectedRange}"
-                            ItemsSource="{Binding Range}" />
+                            SelectedItem="{Binding RangeViewModel.SelectedRange}"
+                            ItemsSource="{Binding RangeViewModel.Range}" />
                     </controls:LabeledControl.HeaderEditControl>
-
-                    <controls:LabeledControl.MainEditControl>
-                        <ui:TextBlock
-                            Margin="10,10,10,10"
-                            Appearance="Secondary"
-                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Text="Content"
-                            TextWrapping="WrapWithOverflow" />
-                    </controls:LabeledControl.MainEditControl>
                 </controls:LabeledControl>
                 
                 <controls:LabeledControl

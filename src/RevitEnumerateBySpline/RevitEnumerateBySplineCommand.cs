@@ -13,6 +13,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitEnumerateBySpline.Models;
+using RevitEnumerateBySpline.Models.Factories;
 using RevitEnumerateBySpline.Providers;
 using RevitEnumerateBySpline.ViewModels;
 using RevitEnumerateBySpline.Views;
@@ -50,6 +51,11 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к ProvidersFactory
+        kernel.Bind<ProvidersFactory>()
             .ToSelf()
             .InSingletonScope();
 

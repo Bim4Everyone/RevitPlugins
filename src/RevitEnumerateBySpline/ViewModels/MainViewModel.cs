@@ -5,6 +5,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
+using RevitEnumerateBySpline.Models.Factories;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
@@ -18,6 +19,7 @@ internal class MainViewModel : BaseViewModel {
 
     private string? _errorText;
     private string _saveProperty = string.Empty;
+    private readonly ProvidersFactory _providersFactory;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -30,12 +32,14 @@ internal class MainViewModel : BaseViewModel {
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
-        CommonSettingsViewModel commonSettingsViewModel) {
+        CommonSettingsViewModel commonSettingsViewModel,
+        ProvidersFactory providersFactory) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         CommonSettingsViewModel = commonSettingsViewModel;
+        _providersFactory = providersFactory;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -76,6 +80,9 @@ internal class MainViewModel : BaseViewModel {
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
         LoadConfig();
+        
+        CommonSettingsViewModel = new CommonSettingsViewModel(_localizationService, _providersFactory, _revitRepository);
+        CommonSettingsViewModel.LoadView();
     }
 
     /// <summary>

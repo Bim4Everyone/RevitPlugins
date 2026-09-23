@@ -47,6 +47,10 @@
     <system:String x:Key="CommonSettingsPage.MainParkParameter">Параметр основного машино-места</system:String>
     <system:String x:Key="CommonSettingsPage.MainParkParameterDescription">Параметр, в значение которого будет записано основное машино-место</system:String>
     
+    <system:String x:Key="RangeViewModel.AllElementsProvider">Все элементы</system:String>
+    <system:String x:Key="RangeViewModel.SelectedElementsProvider">Выделенные</system:String>
+    <system:String x:Key="RangeViewModel.CurrentViewProvider">Видимые на виде</system:String>
+    
     
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>

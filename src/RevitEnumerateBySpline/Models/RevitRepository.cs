@@ -63,7 +63,6 @@ internal class RevitRepository(
             .ToList();
     }
     
-    
     /// <summary>
     /// Метод проверки, есть ли выделенные помещения
     /// </summary>
@@ -71,6 +70,18 @@ internal class RevitRepository(
         var selected = GetSelectedElements().ToArray();
         return selected.Count() != 0
                && selected.Any(element => element is Room);
+    }
+    
+    /// <summary>
+    /// Метод проверки, есть ли помещения на активном виде
+    /// </summary>
+    public bool HasRoomsOnCurrentView() {
+        var viewId = Document.ActiveView.Id;
+
+        return new FilteredElementCollector(Document, viewId)
+            .OfCategory(BuiltInCategory.OST_Rooms)
+            .WhereElementIsNotElementType()
+            .Any();
     }
     
     // Метод получения всех выделенных элементов модели
