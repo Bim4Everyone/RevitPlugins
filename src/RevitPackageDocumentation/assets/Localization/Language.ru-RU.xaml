@@ -118,7 +118,7 @@
     <system:String x:Key="Validation.FamilyIsNotSelected">Не выбрано семейство</system:String>
     <system:String x:Key="Validation.FamilyNotFoundInFolder">Семейство {0} не найдено в папке</system:String>
     <system:String x:Key="Validation.FamilyNotFoundInProject">Семейство {0} не найдено в проекте</system:String>
-    <system:String x:Key="Validation.FamilyIsNotGenericAnnotation">Семейство {0} не является типовой аннотацией</system:String>
+    <system:String x:Key="Validation.FamilyIsNotInCategory">Семейство {0} не относится к категории {1}</system:String>
     <system:String x:Key="Validation.FamilyTypesReadError">Не удалось получить типоразмеры семейства {0}</system:String>
     <system:String x:Key="Validation.TypeIsNotSelected">Не выбран типоразмер</system:String>
     <system:String x:Key="Validation.TypeNotFoundInFamily">Типоразмер {0} не найден в семействе {1}</system:String>

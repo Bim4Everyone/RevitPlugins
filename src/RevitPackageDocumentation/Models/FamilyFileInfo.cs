@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 namespace RevitPackageDocumentation.Models;
 
 /// <summary>
 /// Сведения о файле семейства, полученные без загрузки семейства в проект
 /// </summary>
 internal class FamilyFileInfo {
-    public FamilyFileInfo(string familyName, bool isGenericAnnotation, IReadOnlyList<string> typeNames) {
+    public FamilyFileInfo(string familyName, BuiltInCategory? builtInCategory, IReadOnlyList<string> typeNames) {
         FamilyName = familyName;
-        IsGenericAnnotation = isGenericAnnotation;
+        FamilyCategory = builtInCategory;
         TypeNames = typeNames;
     }
 
@@ -18,9 +20,9 @@ internal class FamilyFileInfo {
     public string FamilyName { get; }
 
     /// <summary>
-    /// Является ли семейство типовой аннотацией
+    /// Категория семейства. Null, если категорию не удалось определить
     /// </summary>
-    public bool IsGenericAnnotation { get; }
+    public BuiltInCategory? FamilyCategory { get; }
 
     /// <summary>
     /// Имена типоразмеров семейства

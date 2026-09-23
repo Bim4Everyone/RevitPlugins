@@ -20,7 +20,6 @@ internal class FamilyLibraryService {
     private const string _partAtomNamespace = "urn:schemas-autodesk-com:partatom";
     private const string _atomNamespace = "http://www.w3.org/2005/Atom";
     private const string _revitGroupingScheme = "adsk:revit:grouping";
-    private const string _genericAnnotationsEnglishName = "Generic Annotations";
 
     // Файлы резервных копий Revit: Имя.0001.rfa
     private static readonly Regex _backupFileRegex = new(@"\.\d{4}$", RegexOptions.Compiled);
@@ -30,6 +29,9 @@ internal class FamilyLibraryService {
     // Кэш сведений о файлах семейств на время сеанса плагина. Ключ - полный путь до файла
     private readonly Dictionary<string, (DateTime LastWriteTime, FamilyFileInfo Info)> _familyInfoCache =
         new(StringComparer.OrdinalIgnoreCase);
+
+    // Категории текущего документа по их локализованным именам, для распознавания категории из PartAtom
+    private Dictionary<string, BuiltInCategory> _categoriesByName;
 
     public FamilyLibraryService(RevitRepository revitRepository) {
         _revitRepository = revitRepository;
@@ -99,7 +101,7 @@ internal class FamilyLibraryService {
             // поэтому дополнительно ищем его по имени
             family ??= _revitRepository.GetFamilyByName(Path.GetFileNameWithoutExtension(familyPath));
             if(family != null) {
-                _revitRepository.RefreshGenericAnnotationTypes();
+                _revitRepository.RaiseFamilySymbolsChanged();
             }
             return family;
         } catch(Exception) {
@@ -130,8 +132,10 @@ internal class FamilyLibraryService {
                 ?.Element(atom + "term")
                 ?.Value;
 
-            // Если категорию не удалось однозначно распознать - переходим к открытию семейства
-            if(!IsGenericAnnotationCategoryName(categoryName, out bool isGenericAnnotation)) {
+            // Если категорию не удалось распознать, например семейство сохранено в Revit другого языка,
+            // - переходим к открытию семейства, где категория известна точно
+            var builtInCategory = GetBuiltInCategory(categoryName);
+            if(builtInCategory is null) {
                 return null;
             }
 
@@ -148,7 +152,7 @@ internal class FamilyLibraryService {
                 return null;
             }
 
-            return new FamilyFileInfo(Path.GetFileNameWithoutExtension(familyPath), isGenericAnnotation, typeNames);
+            return new FamilyFileInfo(Path.GetFileNameWithoutExtension(familyPath), builtInCategory, typeNames);
         } catch(Exception) {
             return null;
         } finally {
@@ -172,8 +176,7 @@ internal class FamilyLibraryService {
             }
 
             string familyName = Path.GetFileNameWithoutExtension(familyPath);
-            bool isGenericAnnotation = familyDocument.OwnerFamily?.FamilyCategory?.GetBuiltInCategory()
-                == BuiltInCategory.OST_GenericAnnotation;
+            var builtInCategory = familyDocument.OwnerFamily?.FamilyCategory?.GetBuiltInCategory();
 
             var typeNames = familyDocument.FamilyManager.Types
                 .Cast<FamilyType>()
@@ -187,7 +190,7 @@ internal class FamilyLibraryService {
                 typeNames.Add(familyName);
             }
 
-            return new FamilyFileInfo(familyName, isGenericAnnotation, typeNames);
+            return new FamilyFileInfo(familyName, builtInCategory, typeNames);
         } catch(Exception) {
             return null;
         } finally {
@@ -198,24 +201,22 @@ internal class FamilyLibraryService {
     }
 
     /// <summary>
-    /// Проверяет имя категории из PartAtom. Возвращает false, если категорию не удалось распознать.
+    /// Переводит имя категории из PartAtom в BuiltInCategory. PartAtom хранит имя категории на языке той версии
+    /// Revit, в которой семейство было сохранено, поэтому сопоставление идет с именами категорий текущего документа.
+    /// Возвращает null, если категорию распознать не удалось
     /// </summary>
-    private bool IsGenericAnnotationCategoryName(string categoryName, out bool isGenericAnnotation) {
-        isGenericAnnotation = false;
+    private BuiltInCategory? GetBuiltInCategory(string categoryName) {
         if(string.IsNullOrWhiteSpace(categoryName)) {
-            return false;
+            return null;
         }
 
-        string localizedName = Category.GetCategory(
-            _revitRepository.Document, BuiltInCategory.OST_GenericAnnotation)?.Name;
+        _categoriesByName ??= _revitRepository.Document.Settings.Categories
+            .OfType<Category>()
+            .GroupBy(c => c.Name, StringComparer.CurrentCultureIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().GetBuiltInCategory(), StringComparer.CurrentCultureIgnoreCase);
 
-        if(string.Equals(categoryName, localizedName, StringComparison.CurrentCultureIgnoreCase)
-            || string.Equals(categoryName, _genericAnnotationsEnglishName, StringComparison.OrdinalIgnoreCase)) {
-            isGenericAnnotation = true;
-            return true;
-        }
-
-        // Имя категории на другом языке не распознать надежно - проверим через открытие семейства
-        return false;
+        return _categoriesByName.TryGetValue(categoryName, out var builtInCategory)
+            ? builtInCategory
+            : null;
     }
 }

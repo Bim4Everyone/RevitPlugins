@@ -41,7 +41,6 @@ internal class RevitRepository {
         SectionViewTemplates = GetSectionViewTemplates();
         ViewportTypes = GetViewportTypes();
         TextNoteTypes = GetTextNoteTypes();
-        GenericAnnotationTypes = GetGenericAnnotationTypes();
         LegendsInProject = GetLegendsInProject();
         TitleBlockFamilies = GetTitleBlockFamilies();
         Sheets = GetSheets();
@@ -79,7 +78,6 @@ internal class RevitRepository {
     public List<ViewSection> SectionViewTemplates { get; }
     public List<ElementType> ViewportTypes { get; }
     public List<TextNoteType> TextNoteTypes { get; }
-    public List<FamilySymbol> GenericAnnotationTypes { get; private set; }
     public List<View> LegendsInProject { get; }
     public List<Family> TitleBlockFamilies { get; }
     public List<ViewSheet> Sheets { get; }
@@ -89,9 +87,9 @@ internal class RevitRepository {
     public ElementId WorksetParamId { get; }
 
     /// <summary>
-    /// Событие обновления списка типоразмеров типовых аннотаций (например, после загрузки семейства)
+    /// Событие изменения состава загруженных семейств в проекте (например, после загрузки семейства с диска)
     /// </summary>
-    public event EventHandler GenericAnnotationTypesChanged;
+    public event EventHandler FamilySymbolsChanged;
 
 
     /// <summary>
@@ -170,10 +168,11 @@ internal class RevitRepository {
         .ToList();
 
     /// <summary>
-    /// Возвращает список типоразмеров типовых аннотаций в проекте
+    /// Возвращает список типоразмеров семейств указанной категории в проекте.
+    /// Поиск выполняется напрямую в документе, т.к. семейство могло быть загружено после запуска плагина
     /// </summary>
-    public List<FamilySymbol> GetGenericAnnotationTypes() => new FilteredElementCollector(Document)
-        .OfCategory(BuiltInCategory.OST_GenericAnnotation)
+    public List<FamilySymbol> GetFamilySymbols(BuiltInCategory builtInCategory) => new FilteredElementCollector(Document)
+        .OfCategory(builtInCategory)
         .WhereElementIsElementType()
         .OfType<FamilySymbol>()
         .OrderBy(a => a.FamilyName)
@@ -181,22 +180,24 @@ internal class RevitRepository {
         .ToList();
 
     /// <summary>
-    /// Повторно собирает список типоразмеров типовых аннотаций в проекте и уведомляет подписчиков
+    /// Возвращает типоразмер семейства указанной категории по имени семейства и типоразмера
     /// </summary>
-    public void RefreshGenericAnnotationTypes() {
-        GenericAnnotationTypes = GetGenericAnnotationTypes();
-        GenericAnnotationTypesChanged?.Invoke(this, EventArgs.Empty);
+    public FamilySymbol GetFamilySymbol(BuiltInCategory builtInCategory, string familyName, string typeName) =>
+        GetFamilySymbols(builtInCategory)
+            .FirstOrDefault(s => s.FamilyName.Equals(familyName) && s.Name.Equals(typeName));
+
+    /// <summary>
+    /// Уведомляет подписчиков об изменении состава загруженных семейств
+    /// </summary>
+    public void RaiseFamilySymbolsChanged() {
+        FamilySymbolsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
-    /// Возвращает типоразмер типовой аннотации по имени семейства и типоразмера.
-    /// Поиск выполняется напрямую в документе, т.к. семейство могло быть загружено после запуска плагина
+    /// Возвращает локализованное имя категории в текущей версии Revit
     /// </summary>
-    public FamilySymbol GetGenericAnnotationSymbol(string familyName, string typeName) => new FilteredElementCollector(Document)
-        .OfCategory(BuiltInCategory.OST_GenericAnnotation)
-        .WhereElementIsElementType()
-        .OfType<FamilySymbol>()
-        .FirstOrDefault(s => s.FamilyName.Equals(familyName) && s.Name.Equals(typeName));
+    public string GetCategoryName(BuiltInCategory builtInCategory) =>
+        Category.GetCategory(Document, builtInCategory)?.Name ?? builtInCategory.ToString();
 
     /// <summary>
     /// Возвращает семейство по имени

@@ -23,6 +23,11 @@ namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponen
 /// В режиме папки семейство загружается в проект с заменой при создании компонента.
 /// </summary>
 internal class TypicalAnnotationVM : SheetComponentVM {
+    /// <summary>
+    /// Категория семейств, с которыми работает модуль
+    /// </summary>
+    private const BuiltInCategory _builtInCategory = BuiltInCategory.OST_GenericAnnotation;
+
     private readonly FamilyLibraryService _familyLibraryService;
     private readonly IOpenFolderDialogService _openFolderDialogService;
 
@@ -69,7 +74,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         SelectFolderCommand = RelayCommand.Create(SelectFolder, CanSelectFolder);
 
         // После загрузки семейства в проект обновляем списки модулей, работающих в режиме проекта
-        Repository.GenericAnnotationTypesChanged += OnGenericAnnotationTypesChanged;
+        Repository.FamilySymbolsChanged += OnFamilySymbolsChanged;
     }
 
     public ICommand SelectFolderCommand { get; }
@@ -246,7 +251,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
 
     private List<string> GetProjectFamilyNames() {
         _familyListError = null;
-        return Repository.GenericAnnotationTypes
+        return Repository.GetFamilySymbols(_builtInCategory)
             .Select(s => s.FamilyName)
             .Distinct()
             .OrderBy(name => name, StringComparer.CurrentCultureIgnoreCase)
@@ -255,7 +260,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
 
     private List<string> GetProjectTypeNames(string familyName) {
         _typeListError = null;
-        return Repository.GenericAnnotationTypes
+        return Repository.GetFamilySymbols(_builtInCategory)
             .Where(s => s.FamilyName.Equals(familyName))
             .Select(s => s.Name)
             .Distinct()
@@ -298,8 +303,9 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             _typeListError = GetText("Validation.FamilyTypesReadError", familyName);
             return [];
         }
-        if(!familyInfo.IsGenericAnnotation) {
-            _typeListError = GetText("Validation.FamilyIsNotGenericAnnotation", familyName);
+        if(familyInfo.FamilyCategory != _builtInCategory) {
+            _typeListError = GetText("Validation.FamilyIsNotInCategory",
+                familyName, Repository.GetCategoryName(_builtInCategory));
             return [];
         }
         return familyInfo.TypeNames
@@ -351,7 +357,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         return IsFromFolder;
     }
 
-    private void OnGenericAnnotationTypesChanged(object sender, EventArgs e) {
+    private void OnFamilySymbolsChanged(object sender, EventArgs e) {
         if(!IsFromFolder) {
             ResolveSelection(FamilyNameForConfig, TypeNameForConfig);
         }
@@ -384,7 +390,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             }
         }
 
-        var annotationType = Repository.GetGenericAnnotationSymbol(SelectedFamilyName, SelectedTypeName);
+        var annotationType = Repository.GetFamilySymbol(_builtInCategory, SelectedFamilyName, SelectedTypeName);
         if(annotationType != null && !annotationType.IsActive) {
             annotationType.Activate();
             Repository.Document.Regenerate();

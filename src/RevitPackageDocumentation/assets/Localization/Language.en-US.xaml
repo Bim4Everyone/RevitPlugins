@@ -117,7 +117,7 @@
     <system:String x:Key="Validation.FamilyIsNotSelected">Family is not selected</system:String>
     <system:String x:Key="Validation.FamilyNotFoundInFolder">Family {0} not found in the folder</system:String>
     <system:String x:Key="Validation.FamilyNotFoundInProject">Family {0} not found in the project</system:String>
-    <system:String x:Key="Validation.FamilyIsNotGenericAnnotation">Family {0} is not a generic annotation</system:String>
+    <system:String x:Key="Validation.FamilyIsNotInCategory">Family {0} does not belong to category {1}</system:String>
     <system:String x:Key="Validation.FamilyTypesReadError">Failed to get types of family {0}</system:String>
     <system:String x:Key="Validation.TypeIsNotSelected">Type is not selected</system:String>
     <system:String x:Key="Validation.TypeNotFoundInFamily">Type {0} not found in family {1}</system:String>
