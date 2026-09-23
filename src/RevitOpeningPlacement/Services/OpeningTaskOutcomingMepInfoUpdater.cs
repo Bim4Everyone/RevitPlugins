@@ -4,15 +4,13 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using DevExpress.XtraRichEdit.Layout.Engine;
-
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
 using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models;
-using RevitOpeningPlacement.Models.Extensions;
+using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
 using RevitOpeningPlacement.OpeningModels.Enums;
@@ -59,24 +57,35 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
     private ICollection<ElementId> _intersectingMepElementsCache;
 
     /// <summary>
-    /// Кэш для хранения найденных конструкций-кандидатов на хосты обрабатываемого задания на отверстия
+    /// Кэш для хранения найденных конструкций-кандидатов на хосты обрабатываемого задания на отверстия.
+    /// <para>Заполняется <see cref="EnsureHostConstructionsCache"/> один раз на задание.</para>
     /// </summary>
     private (ICollection<ElementId> HostCandidates, IConstructureLinkElementsProvider Link) _hostConstructionsCache;
+
+    /// <summary>
+    /// Кэш для хранения чистовых отверстий из связи, которые пересекаются с обрабатываемым заданием.
+    /// <para>Заполняется вместе с <see cref="_hostConstructionsCache"/>.</para>
+    /// </summary>
+    private ICollection<IOpeningReal> _hostOpeningsCache;
 
     /// <summary>
     /// Кэш для хранения солида обрабатываемого исходящего задания на отверстие из активного файла
     /// </summary>
     private Solid _openingSolidCache;
 
+    private readonly OutcomingTaskStatusesSettings _statusesSettings;
+
 
     public OpeningTaskOutcomingMepInfoUpdater(
         RevitRepository revitRepository,
         ISolidProviderUtils solidProviderUtils,
-        IOutcomingTaskOffsetFinder offsetFinder) {
+        IOutcomingTaskOffsetFinder offsetFinder,
+        OpeningConfig config) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _solidProviderUtils = solidProviderUtils ?? throw new ArgumentNullException(nameof(solidProviderUtils));
         _offsetFinder = offsetFinder ?? throw new ArgumentNullException(nameof(offsetFinder));
+        _statusesSettings = config.NavigatorSettings;
         _outcomingTasksIds = GetOpeningsMepTasksOutcoming(_revitRepository);
         _mepElementsIds = revitRepository.GetMepElementsIds();
         _constructureLinks = GetLinkProviders(revitRepository);
@@ -96,32 +105,49 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
                 outcomingTask.Status = OpeningTaskOutcomingStatus.Invalid;
                 return;
             }
-            if(OpeningTaskIsManuallyPlaced(outcomingTask)) {
+
+            // Поиск конструкций-основ нужен и для хоста, который назначается в любой ветке,
+            // и для проверок актуальности и разных конструкций. Прогреваем кэш явно и один раз,
+            // иначе выключение CheckNotActual заставит FindAndSetHost перебирать связи заново.
+            EnsureHostConstructionsCache(outcomingTask);
+
+            if(_statusesSettings.CheckManuallyPlaced
+               && OpeningTaskIsManuallyPlaced(outcomingTask)) {
                 FindAndSetHost(outcomingTask);
                 outcomingTask.Status = OpeningTaskOutcomingStatus.ManuallyPlaced;
                 return;
             }
-            if(OpeningTaskIsNotActual(outcomingTask)) {
+
+            if(_statusesSettings.CheckNotActual
+               && OpeningTaskIsNotActual(outcomingTask)) {
                 FindAndSetHost(outcomingTask);
                 outcomingTask.Status = OpeningTaskOutcomingStatus.NotActual;
                 return;
             }
-            if(OpeningTaskInUnacceptableConstructions(outcomingTask)) {
+
+            if(_statusesSettings.CheckUnacceptableConstructions
+               && OpeningTaskInUnacceptableConstructions(outcomingTask)) {
                 FindAndSetHost(outcomingTask);
                 outcomingTask.Status = OpeningTaskOutcomingStatus.UnacceptableConstructions;
                 return;
             }
-            if(OpeningTaskInDifferentConstructions(outcomingTask)) {
+
+            if(_statusesSettings.DifferentConstructionsEnabled
+               && OpeningTaskInDifferentConstructions(outcomingTask)) {
                 FindAndSetHost(outcomingTask);
                 outcomingTask.Status = OpeningTaskOutcomingStatus.DifferentConstructions;
                 return;
             }
-            if(OpeningTaskIsIntersecting(outcomingTask)) {
+
+            if(_statusesSettings.CheckIntersects
+               && OpeningTaskIsIntersecting(outcomingTask)) {
                 FindAndSetHost(outcomingTask);
                 outcomingTask.Status = OpeningTaskOutcomingStatus.Intersects;
                 return;
             }
-            if(OpeningTaskIsUnited(outcomingTask)) {
+
+            if(_statusesSettings.CheckUnited
+               && OpeningTaskIsUnited(outcomingTask)) {
                 FindAndSetHost(outcomingTask);
                 outcomingTask.Status = OpeningTaskOutcomingStatus.United;
                 return;
@@ -192,6 +218,23 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
     /// </summary>
     /// <param name="opening">Исходящее задание на отверстие</param>
     private void SetSizeStatus(OpeningMepTaskOutcoming opening) {
+        opening.Status = GetOffsetsStatus(opening);
+        FindAndSetHost(opening);
+    }
+
+    /// <summary>
+    /// Возвращает статус задания по его отступам от элемента инженерных систем.
+    /// <para>
+    /// Диапазоны взаимоисключающие, поэтому выключение проверки не подменяет один статус другим:
+    /// все задания становятся корректными.
+    /// </para>
+    /// </summary>
+    /// <param name="opening">Исходящее задание на отверстие</param>
+    private OpeningTaskOutcomingStatus GetOffsetsStatus(OpeningMepTaskOutcoming opening) {
+        if(!_statusesSettings.CheckOffsets) {
+            return OpeningTaskOutcomingStatus.Correct;
+        }
+
         var mepElement = GetIntersectingMepElements(opening).First();
 
         double minOffset = _offsetFinder.GetMinHorizontalOffsetSum(mepElement);
@@ -200,14 +243,12 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
         double vert = GetRoundDistance(_offsetFinder.FindVerticalOffsetsSum(opening, mepElement));
 
         if((horiz < minOffset) || (vert < minOffset)) {
-            opening.Status = OpeningTaskOutcomingStatus.TooSmall;
-        } else if((horiz > maxOffset) || (vert > maxOffset)) {
-            opening.Status = OpeningTaskOutcomingStatus.TooBig;
-        } else if((minOffset <= horiz) && (horiz <= maxOffset)
-            && (minOffset <= vert) && (vert <= maxOffset)) {
-            opening.Status = OpeningTaskOutcomingStatus.Correct;
+            return OpeningTaskOutcomingStatus.TooSmall;
         }
-        FindAndSetHost(opening);
+
+        return ((horiz > maxOffset) || (vert > maxOffset))
+            ? OpeningTaskOutcomingStatus.TooBig
+            : OpeningTaskOutcomingStatus.Correct;
     }
 
     /// <summary>
@@ -246,6 +287,7 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
         _intersectingMepElementsCache = null;
         _openingSolidCache = null;
         _hostConstructionsCache = (null, null);
+        _hostOpeningsCache = null;
     }
 
     /// <summary>
@@ -272,29 +314,51 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
     /// <param name="mepTaskOutcoming">Исходящее задание на отверстие из активного файла</param>
     /// <returns><True - задание на отверстие в разных констркуциях, False - другие случаи/returns>
     private bool OpeningTaskInDifferentConstructions(OpeningMepTaskOutcoming mepTaskOutcoming) {
-        if(_hostConstructionsCache.Link != null && _hostConstructionsCache.HostCandidates != null) {
-            return _hostConstructionsCache.HostCandidates
-                .Select(hostId => _hostConstructionsCache.Link.Document
-                    .GetElement(hostId)
-                    .Category
-                    .GetBuiltInCategory())
-                .Distinct()
-                .Count() > 1;
-        } else {
-            foreach(var link in _constructureLinks) {
-                var hostConstructions = GetHostConstructionsForThisOpeningTask(
-                    mepTaskOutcoming,
-                    link,
-                    out _);
-                if(hostConstructions.Count > 0) {
-                    return hostConstructions
-                        .Select(hostId => link.Document.GetElement(hostId).Category.GetBuiltInCategory())
-                        .Distinct()
-                        .Count() > 1;
-                }
-            }
+        if(!HostConstructionsFound()) {
             return false;
         }
+
+        return _hostConstructionsCache.HostCandidates
+                   .Select(hostId => _hostConstructionsCache.Link.Document
+                       .GetElement(hostId)
+                       .Category
+                       .GetBuiltInCategory())
+                   .Distinct()
+                   .Count()
+               > 1;
+    }
+
+    /// <summary>
+    /// Находит конструкции-основы обрабатываемого задания и складывает их в кэш.
+    /// <para>
+    /// Берется первая связь, в которой такие конструкции нашлись.
+    /// Повторный вызов для того же задания ничего не делает.
+    /// </para>
+    /// </summary>
+    /// <param name="mepTaskOutcoming">Исходящее задание на отверстие из активного файла</param>
+    private void EnsureHostConstructionsCache(OpeningMepTaskOutcoming mepTaskOutcoming) {
+        if(HostConstructionsFound()) {
+            return;
+        }
+
+        foreach(var link in _constructureLinks) {
+            var hostConstructions = GetHostConstructionsForThisOpeningTask(
+                mepTaskOutcoming,
+                link,
+                out var intersectingOpenings);
+            if(hostConstructions.Count > 0) {
+                _hostConstructionsCache = (hostConstructions, link);
+                _hostOpeningsCache = intersectingOpenings;
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Были ли найдены конструкции-основы обрабатываемого задания
+    /// </summary>
+    private bool HostConstructionsFound() {
+        return (_hostConstructionsCache.Link != null) && (_hostConstructionsCache.HostCandidates != null);
     }
 
     /// <summary>
@@ -314,33 +378,19 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
         // во-первых есть конструкции в связанных файлах, внутри которых расположено задание на отверстие (хостов),
         // во-вторых, что ни один элемент ВИС, проходящий через задание на отверстие,
         // не пересекается с этими конструкциями
-        foreach(var link in _constructureLinks) {
-            // поиск конструкций из связей, которые можно считать хостами для исходящего задания на отверстие
-            var hostConstructions = GetHostConstructionsForThisOpeningTask(
-                mepTaskOutcoming,
-                link,
-                out var intersectingOpenings);
-            if(hostConstructions.Count > 0) {
-                // хост-конструкции найдены.
-                // проверяем, что элементы ВИС из активного файла,
-                // проходящие через исходящее задание на отверстие, не пересекают эти конструкции
-                // и заканчиваем обработку
-                _hostConstructionsCache = (hostConstructions, link);
-                return MepElementsIntersectConstructionsOrOpenings(
-                        mepTaskOutcoming,
-                        hostConstructions,
-                        intersectingOpenings,
-                        link);
-            } else {
-                // если не найдены конструкции, которые можно считать хостами текущего задания на отверстие,
-                // то либо задание на отверстие висит в воздухе,
-                // либо задание на отверстие пересекается с другой связью. Переходим к следующей связи.
-                continue;
-            }
+        if(!HostConstructionsFound()) {
+            // конструкции-основы не найдены ни в одной связи: либо задание висит в воздухе,
+            // либо конструкция сдвинулась. Корректная ситуация не найдена, задание не актуально
+            return true;
         }
 
-        // корректная ситуация не найдена, отверстие считается не актуальным
-        return true;
+        // хост-конструкции найдены. Проверяем, что элементы ВИС из активного файла,
+        // проходящие через исходящее задание на отверстие, не пересекают эти конструкции
+        return MepElementsIntersectConstructionsOrOpenings(
+            mepTaskOutcoming,
+            _hostConstructionsCache.HostCandidates,
+            _hostOpeningsCache,
+            _hostConstructionsCache.Link);
     }
 
     /// <summary>
@@ -552,23 +602,14 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
     /// Назначает хост задания на отверстие
     /// </summary>
     private void FindAndSetHost(OpeningMepTaskOutcoming mepTaskOutcoming) {
-        if(_hostConstructionsCache.Link != null && _hostConstructionsCache.HostCandidates != null) {
-            mepTaskOutcoming.Host = FindHostConstruction(
-                mepTaskOutcoming,
-                _hostConstructionsCache.HostCandidates,
-                _hostConstructionsCache.Link);
+        if(!HostConstructionsFound()) {
             return;
         }
-        foreach(var link in _constructureLinks) {
-            var hostConstructions = GetHostConstructionsForThisOpeningTask(
-                mepTaskOutcoming,
-                link,
-                out _);
-            if(hostConstructions.Count > 0) {
-                mepTaskOutcoming.Host = FindHostConstruction(mepTaskOutcoming, hostConstructions, link);
-                break;
-            }
-        }
+
+        mepTaskOutcoming.Host = FindHostConstruction(
+            mepTaskOutcoming,
+            _hostConstructionsCache.HostCandidates,
+            _hostConstructionsCache.Link);
     }
 
     /// <summary>

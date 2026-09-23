@@ -28,7 +28,8 @@ using RevitOpeningPlacement.Views.Settings;
 using RevitOpeningPlacement.Views.Utils;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
-internal class MainViewModel : BaseViewModel {
+
+internal class MepPlacementSettingsViewModel : BaseViewModel {
     private string _errorText;
     private string _messageText;
     private ObservableCollection<MepCategoryViewModel> _mepCategories;
@@ -43,7 +44,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILogicalFilterFactory _filterFactory;
     private string _configName;
 
-    public MainViewModel(
+    public MepPlacementSettingsViewModel(
         RevitRepository revitRepository,
         ConfigFileService configFileService,
         Models.Configs.OpeningConfig openingConfig,
@@ -269,8 +270,10 @@ internal class MainViewModel : BaseViewModel {
             mepCategory);
     }
 
-    private Models.Configs.OpeningConfig GetOpeningConfig() {
-        var config = Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc);
+    /// <summary>
+    /// Записывает текущие настройки расстановки в конфиг
+    /// </summary>
+    public Models.Configs.OpeningConfig UpdateConfig(Models.Configs.OpeningConfig config) {
         config.Categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
         config.ShowPlacingErrors = ShowPlacingErrors;
         config.Name = ConfigName.Trim();
@@ -280,7 +283,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void SaveConfig() {
-        var config = GetOpeningConfig();
+        var config = UpdateConfig(Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc));
         config.SaveProjectConfig();
         UpdateOpeningConfigPath(config.ProjectConfigPath);
         MessageText = "Файл настроек успешно сохранен.";
@@ -288,7 +291,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void SaveAsConfig() {
-        var config = GetOpeningConfig();
+        var config = UpdateConfig(Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc));
         var css = new ConfigSaverService(SaveFileDialogService);
         string path = css.Save(config, _revitRepository.Doc);
         UpdateOpeningConfigPath(path);
@@ -321,6 +324,11 @@ internal class MainViewModel : BaseViewModel {
         mepConfigPath.OpeningConfigPath = path;
         mepConfigPath.SaveProjectConfig();
     }
+
+    /// <summary>
+    /// Проверяет корректность введенных настроек расстановки, заполняя <see cref="ErrorText"/> при ошибке
+    /// </summary>
+    public bool Validate() => CanSaveConfig();
 
     private bool CanSaveConfig() {
         if(string.IsNullOrWhiteSpace(ConfigName)) {

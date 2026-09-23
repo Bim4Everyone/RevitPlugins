@@ -1,32 +1,41 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 
-using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
-internal class OpeningRealsArConfigViewModel : BaseViewModel {
-    private readonly RevitRepository _revitRepository;
 
-    public OpeningRealsArConfigViewModel(RevitRepository revitRepository, OpeningRealsArConfig openingRealsArConfig) {
-        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        if(openingRealsArConfig is null) {
-            throw new ArgumentNullException(nameof(openingRealsArConfig));
+internal class KrPlacementSettingsViewModel : BaseViewModel {
+    public KrPlacementSettingsViewModel(OpeningRealsKrConfig openingRealsKrConfig) {
+        if(openingRealsKrConfig is null) {
+            throw new ArgumentNullException(nameof(openingRealsKrConfig));
         }
 
-        RoundElevation = openingRealsArConfig.ElevationRounding > 0;
-        SelectedRoundElevation = openingRealsArConfig.ElevationRounding;
-        RoundSize = openingRealsArConfig.Rounding > 0;
-        SelectedRoundSize = openingRealsArConfig.Rounding;
-
-        SaveConfigCommand = RelayCommand.Create(SaveConfig);
+        PlaceByMep = openingRealsKrConfig.PlacementType == OpeningRealKrPlacementType.PlaceByMep;
+        PlaceByAr = !PlaceByMep;
+        RoundElevation = openingRealsKrConfig.ElevationRounding > 0;
+        SelectedRoundElevation = openingRealsKrConfig.ElevationRounding;
+        RoundSize = openingRealsKrConfig.Rounding > 0;
+        SelectedRoundSize = openingRealsKrConfig.Rounding;
     }
 
+    private bool _placeByMep;
+
+    public bool PlaceByMep {
+        get => _placeByMep;
+        set => RaiseAndSetIfChanged(ref _placeByMep, value);
+    }
+
+    private bool _placeByAr;
+
+    public bool PlaceByAr {
+        get => _placeByAr;
+        set => RaiseAndSetIfChanged(ref _placeByAr, value);
+    }
 
     private bool _roundSize;
 
@@ -79,18 +88,25 @@ internal class OpeningRealsArConfigViewModel : BaseViewModel {
     /// </summary>
     public IReadOnlyCollection<int> EnabledRoundings { get; } = new int[] { 1, 5, 10, 25, 50 };
 
+    private string _errorText;
 
-    public ICommand SaveConfigCommand { get; }
+    /// <summary>
+    /// Текст ошибки валидации страницы.
+    /// <para>Настройки расстановки этого раздела вводятся выбором из списка, ошибок не бывает.</para>
+    /// </summary>
+    public string ErrorText {
+        get => _errorText;
+        set => RaiseAndSetIfChanged(ref _errorText, value);
+    } // TODO отрефакторить ErrorText в 3-х окнах
 
-    private void SaveConfig() {
-        GetOpeningConfig().SaveProjectConfig();
-    }
-
-
-    private OpeningRealsArConfig GetOpeningConfig() {
-        var config = OpeningRealsArConfig.GetOpeningConfig(_revitRepository.Doc);
+    /// <summary>
+    /// Записывает текущие настройки расстановки в конфиг
+    /// </summary>
+    public void UpdateConfig(OpeningRealsKrConfig config) {
+        config.PlacementType = PlaceByAr
+            ? OpeningRealKrPlacementType.PlaceByAr
+            : OpeningRealKrPlacementType.PlaceByMep;
         config.Rounding = SelectedRoundSize;
         config.ElevationRounding = SelectedRoundElevation;
-        return config;
     }
 }
