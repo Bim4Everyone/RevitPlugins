@@ -20,7 +20,15 @@ public partial class FiltrationComboBoxControl : UserControl {
             new PropertyMetadata(null, OnComboBoxSourceChanged));
 
     public static readonly DependencyProperty ComboBoxSelectedProperty =
-        DependencyProperty.Register(nameof(ComboBoxSelected), typeof(Element), typeof(FiltrationComboBoxControl));
+        DependencyProperty.Register(nameof(ComboBoxSelected), typeof(object), typeof(FiltrationComboBoxControl));
+
+    /// <summary>
+    /// Путь до отображаемого свойства элемента. По умолчанию "Name" (для элементов Revit).
+    /// Для списка строк нужно передать пустую строку.
+    /// </summary>
+    public static readonly DependencyProperty DisplayMemberPathProperty =
+        DependencyProperty.Register(nameof(DisplayMemberPath), typeof(string), typeof(FiltrationComboBoxControl),
+            new PropertyMetadata("Name"));
 
     public static readonly DependencyProperty FilterListProperty =
         DependencyProperty.Register(nameof(FilterList), typeof(FiltrationComboBoxFilterListVM), typeof(FiltrationComboBoxControl),
@@ -44,9 +52,17 @@ public partial class FiltrationComboBoxControl : UserControl {
         set => SetValue(ComboBoxSourceProperty, value);
     }
 
-    public Element ComboBoxSelected {
-        get => (Element) GetValue(ComboBoxSelectedProperty);
+    /// <summary>
+    /// Выбранный элемент: элемент Revit (Element) или строка
+    /// </summary>
+    public object ComboBoxSelected {
+        get => GetValue(ComboBoxSelectedProperty);
         set => SetValue(ComboBoxSelectedProperty, value);
+    }
+
+    public string DisplayMemberPath {
+        get => (string) GetValue(DisplayMemberPathProperty);
+        set => SetValue(DisplayMemberPathProperty, value);
     }
 
     internal FiltrationComboBoxFilterListVM FilterList {
@@ -72,7 +88,7 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// <summary>
     /// Коллекция элементов для ComboBox, после того как проведена фильтрация по фильтрам
     /// </summary>
-    public ObservableCollection<Element> FilteredItemsSource { get; } = [];
+    public ObservableCollection<object> FilteredItemsSource { get; } = [];
 
 
     /// <summary>
@@ -89,6 +105,7 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// </summary>
     private static void OnFilterListSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
         var control = (FiltrationComboBoxControl) d;
+        control.UnsubscribeFromFilterList(e.OldValue as FiltrationComboBoxFilterListVM);
         control.UpdateFilteredItems();
         control.SubscribeToFilterList();
     }
@@ -133,6 +150,18 @@ public partial class FiltrationComboBoxControl : UserControl {
         UpdateFilteredItems();
     }
 
+    /// <summary>
+    /// Отписывается от предыдущего списка фильтров, чтобы выгруженный контрол не реагировал на его изменения
+    /// </summary>
+    private void UnsubscribeFromFilterList(FiltrationComboBoxFilterListVM oldFilterList) {
+        if(oldFilterList?.ValueList == null) { return; }
+
+        oldFilterList.ValueList.CollectionChanged -= OnValueListCollectionChanged;
+        foreach(var item in oldFilterList.ValueList) {
+            UnsubscribeFromFilterItem(item);
+        }
+    }
+
     private void SubscribeToFilterItem(FiltrationComboBoxFilterVM item) {
         if(item is INotifyPropertyChanged notifyItem) {
             notifyItem.PropertyChanged += OnFilterItemPropertyChanged;
@@ -156,19 +185,23 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// Обновляет значения ComboBox по фильтрам
     /// </summary>
     private void UpdateFilteredItems() {
-        FilteredItemsSource.Clear();
-
+        // Источник или фильтры становятся null, когда контрол выгружается (например, при переключении листа
+        // шаблон компонента уничтожается и привязки к DataContext сбрасываются). Если в этот момент очистить список,
+        // ComboBox сбросит SelectedItem в null и через еще не отвязанную двустороннюю привязку ComboBoxSelected
+        // запишет null в ViewModel - выбор будет потерян. Поэтому в этом случае список не трогаем.
         if(ComboBoxSource is null || FilterList is null) {
             return;
         }
+
+        FilteredItemsSource.Clear();
         var filters = FilterList.ValueList
             .Select(x => x?.Value)
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .ToList();
 
-        foreach(var element in ComboBoxSource.OfType<Element>()) {
-            if(ItemMatchesAllFilters(element, filters)) {
-                FilteredItemsSource.Add(element);
+        foreach(object item in ComboBoxSource) {
+            if(item is not null && ItemMatchesAllFilters(item, filters)) {
+                FilteredItemsSource.Add(item);
             }
         }
 
@@ -180,20 +213,29 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// <summary>
     /// Проверяет, что имя элемента содержит все строки фильтра
     /// </summary>
-    private bool ItemMatchesAllFilters(Element element, IReadOnlyCollection<string> filters) {
+    private bool ItemMatchesAllFilters(object item, IReadOnlyCollection<string> filters) {
         if(filters.Count == 0) {
             return true;
         }
-        string name = element.Name ?? string.Empty;
+        string name = GetItemName(item);
         return filters.All(name.Contains);
+    }
+
+    /// <summary>
+    /// Возвращает имя элемента для фильтрации: строка как есть, для элемента Revit - его имя
+    /// </summary>
+    private static string GetItemName(object item) {
+        return item switch {
+            string str => str,
+            Element element => element.Name ?? string.Empty,
+            _ => item?.ToString() ?? string.Empty
+        };
     }
 
     /// <summary>
     /// Показывает/скрывает видимость фильтров
     /// </summary>
     private void Button_Click(object sender, RoutedEventArgs e) {
-        flyout.IsOpen = flyout.IsOpen == true
-            ? false
-            : true;
+        flyout.IsOpen = flyout.IsOpen != true;
     }
 }

@@ -1055,21 +1055,75 @@
                         Width="Auto"/>
                     <ColumnDefinition
                         Width="*" />
+                    <ColumnDefinition
+                        Width="Auto" />
+                    <ColumnDefinition
+                        Width="Auto" />
                 </Grid.ColumnDefinitions>
 
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!--Семейство-->
                 <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Text="{extensions:Localized MainWindow.FamilyName}" />
+
+                <controls:FiltrationComboBoxControl
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Margin="5"
+                    DisplayMemberPath=""
+                    ComboBoxSource="{Binding FamilyNames}"
+                    ComboBoxSelected="{Binding SelectedFamilyName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    FilterList="{Binding FamilyNameFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
+
+                <!--Тумблер источника: слева - проект, справа - папка с семействами-->
+                <ui:ToggleSwitch
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    IsChecked="{Binding IsFromFolder, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    ToolTip="{extensions:Localized MainWindow.FamilySourceToolTip}" />
+
+                <!--Выбор папки с семействами-->
+                <ui:Button
+                    Grid.Row="0"
+                    Grid.Column="3"
+                    Margin="5"
+                    Height="37"
+                    Width="37"
+                    Padding="0"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Icon="{ui:SymbolIcon Folder24}"
+                    Command="{Binding SelectFolderCommand}"
+                    ToolTip="{Binding FolderButtonToolTip}"
+                    ToolTipService.ShowOnDisabled="True" />
+
+                <!--Типоразмер-->
+                <TextBlock
+                    Grid.Row="1"
                     Grid.Column="0"
                     Margin="5"
                     VerticalAlignment="Center"
                     Text="{extensions:Localized MainWindow.ElementType}" />
 
                 <controls:FiltrationComboBoxControl
+                    Grid.Row="1"
                     Grid.Column="1"
                     Margin="5"
-                    ComboBoxSource="{Binding DataContext.GenericAnnotationTypes, RelativeSource={RelativeSource AncestorType=Window}}"
-                    ComboBoxSelected="{Binding AnnotationType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    FilterList="{Binding AnnotationTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ItemTemplate="{StaticResource WithFamilyNameItemTemplate}"
+                    DisplayMemberPath=""
+                    ComboBoxSource="{Binding TypeNames}"
+                    ComboBoxSelected="{Binding SelectedTypeName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    FilterList="{Binding TypeNameFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
             </Grid>
 

@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Reflection;
 
@@ -92,6 +93,11 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
             .To<SheetSetDataFactory>()
             .InSingletonScope();
 
+        // Сервис работы с библиотекой семейств на диске (типовые аннотации из папки)
+        kernel.Bind<FamilyLibraryService>()
+            .ToSelf()
+            .InSingletonScope();
+
         // Сервис обновления свойств по параметрам конфигурации
         kernel.Bind<StringParamSetService>()
             .ToSelf()
@@ -129,6 +135,12 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
             title: localizationService.GetLocalizedString("MainViewModel.SaveConfiguration"),
             defaultFileName: "config.json",
             addExtension: true);
+
+        // Сервис выбора папки с семействами (передается фабрикой в модули типовых аннотаций)
+        kernel.UseWpfOpenFolderDialog<SheetSetVMFactory>(
+            title: localizationService.GetLocalizedString("MainViewModel.SelectFamilyFolder"),
+            initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+            multiSelect: false);
 
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());

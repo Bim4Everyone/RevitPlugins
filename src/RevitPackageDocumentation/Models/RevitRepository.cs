@@ -79,7 +79,7 @@ internal class RevitRepository {
     public List<ViewSection> SectionViewTemplates { get; }
     public List<ElementType> ViewportTypes { get; }
     public List<TextNoteType> TextNoteTypes { get; }
-    public List<FamilySymbol> GenericAnnotationTypes { get; }
+    public List<FamilySymbol> GenericAnnotationTypes { get; private set; }
     public List<View> LegendsInProject { get; }
     public List<Family> TitleBlockFamilies { get; }
     public List<ViewSheet> Sheets { get; }
@@ -87,6 +87,11 @@ internal class RevitRepository {
     public List<ViewSchedule> Specs { get; }
     public List<ScheduleTypeInfo> FilterTypes { get; }
     public ElementId WorksetParamId { get; }
+
+    /// <summary>
+    /// Событие обновления списка типоразмеров типовых аннотаций (например, после загрузки семейства)
+    /// </summary>
+    public event EventHandler GenericAnnotationTypesChanged;
 
 
     /// <summary>
@@ -174,6 +179,32 @@ internal class RevitRepository {
         .OrderBy(a => a.FamilyName)
         .ThenBy(a => a.Name)
         .ToList();
+
+    /// <summary>
+    /// Повторно собирает список типоразмеров типовых аннотаций в проекте и уведомляет подписчиков
+    /// </summary>
+    public void RefreshGenericAnnotationTypes() {
+        GenericAnnotationTypes = GetGenericAnnotationTypes();
+        GenericAnnotationTypesChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Возвращает типоразмер типовой аннотации по имени семейства и типоразмера.
+    /// Поиск выполняется напрямую в документе, т.к. семейство могло быть загружено после запуска плагина
+    /// </summary>
+    public FamilySymbol GetGenericAnnotationSymbol(string familyName, string typeName) => new FilteredElementCollector(Document)
+        .OfCategory(BuiltInCategory.OST_GenericAnnotation)
+        .WhereElementIsElementType()
+        .OfType<FamilySymbol>()
+        .FirstOrDefault(s => s.FamilyName.Equals(familyName) && s.Name.Equals(typeName));
+
+    /// <summary>
+    /// Возвращает семейство по имени
+    /// </summary>
+    public Family GetFamilyByName(string familyName) => new FilteredElementCollector(Document)
+        .OfClass(typeof(Family))
+        .OfType<Family>()
+        .FirstOrDefault(f => f.Name.Equals(familyName));
 
     /// <summary>
     /// Возвращает список всех легенд, присутствующих в проекте

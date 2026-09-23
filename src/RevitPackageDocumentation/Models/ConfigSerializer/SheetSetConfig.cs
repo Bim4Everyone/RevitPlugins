@@ -182,8 +182,28 @@ public class TextNoteData : SheetComponentData {
 public class TypicalAnnotationData : SheetComponentData {
     public override string ComponentType => "TypicalAnnotation";
 
-    public string AnnotationTypeName { get; set; }
-    public FiltrationComboBoxFilterListData AnnotationTypeFilterValues { get; set; }
+    /// <summary>
+    /// Источник семейства: false - из проекта, true - из папки с семействами
+    /// </summary>
+    public bool? IsFromFolder { get; set; }
+
+    /// <summary>
+    /// Путь до папки с семействами (используется, когда IsFromFolder = true)
+    /// </summary>
+    public string FamilyFolderPath { get; set; }
+
+    /// <summary>
+    /// Имя семейства (в режиме папки - имя файла .rfa без расширения)
+    /// </summary>
+    public string FamilyName { get; set; }
+
+    /// <summary>
+    /// Имя типоразмера
+    /// </summary>
+    public string TypeName { get; set; }
+
+    public FiltrationComboBoxFilterListData FamilyNameFilterValues { get; set; }
+    public FiltrationComboBoxFilterListData TypeNameFilterValues { get; set; }
 }
 
 /// <summary>

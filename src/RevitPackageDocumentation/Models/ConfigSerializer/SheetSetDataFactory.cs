@@ -153,11 +153,12 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ModuleComment = vm.ModuleComment,
                 CustomParamsList = GetCustomParametersList(vm),
 
-                AnnotationTypeName =
-                    string.Format("{0}: {1}",
-                    vm.AnnotationType?.FamilyName ?? string.Empty,
-                    vm.AnnotationType?.Name ?? string.Empty),
-                AnnotationTypeFilterValues = GetFiltrationComboBoxFilterList(vm.AnnotationTypeFilter),
+                IsFromFolder = vm.IsFromFolder,
+                FamilyFolderPath = vm.FamilyFolderPath ?? string.Empty,
+                FamilyName = vm.FamilyNameForConfig,
+                TypeName = vm.TypeNameForConfig,
+                FamilyNameFilterValues = GetFiltrationComboBoxFilterList(vm.FamilyNameFilter),
+                TypeNameFilterValues = GetFiltrationComboBoxFilterList(vm.TypeNameFilter),
             },
 
             LegendViewVM vm => new LegendViewData {

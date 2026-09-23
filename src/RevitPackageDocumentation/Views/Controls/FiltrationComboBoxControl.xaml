@@ -25,19 +25,6 @@
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
-            <DataTemplate
-                x:Key="WithFamilyNameItemTemplate">
-                <TextBlock>
-                    <TextBlock.Text>
-                        <MultiBinding
-                            StringFormat="{}{0}: {1}">
-                            <Binding Path="FamilyName" />
-                            <Binding Path="Name" />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -56,7 +43,7 @@
             Grid.Column="0"
             Margin="0 5 5 5"
             VerticalAlignment="Top"
-            DisplayMemberPath="Name"
+            DisplayMemberPath="{Binding Path=DisplayMemberPath, ElementName=root}"
             Style="{Binding Path=ComboBoxStyle, ElementName=root, TargetNullValue={StaticResource {x:Type ComboBox}}}"
             ItemsSource="{Binding Path=FilteredItemsSource, ElementName=root}"
             SelectedItem="{Binding Path=ComboBoxSelected, ElementName=root}"

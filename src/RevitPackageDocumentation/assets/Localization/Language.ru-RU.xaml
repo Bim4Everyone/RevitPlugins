@@ -72,6 +72,8 @@
     <system:String x:Key="MainWindow.TextWidthOnSheet">Ширина текста на листе</system:String>
     <system:String x:Key="MainWindow.TextTemplate">Шаблон текста</system:String>
     <system:String x:Key="MainWindow.ElementType">Типоразмер</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Имя семейства</system:String>
+    <system:String x:Key="MainWindow.FamilySourceToolTip">Источник семейства: слева — из проекта, справа — из папки с семействами</system:String>
     <system:String x:Key="MainWindow.Select">Выбрать</system:String>
     <system:String x:Key="MainWindow.RemoveAfterCreation">Снять после создания</system:String>
 
@@ -110,7 +112,16 @@
     <system:String x:Key="Validation.TextNoteTypeIsNull">Не выбран тип текстовой заметки</system:String>
     <system:String x:Key="Validation.TextWidthIsNotCorrect">Ширина текста не корректна</system:String>
 
-    <system:String x:Key="Validation.AnnotationTypeIsNull">Не выбран тип типовой аннотации</system:String>
+    <system:String x:Key="Validation.FamilyFolderIsEmpty">Не выбрана папка с семействами</system:String>
+    <system:String x:Key="Validation.FamilyFolderNotFound">Папка не найдена: {0}</system:String>
+    <system:String x:Key="Validation.FamilyFolderHasNoFamilies">В папке нет семейств (.rfa)</system:String>
+    <system:String x:Key="Validation.FamilyIsNotSelected">Не выбрано семейство</system:String>
+    <system:String x:Key="Validation.FamilyNotFoundInFolder">Семейство {0} не найдено в папке</system:String>
+    <system:String x:Key="Validation.FamilyNotFoundInProject">Семейство {0} не найдено в проекте</system:String>
+    <system:String x:Key="Validation.FamilyIsNotGenericAnnotation">Семейство {0} не является типовой аннотацией</system:String>
+    <system:String x:Key="Validation.FamilyTypesReadError">Не удалось получить типоразмеры семейства {0}</system:String>
+    <system:String x:Key="Validation.TypeIsNotSelected">Не выбран типоразмер</system:String>
+    <system:String x:Key="Validation.TypeNotFoundInFamily">Типоразмер {0} не найден в семействе {1}</system:String>
     
     <system:String x:Key="MainViewModel.Export">Экспорт</system:String>
     <system:String x:Key="MainViewModel.ExportIsSuccessful">Экспорт прошел успешно!</system:String>
@@ -131,4 +142,5 @@
     <system:String x:Key="MainViewModel.ErrorDeserializingType">Ошибка десериализации типа</system:String>
     <system:String x:Key="MainViewModel.SelectConfigurationFile">Выберите файл конфигурации</system:String>
     <system:String x:Key="MainViewModel.SaveConfiguration">Сохранить конфигурацию</system:String>
+    <system:String x:Key="MainViewModel.SelectFamilyFolder">Выберите папку с семействами</system:String>
 </ResourceDictionary>
