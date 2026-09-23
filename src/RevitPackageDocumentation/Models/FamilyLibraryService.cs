@@ -26,10 +26,6 @@ internal class FamilyLibraryService {
 
     private readonly RevitRepository _revitRepository;
 
-    // Кэш сведений о файлах семейств на время сеанса плагина. Ключ - полный путь до файла
-    private readonly Dictionary<string, (DateTime LastWriteTime, FamilyFileInfo Info)> _familyInfoCache =
-        new(StringComparer.OrdinalIgnoreCase);
-
     // Категории текущего документа по их локализованным именам, для распознавания категории из PartAtom
     private Dictionary<string, BuiltInCategory> _categoriesByName;
 
@@ -64,6 +60,9 @@ internal class FamilyLibraryService {
     /// Получает сведения о семействе (категория и типоразмеры) без загрузки его в проект.
     /// Сначала выполняется попытка чтения PartAtom, если не удалось - семейство открывается в фоне и закрывается.
     /// </summary>
+    /// <remarks>
+    /// Файл читается при каждом вызове, результаты не сохраняются между вызовами
+    /// </remarks>
     /// <returns>True, если сведения удалось получить</returns>
     public bool TryGetFamilyInfo(string familyPath, out FamilyFileInfo familyInfo) {
         familyInfo = null;
@@ -71,19 +70,8 @@ internal class FamilyLibraryService {
             return false;
         }
 
-        DateTime lastWriteTime = File.GetLastWriteTimeUtc(familyPath);
-        if(_familyInfoCache.TryGetValue(familyPath, out var cached) && cached.LastWriteTime == lastWriteTime) {
-            familyInfo = cached.Info;
-            return true;
-        }
-
         familyInfo = ReadByPartAtom(familyPath) ?? ReadByOpeningDocument(familyPath);
-        if(familyInfo is null) {
-            return false;
-        }
-
-        _familyInfoCache[familyPath] = (lastWriteTime, familyInfo);
-        return true;
+        return familyInfo != null;
     }
 
     /// <summary>
