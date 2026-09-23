@@ -30,6 +30,11 @@ internal class OpeningRealsArConfig : ProjectConfig {
     /// </summary>
     public int ElevationRounding { get; set; } = 1;
 
+    /// <summary>
+    /// Настройки статусов Навигатора
+    /// </summary>
+    public NavigatorArSettings NavigatorSettings { get; set; } = new();
+
     public static OpeningRealsArConfig GetOpeningConfig(Document document) {
         return document is null
             ? throw new ArgumentNullException(nameof(document))
