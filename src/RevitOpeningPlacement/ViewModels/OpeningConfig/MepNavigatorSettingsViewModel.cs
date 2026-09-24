@@ -13,6 +13,7 @@ internal class MepNavigatorSettingsViewModel : BaseViewModel {
     private bool _checkManuallyPlaced;
     private bool _checkNotActual;
     private bool _checkDifferentConstructions;
+    private bool _checkHost;
     private bool _checkUnacceptableConstructions;
     private bool _checkIntersects;
     private bool _checkUnited;
@@ -27,6 +28,7 @@ internal class MepNavigatorSettingsViewModel : BaseViewModel {
         _checkManuallyPlaced = settings.CheckManuallyPlaced;
         _checkNotActual = settings.CheckNotActual;
         _checkDifferentConstructions = settings.CheckDifferentConstructions;
+        _checkHost = settings.CheckHost;
         _checkUnacceptableConstructions = settings.CheckUnacceptableConstructions;
         _checkIntersects = settings.CheckIntersects;
         _checkUnited = settings.CheckUnited;
@@ -81,6 +83,14 @@ internal class MepNavigatorSettingsViewModel : BaseViewModel {
     }
 
     /// <summary>
+    /// Включает поиск основы задания на отверстие
+    /// </summary>
+    public bool CheckHost {
+        get => _checkHost;
+        set => RaiseAndSetIfChanged(ref _checkHost, value);
+    }
+
+    /// <summary>
     /// Включает проверку расположения задания в недопустимых конструкциях
     /// </summary>
     public bool CheckUnacceptableConstructions {
@@ -120,6 +130,7 @@ internal class MepNavigatorSettingsViewModel : BaseViewModel {
         settings.CheckManuallyPlaced = CheckManuallyPlaced;
         settings.CheckNotActual = CheckNotActual;
         settings.CheckDifferentConstructions = CheckDifferentConstructions;
+        settings.CheckHost = CheckHost;
         settings.CheckUnacceptableConstructions = CheckUnacceptableConstructions;
         settings.CheckIntersects = CheckIntersects;
         settings.CheckUnited = CheckUnited;

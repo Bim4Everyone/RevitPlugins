@@ -22,6 +22,12 @@ internal class NavigatorMepSettings {
     public bool CheckDifferentConstructions { get; set; } = true;
 
     /// <summary>
+    /// Включает поиск основы задания на отверстие.
+    /// <para>Работает быстрее при включенной <see cref="CheckNotActual"/>: она уже находит конструкции-кандидаты.</para>
+    /// </summary>
+    public bool CheckHost { get; set; } = true;
+
+    /// <summary>
     /// Включает проверку расположения задания в недопустимых конструкциях
     /// </summary>
     public bool CheckUnacceptableConstructions { get; set; } = true;
