@@ -86,11 +86,6 @@ internal class RevitRepository {
     public List<ScheduleTypeInfo> FilterTypes { get; }
     public ElementId WorksetParamId { get; }
 
-    /// <summary>
-    /// Событие изменения состава загруженных семейств в проекте (например, после загрузки семейства с диска)
-    /// </summary>
-    public event EventHandler FamilySymbolsChanged;
-
 
     /// <summary>
     /// Возвращает список типоразмеров видов в плане в проекте
@@ -186,12 +181,6 @@ internal class RevitRepository {
         GetFamilySymbols(builtInCategory)
             .FirstOrDefault(s => s.FamilyName.Equals(familyName) && s.Name.Equals(typeName));
 
-    /// <summary>
-    /// Уведомляет подписчиков об изменении состава загруженных семейств
-    /// </summary>
-    public void RaiseFamilySymbolsChanged() {
-        FamilySymbolsChanged?.Invoke(this, EventArgs.Empty);
-    }
 
     /// <summary>
     /// Возвращает локализованное имя категории в текущей версии Revit

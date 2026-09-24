@@ -72,9 +72,6 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         ChangeFamilySourceCommand = RelayCommand.Create(ChangeFamilySource);
         SelectFamilyCommand = RelayCommand.Create(SelectFamily);
         SelectTypeCommand = RelayCommand.Create(SelectType);
-
-        // После загрузки семейства в проект обновляем списки модулей, работающих в режиме проекта
-        Repository.FamilySymbolsChanged += OnFamilySymbolsChanged;
     }
 
     public ICommand SelectFolderCommand { get; }
@@ -275,14 +272,16 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             _typeListError = GetText("Validation.FamilyTypesReadError", familyName);
             return [];
         }
-        if(familyInfo.FamilyCategory != _builtInCategory) {
-            _typeListError = GetText("Validation.FamilyIsNotInCategory",
-                familyName, Repository.GetCategoryName(_builtInCategory));
-            return [];
+
+        if(familyInfo.FamilyCategory == _builtInCategory) {
+            return familyInfo.TypeNames
+                .OrderBy(name => name, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
         }
-        return familyInfo.TypeNames
-            .OrderBy(name => name, StringComparer.CurrentCultureIgnoreCase)
-            .ToList();
+
+        _typeListError = GetText("Validation.FamilyIsNotInCategory",
+            familyName, Repository.GetCategoryName(_builtInCategory));
+        return [];
     }
 
     /// <summary>
@@ -363,12 +362,6 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         return IsFromFolder;
     }
 
-    private void OnFamilySymbolsChanged(object sender, EventArgs e) {
-        if(!IsFromFolder) {
-            ResolveSelection(FamilyNameForConfig, TypeNameForConfig);
-        }
-    }
-
 
     public override void Process(bool processDependent = false) {
         var annotationType = GetAnnotationType();
@@ -397,14 +390,17 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         }
 
         var annotationType = Repository.GetFamilySymbol(_builtInCategory, SelectedFamilyName, SelectedTypeName);
-        if(annotationType != null && !annotationType.IsActive) {
-            annotationType.Activate();
-            Repository.Document.Regenerate();
+        if(annotationType == null
+           || annotationType.IsActive) {
+            return annotationType;
         }
+
+        annotationType.Activate();
+        Repository.Document.Regenerate();
         return annotationType;
     }
 
-    public FamilyInstance Place(FamilySymbol annotationType) {
+    private FamilyInstance Place(FamilySymbol annotationType) {
         var position = new XYZ(
             UnitUtilsHelper.ConvertToInternalValue(-100),
             UnitUtilsHelper.ConvertToInternalValue(250),

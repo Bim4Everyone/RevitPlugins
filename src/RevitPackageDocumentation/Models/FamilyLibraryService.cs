@@ -87,11 +87,7 @@ internal class FamilyLibraryService {
             _revitRepository.Document.LoadFamily(familyPath, new FamilyLoadOptions(), out Family family);
             // Если такое же семейство уже есть в проекте и не изменилось, Revit возвращает false и не отдает семейство,
             // поэтому дополнительно ищем его по имени
-            family ??= _revitRepository.GetFamilyByName(Path.GetFileNameWithoutExtension(familyPath));
-            if(family != null) {
-                _revitRepository.RaiseFamilySymbolsChanged();
-            }
-            return family;
+            return family ?? _revitRepository.GetFamilyByName(Path.GetFileNameWithoutExtension(familyPath));
         } catch(Exception) {
             return null;
         }
