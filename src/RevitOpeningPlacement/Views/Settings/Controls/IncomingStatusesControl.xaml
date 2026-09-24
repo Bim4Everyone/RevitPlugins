@@ -23,7 +23,7 @@
         <controls:StatusToggleControl
             Title="{me:LocalizationSource NavigatorSettings.Incoming.UnacceptableConstructions.Title}"
             Description="{me:LocalizationSource NavigatorSettings.Incoming.UnacceptableConstructions.Description}"
-            CostTag="{me:LocalizationSource NavigatorSettings.Cost.Slow}"
+            CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
             IsChecked="{Binding CheckUnacceptableConstructions, UpdateSourceTrigger=PropertyChanged}" />
 
         <controls:StatusToggleControl
@@ -61,7 +61,7 @@
                             Style="{StaticResource StatusToggleTagBorder}">
                             <ui:TextBlock
                                 Style="{StaticResource StatusToggleTagText}"
-                                Text="{me:LocalizationSource NavigatorSettings.Cost.Slow}" />
+                                Text="{me:LocalizationSource NavigatorSettings.Cost.Medium}" />
                         </Border>
                     </StackPanel>
                     <ui:TextBlock

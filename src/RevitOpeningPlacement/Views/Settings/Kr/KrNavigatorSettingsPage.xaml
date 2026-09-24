@@ -43,7 +43,7 @@
                 DataContext="{Binding RealOpeningStatuses}"
                 Title="{me:LocalizationSource NavigatorSettings.Real.TooClose.Title}"
                 Description="{me:LocalizationSource NavigatorSettings.Real.TooClose.Description}"
-                CostTag="{me:LocalizationSource NavigatorSettings.Cost.Slow}"
+                CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
                 IsChecked="{Binding CheckTooClose, UpdateSourceTrigger=PropertyChanged}">
                 <controls:StatusToggleControl.NestedContent>
                     <DockPanel

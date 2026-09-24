@@ -68,13 +68,13 @@
             <controls:StatusToggleControl
                 Title="{me:LocalizationSource NavigatorSettings.Outcoming.UnacceptableConstructions.Title}"
                 Description="{me:LocalizationSource NavigatorSettings.Outcoming.UnacceptableConstructions.Description}"
-                CostTag="{me:LocalizationSource NavigatorSettings.Cost.Slow}"
+                CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
                 IsChecked="{Binding CheckUnacceptableConstructions, UpdateSourceTrigger=PropertyChanged}" />
 
             <controls:StatusToggleControl
                 Title="{me:LocalizationSource NavigatorSettings.Outcoming.Intersects.Title}"
                 Description="{me:LocalizationSource NavigatorSettings.Outcoming.Intersects.Description}"
-                CostTag="{me:LocalizationSource NavigatorSettings.Cost.Slow}"
+                CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
                 IsChecked="{Binding CheckIntersects, UpdateSourceTrigger=PropertyChanged}" />
 
             <controls:StatusToggleControl

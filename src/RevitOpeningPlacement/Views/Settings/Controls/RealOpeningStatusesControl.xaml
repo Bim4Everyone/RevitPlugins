@@ -29,7 +29,7 @@
                 <controls:StatusToggleControl
                     Title="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.Title}"
                     Description="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.Description}"
-                    CostTag="{me:LocalizationSource NavigatorSettings.Cost.Fast}"
+                    CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
                     IsChecked="{Binding CheckVolumeMatch, UpdateSourceTrigger=PropertyChanged}">
                     <controls:StatusToggleControl.NestedContent>
                         <StackPanel>
