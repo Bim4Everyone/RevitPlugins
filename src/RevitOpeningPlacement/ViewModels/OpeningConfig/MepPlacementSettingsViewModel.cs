@@ -31,9 +31,7 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 
 internal class MepPlacementSettingsViewModel : BaseViewModel {
     private string _errorText;
-    private string _messageText;
     private ObservableCollection<MepCategoryViewModel> _mepCategories;
-    private DispatcherTimer _timer;
     private readonly RevitRepository _revitRepository;
     private readonly ConfigFileService _configFileService;
     private readonly IResolutionRoot _root;
@@ -82,8 +80,6 @@ internal class MepPlacementSettingsViewModel : BaseViewModel {
         RoundUnitedTaskElevation = openingConfig.UnitedTasksElevationRounding > 0;
         SelectedElevationRoundingForUnitedTask = openingConfig.UnitedTasksElevationRounding;
         ShowPlacingErrors = openingConfig.ShowPlacingErrors;
-
-        InitializeTimer();
 
         SaveConfigCommand = RelayCommand.Create(SaveConfig, CanSaveConfig);
         SaveAsConfigCommand = RelayCommand.Create(SaveAsConfig, CanSaveConfig);
@@ -177,12 +173,7 @@ internal class MepPlacementSettingsViewModel : BaseViewModel {
 
     public string ErrorText {
         get => _errorText;
-        set => RaiseAndSetIfChanged(ref _errorText, value);
-    }
-
-    public string MessageText {
-        get => _messageText;
-        set => RaiseAndSetIfChanged(ref _messageText, value);
+        private set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
     public ICommand SaveConfigCommand { get; }
@@ -197,16 +188,6 @@ internal class MepPlacementSettingsViewModel : BaseViewModel {
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
-
-    private void InitializeTimer() {
-        _timer = new DispatcherTimer {
-            Interval = new TimeSpan(0, 0, 0, 3)
-        };
-        _timer.Tick += (s, a) => {
-            MessageText = null;
-            _timer.Stop();
-        };
-    }
 
     private void CheckMepFilter() {
         SaveConfig();
@@ -286,8 +267,6 @@ internal class MepPlacementSettingsViewModel : BaseViewModel {
         var config = UpdateConfig(Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc));
         config.SaveProjectConfig();
         UpdateOpeningConfigPath(config.ProjectConfigPath);
-        MessageText = "Файл настроек успешно сохранен.";
-        _timer.Start();
     }
 
     private void SaveAsConfig() {
@@ -295,8 +274,6 @@ internal class MepPlacementSettingsViewModel : BaseViewModel {
         var css = new ConfigSaverService(SaveFileDialogService);
         string path = css.Save(config, _revitRepository.Doc);
         UpdateOpeningConfigPath(path);
-        MessageText = "Файл настроек успешно сохранен.";
-        _timer.Start();
     }
 
     private void LoadConfig() {
@@ -315,8 +292,6 @@ internal class MepPlacementSettingsViewModel : BaseViewModel {
             SelectedElevationRoundingForUnitedTask = config.UnitedTasksElevationRounding;
             UpdateOpeningConfigPath(config.ProjectConfigPath);
         }
-        MessageText = "Файл настроек успешно загружен.";
-        _timer.Start();
     }
 
     private void UpdateOpeningConfigPath(string path) {
@@ -324,11 +299,6 @@ internal class MepPlacementSettingsViewModel : BaseViewModel {
         mepConfigPath.OpeningConfigPath = path;
         mepConfigPath.SaveProjectConfig();
     }
-
-    /// <summary>
-    /// Проверяет корректность введенных настроек расстановки, заполняя <see cref="ErrorText"/> при ошибке
-    /// </summary>
-    public bool Validate() => CanSaveConfig();
 
     private bool CanSaveConfig() {
         if(string.IsNullOrWhiteSpace(ConfigName)) {

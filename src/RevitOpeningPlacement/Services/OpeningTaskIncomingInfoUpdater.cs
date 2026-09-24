@@ -74,7 +74,8 @@ internal class OpeningTaskIncomingInfoUpdater : OpeningInfoUpdaterBase<IOpeningT
             intersectingOpenings = GetIntersectingOpeningsIds(taskSolid, taskBBox);
         }
 
-        if(_statusesSettings.HostEnabled) {
+        if(_statusesSettings.CheckIntersections
+           && _statusesSettings.CheckHost) {
             incomingTask.Host = FindHost(taskSolid, intersectingStructureElements, intersectingOpenings);
         }
 
@@ -87,9 +88,10 @@ internal class OpeningTaskIncomingInfoUpdater : OpeningInfoUpdaterBase<IOpeningT
             return;
         }
 
-        if(_statusesSettings.DifferentConstructionsEnabled
-            && _hostFinder.InDifferentCategories(
-                GetHostElements(intersectingStructureElements, intersectingOpenings))) {
+        if(_statusesSettings.CheckIntersections
+           && _statusesSettings.CheckDifferentConstructions
+           && _hostFinder.InDifferentCategories(
+               GetHostElements(intersectingStructureElements, intersectingOpenings))) {
             incomingTask.Status = OpeningTaskIncomingStatus.DifferentConstructions;
             return;
         }

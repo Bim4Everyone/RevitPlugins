@@ -73,7 +73,7 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
     /// </summary>
     private Solid _openingSolidCache;
 
-    private readonly OutcomingTaskStatusesSettings _statusesSettings;
+    private readonly NavigatorMepSettings _statusesSettings;
 
 
     public OpeningTaskOutcomingMepInfoUpdater(
@@ -132,7 +132,8 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
                 return;
             }
 
-            if(_statusesSettings.DifferentConstructionsEnabled
+            if(_statusesSettings.CheckNotActual
+               && _statusesSettings.CheckDifferentConstructions
                && OpeningTaskInDifferentConstructions(outcomingTask)) {
                 FindAndSetHost(outcomingTask);
                 outcomingTask.Status = OpeningTaskOutcomingStatus.DifferentConstructions;
@@ -606,6 +607,7 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
             return;
         }
 
+        // TODO зачем вообще нужен хост исходящего задания? только для графики?
         mepTaskOutcoming.Host = FindHostConstruction(
             mepTaskOutcoming,
             _hostConstructionsCache.HostCandidates,

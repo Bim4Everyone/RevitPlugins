@@ -9,6 +9,11 @@ using RevitOpeningPlacement.Models.Configs;
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 
 internal class ArPlacementSettingsViewModel : BaseViewModel {
+    private bool _roundSize;
+    private bool _roundElevation;
+    private int _selectedRoundElevation;
+    private int _selectedRoundSize;
+
     public ArPlacementSettingsViewModel(OpeningRealsArConfig openingRealsArConfig) {
         if(openingRealsArConfig is null) {
             throw new ArgumentNullException(nameof(openingRealsArConfig));
@@ -19,9 +24,6 @@ internal class ArPlacementSettingsViewModel : BaseViewModel {
         RoundSize = openingRealsArConfig.Rounding > 0;
         SelectedRoundSize = openingRealsArConfig.Rounding;
     }
-
-
-    private bool _roundSize;
 
     /// <summary>
     /// Включает/выключает округление размеров
@@ -34,8 +36,6 @@ internal class ArPlacementSettingsViewModel : BaseViewModel {
         }
     }
 
-    private bool _roundElevation;
-
     /// <summary>
     /// Включает/выключает округление отметки
     /// </summary>
@@ -47,8 +47,6 @@ internal class ArPlacementSettingsViewModel : BaseViewModel {
         }
     }
 
-    private int _selectedRoundElevation;
-
     /// <summary>
     /// Округление высотной отметки в мм
     /// </summary>
@@ -56,8 +54,6 @@ internal class ArPlacementSettingsViewModel : BaseViewModel {
         get => _selectedRoundElevation;
         set => RaiseAndSetIfChanged(ref _selectedRoundElevation, value);
     }
-
-    private int _selectedRoundSize;
 
     /// <summary>
     /// Округление размеров в мм
@@ -70,18 +66,7 @@ internal class ArPlacementSettingsViewModel : BaseViewModel {
     /// <summary>
     /// Доступные для выбора значения округления в мм
     /// </summary>
-    public IReadOnlyCollection<int> EnabledRoundings { get; } = new int[] { 1, 5, 10, 25, 50 };
-
-    private string _errorText;
-
-    /// <summary>
-    /// Текст ошибки валидации страницы.
-    /// <para>Настройки расстановки этого раздела вводятся выбором из списка, ошибок не бывает.</para>
-    /// </summary>
-    public string ErrorText {
-        get => _errorText;
-        set => RaiseAndSetIfChanged(ref _errorText, value);
-    }
+    public IReadOnlyCollection<int> EnabledRoundings { get; } = [1, 5, 10, 25, 50];
 
     /// <summary>
     /// Записывает текущие настройки расстановки в конфиг

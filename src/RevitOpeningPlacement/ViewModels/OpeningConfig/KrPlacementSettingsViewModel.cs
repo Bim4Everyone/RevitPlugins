@@ -10,6 +10,13 @@ using RevitOpeningPlacement.Models.Configs;
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 
 internal class KrPlacementSettingsViewModel : BaseViewModel {
+    private bool _placeByMep;
+    private bool _placeByAr;
+    private bool _roundSize;
+    private bool _roundElevation;
+    private int _selectedRoundElevation;
+    private int _selectedRoundSize;
+
     public KrPlacementSettingsViewModel(OpeningRealsKrConfig openingRealsKrConfig) {
         if(openingRealsKrConfig is null) {
             throw new ArgumentNullException(nameof(openingRealsKrConfig));
@@ -23,21 +30,15 @@ internal class KrPlacementSettingsViewModel : BaseViewModel {
         SelectedRoundSize = openingRealsKrConfig.Rounding;
     }
 
-    private bool _placeByMep;
-
     public bool PlaceByMep {
         get => _placeByMep;
         set => RaiseAndSetIfChanged(ref _placeByMep, value);
     }
 
-    private bool _placeByAr;
-
     public bool PlaceByAr {
         get => _placeByAr;
         set => RaiseAndSetIfChanged(ref _placeByAr, value);
     }
-
-    private bool _roundSize;
 
     /// <summary>
     /// Включает/выключает округление размеров
@@ -50,8 +51,6 @@ internal class KrPlacementSettingsViewModel : BaseViewModel {
         }
     }
 
-    private bool _roundElevation;
-
     /// <summary>
     /// Включает/выключает округление отметки
     /// </summary>
@@ -63,8 +62,6 @@ internal class KrPlacementSettingsViewModel : BaseViewModel {
         }
     }
 
-    private int _selectedRoundElevation;
-
     /// <summary>
     /// Округление высотной отметки в мм
     /// </summary>
@@ -72,8 +69,6 @@ internal class KrPlacementSettingsViewModel : BaseViewModel {
         get => _selectedRoundElevation;
         set => RaiseAndSetIfChanged(ref _selectedRoundElevation, value);
     }
-
-    private int _selectedRoundSize;
 
     /// <summary>
     /// Округление размеров в мм
@@ -86,18 +81,7 @@ internal class KrPlacementSettingsViewModel : BaseViewModel {
     /// <summary>
     /// Доступные для выбора значения округления в мм
     /// </summary>
-    public IReadOnlyCollection<int> EnabledRoundings { get; } = new int[] { 1, 5, 10, 25, 50 };
-
-    private string _errorText;
-
-    /// <summary>
-    /// Текст ошибки валидации страницы.
-    /// <para>Настройки расстановки этого раздела вводятся выбором из списка, ошибок не бывает.</para>
-    /// </summary>
-    public string ErrorText {
-        get => _errorText;
-        set => RaiseAndSetIfChanged(ref _errorText, value);
-    } // TODO отрефакторить ErrorText в 3-х окнах
+    public IReadOnlyCollection<int> EnabledRoundings { get; } = [1, 5, 10, 25, 50];
 
     /// <summary>
     /// Записывает текущие настройки расстановки в конфиг
