@@ -100,6 +100,7 @@ internal class RealOpeningVolumeAnalyzer {
                 link,
                 solidAfterIntersection,
                 checkNotActual,
+                checkVolumeMatch,
                 out bool openingIsNotActual);
             if(checkNotActual && openingIsNotActual) {
                 return (true, 0);
@@ -120,6 +121,9 @@ internal class RealOpeningVolumeAnalyzer {
     /// <param name="checkNotActual">
     /// Нужно ли проверять, пересекают ли задания из связи основу чистового отверстия
     /// </param>
+    /// <param name="checkVolumeMatch">
+    /// Нужно ли вычитать солиды заданий: результат вычитания нужен только для расчета доли заполнения
+    /// </param>
     /// <param name="linkOpeningsIntersectConstructions">
     /// Флаг, показывающий, полностью ли чистовое отверстие закрывает собой пересекающие его задания
     /// </param>
@@ -128,6 +132,7 @@ internal class RealOpeningVolumeAnalyzer {
         IConstructureLinkElementsProvider link,
         Solid solidForSubtraction,
         bool checkNotActual,
+        bool checkVolumeMatch,
         out bool linkOpeningsIntersectConstructions) {
         var openingSolid = opening.GetSolid();
         var openingSolidInLinkCoordinates = link.ToLinkCoordinates(openingSolid);
@@ -151,7 +156,9 @@ internal class RealOpeningVolumeAnalyzer {
             linkOpeningsIntersectConstructions = false;
         }
 
-        return _solidUtils.SubtractSolids(solidForSubtraction, intersectingTasksSolids);
+        return checkVolumeMatch
+            ? _solidUtils.SubtractSolids(solidForSubtraction, intersectingTasksSolids)
+            : solidForSubtraction;
     }
 
     /// <summary>
