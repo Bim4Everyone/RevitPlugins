@@ -1,3 +1,5 @@
+using Autodesk.Revit.DB;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 
@@ -65,13 +67,8 @@ internal class RevitSettings : ProjectSettings {
 }
 
 internal class SystemPluginConfig {
-    // Название стадии по умолчанию
-    public string DefaultPhaseName => "Основная планировка";
-
-    // Количество вариантов знаков по умолчанию
-    public int DefaultAccuracyRange => 3;
     
-    // Количество знаков по умолчанию 
-    public int DefaultAccuracy => 1;
+    // Системный параметр имени помещений по умолчанию
+    public BuiltInParameter SystemRoomNameParamId => BuiltInParameter.ROOM_NAME;
     
 }

@@ -14,6 +14,7 @@ using Ninject;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Factories;
+using RevitEnumerateBySpline.Models.Services;
 using RevitEnumerateBySpline.Providers;
 using RevitEnumerateBySpline.ViewModels;
 using RevitEnumerateBySpline.Views;
@@ -56,6 +57,16 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         
         // Настройка доступа к ProvidersFactory
         kernel.Bind<ProvidersFactory>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к классу параметров
+        kernel.Bind<ParamService>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к CommonSettingsViewModel
+        kernel.Bind<CommonSettingsViewModel>()
             .ToSelf()
             .InSingletonScope();
 

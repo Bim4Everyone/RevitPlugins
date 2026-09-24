@@ -58,7 +58,6 @@
                     Grid.Column="1"
                     Grid.Row="0" >
                     <ui:TextBlock
-                        Margin="0"
                         FontTypography="BodyStrong"
                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                         Text="{Binding Header, ElementName=_this}"
@@ -91,7 +90,6 @@
             BorderThickness="1,0,1,1">
             <ContentControl
                 VerticalAlignment="Top"
-                Margin="{DynamicResource CardControlContentMargin}"
                 Content="{Binding MainEditControl, ElementName=_this}" />
         </Border>
     </StackPanel>

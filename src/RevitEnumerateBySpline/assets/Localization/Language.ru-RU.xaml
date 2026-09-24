@@ -16,7 +16,7 @@
     <system:String x:Key="CommonSettingsPage.LineSet">Линии / сплайны для нумерации</system:String>
     <system:String x:Key="CommonSettingsPage.LineSetDescription">Выбор линии ли сплайнов для нумерации</system:String>
     
-    <system:String x:Key="CommonSettingsPage.ResetFilter">Сбросить все</system:String>
+    <system:String x:Key="CommonSettingsPage.ResetFilter">По умолчанию</system:String>
     <system:String x:Key="CommonSettingsPage.DeleteAllLines">Удалить все</system:String>
     <system:String x:Key="CommonSettingsPage.SelectLines">Выбрать линии в модели</system:String>
     
@@ -47,10 +47,13 @@
     <system:String x:Key="CommonSettingsPage.MainParkParameter">Параметр основного машино-места</system:String>
     <system:String x:Key="CommonSettingsPage.MainParkParameterDescription">Параметр, в значение которого будет записано основное машино-место</system:String>
     
+    <system:String x:Key="CommonSettingsPage.SelectAll">Выбрать все</system:String>
+    <system:String x:Key="CommonSettingsPage.ClearSelections">Сбросить выбор</system:String>
+    <system:String x:Key="CommonSettingsPage.SearchText">Поиск по значению</system:String>
+    
     <system:String x:Key="RangeViewModel.AllElementsProvider">Все элементы</system:String>
     <system:String x:Key="RangeViewModel.SelectedElementsProvider">Выделенные</system:String>
     <system:String x:Key="RangeViewModel.CurrentViewProvider">Видимые на виде</system:String>
-    
     
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>

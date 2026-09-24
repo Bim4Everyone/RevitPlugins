@@ -9,6 +9,7 @@ using dosymep.WPF.ViewModels;
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Enums;
 using RevitEnumerateBySpline.Models.Factories;
+using RevitEnumerateBySpline.Models.Interfaces;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
@@ -18,19 +19,23 @@ internal class RangeViewModel(
     RevitRepository revitRepository)
     : BaseViewModel {
     
+    private ObservableCollection<ElementsProviderViewModel>? _range;
+    private ElementsProviderViewModel? _selectedRange;
+    
     public ObservableCollection<ElementsProviderViewModel>? Range {
-        get;
-        set => RaiseAndSetIfChanged(ref field, value);
+        get => _range;
+        set => RaiseAndSetIfChanged(ref _range, value);
     }
     
     public ElementsProviderViewModel? SelectedRange {
-        get ;
-        set => RaiseAndSetIfChanged(ref field, value);
+        get => _selectedRange;
+        set => RaiseAndSetIfChanged(ref _selectedRange, value);
     }
-    
+
     /// <summary>
     /// Метод загрузки окна
     /// </summary>
+    /// <param name="selectedRangeElementsProvider"></param>
     public void LoadView() {
         Range = new ObservableCollection<ElementsProviderViewModel>(GetElementsProviderViewModels());
         SelectedRange = ResolveDefaultRange() ?? Range.FirstOrDefault();

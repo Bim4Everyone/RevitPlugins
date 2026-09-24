@@ -6,6 +6,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Factories;
+using RevitEnumerateBySpline.Models.Services;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
@@ -13,13 +14,14 @@ namespace RevitEnumerateBySpline.ViewModels;
 /// Основная ViewModel главного окна плагина.
 /// </summary>
 internal class MainViewModel : BaseViewModel {
+    private readonly ILocalizationService _localizationService;
+    private readonly ParamService _paramService;
+    private readonly ProvidersFactory _providersFactory;
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
-    private readonly ILocalizationService _localizationService;
 
     private string? _errorText;
     private string _saveProperty = string.Empty;
-    private readonly ProvidersFactory _providersFactory;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -28,18 +30,23 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     /// <param name="commonSettingsViewModel"></param>
+    /// <param name="providersFactory"></param>
+    /// <param name="paramService"></param>
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
-        CommonSettingsViewModel commonSettingsViewModel,
-        ProvidersFactory providersFactory) {
+        ProvidersFactory providersFactory,
+        ParamService paramService,
+        CommonSettingsViewModel commonSettingsViewModel) {
         
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
-        CommonSettingsViewModel = commonSettingsViewModel;
         _providersFactory = providersFactory;
+        _paramService = paramService;
+        
+        CommonSettingsViewModel = commonSettingsViewModel;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -81,7 +88,6 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         LoadConfig();
         
-        CommonSettingsViewModel = new CommonSettingsViewModel(_localizationService, _providersFactory, _revitRepository);
         CommonSettingsViewModel.LoadView();
     }
 

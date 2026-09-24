@@ -9,6 +9,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitEnumerateBySpline.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     d:DataContext="{d:DesignInstance vms:CommonSettingsViewModel, IsDesignTimeCreatable=False}"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d" x:ClassModifier="internal">
@@ -35,35 +36,80 @@
                     Margin="0,14,0,0"
                     Icon="{ui:SymbolIcon multiselectLtr24}"
                     Header="{me:LocalizationSource CommonSettingsPage.FilterElements}"
-                    Description="{me:LocalizationSource CommonSettingsPage.FilterElementsDescription}">
+                    Description="{me:LocalizationSource CommonSettingsPage.FilterElementsDescription}"
+                    MainEditControlVisible="True">
                     
                     <controls:LabeledControl.HeaderEditControl>
                         <StackPanel
                             Orientation="Horizontal"
                             HorizontalAlignment="Right">
-
                             <ui:Button
                                 Margin="0,0,14,0"
                                 Height="37"
-                                Width="130"
+                                Width="145"
                                 Content="{me:LocalizationSource CommonSettingsPage.ResetFilter}"
-                                Command="{Binding ResetFilterCommand}" />
-
+                                Command="{Binding SpatialModelsViewModel.ResetFilterCommand}" />
                             <ComboBox
-                                Width="260"
-                                ItemsSource="{Binding FilterParameterVeiwModels}"
-                                SelectedValue="{Binding SelectedFilterParameterVeiwModel}"
+                                Width="304"
+                                ItemsSource="{Binding SpatialModelsViewModel.FilterParameterViewModels}"
+                                SelectedValue="{Binding SpatialModelsViewModel.SelectedFilterParameterViewModel}"
                                 DisplayMemberPath="Name" />
                         </StackPanel>
                     </controls:LabeledControl.HeaderEditControl>
 
                     <controls:LabeledControl.MainEditControl>
-                        <ui:TextBlock
-                            Margin="10,10,10,10"
-                            Appearance="Secondary"
-                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Text="Content"
-                            TextWrapping="WrapWithOverflow" />
+                        <StackPanel>
+                            <StackPanel
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                                <RadioButton
+                                    Margin="20,0,0,0"
+                                    GroupName="Choise"
+                                    Content="{me:LocalizationSource CommonSettingsPage.SelectAll}"
+                                    Command="{Binding SpatialModelsViewModel.SelectAllCommand}" />
+                                <RadioButton
+                                    Margin="20,0,0,0"
+                                    GroupName="Choise"
+                                    Content="{me:LocalizationSource CommonSettingsPage.ClearSelections}"
+                                    IsChecked="{Binding SpatialModelsViewModel.IsNotSelected, Mode=TwoWay}"
+                                    Command="{Binding SpatialModelsViewModel.ClearSelectionsCommand}" />
+                            </StackPanel>
+                            <ui:AutoSuggestBox
+                                Margin="14,0,14,14"
+                                Icon="{ui:SymbolIcon Search24}"
+                                Text="{Binding SpatialModelsViewModel.SearchText, Mode=TwoWay}"
+                                PlaceholderText="{me:LocalizationSource CommonSettingsPage.SearchText}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger
+                                        EventName="TextChanged">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding SpatialModelsViewModel.SearchCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </ui:AutoSuggestBox>
+                            <ScrollViewer
+                                Height="250"
+                                VerticalScrollBarVisibility="Auto"
+                                HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl
+                                    ItemsSource="{Binding SpatialModelsViewModel.FilteredSpatialModelViewModels}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate
+                                            DataType="{x:Type vms:SpatialModelViewModel}">
+                                            <controls:ItemControl
+                                                ItemName="{Binding Name}"
+                                                IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </StackPanel>
                     </controls:LabeledControl.MainEditControl>
                 </controls:LabeledControl>
                 
@@ -81,12 +127,12 @@
                             <ui:Button
                                 Margin="0,0,14,0"
                                 Height="37"
-                                Width="130"
+                                Width="145"
                                 Content="{me:LocalizationSource CommonSettingsPage.DeleteAllLines}"
                                 Command="{Binding ResetFilterCommand}" />
                             <ui:Button
                                 Height="37"
-                                Width="260"
+                                Width="304"
                                 Appearance="Primary"
                                 Content="{me:LocalizationSource CommonSettingsPage.SelectLines}"
                                 Command="{Binding SelectLinesCommand}" />
