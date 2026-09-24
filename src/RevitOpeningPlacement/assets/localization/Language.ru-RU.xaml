@@ -321,71 +321,107 @@
         x:Key="NavigatorSettings.Validation.DistanceRange">Минимальное расстояние должно быть от 0 до {0} мм</system:String>
 
     <system:String
-        x:Key="NavigatorSettings.Incoming.UnacceptableConstructions.Title">Недопустимые конструкции</system:String>
+        x:Key="NavigatorSettings.Incoming.UnacceptableConstructions.Title">Проверка недопустимых конструкций</system:String>
     <system:String
-        x:Key="NavigatorSettings.Incoming.UnacceptableConstructions.Description">Задание на отверстие расположено в конструкциях недопустимых категорий. Статус: "недопустимые конструкции".</system:String>
+        x:Key="NavigatorSettings.Incoming.UnacceptableConstructions.Description"
+        xml:space="preserve">Проверяет, пересекает ли задание на отверстие конструкции текущего файла категорий "Каркас несущий" или "Несущие колонны". Статус: "Недопустимые конструкции".
+
+Если выключить, такие задания пройдут остальные проверки как обычные; задание только в балке или колонне получит "Нет пересечения".</system:String>
     <system:String
-        x:Key="NavigatorSettings.Incoming.Intersections.Title">Сопоставление с конструкциями и отверстиями</system:String>
+        x:Key="NavigatorSettings.Incoming.Intersections.Title">Проверка выполнения задания</system:String>
     <system:String
-        x:Key="NavigatorSettings.Incoming.Intersections.Description">Определяет, что именно пересекает задание на отверстие в текущем файле: конструкции, уже размещенные чистовые отверстия, и то, и другое или ничего. Статусы: "нет пересечения", "выполнено", "не соответствует", "новое". Если проверка выключена, всем заданиям назначается статус "новое".</system:String>
+        x:Key="NavigatorSettings.Incoming.Intersections.Description"
+        xml:space="preserve">Определяет, что пересекает задание на отверстие в текущем файле: только конструкции — "Новое задание", конструкции и чистовые отверстия — "Частично выполненное задание", только чистовые отверстия — "Выполненное задание", ничего — "Нет пересечения".
+
+Если выключить, всем заданиям назначается статус "Новое задание", а вложенные проверка разных конструкций и поиск основы тоже выключаются.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Incoming.DifferentConstructions.Title">Разные конструкции</system:String>
+        x:Key="NavigatorSettings.Incoming.DifferentConstructions.Title">Проверка расположения в разных конструкциях</system:String>
     <system:String
-        x:Key="NavigatorSettings.Incoming.DifferentConstructions.Description">Задание на отверстие пересекает конструкции разных категорий. Статус: "разные конструкции".</system:String>
+        x:Key="NavigatorSettings.Incoming.DifferentConstructions.Description"
+        xml:space="preserve">Проверяет, относятся ли пересекаемые заданием конструкции текущего файла, включая основы пересекаемых чистовых отверстий, к разным категориям — например, к стенам и перекрытиям. Статус: "В разных конструкциях".
+
+Если выключить, задания на стыке стены и перекрытия получат обычный статус выполнения.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Incoming.Host.Title">Расчет основы</system:String>
+        x:Key="NavigatorSettings.Incoming.Host.Title">Поиск основы</system:String>
     <system:String
-        x:Key="NavigatorSettings.Incoming.Host.Description">Определяет конструкцию, в которой расположено задание на отверстие. Статусов не назначает: заполняет столбец "Основа" в Навигаторе.</system:String>
+        x:Key="NavigatorSettings.Incoming.Host.Description">Определяет конструкцию текущего файла, в которой расположено задание: основу пересекаемого чистового отверстия, а если его нет — конструкцию с наибольшим объемом пересечения. Статусов не назначает: заполняет столбец "Основа" в Навигаторе.</system:String>
 
     <system:String
-        x:Key="NavigatorSettings.Real.NotActual.Title">Неактуально</system:String>
+        x:Key="NavigatorSettings.Real.NotActual.Title">Проверка актуальности</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.NotActual.Description">Чистовое отверстие не соответствует заданиям или элементам инженерных систем из связей: конструкция, вероятно, изменилась. Статус: "неактуально".</system:String>
+        x:Key="NavigatorSettings.Real.NotActual.Description"
+        xml:space="preserve">Проверяет, полностью ли чистовое отверстие закрывает пересекающие его входящие задания и элементы инженерных систем из связей: если они выходят за отверстие и пересекают его основу, отверстие неактуально. Статус: "Неактуальное отверстие".
+
+Если выключить, вложенная проверка заполнения тоже выключится, и все отверстия, кроме слишком близких у КР, получат статус "Корректно" — в том числе неактуальные.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.VolumeMatch.Title">Соответствие объема</system:String>
+        x:Key="NavigatorSettings.Real.VolumeMatch.Title">Проверка заполнения отверстия</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.VolumeMatch.Description">Сравнивает объем чистового отверстия с объемом заданий и элементов инженерных систем из связей, которые через него проходят. Статусы: "пустое", "слишком большое". Если проверка выключена, отверстия считаются корректными.</system:String>
+        x:Key="NavigatorSettings.Real.VolumeMatch.Description"
+        xml:space="preserve">Определяет, какую долю объема чистового отверстия занимают входящие задания и элементы инженерных систем из связей: меньше порога "пустое" — "Пустое отверстие", меньше порога "слишком большое" — "Слишком большое отверстие".
+
+Если выключить, отверстия считаются корректными.</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">Порог "пустое", % пересеченного объема</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">Порог "слишком большое", % пересеченного объема</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.TooClose.Title">Слишком близко</system:String>
+        x:Key="NavigatorSettings.Real.TooClose.Title">Проверка расстояния между отверстиями</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.TooClose.Description">Чистовое отверстие расположено слишком близко к другому чистовому отверстию КР. Статус: "слишком близко".</system:String>
+        x:Key="NavigatorSettings.Real.TooClose.Description">Проверяет, есть ли другое чистовое отверстие КР ближе заданного расстояния к краям отверстия в плоскости конструкции. Статус: "Слишком близко друг к другу".</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.TooClose.DistanceValue">Минимальное расстояние, мм</system:String>
 
     <system:String
-        x:Key="NavigatorSettings.Outcoming.ManuallyPlaced.Title">Размещено вручную</system:String>
+        x:Key="NavigatorSettings.Outcoming.ManuallyPlaced.Title">Проверка ручного размещения</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.ManuallyPlaced.Description">Задание на отверстие размещено пользователем вручную. Статус: "размещено вручную".</system:String>
+        x:Key="NavigatorSettings.Outcoming.ManuallyPlaced.Description"
+        xml:space="preserve">Проверяет, включен ли у задания на отверстие параметр "ФОП_Размещено вручную". Статус: "Размещено вручную".
+
+Если выключить, такие задания пройдут остальные проверки как обычные и могут получить статус ошибки по размеру или актуальности.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.NotActual.Title">Неактуально</system:String>
+        x:Key="NavigatorSettings.Outcoming.NotActual.Title">Проверка актуальности</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.NotActual.Description">Задание на отверстие не пересекает ни один элемент инженерных систем текущего файла или не пересекает конструкции из связей: вероятно, элемент или конструкция были перемещены. Статус: "неактуально".</system:String>
+        x:Key="NavigatorSettings.Outcoming.NotActual.Description"
+        xml:space="preserve">Задание неактуально, если его не пересекает ни один элемент инженерных систем, если ни в одной связи не найдена конструкция, в которой оно расположено, или если элементы инженерных систем за пределами задания пересекают эту конструкцию или чистовое отверстие из связи. Статус: "Неактуальное задание".
+
+Если выключить, вложенная проверка разных конструкций тоже выключится, поиск основы замедлится, а задания без элементов инженерных систем при включенной проверке отступов получат "Ошибка обработки геометрии".</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Title">Разные конструкции</system:String>
+        x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Title">Проверка расположения в разных конструкциях</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Description">Задание на отверстие пересекает конструкции разных категорий. Статус: "разные конструкции".</system:String>
+        x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Description"
+        xml:space="preserve">Проверяет, относятся ли конструкции из связи, в которых расположено задание, к разным категориям — например, к стенам и перекрытиям. Статус: "В разных конструкциях".
+
+Если выключить, задания на стыке стены и перекрытия пройдут остальные проверки как обычные.</system:String>
     <system:String
         x:Key="NavigatorSettings.Outcoming.Host.Title">Поиск основы</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.Host.Description">Определяет конструкцию из связи, в которой расположено задание на отверстие. Статусов не назначает: основа нужна, чтобы подсветить ее на виде при выборе задания в Навигаторе. Работает быстрее, если включена проверка "Неактуально": она уже находит конструкции-кандидаты.</system:String>
+        x:Key="NavigatorSettings.Outcoming.Host.Description">Определяет конструкцию из связи, в которой расположено задание: ту, с которой пересекается не менее половины объема задания, а если такой нет — с наибольшим объемом пересечения. Статусов не назначает: основа нужна, чтобы подсветить ее на виде при выборе задания в Навигаторе. Работает быстрее, если включена проверка актуальности: она уже находит конструкции-кандидаты.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Title">Недопустимые конструкции</system:String>
+        x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Title">Проверка недопустимых конструкций</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Description">Задание на отверстие расположено в конструкциях недопустимых категорий. Статус: "недопустимые конструкции".</system:String>
+        x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Description"
+        xml:space="preserve">Проверяет, пересекает ли задание на отверстие конструкции из связей категорий "Каркас несущий" или "Несущие колонны". Статус: "Недопустимые конструкции".
+
+Если выключить, такие задания пройдут остальные проверки как обычные.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.Intersects.Title">Пересекается с заданием</system:String>
+        x:Key="NavigatorSettings.Outcoming.Intersects.Title">Проверка пересечения с другими заданиями</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.Intersects.Description">Задание на отверстие пересекается с другим заданием на отверстие. Статус: "пересекается с заданием".</system:String>
+        x:Key="NavigatorSettings.Outcoming.Intersects.Description"
+        xml:space="preserve">Проверяет, пересекается ли задание на отверстие с другим заданием на отверстие текущего файла. Статус: "Пересекающееся задание".
+
+Если выключить, пересечение не будет отмечено, и такие задания получат статус по объединению или отступам.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.United.Title">Объединено</system:String>
+        x:Key="NavigatorSettings.Outcoming.United.Title">Проверка объединения</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.United.Description">Через задание на отверстие проходит более одного элемента инженерных систем: задание считается объединенным. Статус: "объединено".</system:String>
+        x:Key="NavigatorSettings.Outcoming.United.Description"
+        xml:space="preserve">Проверяет, проходят ли через задание на отверстие два и более элемента инженерных систем. Статус: "Объединенное".
+
+Если выключить, объединенные задания почти всегда получат "Слишком большое задание": проверка отступов сравнивает задание только с одним элементом.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.Offsets.Title">Соответствие отступов</system:String>
+        x:Key="NavigatorSettings.Outcoming.Offsets.Title">Проверка отступов</system:String>
     <system:String
-        x:Key="NavigatorSettings.Outcoming.Offsets.Description">Сравнивает отступы задания на отверстие от элемента инженерных систем с допустимыми. Статусы: "слишком маленькое", "слишком большое". Если проверка выключена, задания считаются корректными.</system:String>
+        x:Key="NavigatorSettings.Outcoming.Offsets.Description"
+        xml:space="preserve">Сравнивает сумму отступов задания от элемента инженерных систем (сверху и снизу, слева и справа) с двойным зазором из настроек расстановки с учетом округления: меньше — "Слишком маленькое задание", больше — "Слишком большое задание".
+
+Отступы считаются по одному элементу, поэтому для объединенных заданий результат верен только вместе с проверкой объединения, а для заданий без элементов инженерных систем — вместе с проверкой актуальности. Если выключить, задания считаются корректными.</system:String>
 </ResourceDictionary>
