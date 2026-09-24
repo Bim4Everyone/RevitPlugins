@@ -107,9 +107,29 @@
                                     Width="35"
                                     Margin="0 5 5 0"
                                     VerticalAlignment="Top"
-                                    Content="≠"
                                     IsChecked="{Binding Path=IsExcluding, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                    ToolTip="{me:LocalizationSource MainWindow.ExcludingFilter}" />
+                                    ToolTip="{me:LocalizationSource MainWindow.ExcludingFilter}">
+                                    <!--Прямой фильтр обозначается символом "=", исключающий - символом "≠"-->
+                                    <TextBlock>
+                                        <TextBlock.Style>
+                                            <Style
+                                                TargetType="TextBlock">
+                                                <Setter
+                                                    Property="Text"
+                                                    Value="=" />
+                                                <Style.Triggers>
+                                                    <DataTrigger
+                                                        Binding="{Binding Path=IsExcluding}"
+                                                        Value="True">
+                                                        <Setter
+                                                            Property="Text"
+                                                            Value="≠" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </ToggleButton>
 
                                 <controls:FormulaTextBoxControl
                                     Grid.Column="1"
