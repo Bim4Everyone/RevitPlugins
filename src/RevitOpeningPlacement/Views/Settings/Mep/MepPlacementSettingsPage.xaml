@@ -113,12 +113,15 @@
                     <ui:DropDownButton.Flyout>
                         <ContextMenu>
                             <MenuItem
+                                Click="CheckFilter_Clicked"
                                 Header="{me:LocalizationSource MepSettingsWindow.CheckFilterMep}"
                                 Command="{Binding CheckMepFilterCommand}" />
                             <MenuItem
+                                Click="CheckFilter_Clicked"
                                 Header="{me:LocalizationSource MepSettingsWindow.CheckFilterWalls}"
                                 Command="{Binding CheckWallFilterCommand}" />
                             <MenuItem
+                                Click="CheckFilter_Clicked"
                                 Header="{me:LocalizationSource MepSettingsWindow.CheckFilterFloors}"
                                 Command="{Binding CheckFloorFilterCommand}" />
                         </ContextMenu>
