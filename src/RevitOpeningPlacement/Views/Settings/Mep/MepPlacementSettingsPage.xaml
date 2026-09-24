@@ -103,14 +103,6 @@
             Style="{StaticResource CustomBorder}">
             <StackPanel
                 Orientation="Horizontal">
-                <ui:TextBlock
-                    Margin="8"
-                    Text="{Binding ErrorText}"
-                    Style="{StaticResource CustomErrorText}" />
-                <ui:TextBlock
-                    Margin="8"
-                    Text="{Binding MessageText}"
-                    Style="{StaticResource CustomMessageText}" />
                 <ui:ToggleSwitch
                     Margin="8"
                     Content="{me:LocalizationSource MepSettingsWindow.ShowPlacingErrors}"

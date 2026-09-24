@@ -4,13 +4,13 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="OpeningRealsArSettingsView.Title">Настройки расстановки отверстий АР</system:String>
+        x:Key="ArSettingsWindow.Title">Настройки расстановки отверстий АР</system:String>
     <system:String
-        x:Key="OpeningRealsArSettingsView.RoundSize">Округлять габариты</system:String>
+        x:Key="ArSettingsWindow.RoundSize">Округлять габариты</system:String>
     <system:String
-        x:Key="OpeningRealsArSettingsView.RoundElevation">Округлять отметку</system:String>
+        x:Key="ArSettingsWindow.RoundElevation">Округлять отметку</system:String>
     <system:String
-        x:Key="OpeningRealsArSettingsView.RoundValues">Значение округления, мм</system:String>
+        x:Key="ArSettingsWindow.RoundValues">Значение округления, мм</system:String>
     
     <system:String
         x:Key="OpeningTasks">Задания на отверстия</system:String>
@@ -163,27 +163,21 @@
         x:Key="Validation.MissingParametersInFamily">У семейства '{0}' отсутствуют общие параметры: {1}</system:String>
 
     <system:String
-        x:Key="OpeningRealsKrSettingsView.Title">Настройки расстановки отверстий КР</system:String>
+        x:Key="KrSettingsWindow.Title">Настройки расстановки отверстий КР</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.PlaceByAr">Размещать отверстия по заданиям из АР</system:String>
+        x:Key="KrSettingsWindow.PlaceByAr">Размещать отверстия по заданиям из АР</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.PlaceByMep">Размещать отверстия по заданиям из ВИС</system:String>
+        x:Key="KrSettingsWindow.PlaceByMep">Размещать отверстия по заданиям из ВИС</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.RoundSize">Округлять габариты</system:String>
+        x:Key="KrSettingsWindow.RoundSize">Округлять габариты</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.RoundElevation">Округлять отметку</system:String>
+        x:Key="KrSettingsWindow.RoundElevation">Округлять отметку</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.RoundValues">Значение округления, мм</system:String>
+        x:Key="KrSettingsWindow.RoundValues">Значение округления, мм</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.CheckDistance">Проверять расстояние между отверстиями</system:String>
+        x:Key="KrSettingsWindow.CheckDistance">Проверять расстояние между отверстиями</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.DistanceValue">Минимальное расстояние, мм</system:String>
-    <system:String
-        x:Key="OpeningRealsKrSettingsView.Validation.DistanceRange">Минимальное расстояние должно быть от 0 до {0} мм</system:String>
-    <system:String
-        x:Key="OpeningRealsKrSettingsView.Validation.CannotParseInt">Введите число</system:String>
-    <system:String
-        x:Key="OpeningRealsKrSettingsView.NavigatorSettings">Настройки навигатора КР</system:String>
+        x:Key="KrSettingsWindow.NavigatorSettings">Настройки навигатора КР</system:String>
 
     <system:String
         x:Key="UnionTaskSettingsView.Title">Настройки объединения</system:String>
@@ -296,4 +290,96 @@
         x:Key="Ok">ОК</system:String>
     <system:String
         x:Key="Cancel">Отмена</system:String>
+    <system:String
+        x:Key="SettingsNavigation.PlacementSettings">Расстановка</system:String>
+    <system:String
+        x:Key="SettingsNavigation.NavigatorSettings">Статусы</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Section.IncomingTasks">Входящие задания на отверстия</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Section.RealOpenings">Чистовые отверстия</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Cost.Slow">Медленная проверка</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Cost.Medium">Средняя проверка</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Cost.Fast">Быстрая проверка</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Validation.CannotParseNumber">Введите число</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.CannotParseInt">Введите целое число</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.EmptyVolumeRange">Порог "пустое" должен быть от {0} до {1} %</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.TooBigVolumeRange">Порог "слишком большое" должен быть больше {0} % и не больше {1} %</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.DistanceRange">Минимальное расстояние должно быть от 0 до {0} мм</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Incoming.UnacceptableConstructions.Title">Недопустимые конструкции</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.UnacceptableConstructions.Description">Задание на отверстие расположено в конструкциях недопустимых категорий. Статус: "недопустимые конструкции".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Intersections.Title">Сопоставление с конструкциями и отверстиями</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Intersections.Description">Определяет, что именно пересекает задание на отверстие в текущем файле: конструкции, уже размещенные чистовые отверстия, и то, и другое или ничего. Статусы: "нет пересечения", "выполнено", "не соответствует", "новое". Если проверка выключена, всем заданиям назначается статус "новое".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.DifferentConstructions.Title">Разные конструкции</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.DifferentConstructions.Description">Задание на отверстие пересекает конструкции разных категорий. Статус: "разные конструкции".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Host.Title">Расчет основы</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Host.Description">Определяет конструкцию, в которой расположено задание на отверстие. Статусов не назначает: заполняет столбец "Основа" в Навигаторе.</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Real.NotActual.Title">Неактуально</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.NotActual.Description">Чистовое отверстие не соответствует заданиям или элементам инженерных систем из связей: конструкция, вероятно, изменилась. Статус: "неактуально".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.Title">Соответствие объема</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.Description">Сравнивает объем чистового отверстия с объемом заданий и элементов инженерных систем из связей, которые через него проходят. Статусы: "пустое", "слишком большое". Если проверка выключена, отверстия считаются корректными.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">Порог "пустое", % пересеченного объема</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">Порог "слишком большое", % пересеченного объема</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.Title">Слишком близко</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.Description">Чистовое отверстие расположено слишком близко к другому чистовому отверстию КР. Статус: "слишком близко".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.DistanceValue">Минимальное расстояние, мм</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.ManuallyPlaced.Title">Размещено вручную</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.ManuallyPlaced.Description">Задание на отверстие размещено пользователем вручную. Статус: "размещено вручную".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.NotActual.Title">Неактуально</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.NotActual.Description">Задание на отверстие не пересекает ни один элемент инженерных систем текущего файла или не пересекает конструкции из связей: вероятно, элемент или конструкция были перемещены. Статус: "неактуально".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Title">Разные конструкции</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Description">Задание на отверстие пересекает конструкции разных категорий. Статус: "разные конструкции".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Title">Недопустимые конструкции</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Description">Задание на отверстие расположено в конструкциях недопустимых категорий. Статус: "недопустимые конструкции".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Intersects.Title">Пересекается с заданием</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Intersects.Description">Задание на отверстие пересекается с другим заданием на отверстие. Статус: "пересекается с заданием".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.United.Title">Объединено</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.United.Description">Через задание на отверстие проходит более одного элемента инженерных систем: задание считается объединенным. Статус: "объединено".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Offsets.Title">Соответствие отступов</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Offsets.Description">Сравнивает отступы задания на отверстие от элемента инженерных систем с допустимыми. Статусы: "слишком маленькое", "слишком большое". Если проверка выключена, задания считаются корректными.</system:String>
 </ResourceDictionary>

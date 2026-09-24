@@ -4,13 +4,13 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="OpeningRealsArSettingsView.Title">AR Opening Placement Settings</system:String>
+        x:Key="ArSettingsWindow.Title">AR Opening Placement Settings</system:String>
     <system:String
-        x:Key="OpeningRealsArSettingsView.RoundSize">Round dimensions</system:String>
+        x:Key="ArSettingsWindow.RoundSize">Round dimensions</system:String>
     <system:String
-        x:Key="OpeningRealsArSettingsView.RoundElevation">Round elevation</system:String>
+        x:Key="ArSettingsWindow.RoundElevation">Round elevation</system:String>
     <system:String
-        x:Key="OpeningRealsArSettingsView.RoundValues">Rounding value, mm</system:String>
+        x:Key="ArSettingsWindow.RoundValues">Rounding value, mm</system:String>
 
     <system:String
         x:Key="OpeningTasks">Opening Tasks</system:String>
@@ -163,27 +163,21 @@ Continue?
         x:Key="Validation.MissingParametersInFamily">Family '{0}' is missing shared parameters: {1}</system:String>
 
     <system:String
-        x:Key="OpeningRealsKrSettingsView.Title">Structural Opening Placement Settings</system:String>
+        x:Key="KrSettingsWindow.Title">Structural Opening Placement Settings</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.PlaceByAr">Place openings by tasks from AR</system:String>
+        x:Key="KrSettingsWindow.PlaceByAr">Place openings by tasks from AR</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.PlaceByMep">Place openings by tasks from MEP</system:String>
+        x:Key="KrSettingsWindow.PlaceByMep">Place openings by tasks from MEP</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.RoundSize">Round dimensions</system:String>
+        x:Key="KrSettingsWindow.RoundSize">Round dimensions</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.RoundElevation">Round elevation</system:String>
+        x:Key="KrSettingsWindow.RoundElevation">Round elevation</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.RoundValues">Rounding value, mm</system:String>
+        x:Key="KrSettingsWindow.RoundValues">Rounding value, mm</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.CheckDistance">Check distance between openings</system:String>
+        x:Key="KrSettingsWindow.CheckDistance">Check distance between openings</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.DistanceValue">Minimum distance, mm</system:String>
-    <system:String
-        x:Key="OpeningRealsKrSettingsView.Validation.DistanceRange">Minimum distance must be from 0 to {0} mm.</system:String>
-    <system:String
-        x:Key="OpeningRealsKrSettingsView.Validation.CannotParseInt">Enter a number</system:String>
-    <system:String
-        x:Key="OpeningRealsKrSettingsView.NavigatorSettings">Navigator KR settings</system:String>
+        x:Key="KrSettingsWindow.NavigatorSettings">Navigator KR settings</system:String>
 
     <system:String
         x:Key="UnionTaskSettingsView.Title">Merge Settings</system:String>
@@ -296,4 +290,97 @@ including in multilayer structures.</system:String>
         x:Key="Ok">OK</system:String>
     <system:String
         x:Key="Cancel">Cancel</system:String>
+
+    <system:String
+        x:Key="SettingsNavigation.PlacementSettings">Placement</system:String>
+    <system:String
+        x:Key="SettingsNavigation.NavigatorSettings">Statuses</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Section.IncomingTasks">Incoming opening tasks</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Section.RealOpenings">Real openings</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Cost.Slow">Slow check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Cost.Medium">Medium check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Cost.Fast">Fast check</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Validation.CannotParseNumber">Enter a number</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.CannotParseInt">Enter an integer</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.EmptyVolumeRange">The "empty" threshold must be from {0} to {1} %</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.TooBigVolumeRange">The "too big" threshold must be greater than {0} % and at most {1} %</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.DistanceRange">The minimum distance must be from 0 to {0} mm</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Incoming.UnacceptableConstructions.Title">Unacceptable constructions</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.UnacceptableConstructions.Description">The opening task is located in constructions of unacceptable categories. Status: "unacceptable constructions".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Intersections.Title">Matching with constructions and openings</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Intersections.Description">Determines what the opening task intersects in the current file: constructions, already placed real openings, both or nothing. Statuses: "no intersection", "completed", "not match", "new". If the check is disabled, every task gets the "new" status.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.DifferentConstructions.Title">Different constructions</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.DifferentConstructions.Description">The opening task intersects constructions of different categories. Status: "different constructions".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Host.Title">Host calculation</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Host.Description">Determines the construction the opening task is located in. Assigns no status: fills the "Host" column in the Navigator.</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Real.NotActual.Title">Not actual</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.NotActual.Description">The real opening does not match the tasks or MEP elements from links: the construction has probably changed. Status: "not actual".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.Title">Volume match</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.Description">Compares the volume of the real opening with the volume of tasks and MEP elements from links that pass through it. Statuses: "empty", "too big". If the check is disabled, openings are considered correct.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">"Empty" threshold, % of intersected volume</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">"Too big" threshold, % of intersected volume</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.Title">Too close</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.Description">The real opening is located too close to another structural real opening. Status: "too close".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.DistanceValue">Minimum distance, mm</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.ManuallyPlaced.Title">Manually placed</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.ManuallyPlaced.Description">The opening task was placed by the user manually. Status: "manually placed".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.NotActual.Title">Not actual</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.NotActual.Description">The opening task does not intersect any MEP element of the current file or does not intersect constructions from links: the element or the construction was probably moved. Status: "not actual".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Title">Different constructions</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Description">The opening task intersects constructions of different categories. Status: "different constructions".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Title">Unacceptable constructions</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Description">The opening task is located in constructions of unacceptable categories. Status: "unacceptable constructions".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Intersects.Title">Intersects another task</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Intersects.Description">The opening task intersects another opening task. Status: "intersects".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.United.Title">United</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.United.Description">More than one MEP element passes through the opening task: the task is considered united. Status: "united".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Offsets.Title">Offsets match</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Offsets.Description">Compares the offsets of the opening task from the MEP element with the acceptable ones. Statuses: "too small", "too big". If the check is disabled, tasks are considered correct.</system:String>
 </ResourceDictionary>
