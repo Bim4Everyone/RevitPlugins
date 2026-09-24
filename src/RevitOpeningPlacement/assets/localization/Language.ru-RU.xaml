@@ -369,6 +369,10 @@
     <system:String
         x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Description">Задание на отверстие пересекает конструкции разных категорий. Статус: "разные конструкции".</system:String>
     <system:String
+        x:Key="NavigatorSettings.Outcoming.Host.Title">Поиск основы</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Host.Description">Определяет конструкцию из связи, в которой расположено задание на отверстие. Статусов не назначает: основа нужна, чтобы подсветить ее на виде при выборе задания в Навигаторе. Работает быстрее, если включена проверка "Неактуально": она уже находит конструкции-кандидаты.</system:String>
+    <system:String
         x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Title">Недопустимые конструкции</system:String>
     <system:String
         x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Description">Задание на отверстие расположено в конструкциях недопустимых категорий. Статус: "недопустимые конструкции".</system:String>

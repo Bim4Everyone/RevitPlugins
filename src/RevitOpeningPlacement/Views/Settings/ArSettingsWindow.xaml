@@ -1,4 +1,4 @@
-<core:WpfUIPlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitOpeningPlacement.Views.Settings.ArSettingsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -37,8 +37,6 @@
         <ui:TitleBar
             Grid.Row="0"
             x:Name="_titleBar"
-            ShowMaximize="False"
-            ShowMinimize="False"
             Title="{me:LocalizationSource ArSettingsWindow.Title}" />
 
         <ui:NavigationView
@@ -50,7 +48,25 @@
             IsPaneOpen="True"
             IsPaneToggleVisible="True"
             IsBackButtonVisible="Collapsed"
-            TitleBar="{Binding ElementName=_titleBar}">
+            TitleBar="{Binding ElementName=_titleBar}"
+            BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
+
+            <ui:NavigationView.Header>
+                <StackPanel
+                    Margin="8 8  0 8">
+                    <ui:BreadcrumbBar
+                        x:Name="_breadcrumbBar">
+                        <ui:BreadcrumbBar.ItemTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock
+                                    FontTypography="Subtitle"
+                                    Text="{Binding Content}" />
+                            </DataTemplate>
+                        </ui:BreadcrumbBar.ItemTemplate>
+                    </ui:BreadcrumbBar>
+                </StackPanel>
+            </ui:NavigationView.Header>
+
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Icon="{ui:SymbolIcon Symbol=TableSettings24}"

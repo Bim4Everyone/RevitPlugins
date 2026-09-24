@@ -10,6 +10,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     mc:Ignorable="d"
+    Title="azaza"
     d:DataContext="{d:DesignInstance vms:ArPlacementSettingsViewModel, IsDesignTimeCreatable=False}">
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
@@ -19,47 +20,50 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
-    <ScrollViewer
-        VerticalScrollBarVisibility="Auto"
-        HorizontalScrollBarVisibility="Disabled">
-    <Border
-        Margin="8 8"
-        Style="{StaticResource CustomBorder}">
-        <StackPanel
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Center">
-            <DockPanel
-                HorizontalAlignment="Stretch">
-                <ui:ToggleSwitch
-                    Content="{me:LocalizationSource ArSettingsWindow.RoundSize}"
-                    IsChecked="{Binding RoundSize, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox
-                    IsEditable="False"
-                    HorizontalAlignment="Right"
-                    MinWidth="{StaticResource SmallInputWidth}"
-                    Width="{StaticResource SmallInputWidth}"
-                    ToolTip="{me:LocalizationSource ArSettingsWindow.RoundValues}"
-                    IsEnabled="{Binding RoundSize}"
-                    ItemsSource="{Binding EnabledRoundings}"
-                    SelectedItem="{Binding SelectedRoundSize, UpdateSourceTrigger=PropertyChanged}" />
-            </DockPanel>
-            <DockPanel
-                Margin="0 5 0 0"
-                HorizontalAlignment="Stretch">
-                <ui:ToggleSwitch
-                    Content="{me:LocalizationSource ArSettingsWindow.RoundElevation}"
-                    IsChecked="{Binding RoundElevation, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox
-                    IsEditable="False"
-                    HorizontalAlignment="Right"
-                    MinWidth="{StaticResource SmallInputWidth}"
-                    Width="{StaticResource SmallInputWidth}"
-                    ToolTip="{me:LocalizationSource ArSettingsWindow.RoundValues}"
-                    IsEnabled="{Binding RoundElevation}"
-                    ItemsSource="{Binding EnabledRoundings}"
-                    SelectedItem="{Binding SelectedRoundElevation, UpdateSourceTrigger=PropertyChanged}" />
-            </DockPanel>
-        </StackPanel>
-    </Border>
-    </ScrollViewer>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="Auto" />
+        </Grid.RowDefinitions>
+        <Border
+            Grid.Row="0"
+            Margin="8 8"
+            Style="{StaticResource CustomBorder}">
+            <StackPanel
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center">
+                <DockPanel
+                    HorizontalAlignment="Stretch">
+                    <ui:ToggleSwitch
+                        Content="{me:LocalizationSource ArSettingsWindow.RoundSize}"
+                        IsChecked="{Binding RoundSize, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox
+                        IsEditable="False"
+                        HorizontalAlignment="Right"
+                        MinWidth="{StaticResource SmallInputWidth}"
+                        Width="{StaticResource SmallInputWidth}"
+                        ToolTip="{me:LocalizationSource ArSettingsWindow.RoundValues}"
+                        IsEnabled="{Binding RoundSize}"
+                        ItemsSource="{Binding EnabledRoundings}"
+                        SelectedItem="{Binding SelectedRoundSize, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <DockPanel
+                    Margin="0 5 0 0"
+                    HorizontalAlignment="Stretch">
+                    <ui:ToggleSwitch
+                        Content="{me:LocalizationSource ArSettingsWindow.RoundElevation}"
+                        IsChecked="{Binding RoundElevation, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox
+                        IsEditable="False"
+                        HorizontalAlignment="Right"
+                        MinWidth="{StaticResource SmallInputWidth}"
+                        Width="{StaticResource SmallInputWidth}"
+                        ToolTip="{me:LocalizationSource ArSettingsWindow.RoundValues}"
+                        IsEnabled="{Binding RoundElevation}"
+                        ItemsSource="{Binding EnabledRoundings}"
+                        SelectedItem="{Binding SelectedRoundElevation, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
 </core:WpfUIPlatformPage>

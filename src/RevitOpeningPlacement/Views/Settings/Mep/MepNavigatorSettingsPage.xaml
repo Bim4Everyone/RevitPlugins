@@ -60,6 +60,12 @@
             </controls:StatusToggleControl>
 
             <controls:StatusToggleControl
+                Title="{me:LocalizationSource NavigatorSettings.Outcoming.Host.Title}"
+                Description="{me:LocalizationSource NavigatorSettings.Outcoming.Host.Description}"
+                CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
+                IsChecked="{Binding CheckHost, UpdateSourceTrigger=PropertyChanged}" />
+
+            <controls:StatusToggleControl
                 Title="{me:LocalizationSource NavigatorSettings.Outcoming.UnacceptableConstructions.Title}"
                 Description="{me:LocalizationSource NavigatorSettings.Outcoming.UnacceptableConstructions.Description}"
                 CostTag="{me:LocalizationSource NavigatorSettings.Cost.Slow}"

@@ -19,9 +19,6 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
-    <ScrollViewer
-        VerticalScrollBarVisibility="Auto"
-        HorizontalScrollBarVisibility="Disabled">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition
@@ -90,5 +87,4 @@
             </StackPanel>
         </Border>
     </Grid>
-    </ScrollViewer>
 </core:WpfUIPlatformPage>

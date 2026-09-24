@@ -58,7 +58,25 @@
             IsPaneOpen="True"
             IsPaneToggleVisible="True"
             IsBackButtonVisible="Collapsed"
-            TitleBar="{Binding ElementName=_titleBar}">
+            TitleBar="{Binding ElementName=_titleBar}"
+            BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
+
+            <ui:NavigationView.Header>
+                <StackPanel
+                    Margin="8 8  0 8">
+                    <ui:BreadcrumbBar
+                        x:Name="_breadcrumbBar">
+                        <ui:BreadcrumbBar.ItemTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock
+                                    FontTypography="Subtitle"
+                                    Text="{Binding Content}" />
+                            </DataTemplate>
+                        </ui:BreadcrumbBar.ItemTemplate>
+                    </ui:BreadcrumbBar>
+                </StackPanel>
+            </ui:NavigationView.Header>
+
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Icon="{ui:SymbolIcon Symbol=TableSettings24}"

@@ -99,7 +99,7 @@
         <Border
             Grid.Row="2"
             Grid.ColumnSpan="2"
-            Margin="8 10 8 0"
+            Margin="8 10 8 8"
             Style="{StaticResource CustomBorder}">
             <StackPanel
                 Orientation="Horizontal">

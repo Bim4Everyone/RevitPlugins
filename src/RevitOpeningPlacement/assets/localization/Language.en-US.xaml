@@ -370,6 +370,10 @@ including in multilayer structures.</system:String>
     <system:String
         x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Description">The opening task intersects constructions of different categories. Status: "different constructions".</system:String>
     <system:String
+        x:Key="NavigatorSettings.Outcoming.Host.Title">Host search</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Host.Description">Determines the construction from a link that the opening task is located in. Assigns no status: the host is needed to highlight it on the view when the task is selected in the Navigator. Works faster if the "Not actual" check is enabled: it already finds the candidate constructions.</system:String>
+    <system:String
         x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Title">Unacceptable constructions</system:String>
     <system:String
         x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Description">The opening task is located in constructions of unacceptable categories. Status: "unacceptable constructions".</system:String>
