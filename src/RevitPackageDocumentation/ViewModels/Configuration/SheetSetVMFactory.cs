@@ -355,6 +355,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             var valueVM = new FiltrationComboBoxFilterVM(filterList, _stringParamSetService) {
                 ValueFormula = valueData.ValueFormula ?? string.Empty,
                 Value = valueData.ValueFormula ?? string.Empty,
+                IsExcluding = valueData.IsExcluding ?? false,
             };
             filterList.ValueList.Add(valueVM);
         }

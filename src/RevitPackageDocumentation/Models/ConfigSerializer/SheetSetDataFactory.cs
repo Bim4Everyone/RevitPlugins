@@ -192,6 +192,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
         ValueList = vm.ValueList
             .Select(r => new FiltrationComboBoxFilterData() {
                 ValueFormula = r.ValueFormula ?? string.Empty,
+                IsExcluding = r.IsExcluding,
             })
         .ToList()
     };

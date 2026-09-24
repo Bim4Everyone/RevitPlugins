@@ -175,7 +175,7 @@ public partial class FiltrationComboBoxControl : UserControl {
     }
 
     private void OnFilterItemPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        if(e.PropertyName == nameof(FiltrationComboBoxFilterVM.Value)) {
+        if(e.PropertyName is nameof(FiltrationComboBoxFilterVM.Value) or nameof(FiltrationComboBoxFilterVM.IsExcluding)) {
             Dispatcher.BeginInvoke(new Action(UpdateFilteredItems), DispatcherPriority.Background);
         }
     }
@@ -194,8 +194,7 @@ public partial class FiltrationComboBoxControl : UserControl {
         }
 
         var filters = FilterList.ValueList
-            .Select(x => x?.Value)
-            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Where(x => !string.IsNullOrWhiteSpace(x?.Value))
             .ToList();
 
         var items = ComboBoxSource
@@ -237,14 +236,15 @@ public partial class FiltrationComboBoxControl : UserControl {
     }
 
     /// <summary>
-    /// Проверяет, что имя элемента содержит все строки фильтра
+    /// Проверяет имя элемента по всем фильтрам: имя должно содержать значения прямых фильтров
+    /// и не должно содержать значения исключающих
     /// </summary>
-    private bool ItemMatchesAllFilters(object item, IReadOnlyCollection<string> filters) {
+    private bool ItemMatchesAllFilters(object item, IReadOnlyCollection<FiltrationComboBoxFilterVM> filters) {
         if(filters.Count == 0) {
             return true;
         }
         string name = GetItemName(item);
-        return filters.All(name.Contains);
+        return filters.All(filter => name.Contains(filter.Value) != filter.IsExcluding);
     }
 
     /// <summary>

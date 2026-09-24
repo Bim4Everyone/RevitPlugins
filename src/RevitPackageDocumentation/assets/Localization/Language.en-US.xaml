@@ -72,6 +72,7 @@
     <system:String x:Key="MainWindow.TextTemplate">Text template</system:String>
     <system:String x:Key="MainWindow.ElementType">Element type</system:String>
     <system:String x:Key="MainWindow.FamilyName">Family name</system:String>
+    <system:String x:Key="MainWindow.ExcludingFilter">Excluding filter: does not contain the value</system:String>
     <system:String x:Key="MainWindow.FamilySourceToolTip">Family source: left — from the project, right — from the folder with families</system:String>
     <system:String x:Key="MainWindow.Select">Select</system:String>
     <system:String x:Key="MainWindow.RemoveAfterCreation">Remove after creation</system:String>

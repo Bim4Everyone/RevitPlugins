@@ -96,19 +96,30 @@
                         <DataTemplate>
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <controls:FormulaTextBoxControl
+                                <ToggleButton
                                     Grid.Column="0"
+                                    Height="35"
+                                    Width="35"
+                                    Margin="0 5 5 0"
+                                    VerticalAlignment="Top"
+                                    Content="≠"
+                                    IsChecked="{Binding Path=IsExcluding, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    ToolTip="{me:LocalizationSource MainWindow.ExcludingFilter}" />
+
+                                <controls:FormulaTextBoxControl
+                                    Grid.Column="1"
                                     Margin="0 5 5 5"
                                     PropFormula="{Binding Path=ValueFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                     PropResult="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                     UpdateCommand="{Binding Path=PropUpdateByFormulaCommand}" />
 
                                 <Button
-                                    Grid.Column="1"
+                                    Grid.Column="2"
                                     Content="✕"
                                     Height="35"
                                     Width="35"

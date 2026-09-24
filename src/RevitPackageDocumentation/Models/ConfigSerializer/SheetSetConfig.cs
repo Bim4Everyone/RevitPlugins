@@ -261,6 +261,11 @@ public class FiltrationComboBoxFilterListData {
 /// </summary>
 public class FiltrationComboBoxFilterData {
     public string ValueFormula { get; set; }
+
+    /// <summary>
+    /// Исключающий фильтр: true - значение не должно содержаться в имени, false (или отсутствует) - должно
+    /// </summary>
+    public bool? IsExcluding { get; set; }
 }
 
 

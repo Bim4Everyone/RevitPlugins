@@ -73,6 +73,7 @@
     <system:String x:Key="MainWindow.TextTemplate">Шаблон текста</system:String>
     <system:String x:Key="MainWindow.ElementType">Типоразмер</system:String>
     <system:String x:Key="MainWindow.FamilyName">Имя семейства</system:String>
+    <system:String x:Key="MainWindow.ExcludingFilter">Исключающий фильтр: не содержит значение</system:String>
     <system:String x:Key="MainWindow.FamilySourceToolTip">Источник семейства: слева — из проекта, справа — из папки с семействами</system:String>
     <system:String x:Key="MainWindow.Select">Выбрать</system:String>
     <system:String x:Key="MainWindow.RemoveAfterCreation">Снять после создания</system:String>
