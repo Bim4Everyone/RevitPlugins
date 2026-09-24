@@ -45,7 +45,7 @@ internal class OpeningConfig : ProjectConfig {
     /// <summary>
     /// Настройки статусов Навигатора
     /// </summary>
-    public OutcomingTaskStatusesSettings NavigatorSettings { get; set; } = new();
+    public NavigatorMepSettings NavigatorSettings { get; set; } = new();
 
     public static OpeningConfig GetOpeningConfig(Document document) {
         if(document is null) { throw new ArgumentNullException(nameof(document)); }

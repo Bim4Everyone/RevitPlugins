@@ -12,5 +12,5 @@ internal class NavigatorArSettings {
     /// <summary>
     /// Настройки статусов чистовых отверстий АР
     /// </summary>
-    public RealOpeningStatusesSettings RealOpeningSettings { get; set; } = new();
+    public RealOpeningArStatusesSettings RealOpeningSettings { get; set; } = new();
 }
