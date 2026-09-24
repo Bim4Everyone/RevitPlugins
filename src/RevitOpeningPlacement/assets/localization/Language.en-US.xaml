@@ -146,6 +146,8 @@
     <system:String
         x:Key="Errors.InactiveDocument">Plugin window was opened in another Revit document that is not currently active, cannot show element.</system:String>
     <system:String
+        x:Key="Errors.CannotApplyViewSettings">Failed to apply view settings.</system:String>
+    <system:String
         x:Key="Errors.ArKrOnly"
         xml:space="preserve">
 This command is only for AR/KR.
