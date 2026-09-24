@@ -607,7 +607,6 @@ internal class OpeningTaskOutcomingMepInfoUpdater : IOpeningInfoUpdater<OpeningM
             return;
         }
 
-        // TODO зачем вообще нужен хост исходящего задания? только для графики?
         mepTaskOutcoming.Host = FindHostConstruction(
             mepTaskOutcoming,
             _hostConstructionsCache.HostCandidates,
