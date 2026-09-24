@@ -44,11 +44,8 @@ internal class TypicalAnnotationVM : SheetComponentVM {
 
     private string _selectionError = string.Empty;
 
-    // Флаг обновления списков: пока списки пересобираются, сброс выбора из UI (null) игнорируется
+    // Флаг обновления списков: пока списки пересобираются, команды выбора из UI не выполняются
     private bool _isUpdating;
-    // Значения, выбранные в UI автоматически во время обновления списков (фильтр оставил один вариант)
-    private string _autoSelectedFamilyName;
-    private string _autoSelectedTypeName;
 
     // Имена из конфигурации, которые не удалось найти. Хранятся для текста ошибки и для повторного экспорта
     private string _missingFamilyName;
@@ -72,6 +69,9 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         _openFolderDialogService = openFolderDialogService;
 
         SelectFolderCommand = RelayCommand.Create(SelectFolder, CanSelectFolder);
+        ChangeFamilySourceCommand = RelayCommand.Create(ChangeFamilySource);
+        SelectFamilyCommand = RelayCommand.Create(SelectFamily);
+        SelectTypeCommand = RelayCommand.Create(SelectType);
 
         // После загрузки семейства в проект обновляем списки модулей, работающих в режиме проекта
         Repository.FamilySymbolsChanged += OnFamilySymbolsChanged;
@@ -80,18 +80,26 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     public ICommand SelectFolderCommand { get; }
 
     /// <summary>
+    /// Команда смены источника семейства, вызывается тумблером
+    /// </summary>
+    public ICommand ChangeFamilySourceCommand { get; }
+
+    /// <summary>
+    /// Команда выбора семейства, вызывается выпадающим списком семейств
+    /// </summary>
+    public ICommand SelectFamilyCommand { get; }
+
+    /// <summary>
+    /// Команда выбора типоразмера, вызывается выпадающим списком типоразмеров
+    /// </summary>
+    public ICommand SelectTypeCommand { get; }
+
+    /// <summary>
     /// Источник семейства: false - проект, true - папка с семействами
     /// </summary>
     public bool IsFromFolder {
         get => _isFromFolder;
-        set {
-            if(_isFromFolder == value) {
-                return;
-            }
-            RaiseAndSetIfChanged(ref _isFromFolder, value);
-            // При смене источника сохраняем выбранные имена и ищем их в новом источнике
-            ResolveSelection(FamilyNameForConfig, TypeNameForConfig);
-        }
+        set => RaiseAndSetIfChanged(ref _isFromFolder, value);
     }
 
     /// <summary>
@@ -99,17 +107,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     /// </summary>
     public string FamilyFolderPath {
         get => _familyFolderPath;
-        set {
-            value ??= string.Empty;
-            if(_familyFolderPath == value) {
-                return;
-            }
-            RaiseAndSetIfChanged(ref _familyFolderPath, value);
-            RaisePropertyChanged(nameof(FolderButtonToolTip));
-            if(IsFromFolder) {
-                ResolveSelection(FamilyNameForConfig, TypeNameForConfig);
-            }
-        }
+        set => RaiseAndSetIfChanged(ref _familyFolderPath, value);
     }
 
     /// <summary>
@@ -126,21 +124,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
 
     public string SelectedFamilyName {
         get => _selectedFamilyName;
-        set {
-            if(_isUpdating) {
-                // Во время пересборки списков UI сбрасывает выбор в null - игнорируем,
-                // но запоминаем автоматический выбор фильтра
-                if(value != null) {
-                    _autoSelectedFamilyName = value;
-                }
-                return;
-            }
-            if(_selectedFamilyName == value) {
-                return;
-            }
-            // Пользователь выбрал другое семейство - типоразмер выбирается заново
-            ResolveSelection(value, null);
-        }
+        set => RaiseAndSetIfChanged(ref _selectedFamilyName, value);
     }
 
     public List<string> TypeNames {
@@ -150,20 +134,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
 
     public string SelectedTypeName {
         get => _selectedTypeName;
-        set {
-            if(_isUpdating) {
-                if(value != null) {
-                    _autoSelectedTypeName = value;
-                }
-                return;
-            }
-            if(_selectedTypeName == value) {
-                return;
-            }
-            RaiseAndSetIfChanged(ref _selectedTypeName, value);
-            _missingTypeName = null;
-            UpdateSelectionError();
-        }
+        set => RaiseAndSetIfChanged(ref _selectedTypeName, value);
     }
 
     public FiltrationComboBoxFilterListVM FamilyNameFilter {
@@ -214,17 +185,17 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     /// </summary>
     private void ResolveSelection(string familyName, string typeName) {
         _isUpdating = true;
-        _autoSelectedFamilyName = null;
-        _autoSelectedTypeName = null;
         try {
             // Семейства
             FamilyNames = IsFromFolder ? GetFolderFamilyNames() : GetProjectFamilyNames();
 
-            string family = FamilyNames.Contains(familyName) ? familyName : null;
-            if(family is null && string.IsNullOrEmpty(familyName) && FamilyNames.Contains(_autoSelectedFamilyName)) {
-                // Имя не задано, но фильтр оставил единственный вариант
-                family = _autoSelectedFamilyName;
-            }
+            // Если имя не задано, принимаем выбор, который сделал фильтр контрола,
+            // когда после фильтрации остался единственный вариант
+            string family = FamilyNames.Contains(familyName)
+                ? familyName
+                : string.IsNullOrEmpty(familyName) && FamilyNames.Contains(_selectedFamilyName)
+                    ? _selectedFamilyName
+                    : null;
             _missingFamilyName = family is null && !string.IsNullOrEmpty(familyName) ? familyName : null;
             _selectedFamilyName = family;
 
@@ -233,10 +204,11 @@ internal class TypicalAnnotationVM : SheetComponentVM {
                 ? []
                 : IsFromFolder ? GetFolderTypeNames(family) : GetProjectTypeNames(family);
 
-            string type = TypeNames.Contains(typeName) ? typeName : null;
-            if(type is null && string.IsNullOrEmpty(typeName) && TypeNames.Contains(_autoSelectedTypeName)) {
-                type = _autoSelectedTypeName;
-            }
+            string type = TypeNames.Contains(typeName)
+                ? typeName
+                : string.IsNullOrEmpty(typeName) && TypeNames.Contains(_selectedTypeName)
+                    ? _selectedTypeName
+                    : null;
             _missingTypeName = type is null && !string.IsNullOrEmpty(typeName) ? typeName : null;
             _selectedTypeName = type;
         } finally {
@@ -348,9 +320,43 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             ? FamilyFolderPath
             : Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-        if(_openFolderDialogService.ShowDialog(initialDirectory)) {
-            FamilyFolderPath = _openFolderDialogService.Folder.FullName;
+        if(!_openFolderDialogService.ShowDialog(initialDirectory)) {
+            return;
         }
+
+        FamilyFolderPath = _openFolderDialogService.Folder.FullName;
+        RaisePropertyChanged(nameof(FolderButtonToolTip));
+        // Папка сменилась - выбранные имена сохраняем и ищем их в новой папке
+        ResolveSelection(FamilyNameForConfig, TypeNameForConfig);
+    }
+
+    /// <summary>
+    /// Смена источника семейства тумблером: выбранные имена сохраняем и ищем их в новом источнике
+    /// </summary>
+    private void ChangeFamilySource() {
+        ResolveSelection(FamilyNameForConfig, TypeNameForConfig);
+    }
+
+    /// <summary>
+    /// Выбор семейства в списке. Типоразмер после смены семейства выбирается заново
+    /// </summary>
+    private void SelectFamily() {
+        // Списки пересобираются кодом - выбор в UI в этот момент не является выбором пользователя
+        if(_isUpdating) {
+            return;
+        }
+        ResolveSelection(SelectedFamilyName, null);
+    }
+
+    /// <summary>
+    /// Выбор типоразмера в списке
+    /// </summary>
+    private void SelectType() {
+        if(_isUpdating) {
+            return;
+        }
+        _missingTypeName = null;
+        UpdateSelectionError();
     }
 
     private bool CanSelectFolder() {

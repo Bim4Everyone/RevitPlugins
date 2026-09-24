@@ -1081,6 +1081,7 @@
                     DisplayMemberPath=""
                     ComboBoxSource="{Binding FamilyNames}"
                     ComboBoxSelected="{Binding SelectedFamilyName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    ComboBoxSelectionChangedCommand="{Binding SelectFamilyCommand}"
                     FilterList="{Binding FamilyNameFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
 
@@ -1091,7 +1092,15 @@
                     Margin="5"
                     VerticalAlignment="Center"
                     IsChecked="{Binding IsFromFolder, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ToolTip="{extensions:Localized MainWindow.FamilySourceToolTip}" />
+                    ToolTip="{extensions:Localized MainWindow.FamilySourceToolTip}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger
+                            EventName="Click">
+                            <i:InvokeCommandAction
+                                Command="{Binding ChangeFamilySourceCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ui:ToggleSwitch>
 
                 <!--Выбор папки с семействами-->
                 <ui:Button
@@ -1123,6 +1132,7 @@
                     DisplayMemberPath=""
                     ComboBoxSource="{Binding TypeNames}"
                     ComboBoxSelected="{Binding SelectedTypeName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    ComboBoxSelectionChangedCommand="{Binding SelectTypeCommand}"
                     FilterList="{Binding TypeNameFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
             </Grid>

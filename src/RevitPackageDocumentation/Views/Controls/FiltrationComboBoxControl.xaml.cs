@@ -193,20 +193,46 @@ public partial class FiltrationComboBoxControl : UserControl {
             return;
         }
 
-        FilteredItemsSource.Clear();
         var filters = FilterList.ValueList
             .Select(x => x?.Value)
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .ToList();
 
-        foreach(object item in ComboBoxSource) {
-            if(item is not null && ItemMatchesAllFilters(item, filters)) {
-                FilteredItemsSource.Add(item);
-            }
-        }
+        var items = ComboBoxSource
+            .OfType<object>()
+            .Where(item => ItemMatchesAllFilters(item, filters))
+            .ToList();
+
+        UpdateFilteredItemsSource(items);
 
         if(FilteredItemsSource.Count == 1) {
             ComboBoxSelected = FilteredItemsSource.First();
+        }
+    }
+
+    /// <summary>
+    /// Приводит коллекцию ComboBox к нужному составу, изменяя только отличия.
+    /// Полная очистка коллекции недопустима: ComboBox на время очистки сбрасывает SelectedItem в null и через
+    /// двустороннюю привязку записывает null в ViewModel, из-за чего теряется уже сделанный выбор.
+    /// </summary>
+    private void UpdateFilteredItemsSource(IReadOnlyList<object> items) {
+        // Удаляем то, чего больше нет в новом составе
+        for(int i = FilteredItemsSource.Count - 1; i >= 0; i--) {
+            if(!items.Contains(FilteredItemsSource[i])) {
+                FilteredItemsSource.RemoveAt(i);
+            }
+        }
+
+        // Добавляем недостающее, сохраняя порядок нового состава
+        for(int i = 0; i < items.Count; i++) {
+            if(i >= FilteredItemsSource.Count || !Equals(FilteredItemsSource[i], items[i])) {
+                FilteredItemsSource.Insert(i, items[i]);
+            }
+        }
+
+        // Удаляем возможный хвост, если элементов стало меньше
+        while(FilteredItemsSource.Count > items.Count) {
+            FilteredItemsSource.RemoveAt(FilteredItemsSource.Count - 1);
         }
     }
 
