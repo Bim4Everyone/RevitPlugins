@@ -4,7 +4,7 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="ArSettingsWindow.Title">Настройки расстановки отверстий АР</system:String>
+        x:Key="ArSettingsWindow.Title">Настройки АР</system:String>
     <system:String
         x:Key="ArSettingsWindow.RoundSize">Округлять габариты</system:String>
     <system:String
@@ -165,7 +165,7 @@
         x:Key="Validation.MissingParametersInFamily">У семейства '{0}' отсутствуют общие параметры: {1}</system:String>
 
     <system:String
-        x:Key="KrSettingsWindow.Title">Настройки расстановки отверстий КР</system:String>
+        x:Key="KrSettingsWindow.Title">Настройки КР</system:String>
     <system:String
         x:Key="KrSettingsWindow.PlaceByAr">Размещать отверстия по заданиям из АР</system:String>
     <system:String
@@ -191,7 +191,7 @@
         x:Key="UnionTaskSettingsView.RoundValues">Значение округления, мм</system:String>
 
     <system:String
-        x:Key="MepSettingsWindow.Title">Настройки расстановки заданий</system:String>
+        x:Key="MepSettingsWindow.Title">Настройки ВИС</system:String>
     <system:String
         x:Key="MepSettingsWindow.MinSizesTooltip">
         Например, если есть кабельный лоток шириной 300 и высотой 50,

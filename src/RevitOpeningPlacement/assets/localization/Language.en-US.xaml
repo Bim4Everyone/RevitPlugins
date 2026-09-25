@@ -4,7 +4,7 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="ArSettingsWindow.Title">AR Opening Placement Settings</system:String>
+        x:Key="ArSettingsWindow.Title">AR settings</system:String>
     <system:String
         x:Key="ArSettingsWindow.RoundSize">Round dimensions</system:String>
     <system:String
@@ -165,7 +165,7 @@ Continue?
         x:Key="Validation.MissingParametersInFamily">Family '{0}' is missing shared parameters: {1}</system:String>
 
     <system:String
-        x:Key="KrSettingsWindow.Title">Structural Opening Placement Settings</system:String>
+        x:Key="KrSettingsWindow.Title">KR settings</system:String>
     <system:String
         x:Key="KrSettingsWindow.PlaceByAr">Place openings by tasks from AR</system:String>
     <system:String
@@ -191,7 +191,7 @@ Continue?
         x:Key="UnionTaskSettingsView.RoundValues">Rounding value, mm</system:String>
 
     <system:String
-        x:Key="MepSettingsWindow.Title">Task Placement Settings</system:String>
+        x:Key="MepSettingsWindow.Title">MEP settings</system:String>
     <system:String
         x:Key="MepSettingsWindow.MinSizesTooltip">
         For example, if there is a cable tray with width 300 and height 50,
