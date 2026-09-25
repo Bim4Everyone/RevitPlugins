@@ -22,7 +22,7 @@
     </core:WpfUIPlatformPage.Resources>
     <ScrollViewer
         VerticalScrollBarVisibility="Auto"
-        HorizontalScrollBarVisibility="Disabled">
+        HorizontalScrollBarVisibility="Auto">
         <StackPanel
             Margin="0 0 0 8">
             <Label

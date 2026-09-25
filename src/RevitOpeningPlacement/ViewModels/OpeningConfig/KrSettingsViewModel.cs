@@ -50,6 +50,7 @@ internal class KrSettingsViewModel : BaseViewModel {
            || !string.IsNullOrEmpty(_navigatorVm.RealOpeningStatuses.ErrorText)) {
             string title = _localization.GetLocalizedString("SettingsNavigation.NavigatorSettings");
             ErrorText = $"{title}: {_navigatorVm.RealOpeningStatuses.ErrorText}";
+            return false;
         }
 
         ErrorText = null;
