@@ -37,25 +37,11 @@
                 CostTag="{me:LocalizationSource NavigatorSettings.Cost.Slow}"
                 IsChecked="{Binding CheckNotActual, UpdateSourceTrigger=PropertyChanged}">
                 <controls:StatusToggleControl.NestedContent>
-                    <StackPanel>
-                        <StackPanel
-                            Orientation="Horizontal">
-                            <ui:ToggleSwitch
-                                Content="{me:LocalizationSource NavigatorSettings.Outcoming.DifferentConstructions.Title}"
-                                IsChecked="{Binding CheckDifferentConstructions, UpdateSourceTrigger=PropertyChanged}" />
-                            <Border
-                                Style="{StaticResource StatusToggleTagBorder}">
-                                <ui:TextBlock
-                                    Style="{StaticResource StatusToggleTagText}"
-                                    Text="{me:LocalizationSource NavigatorSettings.Cost.Fast}" />
-                            </Border>
-                        </StackPanel>
-                        <ui:TextBlock
-                            Margin="0 4 0 0"
-                            TextWrapping="Wrap"
-                            TextAlignment="Justify"
-                            Text="{me:LocalizationSource NavigatorSettings.Outcoming.DifferentConstructions.Description}" />
-                    </StackPanel>
+                    <controls:StatusToggleControl
+                        Title="{me:LocalizationSource NavigatorSettings.Outcoming.DifferentConstructions.Title}"
+                        Description="{me:LocalizationSource NavigatorSettings.Outcoming.DifferentConstructions.Description}"
+                        CostTag="{me:LocalizationSource NavigatorSettings.Cost.Fast}"
+                        IsChecked="{Binding CheckDifferentConstructions, UpdateSourceTrigger=PropertyChanged}" />
                 </controls:StatusToggleControl.NestedContent>
             </controls:StatusToggleControl>
 

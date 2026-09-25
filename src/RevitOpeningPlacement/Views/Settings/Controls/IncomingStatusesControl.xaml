@@ -33,42 +33,17 @@
             IsChecked="{Binding CheckIntersections, UpdateSourceTrigger=PropertyChanged}">
             <controls:StatusToggleControl.NestedContent>
                 <StackPanel>
-                    <StackPanel
-                        Orientation="Horizontal">
-                        <ui:ToggleSwitch
-                            Content="{me:LocalizationSource NavigatorSettings.Incoming.DifferentConstructions.Title}"
-                            IsChecked="{Binding CheckDifferentConstructions, UpdateSourceTrigger=PropertyChanged}" />
-                        <Border
-                            Style="{StaticResource StatusToggleTagBorder}">
-                            <ui:TextBlock
-                                Style="{StaticResource StatusToggleTagText}"
-                                Text="{me:LocalizationSource NavigatorSettings.Cost.Fast}" />
-                        </Border>
-                    </StackPanel>
-                    <ui:TextBlock
-                        Margin="0 4 0 0"
-                        TextWrapping="Wrap"
-                        TextAlignment="Justify"
-                        Text="{me:LocalizationSource NavigatorSettings.Incoming.DifferentConstructions.Description}" />
+                    <controls:StatusToggleControl
+                        Title="{me:LocalizationSource NavigatorSettings.Incoming.DifferentConstructions.Title}"
+                        Description="{me:LocalizationSource NavigatorSettings.Incoming.DifferentConstructions.Description}"
+                        CostTag="{me:LocalizationSource NavigatorSettings.Cost.Fast}"
+                        IsChecked="{Binding CheckDifferentConstructions, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <StackPanel
-                        Margin="0 8 0 0"
-                        Orientation="Horizontal">
-                        <ui:ToggleSwitch
-                            Content="{me:LocalizationSource NavigatorSettings.Incoming.Host.Title}"
-                            IsChecked="{Binding CheckHost, UpdateSourceTrigger=PropertyChanged}" />
-                        <Border
-                            Style="{StaticResource StatusToggleTagBorder}">
-                            <ui:TextBlock
-                                Style="{StaticResource StatusToggleTagText}"
-                                Text="{me:LocalizationSource NavigatorSettings.Cost.Medium}" />
-                        </Border>
-                    </StackPanel>
-                    <ui:TextBlock
-                        Margin="0 4 0 0"
-                        TextWrapping="Wrap"
-                        TextAlignment="Justify"
-                        Text="{me:LocalizationSource NavigatorSettings.Incoming.Host.Description}" />
+                    <controls:StatusToggleControl
+                        Title="{me:LocalizationSource NavigatorSettings.Incoming.Host.Title}"
+                        Description="{me:LocalizationSource NavigatorSettings.Incoming.Host.Description}"
+                        CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
+                        IsChecked="{Binding CheckHost, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
             </controls:StatusToggleControl.NestedContent>
         </controls:StatusToggleControl>

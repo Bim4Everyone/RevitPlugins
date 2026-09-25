@@ -314,9 +314,9 @@
     <system:String
         x:Key="NavigatorSettings.Validation.CannotParseInt">Введите целое число</system:String>
     <system:String
-        x:Key="NavigatorSettings.Validation.EmptyVolumeRange">Порог "пустое" должен быть от {0} до {1} %</system:String>
+        x:Key="NavigatorSettings.Validation.EmptyVolumeRange">Порог "пустое" должен быть от {0} до {1}</system:String>
     <system:String
-        x:Key="NavigatorSettings.Validation.TooBigVolumeRange">Порог "слишком большое" должен быть больше {0} % и не больше {1} %</system:String>
+        x:Key="NavigatorSettings.Validation.TooBigVolumeRange">Порог "слишком большое" должен быть больше {0} и не больше {1}</system:String>
     <system:String
         x:Key="NavigatorSettings.Validation.DistanceRange">Минимальное расстояние должно быть от 0 до {0} мм</system:String>
 
@@ -361,9 +361,9 @@
 
 Если выключить, отверстия считаются корректными.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">Порог "пустое", % пересеченного объема</system:String>
+        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">Порог "пустое", доля от 1 пересеченного объема</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">Порог "слишком большое", % пересеченного объема</system:String>
+        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">Порог "слишком большое", доля от 1 пересеченного объема</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.TooClose.Title">Проверка расстояния между отверстиями</system:String>
     <system:String

@@ -11,6 +11,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary
                     Source="../../../Resources/CustomStyles.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/Wpf.Ui;component/Controls/Flyout/Flyout.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <converters:BoolToVisibilityConverter
                 x:Key="BoolToVisibilityConverter" />
@@ -31,14 +33,40 @@
                         Style="{StaticResource StatusToggleTagText}"
                         Text="{Binding CostTag, ElementName=_control}" />
                 </Border>
+                <ui:SymbolIcon
+                    Margin="8 0 0 0"
+                    Symbol="Info20"
+                    x:Name="_hoverElement">
+                </ui:SymbolIcon>
+                <ui:Flyout
+                    Placement="Top">
+                    <TextBlock
+                        TextWrapping="Wrap"
+                        TextAlignment="Justify"
+                        MaxWidth="400"
+                        Text="{Binding Description, ElementName=_control}"></TextBlock>
+                    <ui:Flyout.Style>
+                        <Style
+                            BasedOn="{StaticResource DefaultFlyoutStyle}"
+                            TargetType="ui:Flyout">
+                            <Setter
+                                Property="IsOpen"
+                                Value="False" />
+                            <Style.Triggers>
+                                <DataTrigger
+                                    Binding="{Binding IsMouseOver, ElementName=_hoverElement}"
+                                    Value="True">
+                                    <Setter
+                                        Property="IsOpen"
+                                        Value="True"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Flyout.Style>
+                </ui:Flyout>
             </StackPanel>
-            <ui:TextBlock
-                Text="{Binding Description, ElementName=_control}"
-                TextWrapping="Wrap"
-                TextAlignment="Justify"
-                Margin="0 4 0 0" />
             <ContentPresenter
-                Margin="24 8 0 0"
+                Margin="24 0 0 0"
                 Content="{Binding NestedContent, ElementName=_control}"
                 Visibility="{Binding HasNestedContent, ElementName=_control,
                     Converter={StaticResource BoolToVisibilityConverter}}" />

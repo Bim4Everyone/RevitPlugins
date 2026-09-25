@@ -41,6 +41,7 @@
                                     Text="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.EmptyPercent}" />
                                 <ui:TextBox
                                     HorizontalAlignment="Right"
+                                    ClearButtonEnabled="False"
                                     MinWidth="{StaticResource SmallInputWidth}"
                                     Width="{StaticResource SmallInputWidth}"
                                     IsEnabled="{Binding CheckVolumeMatch}"
@@ -55,6 +56,7 @@
                                     Text="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.TooBigPercent}" />
                                 <ui:TextBox
                                     HorizontalAlignment="Right"
+                                    ClearButtonEnabled="False"
                                     MinWidth="{StaticResource SmallInputWidth}"
                                     Width="{StaticResource SmallInputWidth}"
                                     IsEnabled="{Binding CheckVolumeMatch}"

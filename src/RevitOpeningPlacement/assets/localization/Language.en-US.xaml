@@ -315,9 +315,9 @@ including in multilayer structures.</system:String>
     <system:String
         x:Key="NavigatorSettings.Validation.CannotParseInt">Enter an integer</system:String>
     <system:String
-        x:Key="NavigatorSettings.Validation.EmptyVolumeRange">The "empty" threshold must be from {0} to {1} %</system:String>
+        x:Key="NavigatorSettings.Validation.EmptyVolumeRange">The "empty" threshold must be from {0} to {1}</system:String>
     <system:String
-        x:Key="NavigatorSettings.Validation.TooBigVolumeRange">The "too big" threshold must be greater than {0} % and at most {1} %</system:String>
+        x:Key="NavigatorSettings.Validation.TooBigVolumeRange">The "too big" threshold must be greater than {0} and at most {1}</system:String>
     <system:String
         x:Key="NavigatorSettings.Validation.DistanceRange">The minimum distance must be from 0 to {0} mm</system:String>
 
@@ -362,9 +362,9 @@ If disabled, the nested fill check is disabled too, and all openings except too 
 
 If disabled, openings are considered correct.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">"Empty" threshold, % of intersected volume</system:String>
+        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">"Empty" threshold, share of 1 of intersected volume</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">"Too big" threshold, % of intersected volume</system:String>
+        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">"Too big" threshold, share of 1 of intersected volume</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.TooClose.Title">Distance between openings check</system:String>
     <system:String
