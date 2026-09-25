@@ -20,7 +20,15 @@ public partial class FiltrationComboBoxControl : UserControl {
             new PropertyMetadata(null, OnComboBoxSourceChanged));
 
     public static readonly DependencyProperty ComboBoxSelectedProperty =
-        DependencyProperty.Register(nameof(ComboBoxSelected), typeof(Element), typeof(FiltrationComboBoxControl));
+        DependencyProperty.Register(nameof(ComboBoxSelected), typeof(object), typeof(FiltrationComboBoxControl));
+
+    /// <summary>
+    /// Путь до отображаемого свойства элемента. По умолчанию "Name" (для элементов Revit).
+    /// Для списка строк нужно передать пустую строку.
+    /// </summary>
+    public static readonly DependencyProperty DisplayMemberPathProperty =
+        DependencyProperty.Register(nameof(DisplayMemberPath), typeof(string), typeof(FiltrationComboBoxControl),
+            new PropertyMetadata("Name"));
 
     public static readonly DependencyProperty FilterListProperty =
         DependencyProperty.Register(nameof(FilterList), typeof(FiltrationComboBoxFilterListVM), typeof(FiltrationComboBoxControl),
@@ -44,9 +52,17 @@ public partial class FiltrationComboBoxControl : UserControl {
         set => SetValue(ComboBoxSourceProperty, value);
     }
 
-    public Element ComboBoxSelected {
-        get => (Element) GetValue(ComboBoxSelectedProperty);
+    /// <summary>
+    /// Выбранный элемент: элемент Revit (Element) или строка
+    /// </summary>
+    public object ComboBoxSelected {
+        get => GetValue(ComboBoxSelectedProperty);
         set => SetValue(ComboBoxSelectedProperty, value);
+    }
+
+    public string DisplayMemberPath {
+        get => (string) GetValue(DisplayMemberPathProperty);
+        set => SetValue(DisplayMemberPathProperty, value);
     }
 
     internal FiltrationComboBoxFilterListVM FilterList {
@@ -72,7 +88,7 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// <summary>
     /// Коллекция элементов для ComboBox, после того как проведена фильтрация по фильтрам
     /// </summary>
-    public ObservableCollection<Element> FilteredItemsSource { get; } = [];
+    public ObservableCollection<object> FilteredItemsSource { get; } = [];
 
 
     /// <summary>
@@ -89,6 +105,7 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// </summary>
     private static void OnFilterListSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
         var control = (FiltrationComboBoxControl) d;
+        control.UnsubscribeFromFilterList(e.OldValue as FiltrationComboBoxFilterListVM);
         control.UpdateFilteredItems();
         control.SubscribeToFilterList();
     }
@@ -133,6 +150,18 @@ public partial class FiltrationComboBoxControl : UserControl {
         UpdateFilteredItems();
     }
 
+    /// <summary>
+    /// Отписывается от предыдущего списка фильтров, чтобы выгруженный контрол не реагировал на его изменения
+    /// </summary>
+    private void UnsubscribeFromFilterList(FiltrationComboBoxFilterListVM oldFilterList) {
+        if(oldFilterList?.ValueList == null) { return; }
+
+        oldFilterList.ValueList.CollectionChanged -= OnValueListCollectionChanged;
+        foreach(var item in oldFilterList.ValueList) {
+            UnsubscribeFromFilterItem(item);
+        }
+    }
+
     private void SubscribeToFilterItem(FiltrationComboBoxFilterVM item) {
         if(item is INotifyPropertyChanged notifyItem) {
             notifyItem.PropertyChanged += OnFilterItemPropertyChanged;
@@ -146,7 +175,7 @@ public partial class FiltrationComboBoxControl : UserControl {
     }
 
     private void OnFilterItemPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        if(e.PropertyName == nameof(FiltrationComboBoxFilterVM.Value)) {
+        if(e.PropertyName is nameof(FiltrationComboBoxFilterVM.Value) or nameof(FiltrationComboBoxFilterVM.IsExcluding)) {
             Dispatcher.BeginInvoke(new Action(UpdateFilteredItems), DispatcherPriority.Background);
         }
     }
@@ -156,21 +185,24 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// Обновляет значения ComboBox по фильтрам
     /// </summary>
     private void UpdateFilteredItems() {
-        FilteredItemsSource.Clear();
-
+        // Источник или фильтры становятся null, когда контрол выгружается (например, при переключении листа
+        // шаблон компонента уничтожается и привязки к DataContext сбрасываются). Если в этот момент очистить список,
+        // ComboBox сбросит SelectedItem в null и через еще не отвязанную двустороннюю привязку ComboBoxSelected
+        // запишет null в ViewModel - выбор будет потерян. Поэтому в этом случае список не трогаем.
         if(ComboBoxSource is null || FilterList is null) {
             return;
         }
+
         var filters = FilterList.ValueList
-            .Select(x => x?.Value)
-            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Where(x => !string.IsNullOrWhiteSpace(x?.Value))
             .ToList();
 
-        foreach(var element in ComboBoxSource.OfType<Element>()) {
-            if(ItemMatchesAllFilters(element, filters)) {
-                FilteredItemsSource.Add(element);
-            }
-        }
+        var items = ComboBoxSource
+            .OfType<object>()
+            .Where(item => ItemMatchesAllFilters(item, filters))
+            .ToList();
+
+        UpdateFilteredItemsSource(items);
 
         if(FilteredItemsSource.Count == 1) {
             ComboBoxSelected = FilteredItemsSource.First();
@@ -178,22 +210,58 @@ public partial class FiltrationComboBoxControl : UserControl {
     }
 
     /// <summary>
-    /// Проверяет, что имя элемента содержит все строки фильтра
+    /// Приводит коллекцию ComboBox к нужному составу, изменяя только отличия.
+    /// Полная очистка коллекции недопустима: ComboBox на время очистки сбрасывает SelectedItem в null и через
+    /// двустороннюю привязку записывает null в ViewModel, из-за чего теряется уже сделанный выбор.
     /// </summary>
-    private bool ItemMatchesAllFilters(Element element, IReadOnlyCollection<string> filters) {
+    private void UpdateFilteredItemsSource(IReadOnlyList<object> items) {
+        // Удаляем то, чего больше нет в новом составе
+        for(int i = FilteredItemsSource.Count - 1; i >= 0; i--) {
+            if(!items.Contains(FilteredItemsSource[i])) {
+                FilteredItemsSource.RemoveAt(i);
+            }
+        }
+
+        // Добавляем недостающее, сохраняя порядок нового состава
+        for(int i = 0; i < items.Count; i++) {
+            if(i >= FilteredItemsSource.Count || !Equals(FilteredItemsSource[i], items[i])) {
+                FilteredItemsSource.Insert(i, items[i]);
+            }
+        }
+
+        // Удаляем возможный хвост, если элементов стало меньше
+        while(FilteredItemsSource.Count > items.Count) {
+            FilteredItemsSource.RemoveAt(FilteredItemsSource.Count - 1);
+        }
+    }
+
+    /// <summary>
+    /// Проверяет имя элемента по всем фильтрам: имя должно содержать значения прямых фильтров
+    /// и не должно содержать значения исключающих
+    /// </summary>
+    private bool ItemMatchesAllFilters(object item, IReadOnlyCollection<FiltrationComboBoxFilterVM> filters) {
         if(filters.Count == 0) {
             return true;
         }
-        string name = element.Name ?? string.Empty;
-        return filters.All(name.Contains);
+        string name = GetItemName(item);
+        return filters.All(filter => name.Contains(filter.Value) != filter.IsExcluding);
+    }
+
+    /// <summary>
+    /// Возвращает имя элемента для фильтрации: строка как есть, для элемента Revit - его имя
+    /// </summary>
+    private static string GetItemName(object item) {
+        return item switch {
+            string str => str,
+            Element element => element.Name ?? string.Empty,
+            _ => item?.ToString() ?? string.Empty
+        };
     }
 
     /// <summary>
     /// Показывает/скрывает видимость фильтров
     /// </summary>
     private void Button_Click(object sender, RoutedEventArgs e) {
-        flyout.IsOpen = flyout.IsOpen == true
-            ? false
-            : true;
+        flyout.IsOpen = flyout.IsOpen != true;
     }
 }

@@ -25,19 +25,6 @@
                 <ResourceDictionary
                     Source="../CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
-            <DataTemplate
-                x:Key="WithFamilyNameItemTemplate">
-                <TextBlock>
-                    <TextBlock.Text>
-                        <MultiBinding
-                            StringFormat="{}{0}: {1}">
-                            <Binding Path="FamilyName" />
-                            <Binding Path="Name" />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -56,7 +43,7 @@
             Grid.Column="0"
             Margin="0 5 5 5"
             VerticalAlignment="Top"
-            DisplayMemberPath="Name"
+            DisplayMemberPath="{Binding Path=DisplayMemberPath, ElementName=root}"
             Style="{Binding Path=ComboBoxStyle, ElementName=root, TargetNullValue={StaticResource {x:Type ComboBox}}}"
             ItemsSource="{Binding Path=FilteredItemsSource, ElementName=root}"
             SelectedItem="{Binding Path=ComboBoxSelected, ElementName=root}"
@@ -109,19 +96,50 @@
                         <DataTemplate>
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <controls:FormulaTextBoxControl
+                                <ToggleButton
                                     Grid.Column="0"
+                                    Height="35"
+                                    Width="35"
+                                    Margin="0 5 5 0"
+                                    VerticalAlignment="Top"
+                                    IsChecked="{Binding Path=IsExcluding, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    ToolTip="{me:LocalizationSource MainWindow.ExcludingFilter}">
+                                    <!--Прямой фильтр обозначается символом "=", исключающий - символом "≠"-->
+                                    <TextBlock>
+                                        <TextBlock.Style>
+                                            <Style
+                                                TargetType="TextBlock">
+                                                <Setter
+                                                    Property="Text"
+                                                    Value="=" />
+                                                <Style.Triggers>
+                                                    <DataTrigger
+                                                        Binding="{Binding Path=IsExcluding}"
+                                                        Value="True">
+                                                        <Setter
+                                                            Property="Text"
+                                                            Value="≠" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </ToggleButton>
+
+                                <controls:FormulaTextBoxControl
+                                    Grid.Column="1"
                                     Margin="0 5 5 5"
                                     PropFormula="{Binding Path=ValueFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                     PropResult="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                     UpdateCommand="{Binding Path=PropUpdateByFormulaCommand}" />
 
                                 <Button
-                                    Grid.Column="1"
+                                    Grid.Column="2"
                                     Content="✕"
                                     Height="35"
                                     Width="35"

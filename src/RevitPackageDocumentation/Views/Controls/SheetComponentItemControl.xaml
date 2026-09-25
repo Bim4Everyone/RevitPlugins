@@ -30,7 +30,9 @@
 
     <Border
         Margin="5"
-        Style="{StaticResource CustomBorder}">
+        Style="{StaticResource CustomBorder}"
+        Background="{Binding Path=AccentBackgroundBrush, ElementName=root}"
+        BorderBrush="{Binding Path=AccentBorderBrush, ElementName=root}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
