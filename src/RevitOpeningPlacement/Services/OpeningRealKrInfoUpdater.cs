@@ -23,7 +23,7 @@ namespace RevitOpeningPlacement.Services;
 /// <see cref="OpeningRealsKrConfig.PlacementType"/>.
 /// </para>
 /// </summary>
-internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningRealKr> {
+internal class OpeningRealKrInfoUpdater : OpeningInfoUpdaterBase<OpeningRealKr> {
     private readonly OpeningRealKrPlacementType _placementType;
 
     /// <summary>
@@ -38,12 +38,20 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
 
     private readonly RevitRepository _revitRepository;
     private readonly ILengthConverter _lengthConverter;
+    private readonly ISolidProviderUtils _solidUtils;
+    private readonly RealOpeningVolumeAnalyzer _volumeAnalyzer;
+    private readonly RealOpeningKrStatusesSettings _statusesSettings;
 
     /// <summary>
     /// Минимальное допустимое расстояние между чистовыми отверстиями КР в единицах длины Revit (футах).
     /// <para>0 - проверка выключена</para>
     /// </summary>
     private readonly double _minDistance;
+
+    /// <summary>
+    /// Включает/выключает проверку расстояния между чистовыми отверстиями (статус TooClose)
+    /// </summary>
+    private readonly bool _checkTooClose;
 
     /// <summary>
     /// Id чистовых отверстий КР активного файла, которые еще могут оказаться слишком близко к соседям.
@@ -59,27 +67,26 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
     /// </summary>
     private readonly ICollection<OpeningRealKr> _realOpenings;
 
-    /// <summary>
-    /// Кэш Id вентблоков по связям АР
-    /// </summary>
-    private readonly Dictionary<IConstructureLinkElementsProvider, ICollection<ElementId>> _ventBlockIdsByLink = [];
-
     public OpeningRealKrInfoUpdater(
         RevitRepository revitRepository,
         OpeningRealsKrConfig config,
         ILengthConverter lengthConverter,
         ISolidProviderUtils solidUtils,
-        IIntersectingElementsFinder intersectingElementsFinder)
-        : base(solidUtils, intersectingElementsFinder) {
+        RealOpeningVolumeAnalyzer volumeAnalyzer) {
+
         if(config is null) {
             throw new ArgumentNullException(nameof(config));
         }
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _lengthConverter = lengthConverter ?? throw new ArgumentNullException(nameof(lengthConverter));
+        _solidUtils = solidUtils ?? throw new ArgumentNullException(nameof(solidUtils));
+        _volumeAnalyzer = volumeAnalyzer ?? throw new ArgumentNullException(nameof(volumeAnalyzer));
+        _statusesSettings = config.NavigatorSettings.RealOpeningSettings;
         _placementType = config.PlacementType;
-        _minDistance = _lengthConverter.ConvertToInternal(config.MinDistanceBetweenOpenings);
-        _realOpenings = _minDistance > 0 ? revitRepository.GetRealOpeningsKr() : [];
+        _checkTooClose = _statusesSettings.CheckTooClose;
+        _minDistance = _lengthConverter.ConvertToInternal(_statusesSettings.MinDistanceBetweenOpenings);
+        _realOpenings = (_checkTooClose && (_minDistance > 0)) ? revitRepository.GetRealOpeningsKr() : [];
         _proximityPool = _realOpenings.Select(opening => opening.Id).ToHashSet();
         if(_placementType == OpeningRealKrPlacementType.PlaceByAr) {
             _arLinks = revitRepository.GetSelectedRevitLinks()
@@ -95,48 +102,76 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
         }
     }
 
-    private protected override double EmptyVolumeRatio => 0.01;
-
-    private protected override double TooBigVolumeRatio => 0.5;
-
     private protected override void UpdateInfoCore(OpeningRealKr opening) {
-        switch(_placementType) {
-            case OpeningRealKrPlacementType.PlaceByAr:
-                UpdateStatusByArLinks(opening);
-                break;
-            case OpeningRealKrPlacementType.PlaceByMep:
-                UpdateStatusByMepLinks(opening, _mepLinks);
-                break;
-            default:
-                throw new InvalidOperationException(
-                    $"Режим обработки заданий для КР: '{_placementType}' не поддерживается.");
+        var analysis = _placementType switch {
+            OpeningRealKrPlacementType.PlaceByAr => _volumeAnalyzer.AnalyzeArLinks(
+                opening,
+                _arLinks,
+                _statusesSettings),
+            OpeningRealKrPlacementType.PlaceByMep => _volumeAnalyzer.AnalyzeMepLinks(
+                opening,
+                _mepLinks,
+                _statusesSettings),
+            _ => throw new InvalidOperationException(
+                $"Режим обработки заданий для КР: '{_placementType}' не поддерживается.")
+        };
+
+        if(_statusesSettings.CheckNotActual
+           && analysis.NotActual) {
+            opening.Status = OpeningRealStatus.NotActual;
+            return;
         }
 
-        UpdateStatusByProximity(opening);
+        var volumeStatus = GetVolumeStatus(analysis.VolumeRatio);
+        if(volumeStatus != OpeningRealStatus.Correct) {
+            opening.Status = volumeStatus;
+            return;
+        }
+
+        opening.Status = GetProximityStatus(opening);
     }
 
-    private protected override void SetStatus(OpeningRealKr opening, OpeningRealStatus status) {
-        opening.Status = status;
+    private protected override void SetInvalidStatus(OpeningRealKr opening) {
+        opening.Status = OpeningRealStatus.Invalid;
     }
 
     /// <summary>
-    /// Понижает статус чистового отверстия до <see cref="OpeningRealStatus.TooClose"/>,
-    /// если рядом с ним есть другое чистовое отверстие КР.
+    /// Возвращает статус чистового отверстия по доле пересеченного объема.
     /// <para>
-    /// Проверяются только отверстия со статусом <see cref="OpeningRealStatus.Correct"/>:
-    /// остальные статусы обозначают более серьезные проблемы и не должны прятаться за близостью.
+    /// Диапазоны взаимоисключающие, поэтому выключение проверки не подменяет один статус другим:
+    /// все отверстия становятся корректными.
     /// </para>
     /// </summary>
-    private void UpdateStatusByProximity(OpeningRealKr opening) {
-        if((_minDistance <= 0)
-           || (opening.Status != OpeningRealStatus.Correct)) {
-            return;
+    /// <param name="volumeRatio">Доля объема отверстия, пересеченная элементами из связей</param>
+    private OpeningRealStatus GetVolumeStatus(double volumeRatio) {
+        if(!_statusesSettings.CheckVolumeMatch) {
+            return OpeningRealStatus.Correct;
+        }
+
+        if(volumeRatio < _statusesSettings.EmptyVolumeRatio) {
+            return OpeningRealStatus.Empty;
+        }
+
+        return volumeRatio < _statusesSettings.TooBigVolumeRatio
+            ? OpeningRealStatus.TooBig
+            : OpeningRealStatus.Correct;
+    }
+
+    /// <summary>
+    /// Возвращает <see cref="OpeningRealStatus.TooClose"/>, если рядом с отверстием есть другое
+    /// чистовое отверстие КР, иначе <see cref="OpeningRealStatus.Correct"/>.
+    /// </summary>
+    private OpeningRealStatus GetProximityStatus(OpeningRealKr opening) {
+        if(!_checkTooClose
+           || (_minDistance <= 0)) {
+            _proximityPool.Remove(opening.Id);
+            return OpeningRealStatus.Correct;
         }
 
         var neighbourIds = _proximityPool.Where(id => id != opening.Id).ToArray();
         if(neighbourIds.Length == 0) {
             _proximityPool.Remove(opening.Id);
-            return;
+            return OpeningRealStatus.Correct;
         }
 
         // грубый отбор кандидатов по раздутому во все стороны боксу
@@ -145,7 +180,7 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
             .ToElementIds();
         if(candidateIds.Count == 0) {
             _proximityPool.Remove(opening.Id);
-            return;
+            return OpeningRealStatus.Correct;
         }
 
         // точная проверка: раздувается только проверяемое отверстие и только в плоскости,
@@ -157,10 +192,11 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
             .Any(neighbour => _solidUtils.IntersectsSolid(neighbour, inflatedSolid, inflatedBBox));
 
         if(tooClose) {
-            opening.Status = OpeningRealStatus.TooClose;
-        } else {
-            _proximityPool.Remove(opening.Id);
+            return OpeningRealStatus.TooClose;
         }
+
+        _proximityPool.Remove(opening.Id);
+        return OpeningRealStatus.Correct;
     }
 
     /// <summary>
@@ -170,143 +206,5 @@ internal class OpeningRealKrInfoUpdater : OpeningRealInfoUpdaterBase<OpeningReal
         var bbox = opening.GetTransformedBBoxXYZ();
         var offset = new XYZ(_minDistance, _minDistance, _minDistance);
         return new Outline(bbox.Min - offset, bbox.Max + offset);
-    }
-
-    /// <summary>
-    /// Определяет статус чистового отверстия КР относительно заданий на отверстия из связей АР
-    /// </summary>
-    private void UpdateStatusByArLinks(OpeningRealKr opening) {
-        var openingSolid = opening.GetSolid();
-        var solidAfterIntersection = openingSolid;
-
-        foreach(var link in _arLinks) {
-            solidAfterIntersection = SubtractLinkOpenings(
-                opening,
-                link,
-                solidAfterIntersection,
-                out bool openingIsNotActual);
-            if(openingIsNotActual) {
-                SetStatus(opening, OpeningRealStatus.NotActual);
-                return;
-            }
-        }
-
-        SetStatus(opening, GetStatusByVolumeRatio(GetSolidsVolumesRatio(openingSolid, solidAfterIntersection)));
-    }
-
-    /// <summary>
-    /// Вычитает из солида чистового отверстия КР солиды заданий на отверстия из связи АР
-    /// </summary>
-    /// <param name="opening">Чистовое отверстие КР из активного файла</param>
-    /// <param name="link">Связь АР</param>
-    /// <param name="solidForSubtraction">
-    /// Солид чистового отверстия в координатах активного файла, из которого уже вычтены задания предыдущих связей
-    /// </param>
-    /// <param name="linkOpeningsIntersectConstructions">
-    /// Флаг, показывающий, полностью ли чистовое отверстие закрывает собой пересекающие его задания
-    /// </param>
-    private Solid SubtractLinkOpenings(
-        OpeningRealKr opening,
-        IConstructureLinkElementsProvider link,
-        Solid solidForSubtraction,
-        out bool linkOpeningsIntersectConstructions) {
-        var openingSolid = opening.GetSolid();
-        var openingSolidInLinkCoordinates = link.ToLinkCoordinates(openingSolid);
-        var openingBBoxInLinkCoordinates = link.ToLinkCoordinates(opening.GetTransformedBBoxXYZ());
-
-        ICollection<Solid> intersectingTasksSolids = link
-            .GetOpeningsReal()
-            .Where(openingTask => _solidUtils.IntersectsSolid(
-                openingTask,
-                openingSolidInLinkCoordinates,
-                openingBBoxInLinkCoordinates))
-            .Select(task => link.ToActiveDocCoordinates(task.GetSolid()))
-            .Concat(GetIntersectingVentBlockSolids(opening, link, openingSolidInLinkCoordinates))
-            .ToHashSet();
-
-        var hostSolid = opening.GetHost().GetSolid();
-        linkOpeningsIntersectConstructions = intersectingTasksSolids
-            .Any(taskSolid => TaskIntersectsHost(taskSolid, hostSolid));
-
-        return _solidUtils.SubtractSolids(solidForSubtraction, intersectingTasksSolids);
-    }
-
-    /// <summary>
-    /// Возвращает солиды вентблоков из связи АР, которые пересекают чистовое отверстие КР,
-    /// в координатах активного файла.
-    /// <para>
-    /// Вентблоки не являются чистовыми отверстиями, поэтому в <see cref="IConstructureLinkElementsProvider"/>
-    /// их нет и они ищутся напрямую в документе связи.
-    /// </para>
-    /// </summary>
-    /// <param name="link">Связь АР</param>
-    /// <param name="openingSolidInLinkCoordinates">
-    /// Солид чистового отверстия КР в координатах связи</param>
-    private IEnumerable<Solid> GetIntersectingVentBlockSolids(
-        OpeningRealKr opening,
-        IConstructureLinkElementsProvider link,
-        Solid openingSolidInLinkCoordinates) {
-        var ventBlockIds = GetVentBlockIds(link);
-        if(ventBlockIds.Count == 0) {
-            yield break;
-        }
-
-        // грубый отбор по боксу. ElementIntersectsSolidFilter здесь неприменим:
-        // он проверяет собственную геометрию экземпляра, а у вентблока ее нет -
-        // тело лежит во вложенном общем семействе, то есть в отдельном элементе связи
-        var candidateIds = new FilteredElementCollector(link.Document, ventBlockIds)
-            .WherePasses(new BoundingBoxIntersectsFilter(openingSolidInLinkCoordinates.GetOutline()))
-            .ToElementIds();
-
-        // точная проверка пересечением солидов.
-        // VentBlockAr.GetSolid уже применяет трансформацию связи,
-        // поэтому сравнение идет в координатах активного документа
-        var openingSolid = opening.GetSolid();
-        var openingBBox = opening.GetTransformedBBoxXYZ();
-        foreach(var id in candidateIds) {
-            if(link.Document.GetElement(id) is not FamilyInstance instance) {
-                continue;
-            }
-
-            var ventBlock = new VentBlockAr(instance, link.DocumentTransform);
-            if(_solidUtils.IntersectsSolid(ventBlock, openingSolid, openingBBox)) {
-                yield return ventBlock.GetSolid();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Возвращает Id вентблоков из документа связи АР с кэшированием по связи
-    /// </summary>
-    private ICollection<ElementId> GetVentBlockIds(IConstructureLinkElementsProvider link) {
-        if(!_ventBlockIdsByLink.TryGetValue(link, out var ids)) {
-            ids = _revitRepository.GetFamilyInstances(
-                    link.Document,
-                    RevitRepository.VentBlockArFamilyName,
-                    RevitRepository.VentBlockCategory)
-                .Select(ventBlock => ventBlock.Id)
-                .ToArray();
-            _ventBlockIdsByLink.Add(link, ids);
-        }
-
-        return ids;
-    }
-
-    /// <summary>
-    /// Проверяет, пересекает ли задание из связи основу чистового отверстия КР.
-    /// </summary>
-    /// <param name="taskSolid">Солид задания на отверстие в координатах активного файла</param>
-    /// <param name="hostSolid">Солид основы чистового отверстия, то есть конструкции с вырезом</param>
-    private bool TaskIntersectsHost(Solid taskSolid, Solid hostSolid) {
-        try {
-            return BooleanOperationsUtils.ExecuteBooleanOperation(
-                           taskSolid,
-                           hostSolid,
-                           BooleanOperationsType.Intersect)
-                       ?.Volume
-                   > ConstantsProvider.ToleranceVolumeFeetCube;
-        } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
-            return false;
-        }
     }
 }

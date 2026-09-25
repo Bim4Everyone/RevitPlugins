@@ -33,7 +33,7 @@ internal class OpeningMepTaskIncoming : IOpeningTaskIncoming, IEquatable<Opening
     /// <summary>
     /// Экземпляр семейства задания на отверстие, расположенного в связанном файле задания на отверстия
     /// 
-    /// <para>Примечание: конструктор не обновляет свойства <see cref="Status"/> и <see cref="Host"/>. Для обновления этих свойств использовать <see cref="OpeningTaskIncomingMepInfoUpdater"/></para>
+    /// <para>Примечание: конструктор не обновляет свойства <see cref="Status"/> и <see cref="Host"/>. Для обновления этих свойств использовать <see cref="OpeningTaskIncomingInfoUpdater"/></para>
     /// </summary>
     /// <param name="openingTaskIncoming">Экземпляр семейства задания на отверстие из связанного файла</param>
     /// <param name="transform">Трансформация связанного файла, в котором создано задание на отверстие</param>
@@ -147,7 +147,7 @@ internal class OpeningMepTaskIncoming : IOpeningTaskIncoming, IEquatable<Opening
 
     /// <summary>
     /// Элемент из активного документа, в котором расположено задание на отверстие из связи.
-    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingMepInfoUpdater"/></para>
+    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingInfoUpdater"/></para>
     /// </summary>
     public Element Host { get; set; } = null;
 
@@ -163,7 +163,7 @@ internal class OpeningMepTaskIncoming : IOpeningTaskIncoming, IEquatable<Opening
 
     /// <summary>
     /// Статус отработки задания на отверстие
-    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingMepInfoUpdater"/></para>
+    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingInfoUpdater"/></para>
     /// </summary>
     public OpeningTaskIncomingStatus Status { get; set; } = OpeningTaskIncomingStatus.New;
 

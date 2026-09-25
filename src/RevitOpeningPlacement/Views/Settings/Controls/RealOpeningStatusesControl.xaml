@@ -1,0 +1,71 @@
+<core:WpfUIPlatformUserControl
+    x:Class="RevitOpeningPlacement.Views.Settings.Controls.RealOpeningStatusesControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:controls="clr-namespace:RevitOpeningPlacement.Views.Settings.Controls"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance vms:RealOpeningArStatusesViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformUserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformUserControl.Resources>
+    <StackPanel>
+        <controls:StatusToggleControl
+            Title="{me:LocalizationSource NavigatorSettings.Real.NotActual.Title}"
+            Description="{me:LocalizationSource NavigatorSettings.Real.NotActual.Description}"
+            CostTag="{me:LocalizationSource NavigatorSettings.Cost.Slow}"
+            IsChecked="{Binding CheckNotActual, UpdateSourceTrigger=PropertyChanged}">
+            <controls:StatusToggleControl.NestedContent>
+                <controls:StatusToggleControl
+                    Title="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.Title}"
+                    Description="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.Description}"
+                    CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
+                    IsChecked="{Binding CheckVolumeMatch, UpdateSourceTrigger=PropertyChanged}">
+                    <controls:StatusToggleControl.NestedContent>
+                        <StackPanel>
+                            <DockPanel
+                                HorizontalAlignment="Stretch">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    TextWrapping="Wrap"
+                                    Text="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.EmptyPercent}" />
+                                <ui:TextBox
+                                    HorizontalAlignment="Right"
+                                    ClearButtonEnabled="False"
+                                    MinWidth="{StaticResource SmallInputWidth}"
+                                    Width="{StaticResource SmallInputWidth}"
+                                    IsEnabled="{Binding CheckVolumeMatch}"
+                                    Text="{Binding EmptyVolumeRatio, UpdateSourceTrigger=PropertyChanged}" />
+                            </DockPanel>
+                            <DockPanel
+                                Margin="0 8 0 0"
+                                HorizontalAlignment="Stretch">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    TextWrapping="Wrap"
+                                    Text="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.TooBigPercent}" />
+                                <ui:TextBox
+                                    HorizontalAlignment="Right"
+                                    ClearButtonEnabled="False"
+                                    MinWidth="{StaticResource SmallInputWidth}"
+                                    Width="{StaticResource SmallInputWidth}"
+                                    IsEnabled="{Binding CheckVolumeMatch}"
+                                    Text="{Binding TooBigVolumeRatio, UpdateSourceTrigger=PropertyChanged}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </controls:StatusToggleControl.NestedContent>
+                </controls:StatusToggleControl>
+            </controls:StatusToggleControl.NestedContent>
+        </controls:StatusToggleControl>
+    </StackPanel>
+</core:WpfUIPlatformUserControl>

@@ -28,11 +28,10 @@ using RevitOpeningPlacement.Views.Settings;
 using RevitOpeningPlacement.Views.Utils;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
-internal class MainViewModel : BaseViewModel {
+
+internal class MepPlacementSettingsViewModel : BaseViewModel {
     private string _errorText;
-    private string _messageText;
     private ObservableCollection<MepCategoryViewModel> _mepCategories;
-    private DispatcherTimer _timer;
     private readonly RevitRepository _revitRepository;
     private readonly ConfigFileService _configFileService;
     private readonly IResolutionRoot _root;
@@ -43,7 +42,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILogicalFilterFactory _filterFactory;
     private string _configName;
 
-    public MainViewModel(
+    public MepPlacementSettingsViewModel(
         RevitRepository revitRepository,
         ConfigFileService configFileService,
         Models.Configs.OpeningConfig openingConfig,
@@ -81,8 +80,6 @@ internal class MainViewModel : BaseViewModel {
         RoundUnitedTaskElevation = openingConfig.UnitedTasksElevationRounding > 0;
         SelectedElevationRoundingForUnitedTask = openingConfig.UnitedTasksElevationRounding;
         ShowPlacingErrors = openingConfig.ShowPlacingErrors;
-
-        InitializeTimer();
 
         SaveConfigCommand = RelayCommand.Create(SaveConfig, CanSaveConfig);
         SaveAsConfigCommand = RelayCommand.Create(SaveAsConfig, CanSaveConfig);
@@ -176,12 +173,7 @@ internal class MainViewModel : BaseViewModel {
 
     public string ErrorText {
         get => _errorText;
-        set => RaiseAndSetIfChanged(ref _errorText, value);
-    }
-
-    public string MessageText {
-        get => _messageText;
-        set => RaiseAndSetIfChanged(ref _messageText, value);
+        private set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
     public ICommand SaveConfigCommand { get; }
@@ -196,16 +188,6 @@ internal class MainViewModel : BaseViewModel {
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
-
-    private void InitializeTimer() {
-        _timer = new DispatcherTimer {
-            Interval = new TimeSpan(0, 0, 0, 3)
-        };
-        _timer.Tick += (s, a) => {
-            MessageText = null;
-            _timer.Stop();
-        };
-    }
 
     private void CheckMepFilter() {
         SaveConfig();
@@ -269,8 +251,10 @@ internal class MainViewModel : BaseViewModel {
             mepCategory);
     }
 
-    private Models.Configs.OpeningConfig GetOpeningConfig() {
-        var config = Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc);
+    /// <summary>
+    /// Записывает текущие настройки расстановки в конфиг
+    /// </summary>
+    public Models.Configs.OpeningConfig UpdateConfig(Models.Configs.OpeningConfig config) {
         config.Categories = new MepCategoryCollection(MepCategories.Select(item => item.GetMepCategory()));
         config.ShowPlacingErrors = ShowPlacingErrors;
         config.Name = ConfigName.Trim();
@@ -280,20 +264,16 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void SaveConfig() {
-        var config = GetOpeningConfig();
+        var config = UpdateConfig(Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc));
         config.SaveProjectConfig();
         UpdateOpeningConfigPath(config.ProjectConfigPath);
-        MessageText = "Файл настроек успешно сохранен.";
-        _timer.Start();
     }
 
     private void SaveAsConfig() {
-        var config = GetOpeningConfig();
+        var config = UpdateConfig(Models.Configs.OpeningConfig.GetOpeningConfig(_revitRepository.Doc));
         var css = new ConfigSaverService(SaveFileDialogService);
         string path = css.Save(config, _revitRepository.Doc);
         UpdateOpeningConfigPath(path);
-        MessageText = "Файл настроек успешно сохранен.";
-        _timer.Start();
     }
 
     private void LoadConfig() {
@@ -312,8 +292,6 @@ internal class MainViewModel : BaseViewModel {
             SelectedElevationRoundingForUnitedTask = config.UnitedTasksElevationRounding;
             UpdateOpeningConfigPath(config.ProjectConfigPath);
         }
-        MessageText = "Файл настроек успешно загружен.";
-        _timer.Start();
     }
 
     private void UpdateOpeningConfigPath(string path) {

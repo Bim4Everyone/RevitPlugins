@@ -4,13 +4,13 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:String
-        x:Key="OpeningRealsArSettingsView.Title">AR Opening Placement Settings</system:String>
+        x:Key="ArSettingsWindow.Title">AR settings</system:String>
     <system:String
-        x:Key="OpeningRealsArSettingsView.RoundSize">Round dimensions</system:String>
+        x:Key="ArSettingsWindow.RoundSize">Round dimensions</system:String>
     <system:String
-        x:Key="OpeningRealsArSettingsView.RoundElevation">Round elevation</system:String>
+        x:Key="ArSettingsWindow.RoundElevation">Round elevation</system:String>
     <system:String
-        x:Key="OpeningRealsArSettingsView.RoundValues">Rounding value, mm</system:String>
+        x:Key="ArSettingsWindow.RoundValues">Rounding value, mm</system:String>
 
     <system:String
         x:Key="OpeningTasks">Opening Tasks</system:String>
@@ -146,6 +146,8 @@
     <system:String
         x:Key="Errors.InactiveDocument">Plugin window was opened in another Revit document that is not currently active, cannot show element.</system:String>
     <system:String
+        x:Key="Errors.CannotApplyViewSettings">Failed to apply view settings.</system:String>
+    <system:String
         x:Key="Errors.ArKrOnly"
         xml:space="preserve">
 This command is only for AR/KR.
@@ -163,27 +165,21 @@ Continue?
         x:Key="Validation.MissingParametersInFamily">Family '{0}' is missing shared parameters: {1}</system:String>
 
     <system:String
-        x:Key="OpeningRealsKrSettingsView.Title">Structural Opening Placement Settings</system:String>
+        x:Key="KrSettingsWindow.Title">KR settings</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.PlaceByAr">Place openings by tasks from AR</system:String>
+        x:Key="KrSettingsWindow.PlaceByAr">Place openings by tasks from AR</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.PlaceByMep">Place openings by tasks from MEP</system:String>
+        x:Key="KrSettingsWindow.PlaceByMep">Place openings by tasks from MEP</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.RoundSize">Round dimensions</system:String>
+        x:Key="KrSettingsWindow.RoundSize">Round dimensions</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.RoundElevation">Round elevation</system:String>
+        x:Key="KrSettingsWindow.RoundElevation">Round elevation</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.RoundValues">Rounding value, mm</system:String>
+        x:Key="KrSettingsWindow.RoundValues">Rounding value, mm</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.CheckDistance">Check distance between openings</system:String>
+        x:Key="KrSettingsWindow.CheckDistance">Check distance between openings</system:String>
     <system:String
-        x:Key="OpeningRealsKrSettingsView.DistanceValue">Minimum distance, mm</system:String>
-    <system:String
-        x:Key="OpeningRealsKrSettingsView.Validation.DistanceRange">Minimum distance must be from 0 to {0} mm.</system:String>
-    <system:String
-        x:Key="OpeningRealsKrSettingsView.Validation.CannotParseInt">Enter a number</system:String>
-    <system:String
-        x:Key="OpeningRealsKrSettingsView.NavigatorSettings">Navigator KR settings</system:String>
+        x:Key="KrSettingsWindow.NavigatorSettings">Navigator KR settings</system:String>
 
     <system:String
         x:Key="UnionTaskSettingsView.Title">Merge Settings</system:String>
@@ -195,7 +191,7 @@ Continue?
         x:Key="UnionTaskSettingsView.RoundValues">Rounding value, mm</system:String>
 
     <system:String
-        x:Key="MepSettingsWindow.Title">Task Placement Settings</system:String>
+        x:Key="MepSettingsWindow.Title">MEP settings</system:String>
     <system:String
         x:Key="MepSettingsWindow.MinSizesTooltip">
         For example, if there is a cable tray with width 300 and height 50,
@@ -296,4 +292,137 @@ including in multilayer structures.</system:String>
         x:Key="Ok">OK</system:String>
     <system:String
         x:Key="Cancel">Cancel</system:String>
+
+    <system:String
+        x:Key="SettingsNavigation.PlacementSettings">Placement</system:String>
+    <system:String
+        x:Key="SettingsNavigation.NavigatorSettings">Statuses</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Section.IncomingTasks">Incoming opening tasks</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Section.RealOpenings">Real openings</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Cost.Slow">Slow check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Cost.Medium">Medium check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Cost.Fast">Fast check</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Validation.CannotParseNumber">Enter a number</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.CannotParseInt">Enter an integer</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.EmptyVolumeRange">The "empty" threshold must be from {0} to {1}</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.TooBigVolumeRange">The "too big" threshold must be greater than {0} and at most {1}</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Validation.DistanceRange">The minimum distance must be from 0 to {0} mm</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Incoming.UnacceptableConstructions.Title">Unacceptable constructions check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.UnacceptableConstructions.Description"
+        xml:space="preserve">Checks whether the opening task intersects "Structural Framing" or "Structural Columns" of the current file. Status: "Unacceptable structures".
+
+If disabled, such tasks go through the remaining checks as usual; a task located only in a beam or a column gets "No intersection".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Intersections.Title">Task completion check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Intersections.Description"
+        xml:space="preserve">Determines what the opening task intersects in the current file: constructions only — "New task", constructions and real openings — "Partially completed task", real openings only — "Completed task", nothing — "No intersection".
+
+If disabled, every task gets the "New task" status, and the nested different constructions check and host search are disabled too.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.DifferentConstructions.Title">Different constructions check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.DifferentConstructions.Description"
+        xml:space="preserve">Checks whether the constructions of the current file intersected by the task, including the hosts of intersected real openings, belong to different categories — for example, walls and floors. Status: "In different structures".
+
+If disabled, tasks at a wall and floor junction get a regular completion status.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Host.Title">Host search</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Incoming.Host.Description">Determines the construction of the current file that the task is located in: the host of the intersected real opening or, if there is none, the construction with the largest intersection volume. Assigns no status: fills the "Host" column in the Navigator.</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Real.NotActual.Title">Actuality check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.NotActual.Description"
+        xml:space="preserve">Checks whether the real opening fully covers the incoming tasks and MEP elements from links that intersect it: if they go beyond the opening and intersect its host, the opening is outdated. Status: "Outdated opening".
+
+If disabled, the nested fill check is disabled too, and all openings except too close ones in structural files get the "Correct" status — including outdated ones.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.Title">Opening fill check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.Description"
+        xml:space="preserve">Determines what share of the real opening volume is occupied by incoming tasks and MEP elements from links: less than the "empty" threshold — "Empty opening", less than the "too big" threshold — "Opening is too big".
+
+If disabled, openings are considered correct.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">"Empty" threshold, share of 1 of intersected volume</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">"Too big" threshold, share of 1 of intersected volume</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.Title">Distance between openings check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.Description">Checks whether another structural real opening is closer than the specified distance to the edges of the opening in the construction plane. Status: "Openings are too close to each other".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.DistanceValue">Minimum distance, mm</system:String>
+
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.ManuallyPlaced.Title">Manual placement check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.ManuallyPlaced.Description"
+        xml:space="preserve">Checks whether the "ФОП_Размещено вручную" parameter of the opening task is enabled. Status: "Placed manually".
+
+If disabled, such tasks go through the remaining checks as usual and may get a size or actuality error status.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.NotActual.Title">Actuality check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.NotActual.Description"
+        xml:space="preserve">The task is outdated if no MEP element intersects it, if no link contains a construction the task is located in, or if MEP elements outside the task intersect this construction or a real opening from the link. Status: "Outdated task".
+
+If disabled, the nested different constructions check is disabled too, the host search gets slower, and tasks without MEP elements get "Geometry processing error" when the offsets check is enabled.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Title">Different constructions check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.DifferentConstructions.Description"
+        xml:space="preserve">Checks whether the link constructions the task is located in belong to different categories — for example, walls and floors. Status: "In different structures".
+
+If disabled, tasks at a wall and floor junction go through the remaining checks as usual.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Host.Title">Host search</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Host.Description">Determines the link construction the task is located in: the one intersecting at least half of the task volume or, if there is none, the one with the largest intersection volume. Assigns no status: the host is needed to highlight it on the view when the task is selected in the Navigator. Works faster if the actuality check is enabled: it already finds the candidate constructions.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Title">Unacceptable constructions check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.UnacceptableConstructions.Description"
+        xml:space="preserve">Checks whether the opening task intersects "Structural Framing" or "Structural Columns" from links. Status: "Unacceptable structures".
+
+If disabled, such tasks go through the remaining checks as usual.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Intersects.Title">Intersection with other tasks check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Intersects.Description"
+        xml:space="preserve">Checks whether the opening task intersects another opening task of the current file. Status: "Intersecting task".
+
+If disabled, the intersection is not marked, and such tasks get a union or offsets status.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.United.Title">Union check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.United.Description"
+        xml:space="preserve">Checks whether two or more MEP elements pass through the opening task. Status: "United".
+
+If disabled, united tasks almost always get "Task is too big": the offsets check compares the task with a single element only.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Offsets.Title">Offsets check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Outcoming.Offsets.Description"
+        xml:space="preserve">Compares the sum of the task offsets from the MEP element (top and bottom, left and right) with the double clearance from the placement settings, taking rounding into account: less — "Task is too small", more — "Task is too big".
+
+Offsets are measured against a single element, so for united tasks the result is correct only together with the union check, and for tasks without MEP elements — only together with the actuality check. If disabled, tasks are considered correct.</system:String>
 </ResourceDictionary>

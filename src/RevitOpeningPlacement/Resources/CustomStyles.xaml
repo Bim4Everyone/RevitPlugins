@@ -118,44 +118,6 @@
         </Style.Triggers>
     </Style>
     <Style
-        TargetType="ui:TextBlock"
-        x:Key="CustomMessageText">
-        <Setter
-            Property="Foreground"
-            Value="Green" />
-        <Setter
-            Property="VerticalAlignment"
-            Value="Center" />
-        <Setter
-            Property="Background"
-            Value="Transparent" />
-        <Setter
-            Property="Focusable"
-            Value="False" />
-        <Setter
-            Property="SnapsToDevicePixels"
-            Value="True" />
-        <Setter
-            Property="OverridesDefaultStyle"
-            Value="True" />
-        <Style.Triggers>
-            <Trigger
-                Property="Text"
-                Value="">
-                <Setter
-                    Property="Visibility"
-                    Value="Hidden" />
-            </Trigger>
-            <Trigger
-                Property="Text"
-                Value="{x:Null}">
-                <Setter
-                    Property="Visibility"
-                    Value="Collapsed" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         TargetType="GridSplitter"
         x:Key="CustomGridSplitter">
         <Setter
@@ -206,5 +168,56 @@
                     Value="{DynamicResource LabelForeground}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+    <system:Double
+        x:Key="SectionHeaderFontSize">16</system:Double>
+    <Style
+        TargetType="Label"
+        x:Key="SectionHeaderLabel"
+        BasedOn="{StaticResource CustomLabel}">
+        <Setter
+            Property="FontSize"
+            Value="{StaticResource SectionHeaderFontSize}" />
+        <Setter
+            Property="FontWeight"
+            Value="SemiBold" />
+        <Setter
+            Property="Padding"
+            Value="0" />
+    </Style>
+    <Style
+        TargetType="Border"
+        x:Key="StatusToggleTagBorder">
+        <Setter
+            Property="Margin"
+            Value="8 0 0 0" />
+        <Setter
+            Property="Padding"
+            Value="6 1" />
+        <Setter
+            Property="VerticalAlignment"
+            Value="Center" />
+        <Setter
+            Property="CornerRadius"
+            Value="{DynamicResource ControlCornerRadius}" />
+        <Setter
+            Property="Background"
+            Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+        <Setter
+            Property="BorderBrush"
+            Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+        <Setter
+            Property="BorderThickness"
+            Value="1" />
+    </Style>
+    <Style
+        TargetType="{x:Type ui:TextBlock}"
+        x:Key="StatusToggleTagText">
+        <Setter
+            Property="FontSize"
+            Value="11" />
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource TextFillColorSecondaryBrush}" />
     </Style>
 </ResourceDictionary>

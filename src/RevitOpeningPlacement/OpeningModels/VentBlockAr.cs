@@ -120,13 +120,13 @@ internal class VentBlockAr : IOpeningTaskIncoming, IEquatable<VentBlockAr> {
 
     /// <summary>
     /// Статус вентблока как входящего задания на отверстие
-    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingArInfoUpdater"/></para>
+    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingInfoUpdater"/></para>
     /// </summary>
     public OpeningTaskIncomingStatus Status { get; set; } = OpeningTaskIncomingStatus.New;
 
     /// <summary>
     /// Хост вентблока из активного документа КР
-    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingArInfoUpdater"/></para>
+    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingInfoUpdater"/></para>
     /// </summary>
     public Element Host { get; set; }
 

@@ -1,0 +1,42 @@
+<core:WpfUIPlatformPage
+    x:Class="RevitOpeningPlacement.Views.Settings.Ar.ArNavigatorSettingsPage"
+    ScrollViewer.CanContentScroll="False"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:controls="clr-namespace:RevitOpeningPlacement.Views.Settings.Controls"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance vms:ArNavigatorSettingsViewModel, IsDesignTimeCreatable=False}">
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary
+                    Source="../../../Resources/CustomStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+    <ScrollViewer
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Auto">
+        <StackPanel
+            Margin="0 0 0 8">
+            <Label
+                Margin="8 8 8 0"
+                Style="{StaticResource SectionHeaderLabel}"
+                Content="{me:LocalizationSource NavigatorSettings.Section.IncomingTasks}" />
+            <controls:IncomingStatusesControl
+                DataContext="{Binding IncomingStatuses}" />
+
+            <Label
+                Margin="8 24 8 0"
+                Style="{StaticResource SectionHeaderLabel}"
+                Content="{me:LocalizationSource NavigatorSettings.Section.RealOpenings}" />
+            <controls:RealOpeningStatusesControl
+                DataContext="{Binding RealOpeningArStatuses}" />
+        </StackPanel>
+    </ScrollViewer>
+</core:WpfUIPlatformPage>

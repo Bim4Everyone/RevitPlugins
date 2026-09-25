@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -23,6 +24,9 @@ using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
 using RevitOpeningPlacement.Views.Settings;
+using RevitOpeningPlacement.Views.Settings.Mep;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitOpeningPlacement;
 /// <summary>
@@ -73,18 +77,38 @@ public class SetOpeningTasksPlacementConfigCmd : BasePluginCommand {
         kernel.Bind<IDocTypesHandler>()
             .To<DocTypesHandler>()
             .InSingletonScope();
-        kernel.BindMainWindow<MainViewModel, MainWindow>();
-        kernel.Bind<UnionTaskSettingsView>()
-            .ToSelf()
-            .InTransientScope()
-            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MainViewModel>());
-        kernel.UseWpfUIMessageBox<MainViewModel>()
-            .UseWpfOpenFileDialog<MainViewModel>()
-            .UseWpfSaveFileDialog<MainViewModel>();
+        kernel.Bind<INavigationViewPageProvider>()
+            .To<NavigationViewPageProvider>()
+            .InSingletonScope();
         kernel.Bind<OpeningConfig>()
             .ToMethod(c =>
                 OpeningConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document)
-            );
+            )
+            .InSingletonScope();
+        kernel.Bind<MepNavigatorSettingsViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<MepPlacementSettingsViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<MepPlacementSettingsPage>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Page.DataContext), c => c.Kernel.Get<MepPlacementSettingsViewModel>());
+        kernel.Bind<MepNavigatorSettingsPage>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Page.DataContext), c => c.Kernel.Get<MepNavigatorSettingsViewModel>());
+        kernel.BindMainWindow<MepSettingsViewModel, MepSettingsWindow>();
+        kernel.Bind<UnionTaskSettingsView>()
+            .ToSelf()
+            .InTransientScope()
+            .WithPropertyValue(nameof(Window.DataContext), c => c.Kernel.Get<MepPlacementSettingsViewModel>());
+        // диалоговые сервисы регистрируются на вью модель страницы - она их и вызывает.
+        // Вью модель окна переиспользует те же экземпляры, чтобы окно привязало к себе именно их
+        kernel.UseWpfUIMessageBox<MepPlacementSettingsViewModel>()
+            .UseWpfOpenFileDialog<MepPlacementSettingsViewModel>()
+            .UseWpfSaveFileDialog<MepPlacementSettingsViewModel>();
         kernel.Bind<ConfigFileService>()
             .ToSelf()
             .InSingletonScope();
@@ -95,6 +119,6 @@ public class SetOpeningTasksPlacementConfigCmd : BasePluginCommand {
 
         kernel.Get<IRevitLinkTypesSetter>().SetRevitLinkTypes();
 
-        Notification(kernel.Get<MainWindow>());
+        Notification(kernel.Get<MepSettingsWindow>());
     }
 }

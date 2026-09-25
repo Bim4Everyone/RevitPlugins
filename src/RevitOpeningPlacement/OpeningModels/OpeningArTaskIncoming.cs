@@ -73,7 +73,7 @@ internal class OpeningArTaskIncoming : OpeningRealBase, IEquatable<OpeningArTask
 
     /// <summary>
     /// Статус входящего задания на отверстие от АР
-    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingArInfoUpdater"/></para>
+    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingInfoUpdater"/></para>
     /// </summary>
     public OpeningTaskIncomingStatus Status { get; set; } = OpeningTaskIncomingStatus.New;
 
@@ -109,7 +109,7 @@ internal class OpeningArTaskIncoming : OpeningRealBase, IEquatable<OpeningArTask
 
     /// <summary>
     /// Хост входящего задания на отверстие из активного документа
-    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingArInfoUpdater"/></para>
+    /// <para>Для обновления использовать <see cref="OpeningTaskIncomingInfoUpdater"/></para>
     /// </summary>
     public Element Host { get; set; }
 
