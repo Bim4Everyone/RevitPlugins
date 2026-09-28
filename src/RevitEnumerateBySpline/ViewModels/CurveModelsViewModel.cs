@@ -20,7 +20,7 @@ internal class CurveModelsViewModel : BaseViewModel {
     private readonly SelectionService _selectionService;
     private readonly RevitRepository _revitRepository;
     private readonly WindowService _windowService;
-    private IList<Curve> _selectedCurves = [];
+    private CurveModelViewModel? _selectedCurveModelViewModel;
     private ObservableCollection<CurveModelViewModel> _curveModelViewModels = [];
 
     public CurveModelsViewModel(SelectionService selectionService, RevitRepository revitRepository, WindowService windowService) {
@@ -29,7 +29,6 @@ internal class CurveModelsViewModel : BaseViewModel {
         _windowService = windowService;
         
         SelectCurvesCommand = RelayCommand.Create(SelectCurves);
-        
         DeleteAllCurvesCommand = RelayCommand.Create(DeleteAllCurves);
         MoveUpCurveCommand = RelayCommand.Create(MoveUpCurve);
         MoveDownCurveCommand = RelayCommand.Create(MoveDownCurve);
@@ -37,15 +36,14 @@ internal class CurveModelsViewModel : BaseViewModel {
     }
 
     public ICommand SelectCurvesCommand { get; }
-    
     public ICommand DeleteAllCurvesCommand { get; }
     public ICommand MoveUpCurveCommand { get; }
     public ICommand MoveDownCurveCommand { get; }
     public ICommand DeleteCurveCommand { get; }
     
-    public IList<Curve>SelectedCurves {
-        get => _selectedCurves;
-        set => RaiseAndSetIfChanged(ref _selectedCurves, value);
+    public CurveModelViewModel? SelectedCurveModelViewModel {
+        get => _selectedCurveModelViewModel;
+        set => RaiseAndSetIfChanged(ref _selectedCurveModelViewModel, value);
     }
     
     public ObservableCollection<CurveModelViewModel> CurveModelViewModels {
@@ -73,20 +71,43 @@ internal class CurveModelsViewModel : BaseViewModel {
     }
     
     private void DeleteCurve() {
-        throw new NotImplementedException();
+        if(SelectedCurveModelViewModel is null) {
+            return;
+        }
+        int index = CurveModelViewModels.IndexOf(SelectedCurveModelViewModel);
+        if(index == -1) {
+            return;
+        }
+        CurveModelViewModels.RemoveAt(index);
+        SelectedCurveModelViewModel = CurveModelViewModels.Count == 0 
+            ? null 
+            : CurveModelViewModels[Math.Min(index, CurveModelViewModels.Count - 1)];
     }
 
     private void MoveDownCurve() {
-        throw new NotImplementedException();
+        if(SelectedCurveModelViewModel is null) {
+            return;
+        }
+        int index = CurveModelViewModels.IndexOf(SelectedCurveModelViewModel);
+        if(index == -1 || index >= CurveModelViewModels.Count - 1) {
+            return;
+        }
+        CurveModelViewModels.Move(index, index + 1);
     }
 
     private void MoveUpCurve() {
-        throw new NotImplementedException();
+        if(SelectedCurveModelViewModel is null) {
+            return;
+        }
+        int index = CurveModelViewModels.IndexOf(SelectedCurveModelViewModel);
+        if(index <= 0) {
+            return;
+        }
+        CurveModelViewModels.Move(index, index - 1);
     }
 
     private void DeleteAllCurves() {
-        throw new NotImplementedException();
+        CurveModelViewModels.Clear();
+        SelectedCurveModelViewModel = null;
     }
-    
-    
 }

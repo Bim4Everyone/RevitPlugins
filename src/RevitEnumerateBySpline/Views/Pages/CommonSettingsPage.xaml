@@ -92,20 +92,18 @@
                                 Height="250"
                                 VerticalScrollBarVisibility="Auto"
                                 HorizontalScrollBarVisibility="Disabled">
-                                <ItemsControl
-                                    ItemsSource="{Binding SpatialModelsViewModel.FilteredSpatialModelViewModels}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate
-                                            DataType="{x:Type vms:SpatialModelViewModel}">
-                                            <controls:ItemControl
-                                                ItemName="{Binding Name}"
-                                                IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
+                                <ItemsControl ItemsSource="{Binding SpatialModelsViewModel.FilteredSpatialModelViewModels}">
+                                     <ItemsControl.ItemTemplate>
+                                          <DataTemplate DataType="{x:Type vms:SpatialModelViewModel}">
+                                               <controls:ItemControl 
+                                                   ItemName="{Binding Name}" 
+                                                   IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                                          </DataTemplate>
+                                     </ItemsControl.ItemTemplate> 
                                     <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel/>
-                                        </ItemsPanelTemplate>
+                                         <ItemsPanelTemplate>
+                                              <StackPanel/>
+                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </ScrollViewer>
@@ -129,7 +127,7 @@
                                 Height="37"
                                 Width="145"
                                 Content="{me:LocalizationSource CommonSettingsPage.DeleteAllLines}"
-                                Command="{Binding ResetFilterCommand}" />
+                                Command="{Binding CurveModelsViewModel.DeleteAllCurvesCommand}" />
                             <ui:Button
                                 Height="37"
                                 Width="304"
@@ -140,26 +138,60 @@
                     </controls:LabeledControl.HeaderEditControl>
 
                     <controls:LabeledControl.MainEditControl>
-                        <ScrollViewer
-                            Height="150"
-                            VerticalScrollBarVisibility="Auto"
-                            HorizontalScrollBarVisibility="Disabled">
-                            <ItemsControl
-                                ItemsSource="{Binding CurveModelsViewModel.CurveModelViewModels}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate
-                                        DataType="{x:Type vms:CurveModelViewModel}">
-                                        <controls:ItemControl
-                                            ItemName="{Binding Name}"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                        </ScrollViewer>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <ScrollViewer
+                                Grid.Column="0"
+                                Height="167"
+                                VerticalScrollBarVisibility="Auto"
+                                HorizontalScrollBarVisibility="Disabled">
+                                <ListBox
+                                    ItemsSource="{Binding CurveModelsViewModel.CurveModelViewModels}"
+                                    SelectedItem="{Binding CurveModelsViewModel.SelectedCurveModelViewModel}"
+                                    SelectionMode="Single"
+                                    BorderThickness="0">
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vms:CurveModelViewModel}">
+                                            <controls:ItemControl
+                                                ItemName="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </ScrollViewer>
+                            <StackPanel
+                                Margin="14,0,14,0"
+                                HorizontalAlignment="Right"
+                                Grid.Column="1">
+                                <ui:Button
+                                    Margin="0,14,0,0"
+                                    Height="37"
+                                    Width="304"
+                                    Content="{me:LocalizationSource CommonSettingsPage.MoveUpCurveCommand}"
+                                    Command="{Binding CurveModelsViewModel.MoveUpCurveCommand}" />
+                                <ui:Button
+                                    Margin="0,14,0,0"
+                                    Height="37"
+                                    Width="304"
+                                    Content="{me:LocalizationSource CommonSettingsPage.MoveDownCurveCommand}"
+                                    Command="{Binding CurveModelsViewModel.MoveDownCurveCommand}" />
+                                <ui:Button
+                                    Margin="0,14,0,0"
+                                    Height="37"
+                                    Width="304"
+                                    Content="{me:LocalizationSource CommonSettingsPage.DeleteCurveCommand}"
+                                    Command="{Binding CurveModelsViewModel.DeleteCurveCommand}" />
+                            </StackPanel>
+                        </Grid>
                     </controls:LabeledControl.MainEditControl>
                 </controls:LabeledControl>
             </StackPanel>

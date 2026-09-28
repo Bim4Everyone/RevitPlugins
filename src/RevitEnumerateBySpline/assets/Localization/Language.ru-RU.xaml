@@ -51,6 +51,10 @@
     <system:String x:Key="CommonSettingsPage.ClearSelections">Сбросить выбор</system:String>
     <system:String x:Key="CommonSettingsPage.SearchText">Поиск по значению</system:String>
     
+    <system:String x:Key="CommonSettingsPage.MoveUpCurveCommand">Переместить вверх</system:String>
+    <system:String x:Key="CommonSettingsPage.MoveDownCurveCommand">Переместить вниз</system:String>
+    <system:String x:Key="CommonSettingsPage.DeleteCurveCommand">Удалить выделенную</system:String>
+    
     <system:String x:Key="RangeViewModel.AllElementsProvider">Все элементы</system:String>
     <system:String x:Key="RangeViewModel.SelectedElementsProvider">Выделенные</system:String>
     <system:String x:Key="RangeViewModel.CurrentViewProvider">Видимые на виде</system:String>
