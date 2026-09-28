@@ -45,7 +45,7 @@ internal class MainViewModel : BaseViewModel {
         _localizationService = localizationService;
         _providersFactory = providersFactory;
         _paramService = paramService;
-        
+
         CommonSettingsViewModel = commonSettingsViewModel;
 
         LoadViewCommand = RelayCommand.Create(LoadView);

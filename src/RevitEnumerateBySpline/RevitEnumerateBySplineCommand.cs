@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -7,6 +8,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -14,6 +16,7 @@ using Ninject;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Factories;
+using RevitEnumerateBySpline.Models.Handlers;
 using RevitEnumerateBySpline.Models.Services;
 using RevitEnumerateBySpline.Providers;
 using RevitEnumerateBySpline.ViewModels;
@@ -49,6 +52,11 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
+        
+        // Настройка доступа к ExternalRevitHandler
+        kernel.Bind<ExternalRevitHandler>()
+            .ToSelf()
+            .InSingletonScope();
 
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
@@ -78,12 +86,22 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
             .InSingletonScope();
+        
+        // Настройка доступа к классу параметров
+        kernel.Bind<WindowService>()
+            .ToSelf()
+            .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+        
+        // Настройка доступа к RevitPickService
+        kernel.Bind<SelectionService>()
+            .ToSelf()
+            .InSingletonScope();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -98,4 +116,6 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
     }
+    
+    
 }

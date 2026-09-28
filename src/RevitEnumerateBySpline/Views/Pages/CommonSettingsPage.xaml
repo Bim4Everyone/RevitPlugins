@@ -135,17 +135,31 @@
                                 Width="304"
                                 Appearance="Primary"
                                 Content="{me:LocalizationSource CommonSettingsPage.SelectLines}"
-                                Command="{Binding SelectLinesCommand}" />
+                                Command="{Binding CurveModelsViewModel.SelectCurvesCommand}" />
                         </StackPanel>
                     </controls:LabeledControl.HeaderEditControl>
 
                     <controls:LabeledControl.MainEditControl>
-                        <ui:TextBlock
-                            Margin="10,10,10,10"
-                            Appearance="Secondary"
-                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Text="Content"
-                            TextWrapping="WrapWithOverflow" />
+                        <ScrollViewer
+                            Height="150"
+                            VerticalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Disabled">
+                            <ItemsControl
+                                ItemsSource="{Binding CurveModelsViewModel.CurveModelViewModels}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate
+                                        DataType="{x:Type vms:CurveModelViewModel}">
+                                        <controls:ItemControl
+                                            ItemName="{Binding Name}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </ScrollViewer>
                     </controls:LabeledControl.MainEditControl>
                 </controls:LabeledControl>
             </StackPanel>

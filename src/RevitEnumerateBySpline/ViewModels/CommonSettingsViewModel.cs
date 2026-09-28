@@ -12,6 +12,8 @@ namespace RevitEnumerateBySpline.ViewModels;
 internal class CommonSettingsViewModel(
     ILocalizationService localizationService,
     ParamService paramService,
+    WindowService windowService,
+    SelectionService selectionService,
     ProvidersFactory providersFactory,
     RevitRepository revitRepository,
     SystemPluginConfig systemPluginConfig)
@@ -19,7 +21,9 @@ internal class CommonSettingsViewModel(
     
     private RangeViewModel? _rangeViewModel;
     private SpatialModelsViewModel? _spatialModelsViewModel;
+    private CurveModelsViewModel? _curveModelsViewModel;
     
+
     public RangeViewModel? RangeViewModel {
         get => _rangeViewModel;
         set => RaiseAndSetIfChanged(ref _rangeViewModel, value);
@@ -28,6 +32,10 @@ internal class CommonSettingsViewModel(
     public SpatialModelsViewModel? SpatialModelsViewModel {
         get => _spatialModelsViewModel;
         set => RaiseAndSetIfChanged(ref _spatialModelsViewModel, value);
+    }
+    public CurveModelsViewModel? CurveModelsViewModel {
+        get => _curveModelsViewModel;
+        set => RaiseAndSetIfChanged(ref _curveModelsViewModel, value);
     }
 
     /// <summary>
@@ -45,6 +53,8 @@ internal class CommonSettingsViewModel(
         SpatialModelsViewModel = new SpatialModelsViewModel(paramService, systemPluginConfig);
         SpatialModelsViewModel?.LoadFilterParameterViewModels();
         SpatialModelsViewModel?.LoadSpatialModelViewModels(RangeViewModel?.SelectedRange?.ElementsProvider);
+        
+        CurveModelsViewModel = new CurveModelsViewModel(selectionService, revitRepository, windowService);
     }
 
     private void OnRangeViewModelChanged(object sender, PropertyChangedEventArgs e) {

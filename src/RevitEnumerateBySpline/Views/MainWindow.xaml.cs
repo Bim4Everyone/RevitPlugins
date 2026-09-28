@@ -16,7 +16,8 @@ public partial class MainWindow {
     /// <summary>
     /// Иницализирует главное окно плагина.
     /// </summary>
-    public MainWindow(INavigationViewPageProvider navigationViewPageProvider,
+    public MainWindow(
+        INavigationViewPageProvider navigationViewPageProvider,
         ILoggerService loggerService,
         ISerializationService serializationService,
         ILanguageService languageService,
@@ -37,11 +38,11 @@ public partial class MainWindow {
             _rootNavigationView.Navigate(typeof(CommonSettingsPage));
         });
     }
-
     
     public override string PluginName => nameof(RevitEnumerateBySpline);
     
     public override string ProjectConfigName => nameof(MainWindow);
+    
     
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;

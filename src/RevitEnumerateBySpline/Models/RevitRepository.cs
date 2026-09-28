@@ -14,8 +14,8 @@ namespace RevitEnumerateBySpline.Models;
 internal class RevitRepository(
     UIApplication uiApplication, 
     ILocalizationService localizationService) {
-    private UIApplication UiApplication { get; } = uiApplication;
-    private UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
+    public UIApplication UiApplication { get; } = uiApplication;
+    public UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
     public Application Application => UiApplication.Application;
     public Document Document => ActiveUiDocument.Document;
     
