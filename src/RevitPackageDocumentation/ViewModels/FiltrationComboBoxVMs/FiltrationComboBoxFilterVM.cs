@@ -10,6 +10,7 @@ namespace RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 internal class FiltrationComboBoxFilterVM : BaseViewModel {
     private string _valueFormula = string.Empty;
     private string _value = string.Empty;
+    private bool _isExcluding;
 
     public FiltrationComboBoxFilterVM(FiltrationComboBoxFilterListVM filterList, StringParamSetService stringParamSetService) {
         FilterList = filterList;
@@ -30,6 +31,14 @@ internal class FiltrationComboBoxFilterVM : BaseViewModel {
     public string Value {
         get => _value;
         set => RaiseAndSetIfChanged(ref _value, value);
+    }
+
+    /// <summary>
+    /// Исключающий фильтр: true - имя элемента не должно содержать значение, false - должно содержать
+    /// </summary>
+    public bool IsExcluding {
+        get => _isExcluding;
+        set => RaiseAndSetIfChanged(ref _isExcluding, value);
     }
 
     private void PropUpdateByFormula(string formulaPropertyName) {

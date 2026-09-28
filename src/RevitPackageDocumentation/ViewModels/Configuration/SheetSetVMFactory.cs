@@ -32,19 +32,25 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
     private readonly IMessageBoxService _messageBoxService;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
     private readonly StringParamSetService _stringParamSetService;
+    private readonly FamilyLibraryService _familyLibraryService;
+    private readonly IOpenFolderDialogService _openFolderDialogService;
 
     public SheetSetVMFactory(
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService,
         ISheetSetDataFactory sheetSetDataFactory,
-        StringParamSetService stringParamSetService) {
+        StringParamSetService stringParamSetService,
+        FamilyLibraryService familyLibraryService,
+        IOpenFolderDialogService openFolderDialogService) {
 
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         _messageBoxService = messageBoxService;
         _sheetSetDataFactory = sheetSetDataFactory;
         _stringParamSetService = stringParamSetService;
+        _familyLibraryService = familyLibraryService;
+        _openFolderDialogService = openFolderDialogService;
     }
 
     public SheetSetVM CreateSheetSetVM(SheetSetData data) {
@@ -274,15 +280,24 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
     private TypicalAnnotationVM CreateTypicalAnnotationVM(SheetSetVM sheetSetVM, SheetVM sheetVM, TypicalAnnotationData data) {
         var sheetComponentVM = new TypicalAnnotationVM(
-            _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService) {
+            _revitRepository, _stringParamSetService, sheetSetVM.SheetSetParams.Params, sheetVM, _localizationService,
+            _familyLibraryService, _openFolderDialogService) {
             IsModuleCheck = data.IsModuleCheck ?? false,
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
             ModuleCode = "02",
 
-            AnnotationType = _revitRepository.GenericAnnotationTypes.FirstOrDefault(t => $"{t.FamilyName}: {t.Name}".Equals(data.AnnotationTypeName)),
-            AnnotationTypeFilter = GetFilterList(data.AnnotationTypeFilterValues, sheetSetVM.SheetSetParams.Params),
+            FamilyNameFilter = GetFilterList(data.FamilyNameFilterValues, sheetSetVM.SheetSetParams.Params),
+            TypeNameFilter = GetFilterList(data.TypeNameFilterValues, sheetSetVM.SheetSetParams.Params),
         };
+
+        // Источник, папка и выбранные имена устанавливаются одним вызовом:
+        // заполняются списки семейств/типоразмеров и выполняется выбор по именам из конфигурации
+        sheetComponentVM.InitializeSelection(
+            data.IsFromFolder ?? false,
+            data.FamilyFolderPath ?? string.Empty,
+            data.FamilyName ?? string.Empty,
+            data.TypeName ?? string.Empty);
 
         // Добавляем список дополнительных параметров
         SetCustomParametersList(sheetComponentVM, data, sheetSetVM.SheetSetParams.Params);
@@ -340,6 +355,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             var valueVM = new FiltrationComboBoxFilterVM(filterList, _stringParamSetService) {
                 ValueFormula = valueData.ValueFormula ?? string.Empty,
                 Value = valueData.ValueFormula ?? string.Empty,
+                IsExcluding = valueData.IsExcluding ?? false,
             };
             filterList.ValueList.Add(valueVM);
         }

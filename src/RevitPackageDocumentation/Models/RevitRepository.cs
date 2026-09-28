@@ -41,7 +41,6 @@ internal class RevitRepository {
         SectionViewTemplates = GetSectionViewTemplates();
         ViewportTypes = GetViewportTypes();
         TextNoteTypes = GetTextNoteTypes();
-        GenericAnnotationTypes = GetGenericAnnotationTypes();
         LegendsInProject = GetLegendsInProject();
         TitleBlockFamilies = GetTitleBlockFamilies();
         Sheets = GetSheets();
@@ -79,7 +78,6 @@ internal class RevitRepository {
     public List<ViewSection> SectionViewTemplates { get; }
     public List<ElementType> ViewportTypes { get; }
     public List<TextNoteType> TextNoteTypes { get; }
-    public List<FamilySymbol> GenericAnnotationTypes { get; }
     public List<View> LegendsInProject { get; }
     public List<Family> TitleBlockFamilies { get; }
     public List<ViewSheet> Sheets { get; }
@@ -165,15 +163,38 @@ internal class RevitRepository {
         .ToList();
 
     /// <summary>
-    /// Возвращает список типоразмеров типовых аннотаций в проекте
+    /// Возвращает список типоразмеров семейств указанной категории в проекте.
+    /// Поиск выполняется напрямую в документе, т.к. семейство могло быть загружено после запуска плагина
     /// </summary>
-    public List<FamilySymbol> GetGenericAnnotationTypes() => new FilteredElementCollector(Document)
-        .OfCategory(BuiltInCategory.OST_GenericAnnotation)
+    public List<FamilySymbol> GetFamilySymbols(BuiltInCategory builtInCategory) => new FilteredElementCollector(Document)
+        .OfCategory(builtInCategory)
         .WhereElementIsElementType()
         .OfType<FamilySymbol>()
         .OrderBy(a => a.FamilyName)
         .ThenBy(a => a.Name)
         .ToList();
+
+    /// <summary>
+    /// Возвращает типоразмер семейства указанной категории по имени семейства и типоразмера
+    /// </summary>
+    public FamilySymbol GetFamilySymbol(BuiltInCategory builtInCategory, string familyName, string typeName) =>
+        GetFamilySymbols(builtInCategory)
+            .FirstOrDefault(s => s.FamilyName.Equals(familyName) && s.Name.Equals(typeName));
+
+
+    /// <summary>
+    /// Возвращает локализованное имя категории в текущей версии Revit
+    /// </summary>
+    public string GetCategoryName(BuiltInCategory builtInCategory) =>
+        Category.GetCategory(Document, builtInCategory)?.Name ?? builtInCategory.ToString();
+
+    /// <summary>
+    /// Возвращает семейство по имени
+    /// </summary>
+    public Family GetFamilyByName(string familyName) => new FilteredElementCollector(Document)
+        .OfClass(typeof(Family))
+        .OfType<Family>()
+        .FirstOrDefault(f => f.Name.Equals(familyName));
 
     /// <summary>
     /// Возвращает список всех легенд, присутствующих в проекте

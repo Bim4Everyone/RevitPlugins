@@ -71,6 +71,9 @@
     <system:String x:Key="MainWindow.TextWidthOnSheet">Text width on sheet</system:String>
     <system:String x:Key="MainWindow.TextTemplate">Text template</system:String>
     <system:String x:Key="MainWindow.ElementType">Element type</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Family name</system:String>
+    <system:String x:Key="MainWindow.ExcludingFilter">Excluding filter: does not contain the value</system:String>
+    <system:String x:Key="MainWindow.FamilySourceToolTip">Family source: left — from the project, right — from the folder with families</system:String>
     <system:String x:Key="MainWindow.Select">Select</system:String>
     <system:String x:Key="MainWindow.RemoveAfterCreation">Remove after creation</system:String>
 
@@ -109,7 +112,16 @@
     <system:String x:Key="Validation.TextNoteTypeIsNull">Text note type is not selected</system:String>
     <system:String x:Key="Validation.TextWidthIsNotCorrect">Text width is incorrect</system:String>
 
-    <system:String x:Key="Validation.AnnotationTypeIsNull">Typical annotation type is not selected</system:String>
+    <system:String x:Key="Validation.FamilyFolderIsEmpty">Folder with families is not selected</system:String>
+    <system:String x:Key="Validation.FamilyFolderNotFound">Folder not found: {0}</system:String>
+    <system:String x:Key="Validation.FamilyFolderHasNoFamilies">There are no families (.rfa) in the folder</system:String>
+    <system:String x:Key="Validation.FamilyIsNotSelected">Family is not selected</system:String>
+    <system:String x:Key="Validation.FamilyNotFoundInFolder">Family {0} not found in the folder</system:String>
+    <system:String x:Key="Validation.FamilyNotFoundInProject">Family {0} not found in the project</system:String>
+    <system:String x:Key="Validation.FamilyIsNotInCategory">Family {0} does not belong to category {1}</system:String>
+    <system:String x:Key="Validation.FamilyTypesReadError">Failed to get types of family {0}</system:String>
+    <system:String x:Key="Validation.TypeIsNotSelected">Type is not selected</system:String>
+    <system:String x:Key="Validation.TypeNotFoundInFamily">Type {0} not found in family {1}</system:String>
 
     <system:String x:Key="MainViewModel.Export">Export</system:String>
     <system:String x:Key="MainViewModel.ExportIsSuccessful">Export completed successfully!</system:String>
@@ -127,4 +139,5 @@
     <system:String x:Key="MainViewModel.ErrorDeserializingType">Error deserializing type</system:String>
     <system:String x:Key="MainViewModel.SelectConfigurationFile">Select configuration file</system:String>
     <system:String x:Key="MainViewModel.SaveConfiguration">Save configuration</system:String>
+    <system:String x:Key="MainViewModel.SelectFamilyFolder">Select folder with families</system:String>
 </ResourceDictionary>

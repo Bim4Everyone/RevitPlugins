@@ -32,6 +32,72 @@
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    <!--Цвета карточек компонентов листа. Кисти полупрозрачные, поэтому ложатся поверх фона текущей
+    темы Revit и одинаково работают и на светлой, и на темной теме-->
+    <!--Вид в плане-->
+    <SolidColorBrush
+        x:Key="PlanViewCardBackgroundBrush"
+        Color="#2F6FED"
+        Opacity="0.06" />
+    <SolidColorBrush
+        x:Key="PlanViewCardBorderBrush"
+        Color="#2F6FED"
+        Opacity="0.3" />
+    <!--Фрагмент плана-->
+    <SolidColorBrush
+        x:Key="CalloutViewCardBackgroundBrush"
+        Color="#17A2B8"
+        Opacity="0.06" />
+    <SolidColorBrush
+        x:Key="CalloutViewCardBorderBrush"
+        Color="#17A2B8"
+        Opacity="0.3" />
+    <!--Разрез-->
+    <SolidColorBrush
+        x:Key="SectionViewCardBackgroundBrush"
+        Color="#7C4DFF"
+        Opacity="0.06" />
+    <SolidColorBrush
+        x:Key="SectionViewCardBorderBrush"
+        Color="#7C4DFF"
+        Opacity="0.3" />
+    <!--Спецификация-->
+    <SolidColorBrush
+        x:Key="ScheduleViewCardBackgroundBrush"
+        Color="#2E9E4F"
+        Opacity="0.06" />
+    <SolidColorBrush
+        x:Key="ScheduleViewCardBorderBrush"
+        Color="#2E9E4F"
+        Opacity="0.3" />
+    <!--Текст-->
+    <SolidColorBrush
+        x:Key="TextNoteCardBackgroundBrush"
+        Color="#B58900"
+        Opacity="0.06" />
+    <SolidColorBrush
+        x:Key="TextNoteCardBorderBrush"
+        Color="#B58900"
+        Opacity="0.3" />
+    <!--Типовая аннотация-->
+    <SolidColorBrush
+        x:Key="TypicalAnnotationCardBackgroundBrush"
+        Color="#C2409B"
+        Opacity="0.06" />
+    <SolidColorBrush
+        x:Key="TypicalAnnotationCardBorderBrush"
+        Color="#C2409B"
+        Opacity="0.3" />
+    <!--Легенда-->
+    <SolidColorBrush
+        x:Key="LegendViewCardBackgroundBrush"
+        Color="#8A8F98"
+        Opacity="0.06" />
+    <SolidColorBrush
+        x:Key="LegendViewCardBorderBrush"
+        Color="#8A8F98"
+        Opacity="0.3" />
     
     <Style
         x:Key="CustomResizableDataGridStyle"
