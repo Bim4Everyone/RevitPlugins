@@ -163,7 +163,8 @@
                                     <ListBox.ItemTemplate>
                                         <DataTemplate DataType="{x:Type vms:CurveModelViewModel}">
                                             <controls:ItemControl
-                                                ItemName="{Binding Name}"/>
+                                                ItemName="{Binding Name}"
+                                                CheckBoxVisible="False"/>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>

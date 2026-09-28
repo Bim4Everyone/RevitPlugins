@@ -54,7 +54,8 @@ internal class CommonSettingsViewModel(
         SpatialModelsViewModel?.LoadFilterParameterViewModels();
         SpatialModelsViewModel?.LoadSpatialModelViewModels(RangeViewModel?.SelectedRange?.ElementsProvider);
         
-        CurveModelsViewModel = new CurveModelsViewModel(selectionService, revitRepository, windowService);
+        CurveModelsViewModel = new CurveModelsViewModel(
+            localizationService, selectionService, revitRepository, windowService);
     }
 
     private void OnRangeViewModelChanged(object sender, PropertyChangedEventArgs e) {

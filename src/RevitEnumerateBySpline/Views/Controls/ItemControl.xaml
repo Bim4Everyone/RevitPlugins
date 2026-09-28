@@ -5,32 +5,38 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     x:Name="_this"
     Margin="5"
     mc:Ignorable="d"
     d:DesignHeight="30" d:DesignWidth="300">
     
-
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition
-                Width="Auto" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="CheckBoxVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+    </UserControl.Resources>
+    
+    <StackPanel
+        Orientation="Horizontal"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Center">
+        
         <CheckBox
-            Grid.Column="0"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
+            Visibility="{Binding CheckBoxVisible, ElementName=_this, 
+                Converter={StaticResource CheckBoxVisible}}"
             IsChecked="{Binding IsChecked, ElementName=_this, Mode=TwoWay}" />
 
         <ui:TextBlock
-            Grid.Column="1"
             VerticalAlignment="Center"
             FontTypography="BodyStrong"
             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
             Text="{Binding ItemName, ElementName=_this}"
             TextWrapping="WrapWithOverflow" />
-            
-    </Grid>
+        
+    </StackPanel>
+    
 </UserControl>

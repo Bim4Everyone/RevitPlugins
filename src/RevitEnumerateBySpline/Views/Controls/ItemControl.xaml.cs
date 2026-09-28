@@ -9,6 +9,9 @@ public partial class ItemControl {
 
     public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register(
         nameof(IsChecked), typeof(bool), typeof(ItemControl), new PropertyMetadata(true));
+    
+    public static readonly DependencyProperty CheckBoxVisibleProperty = DependencyProperty.Register(
+        nameof(CheckBoxVisible), typeof(bool), typeof(ItemControl), new PropertyMetadata(true));
 
 
     public ItemControl() {
@@ -23,5 +26,10 @@ public partial class ItemControl {
     public bool IsChecked {
         get => (bool) GetValue(IsCheckedProperty);
         set => SetValue(IsCheckedProperty, value);
+    }
+    
+    public bool CheckBoxVisible {
+        get => (bool) GetValue(CheckBoxVisibleProperty);
+        set => SetValue(CheckBoxVisibleProperty, value);
     }
 }

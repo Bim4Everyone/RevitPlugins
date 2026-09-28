@@ -59,6 +59,8 @@
     <system:String x:Key="RangeViewModel.SelectedElementsProvider">Выделенные</system:String>
     <system:String x:Key="RangeViewModel.CurrentViewProvider">Видимые на виде</system:String>
     
+    <system:String x:Key="CurveModelsViewModel.SelectCurves.Promt">Выберите линии в модели и нажмите ГОТОВО</system:String>
+    
     <system:String x:Key="SelectionService.CancelledSelectionElements">Ошибка</system:String>
     
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
