@@ -72,8 +72,28 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
         
-        // Настройка доступа к CommonSettingsViewModel
-        kernel.Bind<CommonSettingsViewModel>()
+        // Настройка доступа к RangeViewModel
+        kernel.Bind<RangeViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к SpatialModelsViewModel
+        kernel.Bind<SpatialModelsViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к CurveModelsViewModel
+        kernel.Bind<CurveModelsViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к CommonParamSettingsViewModel
+        kernel.Bind<CommonParamSettingsViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к ParkingSpaceParamSettingsViewModel
+        kernel.Bind<ParkingSpaceParamSettingsViewModel>()
             .ToSelf()
             .InSingletonScope();
 
@@ -95,17 +115,17 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         kernel.Bind<IMessenger>()
             .To<Messenger>()
             .InSingletonScope();
+        
+        // Настройка доступа к RevitPickService
+        kernel.Bind<SelectionService>()
+            .ToSelf()
+            .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
-        
-        // Настройка доступа к RevitPickService
-        kernel.Bind<SelectionService>()
-            .ToSelf()
-            .InSingletonScope();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -120,6 +140,4 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
     }
-    
-    
 }

@@ -9,6 +9,6 @@ internal class ElementsProviderCurrentView(RevitRepository revitRepository) : IE
     public ElementsProviderType Type => ElementsProviderType.CurrentViewProvider;
 
     public List<SpatialModel> GetSpatialElements() {
-        return revitRepository.GetActiveViewSpatialModels();
+        return revitRepository.ActiveViewSpatialModels;
     }
 }

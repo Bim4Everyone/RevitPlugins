@@ -11,13 +11,19 @@ using dosymep.SimpleServices;
 
 namespace RevitEnumerateBySpline.Models;
 
-internal class RevitRepository(
-    UIApplication uiApplication, 
-    ILocalizationService localizationService) {
+internal class RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
+    
+    private List<SpatialModel>? _allSpatialModels;
+    private List<SpatialModel>? _activeViewSpatialModels;
+    private List<SpatialModel>? _selectedSpatialModels;
+    
     public UIApplication UiApplication { get; } = uiApplication;
     public UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
     public Application Application => UiApplication.Application;
     public Document Document => ActiveUiDocument.Document;
+    public List<SpatialModel> AllSpatialModels => _allSpatialModels ??= GetAllSpatialModels();
+    public List<SpatialModel> ActiveViewSpatialModels => _activeViewSpatialModels ??= GetActiveViewSpatialModels();
+    public List<SpatialModel> SelectedSpatialModels => _selectedSpatialModels ??= GetSelectedSpatialModels();
     
     /// <summary>
     /// Метод получения всех помещений SpatialModel
@@ -44,22 +50,13 @@ internal class RevitRepository(
     /// Метод получения всех выделенных помещений SpatialModel
     /// </summary>
     public List<SpatialModel> GetSelectedSpatialModels() {
-        return !HasSelectedRooms()
-            ? []
-            : GetSelectedElements()
-                .OfType<SpatialElement>()
-                .Select(CreateSpatialModel)
-                .ToList();
-    }
-    
-    /// <summary>
-    /// Метод получения всех помещений 
-    /// </summary>
-    public List<SpatialElement> GetAllSpatialElements() {
-        return new FilteredElementCollector(Document)
-            .OfCategory(BuiltInCategory.OST_Rooms)
-            .WhereElementIsNotElementType()
+        var selected = GetSelectedElements().ToArray();
+        if(selected.Length == 0) {
+            return [];
+        }
+        return selected
             .OfType<SpatialElement>()
+            .Select(CreateSpatialModel)
             .ToList();
     }
     
@@ -67,28 +64,32 @@ internal class RevitRepository(
     /// Метод проверки, есть ли выделенные помещения
     /// </summary>
     public bool HasSelectedRooms() {
-        var selected = GetSelectedElements().ToArray();
-        return selected.Count() != 0
-               && selected.Any(element => element is Room);
+        return SelectedSpatialModels.Any();
     }
     
     /// <summary>
     /// Метод проверки, есть ли помещения на активном виде
     /// </summary>
     public bool HasRoomsOnCurrentView() {
-        var viewId = Document.ActiveView.Id;
-
-        return new FilteredElementCollector(Document, viewId)
+        return ActiveViewSpatialModels.Any();
+    }
+    
+    /// <summary>
+    /// Метод получения всех помещений 
+    /// </summary>
+    private List<SpatialElement> GetAllSpatialElements() {
+        return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Rooms)
             .WhereElementIsNotElementType()
-            .Any();
+            .OfType<SpatialElement>()
+            .ToList();
     }
     
     // Метод получения всех выделенных элементов модели
     private IEnumerable<Element> GetSelectedElements() {
-        return ActiveUiDocument.GetSelectedElements();
+        return ActiveUiDocument.GetSelectedElements()
+            .Where(element => element is Room);
     }
-    
     
     // Создания объекта SpatialModel
     private SpatialModel CreateSpatialModel(SpatialElement spatialElement) {

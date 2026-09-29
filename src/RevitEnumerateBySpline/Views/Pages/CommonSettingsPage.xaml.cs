@@ -12,7 +12,7 @@ internal partial class CommonSettingsPage {
             languageService, localizationService,
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
-        DataContext = viewModel.CommonSettingsViewModel;
+        DataContext = viewModel;
     }
 }
 

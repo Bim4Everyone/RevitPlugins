@@ -9,6 +9,6 @@ internal class ElementsProviderSelected(RevitRepository revitRepository) : IElem
     public ElementsProviderType Type => ElementsProviderType.SelectedElementsProvider;
 
     public List<SpatialModel> GetSpatialElements() {
-        return revitRepository.GetSelectedSpatialModels();
+        return revitRepository.SelectedSpatialModels;
     }
 }

@@ -10,7 +10,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitEnumerateBySpline.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-    d:DataContext="{d:DesignInstance vms:CommonSettingsViewModel, IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d" x:ClassModifier="internal">
     

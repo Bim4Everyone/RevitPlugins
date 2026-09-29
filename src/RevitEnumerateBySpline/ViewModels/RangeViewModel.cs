@@ -15,13 +15,14 @@ namespace RevitEnumerateBySpline.ViewModels;
 
 internal class RangeViewModel(
     ILocalizationService localizationService,
+    IMessenger messenger,
     ProvidersFactory providersFactory,
     RevitRepository revitRepository)
     : BaseViewModel {
     
     private ObservableCollection<ElementsProviderViewModel>? _range;
     private ElementsProviderViewModel? _selectedRange;
-    
+
     public ObservableCollection<ElementsProviderViewModel>? Range {
         get => _range;
         set => RaiseAndSetIfChanged(ref _range, value);
@@ -29,13 +30,14 @@ internal class RangeViewModel(
     
     public ElementsProviderViewModel? SelectedRange {
         get => _selectedRange;
-        set => RaiseAndSetIfChanged(ref _selectedRange, value);
+        set {RaiseAndSetIfChanged(ref _selectedRange, value);
+            messenger.Send(new RangeChangedMessage(value?.ElementsProvider));
+        }
     }
 
     /// <summary>
     /// Метод загрузки окна
     /// </summary>
-    /// <param name="selectedRangeElementsProvider"></param>
     public void LoadView() {
         Range = new ObservableCollection<ElementsProviderViewModel>(GetElementsProviderViewModels());
         SelectedRange = ResolveDefaultRange() ?? Range.FirstOrDefault();

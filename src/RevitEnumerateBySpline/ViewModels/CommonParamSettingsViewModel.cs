@@ -11,6 +11,10 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
     private double _startNumber = 1.0;
     private string _prefix = string.Empty;
     private string _suffix = string.Empty;
+    
+    public CommonParamSettingsViewModel() {
+        LoadView();
+    }
 
     public ObservableCollection<ParamViewModel>? NumberParams {
         get => _numberParams;

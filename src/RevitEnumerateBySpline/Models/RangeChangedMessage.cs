@@ -2,6 +2,6 @@
 
 namespace RevitEnumerateBySpline.Models;
 
-internal sealed class RangeChangedMessage(IElementsProvider provider) {
-    public IElementsProvider Provider { get; } = provider;
+internal sealed class RangeChangedMessage(IElementsProvider? provider) {
+    public IElementsProvider? Provider { get; } = provider;
 }

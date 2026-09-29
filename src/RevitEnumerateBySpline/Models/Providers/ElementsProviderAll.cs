@@ -9,6 +9,6 @@ internal class ElementsProviderAll(RevitRepository revitRepository) : IElementsP
     public ElementsProviderType Type => ElementsProviderType.AllElementsProvider;
 
     public List<SpatialModel> GetSpatialElements() {
-        return revitRepository.GetAllSpatialModels();
+        return revitRepository.AllSpatialModels;
     }
 }
