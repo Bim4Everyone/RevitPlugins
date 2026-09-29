@@ -60,8 +60,8 @@ internal class CurveModelsViewModel : BaseViewModel {
 
     private void SelectCurves() {
         _windowService.HideMainWindow();
-        string promt = _localizationService.GetLocalizedString("CurveModelsViewModel.SelectCurves.Promt");
-        var curves = _selectionService.PickCurve(promt, _revitRepository.ActiveUiDocument);
+        string prompt = _localizationService.GetLocalizedString("CurveModelsViewModel.SelectCurves.Promt");
+        var curves = _selectionService.PickCurve(prompt, _revitRepository.ActiveUiDocument);
         if(curves.Count == 0) {
             _windowService.ShowMainWindow();
             return;

@@ -40,9 +40,8 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
         get => _suffix;
         set => RaiseAndSetIfChanged(ref _suffix, value);
     }
-    
-    
-    public void LoadView() {
+
+    private void LoadView() {
        
     } 
 }

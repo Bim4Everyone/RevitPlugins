@@ -7,6 +7,8 @@ using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Enums;
+using RevitEnumerateBySpline.Models.Services;
+using RevitEnumerateBySpline.Models.Settings;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
@@ -16,16 +18,21 @@ namespace RevitEnumerateBySpline.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly PluginConfig _pluginConfig;
+    private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
 
     private string? _errorText;
     private string _saveProperty = string.Empty;
     private bool _hasCommonSettingsErrors;
+    
+    private ConfigSettings? _configSettings;
+    private EnumeratorBySplineSettings? _enumeratorBySplineSettings;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
     /// <param name="pluginConfig">Настройки плагина.</param>
+    /// <param name="systemPluginConfig"></param>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
     /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>/
     /// <param name="rangeViewModel"></param>
@@ -35,6 +42,7 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="parkingSpaceParamSettingsViewModel"></param>
     public MainViewModel(
         PluginConfig pluginConfig,
+        SystemPluginConfig systemPluginConfig,
         RevitRepository revitRepository,
         ILocalizationService localizationService,
         RangeViewModel rangeViewModel,
@@ -44,6 +52,7 @@ internal class MainViewModel : BaseViewModel {
         ParkingSpaceParamSettingsViewModel parkingSpaceParamSettingsViewModel) {
         
         _pluginConfig = pluginConfig;
+        _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
         
@@ -79,14 +88,6 @@ internal class MainViewModel : BaseViewModel {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
-
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
-    }
     
     public RangeViewModel RangeViewModel { get; set; }
     public SpatialModelsViewModel SpatialModelsViewModel { get; set; }
@@ -107,6 +108,10 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void AcceptView() {
         SaveConfig();
+        SaveSettings();
+        
+        
+
     }
 
     /// <summary>
@@ -114,8 +119,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
     private bool CanAcceptView() {
-        switch (RangeViewModel?.SelectedRange?.ElementsProvider?.Type)
-        {
+        switch (RangeViewModel?.SelectedRange?.ElementsProvider?.Type) {
             case ElementsProviderType.SelectedElementsProvider
                 when !_revitRepository.HasSelectedRooms():
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NotSelected");
@@ -127,7 +131,6 @@ internal class MainViewModel : BaseViewModel {
                 HasCommonSettingsErrors = true;
                 return false;
         }
-
         if(SpatialModelsViewModel?.FilteredSpatialModelViewModels?
                .Any(x => x.IsChecked) != true) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSelection");
@@ -148,18 +151,56 @@ internal class MainViewModel : BaseViewModel {
     /// Загрузка настроек плагина.
     /// </summary>
     private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        _configSettings = setting?.ConfigSettings ?? new ConfigSettings();
+        ApplyDefaultsConfig();
+    }
+
+    // Метод применения дефолтных значений настроек.
+    private void ApplyDefaultsConfig() {
+        _configSettings?.StartNumber ??= _systemPluginConfig.DefaultStartNumber;
+        _configSettings?.Prefix ??= _systemPluginConfig.DefaultPrefix;
+        _configSettings?.Suffix ??= _systemPluginConfig.DefaultSuffix;
+        _configSettings?.SearchKey ??= _systemPluginConfig.DefaultSearchKey;
+        _configSettings?.DependentParam ??= _systemPluginConfig.DefaultDependentParam;
+        _configSettings?.DependentSearchParam ??= _systemPluginConfig.DefaultDependentSearchParam;
     }
 
     /// <summary>
     /// Сохранение настроек плагина.
     /// </summary>
     private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                ?? _pluginConfig.AddSettings(_revitRepository.Document);
-
-        setting.SaveProperty = SaveProperty;
+        var setting = _pluginConfig.GetSettings(_revitRepository.Document)
+                      ?? _pluginConfig.AddSettings(_revitRepository.Document);
+        setting.ConfigSettings = new ConfigSettings {
+            StartNumber = CommonParamSettingsViewModel.StartNumber,
+            Prefix = CommonParamSettingsViewModel.Prefix,
+            Suffix = CommonParamSettingsViewModel.Suffix,
+            SearchKey = ParkingSpaceParamSettingsViewModel.SearchKey,
+            DependentParam = ParkingSpaceParamSettingsViewModel.SelectedDependentParam?.RevitParam,
+            DependentSearchParam = ParkingSpaceParamSettingsViewModel.SelectedDependentSearchParam?.RevitParam
+        };
         _pluginConfig.SaveProjectConfig();
+    }
+    
+    /// <summary>
+    /// Сохранение настроек плагина.
+    /// </summary>
+    private void SaveSettings() {
+        _enumeratorBySplineSettings = new EnumeratorBySplineSettings { 
+            StartNumber = CommonParamSettingsViewModel.StartNumber,
+            Prefix = CommonParamSettingsViewModel.Prefix,
+            Suffix = CommonParamSettingsViewModel.Suffix,
+            SearchKey = ParkingSpaceParamSettingsViewModel.SearchKey,
+            DependentParam = ParkingSpaceParamSettingsViewModel.SelectedDependentParam?.RevitParam,
+            DependentSearchParam = ParkingSpaceParamSettingsViewModel.SelectedDependentSearchParam?.RevitParam,
+            SpatialModels = SpatialModelsViewModel.FilteredSpatialModelViewModels?
+                .Where(x => x.IsChecked)
+                .Select(x => x.SpatialModel)
+                .ToList(),
+            CurveModels = CurveModelsViewModel.CurveModelViewModels
+                .Select(x => x.CurveModel)
+                .ToList()
+        };
     }
 }

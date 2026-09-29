@@ -2,8 +2,11 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SharedParams;
 
 using pyRevitLabs.Json;
+
+using RevitEnumerateBySpline.Models.Settings;
 
 namespace RevitEnumerateBySpline.Models;
 
@@ -61,14 +64,19 @@ internal class RevitSettings : ProjectSettings {
     public override string ProjectName { get; set; } = string.Empty;
     
     /// <summary>
-    /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
+    /// Сохраняемое свойство
     /// </summary>
-    public string SaveProperty { get; set; } = string.Empty;
+    public ConfigSettings? ConfigSettings { get; set; }
 }
 
 internal class SystemPluginConfig {
-    
     // Системный параметр имени помещений по умолчанию
     public BuiltInParameter SystemRoomNameParamId => BuiltInParameter.ROOM_NAME;
+    public double DefaultStartNumber => 1;
+    public string DefaultPrefix => string.Empty;
+    public string DefaultSuffix => string.Empty;
+    public string DefaultSearchKey => "зависимое";
+    public RevitParam DefaultDependentParam => SharedParamsConfig.Instance.RoomArea;
+    public RevitParam DefaultDependentSearchParam => SharedParamsConfig.Instance.RoomArea;
     
 }
