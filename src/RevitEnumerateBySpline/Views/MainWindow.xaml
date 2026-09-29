@@ -80,7 +80,7 @@
                     <ui:NavigationViewItem.InfoBadge>
                         <ui:InfoBadge
                             Style="{StaticResource RoundInfoBadgeStyle}"
-                            Visibility="{Binding Path=HasSettingsErrors,
+                            Visibility="{Binding Path=HasCommonSettingsErrors,
                             Converter={StaticResource BooleanToVisibilityConverter}}">
                         </ui:InfoBadge>
                     </ui:NavigationViewItem.InfoBadge>
@@ -97,7 +97,7 @@
                     <ui:NavigationViewItem.InfoBadge>
                         <ui:InfoBadge
                             Style="{StaticResource RoundInfoBadgeStyle}"
-                            Visibility="{Binding Path=HasViewErrors,
+                            Visibility="{Binding Path=HasParamSettingsErrors,
                             Converter={StaticResource BooleanToVisibilityConverter}}">
                         </ui:InfoBadge>
                     </ui:NavigationViewItem.InfoBadge>

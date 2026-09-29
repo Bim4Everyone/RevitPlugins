@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Reflection;
-using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -8,7 +7,6 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -17,6 +15,7 @@ using Ninject;
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Factories;
 using RevitEnumerateBySpline.Models.Handlers;
+using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Services;
 using RevitEnumerateBySpline.Providers;
 using RevitEnumerateBySpline.ViewModels;
@@ -90,6 +89,11 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         // Настройка доступа к классу параметров
         kernel.Bind<WindowService>()
             .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к классу мессенджера
+        kernel.Bind<IMessenger>()
+            .To<Messenger>()
             .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI

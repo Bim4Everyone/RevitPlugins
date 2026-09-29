@@ -28,7 +28,6 @@ internal class CommonSettingsViewModel(
         get => _rangeViewModel;
         set => RaiseAndSetIfChanged(ref _rangeViewModel, value);
     }
-    
     public SpatialModelsViewModel? SpatialModelsViewModel {
         get => _spatialModelsViewModel;
         set => RaiseAndSetIfChanged(ref _spatialModelsViewModel, value);

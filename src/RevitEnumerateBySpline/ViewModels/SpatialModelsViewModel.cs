@@ -77,7 +77,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
     public void LoadFilterParameterViewModels() {
         FilterParameterViewModels = new ObservableCollection<ParamViewModel>(GetFilterParamViewModels());
         SelectedFilterParameterViewModel = FilterParameterViewModels
-            .FirstOrDefault(param => param?.RevitParam?.Id == _paramService.DefaultFilterParam?.Id)
+            .FirstOrDefault(param => param?.RevitParam?.Id == _paramService.DefaultSpatialFilterParam?.Id)
             ?? FilterParameterViewModels.FirstOrDefault();
     }
     
@@ -92,7 +92,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
     // Метод сброса фильтра на значение по умолчанию
     private void ResetFilter() {
         SelectedFilterParameterViewModel = FilterParameterViewModels?
-            .FirstOrDefault(param => param?.RevitParam?.Id == _paramService.DefaultFilterParam?.Id) 
+            .FirstOrDefault(param => param?.RevitParam?.Id == _paramService.DefaultSpatialFilterParam?.Id) 
             ?? FilterParameterViewModels?.FirstOrDefault();
     }
     
@@ -143,7 +143,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
     
     // Метод получения коллекции ParamViewModel для FilterParameterViewModels
     private IEnumerable<ParamViewModel> GetFilterParamViewModels() {
-        return _paramService.AllRevitParams
+        return _paramService.AllSpatialRevitParams
             .Select(param => new ParamViewModel {
                 Name = param.Name,
                 RevitParam = param

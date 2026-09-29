@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -5,6 +6,7 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
+using RevitEnumerateBySpline.Models.Enums;
 using RevitEnumerateBySpline.Models.Factories;
 using RevitEnumerateBySpline.Models.Services;
 
@@ -22,6 +24,7 @@ internal class MainViewModel : BaseViewModel {
 
     private string? _errorText;
     private string _saveProperty = string.Empty;
+    private bool _hasCommonSettingsErrors = false;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -62,6 +65,11 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
+    
+    public bool HasCommonSettingsErrors {
+        get => _hasCommonSettingsErrors;
+        set => RaiseAndSetIfChanged(ref _hasCommonSettingsErrors, value);
+    }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -110,12 +118,31 @@ internal class MainViewModel : BaseViewModel {
     /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
     /// </remarks>
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+        if(CommonSettingsViewModel.RangeViewModel?.SelectedRange?.ElementsProvider?.Type == ElementsProviderType.SelectedElementsProvider
+           && !_revitRepository.HasSelectedRooms()) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NotSelected");
+            HasCommonSettingsErrors = true;
             return false;
         }
-
+        if(CommonSettingsViewModel.RangeViewModel?.SelectedRange?.ElementsProvider?.Type == ElementsProviderType.CurrentViewProvider
+           && !_revitRepository.HasRoomsOnCurrentView()) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoRoomsOnView");
+            HasCommonSettingsErrors = true;
+            return false;
+        }
+        if(CommonSettingsViewModel.SpatialModelsViewModel?.FilteredSpatialModelViewModels?
+               .Any(x => x.IsChecked) != true) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSelection");
+            HasCommonSettingsErrors = true;
+            return false;
+        }
+        if(CommonSettingsViewModel.CurveModelsViewModel?.CurveModelViewModels.Count == 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoCurves");
+            HasCommonSettingsErrors = true;
+            return false;
+        }
         ErrorText = null;
+        HasCommonSettingsErrors = false;
         return true;
     }
 
@@ -123,6 +150,8 @@ internal class MainViewModel : BaseViewModel {
     /// Загрузка настроек плагина.
     /// </summary>
     private void LoadConfig() {
+        
+        
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
         SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");

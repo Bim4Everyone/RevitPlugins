@@ -26,13 +26,13 @@ internal class ParamService {
 
         _allParamElementIds = GetAllParamElementIds();
 
-        AllRevitParams = GetAllRevitParams().AsReadOnly();
+        AllSpatialRevitParams = GetAllRevitParams().AsReadOnly();
 
-        DefaultFilterParam = GetDefaultFilterParam();
+        DefaultSpatialFilterParam = GetDefaultFilterParam();
     }
 
-    public IReadOnlyList<RevitParam> AllRevitParams { get; }
-    public RevitParam? DefaultFilterParam { get; }
+    public IReadOnlyList<RevitParam> AllSpatialRevitParams { get; }
+    public RevitParam? DefaultSpatialFilterParam { get; }
     
     public string GetParamValue(SpatialModel spatialModel, RevitParam? filterParam) {
         return spatialModel.SpatialElement.GetParamValueOrDefault<string>(filterParam, "Нет значения");
@@ -46,7 +46,7 @@ internal class ParamService {
     }
 
     private RevitParam? GetDefaultFilterParam() {
-        return AllRevitParams
+        return AllSpatialRevitParams
             .OfType<SystemParam>()
             .FirstOrDefault(x => x.SystemParamId == _systemPluginConfig.SystemRoomNameParamId);
     }
