@@ -353,7 +353,7 @@ If disabled, tasks at a wall and floor junction get a regular completion status.
         x:Key="NavigatorSettings.Real.NotActual.Description"
         xml:space="preserve">Checks whether the real opening fully covers the incoming tasks and MEP elements from links that intersect it: if they go beyond the opening and intersect its host, the opening is outdated. Status: "Outdated opening".
 
-If disabled, the nested fill check is disabled too, and all openings except too close ones in structural files get the "Correct" status — including outdated ones.</system:String>
+If disabled, the nested fill check is disabled too.</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.VolumeMatch.Title">Opening fill check</system:String>
     <system:String
