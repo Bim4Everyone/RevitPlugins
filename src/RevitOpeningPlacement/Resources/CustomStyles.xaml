@@ -11,6 +11,10 @@
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TextBox/TextBox.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ToggleSwitch/ToggleSwitch.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/CardControl/CardControl.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/CardExpander/CardExpander.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <system:Double
         x:Key="SmallInputWidth">70</system:Double>
@@ -209,6 +213,49 @@
         <Setter
             Property="BorderThickness"
             Value="1" />
+    </Style>
+    <Style
+        TargetType="{x:Type ui:CardControl}"
+        x:Key="StatusCardControl"
+        BasedOn="{StaticResource DefaultUiCardControlStyle}">
+        <Style.Triggers>
+            <DataTrigger
+                Binding="{Binding IsNested, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                Value="True">
+                <Setter
+                    Property="Background"
+                    Value="Transparent" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="0 2 0 0" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        TargetType="{x:Type ui:CardExpander}"
+        x:Key="StatusCardExpander"
+        BasedOn="{StaticResource DefaultUiCardExpanderStyle}">
+        <Setter
+            Property="ContentPadding"
+            Value="0" />
+        <Style.Triggers>
+            <DataTrigger
+                Binding="{Binding IsNested, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                Value="True">
+                <Setter
+                    Property="Background"
+                    Value="Transparent" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="0 2 0 0" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         TargetType="{x:Type ui:TextBlock}"

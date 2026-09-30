@@ -24,16 +24,16 @@
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Auto">
         <StackPanel
-            Margin="0 0 0 8">
+            Margin="8 0 8 8">
             <Label
-                Margin="8 8 8 0"
+                Margin="0 8 0 4"
                 Style="{StaticResource SectionHeaderLabel}"
                 Content="{me:LocalizationSource NavigatorSettings.Section.IncomingTasks}" />
             <controls:IncomingStatusesControl
                 DataContext="{Binding IncomingStatuses}" />
 
             <Label
-                Margin="8 24 8 0"
+                Margin="0 24 0 4"
                 Style="{StaticResource SectionHeaderLabel}"
                 Content="{me:LocalizationSource NavigatorSettings.Section.RealOpenings}" />
             <controls:RealOpeningStatusesControl
@@ -41,25 +41,22 @@
 
             <controls:StatusToggleControl
                 DataContext="{Binding RealOpeningStatuses}"
+                Icon="{ui:SymbolIcon ArrowAutofitWidth24}"
                 Title="{me:LocalizationSource NavigatorSettings.Real.TooClose.Title}"
                 Description="{me:LocalizationSource NavigatorSettings.Real.TooClose.Description}"
                 CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
                 IsChecked="{Binding CheckTooClose, UpdateSourceTrigger=PropertyChanged}">
-                <controls:StatusToggleControl.NestedContent>
-                    <DockPanel
-                        HorizontalAlignment="Stretch">
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            TextWrapping="Wrap"
-                            Text="{me:LocalizationSource NavigatorSettings.Real.TooClose.DistanceValue}" />
-                        <ui:TextBox
-                            HorizontalAlignment="Right"
-                            MinWidth="{StaticResource SmallInputWidth}"
-                            Width="{StaticResource SmallInputWidth}"
-                            IsEnabled="{Binding CheckTooClose}"
-                            Text="{Binding MinDistance, UpdateSourceTrigger=PropertyChanged}" />
-                    </DockPanel>
-                </controls:StatusToggleControl.NestedContent>
+                <controls:StatusValueControl
+                    IsNested="True"
+                    Icon="{ui:SymbolIcon Ruler24}"
+                    Title="{me:LocalizationSource NavigatorSettings.Real.TooClose.DistanceTitle}"
+                    Description="{me:LocalizationSource NavigatorSettings.Real.TooClose.DistanceValue}">
+                    <ui:TextBox
+                        MinWidth="{StaticResource SmallInputWidth}"
+                        Width="{StaticResource SmallInputWidth}"
+                        IsEnabled="{Binding CheckTooClose}"
+                        Text="{Binding MinDistance, UpdateSourceTrigger=PropertyChanged}" />
+                </controls:StatusValueControl>
             </controls:StatusToggleControl>
         </StackPanel>
     </ScrollViewer>

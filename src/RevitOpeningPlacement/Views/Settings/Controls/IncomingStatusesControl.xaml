@@ -11,41 +11,37 @@
     xmlns:controls="clr-namespace:RevitOpeningPlacement.Views.Settings.Controls"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vms:IncomingStatusesViewModel, IsDesignTimeCreatable=False}">
-    <core:WpfUIPlatformUserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                    Source="../../../Resources/CustomStyles.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </core:WpfUIPlatformUserControl.Resources>
     <StackPanel>
         <controls:StatusToggleControl
+            Icon="{ui:SymbolIcon ErrorCircle24}"
             Title="{me:LocalizationSource NavigatorSettings.Incoming.UnacceptableConstructions.Title}"
             Description="{me:LocalizationSource NavigatorSettings.Incoming.UnacceptableConstructions.Description}"
             CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
             IsChecked="{Binding CheckUnacceptableConstructions, UpdateSourceTrigger=PropertyChanged}" />
 
         <controls:StatusToggleControl
+            Icon="{ui:SymbolIcon TaskListSquareLtr24}"
             Title="{me:LocalizationSource NavigatorSettings.Incoming.Intersections.Title}"
             Description="{me:LocalizationSource NavigatorSettings.Incoming.Intersections.Description}"
             CostTag="{me:LocalizationSource NavigatorSettings.Cost.Slow}"
             IsChecked="{Binding CheckIntersections, UpdateSourceTrigger=PropertyChanged}">
-            <controls:StatusToggleControl.NestedContent>
-                <StackPanel>
-                    <controls:StatusToggleControl
-                        Title="{me:LocalizationSource NavigatorSettings.Incoming.DifferentConstructions.Title}"
-                        Description="{me:LocalizationSource NavigatorSettings.Incoming.DifferentConstructions.Description}"
-                        CostTag="{me:LocalizationSource NavigatorSettings.Cost.Fast}"
-                        IsChecked="{Binding CheckDifferentConstructions, UpdateSourceTrigger=PropertyChanged}" />
+            <StackPanel>
+                <controls:StatusToggleControl
+                    IsNested="True"
+                    Icon="{ui:SymbolIcon Layer24}"
+                    Title="{me:LocalizationSource NavigatorSettings.Incoming.DifferentConstructions.Title}"
+                    Description="{me:LocalizationSource NavigatorSettings.Incoming.DifferentConstructions.Description}"
+                    CostTag="{me:LocalizationSource NavigatorSettings.Cost.Fast}"
+                    IsChecked="{Binding CheckDifferentConstructions, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <controls:StatusToggleControl
-                        Title="{me:LocalizationSource NavigatorSettings.Incoming.Host.Title}"
-                        Description="{me:LocalizationSource NavigatorSettings.Incoming.Host.Description}"
-                        CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
-                        IsChecked="{Binding CheckHost, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-            </controls:StatusToggleControl.NestedContent>
+                <controls:StatusToggleControl
+                    IsNested="True"
+                    Icon="{ui:SymbolIcon Building24}"
+                    Title="{me:LocalizationSource NavigatorSettings.Incoming.Host.Title}"
+                    Description="{me:LocalizationSource NavigatorSettings.Incoming.Host.Description}"
+                    CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
+                    IsChecked="{Binding CheckHost, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
         </controls:StatusToggleControl>
     </StackPanel>
 </core:WpfUIPlatformUserControl>

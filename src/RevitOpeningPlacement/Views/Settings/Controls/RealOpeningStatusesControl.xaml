@@ -21,51 +21,45 @@
     </core:WpfUIPlatformUserControl.Resources>
     <StackPanel>
         <controls:StatusToggleControl
+            Icon="{ui:SymbolIcon ArrowSyncCircle24}"
             Title="{me:LocalizationSource NavigatorSettings.Real.NotActual.Title}"
             Description="{me:LocalizationSource NavigatorSettings.Real.NotActual.Description}"
             CostTag="{me:LocalizationSource NavigatorSettings.Cost.Slow}"
             IsChecked="{Binding CheckNotActual, UpdateSourceTrigger=PropertyChanged}">
-            <controls:StatusToggleControl.NestedContent>
-                <controls:StatusToggleControl
-                    Title="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.Title}"
-                    Description="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.Description}"
-                    CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
-                    IsChecked="{Binding CheckVolumeMatch, UpdateSourceTrigger=PropertyChanged}">
-                    <controls:StatusToggleControl.NestedContent>
-                        <StackPanel>
-                            <DockPanel
-                                HorizontalAlignment="Stretch">
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    TextWrapping="Wrap"
-                                    Text="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.EmptyPercent}" />
-                                <ui:TextBox
-                                    HorizontalAlignment="Right"
-                                    ClearButtonEnabled="False"
-                                    MinWidth="{StaticResource SmallInputWidth}"
-                                    Width="{StaticResource SmallInputWidth}"
-                                    IsEnabled="{Binding CheckVolumeMatch}"
-                                    Text="{Binding EmptyVolumeRatio, UpdateSourceTrigger=PropertyChanged}" />
-                            </DockPanel>
-                            <DockPanel
-                                Margin="0 8 0 0"
-                                HorizontalAlignment="Stretch">
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    TextWrapping="Wrap"
-                                    Text="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.TooBigPercent}" />
-                                <ui:TextBox
-                                    HorizontalAlignment="Right"
-                                    ClearButtonEnabled="False"
-                                    MinWidth="{StaticResource SmallInputWidth}"
-                                    Width="{StaticResource SmallInputWidth}"
-                                    IsEnabled="{Binding CheckVolumeMatch}"
-                                    Text="{Binding TooBigVolumeRatio, UpdateSourceTrigger=PropertyChanged}" />
-                            </DockPanel>
-                        </StackPanel>
-                    </controls:StatusToggleControl.NestedContent>
-                </controls:StatusToggleControl>
-            </controls:StatusToggleControl.NestedContent>
+            <controls:StatusToggleControl
+                IsNested="True"
+                Icon="{ui:SymbolIcon Cube24}"
+                Title="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.Title}"
+                Description="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.Description}"
+                CostTag="{me:LocalizationSource NavigatorSettings.Cost.Medium}"
+                IsChecked="{Binding CheckVolumeMatch, UpdateSourceTrigger=PropertyChanged}">
+                <StackPanel>
+                    <controls:StatusValueControl
+                        IsNested="True"
+                        Icon="{ui:SymbolIcon DataPie24}"
+                        Title="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.EmptyPercent}"
+                        Description="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.PercentDescription}">
+                        <ui:TextBox
+                            ClearButtonEnabled="False"
+                            MinWidth="{StaticResource SmallInputWidth}"
+                            Width="{StaticResource SmallInputWidth}"
+                            IsEnabled="{Binding CheckVolumeMatch}"
+                            Text="{Binding EmptyVolumeRatio, UpdateSourceTrigger=PropertyChanged}" />
+                    </controls:StatusValueControl>
+                    <controls:StatusValueControl
+                        IsNested="True"
+                        Icon="{ui:SymbolIcon DataPie24}"
+                        Title="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.TooBigPercent}"
+                        Description="{me:LocalizationSource NavigatorSettings.Real.VolumeMatch.PercentDescription}">
+                        <ui:TextBox
+                            ClearButtonEnabled="False"
+                            MinWidth="{StaticResource SmallInputWidth}"
+                            Width="{StaticResource SmallInputWidth}"
+                            IsEnabled="{Binding CheckVolumeMatch}"
+                            Text="{Binding TooBigVolumeRatio, UpdateSourceTrigger=PropertyChanged}" />
+                    </controls:StatusValueControl>
+                </StackPanel>
+            </controls:StatusToggleControl>
         </controls:StatusToggleControl>
     </StackPanel>
 </core:WpfUIPlatformUserControl>

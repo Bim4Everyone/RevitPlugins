@@ -308,6 +308,12 @@
         x:Key="NavigatorSettings.Cost.Medium">Средняя проверка</system:String>
     <system:String
         x:Key="NavigatorSettings.Cost.Fast">Быстрая проверка</system:String>
+    <system:String
+        x:Key="NavigatorSettings.MoreInfo">Больше информации</system:String>
+    <system:String
+        x:Key="NavigatorSettings.ToggleSwitch.On">Вкл.</system:String>
+    <system:String
+        x:Key="NavigatorSettings.ToggleSwitch.Off">Откл.</system:String>
 
     <system:String
         x:Key="NavigatorSettings.Validation.CannotParseNumber">Введите число</system:String>
@@ -361,13 +367,17 @@
 
 Если выключить, отверстия считаются корректными.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">Порог "пустое", доля от 1 пересеченного объема</system:String>
+        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">Порог "пустое"</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">Порог "слишком большое", доля от 1 пересеченного объема</system:String>
+        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">Порог "слишком большое"</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.PercentDescription">Доля от 1 пересеченного объема</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.TooClose.Title">Проверка расстояния между отверстиями</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.TooClose.Description">Проверяет, есть ли другое чистовое отверстие КР ближе заданного расстояния к краям отверстия в плоскости конструкции. Статус: "Слишком близко друг к другу".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.DistanceTitle">Допуск</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.TooClose.DistanceValue">Минимальное расстояние, мм</system:String>
 

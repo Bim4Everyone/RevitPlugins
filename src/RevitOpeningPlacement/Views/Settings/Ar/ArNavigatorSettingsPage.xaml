@@ -23,16 +23,16 @@
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Auto">
         <StackPanel
-            Margin="0 0 0 8">
+            Margin="8 0 8 8">
             <Label
-                Margin="8 8 8 0"
+                Margin="0 8 0 4"
                 Style="{StaticResource SectionHeaderLabel}"
                 Content="{me:LocalizationSource NavigatorSettings.Section.IncomingTasks}" />
             <controls:IncomingStatusesControl
                 DataContext="{Binding IncomingStatuses}" />
 
             <Label
-                Margin="8 24 8 0"
+                Margin="0 24 0 4"
                 Style="{StaticResource SectionHeaderLabel}"
                 Content="{me:LocalizationSource NavigatorSettings.Section.RealOpenings}" />
             <controls:RealOpeningStatusesControl

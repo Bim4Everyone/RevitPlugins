@@ -309,6 +309,12 @@ including in multilayer structures.</system:String>
         x:Key="NavigatorSettings.Cost.Medium">Medium check</system:String>
     <system:String
         x:Key="NavigatorSettings.Cost.Fast">Fast check</system:String>
+    <system:String
+        x:Key="NavigatorSettings.MoreInfo">More info</system:String>
+    <system:String
+        x:Key="NavigatorSettings.ToggleSwitch.On">On</system:String>
+    <system:String
+        x:Key="NavigatorSettings.ToggleSwitch.Off">Off</system:String>
 
     <system:String
         x:Key="NavigatorSettings.Validation.CannotParseNumber">Enter a number</system:String>
@@ -362,13 +368,17 @@ If disabled, the nested fill check is disabled too.</system:String>
 
 If disabled, openings are considered correct.</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">"Empty" threshold, share of 1 of intersected volume</system:String>
+        x:Key="NavigatorSettings.Real.VolumeMatch.EmptyPercent">"Empty" threshold</system:String>
     <system:String
-        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">"Too big" threshold, share of 1 of intersected volume</system:String>
+        x:Key="NavigatorSettings.Real.VolumeMatch.TooBigPercent">"Too big" threshold</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.VolumeMatch.PercentDescription">Share of 1 of intersected volume</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.TooClose.Title">Distance between openings check</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.TooClose.Description">Checks whether another structural real opening is closer than the specified distance to the edges of the opening in the construction plane. Status: "Openings are too close to each other".</system:String>
+    <system:String
+        x:Key="NavigatorSettings.Real.TooClose.DistanceTitle">Tolerance</system:String>
     <system:String
         x:Key="NavigatorSettings.Real.TooClose.DistanceValue">Minimum distance, mm</system:String>
 
