@@ -10,9 +10,7 @@ internal class ParkingSpaceParamSettingsViewModel : BaseViewModel {
     private ParamViewModel? _selectedDependentParam;
     private ObservableCollection<ParamViewModel>? _dependentSearchParams;
     private ParamViewModel? _selectedDependentSearchParam;
-    private string _searchKey = string.Empty;
-    private string _prefix = string.Empty;
-    private string _suffix = string.Empty;
+    private string? _searchKey;
     
     public ParkingSpaceParamSettingsViewModel() {
         LoadView();
@@ -38,7 +36,7 @@ internal class ParkingSpaceParamSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedDependentSearchParam, value);
     }
     
-    public string SearchKey {
+    public string? SearchKey {
         get => _searchKey;
         set => RaiseAndSetIfChanged(ref _searchKey, value);
     }

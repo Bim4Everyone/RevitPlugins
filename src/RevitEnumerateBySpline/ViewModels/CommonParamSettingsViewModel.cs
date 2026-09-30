@@ -8,9 +8,9 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
     
     private ObservableCollection<ParamViewModel>? _numberParams;
     private ParamViewModel? _selectedNumberParam;
-    private double _startNumber = 1.0;
-    private string _prefix = string.Empty;
-    private string _suffix = string.Empty;
+    private double? _startNumber;
+    private string? _prefix;
+    private string? _suffix;
     
     public CommonParamSettingsViewModel() {
         LoadView();
@@ -26,17 +26,17 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedNumberParam, value);
     }
     
-    public double StartNumber {
+    public double? StartNumber {
         get => _startNumber;
         set => RaiseAndSetIfChanged(ref _startNumber, value);
     }
     
-    public string Prefix {
+    public string? Prefix {
         get => _prefix;
         set => RaiseAndSetIfChanged(ref _prefix, value);
     }
     
-    public string Suffix {
+    public string? Suffix {
         get => _suffix;
         set => RaiseAndSetIfChanged(ref _suffix, value);
     }

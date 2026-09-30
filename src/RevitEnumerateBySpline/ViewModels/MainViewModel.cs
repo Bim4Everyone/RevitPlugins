@@ -26,7 +26,7 @@ internal class MainViewModel : BaseViewModel {
     private bool _hasCommonSettingsErrors;
     
     private ConfigSettings? _configSettings;
-    private EnumeratorBySplineSettings? _enumeratorBySplineSettings;
+    private EnumerateBySplineSettings? _enumeratorBySplineSettings;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -107,11 +107,13 @@ internal class MainViewModel : BaseViewModel {
     /// Метод применения настроек главного окна. (выполнение плагина)
     /// </summary>
     private void AcceptView() {
+        BuildSettings();
         SaveConfig();
-        SaveSettings();
         
-        
-
+        CommonParamSettingsViewModel.Prefix = _enumeratorBySplineSettings?.ConfigSettings?.Prefix;
+        CommonParamSettingsViewModel.Suffix = _enumeratorBySplineSettings?.ConfigSettings?.Suffix;
+        CommonParamSettingsViewModel.StartNumber = _enumeratorBySplineSettings?.ConfigSettings?.StartNumber;
+        ParkingSpaceParamSettingsViewModel.SearchKey = _enumeratorBySplineSettings?.ConfigSettings?.SearchKey;
     }
 
     /// <summary>
@@ -119,7 +121,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
     private bool CanAcceptView() {
-        switch (RangeViewModel?.SelectedRange?.ElementsProvider?.Type) {
+        switch (RangeViewModel.SelectedRange?.ElementsProvider?.Type) {
             case ElementsProviderType.SelectedElementsProvider
                 when !_revitRepository.HasSelectedRooms():
                 ErrorText = _localizationService.GetLocalizedString("MainViewModel.NotSelected");
@@ -131,13 +133,13 @@ internal class MainViewModel : BaseViewModel {
                 HasCommonSettingsErrors = true;
                 return false;
         }
-        if(SpatialModelsViewModel?.FilteredSpatialModelViewModels?
+        if(SpatialModelsViewModel.FilteredSpatialModelViewModels?
                .Any(x => x.IsChecked) != true) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSelection");
             HasCommonSettingsErrors = true;
             return false;
         }
-        if(CurveModelsViewModel?.CurveModelViewModels.Count == 0) {
+        if(CurveModelsViewModel.CurveModelViewModels.Count == 0) {
             ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoCurves");
             HasCommonSettingsErrors = true;
             return false;
@@ -165,42 +167,39 @@ internal class MainViewModel : BaseViewModel {
         _configSettings?.DependentParam ??= _systemPluginConfig.DefaultDependentParam;
         _configSettings?.DependentSearchParam ??= _systemPluginConfig.DefaultDependentSearchParam;
     }
+    
+     /// <summary>
+     /// Сохранение основных настроек плагина.
+     /// </summary>
+     private void BuildSettings() {
+         _enumeratorBySplineSettings = new EnumerateBySplineSettings { 
+             ConfigSettings = new ConfigSettings {
+                 StartNumber = CommonParamSettingsViewModel.StartNumber,
+                 Prefix = CommonParamSettingsViewModel.Prefix,
+                 Suffix = CommonParamSettingsViewModel.Suffix,
+                 SearchKey = ParkingSpaceParamSettingsViewModel.SearchKey,
+                 DependentParam = ParkingSpaceParamSettingsViewModel.SelectedDependentParam?.RevitParam,
+                 DependentSearchParam = ParkingSpaceParamSettingsViewModel.SelectedDependentSearchParam?.RevitParam
+             },
+             SpatialModels = SpatialModelsViewModel.FilteredSpatialModelViewModels?
+                 .Where(x => x.IsChecked)
+                 .Select(x => x.SpatialModel)
+                 .ToList(),
+             CurveModels = CurveModelsViewModel.CurveModelViewModels
+                 .Select(x => x.CurveModel)
+                 .ToList()
+         };
+     }   
 
     /// <summary>
-    /// Сохранение настроек плагина.
+    /// Сохранение сохраняемых настроек плагина.
     /// </summary>
     private void SaveConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                       ?? _pluginConfig.AddSettings(_revitRepository.Document);
-        setting.ConfigSettings = new ConfigSettings {
-            StartNumber = CommonParamSettingsViewModel.StartNumber,
-            Prefix = CommonParamSettingsViewModel.Prefix,
-            Suffix = CommonParamSettingsViewModel.Suffix,
-            SearchKey = ParkingSpaceParamSettingsViewModel.SearchKey,
-            DependentParam = ParkingSpaceParamSettingsViewModel.SelectedDependentParam?.RevitParam,
-            DependentSearchParam = ParkingSpaceParamSettingsViewModel.SelectedDependentSearchParam?.RevitParam
-        };
+        setting.ConfigSettings = _enumeratorBySplineSettings?.ConfigSettings;
         _pluginConfig.SaveProjectConfig();
     }
     
-    /// <summary>
-    /// Сохранение настроек плагина.
-    /// </summary>
-    private void SaveSettings() {
-        _enumeratorBySplineSettings = new EnumeratorBySplineSettings { 
-            StartNumber = CommonParamSettingsViewModel.StartNumber,
-            Prefix = CommonParamSettingsViewModel.Prefix,
-            Suffix = CommonParamSettingsViewModel.Suffix,
-            SearchKey = ParkingSpaceParamSettingsViewModel.SearchKey,
-            DependentParam = ParkingSpaceParamSettingsViewModel.SelectedDependentParam?.RevitParam,
-            DependentSearchParam = ParkingSpaceParamSettingsViewModel.SelectedDependentSearchParam?.RevitParam,
-            SpatialModels = SpatialModelsViewModel.FilteredSpatialModelViewModels?
-                .Where(x => x.IsChecked)
-                .Select(x => x.SpatialModel)
-                .ToList(),
-            CurveModels = CurveModelsViewModel.CurveModelViewModels
-                .Select(x => x.CurveModel)
-                .ToList()
-        };
-    }
+   
 }

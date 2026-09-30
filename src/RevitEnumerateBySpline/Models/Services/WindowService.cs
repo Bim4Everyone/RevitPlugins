@@ -12,6 +12,10 @@ internal class WindowService  {
     public void HideMainWindow() {
         _mainWindow.Hide();
     }
+    
+    public void CloseMainWindow() {
+        _mainWindow.Close();
+    }
 
     public void ShowMainWindow() {
         _mainWindow.ShowDialog();
