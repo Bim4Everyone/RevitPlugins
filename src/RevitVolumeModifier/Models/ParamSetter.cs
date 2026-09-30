@@ -43,8 +43,21 @@ internal class ParamSetter {
                 return;
             }
             directShapeParam.Set(elementParam);
+            SetWorkset(element, directShapeObject.DirectShape);
         } catch {
             return;
         }
+    }
+    
+    private static void SetWorkset(Element element, DirectShape directShape) {
+        if(!directShape.Document.IsWorkshared) {
+            return;
+        }
+        var sourceWorksetId = element.WorksetId;
+        var worksetParam = directShape.GetParam(BuiltInParameter.ELEM_PARTITION_PARAM);
+        if(worksetParam == null || worksetParam.IsReadOnly) {
+            return;
+        }
+        worksetParam.Set(sourceWorksetId.IntegerValue);
     }
 }
