@@ -52,6 +52,8 @@
 
     <system:String x:Key="CommonSettingViewModel.SlabBasedAlgorithm">На основе перекрытий (автоматический)</system:String>
     <system:String x:Key="CommonSettingViewModel.ParamBasedAlgorithm">На основе параметров (низа и верха)</system:String>
+    <system:String x:Key="CommonSettingViewModel.SlabContourAlgorithm">На основе перекрытий (контуры)</system:String>
+    
     <system:String x:Key="CommonSettingViewModel.DescriptionParamDescription">Параметр типа зон</system:String>
     <system:String x:Key="CommonSettingViewModel.DescriptionParamDetailDescription">Используется для определения типа зон</system:String>
     <system:String x:Key="CommonSettingViewModel.BlockParamDescription">Параметр блока СМР</system:String>

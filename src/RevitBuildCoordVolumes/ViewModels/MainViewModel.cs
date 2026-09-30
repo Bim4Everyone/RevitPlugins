@@ -82,7 +82,8 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод обновляющий свойство для скрытия/отображения дополнительных настроек основного окна
     private void UpdateVisibilitySettings() {
-        IsSlabBasedAlgorithm = CommonSettingViewModel.SelectedTypeAlgorithm.AlgorithmType == AlgorithmType.SlabBasedAlgorithm;
+        IsSlabBasedAlgorithm = CommonSettingViewModel.SelectedTypeAlgorithm.AlgorithmType 
+            is AlgorithmType.SlabBasedAlgorithm or AlgorithmType.SlabContourAlgorithm;
     }
 
     // Метод обновления свойства необходимости проверки зоны

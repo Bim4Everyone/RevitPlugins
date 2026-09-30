@@ -33,6 +33,8 @@ internal sealed class BuilderFactory {
             ? new SlabBasedCoordVolumeBuilder(_revitRepository, _services, _settings)
             : algorithmType == AlgorithmType.ParamBasedAlgorithm
             ? new ParamBasedCoordVolumeBuilder(_services, _settings)
+            : algorithmType == AlgorithmType.SlabContourAlgorithm
+            ? new SlabContourCoordVolumeBuilder()
             : new ParamBasedCoordVolumeBuilder(_services, _settings);
     }
 }
