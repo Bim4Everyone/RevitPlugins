@@ -36,6 +36,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
     private string _searchTextLevels;
     private string _squareSideMm;
     private string _squareAngleDeg;
+    private bool _unionVolumes;
 
     public SlabBasedSettingViewModel(
         SystemPluginConfig systemPluginConfig,
@@ -69,6 +70,10 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
     public BuilderModeViewModel SelectedBuilderMode {
         get => _selectedBuilderMode;
         set => RaiseAndSetIfChanged(ref _selectedBuilderMode, value);
+    }
+    public bool UnionVolumes {
+        get => _unionVolumes;
+        set => RaiseAndSetIfChanged(ref _unionVolumes, value);
     }
     public ObservableCollection<DocumentViewModel> Documents {
         get => _documents;
@@ -269,6 +274,8 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         SelectedBuilderMode = BuilderModes
             .OrderByDescending(mode => mode.BuilderMode == _settings.BuilderMode)
             .FirstOrDefault();
+
+        UnionVolumes = _settings.UnionVolumes;
 
         Documents = new ObservableCollection<DocumentViewModel>(GetDocumentViewModels());
         FilteredDocuments = new ObservableCollection<DocumentViewModel>(Documents);

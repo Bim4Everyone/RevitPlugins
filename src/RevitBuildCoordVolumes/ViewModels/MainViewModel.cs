@@ -311,6 +311,7 @@ internal class MainViewModel : BaseViewModel {
         _settings = new BuildCoordVolumeSettings {
             AlgorithmType = configSettings.AlgorithmType,
             BuilderMode = configSettings.BuilderMode,
+            UnionVolumes = configSettings.UnionVolumes,
             TypeZones = configSettings.TypeZones,
             ParamMaps = configSettings.ParamMaps,
             Documents = documents,
@@ -329,11 +330,13 @@ internal class MainViewModel : BaseViewModel {
         var documents = SlabBasedSettingViewModel.FilteredDocuments.Where(vm => vm.IsChecked).Select(d => d.Document).ToList();
         var typeSlabs = SlabBasedSettingViewModel.FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
         var levels = SlabBasedSettingViewModel.FilteredLevels.Where(vm => vm.IsChecked).Select(vm => vm.Level).ToList();
+        bool unionVolumes = SlabBasedSettingViewModel.UnionVolumes;
         double squareSide = Convert.ToDouble(SlabBasedSettingViewModel.SquareSideMm);
         double squareAngle = Convert.ToDouble(SlabBasedSettingViewModel.SquareAngleDeg);
 
         _settings.AlgorithmType = algorithmType;
         _settings.BuilderMode = builderMode;
+        _settings.UnionVolumes = unionVolumes;
         _settings.Documents = documents;
         _settings.TypeSlabs = typeSlabs;
         _settings.TypeZones = typeZones;
@@ -348,6 +351,7 @@ internal class MainViewModel : BaseViewModel {
         var configSettings = new ConfigSettings {
             AlgorithmType = _settings.AlgorithmType,
             BuilderMode = _settings.BuilderMode,
+            UnionVolumes = _settings.UnionVolumes,
             Documents = _settings.Documents.Select(doc => doc.GetUniqId()).ToList(),
             TypeZones = _settings.TypeZones,
             ParamMaps = _settings.ParamMaps,

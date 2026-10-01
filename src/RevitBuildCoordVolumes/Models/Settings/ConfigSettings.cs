@@ -7,6 +7,7 @@ namespace RevitBuildCoordVolumes.Models.Settings;
 internal class ConfigSettings {
     public AlgorithmType AlgorithmType { get; set; }
     public BuilderMode BuilderMode { get; set; }
+    public bool UnionVolumes { get; set; }
     public List<string> TypeZones { get; set; }
     public List<ParamMap> ParamMaps { get; set; }
     public List<string> Documents { get; set; }
@@ -17,6 +18,7 @@ internal class ConfigSettings {
     public void ApplyDefaultValues(SystemPluginConfig systemPluginConfig) {
         AlgorithmType = AlgorithmType.SlabBasedAlgorithm;
         BuilderMode = BuilderMode.AutomaticBuilder;
+        UnionVolumes = true;
         TypeZones = [];
         ParamMaps = systemPluginConfig.GetAdvancedParamMaps();
         Documents = [];
