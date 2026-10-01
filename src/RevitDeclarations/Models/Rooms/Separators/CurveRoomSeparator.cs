@@ -1,57 +1,70 @@
-using System.Linq;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
-
-namespace RevitDeclarations.Models;
+namespace RevitDeclarations.Models.Rooms.Separators;
 internal class CurveRoomSeparator : RoomSeparator {
-    private readonly CurveElement _curve;
-
-    public CurveRoomSeparator(ApartmentsProject project, CurveElement curve) {
-        _curve = curve;
-
-        foreach(var room in project.Rooms) {
-            AddRoom(room);
+    public CurveRoomSeparator(CurveElement curve, RoomBoundaryCache boundaryCache) {
+        if (!boundaryCache.TryGetRooms(curve.Id, out var roomBoundaries)) {
+            return;
         }
+
+        BuildRooms(roomBoundaries);
     }
 
-    private void AddRoom(RoomElement room) {
-        var roomSegments = room.GetBoundaries()
-            .Where(x => x.ElementId == _curve.Id)
-            .ToList();
+    private void BuildRooms(Dictionary<ElementId, RoomBoundaryInfo> roomBoundaries) {
+        var addedRooms = new List<RoomBoundaryInfo>();
 
-        if(roomSegments.Count == 0) {
-            return;
-        }
+        foreach (var roomBoundary in roomBoundaries.Values) {
+            
+            // Первое помещение, найденное на данной Room Separation Line, становится первым помещением separator
+            if (addedRooms.Count == 0) {
+                addedRooms.Add(roomBoundary);
+                Rooms.Add(roomBoundary.Room);
 
-        if(Rooms.Count == 0) {
-            Rooms.Add(room.RevitRoom);
-            return;
-        }
+                continue;
+            }
+            
+            // Помещение добавляется только в том случае, если её сегменты
+            // пересекаются с сегментами хотя бы одним уже добавленным помещением.
+            bool isConnected = false;
 
-        foreach(var addedRoom in Rooms) {
-            var addedSegments = addedRoom
-                .GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
-                .SelectMany(x => x)
-                .Where(x => x.ElementId == _curve.Id);
+            foreach (var addedRoom in addedRooms) {
+                if (!AreConnected(roomBoundary.Segments, addedRoom.Segments)) {
+                    continue;
+                }
 
-            if(!roomSegments.Any(x => addedSegments.Any(y => IsIntersectSegment(x, y)))) {
+                isConnected = true;
+                break;
+            }
+
+            if (!isConnected) {
                 continue;
             }
 
-            Rooms.Add(room.RevitRoom);
-            return;
+            addedRooms.Add(roomBoundary);
+            Rooms.Add(roomBoundary.Room);
         }
     }
-    
-    private static bool IsIntersectSegment(BoundarySegment first, BoundarySegment second) {
-        var result = first.GetCurve().Intersect(second.GetCurve());
 
-        return result 
-            is SetComparisonResult.Overlap 
-            or SetComparisonResult.Equal 
-            or SetComparisonResult.Subset 
-            or SetComparisonResult.Superset;
+    private static bool AreConnected(IReadOnlyList<BoundarySegment> firstSegments, IReadOnlyList<BoundarySegment> secondSegments) {
+        foreach (var firstSegment in firstSegments) {
+            var firstCurve = firstSegment.GetCurve();
+
+            foreach (var secondSegment in secondSegments) {
+                var result = firstCurve.Intersect(
+                    secondSegment.GetCurve());
+
+                if (result
+                    is SetComparisonResult.Overlap
+                    or SetComparisonResult.Equal
+                    or SetComparisonResult.Subset
+                    or SetComparisonResult.Superset) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
