@@ -1,20 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 
-using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
-using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
-internal class OpeningRealsArConfigViewModel : BaseViewModel {
-    private readonly RevitRepository _revitRepository;
 
-    public OpeningRealsArConfigViewModel(RevitRepository revitRepository, OpeningRealsArConfig openingRealsArConfig) {
-        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+internal class ArPlacementSettingsViewModel : BaseViewModel {
+    private bool _roundSize;
+    private bool _roundElevation;
+    private int _selectedRoundElevation;
+    private int _selectedRoundSize;
+
+    public ArPlacementSettingsViewModel(OpeningRealsArConfig openingRealsArConfig) {
         if(openingRealsArConfig is null) {
             throw new ArgumentNullException(nameof(openingRealsArConfig));
         }
@@ -23,12 +23,7 @@ internal class OpeningRealsArConfigViewModel : BaseViewModel {
         SelectedRoundElevation = openingRealsArConfig.ElevationRounding;
         RoundSize = openingRealsArConfig.Rounding > 0;
         SelectedRoundSize = openingRealsArConfig.Rounding;
-
-        SaveConfigCommand = RelayCommand.Create(SaveConfig);
     }
-
-
-    private bool _roundSize;
 
     /// <summary>
     /// Включает/выключает округление размеров
@@ -41,8 +36,6 @@ internal class OpeningRealsArConfigViewModel : BaseViewModel {
         }
     }
 
-    private bool _roundElevation;
-
     /// <summary>
     /// Включает/выключает округление отметки
     /// </summary>
@@ -54,8 +47,6 @@ internal class OpeningRealsArConfigViewModel : BaseViewModel {
         }
     }
 
-    private int _selectedRoundElevation;
-
     /// <summary>
     /// Округление высотной отметки в мм
     /// </summary>
@@ -63,8 +54,6 @@ internal class OpeningRealsArConfigViewModel : BaseViewModel {
         get => _selectedRoundElevation;
         set => RaiseAndSetIfChanged(ref _selectedRoundElevation, value);
     }
-
-    private int _selectedRoundSize;
 
     /// <summary>
     /// Округление размеров в мм
@@ -77,20 +66,13 @@ internal class OpeningRealsArConfigViewModel : BaseViewModel {
     /// <summary>
     /// Доступные для выбора значения округления в мм
     /// </summary>
-    public IReadOnlyCollection<int> EnabledRoundings { get; } = new int[] { 1, 5, 10, 25, 50 };
+    public IReadOnlyCollection<int> EnabledRoundings { get; } = [1, 5, 10, 25, 50];
 
-
-    public ICommand SaveConfigCommand { get; }
-
-    private void SaveConfig() {
-        GetOpeningConfig().SaveProjectConfig();
-    }
-
-
-    private OpeningRealsArConfig GetOpeningConfig() {
-        var config = OpeningRealsArConfig.GetOpeningConfig(_revitRepository.Doc);
+    /// <summary>
+    /// Записывает текущие настройки расстановки в конфиг
+    /// </summary>
+    public void UpdateConfig(OpeningRealsArConfig config) {
         config.Rounding = SelectedRoundSize;
         config.ElevationRounding = SelectedRoundElevation;
-        return config;
     }
 }

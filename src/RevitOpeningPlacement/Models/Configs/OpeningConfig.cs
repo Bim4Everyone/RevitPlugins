@@ -42,6 +42,11 @@ internal class OpeningConfig : ProjectConfig {
     /// </summary>
     public string Name { get; set; } = "по умолчанию";
 
+    /// <summary>
+    /// Настройки статусов Навигатора
+    /// </summary>
+    public NavigatorMepSettings NavigatorSettings { get; set; } = new();
+
     public static OpeningConfig GetOpeningConfig(Document document) {
         if(document is null) { throw new ArgumentNullException(nameof(document)); }
 

@@ -1,10 +1,16 @@
 using System.Windows;
+using System.Windows.Threading;
 
 using dosymep.SimpleServices;
 
+using RevitOpeningPlacement.Views.Settings.Kr;
+
+using Wpf.Ui.Abstractions;
+
 namespace RevitOpeningPlacement.Views.Settings;
-public partial class OpeningRealsKrSettingsView {
-    public OpeningRealsKrSettingsView(
+public partial class KrSettingsWindow {
+    public KrSettingsWindow(
+    INavigationViewPageProvider navigationViewPageProvider,
     ILoggerService loggerService,
     ISerializationService serializationService,
     ILanguageService languageService,
@@ -16,10 +22,14 @@ public partial class OpeningRealsKrSettingsView {
         languageService, localizationService,
         uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
+        Dispatcher.BeginInvoke(
+            DispatcherPriority.Loaded,
+            () => _rootNavigationView.Navigate(typeof(KrPlacementSettingsPage)));
     }
 
     public override string PluginName => nameof(RevitOpeningPlacement);
-    public override string ProjectConfigName => nameof(OpeningRealsKrSettingsView);
+    public override string ProjectConfigName => nameof(KrSettingsWindow);
 
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;

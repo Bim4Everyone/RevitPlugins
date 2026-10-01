@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using System.Windows.Controls;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -20,8 +21,11 @@ using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
 using RevitOpeningPlacement.Views.Settings;
+using RevitOpeningPlacement.Views.Settings.Kr;
 
 using RevitOpeningPlacement.Services;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitOpeningPlacement;
 /// <summary>
@@ -61,13 +65,31 @@ internal class SetOpeningRealsKrPlacementConfigCmd : BasePluginCommand {
         kernel.Bind<OpeningRealsKrConfig>()
             .ToMethod(c =>
                     OpeningRealsKrConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document)
-                );
-        kernel.BindMainWindow<OpeningRealsKrConfigViewModel, OpeningRealsKrSettingsView>();
+                )
+            .InSingletonScope();
+        kernel.Bind<INavigationViewPageProvider>()
+            .To<NavigationViewPageProvider>()
+            .InSingletonScope();
+        kernel.Bind<KrPlacementSettingsViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<KrNavigatorSettingsViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<KrPlacementSettingsPage>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Page.DataContext), c => c.Kernel.Get<KrPlacementSettingsViewModel>());
+        kernel.Bind<KrNavigatorSettingsPage>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Page.DataContext), c => c.Kernel.Get<KrNavigatorSettingsViewModel>());
+        kernel.BindMainWindow<KrSettingsViewModel, KrSettingsWindow>();
         kernel.UseWpfUIThemeUpdater();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        Notification(kernel.Get<OpeningRealsKrSettingsView>());
+        Notification(kernel.Get<KrSettingsWindow>());
     }
 }

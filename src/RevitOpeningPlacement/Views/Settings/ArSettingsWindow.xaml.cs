@@ -1,10 +1,16 @@
 using System.Windows;
+using System.Windows.Threading;
 
 using dosymep.SimpleServices;
 
+using RevitOpeningPlacement.Views.Settings.Ar;
+
+using Wpf.Ui.Abstractions;
+
 namespace RevitOpeningPlacement.Views.Settings;
-public partial class MainWindow {
-    public MainWindow(
+public partial class ArSettingsWindow {
+    public ArSettingsWindow(
+    INavigationViewPageProvider navigationViewPageProvider,
     ILoggerService loggerService,
     ISerializationService serializationService,
     ILanguageService languageService,
@@ -16,10 +22,14 @@ public partial class MainWindow {
         languageService, localizationService,
         uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
+        Dispatcher.BeginInvoke(
+            DispatcherPriority.Loaded,
+            () => _rootNavigationView.Navigate(typeof(ArPlacementSettingsPage)));
     }
 
     public override string PluginName => nameof(RevitOpeningPlacement);
-    public override string ProjectConfigName => nameof(MainWindow);
+    public override string ProjectConfigName => nameof(ArSettingsWindow);
 
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogResult = true;
@@ -27,9 +37,5 @@ public partial class MainWindow {
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
-    }
-
-    private void ButtonCheckFilter_Click(object sender, RoutedEventArgs e) {
-        DialogResult = true;
     }
 }

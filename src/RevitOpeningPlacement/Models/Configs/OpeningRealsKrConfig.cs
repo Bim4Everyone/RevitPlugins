@@ -33,15 +33,9 @@ internal class OpeningRealsKrConfig : ProjectConfig {
     public int ElevationRounding { get; set; } = 1;
 
     /// <summary>
-    /// Минимальное расстояние между чистовыми отверстиями КР в мм.
-    /// <para>0 - проверка расстояния между отверстиями выключена</para>
+    /// Настройки статусов Навигатора
     /// </summary>
-    public int MinDistanceBetweenOpenings { get; set; } = 50;
-
-    /// <summary>
-    /// Максимально допустимое значение <see cref="MinDistanceBetweenOpenings"/> в мм
-    /// </summary>
-    public static int MaxDistanceBetweenOpenings => 1000;
+    public NavigatorKrSettings NavigatorSettings { get; set; } = new();
 
     public static OpeningRealsKrConfig GetOpeningConfig(Document document) {
         return document is null

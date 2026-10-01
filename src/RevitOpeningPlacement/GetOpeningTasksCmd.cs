@@ -87,6 +87,9 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<IHostFinder>()
             .To<HostFinder>()
             .InSingletonScope();
+        kernel.Bind<RealOpeningVolumeAnalyzer>()
+            .ToSelf()
+            .InSingletonScope();
         kernel.Bind<LinksSelectorWindow>()
             .ToSelf()
             .InTransientScope()
@@ -136,6 +139,13 @@ public class GetOpeningTasksCmd : BasePluginCommand {
     /// Логика вывода окна навигатора по заданиям на отверстия в файле архитектуры
     /// </summary>
     private void GetOpeningsTaskInDocumentAR(IKernel kernel) {
+        kernel.Bind<OpeningRealsArConfig>()
+            .ToMethod(c => {
+                var repo = c.Kernel.Get<RevitRepository>();
+                return OpeningRealsArConfig.GetOpeningConfig(repo.Doc);
+            })
+            .InSingletonScope();
+
         kernel.Bind<IDocTypesProvider>()
             .ToMethod(c => {
                 return new DocTypesProvider(new DocTypeEnum[] { DocTypeEnum.MEP });
@@ -144,8 +154,11 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<IRevitLinkTypesSetter>()
             .To<UserSelectedLinksSetter>()
             .InTransientScope();
+        kernel.Bind<IncomingTaskStatusesSettings>()
+            .ToMethod(c => c.Kernel.Get<OpeningRealsArConfig>().NavigatorSettings.IncomingTaskSettings)
+            .InSingletonScope();
         kernel.Bind<IOpeningInfoUpdater<IOpeningTaskIncoming>>()
-            .To<OpeningTaskIncomingMepInfoUpdater>()
+            .To<OpeningTaskIncomingInfoUpdater>()
             .InTransientScope();
         kernel.Bind<IOpeningInfoUpdater<OpeningRealAr>>()
             .To<OpeningRealArInfoUpdater>()
@@ -206,7 +219,8 @@ public class GetOpeningTasksCmd : BasePluginCommand {
             .ToMethod(c => {
                 var repo = c.Kernel.Get<RevitRepository>();
                 return OpeningRealsKrConfig.GetOpeningConfig(repo.Doc);
-            });
+            })
+            .InSingletonScope();
 
         var navigatorMode = GetKrNavigatorMode(kernel.Get<ILocalizationService>());
         var config = kernel.Get<OpeningRealsKrConfig>();
@@ -235,15 +249,12 @@ public class GetOpeningTasksCmd : BasePluginCommand {
         kernel.Bind<IRevitLinkTypesSetter>()
             .To<UserSelectedLinksSetter>()
             .InTransientScope();
-        if(navigatorMode == KrNavigatorMode.IncomingAr) {
-            kernel.Bind<IOpeningInfoUpdater<IOpeningTaskIncoming>>()
-                .To<OpeningTaskIncomingArInfoUpdater>()
-                .InTransientScope();
-        } else {
-            kernel.Bind<IOpeningInfoUpdater<IOpeningTaskIncoming>>()
-                .To<OpeningTaskIncomingMepInfoUpdater>()
-                .InTransientScope();
-        }
+        kernel.Bind<IncomingTaskStatusesSettings>()
+            .ToMethod(c => c.Kernel.Get<OpeningRealsKrConfig>().NavigatorSettings.IncomingTaskSettings)
+            .InSingletonScope();
+        kernel.Bind<IOpeningInfoUpdater<IOpeningTaskIncoming>>()
+            .To<OpeningTaskIncomingInfoUpdater>()
+            .InTransientScope();
         kernel.Bind<IOpeningInfoUpdater<OpeningRealKr>>()
             .To<OpeningRealKrInfoUpdater>()
             .InTransientScope();
@@ -288,7 +299,8 @@ public class GetOpeningTasksCmd : BasePluginCommand {
             .ToMethod(c => {
                 var repo = c.Kernel.Get<RevitRepository>();
                 return OpeningConfig.GetOpeningConfig(repo.Doc);
-            });
+            })
+            .InSingletonScope();
         kernel.Bind<IOpeningInfoUpdater<OpeningMepTaskOutcoming>>()
             .To<OpeningTaskOutcomingMepInfoUpdater>()
             .InTransientScope();

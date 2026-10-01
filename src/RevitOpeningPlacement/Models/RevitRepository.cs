@@ -18,6 +18,7 @@ using dosymep.SimpleServices;
 
 using RevitClashDetective.Models;
 using RevitClashDetective.Models.Clashes;
+using RevitClashDetective.Models.Extensions;
 
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Exceptions;
@@ -421,25 +422,59 @@ internal class RevitRepository {
         _clashRevitRepository.SelectAndShowElement(elements, additionalSize, _view);
     }
 
+    /// <summary>
+    /// Выделяет элемент, выбранный в Навигаторе, подрезает вид по его габаритам и выделяет графикой его основу
+    /// </summary>
     public void SelectAndShowElement(ISelectorAndHighlighter selectorAndHighlighter, IMessageBoxService msgBox) {
-        var elementToHighlight = selectorAndHighlighter.GetElementToHighlight();
-        if(elementToHighlight != null) {
-            try {
-                new ElementHighlighter(
-                        this,
-                        _view,
-                        elementToHighlight,
-                        msgBox,
-                        _localization,
-                        _filterFactory)
-                    .HighlightElement();
-            } catch(ArgumentException) {
-                // элемент для выделения не стена и не перекрытие
-            }
+        var elements = selectorAndHighlighter.GetElementsToSelect();
+        if(elements.Count == 0) {
+            return;
         }
-        double additionalSize = 2;
-        var elementsToSelect = selectorAndHighlighter.GetElementsToSelect();
-        _clashRevitRepository.SelectAndShowElement(elementsToSelect, additionalSize, _view);
+
+        var viewSettings = new NavigatorViewSettings(
+            _clashRevitRepository,
+            _filterFactory,
+            _localization,
+            selectorAndHighlighter);
+        try {
+            _uiDocument.ActiveView = _view;
+            DoAction(() => {
+                try {
+                    viewSettings.Apply(_view);
+                } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                    ShowError(msgBox, "Errors.CannotApplyViewSettings");
+                }
+            });
+            _uiDocument.Selection.SetElementIds(GetElementsToSelect(elements));
+        } catch(AccessViolationException) {
+            ShowError(msgBox, "Errors.ClosedDocument");
+        } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
+            ShowError(msgBox, "Errors.InactiveDocument");
+        }
+    }
+
+    /// <summary>
+    /// Возвращает Id элементов для выделения: элементы активного документа,
+    /// а если таких нет (например, все элементы из связей) - подрезку 3D вида
+    /// </summary>
+    private ICollection<ElementId> GetElementsToSelect(ICollection<ElementModel> elements) {
+        var elementsFromThisDoc = elements
+            .Select(item => item.GetElement(DocInfos))
+            .Where(item => item != null && item.IsFromDocument(Doc))
+            .Select(item => item.Id)
+            .ToList();
+        return elementsFromThisDoc.Count > 0
+            ? elementsFromThisDoc
+            : _view.GetDependentElements(new ElementCategoryFilter(BuiltInCategory.OST_SectionBox));
+    }
+
+    private void ShowError(IMessageBoxService msgBox, string messageKey) {
+        msgBox.Show(
+            _localization.GetLocalizedString(messageKey),
+            _localization.GetLocalizedString("OpeningTasks"),
+            MessageBoxButton.OK,
+            MessageBoxImage.Error,
+            MessageBoxResult.OK);
     }
 
     public static string GetDocumentName(Document doc) {
