@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -121,5 +122,45 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             FloorName = firstElement.FloorName,
             Volume = volumes.Sum()
         }];
+    }
+
+    public List<GeomObject> GetSlabGeomObjects(List<ColumnObject> columns) {
+        var firstElement = columns[0];
+        
+        var firstSlab = firstElement.StartSlabElement;
+        var lastSlab = firstElement.FinishSlabElement;
+        
+        double firstSlabZ = firstSlab.OuterContours[0].First().GetEndPoint(0).Z;
+        double lastSlabZ = lastSlab.OuterContours[0].First().GetEndPoint(0).Z;
+        
+        //System.Windows.MessageBox.Show((firstSlabZ * 304.8).ToString(CultureInfo.InvariantCulture));
+        //System.Windows.MessageBox.Show((lastSlabZ * 304.8).ToString(CultureInfo.InvariantCulture));
+        
+        var firstSolid = SolidUtility.ExtrudeSolid(firstSlab.OuterContours, firstElement.StartPosition, firstElement.FinishPosition);
+        var lastSolid = SolidUtility.ExtrudeSolid(lastSlab.OuterContours, firstElement.StartPosition, firstElement.FinishPosition, false);
+        
+        if(firstSolid is null ) {
+            System.Windows.MessageBox.Show("firstSolid is null");
+            return [];
+        }
+        
+        if(lastSolid is null) {
+            System.Windows.MessageBox.Show("lastSolid is null");
+            return [];
+        }
+        
+        var result = SolidUtility.IntersectSolid(firstSolid, lastSolid);
+        
+        if(result is null) {
+            return [];
+        }
+
+        var geo = new GeomObject {
+            GeometryObjects = [result],
+            FloorName = firstElement.FloorName,
+            Volume = result.Volume
+        };
+
+        return [geo];
     }
 }

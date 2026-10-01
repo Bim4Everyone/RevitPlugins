@@ -95,7 +95,9 @@ internal class ColumnFactory : IColumnFactory {
                     FinishPosition = end.Position,
                     StartSlabGuid = start.SlabGuid,
                     FinishSlabGuid = end.SlabGuid,
-                    IsSloped = start.IsSloped || end.IsSloped
+                    IsSloped = start.IsSloped || end.IsSloped,
+                    StartSlabElement = slabs.First(s => s.Guid == start.SlabGuid),
+                    FinishSlabElement = slabs.First(s => s.Guid == end.SlabGuid)
                 });
                 start = end;
             }

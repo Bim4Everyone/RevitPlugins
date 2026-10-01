@@ -35,6 +35,9 @@ internal class SlabNormalizeService : ISlabNormalizeService {
             slab.TopFaces = slab.IsSloped
                 ? topFaces
                 : GetTopFacesClean(slab, topFaces);
+            
+            slab.OuterContours = GetContour(slab, topFaces);
+            
             processed++;
             int current = processed * 100 / total;
             if(current > 100) {
@@ -46,6 +49,47 @@ internal class SlabNormalizeService : ISlabNormalizeService {
             }
         }
         return slabElements;
+    }
+
+    private List<CurveLoop> GetContour(SlabElement slabElement, List<Face> topFaces) {
+        var floorProfile = slabElement.Profile;
+        double maxZ = GetTopFacesMaxZ(topFaces);
+        return [GetLongestCurveLoop(floorProfile, maxZ)];
+    }
+    
+    private CurveLoop GetLongestCurveLoop(CurveArrArray curveArrArray, double point) {
+        CurveArray longestCurveArray = null;
+        double maxLength = 0;
+
+        foreach (CurveArray curveArray in curveArrArray) {
+            double length = 0;
+
+            foreach (Curve curve in curveArray) {
+                length += curve.Length;
+            }
+
+            if (length > maxLength) {
+                maxLength = length;
+                longestCurveArray = curveArray;
+            }
+        }
+
+        if (longestCurveArray == null) {
+            return null;
+        }
+
+        CurveLoop curveLoop = new CurveLoop();
+
+        foreach (Curve curve in longestCurveArray) {
+            curveLoop.Append(curve);
+        }
+
+        double currentZ = curveLoop.First().GetEndPoint(0).Z;
+
+        Transform transform = Transform.CreateTranslation(
+            new XYZ(0, 0, point - currentZ));
+
+        return CurveLoop.CreateViaTransform(curveLoop, transform);
     }
 
     public List<Face> GetTopFaces(SlabElement slabElement) {

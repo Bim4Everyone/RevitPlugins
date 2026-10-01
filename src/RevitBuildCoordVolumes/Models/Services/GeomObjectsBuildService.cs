@@ -5,6 +5,7 @@ using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Settings;
+using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 internal class GeomObjectsBuildService : IGeomObjectsBuildService {
@@ -37,6 +38,11 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
                 var sepObjects = _geomObjectFactory.GetSeparatedGeomObjects(listColumns, polygons, progressService);
                 geomObjects.AddRange(sepObjects);
             }
+            
+            if(builderMode is BuilderMode.SlabBuilder) {
+                var sepObjects = _geomObjectFactory.GetSlabGeomObjects(listColumns);
+                geomObjects.AddRange(sepObjects);
+            }
 
             if(builderMode is BuilderMode.ContourBuilder or BuilderMode.AutomaticBuilder) {
                 if(alongObject || isSloped) {
@@ -50,9 +56,11 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
             }
         }
 
-        var finalObjects = builderMode == BuilderMode.AutomaticBuilder
-            ? _geomObjectConnector.UnionGeomObjects(geomObjects, progressService)
-            : geomObjects;
+        // var finalObjects = builderMode == BuilderMode.AutomaticBuilder
+        //     ? _geomObjectConnector.UnionGeomObjects(geomObjects, progressService)
+        //     : geomObjects;
+
+        var finalObjects = _geomObjectConnector.UnionObjects(geomObjects);
 
         return finalObjects;
     }

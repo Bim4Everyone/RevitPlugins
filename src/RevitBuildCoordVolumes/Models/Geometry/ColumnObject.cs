@@ -10,4 +10,6 @@ internal class ColumnObject {
     public Guid StartSlabGuid { get; set; }
     public Guid FinishSlabGuid { get; set; }
     public bool IsSloped { get; set; }
+    public SlabElement StartSlabElement { get; set; }
+    public SlabElement FinishSlabElement { get; set; }
 }

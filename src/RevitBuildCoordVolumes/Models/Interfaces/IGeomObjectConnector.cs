@@ -17,4 +17,6 @@ internal interface IGeomObjectConnector {
     /// Объединенные объекты GeomObject.
     /// </returns>
     List<GeomObject> UnionGeomObjects(List<GeomObject> geomObjects, ProgressService progressService);
+    
+    List<GeomObject> UnionObjects(List<GeomObject> geomObjects);
 }

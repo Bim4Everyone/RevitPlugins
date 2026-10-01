@@ -54,4 +54,18 @@ internal interface IGeomObjectFactory {
         List<ColumnObject> columns,
         List<PolygonObject> polygonObject,
         ProgressService progressService);
+    /// <summary>
+    /// Метод получения списка геометрических объектов по списку колонн.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится получение разъединенных геометрических объектов для построения DirectShape.
+    /// </remarks>
+    /// <param name="columns">Колонны, построенные ColumnFactory.</param>   
+    /// <param name="polygonObject">Список всех полигонов зоны.</param>  
+    /// <param name="progressService">Прогресс сервис.</param>  
+    /// <returns>
+    /// Список геометрических элементов GeomObject.
+    /// </returns>
+    List<GeomObject> GetSlabGeomObjects(
+        List<ColumnObject> columns);
 }

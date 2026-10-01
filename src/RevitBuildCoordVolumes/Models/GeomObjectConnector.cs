@@ -19,6 +19,25 @@ internal class GeomObjectConnector : IGeomObjectConnector {
         _revitRepository = revitRepository;
         _systemPluginConfig = systemPluginConfig;
     }
+    
+    public List<GeomObject> UnionObjects(List<GeomObject> geomObjects) {
+        var solids = geomObjects
+            .SelectMany(x => x.GeometryObjects)
+            .OfType<Solid>()
+            .ToList();
+
+        var splitSolids = SolidUtility.Split(solids);
+
+        return splitSolids
+            .Select(solid => new GeomObject {
+                GeometryObjects = [solid],
+                FloorName = "Уровень 666",
+                Volume = solid.Volume
+            })
+            .ToList();
+    }
+
+    
 
     public List<GeomObject> UnionGeomObjects(List<GeomObject> geomObjects, ProgressService progressService) {
         if(geomObjects.Count == 0) {
@@ -75,6 +94,8 @@ internal class GeomObjectConnector : IGeomObjectConnector {
         }
         return unitedGeomObjects;
     }
+
+    
 
     // Метод объединения солидов с прогрессом
     private IList<Solid> CreateUnitedSolids(IList<Solid> solids, ProgressService progressService) {

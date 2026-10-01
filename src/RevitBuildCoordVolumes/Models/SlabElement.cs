@@ -15,4 +15,5 @@ internal class SlabElement {
     public List<Face> TopFaces { get; set; }
     public Transform Transform { get; set; }
     public bool IsSloped { get; set; }
+    public List<CurveLoop> OuterContours { get; set; }
 }
