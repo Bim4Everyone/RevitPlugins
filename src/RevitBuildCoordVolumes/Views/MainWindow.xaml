@@ -17,7 +17,7 @@
     mc:Ignorable="d"       
     Width="900"
     MinWidth="900"
-    Height="950"       
+    Height="1050"       
     MinHeight="460"
     Title="{me:LocalizationSource MainWindow.Title}"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">

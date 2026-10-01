@@ -28,6 +28,17 @@
                 DisplayMemberPath="Name" />
         </edits:CustomEditControl>
         
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon shapeUnion24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.UnionMode}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.UnionModeDescription}">
+            <ui:ToggleSwitch
+                Margin="10,0,10,0"
+                OnContent="{me:LocalizationSource SlabBasedSettingEditControl.UnionModeOnContent}"
+                OffContent="{me:LocalizationSource SlabBasedSettingEditControl.UnionModeOffContent}"
+                IsChecked="{Binding UnionVolumes, Mode=TwoWay}"/>
+        </edits:CustomEditControl>
+        
         <edits:CustomGroupEditControl
             Icon="{ui:SymbolIcon scanText24}"
             Header="{me:LocalizationSource SlabBasedSettingEditControl.SourceFiles}"

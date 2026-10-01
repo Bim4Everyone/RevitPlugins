@@ -28,6 +28,11 @@
     <system:String x:Key="SlabBasedSettingEditControl.BuilderMode">Режим работы алгоритма</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Выбор режима работы алгоритма в пределах этажа</system:String>
     
+    <system:String x:Key="SlabBasedSettingEditControl.UnionMode">Объединение объемов</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.UnionModeDescription">Объединять объемы по уровню нижней плиты</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.UnionModeOnContent">Включено</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.UnionModeOffContent">Выключено</system:String>
+    
     <system:String x:Key="SlabBasedSettingEditControl.SourceFiles">Файлы с плитами перекрытий</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SourceFilesDescription">Файлы, где расположены плиты перекрытий</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SearchTextDocs">Поиск по имени файла</system:String>    

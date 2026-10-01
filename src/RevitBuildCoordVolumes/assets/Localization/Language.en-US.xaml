@@ -27,6 +27,11 @@
 
     <system:String x:Key="SlabBasedSettingEditControl.BuilderMode">Algorithm builder mode</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Selecting the algorithm operating mode within a floor</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.UnionMode">Volume Union</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.UnionModeDescription">Union volumes by the bottom slab elevation</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.UnionModeOnContent">Enabled</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.UnionModeOffContent">Disabled</system:String>
 
     <system:String x:Key="SlabBasedSettingEditControl.SourceFiles">Source files</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SourceFilesDescription">Files containing floor slabs</system:String>
