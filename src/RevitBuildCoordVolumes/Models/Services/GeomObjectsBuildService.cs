@@ -33,12 +33,12 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
             bool alongObject = listColumns.Count == 1;
             bool isSloped = firstColumn.IsSloped;
 
-            if(builderMode == BuilderMode.ColumnBuilder) {
+            if(builderMode is BuilderMode.ColumnBuilder) {
                 var sepObjects = _geomObjectFactory.GetSeparatedGeomObjects(listColumns, polygons, progressService);
                 geomObjects.AddRange(sepObjects);
             }
 
-            if(builderMode is BuilderMode.ContourBuilder or BuilderMode.AutomaticBuilder) {
+            if(builderMode is BuilderMode.ContourBuilder) {
                 if(alongObject || isSloped) {
                     var sepObjects = _geomObjectFactory.GetSeparatedGeomObjects(listColumns, polygons, progressService);
                     var uniObjects = _geomObjectConnector.UnionGeomObjects(sepObjects, progressService);
@@ -48,9 +48,14 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
                     geomObjects.AddRange(uniObjects);
                 }
             }
+            
+            if(builderMode is BuilderMode.SlabBuilder or BuilderMode.AutomaticBuilder) {
+                var sepObjects = _geomObjectFactory.GetSlabContourGeomObjects(listColumns, progressService);
+                geomObjects.AddRange(sepObjects);
+            }
         }
 
-        var finalObjects = builderMode == BuilderMode.AutomaticBuilder
+        var finalObjects =  settings.UnionVolumes
             ? _geomObjectConnector.UnionGeomObjects(geomObjects, progressService)
             : geomObjects;
 

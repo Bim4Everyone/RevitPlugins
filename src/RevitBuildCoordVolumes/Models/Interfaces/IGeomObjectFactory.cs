@@ -54,4 +54,19 @@ internal interface IGeomObjectFactory {
         List<ColumnObject> columns,
         List<PolygonObject> polygonObject,
         ProgressService progressService);
+    
+    /// <summary>
+    /// Метод получения списка геометрических объектов по списку колонн.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится получение геометрических объектов для построения DirectShape по контурам плит перекрытий.
+    /// </remarks>
+    /// <param name="columns">Колонны, построенные ColumnFactory.</param>   
+    /// <param name="progressService">Прогресс сервис.</param>  
+    /// <returns>
+    /// Список геометрических элементов GeomObject.
+    /// </returns>
+    List<GeomObject> GetSlabContourGeomObjects(
+        List<ColumnObject> columns,
+        ProgressService progressService);
 }

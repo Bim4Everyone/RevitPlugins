@@ -122,4 +122,8 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             Volume = volumes.Sum()
         }];
     }
+
+    public List<GeomObject> GetSlabContourGeomObjects(List<ColumnObject> columns, ProgressService progressService) {
+        throw new System.NotImplementedException();
+    }
 }
