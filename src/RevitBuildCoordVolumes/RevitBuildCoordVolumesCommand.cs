@@ -51,18 +51,13 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using var kernel = uiApplication.CreatePlatformServices();
         
-        kernel.Bind<UIApplication>()
-            .ToConstant(uiApplication);
-        
-        kernel.Bind<Document>()
-            .ToMethod(context =>
-                context.Kernel.Get<UIApplication>()
-                    .ActiveUIDocument.Document)
-            .InSingletonScope();
-
         // Создание системных настроек
         kernel.Bind<SystemPluginConfig>()
             .ToSelf()
+            .InSingletonScope();
+        
+        kernel.Bind<Document>()
+            .ToMethod(_ => uiApplication.ActiveUIDocument.Document)
             .InSingletonScope();
 
         // Настройка доступа к Revit
@@ -70,7 +65,6 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
         
-        // Настройка доступа к сервису документов
         kernel.Bind<IDocumentService>()
             .To<DocumentService>()
             .InSingletonScope();
