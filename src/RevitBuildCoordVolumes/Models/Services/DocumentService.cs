@@ -21,7 +21,7 @@ internal class DocumentService : IDocumentService {
         var foundDoc = _documentsByName
             .FirstOrDefault(dic => dic.Key.Equals(name))
             .Value.Item1;
-        return foundDoc ?? null;
+        return foundDoc;
     }
 
     public Transform GetTransformByName(string name) {
@@ -31,7 +31,7 @@ internal class DocumentService : IDocumentService {
         var foundTrans = _documentsByName
             .FirstOrDefault(dic => dic.Key.Equals(name))
             .Value.Item2;
-        return foundTrans ?? null;
+        return foundTrans;
     }
 
     public IEnumerable<Document> GetAllDocuments() {
@@ -42,7 +42,7 @@ internal class DocumentService : IDocumentService {
     // Метод построения словаря
     private void BuildDocumentsDictionary(Document mainDocument) {
         _documentsByName.Clear();
-        _documentsByName[mainDocument.Title] = (mainDocument, null);
+        _documentsByName[mainDocument.Title] = (mainDocument, GetTransform(mainDocument));
 
         foreach(var linkInst in GetLinkInstances(mainDocument)) {
             var doc = linkInst.GetLinkDocument();
@@ -69,5 +69,21 @@ internal class DocumentService : IDocumentService {
         })
         .Where(x => x.LinkType != null && x.LinkType.GetLinkedFileStatus() == LinkedFileStatus.Loaded)
         .Select(x => x.Instance);
+    }
+
+    // Метод получения локального трансформа
+    private Transform GetTransform(Document document) {
+        var basePointPosition = GetBasePointPosition(document);
+        return Transform.CreateTranslation(-basePointPosition);
+    }
+    
+    // Метод получения смещения базовой точки
+    private XYZ GetBasePointPosition(Document document) {
+        var basePoint = new FilteredElementCollector(document)
+            .OfCategory(BuiltInCategory.OST_ProjectBasePoint)
+            .WhereElementIsNotElementType()
+            .Cast<BasePoint>()
+            .FirstOrDefault();
+        return basePoint?.Position;
     }
 }

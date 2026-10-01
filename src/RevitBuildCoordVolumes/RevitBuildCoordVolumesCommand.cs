@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Windows;
 
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -49,6 +50,15 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using var kernel = uiApplication.CreatePlatformServices();
+        
+        kernel.Bind<UIApplication>()
+            .ToConstant(uiApplication);
+        
+        kernel.Bind<Document>()
+            .ToMethod(context =>
+                context.Kernel.Get<UIApplication>()
+                    .ActiveUIDocument.Document)
+            .InSingletonScope();
 
         // Создание системных настроек
         kernel.Bind<SystemPluginConfig>()
@@ -59,13 +69,83 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
+        
+        // Настройка доступа к сервису документов
+        kernel.Bind<IDocumentService>()
+            .To<DocumentService>()
+            .InSingletonScope();
 
-        // Создание сервиса по управлению окнами
+        // Настройка доступа к сервису управления окнами
         kernel.Bind<IWindowService>()
             .To<WindowService>()
             .InSingletonScope();
+        
+        // Настройка доступа к сервису разбития зон на элементы
+        kernel.Bind<ISpatialElementDividerService>()
+            .To<SpatialElementDividerService>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису плит перекрытий
+        kernel.Bind<ISlabService>()
+            .To<SlabService>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису нормализации плит перекрытий
+        kernel.Bind<ISlabNormalizeService>()
+            .To<SlabNormalizeService>()
+            .InSingletonScope();
+        
+        // Настройка доступа к фабрике производства колонн
+        kernel.Bind<IColumnFactory>()
+            .To<ColumnFactory>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису контуров
+        kernel.Bind<IContourService>()
+            .To<ContourService>()
+            .InSingletonScope();
+        
+        // Настройка доступа к фабрике геометрических объектов
+        kernel.Bind<IGeomObjectFactory>()
+            .To<GeomObjectFactory>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису установки параметров
+        kernel.Bind<IParamSetter>()
+            .To<ParamSetter>()
+            .InSingletonScope();
+        
+        // Настройка доступа к фабрике объектов DirectShape
+        kernel.Bind<IDirectShapeObjectFactory>()
+            .To<DirectShapeObjectFactory>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису доступности категорий
+        kernel.Bind<ICategoryAvailabilityService>()
+            .To<CategoryAvailabilityService>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису доступности параметров
+        kernel.Bind<IParamAvailabilityService>()
+            .To<ParamAvailabilityService>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису проверки зон
+        kernel.Bind<ISpatialElementCheckService>()
+            .To<SpatialElementCheckService>()
+            .InSingletonScope();
+        
+        // Настройка доступа к классу коннектора геометрических объектов
+        kernel.Bind<IGeomObjectConnector>()
+            .To<GeomObjectConnector>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису построения геометрических объектов
+        kernel.Bind<IGeomObjectsBuildService>()
+            .To<GeomObjectsBuildService>()
+            .InSingletonScope();
 
-        // Создание сервисов
+        // Настройка доступа к агрегатору сервисов
         kernel.Bind<BuildCoordVolumeServices>()
             .ToSelf()
             .InSingletonScope();

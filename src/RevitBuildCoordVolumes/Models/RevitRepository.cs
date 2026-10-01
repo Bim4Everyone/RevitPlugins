@@ -7,7 +7,9 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
@@ -19,18 +21,18 @@ namespace RevitBuildCoordVolumes.Models;
 internal class RevitRepository {
     private readonly IDocumentService _documentsService;
     private readonly ISlabService _slabsService;
-    private readonly SystemPluginConfig _systemPluginConfig;
 
-    public RevitRepository(UIApplication uiApp, SystemPluginConfig systemPluginConfig) {
+    public RevitRepository(
+        UIApplication uiApp,
+        IDocumentService documentService, 
+        ISlabService slabService) {
         UIApplication = uiApp;
-        _systemPluginConfig = systemPluginConfig;
-        _documentsService = new DocumentService(Document);
-        _slabsService = new SlabService(_documentsService, _systemPluginConfig);
+        _documentsService = documentService;
+        _slabsService = slabService;
     }
 
     public UIApplication UIApplication { get; }
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    public Application Application => UIApplication.Application;
     public Document Document => ActiveUIDocument.Document;
 
     /// <summary>

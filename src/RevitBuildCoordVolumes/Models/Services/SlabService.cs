@@ -67,16 +67,16 @@ internal class SlabService : ISlabService {
             .OfType<Floor>()
             .Where(floor => !string.IsNullOrWhiteSpace(floor.Name))
             .Select(floor => {
-                var tansform = _documentsService.GetTransformByName(doc.GetUniqId());
+                var transform = _documentsService.GetTransformByName(doc.GetUniqId());
                 var level = GetLevel(doc, floor);
                 return new SlabElement {
+                    Guid = Guid.NewGuid(),
                     Floor = floor,
                     FloorName = floor.Name,
                     Level = level,
                     LevelName = GetLevelName(level),
                     Profile = GetProfile(doc, floor),
-                    Guid = Guid.NewGuid(),
-                    Transform = tansform
+                    Transform = transform
                 };
             });
     }
@@ -90,7 +90,7 @@ internal class SlabService : ISlabService {
     // Метод получения имени уровня
     private string GetLevelName(Level level) {
         string levelName = level.Name;
-        string modifyLevelName = levelName.Split(['_']).FirstOrDefault();
+        string modifyLevelName = levelName.Split('_').FirstOrDefault();
         return modifyLevelName ?? string.Empty;
     }
 
