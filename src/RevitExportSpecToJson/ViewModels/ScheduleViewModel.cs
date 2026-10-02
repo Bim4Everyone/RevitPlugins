@@ -17,7 +17,10 @@ internal sealed class ScheduleViewModel : BaseViewModel {
     public ElementId Id => Schedule.Id;
     public string Name => Schedule.Name;
 
-    public ScheduleStatus Status => Schedule.Status;
+    public ScheduleStatusViewModel? Status {
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    }
 
     public bool Checked {
         get;

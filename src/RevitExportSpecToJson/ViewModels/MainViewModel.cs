@@ -108,7 +108,9 @@ internal class MainViewModel : BaseViewModel {
     private void LoadView() {
         MainSchedules = [
             .. _revitRepository.GetSchedules()
-                .Select(item => new ScheduleViewModel(item))
+                .Select(item => new ScheduleViewModel(item) {
+                    Status = new ScheduleStatusViewModel(item.Status, _localizationService)
+                })
         ];
 
         FilteredSchedules = MainSchedules;

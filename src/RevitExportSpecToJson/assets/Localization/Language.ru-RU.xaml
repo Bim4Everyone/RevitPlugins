@@ -23,4 +23,8 @@
     
     <system:String x:Key="MainWindow.SaveSelectedSchedules">Необходимо выбрать хотя бы одну спецификацию</system:String>
     <system:String x:Key="MainWindow.EmptyTypeSchedule">Необходимо указать тип спецификации для "{0}"</system:String>
+    
+    <system:String x:Key="ScheduleStatus.Active">Активная</system:String>
+    <system:String x:Key="ScheduleStatus.Opened">Открытая</system:String>
+    <system:String x:Key="ScheduleStatus.Closed">Закрытая</system:String>
 </ResourceDictionary>

@@ -25,4 +25,8 @@
     
     <system:String x:Key="MainWindow.SaveSelectedSchedules">You must select at least one schedule</system:String>
     <system:String x:Key="MainWindow.EmptyTypeSchedule">You must write a type schedule for "{0}"</system:String>
+    
+    <system:String x:Key="ScheduleStatus.Active">Active</system:String>
+    <system:String x:Key="ScheduleStatus.Opened">Opened</system:String>
+    <system:String x:Key="ScheduleStatus.Closed">Closed</system:String>
 </ResourceDictionary>
