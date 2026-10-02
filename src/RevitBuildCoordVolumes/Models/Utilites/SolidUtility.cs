@@ -86,4 +86,31 @@ internal static class SolidUtility {
             .Select(solid => (double) SolidExtensions.GetVolumeOrDefault(solid, 0))
             .Sum();
     }
+    
+    public static bool IsIntersect(Solid solid1, Solid solid2) {
+        if (solid1 is null || solid2 is null)
+            return false;
+        try {
+            var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
+                solid1,
+                solid2,
+                BooleanOperationsType.Intersect);
+
+            return intersection is not null && GetSafeSolidVolume(intersection) > 0;
+        }
+        catch (Exception) {
+            return false;
+        }
+    }
+    
+    // Метод безопасного получения объёма солида
+    private static double GetSafeSolidVolume(Solid solid) {
+        return solid?.Volume ?? 0;
+    }
+    
+    public static List<Solid> GetSplitSolids(IList<Solid> solids) {
+        return solids
+            .SelectMany(SolidUtils.SplitVolumes)
+            .ToList();
+    }
 }

@@ -54,7 +54,7 @@ internal class RevitRepository {
     /// </summary>
     public IEnumerable<string> GetTypeSlabsByDocs(IEnumerable<Document> documents) {
         return _slabsService.GetSlabsByDocs(documents)
-            .Select(slab => slab.FloorName)
+            .Select(slab => slab.Floor.Name)
             .Distinct();
     }
 

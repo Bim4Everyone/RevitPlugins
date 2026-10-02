@@ -41,12 +41,16 @@ internal class DocumentService : IDocumentService {
 
     // Метод построения словаря
     private void BuildDocumentsDictionary(Document mainDocument) {
+        var basePointTransform = GetTransform(mainDocument);
+        var identityTransform = Transform.Identity;
+        var localTransform = basePointTransform.Multiply(identityTransform);
         _documentsByName.Clear();
-        _documentsByName[mainDocument.Title] = (mainDocument, GetTransform(mainDocument));
+        _documentsByName[mainDocument.Title] = (mainDocument, localTransform);
 
         foreach(var linkInst in GetLinkInstances(mainDocument)) {
             var doc = linkInst.GetLinkDocument();
-            var trans = linkInst.GetTransform();
+            var linkTransform = linkInst.GetTransform();
+            var trans = basePointTransform.Multiply(linkTransform);
             if(doc != null && !_documentsByName.ContainsKey(doc.Title)) {
                 _documentsByName[doc.Title] = (doc, trans);
             }

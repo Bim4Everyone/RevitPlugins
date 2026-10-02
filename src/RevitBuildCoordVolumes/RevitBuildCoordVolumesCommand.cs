@@ -138,10 +138,25 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
         kernel.Bind<IGeomObjectsBuildService>()
             .To<GeomObjectsBuildService>()
             .InSingletonScope();
+        
+        // Настройка доступа к сервису 
+        kernel.Bind<ISlabGeometryService>()
+            .To<SlabGeometryService>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису 
+        kernel.Bind<IBoundingBoxService>()
+            .To<BoundingBoxService>()
+            .InSingletonScope();
 
         // Настройка доступа к агрегатору сервисов
         kernel.Bind<BuildCoordVolumeServices>()
             .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к агрегатору сервисов
+        kernel.Bind<ISlabAnalyzeSlopeService>()
+            .To<SlabAnalyzeSlopeService>()
             .InSingletonScope();
 
         // Настройка конфигурации плагина
