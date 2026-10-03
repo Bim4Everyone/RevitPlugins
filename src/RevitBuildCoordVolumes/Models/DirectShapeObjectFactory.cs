@@ -34,7 +34,7 @@ internal class DirectShapeObjectFactory : IDirectShapeObjectFactory {
             directShape.SetShape(geometryObjects);
             return new DirectShapeObject {
                 DirectShape = directShape,
-                FloorName = geomObject.FloorName,
+                FloorName = geomObject.LevelName,
                 Volume = geomObject.Volume
             };
         } else {

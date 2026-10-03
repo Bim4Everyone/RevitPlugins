@@ -77,7 +77,7 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         return [.. splittedSolid
             .Select(solid => new GeomObject {
                 GeometryObjects = [solid],
-                FloorName = firstElement.FloorName,
+                LevelName = firstElement.LevelName,
                 Volume = solid.Volume
             })];
     }
@@ -118,7 +118,7 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             ? []
             : [new GeomObject {
             GeometryObjects = solids,
-            FloorName = firstElement.FloorName,
+            LevelName = firstElement.LevelName,
             Volume = volumes.Sum()
         }];
     }
@@ -129,25 +129,13 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         var firstSlab = firstElement.StartSlab;
         var lastSlab = firstElement.FinishSlab;
         
-        double firstSlabZ = firstSlab.TopContour[0].First().GetEndPoint(0).Z;
-        double lastSlabZ = lastSlab.TopContour[0].First().GetEndPoint(0).Z;
-        
-        //System.Windows.MessageBox.Show((firstSlabZ * 304.8).ToString(CultureInfo.InvariantCulture));
-        //System.Windows.MessageBox.Show((lastSlabZ * 304.8).ToString(CultureInfo.InvariantCulture));
-        
         var firstSolid = SolidUtility.ExtrudeSolid(firstSlab.TopContour, firstElement.StartPosition, firstElement.FinishPosition);
         var lastSolid = SolidUtility.ExtrudeSolid(lastSlab.TopContour, firstElement.StartPosition, firstElement.FinishPosition, false);
         
-        if(firstSolid is null ) {
-            System.Windows.MessageBox.Show("firstSolid is null");
+        if(firstSolid is null || lastSolid is null ) {
             return [];
         }
-        
-        if(lastSolid is null) {
-            System.Windows.MessageBox.Show("lastSolid is null");
-            return [];
-        }
-        
+
         var result = SolidUtility.IntersectSolid(firstSolid, lastSolid);
         
         if(result is null) {
@@ -156,7 +144,7 @@ internal class GeomObjectFactory : IGeomObjectFactory {
 
         var geo = new GeomObject {
             GeometryObjects = [result],
-            FloorName = firstElement.FloorName,
+            LevelName = firstElement.LevelName,
             Volume = result.Volume
         };
 

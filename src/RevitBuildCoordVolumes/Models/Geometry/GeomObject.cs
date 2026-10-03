@@ -6,6 +6,6 @@ namespace RevitBuildCoordVolumes.Models.Geometry;
 
 internal class GeomObject {
     public List<GeometryObject> GeometryObjects { get; set; }
-    public string FloorName { get; set; }
+    public string LevelName { get; set; }
     public double Volume { get; set; }
 }

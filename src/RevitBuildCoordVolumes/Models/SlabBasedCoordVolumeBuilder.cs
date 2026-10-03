@@ -37,7 +37,7 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
         var columnGroups = _columnFactory.GenerateColumnGroups(polygons, allSlabs, progressService);
 
         // Финальная сборка
-        var geomObjects = _services.GeomObjectsBuildService.GetGeomObjects(_settings, columnGroups, polygons, progressService);
+        var geomObjects = _services.GeomObjectsBuildService.GetGeomObjects(_settings, columnGroups, polygons, spatialObject, progressService);
 
         return geomObjects;
     }

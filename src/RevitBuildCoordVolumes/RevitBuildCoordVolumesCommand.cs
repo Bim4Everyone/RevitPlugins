@@ -154,6 +154,11 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
         kernel.Bind<ISlabAnalyzeSlopeService>()
             .To<SlabAnalyzeSlopeService>()
             .InSingletonScope();
+        
+        // Настройка доступа к сервису разбиения геометрических объектов
+        kernel.Bind<IGeomObjectsSplitter>()
+            .To<GeomObjectsSplitter>()
+            .InSingletonScope();
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()

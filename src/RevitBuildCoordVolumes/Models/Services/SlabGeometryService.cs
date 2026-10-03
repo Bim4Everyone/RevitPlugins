@@ -148,33 +148,20 @@ public class SlabGeometryService(ISlabAnalyzeSlopeService slabAnalyzeSlopeServic
     // Метод получения самой верхней точки Face
     private double GetMaxPointZ(List<Face> topFaces) {
         double maxZ = double.MinValue;
+        foreach (var face in topFaces) {
+            foreach (EdgeArray edgeLoop in face.EdgeLoops) {
+                foreach (Edge edge in edgeLoop) {
+                    var curve = edge.AsCurve();
+                    
+                    var p0 = curve.GetEndPoint(0);
+                    var p1 = curve.GetEndPoint(1);
 
-        foreach(var face in topFaces) {
-            foreach(EdgeArray edgeLoop in face.EdgeLoops) {
-                double edgeZ = GetEdgeLoopZ(edgeLoop);
-                if(edgeZ > maxZ) {
-                    maxZ = edgeZ;
+                    maxZ = Math.Max(maxZ, p0.Z);
+                    maxZ = Math.Max(maxZ, p1.Z);
                 }
             }
         }
         return maxZ;
-    }
-    
-    // Метод получения самой верхней точки EdgeArray
-    private static double GetEdgeLoopZ(EdgeArray edgeArray) {
-        var enumerator = edgeArray.GetEnumerator();
-        try {
-            if(enumerator.MoveNext()) {
-                var edge = (Edge) enumerator.Current;
-                if(edge != null) {
-                    return edge.AsCurve().GetEndPoint(0).Z;
-                }
-            }
-        } finally {
-            (enumerator as IDisposable)?.Dispose();
-        }
-
-        return double.MinValue;
     }
     
     // Метод определения, входит ли значение нормали Face в заданный диапазон

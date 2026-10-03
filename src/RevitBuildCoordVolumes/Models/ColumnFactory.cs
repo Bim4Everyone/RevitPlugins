@@ -88,7 +88,7 @@ internal class ColumnFactory : IColumnFactory {
 
                 columns.Add(new ColumnObject {
                     PolygonObject = polygon,
-                    FloorName = startSlabObject.SlabElement.FloorName,
+                    LevelName = startSlabObject.SlabElement.LevelName,
                     StartPosition = startSlabObject.Position,
                     FinishPosition = endSlabObject.Position,
                     StartSlab = startSlabObject.SlabElement,

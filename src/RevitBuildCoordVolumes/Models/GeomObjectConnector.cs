@@ -25,7 +25,7 @@ internal class GeomObjectConnector : IGeomObjectConnector {
             return [];
         }
 
-        var groups = geomObjects.GroupBy(geomObject => geomObject.FloorName);
+        var groups = geomObjects.GroupBy(geomObject => geomObject.LevelName);
 
         var unitedGeomObjects = new List<GeomObject>();
         foreach(var group in groups) {
@@ -63,7 +63,7 @@ internal class GeomObjectConnector : IGeomObjectConnector {
             if(check) {
                 unitedGeomObjects.Add(new GeomObject {
                     GeometryObjects = [.. unitedSolids],
-                    FloorName = group.Key,
+                    LevelName = group.Key,
                     Volume = SolidUtility.GetSolidsVolume(unitedSolids)
                 });
             } else {
