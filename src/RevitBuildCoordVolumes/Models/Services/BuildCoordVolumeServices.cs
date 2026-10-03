@@ -18,7 +18,6 @@ internal sealed class BuildCoordVolumeServices {
         IWindowService windowService,
         ISpatialElementCheckService spatialElementCheckService,
         ISpatialElementDividerService spatialDivider,
-        ISlabNormalizeService slabNormalizer,
         IColumnFactory columnFactory,
         IGeomObjectsBuildService geomObjectsBuildService) {
 
@@ -32,13 +31,11 @@ internal sealed class BuildCoordVolumeServices {
         WindowService = windowService;
         SpatialElementCheckService = spatialElementCheckService;
         SpatialDivider = spatialDivider;
-        SlabNormalizer = slabNormalizer;
         ColumnFactory = columnFactory;
         GeomObjectsBuildService = geomObjectsBuildService;
     }
 
     public ISpatialElementDividerService SpatialDivider { get; }
-    public ISlabNormalizeService SlabNormalizer { get; }
     public IColumnFactory ColumnFactory { get; }
     public IGeomObjectFactory GeomObjectFactory { get; }
     public IParamSetter ParamSetter { get; }

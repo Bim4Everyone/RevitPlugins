@@ -4,7 +4,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
@@ -14,13 +13,7 @@ using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 
-internal class SlabNormalizeService : ISlabNormalizeService {
-    private readonly SystemPluginConfig _systemPluginConfig;
-
-    public SlabNormalizeService(SystemPluginConfig systemPluginConfig) {
-        _systemPluginConfig = systemPluginConfig;
-    }
-
+internal class SlabNormalizeService(SystemPluginConfig systemPluginConfig) : ISlabNormalizeService {
     // Метод получения всех перекрытий без отверстий и вырезов (для плоских)
     public List<SlabElement> GetNormalizeSlabs(List<SlabElement> slabElements, ProgressService progressService) {
         progressService?.BeginStage(ProgressType.SlabNormalize);
@@ -40,10 +33,13 @@ internal class SlabNormalizeService : ISlabNormalizeService {
             if(current > 100) {
                 current = 100;
             }
-            if(current > reported) {
-                reported = current;
-                progressService?.ProgressCount?.Report(reported);
+
+            if(current <= reported) {
+                continue;
             }
+
+            reported = current;
+            progressService?.ProgressCount?.Report(reported);
         }
         return slabElements;
     }
@@ -57,9 +53,9 @@ internal class SlabNormalizeService : ISlabNormalizeService {
             ? commonSolids
             : commonSolids.Select(solid => SolidUtils.CreateTransformed(solid, transform));
 
-        var splittedSolids = transformedSolids.SelectMany(SolidUtils.SplitVolumes);
+        var splitSolids = transformedSolids.SelectMany(SolidUtils.SplitVolumes);
 
-        return splittedSolids
+        return splitSolids
             .SelectMany(solid => solid.Faces
                 .Cast<Face>()
                 .Where(face => IsFaceNormalWithinZRange(face, 0, 1)))
@@ -89,14 +85,15 @@ internal class SlabNormalizeService : ISlabNormalizeService {
         }
     }
 
+    // Метод проверки, является ли перекрытие наклонным
     public bool IsSloped(SlabElement slabElement) {
         var floor = slabElement.Floor;
         var doc = floor.Document;
-        return IsShapeEdited(doc, floor) || HasSlopeBySlopeLine(doc, floor);
+        return IsShapeEdited(floor) || HasSlopeBySlopeLine(doc, floor);
     }
 
-    // Метод определения входит ли значение нормали Face в заданный диапазон
-    private bool IsFaceNormalWithinZRange(Face face, double minValue, double maxValue) {
+    // Метод определения, входит ли значение нормали Face в заданный диапазон
+    private static bool IsFaceNormalWithinZRange(Face face, double minValue, double maxValue) {
         double normalZ = face.ComputeNormal(new UV(0.5, 0.5)).Normalize().Z;
         return normalZ > minValue && normalZ <= maxValue;
     }
@@ -125,7 +122,7 @@ internal class SlabNormalizeService : ISlabNormalizeService {
     }
 
     // Метод получения самой верхней точки Face
-    private double GetTopFacesMaxZ(List<Face> topFaces) {
+    private static double GetTopFacesMaxZ(List<Face> topFaces) {
         double maxZ = double.MinValue;
 
         foreach(var face in topFaces) {
@@ -141,12 +138,14 @@ internal class SlabNormalizeService : ISlabNormalizeService {
     }
 
     // Метод получения самой верхней точки EdgeArray
-    private double GetEdgeLoopZ(EdgeArray edgeArray) {
+    private static double GetEdgeLoopZ(EdgeArray edgeArray) {
         var enumerator = edgeArray.GetEnumerator();
         try {
             if(enumerator.MoveNext()) {
                 var edge = (Edge) enumerator.Current;
-                return edge.AsCurve().GetEndPoint(0).Z;
+                if(edge != null) {
+                    return edge.AsCurve().GetEndPoint(0).Z;
+                }
             }
         } finally {
             (enumerator as IDisposable)?.Dispose();
@@ -156,7 +155,7 @@ internal class SlabNormalizeService : ISlabNormalizeService {
     }
 
     // Метод построения контура
-    private List<CurveLoop> BuildCurveLoops(
+    private static List<CurveLoop> BuildCurveLoops(
     List<CurveArray> outerContours,
     Transform linkTransform,
     double targetZ) {
@@ -178,7 +177,7 @@ internal class SlabNormalizeService : ISlabNormalizeService {
     }
 
     // Метод построения трансформированных кривых
-    private List<Curve> TransformAndProjectCurves(
+    private static List<Curve> TransformAndProjectCurves(
     CurveArray curveArray,
     Transform transform,
     double z) {
@@ -215,12 +214,10 @@ internal class SlabNormalizeService : ISlabNormalizeService {
     }
 
     // Метод проверки, является ли точка частью контура
-    private bool IsPointInsideCurveArray(XYZ point3d, CurveArray curveArray) {
+    private static bool IsPointInsideCurveArray(XYZ point3d, CurveArray curveArray) {
         List<XYZ> poly = [];
-        foreach(Curve item in curveArray) {
-            var curve = item;
-            poly.Add(new XYZ(curve.GetEndPoint(0).X, curve.GetEndPoint(0).Y, 0.0));
-        }
+        poly.AddRange(from Curve item in curveArray 
+            select new XYZ(item.GetEndPoint(0).X, item.GetEndPoint(0).Y, 0.0));
         var p = new XYZ(point3d.X, point3d.Y, 0.0);
         return GeometryUtility.IsPointInsidePolygon(p, poly);
     }
@@ -228,7 +225,7 @@ internal class SlabNormalizeService : ISlabNormalizeService {
 
 
     // Метод проверки редактирована ли плита
-    private bool IsShapeEdited(Document doc, Floor floor) {
+    private static bool IsShapeEdited(Floor floor) {
 #if REVIT_2023_OR_LESS
         var slabShapeEditor = floor.SlabShapeEditor;
 #else
@@ -258,7 +255,8 @@ internal class SlabNormalizeService : ISlabNormalizeService {
 
         var lines = depIds
             .Select(doc.GetElement)
-            .Where(element => element.Name.Equals(_systemPluginConfig.SlopeLineName));
+            .Where(element => element.Name.Equals(systemPluginConfig.SlopeLineName))
+            .ToArray();
 
         if(!lines.Any()) {
             return false;

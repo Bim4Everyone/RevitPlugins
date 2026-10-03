@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
 using RevitBuildCoordVolumes.Models.Interfaces;
@@ -11,33 +11,29 @@ using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 
-public class SlabGeometryService : ISlabGeometryService{
+public class SlabGeometryService(ISlabAnalyzeSlopeService slabAnalyzeSlopeService) : ISlabGeometryService {
     
-    private readonly ISlabAnalyzeSlopeService _slabAnalyzeSlopeService;
-    private readonly IBoundingBoxService _boundingBoxService;
-
-    public SlabGeometryService(ISlabAnalyzeSlopeService slabAnalyzeSlopeService, IBoundingBoxService boundingBoxService) {
-        _slabAnalyzeSlopeService = slabAnalyzeSlopeService;
-        _boundingBoxService = boundingBoxService;
-    }
-    
+    // Метод получения геометрии плиты
     public SlabGeometryData GetSlabGeometryData(Floor floor, Transform transformFromDoc) {
-        bool isSloped = _slabAnalyzeSlopeService.IsSloped(floor);
+        bool isSloped = slabAnalyzeSlopeService.IsSloped(floor);
+        
+        // 1. Получаем реальные верхние поверхности
+        var realTopFaces = GetRealTopFaces(floor, transformFromDoc);
+        
+        // 2. Получаем проверочные солиды
+        var checkingSolids = CreateCheckingSolids(floor, realTopFaces);
 
-        // 1. Строим проверочные solids из профиля.
-        var checkingSolids = CreateCheckingSolids(floor, transformFromDoc);
-
-        // 2. Убираем внутренние solids.
+        // 3. Убираем внутренние solids.
         var validSolids = RemoveInnerSolids(checkingSolids);
 
-        // 3. Контур ВСЕГДА берём из проверочных solids.
+        // 4. Контур берём из проверочных solids.
         var contour = validSolids
             .Select(x => x.Loop)
             .ToList();
 
-        // 4. Верхние грани зависят от типа перекрытия.
+        // 5. Верхние грани зависят от типа перекрытия.
         var topFaces = isSloped
-            ? GetSlopeTopFaces(floor, transformFromDoc)
+            ? realTopFaces
             : GetFlatTopFaces(validSolids);
 
         return new SlabGeometryData {
@@ -47,13 +43,25 @@ public class SlabGeometryService : ISlabGeometryService{
         };
     }
     
-    private List<(CurveLoop Loop, Solid Solid)> CreateCheckingSolids(Floor floor, Transform transformFromDoc) {
+    // Метод получения реальных верхних граней плиты
+    private List<Face> GetRealTopFaces(Floor floor, Transform transformFromDoc) {
+        var commonSolids = floor.GetSolids();
+
+        var transformedSolids = (transformFromDoc == null)
+            ? commonSolids
+            : commonSolids.Select(solid => SolidUtils.CreateTransformed(solid, transformFromDoc));
+        
+        return GetSolidsTopFaces(transformedSolids);
+    }
+    
+    // Метод получения проверочных солидов плиты
+    private List<(CurveLoop Loop, Solid Solid)> CreateCheckingSolids(Floor floor, List<Face> topFaces) {
         var profile = GetProfile(floor);
         if (profile == null || profile.Size == 0) {
             return [];
         }
         double sketchZ = GetSketchZ(profile);
-        double actualZ = GetMaxPointZ(floor, transformFromDoc);
+        double actualZ = GetMaxPointZ(topFaces);
         var transform = CreateZTranslation(sketchZ, actualZ);
         var result = new List<(CurveLoop Loop, Solid Solid)>();
 
@@ -77,6 +85,7 @@ public class SlabGeometryService : ISlabGeometryService{
         return result;
     }
     
+    // Метод удаления внутренних солидов (которые находятся внутри других солидов)
     private static List<(CurveLoop Loop, Solid Solid)> RemoveInnerSolids(IReadOnlyList<(CurveLoop Loop, Solid Solid)> solids) {
         var result = new List<(CurveLoop Loop, Solid Solid)>();
 
@@ -102,20 +111,16 @@ public class SlabGeometryService : ISlabGeometryService{
         return result;
     }
     
-    private static IList<Face> GetFlatTopFaces(IEnumerable<(CurveLoop Loop, Solid Solid)> solids) {
+    // Метод получения реальных верхних граней плоской плиты
+    private static List<Face> GetFlatTopFaces(IEnumerable<(CurveLoop Loop, Solid Solid)> solids) {
         return solids
             .SelectMany(x => x.Solid.Faces.Cast<Face>())
             .Where(face => IsFaceNormalWithinZRange(face, 0, 1))
             .ToList();
     }
-
-    private IList<Face> GetSlopeTopFaces(Floor floor, Transform transformFromDoc) {
-        var commonSolids = floor.GetSolids();
-        var transformedSolids = commonSolids.Select(solid => SolidUtils.CreateTransformed(solid, transformFromDoc));
-        return GetSolidsTopFaces(transformedSolids);
-    }
     
-    private IList<Face> GetSolidsTopFaces(IEnumerable<Solid> solids) {
+    // Метод получения верхних граней из любых солидов
+    private static List<Face> GetSolidsTopFaces(IEnumerable<Solid> solids) {
         var faces =  solids
             .SelectMany(solid => solid.Faces
                 .Cast<Face>()
@@ -124,7 +129,8 @@ public class SlabGeometryService : ISlabGeometryService{
         return faces;
     }
 
-    private double GetSketchZ(CurveArrArray curveArrArray) {
+    // Метод получения Z координаты плоской поверхности
+    private static double GetSketchZ(CurveArrArray curveArrArray) {
         return curveArrArray
             .Cast<CurveArray>()
             .Select(x => x
@@ -135,14 +141,40 @@ public class SlabGeometryService : ISlabGeometryService{
     }
     
     // Метод получения трансформации по старой и новой позициям
-    private Transform CreateZTranslation(double oldPosition, double newPosition) {
+    private static Transform CreateZTranslation(double oldPosition, double newPosition) {
         return Transform.CreateTranslation(new XYZ(0, 0, newPosition - oldPosition));
     }
     
-    private double GetMaxPointZ(Floor floor, Transform transformFromDoc) {
-        var bbox = floor.get_BoundingBox(null);
-        var transformBbox = _boundingBoxService.GetTransformedBoundingBox(bbox, transformFromDoc);
-        return  transformBbox.Max.Z;
+    // Метод получения самой верхней точки Face
+    private double GetMaxPointZ(List<Face> topFaces) {
+        double maxZ = double.MinValue;
+
+        foreach(var face in topFaces) {
+            foreach(EdgeArray edgeLoop in face.EdgeLoops) {
+                double edgeZ = GetEdgeLoopZ(edgeLoop);
+                if(edgeZ > maxZ) {
+                    maxZ = edgeZ;
+                }
+            }
+        }
+        return maxZ;
+    }
+    
+    // Метод получения самой верхней точки EdgeArray
+    private static double GetEdgeLoopZ(EdgeArray edgeArray) {
+        var enumerator = edgeArray.GetEnumerator();
+        try {
+            if(enumerator.MoveNext()) {
+                var edge = (Edge) enumerator.Current;
+                if(edge != null) {
+                    return edge.AsCurve().GetEndPoint(0).Z;
+                }
+            }
+        } finally {
+            (enumerator as IDisposable)?.Dispose();
+        }
+
+        return double.MinValue;
     }
     
     // Метод определения, входит ли значение нормали Face в заданный диапазон

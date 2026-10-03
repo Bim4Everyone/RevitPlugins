@@ -7,7 +7,7 @@ internal class ColumnObject {
     public string FloorName { get; set; }
     public double StartPosition { get; set; }
     public double FinishPosition { get; set; }
-    public Guid StartSlabGuid { get; set; }
-    public Guid FinishSlabGuid { get; set; }
+    public SlabElement StartSlab { get; set; }
+    public SlabElement FinishSlab { get; set; }
     public bool IsSloped { get; set; }
 }

@@ -124,6 +124,42 @@ internal class GeomObjectFactory : IGeomObjectFactory {
     }
 
     public List<GeomObject> GetSlabContourGeomObjects(List<ColumnObject> columns, ProgressService progressService) {
-        throw new System.NotImplementedException();
+        var firstElement = columns[0];
+        
+        var firstSlab = firstElement.StartSlab;
+        var lastSlab = firstElement.FinishSlab;
+        
+        double firstSlabZ = firstSlab.TopContour[0].First().GetEndPoint(0).Z;
+        double lastSlabZ = lastSlab.TopContour[0].First().GetEndPoint(0).Z;
+        
+        //System.Windows.MessageBox.Show((firstSlabZ * 304.8).ToString(CultureInfo.InvariantCulture));
+        //System.Windows.MessageBox.Show((lastSlabZ * 304.8).ToString(CultureInfo.InvariantCulture));
+        
+        var firstSolid = SolidUtility.ExtrudeSolid(firstSlab.TopContour, firstElement.StartPosition, firstElement.FinishPosition);
+        var lastSolid = SolidUtility.ExtrudeSolid(lastSlab.TopContour, firstElement.StartPosition, firstElement.FinishPosition, false);
+        
+        if(firstSolid is null ) {
+            System.Windows.MessageBox.Show("firstSolid is null");
+            return [];
+        }
+        
+        if(lastSolid is null) {
+            System.Windows.MessageBox.Show("lastSolid is null");
+            return [];
+        }
+        
+        var result = SolidUtility.IntersectSolid(firstSolid, lastSolid);
+        
+        if(result is null) {
+            return [];
+        }
+
+        var geo = new GeomObject {
+            GeometryObjects = [result],
+            FloorName = firstElement.FloorName,
+            Volume = result.Volume
+        };
+
+        return [geo];
     }
 }

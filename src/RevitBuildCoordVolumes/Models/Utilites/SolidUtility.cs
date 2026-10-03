@@ -17,6 +17,15 @@ internal static class SolidUtility {
     private static readonly XYZ _directionUp = new(0, 0, 10);
     // Направление экструзии - вниз
     private static readonly XYZ _directionDown = new(0, 0, -10);
+    
+    public static Solid IntersectSolid(Solid solid1, Solid solid2) {
+        try {
+            var result = BooleanOperationsUtils.ExecuteBooleanOperation(solid1, solid2, BooleanOperationsType.Intersect);
+            return result != null && result.Volume > GeometryTolerance.Model ? result : null;
+        } catch {
+            return null;
+        }
+    }
 
     /// <summary>
     /// Метод экструзии объемных элементов.
@@ -37,7 +46,7 @@ internal static class SolidUtility {
         double finish = _finishDefault,
         bool up = true) {
 
-        if(start == double.NaN || finish == double.NaN) {
+        if(double.IsNaN(start) || double.IsNaN(finish)) {
             return null;
         }
 

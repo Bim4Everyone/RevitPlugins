@@ -41,31 +41,28 @@ internal class DocumentService : IDocumentService {
 
     // Метод построения словаря
     private void BuildDocumentsDictionary(Document mainDocument) {
-        var basePointTransform = GetTransform(mainDocument);
-        var identityTransform = Transform.Identity;
-        var localTransform = basePointTransform.Multiply(identityTransform);
         _documentsByName.Clear();
-        _documentsByName[mainDocument.Title] = (mainDocument, localTransform);
+        _documentsByName[mainDocument.Title] = (mainDocument, null);
 
         foreach(var linkInst in GetLinkInstances(mainDocument)) {
             var doc = linkInst.GetLinkDocument();
             var linkTransform = linkInst.GetTransform();
-            var trans = basePointTransform.Multiply(linkTransform);
             if(doc != null && !_documentsByName.ContainsKey(doc.Title)) {
-                _documentsByName[doc.Title] = (doc, trans);
+                _documentsByName[doc.Title] = (doc, linkTransform);
             }
         }
     }
 
     // Метод получения всех RevitLinkInstance
-    private IEnumerable<RevitLinkInstance> GetLinkInstances(Document doc) {
+    private static IEnumerable<RevitLinkInstance> GetLinkInstances(Document doc) {
         var linkInstances = new FilteredElementCollector(doc)
             .OfCategory(BuiltInCategory.OST_RvtLinks)
             .OfClass(typeof(RevitLinkInstance))
-            .Cast<RevitLinkInstance>();
+            .Cast<RevitLinkInstance>()
+            .ToArray();
 
         return !linkInstances.Any()
-            ? Enumerable.Empty<RevitLinkInstance>()
+            ? []
             : linkInstances
         .Select(instance => new {
             Instance = instance,
@@ -73,21 +70,5 @@ internal class DocumentService : IDocumentService {
         })
         .Where(x => x.LinkType != null && x.LinkType.GetLinkedFileStatus() == LinkedFileStatus.Loaded)
         .Select(x => x.Instance);
-    }
-
-    // Метод получения локального трансформа
-    private Transform GetTransform(Document document) {
-        var basePointPosition = GetBasePointPosition(document);
-        return Transform.CreateTranslation(-basePointPosition);
-    }
-    
-    // Метод получения смещения базовой точки
-    private XYZ GetBasePointPosition(Document document) {
-        var basePoint = new FilteredElementCollector(document)
-            .OfCategory(BuiltInCategory.OST_ProjectBasePoint)
-            .WhereElementIsNotElementType()
-            .Cast<BasePoint>()
-            .FirstOrDefault();
-        return basePoint?.Position;
     }
 }

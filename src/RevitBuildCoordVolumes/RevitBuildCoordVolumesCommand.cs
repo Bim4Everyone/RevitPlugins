@@ -65,6 +65,7 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
         
+        // Настройка доступа к сервису документов
         kernel.Bind<IDocumentService>()
             .To<DocumentService>()
             .InSingletonScope();
@@ -139,14 +140,9 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
             .To<GeomObjectsBuildService>()
             .InSingletonScope();
         
-        // Настройка доступа к сервису 
+        // Настройка доступа к сервису получения геометрии плит
         kernel.Bind<ISlabGeometryService>()
             .To<SlabGeometryService>()
-            .InSingletonScope();
-        
-        // Настройка доступа к сервису 
-        kernel.Bind<IBoundingBoxService>()
-            .To<BoundingBoxService>()
             .InSingletonScope();
 
         // Настройка доступа к агрегатору сервисов
@@ -154,7 +150,7 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
         
-        // Настройка доступа к агрегатору сервисов
+        // Настройка доступа к сервису анализатора плит
         kernel.Bind<ISlabAnalyzeSlopeService>()
             .To<SlabAnalyzeSlopeService>()
             .InSingletonScope();

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 
@@ -21,7 +22,6 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeSettings _settings;
-    private readonly BuildCoordVolumeServices _services;
     private readonly ILocalizationService _localizationService;
     private ObservableCollection<BuilderModeViewModel> _builderModes;
     private BuilderModeViewModel _selectedBuilderMode;
@@ -46,8 +46,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
         _settings = buildCoordVolumeSettings;
-        _services = buildCoordVolumeServices;
-        _localizationService = _services.LocalizationService;
+        _localizationService = buildCoordVolumeServices.LocalizationService;
 
         LoadView();
 
@@ -57,6 +56,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         CheckAllLevelsCommand = RelayCommand.Create(CheckAllLevels);
         UncheckAllLevelsCommand = RelayCommand.Create(UncheckAllLevels);
     }
+    
     public ICommand SearchDocsCommand { get; }
     public ICommand SearchSlabsCommand { get; }
     public ICommand SearchLevelsCommand { get; }
@@ -150,11 +150,11 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
     }
 
     // Метод получения коллекции LevelViewModel для UpLevels и BottomLevels
-    public IEnumerable<LevelViewModel> GetLevelViewModels() {
-        var typeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name);
-        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
+    private IEnumerable<LevelViewModel> GetLevelViewModels() {
+        string[] typeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToArray();
+        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document).ToArray();
 
-        if(!typeSlabs.Any() || !documents.Any()) {
+        if(typeSlabs.Length == 0 || documents.Length == 0) {
             return [];
         }
         var slabs = _revitRepository.GetSlabsByTypesAndDocs(typeSlabs, documents);
@@ -172,8 +172,8 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
         FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
         // Подписка на события в SlabViewModel
-        foreach(var slabVM in FilteredSlabs) {
-            slabVM.PropertyChanged += OnSlabChanged;
+        foreach(var slabVm in FilteredSlabs) {
+            slabVm.PropertyChanged += OnSlabChanged;
         }
     }
 
@@ -188,12 +188,13 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
 
     // Метод подписанный на событие изменения SlabViewModel
     private void OnSlabChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not SlabViewModel vm) {
+        if(sender is not SlabViewModel) {
             return;
         }
-        if(e.PropertyName == nameof(vm.IsChecked)) {
-            UpdateLevels();
+        if(e.PropertyName != nameof(SlabViewModel.IsChecked)) {
+            return;
         }
+        UpdateLevels();
     }
 
     // Метод получения коллекции SlabViewModel для Slabs
@@ -213,7 +214,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
                 Name = slabType,
                 IsChecked = hasSaved
                     ? savedSlabs.Contains(slabType)
-                    : defaultNames.Any(def => slabType.Contains(def))
+                    : defaultNames.Any(slabType.Contains)
             })
             .OrderByDescending(vm => defaultNames.Any(def => vm.Name.Contains(def)))
             .ThenBy(vm => vm.Name);
@@ -228,27 +229,30 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
                 .IndexOf(SearchTextDocs, StringComparison.OrdinalIgnoreCase) >= 0));
     }
 
-    // Метод подписанный на событие изменения DocumentViewModel
+    // Метод, подписанный на событие изменения DocumentViewModel
     private void OnDocumentChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not DocumentViewModel vm) {
+        if(sender is not DocumentViewModel) {
             return;
         }
-        if(e.PropertyName == nameof(vm.IsChecked)) {
-            UpdateFilteredSlabs();
-            UpdateLevels();
+
+        if(e.PropertyName != nameof(DocumentViewModel.IsChecked)) {
+            return;
         }
+
+        UpdateFilteredSlabs();
+        UpdateLevels();
     }
 
     // Метод получения коллекции DocumentViewModel для Documents
     private IEnumerable<DocumentViewModel> GetDocumentViewModels() {
-        var allDocuments = _revitRepository.GetAllDocuments();
+        var allDocuments = _revitRepository.GetAllDocuments().ToArray();
         var savedDocuments = _settings.Documents;
         var savedDocumentsNames = savedDocuments.Count == 0
             ? []
             : savedDocuments
                 .Select(doc => doc.GetUniqId());
 
-        return !allDocuments.Any()
+        return allDocuments.Length == 0
             ? []
             : allDocuments
                 .Select(document => new DocumentViewModel(_localizationService, document) {
@@ -259,7 +263,6 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
 
     // Метод получения коллекции BuilderModeViewModel для BuilderModes
     private IEnumerable<BuilderModeViewModel> GetTypeBuilderModeViewModels() {
-        var currentBuilderMode = _settings.BuilderMode;
         var builderModes = Enum.GetValues(typeof(BuilderMode)).Cast<BuilderMode>();
         return builderModes
             .Select(builderMode => new BuilderModeViewModel {
@@ -280,21 +283,21 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         Documents = new ObservableCollection<DocumentViewModel>(GetDocumentViewModels());
         FilteredDocuments = new ObservableCollection<DocumentViewModel>(Documents);
         // Подписка на события в DocumentViewModel
-        foreach(var documentVM in FilteredDocuments) {
-            documentVM.PropertyChanged += OnDocumentChanged;
+        foreach(var documentVm in FilteredDocuments) {
+            documentVm.PropertyChanged += OnDocumentChanged;
         }
 
         Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
         FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
         // Подписка на события в SlabViewModel
-        foreach(var slabVM in FilteredSlabs) {
-            slabVM.PropertyChanged += OnSlabChanged;
+        foreach(var slabVm in FilteredSlabs) {
+            slabVm.PropertyChanged += OnSlabChanged;
         }
 
         Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
         FilteredLevels = new ObservableCollection<LevelViewModel>(Levels);
 
-        SquareSideMm = Convert.ToString(_settings.SquareSideMm);
-        SquareAngleDeg = Convert.ToString(_settings.SquareAngleDeg);
+        SquareSideMm = Convert.ToString(_settings.SquareSideMm, CultureInfo.InvariantCulture);
+        SquareAngleDeg = Convert.ToString(_settings.SquareAngleDeg, CultureInfo.InvariantCulture);
     }
 }

@@ -25,10 +25,7 @@ internal class GeomObjectConnector : IGeomObjectConnector {
             return [];
         }
 
-        var groups = geomObjects
-            .GroupBy(geomObject => geomObject.FloorName);
-
-
+        var groups = geomObjects.GroupBy(geomObject => geomObject.FloorName);
 
         var unitedGeomObjects = new List<GeomObject>();
         foreach(var group in groups) {

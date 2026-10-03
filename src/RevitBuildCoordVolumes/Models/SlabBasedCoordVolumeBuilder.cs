@@ -10,7 +10,6 @@ namespace RevitBuildCoordVolumes.Models;
 
 internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
     private readonly ISpatialElementDividerService _spatialElementDividerService;
-    private readonly ISlabNormalizeService _slabNormalizeService;
     private readonly IColumnFactory _columnFactory;
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeServices _services;
@@ -23,7 +22,6 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
         _revitRepository = revitRepository;
         _services = services;
         _spatialElementDividerService = _services.SpatialDivider;
-        _slabNormalizeService = _services.SlabNormalizer;
         _columnFactory = _services.ColumnFactory;
         _settings = settings;
     }
@@ -35,11 +33,8 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
         // Получение всех плит перекрытия из настроек
         var allSlabs = _revitRepository.GetSlabsByTypesDocsAndLevels(_settings).ToList();
 
-        // Получение всех плит без отверстий (для плоских)
-        var normalizedSlabs = _slabNormalizeService.GetNormalizeSlabs(allSlabs, progressService);
-
         // Построение групп колонн
-        var columnGroups = _columnFactory.GenerateColumnGroups(polygons, normalizedSlabs, progressService);
+        var columnGroups = _columnFactory.GenerateColumnGroups(polygons, allSlabs, progressService);
 
         // Финальная сборка
         var geomObjects = _services.GeomObjectsBuildService.GetGeomObjects(_settings, columnGroups, polygons, progressService);
