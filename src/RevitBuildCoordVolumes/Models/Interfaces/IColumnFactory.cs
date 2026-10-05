@@ -19,5 +19,5 @@ internal interface IColumnFactory {
     /// <returns>
     /// Коллекция групп ColumnObject, где ключ параметр группировки (GUID низа и верха плиты).
     /// </returns>
-    IEnumerable<IGrouping<string, ColumnObject>> GenerateColumnGroups(List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService);
+    IList<ColumnGroupObject> CreateColumnGroups(List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService);
 }

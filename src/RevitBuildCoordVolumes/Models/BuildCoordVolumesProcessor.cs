@@ -45,7 +45,7 @@ internal class BuildCoordVolumesProcessor {
 
             var geomElements = _builder.Build(spatialObjects[i], progressService);
 
-            var directShapeElements = _services.DirectShapeObjectFactory.GetDirectShapeObjects(geomElements, _revitRepository);
+            var directShapeElements = _services.DirectShapeObjectFactory.CreateDirectShapeObjects(geomElements, _revitRepository);
 
             _services.ParamSetter.SetParams(spatialObjects[i].SpatialElement, directShapeElements, _settings);
         }

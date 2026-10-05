@@ -13,7 +13,7 @@ namespace RevitBuildCoordVolumes.Models.Services;
 
 internal class ContourService : IContourService {
     public List<CurveLoop> GetColumnsCurveLoops(
-        List<ColumnObject> columns, double spatialElementPosition, double startExtrudePosition, ProgressService progressService) {
+        IList<ColumnObject> columns, double spatialElementPosition, double startExtrudePosition, ProgressService progressService) {
         // Получаем все линии полигонов
         var allLines = columns
             .SelectMany(column => column.PolygonObject.Sides)

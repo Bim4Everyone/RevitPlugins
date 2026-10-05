@@ -22,7 +22,7 @@ internal interface IContourService {
     /// Список CurveLoop для построения Solid.
     /// </returns>
     List<CurveLoop> GetColumnsCurveLoops(
-        List<ColumnObject> columns,
+        IList<ColumnObject> columns,
         double spatialElementPosition,
         double startExtrudePosition,
         ProgressService progressService);

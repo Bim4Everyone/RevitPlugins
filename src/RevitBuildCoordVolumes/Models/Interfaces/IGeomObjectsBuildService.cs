@@ -21,10 +21,10 @@ internal interface IGeomObjectsBuildService {
     /// <returns>
     /// Список GeomObject.
     /// </returns>
-    List<GeomObject> GetGeomObjects(
+    List<GeomObject> CreateGeomObjects(
         BuildCoordVolumeSettings settings,
-        IEnumerable<IGrouping<string, ColumnObject>> columnGroups,
-        List<PolygonObject> polygons,
+        IList<ColumnGroupObject> columnGroups,
+        IList<PolygonObject> polygons,
         SpatialObject spatialObject,
         ProgressService progressService);
 }

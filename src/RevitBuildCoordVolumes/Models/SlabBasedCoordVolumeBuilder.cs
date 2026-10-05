@@ -34,10 +34,10 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
         var allSlabs = _revitRepository.GetSlabsByTypesDocsAndLevels(_settings).ToList();
 
         // Построение групп колонн
-        var columnGroups = _columnFactory.GenerateColumnGroups(polygons, allSlabs, progressService);
+        var columnGroups = _columnFactory.CreateColumnGroups(polygons, allSlabs, progressService);
 
         // Финальная сборка
-        var geomObjects = _services.GeomObjectsBuildService.GetGeomObjects(_settings, columnGroups, polygons, spatialObject, progressService);
+        var geomObjects = _services.GeomObjectsBuildService.CreateGeomObjects(_settings, columnGroups, polygons, spatialObject, progressService);
 
         return geomObjects;
     }

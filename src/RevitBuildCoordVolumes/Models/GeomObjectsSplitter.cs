@@ -10,8 +10,8 @@ using RevitBuildCoordVolumes.Models.Utilites;
 namespace RevitBuildCoordVolumes.Models;
 
 internal class GeomObjectsSplitter : IGeomObjectsSplitter{
-    public List<GeomObject> SplitGeomObjects(List<GeomObject> geomObjects, List<ColumnObject> columns, SpatialObject spatialObject) {
-        var firstElement = columns[0];
+    public List<GeomObject> SplitGeomObjects(List<GeomObject> geomObjects, ColumnGroupObject columnGroupObject, SpatialObject spatialObject) {
+        var firstElement = columnGroupObject.ColumnObjects[0];
         var solids = geomObjects
             .SelectMany(x => x.GeometryObjects)
             .OfType<Solid>()

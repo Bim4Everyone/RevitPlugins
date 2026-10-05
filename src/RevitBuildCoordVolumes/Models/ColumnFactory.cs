@@ -14,17 +14,21 @@ internal class ColumnFactory : IColumnFactory {
     // Длина линии для пресечения, примерно 100 этажей
     private const double _rayHeight = 1000;
 
-    public IEnumerable<IGrouping<string, ColumnObject>> GenerateColumnGroups(List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService) {
+    public IList<ColumnGroupObject> CreateColumnGroups(List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService) {
         
-        var columns = GetColumns(polygons, slabs, progressService);
+        var columns = CreateColumns(polygons, slabs, progressService);
 
         // Группируем по GUID плит - низ + верх      
         return columns
-            .GroupBy(col => col.StartSlab.Guid + "_" + col.FinishSlab.Guid);
+            .GroupBy(col => col.StartSlab.Guid + "_" + col.FinishSlab.Guid)
+            .Select(group => new ColumnGroupObject {
+                ColumnObjects = group.ToList()
+            })
+            .ToList();
     }
 
     // Метод генерации колонн
-    private static List<ColumnObject> GetColumns(
+    private static List<ColumnObject> CreateColumns(
         List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService) {
         if(polygons.Count == 0 || slabs.Count < 2) {
             return [];

@@ -14,22 +14,82 @@ namespace RevitBuildCoordVolumes.Models;
 
 internal class GeomObjectFactory : IGeomObjectFactory {
     private readonly IContourService _contourService;
+    private readonly IGeomObjectConnector _geomObjectConnector;
+    private readonly IGeomObjectsSplitter _geomObjectsSplitter;
     private readonly RevitRepository _revitRepository;
 
-    public GeomObjectFactory(IContourService contourService, RevitRepository revitRepository) {
+    public GeomObjectFactory(
+        IContourService contourService, 
+        IGeomObjectConnector geomObjectConnector, 
+        IGeomObjectsSplitter geomObjectsSplitter,
+        RevitRepository revitRepository) {
         _contourService = contourService;
+        _geomObjectConnector = geomObjectConnector;
+        _geomObjectsSplitter = geomObjectsSplitter;
         _revitRepository = revitRepository;
     }
-
-    public List<GeomObject> GetSimpleGeomObjects(
-        BuildCoordVolumeSettings settings,
-        SpatialObject spatialObject,
-        ProgressService progressService) {
-
+    
+    public List<GeomObject> CreateIndividualColumnsGeomObjects(IList<ColumnGroupObject> columnGroups, IList<PolygonObject> polygons, ProgressService progressService) {
+        var geomObjects = new List<GeomObject>();
+        foreach(var columnGroup in columnGroups) {
+            var sepObjects = CreateIndividualColumnsGeomObjects(columnGroup, polygons, progressService);
+            geomObjects.AddRange(sepObjects);
+        }
+        return geomObjects;
+    }
+    
+    public List<GeomObject> CreateUnitedContourGeomObjects(IList<ColumnGroupObject> columnGroups, IList<PolygonObject> polygons, ProgressService progressService) {
+        var geomObjects = new List<GeomObject>();
+        foreach(var columnGroup in columnGroups) {
+            if(columnGroup.ColumnObjects.Count == 0) {
+                continue;
+            }
+            bool groupContainOneColumn = columnGroup.ColumnObjects.Count == 1;
+            var firstRandomColumn = columnGroup.ColumnObjects[0];
+            bool groupContainSloped = firstRandomColumn.IsSloped;
+            if(groupContainOneColumn || groupContainSloped) {
+                var slopedObjects = CreateSlopedGeomObjects(columnGroup, polygons, progressService);
+                geomObjects.AddRange(slopedObjects);
+            }
+            else {
+                var uniObjects = CreateUnitedContourGeomObjects(columnGroup, polygons, progressService);
+                geomObjects.AddRange(uniObjects);
+            }
+        }
+        return geomObjects;
+    }
+    
+    public List<GeomObject> CreateSlabContourGeomObjects(IList<ColumnGroupObject> columnGroups, IList<PolygonObject> polygons, SpatialObject spatialObject, ProgressService progressService) {
+        var geomObjects = new List<GeomObject>();
+        foreach(var columnGroup in columnGroups) {
+            if(columnGroup.ColumnObjects.Count == 0) {
+                continue;
+            }
+            bool groupContainOneColumn = columnGroup.ColumnObjects.Count == 1;
+            var firstRandomColumn = columnGroup.ColumnObjects[0];
+            bool groupContainSloped = firstRandomColumn.IsSloped;
+            if(groupContainOneColumn || groupContainSloped) {
+                var slopedObjects = CreateSlopedGeomObjects(columnGroup, polygons, progressService);
+                geomObjects.AddRange(slopedObjects);
+            }
+            else {
+                var uniObjects = CreateSlabContourGeomObjects(columnGroup, progressService);
+                geomObjects.AddRange(uniObjects);
+            }
+        }
+        var firstColumnObject = columnGroups[0];
+        var finalObjects = _geomObjectsSplitter.SplitGeomObjects(
+            geomObjects,
+            firstColumnObject,
+            spatialObject);
+        
+        return finalObjects;
+    }
+    
+    public List<GeomObject> CreateSpatialExtrudeGeomObjects(BuildCoordVolumeSettings settings, SpatialObject spatialObject, ProgressService progressService) {
         progressService?.BeginStage(ProgressType.BuildVolumes);
-
         var spatialElement = spatialObject.SpatialElement;
-
+        
         var topZoneParam = settings.ParamMaps
             .Where(param => param.Type == ParamType.TopZoneParam)
             .Select(param => param.SourceParam).First();
@@ -56,8 +116,13 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             }];
     }
 
-    public List<GeomObject> GetUnitedGeomObjects(
-        List<ColumnObject> columns, List<PolygonObject> polygons, ProgressService progressService) {
+    private List<GeomObject> CreateSlopedGeomObjects(ColumnGroupObject columnGroup, IList<PolygonObject> polygons, ProgressService progressService) {
+        var sepObjects = CreateIndividualColumnsGeomObjects(columnGroup, polygons, progressService);
+        return _geomObjectConnector.UnionGeomObjects(sepObjects, progressService);
+    }
+
+    private List<GeomObject> CreateUnitedContourGeomObjects(ColumnGroupObject columnGroupObject, IList<PolygonObject> polygons, ProgressService progressService) {
+        var columns = columnGroupObject.ColumnObjects;
         double spatialElementPosition = polygons[0].Sides[0].GetEndPoint(0).Z;
         var firstElement = columns[0];
         double startExtrudePosition = firstElement.StartPosition;
@@ -82,8 +147,9 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             })];
     }
 
-    public List<GeomObject> GetSeparatedGeomObjects(
-        List<ColumnObject> columns, List<PolygonObject> polygons, ProgressService progressService) {
+    private List<GeomObject> CreateIndividualColumnsGeomObjects(
+        ColumnGroupObject columnGroupObject, IList<PolygonObject> polygons, ProgressService progressService) {
+        var columns = columnGroupObject.ColumnObjects;
         double spatialElementPosition = polygons[0].Sides[0].GetEndPoint(0).Z;
         var solids = new List<GeometryObject>();
         var volumes = new List<double>();
@@ -123,7 +189,8 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         }];
     }
 
-    public List<GeomObject> GetSlabContourGeomObjects(List<ColumnObject> columns, ProgressService progressService) {
+    public List<GeomObject> CreateSlabContourGeomObjects(ColumnGroupObject columnGroupObject, ProgressService progressService) {
+        var columns = columnGroupObject.ColumnObjects;
         var firstElement = columns[0];
         
         var firstSlab = firstElement.StartSlab;

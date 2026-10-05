@@ -19,7 +19,7 @@ internal class ParamBasedCoordVolumeBuilder : ICoordVolumeBuilder {
     }
 
     public List<GeomObject> Build(SpatialObject spatialObject, ProgressService progressService) {
-        var listGeomObjects = _geomObjectFactory.GetSimpleGeomObjects(_settings, spatialObject, progressService);
+        var listGeomObjects = _geomObjectFactory.CreateSpatialExtrudeGeomObjects(_settings, spatialObject, progressService);
 
         return listGeomObjects.Count > 0
             ? listGeomObjects

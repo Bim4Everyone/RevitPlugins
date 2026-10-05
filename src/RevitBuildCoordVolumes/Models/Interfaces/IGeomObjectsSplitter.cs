@@ -20,5 +20,5 @@ namespace RevitBuildCoordVolumes.Models.Interfaces;
 /// Список геометрических объектов, сформированных из непересекающихся солидов.
 /// </returns>
 internal interface IGeomObjectsSplitter {
-    List<GeomObject> SplitGeomObjects(List<GeomObject> geomObjects, List<ColumnObject> columns, SpatialObject spatialObject);
+    List<GeomObject> SplitGeomObjects(List<GeomObject> geomObjects, ColumnGroupObject columnGroupObject, SpatialObject spatialObject);
 }
