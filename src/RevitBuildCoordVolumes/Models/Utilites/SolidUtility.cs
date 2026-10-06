@@ -5,7 +5,6 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 namespace RevitBuildCoordVolumes.Models.Utilites;
-
 internal static class SolidUtility {
     // Старт для тестовой экструзии
     private const double _startDefault = 0;
@@ -15,6 +14,52 @@ internal static class SolidUtility {
     private static readonly XYZ _directionUp = new(0, 0, 10);
     // Направление экструзии - вниз
     private static readonly XYZ _directionDown = new(0, 0, -10);
+    
+    // Метод разрезания солида
+    public static Solid DivideSolidSafe(Solid solid, Plane plane) {
+        try {
+            return BooleanOperationsUtils.CutWithHalfSpace(solid, plane);
+        } catch {
+            return null;
+        }
+    }    
+    
+    /// <summary>
+    /// Метод построения секущей плоскости из Face
+    /// </summary>
+    public static DividePlane GetPlaneFromFace(Face face) {
+        XYZ normal;
+        if(face is PlanarFace pf) {
+            normal = pf.FaceNormal;
+        } else {
+            var bbox = face.GetBoundingBox();
+            var uv = (bbox.Min + bbox.Max) / 2;
+            normal = face.ComputeNormal(uv);
+        }
+
+        XYZ originLocal;
+        if(face is PlanarFace ppf) {
+            originLocal = ppf.Origin;
+        } else {
+            var bbox = face.GetBoundingBox();
+            var uv = (bbox.Min + bbox.Max) / 2;
+            originLocal = face.Evaluate(uv);
+        }
+        var transform = Transform.Identity;
+        
+        var normalHost = transform.OfVector(normal).Normalize();
+        var originHost = transform.OfPoint(originLocal);
+
+        return CreateDividePlane(normalHost, originHost);
+    }
+    
+    // Метод построения разрезающих плоскостей
+    private static DividePlane CreateDividePlane(XYZ normal, XYZ origin) {
+        var positivePlane = Plane.CreateByNormalAndOrigin(normal, origin);
+        var negativePlane = Plane.CreateByNormalAndOrigin(normal.Negate(), origin);
+        return new DividePlane { PositivePlane = positivePlane, NegativePlane = negativePlane };
+    }
+    
     
     /// <summary>
     /// Разбиение солидов на непересекающиеся части.

@@ -74,7 +74,6 @@ internal class SlabService(
         var geometryData = slabGeometryService.GetSlabGeometryData(floor, transformFromDoc);
         var level = GetSlabLevel(floor);
         string levelName = GetLevelName(level);
-        
         return new SlabElement {
             Guid = Guid.NewGuid(),
             Floor = floor,
@@ -83,7 +82,7 @@ internal class SlabService(
             LevelName = levelName,
             TopContour = geometryData.Contour,
             TopFaces = geometryData.TopFaces,
-            IsSloped = geometryData.IsSloped
+            SlabType = geometryData.SlabType
         };
     }
 

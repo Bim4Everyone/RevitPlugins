@@ -9,5 +9,4 @@ internal class ColumnObject {
     public double FinishPosition { get; set; }
     public SlabElement StartSlab { get; set; }
     public SlabElement FinishSlab { get; set; }
-    public bool IsSloped { get; set; }
 }

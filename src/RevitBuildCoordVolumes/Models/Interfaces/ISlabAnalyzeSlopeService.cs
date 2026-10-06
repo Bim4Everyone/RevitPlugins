@@ -1,7 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 
+using RevitBuildCoordVolumes.Models.Enums;
+
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
 public interface ISlabAnalyzeSlopeService {
-    bool IsSloped(Floor floor);
+    SlabType GetSlabType(Floor floor);
 }

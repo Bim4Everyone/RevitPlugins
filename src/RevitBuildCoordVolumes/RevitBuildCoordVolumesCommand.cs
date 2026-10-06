@@ -85,11 +85,6 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
             .To<SlabService>()
             .InSingletonScope();
         
-        // Настройка доступа к сервису нормализации плит перекрытий
-        kernel.Bind<ISlabNormalizeService>()
-            .To<SlabNormalizeService>()
-            .InSingletonScope();
-        
         // Настройка доступа к фабрике производства колонн
         kernel.Bind<IColumnFactory>()
             .To<ColumnFactory>()
@@ -158,6 +153,11 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
         // Настройка доступа к сервису разбиения геометрических объектов
         kernel.Bind<IGeomObjectsSplitter>()
             .To<GeomObjectsSplitter>()
+            .InSingletonScope();
+        
+        // Настройка доступа к сервису разбиения геометрических объектов
+        kernel.Bind<ISlabFaceService>()
+            .To<SlabFaceService>()
             .InSingletonScope();
 
         // Настройка конфигурации плагина

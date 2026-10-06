@@ -4,21 +4,27 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.Revit.Geometry;
 
+using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 
 internal class SlabAnalyzeSlopeService(SystemPluginConfig systemPluginConfig) : ISlabAnalyzeSlopeService {
-    
-    public bool IsSloped(Floor floor) {
-        var doc = floor.Document;
-        return IsShapeEdited(doc, floor) || HasSlopeBySlopeLine(doc, floor);
+    public SlabType GetSlabType(Floor floor) {
+        if(HasRuledFaces(floor)) {
+            return SlabType.Ruled;
+        }
+        if( IsShapeEdited(floor) || HasSlopeBySlopeLine(floor)) {
+            return SlabType.SlopedPlanar;
+        }
+        return SlabType.Planar;
     }
     
     // Метод проверки редактирована ли плита
-    private bool IsShapeEdited(Document doc, Floor floor) {
+    private static bool IsShapeEdited(Floor floor) {
 #if REVIT_2023_OR_LESS
         var slabShapeEditor = floor.SlabShapeEditor;
 #else
@@ -42,7 +48,8 @@ internal class SlabAnalyzeSlopeService(SystemPluginConfig systemPluginConfig) : 
     }
     
     // Метод проверки наклонена ли плита линией уклона
-    private bool HasSlopeBySlopeLine(Document doc, Floor floor) {
+    private bool HasSlopeBySlopeLine(Floor floor) {
+        var doc = floor.Document;
         var filter = new ElementCategoryFilter(BuiltInCategory.OST_SketchLines);
         var depIds = floor.GetDependentElements(filter);
 
@@ -58,6 +65,14 @@ internal class SlabAnalyzeSlopeService(SystemPluginConfig systemPluginConfig) : 
         double end = slopeLine.GetParamValueOrDefault<double>(BuiltInParameter.SLOPE_END_HEIGHT);
 
         return Math.Abs(start - end) < GeometryTolerance.Model;
+    }
+
+    private static bool HasRuledFaces(Floor floor) {
+        var solids = floor.GetSolids();
+        return solids
+            .SelectMany(commonSolid => commonSolid.Faces
+                .Cast<Face>())
+            .Any(face => face is RuledFace);
     }
     
 }
