@@ -32,7 +32,7 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
 
         // Получение всех плит перекрытия из настроек
         var allSlabs = _revitRepository.GetSlabsByTypesDocsAndLevels(_settings).ToList();
-
+        
         // Построение групп колонн
         var columnGroups = _columnFactory.CreateColumnGroups(polygons, allSlabs, progressService);
 

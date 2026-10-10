@@ -127,10 +127,10 @@
     <system:String x:Key="WarningsViewModel.WrongFilledParam">Zones with incorrectly filled parameters</system:String>
     <system:String x:Key="WarningsViewModel.WrongFilledParamDescription">Bottom elevation is higher than or equal to top elevation</system:String>
 
-    <system:String x:Key="DivideSpatial.ProgressTitle">Divide zone {0}%</system:String>
-    <system:String x:Key="SlabNormalize.ProgressTitle">Processing slabs {0}%</system:String>
-    <system:String x:Key="BuildContour.ProgressTitle">Generate contours {0}%</system:String>
+    <system:String x:Key="DivideSpatial.ProgressTitle">Processing zone {0}%</system:String>
+    <system:String x:Key="BuildContour.ProgressTitle">Processing slabs {0}%</system:String>
     <system:String x:Key="BuildVolumes.ProgressTitle">Generate volumes {0}%</system:String>
     <system:String x:Key="UnionVolumes.ProgressTitle">Union volumes {0}%</system:String>
+    <system:String x:Key="ProcessingVolumes.ProgressTitle">Processing volumes {0}%</system:String>   
 
 </ResourceDictionary>

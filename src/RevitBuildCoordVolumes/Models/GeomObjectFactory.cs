@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.Revit.Geometry;
 
 using RevitBuildCoordVolumes.Models.Enums;
@@ -20,22 +18,19 @@ internal class GeomObjectFactory : IGeomObjectFactory {
     private readonly IContourService _contourService;
     private readonly IGeomObjectConnector _geomObjectConnector;
     private readonly IGeomObjectsSplitter _geomObjectsSplitter;
-    private readonly ISlabFaceService _slabFaceService;
-    private readonly ISlabGeometryService _slabGeometryService;
+    private readonly ISlabContourSolidService _slabContourSolidService;
     private readonly RevitRepository _revitRepository;
 
     public GeomObjectFactory(
         IContourService contourService, 
         IGeomObjectConnector geomObjectConnector, 
         IGeomObjectsSplitter geomObjectsSplitter,
-        ISlabFaceService slabFaceService,
-        ISlabGeometryService slabGeometryService,
+        ISlabContourSolidService slabContourSolidService,
         RevitRepository revitRepository) {
         _contourService = contourService;
         _geomObjectConnector = geomObjectConnector;
         _geomObjectsSplitter = geomObjectsSplitter;
-        _slabFaceService = slabFaceService;
-        _slabGeometryService = slabGeometryService;
+        _slabContourSolidService = slabContourSolidService;
         _revitRepository = revitRepository;
     }
     
@@ -54,14 +49,15 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             if(columnGroup.ColumnObjects.Count == 0) {
                 continue;
             }
+            var firstRandomColumnObject = columnGroup.ColumnObjects[0];
             bool groupContainOneColumn = columnGroup.ColumnObjects.Count == 1;
-            var firstRandomColumn = columnGroup.ColumnObjects[0];
-            bool groupContainSloped = firstRandomColumn.StartSlab.SlabType != SlabType.Planar || firstRandomColumn.FinishSlab.SlabType != SlabType.Planar;
-            if(groupContainOneColumn || groupContainSloped) {
-                var slopedObjects = CreateSlopedGeomObjects(columnGroup, polygons, progressService);
-                geomObjects.AddRange(slopedObjects);
-            }
-            else {
+            bool groupContainCurved = firstRandomColumnObject.StartSlab.SlabType == SlabType.Ruled || firstRandomColumnObject.FinishSlab.SlabType == SlabType.Ruled;
+            bool groupContainSlope = firstRandomColumnObject.StartSlab.SlabType == SlabType.SlopedPlanar || firstRandomColumnObject.FinishSlab.SlabType == SlabType.SlopedPlanar;
+            
+            if(groupContainOneColumn || groupContainCurved || groupContainSlope) {
+                var unitedObjects = CreateIndividualAndUnitedObjects(columnGroup, polygons, progressService);
+                geomObjects.AddRange(unitedObjects);
+            } else {
                 var uniObjects = CreateUnitedContourGeomObjects(columnGroup, polygons, progressService);
                 geomObjects.AddRange(uniObjects);
             }
@@ -70,37 +66,48 @@ internal class GeomObjectFactory : IGeomObjectFactory {
     }
     
     public List<GeomObject> CreateSlabContourGeomObjects(IList<ColumnGroupObject> columnGroups, IList<PolygonObject> polygons, SpatialObject spatialObject, ProgressService progressService) {
+        progressService?.BeginStage(ProgressType.BuildVolumes);
+        int total = columnGroups.Count;
+        int processed = 0;
+        int reported = 0;
         var geomObjects = new List<GeomObject>();
-        var spatialSolid = ExtrudeSpatialObject(columnGroups, spatialObject);
+        var spatialSolid = _slabContourSolidService.CreateSpatialSolid(spatialObject);
+        
         foreach(var columnGroup in columnGroups) {
+            progressService?.CancellationToken.ThrowIfCancellationRequested();
             if(columnGroup.ColumnObjects.Count == 0) {
                 continue;
             }
+            
+            var firstRandomColumnObject = columnGroup.ColumnObjects[0];
             bool groupContainOneColumn = columnGroup.ColumnObjects.Count == 1;
-            var firstRandomColumn = columnGroup.ColumnObjects[0];
-            bool groupContainCurved = firstRandomColumn.StartSlab.SlabType == SlabType.Ruled || firstRandomColumn.FinishSlab.SlabType == SlabType.Ruled;
-            bool groupContainSlope = firstRandomColumn.StartSlab.SlabType == SlabType.SlopedPlanar || firstRandomColumn.FinishSlab.SlabType == SlabType.SlopedPlanar;
+            bool groupContainCurved = firstRandomColumnObject.StartSlab.SlabType == SlabType.Ruled || firstRandomColumnObject.FinishSlab.SlabType == SlabType.Ruled;
+            bool groupContainSlope = firstRandomColumnObject.StartSlab.SlabType == SlabType.SlopedPlanar || firstRandomColumnObject.FinishSlab.SlabType == SlabType.SlopedPlanar;
             
-            if(groupContainOneColumn || groupContainCurved) {
-                var slopedObjects = CreateSlopedGeomObjects(columnGroup, polygons, progressService);
+            if (groupContainOneColumn || groupContainCurved) {
+                var unitedObjects = CreateIndividualAndUnitedObjects(columnGroup, polygons, progressService);
+                geomObjects.AddRange(unitedObjects);
+            } else if (groupContainSlope) {
+                var slopedObjects = CreateSlopeSlabContourGeomObjects(columnGroup, spatialSolid, progressService);
                 geomObjects.AddRange(slopedObjects);
+            } else {
+                var flatObjects = CreateFlatSlabContourGeomObjects(columnGroup, spatialSolid, progressService);
+                geomObjects.AddRange(flatObjects);
             }
-            
-            if(groupContainSlope) {
-                var slopedObjects = CreateSlopedSlabContourGeomObjects(columnGroup, spatialSolid, progressService);
-                geomObjects.AddRange(slopedObjects);
+            processed++;
+            int current = processed * 100 / total;
+            if(current > 100) {
+                current = 100;
             }
-            
-            else {
-                var uniObjects = CreateSlabContourGeomObjects(columnGroup, spatialSolid, progressService);
-                geomObjects.AddRange(uniObjects);
+            if(current > reported) {
+                reported = current;
+                progressService?.ProgressCount?.Report(reported);
             }
         }
+        
         var firstColumnObject = columnGroups[0];
-        var finalObjects = _geomObjectsSplitter.SplitGeomObjects(
-            geomObjects,
-            firstColumnObject,
-            spatialObject);
+        
+        var finalObjects = _geomObjectsSplitter.SplitGeomObjects(geomObjects, firstColumnObject, spatialObject, progressService);
         
         return finalObjects;
     }
@@ -135,7 +142,7 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             }];
     }
 
-    private List<GeomObject> CreateSlopedGeomObjects(ColumnGroupObject columnGroup, IList<PolygonObject> polygons, ProgressService progressService) {
+    private List<GeomObject> CreateIndividualAndUnitedObjects(ColumnGroupObject columnGroup, IList<PolygonObject> polygons, ProgressService progressService) {
         var sepObjects = CreateIndividualColumnsGeomObjects(columnGroup, polygons, progressService);
         return _geomObjectConnector.UnionGeomObjects(sepObjects, progressService);
     }
@@ -156,18 +163,17 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             return [];
         }
 
-        var splittedSolid = SolidUtils.SplitVolumes(solid);
+        var splitSolid = SolidUtils.SplitVolumes(solid);
 
-        return [.. splittedSolid
-            .Select(solid => new GeomObject {
-                GeometryObjects = [solid],
+        return [.. splitSolid
+            .Select(solidPart => new GeomObject {
+                GeometryObjects = [solidPart],
                 LevelName = firstElement.LevelName,
-                Volume = solid.Volume
+                Volume = solidPart.Volume
             })];
     }
 
-    private List<GeomObject> CreateIndividualColumnsGeomObjects(
-        ColumnGroupObject columnGroupObject, IList<PolygonObject> polygons, ProgressService progressService) {
+    private List<GeomObject> CreateIndividualColumnsGeomObjects(ColumnGroupObject columnGroupObject, IList<PolygonObject> polygons, ProgressService progressService) {
         var columns = columnGroupObject.ColumnObjects;
         double spatialElementPosition = polygons[0].Sides[0].GetEndPoint(0).Z;
         var solids = new List<GeometryObject>();
@@ -208,166 +214,38 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         }];
     }
 
-    private List<GeomObject> CreateSlabContourGeomObjects(ColumnGroupObject columnGroupObject, Solid spatialSolid, ProgressService progressService) {
+    private List<GeomObject> CreateFlatSlabContourGeomObjects(ColumnGroupObject columnGroupObject, Solid spatialSolid, ProgressService progressService) {
+        var columns = columnGroupObject.ColumnObjects;
+        var firstColumnObject = columns[0];
+        
+        var solid = _slabContourSolidService.CreateFlatSlabContourSolid(firstColumnObject, spatialSolid, progressService);
+        
+        if(solid is null) {
+            return [];
+        }
+
+        return [new GeomObject {
+            GeometryObjects = [solid],
+            LevelName = firstColumnObject.LevelName,
+            Volume = solid.Volume
+        }];
+    }
+
+    private List<GeomObject> CreateSlopeSlabContourGeomObjects(ColumnGroupObject columnGroupObject, Solid spatialSolid, ProgressService progressService) {
         var columns = columnGroupObject.ColumnObjects;
         var firstElement = columns[0];
-        
-        var startSlab = firstElement.StartSlab;
-        var finishSlab = firstElement.FinishSlab;
-        
-        double minPointZ = _slabFaceService.GetMinPointZ(startSlab.TopFaces);
-        double maxPointZ = _slabFaceService.GetMaxPointZ(finishSlab.TopFaces);
-        
-        var firstSolid = SolidUtility.ExtrudeSolid(startSlab.TopContour, minPointZ, maxPointZ);
-        var lastSolid = SolidUtility.ExtrudeSolid(finishSlab.TopContour, minPointZ, maxPointZ, false);
-        
-        if(firstSolid is null || lastSolid is null ) {
-            return [];
-        }
-        
-        var result = SolidUtility.IntersectSolid(firstSolid, lastSolid);
-        
-        if(result is null || spatialSolid is null) {
-            return [];
-        }
-        
-        var finalResult = SolidUtility.IntersectSolid(result, spatialSolid);
-        
-        if(finalResult is null) {
+
+        var solids =
+            _slabContourSolidService.CreateSlopedSlabContourSolids(firstElement, spatialSolid, progressService);
+
+        if(solids.Count == 0) {
             return [];
         }
 
-        var geo = new GeomObject {
-            GeometryObjects = [finalResult],
+        return  [new GeomObject {
+            GeometryObjects = solids.Cast<GeometryObject>().ToList(),
             LevelName = firstElement.LevelName,
-            Volume = finalResult.Volume
-        };
-        return [geo];
-    }
-    
-    private List<GeomObject> CreateSlopedSlabContourGeomObjects(ColumnGroupObject columnGroupObject, Solid spatialSolid, ProgressService progressService) {
-        var columns = columnGroupObject.ColumnObjects;
-        var firstElement = columns[0];
-        
-        var startSlab = firstElement.StartSlab;
-        var finishSlab = firstElement.FinishSlab;
-        
-        double maxPointStartSlab = _slabFaceService.GetMaxPointZ(startSlab.TopFaces);
-        double minPointZ = _slabFaceService.GetMinPointZ(startSlab.TopFaces);
-        double maxPointZ = _slabFaceService.GetMaxPointZ(finishSlab.TopFaces);
-        
-        var startContour = startSlab.TopContour;
-        var transform = _slabGeometryService.CreateZTranslation(maxPointStartSlab, minPointZ);
-        foreach(var loop in startContour) {
-            loop.Transform(transform);
-        }
-        
-        var firstSolid = SolidUtility.ExtrudeSolid(startContour, minPointZ, maxPointZ);
-        var lastSolid = SolidUtility.ExtrudeSolid(finishSlab.TopContour, minPointZ, maxPointZ, false);
-        
-        if(firstSolid is null || lastSolid is null ) {
-            return [];
-        }
-        
-        var result = SolidUtility.IntersectSolid(firstSolid, lastSolid);
-        
-        if(result is null || spatialSolid is null) {
-            return [];
-        }
-        
-        var finalResult = SolidUtility.IntersectSolid(result, spatialSolid);
-        
-        if(finalResult is null) {
-            return [];
-        }
-        
-        var startSlabSolid = startSlab.Floor.GetSolids().First();
-        var finishSlabSolid = finishSlab.Floor.GetSolids().First();
-        
-        
-        var cutSolids = new List<Solid> { finalResult };
-
-        // ============================================================
-        // Нижняя плита
-        // ============================================================
-
-        foreach (var face in startSlab.TopFaces) {
-            var dividePlane = SolidUtility.GetPlaneFromFace(face);
-
-            cutSolids = SplitSolids(cutSolids, dividePlane);
-        }
-
-        // Удаляем всё, что пересекает нижнюю плиту объемом
-        cutSolids = cutSolids
-            .Where(solid => !SolidUtility.IsIntersect(solid, startSlabSolid))
-            .ToList();
-        
-        var uniSolid = SolidExtensions.CreateUnitedSolids(cutSolids).ToList();
-
-
-        // ============================================================
-        // Верхняя плита
-        // ============================================================
-
-        foreach (var face in finishSlab.TopFaces) {
-            var dividePlane = SolidUtility.GetPlaneFromFace(face);
-
-            uniSolid = SplitSolids(uniSolid, dividePlane);
-        }
-
-        // Оставляем только то, что пересекает верхнюю плиту объемом
-        uniSolid = uniSolid
-            .Where(solid => SolidUtility.IsIntersect(solid, finishSlabSolid))
-            .ToList();
-        
-        uniSolid = SolidExtensions.CreateUnitedSolids(uniSolid).ToList();
-        
-        
-        var geo = new GeomObject {
-            GeometryObjects = uniSolid.Cast<GeometryObject>().ToList(),
-            LevelName = firstElement.LevelName,
-            Volume = 1
-        };
-        return [geo];
-    }
-    
-    
-    private static List<Solid> SplitSolids(List<Solid> solids, DividePlane dividePlane) {
-        var result = new List<Solid>();
-
-        foreach (var solid in solids) {
-            var negativeSolid = SolidUtility.DivideSolidSafe(solid, dividePlane.NegativePlane);
-
-            var positiveSolid = SolidUtility.DivideSolidSafe(solid, dividePlane.PositivePlane);
-
-            if (negativeSolid != null)
-                result.Add(negativeSolid);
-
-            if (positiveSolid != null)
-                result.Add(positiveSolid);
-        }
-
-        return result;
-    }
-
-    private Solid ExtrudeSpatialObject(IList<ColumnGroupObject> columnGroups, SpatialObject spatialObject) {
-        var faces = new List<Face>();
-        foreach(var columnGroupObject in columnGroups) {
-            faces.AddRange(columnGroupObject.ColumnObjects.SelectMany(x => x.StartSlab.TopFaces));
-            faces.AddRange(columnGroupObject.ColumnObjects.SelectMany(x => x.FinishSlab.TopFaces));
-        }
-        
-        double minPointZ = _slabFaceService.GetMinPointZ(faces);
-        double maxPointZ = _slabFaceService.GetMaxPointZ(faces);
-        
-        var contourCurves = _contourService.GetOuterContour(spatialObject.SpatialElement);
-        var startContour = _contourService.GetCurveLoopsContour(contourCurves, null);
-        double pointSpatial = startContour[0].ElementAt(0).GetEndPoint(0).Z;
-        var transform = _slabGeometryService.CreateZTranslation(pointSpatial, minPointZ);
-        foreach(var loop in startContour) {
-            loop.Transform(transform);
-        }
-        
-        return SolidUtility.ExtrudeSolid(startContour, minPointZ, maxPointZ);
+            Volume = solids.Sum(s => s.Volume)
+        }];
     }
 }

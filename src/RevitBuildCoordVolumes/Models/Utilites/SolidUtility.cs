@@ -15,18 +15,20 @@ internal static class SolidUtility {
     // Направление экструзии - вниз
     private static readonly XYZ _directionDown = new(0, 0, -10);
     
-    // Метод разрезания солида
-    public static Solid DivideSolidSafe(Solid solid, Plane plane) {
-        try {
-            return BooleanOperationsUtils.CutWithHalfSpace(solid, plane);
-        } catch {
-            return null;
-        }
-    }    
-    
     /// <summary>
-    /// Метод построения секущей плоскости из Face
+    /// Получение плоскости разделения на основе грани.
     /// </summary>
+    /// <remarks>
+    /// В данном методе определяется нормаль и начало координат заданной грани.
+    /// Для планарной грани используются ее нормаль и начало координат,
+    /// для непланарной грани нормаль и точка вычисляются в центре ограничивающего
+    /// прямоугольника. Полученные значения преобразуются в систему координат хоста
+    /// и используются для создания плоскости разделения.
+    /// </remarks>
+    /// <param name="face">Грань, на основе которой создается плоскость разделения.</param>
+    /// <returns>
+    /// Плоскость разделения, соответствующая геометрии заданной грани.
+    /// </returns>
     public static DividePlane GetPlaneFromFace(Face face) {
         XYZ normal;
         if(face is PlanarFace pf) {
@@ -53,91 +55,28 @@ internal static class SolidUtility {
         return CreateDividePlane(normalHost, originHost);
     }
     
-    // Метод построения разрезающих плоскостей
-    private static DividePlane CreateDividePlane(XYZ normal, XYZ origin) {
-        var positivePlane = Plane.CreateByNormalAndOrigin(normal, origin);
-        var negativePlane = Plane.CreateByNormalAndOrigin(normal.Negate(), origin);
-        return new DividePlane { PositivePlane = positivePlane, NegativePlane = negativePlane };
-    }
-    
-    
     /// <summary>
-    /// Разбиение солидов на непересекающиеся части.
+    /// Безопасное разделение солида плоскостью.
     /// </summary>
     /// <remarks>
-    /// В данном методе исходные солиды последовательно сравниваются с уже сформированными частями результата.
-    /// При обнаружении пересечения существующая часть и текущий солид разделяются на общую область
-    /// и остатки без пересечения. В результате формируется набор валидных солидов без взаимного перекрытия.
+    /// В данном методе из исходного солида удаляется часть, расположенная
+    /// за заданной плоскостью, с использованием операции отсечения полупространством.
+    /// Если операция завершается с ошибкой, возвращается <c>null</c>.
     /// </remarks>
-    /// <param name="solids">Исходный список солидов.</param>
+    /// <param name="solid">Исходный солид.</param>
+    /// <param name="plane">Плоскость, используемая для отсечения солида.</param>
     /// <returns>
-    /// Список солидов, разбитых на непересекающиеся части.
+    /// Солид, полученный после отсечения исходного солида плоскостью,
+    /// или <c>null</c> в случае ошибки выполнения операции.
     /// </returns>
-    public static IList<Solid> Split(IList<Solid> solids) {
-        var result = new List<Solid>();
-
-        foreach (var sourceSolid in solids) {
-            if (!IsValid(sourceSolid)) {
-                continue;
-            }
-
-            var newSolid = sourceSolid;
-
-            // Работаем со снимком текущего результата.
-            // Внутри цикла result будет меняться.
-            var existingParts = new List<Solid>(result);
-
-            foreach (var existingPart in existingParts) {
-                if (!IsValid(newSolid)) {
-                    break;
-                }
-
-                var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
-                    existingPart,
-                    newSolid,
-                    BooleanOperationsType.Intersect);
-
-                if (!IsValid(intersection)) {
-                    continue;
-                }
-
-                // Старая часть без пересечения.
-                var existingRest = BooleanOperationsUtils.ExecuteBooleanOperation(
-                    existingPart,
-                    intersection,
-                    BooleanOperationsType.Difference);
-
-                // Новый Solid без пересечения.
-                var newRest = BooleanOperationsUtils.ExecuteBooleanOperation(
-                    newSolid,
-                    intersection,
-                    BooleanOperationsType.Difference);
-
-                // Удаляем старую часть из result.
-                result.Remove(existingPart);
-
-                // Добавляем остаток старой части.
-                if (IsValid(existingRest)) {
-                    result.Add(existingRest);
-                }
-
-                // Добавляем общую часть.
-                result.Add(intersection);
-
-                // Продолжаем работать только с остатком нового Solid.
-                newSolid = newRest;
-            }
-
-            // Всё, что осталось от нового Solid,
-            // ещё ни с чем не пересеклось.
-            if (IsValid(newSolid)) {
-                result.Add(newSolid);
-            }
+    public static Solid DivideSolidSafe(Solid solid, Plane plane) {
+        try {
+            return BooleanOperationsUtils.CutWithHalfSpace(solid, plane);
+        } catch {
+            return null;
         }
-
-        return result;
     }
-    
+
     /// <summary>
     /// Пересечение двух солидов.
     /// </summary>
@@ -148,17 +87,27 @@ internal static class SolidUtility {
     /// </remarks>
     /// <param name="solid1">Первый исходный солид.</param>
     /// <param name="solid2">Второй исходный солид.</param>
+    /// <param name="operationsType">Тип булевой операции</param>
+    /// <param name="result"></param>
     /// <returns>
-    /// Солид, полученный в результате пересечения исходных солидов,
+    /// Солид, полученный в результате булевой операции исходных солидов,
     /// или <c>null</c>, если пересечение отсутствует, имеет недостаточный объем
     /// либо при выполнении операции произошла ошибка.
     /// </returns>
-    public static Solid IntersectSolid(Solid solid1, Solid solid2) {
+    public static bool TryGetBooleanSolid(Solid solid1, Solid solid2, BooleanOperationsType operationsType, out Solid result) {
+        result = null;
         try {
-            var result = BooleanOperationsUtils.ExecuteBooleanOperation(solid1, solid2, BooleanOperationsType.Intersect);
-            return result != null && result.Volume > GeometryTolerance.Model ? result : null;
-        } catch {
-            return null;
+            var solid = BooleanOperationsUtils.ExecuteBooleanOperation(
+                solid1,
+                solid2,
+                operationsType);
+
+            result = IsValid(solid) 
+                ? solid 
+                : null;
+            return true;
+        } catch (Autodesk.Revit.Exceptions.InvalidOperationException) {
+            return false;
         }
     }
 
@@ -195,7 +144,9 @@ internal static class SolidUtility {
 
         try {
             var solid = GeometryCreationUtilities.CreateExtrusionGeometry(listCurveLoops, direction, amountToExtrude);
-            return solid != null && solid.Volume > GeometryTolerance.Model ? solid : null;
+            return IsValid(solid)
+                ? solid 
+                : null;
         } catch {
             return null;
         }
@@ -245,26 +196,36 @@ internal static class SolidUtility {
     public static bool IsIntersect(Solid solid1, Solid solid2) {
         if (solid1 is null || solid2 is null)
             return false;
-        try {
-            var intersection = BooleanOperationsUtils.ExecuteBooleanOperation(
-                solid1,
-                solid2,
-                BooleanOperationsType.Intersect);
-
-            return intersection is not null && GetSafeSolidVolume(intersection) > 0;
-        }
-        catch (Exception) {
-            return false;
-        }
+        TryGetBooleanSolid(solid1, solid2, BooleanOperationsType.Intersect, out var result);
+        return result != null;
     }
+       
     
-    // Метод проверки валидности солида
-    private static bool IsValid(Solid solid) {
-        return solid != null && GetSafeSolidVolume(solid) > 0&& solid.Faces.Size > 0;
+    /// <summary>
+    /// Проверка корректности солида.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе проверяется наличие солида, его положительный объем
+    /// и наличие хотя бы одной грани.
+    /// </remarks>
+    /// <param name="solid">Солид, подлежащий проверке.</param>
+    /// <returns>
+    /// <c>true</c>, если солид существует, имеет положительный объем и содержит грани;
+    /// в противном случае — <c>false</c>.
+    /// </returns>
+    public static bool IsValid(Solid solid) {
+        return solid != null && GetSafeSolidVolume(solid) > 0 && solid.Faces.Size > 0;
     }
     
     // Метод безопасного получения объёма солида
     private static double GetSafeSolidVolume(Solid solid) {
         return solid?.Volume ?? 0;
+    }
+    
+    // Метод построения разрезающих плоскостей
+    private static DividePlane CreateDividePlane(XYZ normal, XYZ origin) {
+        var positivePlane = Plane.CreateByNormalAndOrigin(normal, origin);
+        var negativePlane = Plane.CreateByNormalAndOrigin(normal.Negate(), origin);
+        return new DividePlane { PositivePlane = positivePlane, NegativePlane = negativePlane };
     }
 }

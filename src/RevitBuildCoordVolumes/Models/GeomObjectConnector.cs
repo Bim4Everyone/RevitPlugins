@@ -24,6 +24,10 @@ internal class GeomObjectConnector : IGeomObjectConnector {
         if(geomObjects.Count == 0) {
             return [];
         }
+        
+        if(geomObjects.Count == 1) {
+            return geomObjects;
+        }
 
         var groups = geomObjects.GroupBy(geomObject => geomObject.LevelName);
 

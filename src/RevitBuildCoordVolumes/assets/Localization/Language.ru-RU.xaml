@@ -127,10 +127,10 @@
     <system:String x:Key="WarningsViewModel.WrongFilledParam">Зоны с неверно заполненными параметрами</system:String>
     <system:String x:Key="WarningsViewModel.WrongFilledParamDescription">Отметка низа находится выше или равна отметке верха</system:String>
 
-    <system:String x:Key="DivideSpatial.ProgressTitle">Деление зоны {0}%</system:String>
-    <system:String x:Key="SlabNormalize.ProgressTitle">Обработка плит {0}%</system:String>
-    <system:String x:Key="BuildContour.ProgressTitle">Генерация контуров {0}%</system:String>
+    <system:String x:Key="DivideSpatial.ProgressTitle">Обработка зоны {0}%</system:String>
+    <system:String x:Key="BuildContour.ProgressTitle">Обработка плит {0}%</system:String>
     <system:String x:Key="BuildVolumes.ProgressTitle">Генерация объемов {0}%</system:String>
     <system:String x:Key="UnionVolumes.ProgressTitle">Объединение объемов {0}%</system:String>   
+    <system:String x:Key="ProcessingVolumes.ProgressTitle">Обработка объемов {0}%</system:String>   
     
 </ResourceDictionary>
