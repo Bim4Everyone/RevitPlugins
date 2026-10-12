@@ -90,6 +90,12 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// </summary>
     public ObservableCollection<object> FilteredItemsSource { get; } = [];
 
+    // Флаг выполнения обновления коллекции ComboBox
+    private bool _isUpdatingItems;
+
+    // Признак того, что во время обновления коллекции потребовалось еще одно обновление
+    private bool _hasPendingUpdate;
+
 
     /// <summary>
     /// Выполняем обновление значений ComboBox по фильтрам после привязки источника
@@ -193,17 +199,42 @@ public partial class FiltrationComboBoxControl : UserControl {
             return;
         }
 
-        var filters = FilterList.ValueList
-            .Where(x => !string.IsNullOrWhiteSpace(x?.Value))
-            .ToList();
+        // Изменение коллекции может синхронно запустить повторное обновление: удаление выбранного элемента
+        // сбрасывает выбор, ViewModel в ответ заменяет источник (ComboBoxSource), и обновление вызывается снова,
+        // пока текущее еще не завершено. Вложенное изменение коллекции сбивает индексы текущего прохода,
+        // поэтому повторный вызов не выполняется сразу, а только отмечается и выполняется после текущего прохода
+        if(_isUpdatingItems) {
+            _hasPendingUpdate = true;
+            return;
+        }
 
-        var items = ComboBoxSource
-            .OfType<object>()
-            .Where(item => ItemMatchesAllFilters(item, filters))
-            .ToList();
+        _isUpdatingItems = true;
+        try {
+            do {
+                _hasPendingUpdate = false;
 
-        UpdateFilteredItemsSource(items);
+                // Источник или фильтры могли быть сброшены во время предыдущего прохода
+                if(ComboBoxSource is null || FilterList is null) {
+                    return;
+                }
 
+                var filters = FilterList.ValueList
+                    .Where(x => !string.IsNullOrWhiteSpace(x?.Value))
+                    .ToList();
+
+                var items = ComboBoxSource
+                    .OfType<object>()
+                    .Where(item => ItemMatchesAllFilters(item, filters))
+                    .ToList();
+
+                UpdateFilteredItemsSource(items);
+            } while(_hasPendingUpdate);
+        } finally {
+            _isUpdatingItems = false;
+        }
+
+        // Автовыбор выполняется после того, как состав коллекции окончательно приведен к фильтрам:
+        // выбор может снова запустить обновление, и оно должно выполниться полностью, а не отложиться
         if(FilteredItemsSource.Count == 1) {
             ComboBoxSelected = FilteredItemsSource.First();
         }
