@@ -366,8 +366,10 @@ internal class MainViewModel : BaseViewModel {
         }
 
         var viewNames = new HashSet<string>();
+        // Проверяются только компоненты листов, включенных в генерацию
         foreach(var sheetComponent in CurrentSheetSet?.SheetList
-            ?.SelectMany(s => s.SheetComponents)
+            ?.Where(s => s.IsModuleCheck)
+            .SelectMany(s => s.SheetComponents)
             .Where(c => c.IsModuleCheck)
             .ToList() ?? []) {
             string name = sheetComponent switch {
