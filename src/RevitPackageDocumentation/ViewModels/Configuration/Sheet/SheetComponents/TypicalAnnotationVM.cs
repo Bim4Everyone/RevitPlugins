@@ -197,17 +197,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             _selectedFamilyName = family;
 
             // Типоразмеры
-            TypeNames = family is null
-                ? []
-                : IsFromFolder ? GetFolderTypeNames(family) : GetProjectTypeNames(family);
-
-            string type = TypeNames.Contains(typeName)
-                ? typeName
-                : string.IsNullOrEmpty(typeName) && TypeNames.Contains(_selectedTypeName)
-                    ? _selectedTypeName
-                    : null;
-            _missingTypeName = type is null && !string.IsNullOrEmpty(typeName) ? typeName : null;
-            _selectedTypeName = type;
+            UpdateTypeNames(typeName);
         } finally {
             _isUpdating = false;
         }
@@ -216,6 +206,43 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         RaisePropertyChanged(nameof(SelectedFamilyName));
         RaisePropertyChanged(nameof(SelectedTypeName));
         UpdateSelectionError();
+    }
+
+    /// <summary>
+    /// Пересобирает только список типоразмеров выбранного семейства и выбирает типоразмер по имени.
+    /// Список семейств не меняется
+    /// </summary>
+    private void ResolveTypeSelection(string typeName) {
+        _isUpdating = true;
+        try {
+            UpdateTypeNames(typeName);
+        } finally {
+            _isUpdating = false;
+        }
+
+        // Синхронизируем UI с итоговым выбором
+        RaisePropertyChanged(nameof(SelectedTypeName));
+        UpdateSelectionError();
+    }
+
+    /// <summary>
+    /// Заполняет список типоразмеров выбранного семейства из текущего источника и выбирает типоразмер по имени.
+    /// Вызывается при установленном флаге обновления списков
+    /// </summary>
+    private void UpdateTypeNames(string typeName) {
+        TypeNames = _selectedFamilyName is null
+            ? []
+            : IsFromFolder ? GetFolderTypeNames(_selectedFamilyName) : GetProjectTypeNames(_selectedFamilyName);
+
+        // Если имя не задано, принимаем выбор, который сделал фильтр контрола,
+        // когда после фильтрации остался единственный вариант
+        string type = TypeNames.Contains(typeName)
+            ? typeName
+            : string.IsNullOrEmpty(typeName) && TypeNames.Contains(_selectedTypeName)
+                ? _selectedTypeName
+                : null;
+        _missingTypeName = type is null && !string.IsNullOrEmpty(typeName) ? typeName : null;
+        _selectedTypeName = type;
     }
 
     private List<string> GetProjectFamilyNames() {
@@ -337,14 +364,18 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     }
 
     /// <summary>
-    /// Выбор семейства в списке. Типоразмер после смены семейства выбирается заново
+    /// Выбор семейства в списке. Типоразмер после смены семейства выбирается заново.
+    /// Список семейств при этом не пересобирается: выбор делается из уже заполненного списка
+    /// (замена списка во время его изменения контролом приводила бы к повторному обновлению контрола)
     /// </summary>
     private void SelectFamily() {
         // Списки пересобираются кодом - выбор в UI в этот момент не является выбором пользователя
         if(_isUpdating) {
             return;
         }
-        ResolveSelection(SelectedFamilyName, null);
+        // Семейство выбрано пользователем или выбор сброшен фильтром - ненайденное имя из конфигурации больше не актуально
+        _missingFamilyName = null;
+        ResolveTypeSelection(null);
     }
 
     /// <summary>
