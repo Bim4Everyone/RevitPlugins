@@ -53,6 +53,7 @@ internal class SlabGeometryService(
         return new SlabGeometryData {
             Contour = contour,
             TopFaces = topFaces,
+            CheckingSolids = validSolids.Select(x => x.Solid).ToList(),
             SlabType = slabType
         };
     }

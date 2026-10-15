@@ -31,7 +31,9 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
         var polygons = _spatialElementDividerService.DivideSpatialElement(spatialObject.SpatialElement, _settings, progressService);
 
         // Получение всех плит перекрытия из настроек
-        var allSlabs = _revitRepository.GetSlabsByTypesDocsAndLevels(_settings).ToList();
+        var allSlabs = _services.SlabService.GetSlabsByTypesDocsAndLevels(
+            _settings.TypeSlabs, _settings.Documents, _settings.Levels)
+            .ToList();
         
         // Построение групп колонн
         var columnGroups = _columnFactory.CreateColumnGroups(polygons, allSlabs, progressService);

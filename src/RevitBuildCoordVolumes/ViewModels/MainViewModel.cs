@@ -298,12 +298,12 @@ internal class MainViewModel : BaseViewModel {
         var documents = configSettings.Documents.Count == 0
             ? []
             : configSettings.Documents
-                .Select(_revitRepository.FindDocumentsByName)
+                .Select(_services.DocumentService.GetDocumentByName)
                 .Where(doc => doc != null)
                 .ToList();
 
         var typeSlabs = configSettings.TypeSlabs.Count == 0
-            ? _revitRepository.GetTypeSlabsByDocs(documents)
+            ? _services.SlabService.GetTypeSlabsByDocs(documents)
                 .Where(name => _systemPluginConfig.DefaultSlabTypeNames.Any(type => name.Contains(type)))
                 .ToList()
             : configSettings.TypeSlabs;

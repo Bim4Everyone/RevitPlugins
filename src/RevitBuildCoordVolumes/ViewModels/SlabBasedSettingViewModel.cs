@@ -20,6 +20,7 @@ namespace RevitBuildCoordVolumes.ViewModels;
 
 internal class SlabBasedSettingViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
+    private readonly BuildCoordVolumeServices _services;
     private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeSettings _settings;
     private readonly ILocalizationService _localizationService;
@@ -46,7 +47,8 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         _systemPluginConfig = systemPluginConfig;
         _revitRepository = revitRepository;
         _settings = buildCoordVolumeSettings;
-        _localizationService = buildCoordVolumeServices.LocalizationService;
+        _services = buildCoordVolumeServices;
+        _localizationService = _services.LocalizationService;
 
         LoadView();
 
@@ -157,7 +159,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         if(typeSlabs.Length == 0 || documents.Length == 0) {
             return [];
         }
-        var slabs = _revitRepository.GetSlabsByTypesAndDocs(typeSlabs, documents);
+        var slabs = _services.SlabService.GetSlabsByTypesAndDocs(typeSlabs, documents);
         var levels = slabs
             .Select(slab => slab.Level)
             .GroupBy(lvl => lvl.Id)
@@ -200,7 +202,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
     // Метод получения коллекции SlabViewModel для Slabs
     private IEnumerable<SlabViewModel> GetSlabViewModels() {
         var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
-        var allSlabs = _revitRepository.GetTypeSlabsByDocs(documents)?.ToList() ?? [];
+        var allSlabs = _services.SlabService.GetTypeSlabsByDocs(documents)?.ToList() ?? [];
         if(!allSlabs.Any()) {
             return [];
         }
@@ -245,7 +247,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
 
     // Метод получения коллекции DocumentViewModel для Documents
     private IEnumerable<DocumentViewModel> GetDocumentViewModels() {
-        var allDocuments = _revitRepository.GetAllDocuments().ToArray();
+        var allDocuments = _services.DocumentService.GetAllDocuments().ToArray();
         var savedDocuments = _settings.Documents;
         var savedDocumentsNames = savedDocuments.Count == 0
             ? []
