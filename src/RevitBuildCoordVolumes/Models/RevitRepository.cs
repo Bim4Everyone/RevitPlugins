@@ -9,10 +9,11 @@ using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
 using RevitBuildCoordVolumes.Models.Geometry;
+using RevitBuildCoordVolumes.Models.Interfaces;
 
 namespace RevitBuildCoordVolumes.Models;
 
-internal class RevitRepository(UIApplication uiApp) {
+internal class RevitRepository(UIApplication uiApp, ISpatialSolidService spatialSolidService) {
     public UIApplication UiApplication { get; } = uiApp;
     public UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
     public Document Document => ActiveUiDocument.Document;
@@ -41,7 +42,8 @@ internal class RevitRepository(UIApplication uiApp) {
                 return new SpatialObject {
                     SpatialElement = spatialElement,
                     LevelName = levelName,
-                    Description = description
+                    Description = description,
+                    CheckingSolid = spatialSolidService.CreateSpatialSolid(spatialElement)
                 };
             })
             .Where(spatialObject => {

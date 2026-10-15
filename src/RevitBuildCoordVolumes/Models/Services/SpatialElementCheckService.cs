@@ -8,16 +8,10 @@ using dosymep.Revit;
 using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Settings;
-using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 
 internal class SpatialElementCheckService : ISpatialElementCheckService {
-    private readonly IContourService _contourService;
-
-    public SpatialElementCheckService(IContourService contourService) {
-        _contourService = contourService;
-    }
 
     public IReadOnlyCollection<WarningElement> CheckSpatialObjects(
         BuildCoordVolumeSettings settings, RevitRepository revitRepository) {
@@ -41,9 +35,7 @@ internal class SpatialElementCheckService : ISpatialElementCheckService {
                         SpatialObject = spatialObject
                     });
                 } else {
-                    var contourCurves = _contourService.GetOuterContour(spatialElement);
-                    var l = _contourService.GetCurveLoopsContour(contourCurves, null);
-                    var testSolid = SolidUtility.ExtrudeSolid(l);
+                    var testSolid = spatialObject.CheckingSolid;
                     if(testSolid == null) {
                         warnings.Add(new WarningBrokenContourElement {
                             WarningType = WarningType.BrokenContour,

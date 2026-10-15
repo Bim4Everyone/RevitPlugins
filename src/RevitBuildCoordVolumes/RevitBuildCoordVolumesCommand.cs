@@ -169,6 +169,11 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
         kernel.Bind<ISplitSolidService>()
             .To<SplitSolidService>()
             .InSingletonScope();
+        
+        // Настройка доступа к сервису экструзии зон в солиды
+        kernel.Bind<ISpatialSolidService>()
+            .To<SpatialSolidService>()
+            .InSingletonScope();
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()

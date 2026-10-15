@@ -12,26 +12,7 @@ using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 
-internal class SlabContourSolidService : ISlabContourSolidService {
-    private readonly IContourService _contourService;
-    private readonly ISlabFaceService _slabFaceService;
-
-    public SlabContourSolidService(IContourService contourService, ISlabFaceService slabFaceService) {
-        _contourService = contourService; 
-        _slabFaceService = slabFaceService;
-    }
-    
-    public Solid CreateSpatialSolid(SpatialObject spatialObject) {
-        var contourCurves = _contourService.GetOuterContour(spatialObject.SpatialElement);
-        var startContour = _contourService.GetCurveLoopsContour(contourCurves, null);
-        double pointSpatial = startContour[0].ElementAt(0).GetEndPoint(0).Z;
-        var transform = GeometryUtility.CreateZTranslation(pointSpatial, -1000);
-        foreach(var loop in startContour) {
-            loop.Transform(transform);
-        }
-        return SolidUtility.ExtrudeSolid(startContour, -1000, 1000);
-    }
-    
+internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlabContourSolidService {
     public Solid CreateFlatSlabContourSolid(ColumnObject columnObject, Solid spatialSolid, ProgressService progressService) {
         if(spatialSolid is null) {
             return null;
@@ -67,8 +48,8 @@ internal class SlabContourSolidService : ISlabContourSolidService {
         var startSlab = columnObject.StartSlab;
         var finishSlab = columnObject.FinishSlab;
         
-        double minPointZ = _slabFaceService.GetMinPointZ(startSlab.TopFaces);
-        double maxPointZ = _slabFaceService.GetMaxPointZ(finishSlab.TopFaces);
+        double minPointZ = slabFaceService.GetMinPointZ(startSlab.TopFaces);
+        double maxPointZ = slabFaceService.GetMaxPointZ(finishSlab.TopFaces);
         
         var startContour = GetStartSlabContour(startSlab, minPointZ);
         
@@ -173,7 +154,7 @@ internal class SlabContourSolidService : ISlabContourSolidService {
             return startSlab.TopContour;
         }
 
-        double maxPointStartSlab = _slabFaceService.GetMaxPointZ(startSlab.TopFaces);
+        double maxPointStartSlab = slabFaceService.GetMaxPointZ(startSlab.TopFaces);
         var startContour = startSlab.TopContour;
         var transform = GeometryUtility.CreateZTranslation(maxPointStartSlab, minPointZ);
         foreach(var loop in startContour) {

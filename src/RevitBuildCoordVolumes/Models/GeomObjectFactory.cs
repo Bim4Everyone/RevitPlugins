@@ -3,8 +3,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit.Geometry;
-
 using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
@@ -71,7 +69,6 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         int processed = 0;
         int reported = 0;
         var geomObjects = new List<GeomObject>();
-        var spatialSolid = _slabContourSolidService.CreateSpatialSolid(spatialObject);
         
         foreach(var columnGroup in columnGroups) {
             progressService?.CancellationToken.ThrowIfCancellationRequested();
@@ -88,10 +85,10 @@ internal class GeomObjectFactory : IGeomObjectFactory {
                 var unitedObjects = CreateIndividualAndUnitedObjects(columnGroup, polygons, progressService);
                 geomObjects.AddRange(unitedObjects);
             } else if (groupContainSlope) {
-                var slopedObjects = CreateSlopeSlabContourGeomObjects(columnGroup, spatialSolid, progressService);
+                var slopedObjects = CreateSlopeSlabContourGeomObjects(columnGroup, spatialObject.CheckingSolid, progressService);
                 geomObjects.AddRange(slopedObjects);
             } else {
-                var flatObjects = CreateFlatSlabContourGeomObjects(columnGroup, spatialSolid, progressService);
+                var flatObjects = CreateFlatSlabContourGeomObjects(columnGroup, spatialObject.CheckingSolid, progressService);
                 geomObjects.AddRange(flatObjects);
             }
             processed++;
