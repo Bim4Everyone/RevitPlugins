@@ -77,11 +77,10 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             }
             
             var firstRandomColumnObject = columnGroup.ColumnObjects[0];
-            bool groupContainOneColumn = columnGroup.ColumnObjects.Count == 1;
             bool groupContainCurved = firstRandomColumnObject.StartSlab.SlabType == SlabType.Ruled || firstRandomColumnObject.FinishSlab.SlabType == SlabType.Ruled;
             bool groupContainSlope = firstRandomColumnObject.StartSlab.SlabType == SlabType.SlopedPlanar || firstRandomColumnObject.FinishSlab.SlabType == SlabType.SlopedPlanar;
             
-            if (groupContainOneColumn || groupContainCurved) {
+            if (groupContainCurved) {
                 var unitedObjects = CreateIndividualAndUnitedObjects(columnGroup, polygons, progressService);
                 geomObjects.AddRange(unitedObjects);
             } else if (groupContainSlope) {
@@ -216,11 +215,11 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         var firstColumnObject = columns[0];
         
         var solid = _slabContourSolidService.CreateFlatSlabContourSolid(firstColumnObject, spatialSolid, progressService);
-        
+
         if(solid is null) {
             return [];
         }
-
+        
         return [new GeomObject {
             GeometryObjects = [solid],
             LevelName = firstColumnObject.LevelName,
@@ -232,8 +231,7 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         var columns = columnGroupObject.ColumnObjects;
         var firstElement = columns[0];
 
-        var solids =
-            _slabContourSolidService.CreateSlopedSlabContourSolids(firstElement, spatialSolid, progressService);
+        var solids = _slabContourSolidService.CreateSlopedSlabContourSolids(firstElement, spatialSolid, progressService);
 
         if(solids.Count == 0) {
             return [];

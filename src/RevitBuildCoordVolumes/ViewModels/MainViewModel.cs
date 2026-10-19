@@ -45,7 +45,7 @@ internal class MainViewModel : BaseViewModel {
             ?? throw new ArgumentNullException(nameof(messageBoxService));
 
         ProgressDialogFactory = progressDialogFactory
-            ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
+            ?? throw new ArgumentNullException(nameof(progressDialogFactory));
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         CheckAreaCommand = RelayCommand.Create(CheckArea, CanCheckArea);
@@ -131,7 +131,7 @@ internal class MainViewModel : BaseViewModel {
 
         UpdateVisibilitySettings();
 
-        SlabBasedSettingViewModel = new SlabBasedSettingViewModel(_systemPluginConfig, _revitRepository, _settings, _services);
+        SlabBasedSettingViewModel = new SlabBasedSettingViewModel(_systemPluginConfig, _settings, _services);
         SlabBasedSettingViewModel.PropertyChanged += OnSlabBasedSettingsChanged;
 
         UpdateRequiredCheckArea();

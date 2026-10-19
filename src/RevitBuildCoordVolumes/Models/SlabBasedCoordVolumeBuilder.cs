@@ -35,8 +35,11 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
             _settings.TypeSlabs, _settings.Documents, _settings.Levels)
             .ToList();
         
+        // Фильтрация плит перекрытий по зоне
+        var filteredSlabs = _services.SlabFilteredService.FilterSlabBySpatialObject(allSlabs, spatialObject);
+        
         // Построение групп колонн
-        var columnGroups = _columnFactory.CreateColumnGroups(polygons, allSlabs, progressService);
+        var columnGroups = _columnFactory.CreateColumnGroups(polygons, filteredSlabs, progressService);
 
         // Финальная сборка
         var geomObjects = _services.GeomObjectsBuildService.CreateGeomObjects(_settings, columnGroups, polygons, spatialObject, progressService);

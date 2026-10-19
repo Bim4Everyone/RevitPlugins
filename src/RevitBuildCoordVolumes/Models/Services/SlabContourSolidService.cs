@@ -64,7 +64,7 @@ internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlab
         if(lastSolid is null ) {
             return [];
         }
-        
+
         SolidUtility.TryGetBooleanSolid(firstSolid, lastSolid, BooleanOperationsType.Intersect, out var result);
         
         if(result is null) {

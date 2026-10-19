@@ -174,6 +174,11 @@ public class RevitBuildCoordVolumesCommand : BasePluginCommand {
         kernel.Bind<ISpatialSolidService>()
             .To<SpatialSolidService>()
             .InSingletonScope();
+        
+        // Настройка доступа к сервису фильтрации плит по зоне
+        kernel.Bind<ISlabFilteredService>()
+            .To<SlabFilteredService>()
+            .InSingletonScope();
 
         // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()

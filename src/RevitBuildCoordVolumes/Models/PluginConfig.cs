@@ -154,10 +154,13 @@ internal class SystemPluginConfig {
     public string DefaultStringTypeZone => "Координаты СМР";
 
     // Наиболее оптимальная сторона фигуры для поиска плиты в миллиметрах
-    public double SquareSideMm => 100;
+    public double SquareSideMm => 200;
 
     // Угол поворота квадрата по умолчанию
     public double SquareAngleDeg => 0;
+    
+    // Длина экструзии для проверочного солида зоны в миллиметрах
+    public double ExtrusionLengthMm => 1000;
 
     // Части имен типоразмеров плит перекрытий КР
     public List<string> DefaultSlabTypeNames => [

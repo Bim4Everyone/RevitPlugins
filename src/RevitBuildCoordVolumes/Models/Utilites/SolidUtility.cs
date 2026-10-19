@@ -88,27 +88,57 @@ internal static class SolidUtility {
     /// <param name="solid1">Первый исходный солид.</param>
     /// <param name="solid2">Второй исходный солид.</param>
     /// <param name="operationsType">Тип булевой операции</param>
-    /// <param name="result"></param>
+    /// <param name="result">Солид, получившийся в результате булевой операции исходных солидов.</param>
+    /// <param name="maxOffsetMm">Максимальное смещение солида при неудаче булевой операции.</param>
     /// <returns>
     /// Солид, полученный в результате булевой операции исходных солидов,
     /// или <c>null</c>, если пересечение отсутствует, имеет недостаточный объем
     /// либо при выполнении операции произошла ошибка.
     /// </returns>
-    public static bool TryGetBooleanSolid(Solid solid1, Solid solid2, BooleanOperationsType operationsType, out Solid result) {
-        result = null;
-        try {
-            var solid = BooleanOperationsUtils.ExecuteBooleanOperation(
-                solid1,
-                solid2,
-                operationsType);
+    public static bool TryGetBooleanSolid(
+        Solid solid1,
+        Solid solid2,
+        BooleanOperationsType operationsType,
+        out Solid result,
+        int maxOffsetMm = 5) {
 
+        result = null;
+
+        try {
+            var solid = BooleanOperationsUtils.ExecuteBooleanOperation(solid1, solid2, operationsType);
             result = IsValid(solid) 
                 ? solid 
                 : null;
             return true;
         } catch (Autodesk.Revit.Exceptions.InvalidOperationException) {
-            return false;
+            // Пробуем повторить операцию со смещением.
         }
+
+        for (int offsetMm = 1; offsetMm <= maxOffsetMm; offsetMm++) {
+            double offset = UnitUtils.ConvertToInternalUnits(
+                offsetMm,
+                UnitTypeId.Millimeters);
+
+            var transform = Transform.CreateTranslation(new XYZ(offset, offset, 0));
+
+            try {
+                var shiftedSolid = SolidUtils.CreateTransformed(solid2, transform);
+                
+                var shiftedResult = BooleanOperationsUtils.ExecuteBooleanOperation(solid1, shiftedSolid, operationsType);
+
+                if (!IsValid(shiftedResult)) {
+                    continue;
+                }
+                
+                result = SolidUtils.CreateTransformed(shiftedResult, transform.Inverse);
+
+                return IsValid(result);
+            } catch (Autodesk.Revit.Exceptions.InvalidOperationException) {
+                // Пробуем следующее смещение.
+            }
+        }
+
+        return false;
     }
 
     /// <summary>

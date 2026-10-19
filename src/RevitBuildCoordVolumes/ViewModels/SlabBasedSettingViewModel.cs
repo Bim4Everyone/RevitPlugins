@@ -21,7 +21,6 @@ namespace RevitBuildCoordVolumes.ViewModels;
 internal class SlabBasedSettingViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly BuildCoordVolumeServices _services;
-    private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeSettings _settings;
     private readonly ILocalizationService _localizationService;
     private ObservableCollection<BuilderModeViewModel> _builderModes;
@@ -41,11 +40,9 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
 
     public SlabBasedSettingViewModel(
         SystemPluginConfig systemPluginConfig,
-        RevitRepository revitRepository,
         BuildCoordVolumeSettings buildCoordVolumeSettings,
         BuildCoordVolumeServices buildCoordVolumeServices) {
         _systemPluginConfig = systemPluginConfig;
-        _revitRepository = revitRepository;
         _settings = buildCoordVolumeSettings;
         _services = buildCoordVolumeServices;
         _localizationService = _services.LocalizationService;

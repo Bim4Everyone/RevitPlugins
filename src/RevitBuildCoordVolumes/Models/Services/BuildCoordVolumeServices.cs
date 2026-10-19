@@ -21,7 +21,8 @@ internal sealed class BuildCoordVolumeServices {
         IColumnFactory columnFactory,
         IGeomObjectsBuildService geomObjectsBuildService,
         IDocumentService documentService,
-        ISlabService slabService) {
+        ISlabService slabService,
+        ISlabFilteredService slabFilteredService) {
 
         LocalizationService = localizationService;
         RevitParamFactory = revitParamFactory;
@@ -37,6 +38,7 @@ internal sealed class BuildCoordVolumeServices {
         GeomObjectsBuildService = geomObjectsBuildService;
         DocumentService = documentService;
         SlabService = slabService;
+        SlabFilteredService = slabFilteredService;
     }
 
     public ISpatialElementDividerService SpatialDivider { get; }
@@ -53,4 +55,5 @@ internal sealed class BuildCoordVolumeServices {
     public IGeomObjectsBuildService GeomObjectsBuildService { get; }
     public IDocumentService DocumentService { get; }
     public ISlabService SlabService { get; }
+    public ISlabFilteredService SlabFilteredService { get; }
 }
