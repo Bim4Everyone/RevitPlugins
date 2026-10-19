@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +17,7 @@ namespace RevitPackageDocumentation.Models;
 /// </summary>
 internal class FamilyLibraryService {
     private const string _familyExtension = ".rfa";
+    private const string _partAtomStreamName = "PartAtom";
     private const string _partAtomNamespace = "urn:schemas-autodesk-com:partatom";
     private const string _atomNamespace = "http://www.w3.org/2005/Atom";
     private const string _revitGroupingScheme = "adsk:revit:grouping";
@@ -58,7 +59,8 @@ internal class FamilyLibraryService {
 
     /// <summary>
     /// Получает сведения о семействе (категория и типоразмеры) без загрузки его в проект.
-    /// Сначала выполняется попытка чтения PartAtom, если не удалось - семейство открывается в фоне и закрывается.
+    /// PartAtom читается напрямую из файла, без вызовов Revit API, поэтому семейство
+    /// не открывается и не обновляется до текущей версии Revit.
     /// </summary>
     /// <remarks>
     /// Файл читается при каждом вызове, результаты не сохраняются между вызовами
@@ -94,7 +96,25 @@ internal class FamilyLibraryService {
     }
 
     /// <summary>
-    /// Чтение сведений о семействе из PartAtom (XML, хранящийся в файле семейства) без открытия семейства
+    /// Чтение PartAtom напрямую из файла .rfa (без вызовов Revit API, семейство не открывается и не обновляется)
+    /// </summary>
+    private FamilyFileInfo ReadPartAtomFromFile(string familyPath) {
+        try {
+            byte[] data = CompoundFileReader.ReadStream(familyPath, _partAtomStreamName);
+            if(data is null || data.Length == 0) {
+                return null;
+            }
+
+            using var memoryStream = new MemoryStream(data);
+            return ParsePartAtom(XDocument.Load(memoryStream), familyPath);
+        } catch(Exception) {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Чтение сведений о семействе из PartAtom, извлеченного средствами Revit.
+    /// Для семейств старых версий Revit открывает и обновляет файл.
     /// </summary>
     private FamilyFileInfo ReadByPartAtom(string familyPath) {
         string xmlPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xml");
@@ -104,39 +124,7 @@ internal class FamilyLibraryService {
                 return null;
             }
 
-            var xml = XDocument.Load(xmlPath);
-            XNamespace atom = _atomNamespace;
-            XNamespace partAtom = _partAtomNamespace;
-
-            // Категория Revit хранится в <category><term>..</term><scheme>adsk:revit:grouping</scheme></category>
-            // на языке Revit, в котором было сохранено семейство
-            string categoryName = xml.Root?
-                .Elements(atom + "category")
-                .FirstOrDefault(c => (string) c.Element(atom + "scheme") == _revitGroupingScheme)
-                ?.Element(atom + "term")
-                ?.Value;
-
-            // Если категорию не удалось распознать, например семейство сохранено в Revit другого языка,
-            // - переходим к открытию семейства, где категория известна точно
-            var builtInCategory = GetBuiltInCategory(categoryName);
-            if(builtInCategory is null) {
-                return null;
-            }
-
-            var typeNames = xml.Root?
-                .Element(partAtom + "family")
-                ?.Elements(partAtom + "part")
-                .Select(p => p.Element(atom + "title")?.Value)
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Distinct()
-                .ToList() ?? [];
-
-            // Если типоразмеров в PartAtom нет - перепроверяем через открытие семейства
-            if(typeNames.Count == 0) {
-                return null;
-            }
-
-            return new FamilyFileInfo(Path.GetFileNameWithoutExtension(familyPath), builtInCategory, typeNames);
+            return ParsePartAtom(XDocument.Load(xmlPath), familyPath);
         } catch(Exception) {
             return null;
         } finally {
@@ -149,7 +137,45 @@ internal class FamilyLibraryService {
     }
 
     /// <summary>
-    /// Чтение сведений о семействе путем его открытия в фоне (без отображения в интерфейсе Revit)
+    /// Разбор XML PartAtom: категория и имена типоразмеров.
+    /// Возвращает null, если категорию не удалось распознать или типоразмеров нет.
+    /// </summary>
+    private FamilyFileInfo ParsePartAtom(XDocument xml, string familyPath) {
+        XNamespace atom = _atomNamespace;
+        XNamespace partAtom = _partAtomNamespace;
+
+        // Категория Revit хранится в <category><term>..</term><scheme>adsk:revit:grouping</scheme></category>
+        // на языке Revit, в котором было сохранено семейство
+        string categoryName = xml.Root?
+            .Elements(atom + "category")
+            .FirstOrDefault(c => (string) c.Element(atom + "scheme") == _revitGroupingScheme)
+            ?.Element(atom + "term")
+            ?.Value;
+
+        // Категория не распознана, например семейство сохранено в Revit другого языка
+        var builtInCategory = GetBuiltInCategory(categoryName);
+        if(builtInCategory is null) {
+            return null;
+        }
+
+        var typeNames = xml.Root?
+            .Element(partAtom + "family")
+            ?.Elements(partAtom + "part")
+            .Select(p => p.Element(atom + "title")?.Value)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct()
+            .ToList() ?? [];
+
+        if(typeNames.Count == 0) {
+            return null;
+        }
+
+        return new FamilyFileInfo(Path.GetFileNameWithoutExtension(familyPath), builtInCategory, typeNames);
+    }
+
+    /// <summary>
+    /// Чтение сведений о семействе путем его открытия в фоне (без отображения в интерфейсе Revit).
+    /// Для семейств старых версий Revit обновляет файл.
     /// </summary>
     private FamilyFileInfo ReadByOpeningDocument(string familyPath) {
         Document familyDocument = null;
@@ -180,6 +206,7 @@ internal class FamilyLibraryService {
         } finally {
             try {
                 familyDocument?.Close(false);
+                familyDocument?.Dispose();
             } catch(Exception) { }
         }
     }
