@@ -1,10 +1,11 @@
+using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 
@@ -109,16 +110,51 @@ internal abstract class BaseParamContainerVM : ValidatableVM {
             return;
         }
         foreach(var param in CustomParamsList.Params) {
-            // Если параметр существует на экземпляре и он редактируемый
-            if(element.IsExistsParam(param.ParamName) && !element.GetParam(param.ParamName).IsReadOnly) {
-                element.SetParamValue(param.ParamName, param.ParamValue);
+            // Если на экземпляре есть редактируемый параметр с таким именем
+            var instanceParam = GetWritableParam(element, param.ParamName);
+            if(instanceParam != null) {
+                SetValue(instanceParam, param.ParamValue);
                 continue;
             }
-            // Если параметр существует на типе и он редактируемый
+            // Если на типе есть редактируемый параметр с таким именем
             var type = Repository.Document.GetElement(element.GetTypeId());
-            if(type != null && type.IsExistsParam(param.ParamName) && !element.GetParam(param.ParamName).IsReadOnly) {
-                type.SetParamValue(param.ParamName, param.ParamValue);
+            var typeParam = GetWritableParam(type, param.ParamName);
+            if(typeParam != null) {
+                SetValue(typeParam, param.ParamValue);
             }
         }
+    }
+
+    /// <summary>
+    /// Возвращает первый редактируемый параметр элемента с указанным именем или null, если такого нет.
+    /// </summary>
+    private static Parameter GetWritableParam(Element element, string paramName) {
+        if(element is null || string.IsNullOrWhiteSpace(paramName)) {
+            return null;
+        }
+        return element.GetParameters(paramName).FirstOrDefault(p => !p.IsReadOnly);
+    }
+
+    /// <summary>
+    /// Записывает строковое значение в параметр с учетом типа его хранения.
+    /// Если значение не удалось преобразовать или Revit его отклонил, параметр не изменяется.
+    /// </summary>
+    private static void SetValue(Parameter parameter, string value) {
+        value ??= string.Empty;
+        try {
+            switch(parameter.StorageType) {
+                case StorageType.String:
+                    parameter.Set(value);
+                    break;
+                case StorageType.Integer:
+                    if(int.TryParse(value.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int intValue)) {
+                        parameter.Set(intValue);
+                    }
+                    break;
+                case StorageType.Double:
+                    parameter.SetValueString(value);
+                    break;
+            }
+        } catch(Exception) { }
     }
 }
