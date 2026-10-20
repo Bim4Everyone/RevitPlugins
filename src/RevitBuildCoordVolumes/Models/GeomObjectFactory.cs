@@ -101,9 +101,19 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             }
         }
         
-        var firstColumnObject = columnGroups[0];
+        if (geomObjects.Count == 0 || columnGroups.Count == 0) {
+            return [];
+        }
+
+        var firstColumnObject = columnGroups.FirstOrDefault(
+            x => x.ColumnObjects.Count > 0
+        );
+
+        if (firstColumnObject == null) {
+            return [];
+        }
         
-        var finalObjects = _geomObjectsSplitter.SplitGeomObjects(geomObjects, firstColumnObject, spatialObject, progressService);
+        var finalObjects = _geomObjectsSplitter.SplitGeomObjects(geomObjects, progressService);
         
         return finalObjects;
     }
@@ -214,7 +224,7 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         var columns = columnGroupObject.ColumnObjects;
         var firstColumnObject = columns[0];
         
-        var solid = _slabContourSolidService.CreateFlatSlabContourSolid(firstColumnObject, spatialSolid, progressService);
+        var solid = _slabContourSolidService.CreateFlatSlabContourSolid(firstColumnObject, spatialSolid);
 
         if(solid is null) {
             return [];
@@ -231,7 +241,7 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         var columns = columnGroupObject.ColumnObjects;
         var firstElement = columns[0];
 
-        var solids = _slabContourSolidService.CreateSlopedSlabContourSolids(firstElement, spatialSolid, progressService);
+        var solids = _slabContourSolidService.CreateSlopedSlabContourSolids(firstElement, spatialSolid);
 
         if(solids.Count == 0) {
             return [];

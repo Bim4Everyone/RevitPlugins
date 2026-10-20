@@ -32,17 +32,6 @@ internal interface ISlabService {
     IEnumerable<SlabElement> GetSlabsByTypesDocsAndLevels(
         IEnumerable<string> typeSlabs, IEnumerable<Document> documents, List<Level> levels);
     /// <summary>
-    /// Метод получения перекрытий.
-    /// </summary>
-    /// <remarks>
-    /// В данном методе производится получения плит перекрытий по документам.
-    /// </remarks>            
-    /// <param name="documents">Коллекция документов.</param>         
-    /// <returns>
-    /// Коллекция SlabElement.
-    /// </returns>
-    IEnumerable<SlabElement> GetSlabsByDocs(IEnumerable<Document> documents);
-    /// <summary>
     /// Метод получения имен типов перекрытий.
     /// </summary>
     /// <remarks>

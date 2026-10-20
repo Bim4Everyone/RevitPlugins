@@ -35,8 +35,15 @@ internal class SlabService(
         return slabs
             .Where(slab => levelIds.Contains(slab.Level.Id));
     }
-
-    public IEnumerable<SlabElement> GetSlabsByDocs(IEnumerable<Document> documents) {
+    
+    public IEnumerable<string> GetTypeSlabsByDocs(IEnumerable<Document> documents) {
+        return GetSlabsByDocs(documents)
+            .Select(slab => slab.Floor.Name)
+            .Distinct();
+    }
+    
+    // Метод получения перекрытий из документов
+    private IEnumerable<SlabElement> GetSlabsByDocs(IEnumerable<Document> documents) {
         var result = new List<SlabElement>();
 
         foreach(var doc in documents) {
@@ -51,12 +58,7 @@ internal class SlabService(
         return result;
     }
     
-    public IEnumerable<string> GetTypeSlabsByDocs(IEnumerable<Document> documents) {
-        return GetSlabsByDocs(documents)
-            .Select(slab => slab.Floor.Name)
-            .Distinct();
-    }
-    
+    // Метод получения перекрытий из документа
     private IList<SlabElement> LoadSlabsFromDocument(Document doc) {
         var categories = systemPluginConfig.SlabCategories;
 

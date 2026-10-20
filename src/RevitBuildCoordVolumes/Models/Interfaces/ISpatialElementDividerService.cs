@@ -18,6 +18,7 @@ internal interface ISpatialElementDividerService {
     /// </remarks>
     /// <param name="spatialElement">Исходная зона.</param>
     /// <param name="settings">Настройки проекта.</param>
+    /// <param name="pro">Сервис отслеживания прогресса</param>
     /// <returns>
     /// Коллекция полигонов, представляющих фрагменты исходной зоны после разбиения.
     /// </returns>

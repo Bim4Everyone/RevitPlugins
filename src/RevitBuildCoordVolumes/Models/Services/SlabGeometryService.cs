@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
-
-using dosymep.Revit.Geometry;
 
 using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Interfaces;
@@ -57,11 +54,6 @@ internal class SlabGeometryService(
             SlabType = slabType
         };
     }
-    
-    // Метод получения трансформации по старой и новой позициям
-    public Transform CreateZTranslation(double oldPosition, double newPosition) {
-        return Transform.CreateTranslation(new XYZ(0, 0, newPosition - oldPosition));
-    }
 
     // Метод получения проверочных солидов плиты
     private List<(CurveLoop Loop, Solid Solid)> CreateCheckingSolids(
@@ -108,13 +100,6 @@ internal class SlabGeometryService(
     }
 
     // Трансформирует Curve и после этого переносит её на targetZ.
-    //
-    // Тип исходной Curve сохраняется:
-    // Line -> Line
-    // Arc -> Arc
-    // Ellipse -> Ellipse
-    // NurbSpline -> NurbSpline
-    // и т.д.
     private static CurveLoop TransformAndMoveLoopToZ(
         CurveArray curveArray,
         Transform transformFromDoc,
@@ -123,9 +108,6 @@ internal class SlabGeometryService(
         var transform = transformFromDoc ?? Transform.Identity;
 
         // Определяем Z первой кривой после основного transform.
-        //
-        // В нормальном Sketch все кривые находятся в одной плоскости,
-        // поэтому достаточно взять Z первой точки.
         var firstCurve = curveArray
             .Cast<Curve>()
             .First();

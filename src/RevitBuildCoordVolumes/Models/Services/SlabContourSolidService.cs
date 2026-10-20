@@ -13,7 +13,7 @@ using RevitBuildCoordVolumes.Models.Utilites;
 namespace RevitBuildCoordVolumes.Models.Services;
 
 internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlabContourSolidService {
-    public Solid CreateFlatSlabContourSolid(ColumnObject columnObject, Solid spatialSolid, ProgressService progressService) {
+    public Solid CreateFlatSlabContourSolid(ColumnObject columnObject, Solid spatialSolid) {
         if(spatialSolid is null) {
             return null;
         }
@@ -41,7 +41,7 @@ internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlab
         return finalResult;
     }
     
-     public IList<Solid> CreateSlopedSlabContourSolids(ColumnObject columnObject, Solid spatialSolid, ProgressService progressService) {
+     public IList<Solid> CreateSlopedSlabContourSolids(ColumnObject columnObject, Solid spatialSolid) {
          if(spatialSolid is null) {
              return [];
          }

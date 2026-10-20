@@ -3,18 +3,42 @@
 using Autodesk.Revit.DB;
 
 using RevitBuildCoordVolumes.Models.Geometry;
-using RevitBuildCoordVolumes.Models.Services;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
 internal interface ISlabContourSolidService {
-    Solid CreateFlatSlabContourSolid(
-        ColumnObject columnObject,
-        Solid spatialSolid,
-        ProgressService progressService);
-    
-    IList<Solid> CreateSlopedSlabContourSolids(
-        ColumnObject columnObject, 
-        Solid spatialSolid, 
-        ProgressService progressService);
+    /// <summary>
+    /// Создание солида контура между плитами с плоской геометрией.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе выполняется экструзия верхних контуров начальной и конечной плит,
+    /// пересечение полученных солидов и ограничение результата пространственным солидом.
+    /// </remarks>
+    /// <param name="columnObject">Объект колонны с данными о начальной и конечной плитах.</param>
+    /// <param name="spatialSolid">Солид, ограничивающий пространственную область.</param>
+    /// <returns>
+    /// Солид контура между плитами, ограниченный пространственным солидом,
+    /// или <c>null</c>, если создание или пересечение солидов не удалось.
+    /// </returns>
+    Solid CreateFlatSlabContourSolid(ColumnObject columnObject, Solid spatialSolid);
+
+    /// <summary>
+    /// Создание солидов контура между плитами с наклонной геометрией.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе формируются и пересекаются солиды, построенные по контурам начальной
+    /// и конечной плит, после чего результат ограничивается пространственным солидом.
+    /// Полученная геометрия последовательно разделяется плоскостями граней нижней и верхней плит.
+    /// Из частей удаляются области, пересекающиеся с нижней плитой, и сохраняются только области,
+    /// имеющие объемное пересечение с верхней плитой. На заключительном этапе выполняется
+    /// объединение полученных солидов.
+    /// </remarks>
+    /// <param name="columnObject">Объект колонны с данными о начальной и конечной плитах.</param>
+    /// <param name="spatialSolid">Солид, ограничивающий пространственную область.</param>
+    /// <returns>
+    /// Список солидов контура между плитами с учетом их наклонной геометрии.
+    /// Если необходимые солиды не созданы или результат обработки отсутствует,
+    /// возвращается пустой список.
+    /// </returns>
+    IList<Solid> CreateSlopedSlabContourSolids(ColumnObject columnObject, Solid spatialSolid);
 }
