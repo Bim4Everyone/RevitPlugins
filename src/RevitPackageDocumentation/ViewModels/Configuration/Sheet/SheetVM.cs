@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Windows.Input;
@@ -62,6 +64,9 @@ internal class SheetVM : ModuleVM {
         SelectAllComponentsCommand = RelayCommand.Create(SelectAllComponents);
         DeselectAllComponentsCommand = RelayCommand.Create(DeselectAllComponents);
         SelectComponentsWithoutErrorsCommand = RelayCommand.Create(SelectComponentsWithoutErrors);
+
+        // Родительский план фрагментов зависит от состава модулей листа и галочек модулей плана
+        _sheetComponents.CollectionChanged += OnSheetComponentsChanged;
     }
 
     public ICommand SelectTitleBlockFamilyCommand { get; }
@@ -180,6 +185,36 @@ internal class SheetVM : ModuleVM {
         }
     }
 
+    private void OnSheetComponentsChanged(object sender, NotifyCollectionChangedEventArgs e) {
+        if(e.NewItems != null) {
+            foreach(var component in e.NewItems.OfType<SheetComponentVM>()) {
+                component.PropertyChanged += OnSheetComponentPropertyChanged;
+            }
+        }
+        if(e.OldItems != null) {
+            foreach(var component in e.OldItems.OfType<SheetComponentVM>()) {
+                component.PropertyChanged -= OnSheetComponentPropertyChanged;
+            }
+        }
+        UpdateCalloutParents();
+    }
+
+    private void OnSheetComponentPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        // От галочки модуля плана зависит, какой план будет родительским для фрагментов ниже него
+        if(sender is PlanViewVM && e.PropertyName == nameof(IsModuleCheck)) {
+            UpdateCalloutParents();
+        }
+    }
+
+    /// <summary>
+    /// Пересчитывает родительские планы всех фрагментов листа
+    /// </summary>
+    public void UpdateCalloutParents() {
+        foreach(var callout in SheetComponents.OfType<CalloutViewVM>()) {
+            callout.UpdateParentPlan();
+        }
+    }
+
     private void SelectAllComponents() {
         foreach(var component in SheetComponents) {
             component.IsModuleCheck = true;
@@ -196,18 +231,10 @@ internal class SheetVM : ModuleVM {
     /// Отмечает модули листа без ошибок и снимает отметку с остальных. Галочка самого листа не меняется
     /// </summary>
     public void SelectComponentsWithoutErrors() {
+        // Модули перебираются сверху вниз: при снятии галочки с плана ошибка отсутствия родительского плана
+        // у фрагментов ниже пересчитывается сразу, поэтому они снимаются по общему правилу
         foreach(var component in SheetComponents) {
             component.IsModuleCheck = !component.HasErrors;
-        }
-
-        // Фрагмент создается на ближайшем отмеченном плане выше по листу, без него фрагмент не создается
-        bool hasCheckedPlanAbove = false;
-        foreach(var component in SheetComponents) {
-            if(component is PlanViewVM && component.IsModuleCheck) {
-                hasCheckedPlanAbove = true;
-            } else if(component is CalloutViewVM && !hasCheckedPlanAbove) {
-                component.IsModuleCheck = false;
-            }
         }
     }
 

@@ -41,6 +41,8 @@ internal class CalloutViewVM : SheetComponentVM {
     private string _viewCount;
     private string _viewportNumber;
     private SelectElemParamVM _selectedSelectElemParam;
+    private PlanViewVM _parentPlan;
+    private string _parentPlanError = string.Empty;
 
     private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
@@ -124,28 +126,66 @@ internal class CalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
 
+    /// <summary>
+    /// Родительский модуль плана - ближайший отмеченный модуль вида в плане выше фрагмента на листе
+    /// </summary>
+    public PlanViewVM ParentPlan {
+        get => _parentPlan;
+        private set => RaiseAndSetIfChanged(ref _parentPlan, value);
+    }
 
-    public override bool CanCreateComponent() {
-        if(HasErrors) {
-            return false;
+    /// <summary>
+    /// Текст ошибки отсутствия родительского плана. Пустая строка - ошибки нет
+    /// </summary>
+    [ErrorTextIsEmpty]
+    public string ParentPlanError {
+        get => _parentPlanError;
+        private set => RaiseAndSetIfChanged(ref _parentPlanError, value);
+    }
+
+    /// <summary>
+    /// Пересчитывает родительский план и ошибку его отсутствия.
+    /// Вызывается листом при добавлении/удалении модулей и смене галочек модулей плана
+    /// </summary>
+    public void UpdateParentPlan() {
+        ParentPlan = FindParentPlan();
+        ParentPlanError = ParentPlan is null
+            ? LocalizationService.GetLocalizedString("Validation.HasNotPlanView")
+            : string.Empty;
+    }
+
+    /// <summary>
+    /// Возвращает ближайший отмеченный модуль вида в плане выше фрагмента на листе или null
+    /// </summary>
+    private PlanViewVM FindParentPlan() {
+        var components = Sheet?.SheetComponents;
+        if(components is null) {
+            return null;
         }
-
-        int index = Sheet.SheetComponents.IndexOf(this);
-        PlanViewVM parentView = null;
-        for(int i = index; i >= 0; i--) {
-            parentView = Sheet.SheetComponents[i] as PlanViewVM;
-
-            if(parentView != null && parentView.IsModuleCheck == true) {
-                break;
+        int index = components.IndexOf(this);
+        for(int i = index - 1; i >= 0; i--) {
+            if(components[i] is PlanViewVM plan && plan.IsModuleCheck) {
+                return plan;
             }
         }
-        if(parentView is null) {
-            FirstError = LocalizationService.GetLocalizedString("Validation.HasNotPlanView");
-            return false;
-        }
+        return null;
+    }
 
-        FirstError = string.Empty;
-        return true;
+    /// <summary>
+    /// Возвращает вид родительского плана: созданный в этом запуске или существующий в проекте с именем плана
+    /// </summary>
+    private ViewPlan GetParentPlanView() {
+        var parentPlan = FindParentPlan();
+        if(parentPlan is null) {
+            return null;
+        }
+        return parentPlan.ViewInstance ?? Repository.FindViewByName<ViewPlan>(parentPlan.ViewName);
+    }
+
+
+    public override bool CanCreateComponent() {
+        // Отсутствие родительского плана также является ошибкой модуля (ParentPlanError)
+        return !HasErrors;
     }
 
     public override void Process(bool processDependent = false) {
@@ -167,18 +207,8 @@ internal class CalloutViewVM : SheetComponentVM {
         }
 
         try {
-            int index = Sheet.SheetComponents.IndexOf(this);
-            PlanViewVM parentView = default;
-
-            for(int i = index; i >= 0; i--) {
-                parentView = Sheet.SheetComponents[i] as PlanViewVM;
-
-                if(parentView != null) {
-                    break;
-                }
-            }
-
-            if(parentView is null || parentView.ViewInstance is null) {
+            var parentView = GetParentPlanView();
+            if(parentView is null) {
                 return null;
             }
 
@@ -191,7 +221,7 @@ internal class CalloutViewVM : SheetComponentVM {
 
             view = ViewSection.CreateCallout(
                 Repository.Document,
-                parentView.ViewInstance.Id,
+                parentView.Id,
                 ViewFamilyType.Id,
                 calloutStart,
                 calloutEnd);

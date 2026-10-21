@@ -69,6 +69,7 @@
     <system:String x:Key="MainWindow.ViewportType">Типоразмер видового экрана</system:String>
     <system:String x:Key="MainWindow.Count">Количество</system:String>
     <system:String x:Key="MainWindow.BindingToObject">Привязка к объекту</system:String>
+    <system:String x:Key="MainWindow.ParentView">Родительский вид</system:String>
     <system:String x:Key="MainWindow.Comments">Комментарии</system:String>
     <system:String x:Key="MainWindow.FinalSpecName">Имя итоговой</system:String>
     <system:String x:Key="MainWindow.ReferenceSpecName">Имя исходной</system:String>
@@ -111,7 +112,7 @@
     
     <system:String x:Key="Validation.ErrorInCustomParams">Исправлены не все ошибки в дополнительных параметрах</system:String>
 
-    <system:String x:Key="Validation.HasNotPlanView">Расположите компонент после вида в плане</system:String>
+    <system:String x:Key="Validation.HasNotPlanView">Над фрагментом на листе нет отмеченного вида в плане</system:String>
 
     <system:String x:Key="Validation.LegendViewIsNull">Не выбрана легенда для размещения</system:String>
     <system:String x:Key="Validation.ViewColumnIsNotCorrect">Номер столбца задан некорректно</system:String>
