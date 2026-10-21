@@ -9,7 +9,13 @@
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     
     <system:String x:Key="MainWindow.AddSheet">Добавить лист</system:String>
+    <system:String x:Key="MainWindow.SelectAllSheets">Выбрать все листы</system:String>
+    <system:String x:Key="MainWindow.DeselectAllSheets">Снять выбор со всех листов</system:String>
+    <system:String x:Key="MainWindow.SelectSheetsWithoutErrors">Выбрать листы и модули без ошибок</system:String>
     <system:String x:Key="MainWindow.AddSheetComponent">Добавить компонент листа</system:String>
+    <system:String x:Key="MainWindow.SelectAllComponents">Выбрать все модули листа</system:String>
+    <system:String x:Key="MainWindow.DeselectAllComponents">Снять выбор со всех модулей листа</system:String>
+    <system:String x:Key="MainWindow.SelectComponentsWithoutErrors">Выбрать модули листа без ошибок</system:String>
     <system:String x:Key="MainWindow.AddSheetSetParam">Добавить параметр</system:String>
     <system:String x:Key="MainWindow.SheetSetParams">Параметры комплекта</system:String>
     

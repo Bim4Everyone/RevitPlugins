@@ -9,7 +9,13 @@
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 
     <system:String x:Key="MainWindow.AddSheet">Add sheet</system:String>
+    <system:String x:Key="MainWindow.SelectAllSheets">Select all sheets</system:String>
+    <system:String x:Key="MainWindow.DeselectAllSheets">Deselect all sheets</system:String>
+    <system:String x:Key="MainWindow.SelectSheetsWithoutErrors">Select sheets and modules without errors</system:String>
     <system:String x:Key="MainWindow.AddSheetComponent">Add sheet component</system:String>
+    <system:String x:Key="MainWindow.SelectAllComponents">Select all sheet modules</system:String>
+    <system:String x:Key="MainWindow.DeselectAllComponents">Deselect all sheet modules</system:String>
+    <system:String x:Key="MainWindow.SelectComponentsWithoutErrors">Select sheet modules without errors</system:String>
     <system:String x:Key="MainWindow.AddSheetSetParam">Add parameter</system:String>
     <system:String x:Key="MainWindow.SheetSetParams">Sheet set parameters</system:String>
 

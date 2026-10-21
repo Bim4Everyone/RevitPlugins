@@ -59,6 +59,9 @@ internal class SheetVM : ModuleVM {
 
         AddComponentCommand = RelayCommand.Create<ComponentTypeItem>(AddComponent);
         RemoveComponentCommand = RelayCommand.Create<SheetComponentVM>(RemoveComponent);
+        SelectAllComponentsCommand = RelayCommand.Create(SelectAllComponents);
+        DeselectAllComponentsCommand = RelayCommand.Create(DeselectAllComponents);
+        SelectComponentsWithoutErrorsCommand = RelayCommand.Create(SelectComponentsWithoutErrors);
     }
 
     public ICommand SelectTitleBlockFamilyCommand { get; }
@@ -66,6 +69,21 @@ internal class SheetVM : ModuleVM {
 
     public ICommand AddComponentCommand { get; }
     public ICommand RemoveComponentCommand { get; }
+
+    /// <summary>
+    /// Команда включения в генерацию всех модулей листа
+    /// </summary>
+    public ICommand SelectAllComponentsCommand { get; }
+
+    /// <summary>
+    /// Команда исключения из генерации всех модулей листа
+    /// </summary>
+    public ICommand DeselectAllComponentsCommand { get; }
+
+    /// <summary>
+    /// Команда включения в генерацию модулей листа без ошибок и исключения остальных
+    /// </summary>
+    public ICommand SelectComponentsWithoutErrorsCommand { get; }
 
     public SheetSetVM SheetSet {
         get => _sheetSet;
@@ -159,6 +177,37 @@ internal class SheetVM : ModuleVM {
             SheetComponents.Add(component);
         } catch(Exception) {
             _messageBoxService.Show("An error occurred while adding the component!", "Error");
+        }
+    }
+
+    private void SelectAllComponents() {
+        foreach(var component in SheetComponents) {
+            component.IsModuleCheck = true;
+        }
+    }
+
+    private void DeselectAllComponents() {
+        foreach(var component in SheetComponents) {
+            component.IsModuleCheck = false;
+        }
+    }
+
+    /// <summary>
+    /// Отмечает модули листа без ошибок и снимает отметку с остальных. Галочка самого листа не меняется
+    /// </summary>
+    public void SelectComponentsWithoutErrors() {
+        foreach(var component in SheetComponents) {
+            component.IsModuleCheck = !component.HasErrors;
+        }
+
+        // Фрагмент создается на ближайшем отмеченном плане выше по листу, без него фрагмент не создается
+        bool hasCheckedPlanAbove = false;
+        foreach(var component in SheetComponents) {
+            if(component is PlanViewVM && component.IsModuleCheck) {
+                hasCheckedPlanAbove = true;
+            } else if(component is CalloutViewVM && !hasCheckedPlanAbove) {
+                component.IsModuleCheck = false;
+            }
         }
     }
 

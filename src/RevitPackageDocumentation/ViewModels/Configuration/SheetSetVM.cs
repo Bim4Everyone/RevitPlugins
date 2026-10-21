@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -42,10 +43,28 @@ internal class SheetSetVM : BaseViewModel {
 
         AddSheetCommand = RelayCommand.Create(AddSheet);
         RemoveSheetCommand = RelayCommand.Create<SheetVM>(RemoveSheet);
+        SelectAllSheetsCommand = RelayCommand.Create(SelectAllSheets);
+        DeselectAllSheetsCommand = RelayCommand.Create(DeselectAllSheets);
+        SelectSheetsWithoutErrorsCommand = RelayCommand.Create(SelectSheetsWithoutErrors);
     }
 
     public ICommand AddSheetCommand { get; }
     public ICommand RemoveSheetCommand { get; }
+
+    /// <summary>
+    /// Команда включения в генерацию всех листов (галочки модулей листов не меняются)
+    /// </summary>
+    public ICommand SelectAllSheetsCommand { get; }
+
+    /// <summary>
+    /// Команда исключения из генерации всех листов (галочки модулей листов не меняются)
+    /// </summary>
+    public ICommand DeselectAllSheetsCommand { get; }
+
+    /// <summary>
+    /// Команда включения в генерацию всех листов и модулей без ошибок и исключения остальных
+    /// </summary>
+    public ICommand SelectSheetsWithoutErrorsCommand { get; }
 
     public string Name {
         get => _name;
@@ -65,6 +84,33 @@ internal class SheetSetVM : BaseViewModel {
     public SheetSetParametersListVM SheetSetParams {
         get => _sheetSetParams;
         set => RaiseAndSetIfChanged(ref _sheetSetParams, value);
+    }
+
+    private void SelectAllSheets() {
+        foreach(var sheet in SheetList) {
+            sheet.IsModuleCheck = true;
+        }
+    }
+
+    private void DeselectAllSheets() {
+        foreach(var sheet in SheetList) {
+            sheet.IsModuleCheck = false;
+        }
+    }
+
+    /// <summary>
+    /// Отмечает все, что можно сгенерировать: модули без ошибок, затем листы без ошибок.
+    /// Лист, у которого есть модули, но ни один из них не остался отмеченным, не отмечается
+    /// </summary>
+    private void SelectSheetsWithoutErrors() {
+        foreach(var sheet in SheetList) {
+            sheet.SelectComponentsWithoutErrors();
+
+            // Ошибки неотмеченных модулей на ошибки листа не влияют
+            bool hasCheckedComponents = sheet.SheetComponents.Count == 0
+                || sheet.SheetComponents.Any(c => c.IsModuleCheck);
+            sheet.IsModuleCheck = !sheet.HasErrors && hasCheckedComponents;
+        }
     }
 
     public void ValidateAllSheets() {

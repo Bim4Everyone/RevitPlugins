@@ -140,14 +140,58 @@
                         ItemsSource="{Binding CurrentSheetSet.SheetList}"
                         SelectedItem="{Binding CurrentSheetSet.SelectedSheet}" />
 
-                    <ui:Button
-                        Grid.Row="1"
-                        Margin="5"
-                        Padding="7"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Right"
-                        Content="{me:LocalizationSource MainWindow.AddSheet}"
-                        Command="{Binding CurrentSheetSet.AddSheetCommand}" />
+                    <Grid
+                        Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--Массовая расстановка галочек листов-->
+                        <StackPanel
+                            Grid.Column="0"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Left">
+                            <ui:Button
+                                Margin="5"
+                                Height="35"
+                                Width="35"
+                                Padding="0"
+                                VerticalAlignment="Center"
+                                Icon="{ui:SymbolIcon CheckboxChecked24}"
+                                ToolTip="{me:LocalizationSource MainWindow.SelectAllSheets}"
+                                Command="{Binding CurrentSheetSet.SelectAllSheetsCommand}" />
+
+                            <ui:Button
+                                Margin="5"
+                                Height="35"
+                                Width="35"
+                                Padding="0"
+                                VerticalAlignment="Center"
+                                Icon="{ui:SymbolIcon CheckboxUnchecked24}"
+                                ToolTip="{me:LocalizationSource MainWindow.DeselectAllSheets}"
+                                Command="{Binding CurrentSheetSet.DeselectAllSheetsCommand}" />
+
+                            <ui:Button
+                                Margin="5"
+                                Height="35"
+                                Width="35"
+                                Padding="0"
+                                VerticalAlignment="Center"
+                                Icon="{ui:SymbolIcon Wand24}"
+                                ToolTip="{me:LocalizationSource MainWindow.SelectSheetsWithoutErrors}"
+                                Command="{Binding CurrentSheetSet.SelectSheetsWithoutErrorsCommand}" />
+                        </StackPanel>
+
+                        <ui:Button
+                            Grid.Column="1"
+                            Margin="5"
+                            Padding="7"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Content="{me:LocalizationSource MainWindow.AddSheet}"
+                            Command="{Binding CurrentSheetSet.AddSheetCommand}" />
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>
@@ -516,6 +560,43 @@
                             HorizontalContentAlignment="Stretch"
                             ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </ScrollViewer>
+
+                    <!--Массовая расстановка галочек модулей выбранного листа-->
+                    <StackPanel
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Left">
+                        <ui:Button
+                            Margin="5"
+                            Height="35"
+                            Width="35"
+                            Padding="0"
+                            VerticalAlignment="Center"
+                            Icon="{ui:SymbolIcon CheckboxChecked24}"
+                            ToolTip="{me:LocalizationSource MainWindow.SelectAllComponents}"
+                            Command="{Binding CurrentSheetSet.SelectedSheet.SelectAllComponentsCommand}" />
+
+                        <ui:Button
+                            Margin="5"
+                            Height="35"
+                            Width="35"
+                            Padding="0"
+                            VerticalAlignment="Center"
+                            Icon="{ui:SymbolIcon CheckboxUnchecked24}"
+                            ToolTip="{me:LocalizationSource MainWindow.DeselectAllComponents}"
+                            Command="{Binding CurrentSheetSet.SelectedSheet.DeselectAllComponentsCommand}" />
+
+                        <ui:Button
+                            Margin="5"
+                            Height="35"
+                            Width="35"
+                            Padding="0"
+                            VerticalAlignment="Center"
+                            Icon="{ui:SymbolIcon Wand24}"
+                            ToolTip="{me:LocalizationSource MainWindow.SelectComponentsWithoutErrors}"
+                            Command="{Binding CurrentSheetSet.SelectedSheet.SelectComponentsWithoutErrorsCommand}" />
+                    </StackPanel>
 
                     <ComboBox
                         x:Name="ComponentTypesComboBox"
