@@ -28,6 +28,12 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     /// </summary>
     private const BuiltInCategory _builtInCategory = BuiltInCategory.OST_GenericAnnotation;
 
+    // Отступ по вертикали в футах между рядом аннотаций и вышестоящим рядом (фрагменты, разрезы или рамка)
+    private readonly double _annotationRowOffset = UnitUtilsHelper.ConvertToInternalValue(100);
+
+    // Шаг по горизонтали в футах между левыми краями соседних аннотаций в ряду
+    private readonly double _annotationStep = UnitUtilsHelper.ConvertToInternalValue(100);
+
     private readonly FamilyLibraryService _familyLibraryService;
     private readonly IOpenFolderDialogService _openFolderDialogService;
 
@@ -431,11 +437,92 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         return annotationType;
     }
 
+    /// <summary>
+    /// Размещает аннотацию под рамкой листа слева направо: ряд аннотаций располагается ниже фрагментов,
+    /// если их нет - ниже разрезов, если нет и их - ниже рамки. Если такой типоразмер уже есть на листе,
+    /// аннотация повторно не размещается.
+    /// </summary>
+    /// <returns>Размещенный экземпляр или null, если аннотация не размещалась</returns>
     private FamilyInstance Place(FamilySymbol annotationType) {
-        var position = new XYZ(
-            UnitUtilsHelper.ConvertToInternalValue(-100),
-            UnitUtilsHelper.ConvertToInternalValue(250),
-            0);
-        return Repository.Document.Create.NewFamilyInstance(position, annotationType, Sheet.SheetInstance);
+        var sheetInstance = Sheet.SheetInstance;
+        if(sheetInstance is null || IsPlacedOnSheet(annotationType, sheetInstance)) {
+            return null;
+        }
+
+        // Без рамки ряд под рамкой не построить - аннотация размещается в фиксированной точке слева от листа
+        if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
+            var position = new XYZ(
+                UnitUtilsHelper.ConvertToInternalValue(-100),
+                UnitUtilsHelper.ConvertToInternalValue(250),
+                0);
+            return Repository.Document.Create.NewFamilyInstance(position, annotationType, sheetInstance);
+        }
+        var titleBlockBB = titleBlock.get_BoundingBox(sheetInstance);
+        double rowTopY = GetAnnotationRowTop(sheetInstance, titleBlockBB.Min.Y) - _annotationRowOffset;
+        double? lastAnnotationLeftX = GetLastAnnotationLeft(sheetInstance, titleBlockBB.Min.Y);
+        double rowLeftX = lastAnnotationLeftX.HasValue
+            ? lastAnnotationLeftX.Value + _annotationStep
+            : titleBlockBB.Min.X;
+
+        // Точка вставки семейства может не совпадать с углом аннотации, поэтому аннотация размещается в начале
+        // координат, а затем сдвигается так, чтобы левый верхний угол ее габарита оказался в нужной точке
+        var instance = Repository.Document.Create.NewFamilyInstance(XYZ.Zero, annotationType, sheetInstance);
+        Repository.Document.Regenerate();
+
+        var instanceBB = instance.get_BoundingBox(sheetInstance);
+        if(instanceBB != null) {
+            var translation = new XYZ(rowLeftX - instanceBB.Min.X, rowTopY - instanceBB.Max.Y, 0);
+            ElementTransformUtils.MoveElement(Repository.Document, instance.Id, translation);
+        }
+        return instance;
+    }
+
+    /// <summary>
+    /// Проверяет, есть ли на листе экземпляр указанного типоразмера
+    /// </summary>
+    private bool IsPlacedOnSheet(FamilySymbol annotationType, ViewSheet sheetInstance) {
+        return new FilteredElementCollector(Repository.Document, sheetInstance.Id)
+            .OfClass(typeof(FamilyInstance))
+            .OfType<FamilyInstance>()
+            .Any(instance => instance.Symbol.Id == annotationType.Id);
+    }
+
+    /// <summary>
+    /// Возвращает отметку, ниже которой располагается ряд аннотаций: низ самого нижнего фрагмента под рамкой,
+    /// если фрагментов нет - низ самого нижнего разреза под рамкой, если нет и их - низ рамки
+    /// </summary>
+    private double GetAnnotationRowTop(ViewSheet sheetInstance, double titleBlockMinY) {
+        var viewportsBelowTitleBlock = Repository.GetViewports(sheetInstance)
+            .Where(viewport => viewport.GetBoxCenter().Y < titleBlockMinY)
+            .Select(viewport => new {
+                View = Repository.Document.GetElement(viewport.ViewId) as View,
+                MinY = viewport.GetBoxOutline().MinimumPoint.Y
+            })
+            .Where(x => x.View != null)
+            .ToList();
+
+        var callouts = viewportsBelowTitleBlock.Where(x => x.View.IsCallout).ToList();
+        if(callouts.Count > 0) {
+            return callouts.Min(x => x.MinY);
+        }
+
+        var sections = viewportsBelowTitleBlock.Where(x => x.View is ViewSection && !x.View.IsCallout).ToList();
+        if(sections.Count > 0) {
+            return sections.Min(x => x.MinY);
+        }
+        return titleBlockMinY;
+    }
+
+    /// <summary>
+    /// Возвращает левую границу самой правой аннотации под рамкой листа или null, если аннотаций под рамкой нет
+    /// </summary>
+    private double? GetLastAnnotationLeft(ViewSheet sheetInstance, double titleBlockMinY) {
+        return new FilteredElementCollector(Repository.Document, sheetInstance.Id)
+            .OfCategory(_builtInCategory)
+            .WhereElementIsNotElementType()
+            .Select(element => element.get_BoundingBox(sheetInstance))
+            .Where(bb => bb != null && (bb.Min.Y + bb.Max.Y) / 2 < titleBlockMinY)
+            .Select(bb => (double?) bb.Min.X)
+            .Max();
     }
 }
