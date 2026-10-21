@@ -174,9 +174,9 @@
 
                     <ToggleButton
                         Grid.Column="2"
-                        Margin="0 10 0 0"
-                        Height="37"
-                        Width="37"
+                        Margin="0 10 5 0"
+                        Height="36"
+                        Width="36"
                         VerticalAlignment="Top"
                         Content="✕"
                         IsChecked="{Binding ViewTemplateRemoveAfterCreation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -380,9 +380,9 @@
 
                     <ToggleButton
                         Grid.Column="2"
-                        Margin="0 10 0 0"
-                        Height="37"
-                        Width="37"
+                        Margin="0 10 5 0"
+                        Height="36"
+                        Width="36"
                         VerticalAlignment="Top"
                         Content="✕"
                         IsChecked="{Binding ViewTemplateRemoveAfterCreation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -608,9 +608,9 @@
 
                     <ToggleButton
                         Grid.Column="2"
-                        Margin="0 10 0 0"
-                        Height="37"
-                        Width="37"
+                        Margin="0 10 5 0"
+                        Height="36"
+                        Width="36"
                         VerticalAlignment="Top"
                         Content="✕"
                         IsChecked="{Binding ViewTemplateRemoveAfterCreation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
