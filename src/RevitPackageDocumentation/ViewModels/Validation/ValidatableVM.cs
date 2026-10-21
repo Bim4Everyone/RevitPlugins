@@ -188,7 +188,7 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
         INotifyPropertyChanged notify) {
 
         PropertyChangedEventHandler handler = (_, e) => {
-            // Включение/исключение модуля из генерации также влияет на результат проверки (см. ChildHasErrors)
+            // Включение/исключение модуля из генерации также влияет на результат проверки (ChildHasErrors)
             if(e.PropertyName == nameof(HasErrors) || e.PropertyName == nameof(ICheckableModule.IsModuleCheck)) {
                 ValidateProperty(propertyName);
             }

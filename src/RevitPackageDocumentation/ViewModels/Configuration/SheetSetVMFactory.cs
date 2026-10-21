@@ -176,6 +176,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ReferenceViewFilter = GetFilterList(data.ReferenceViewFilterValues, sheetSetVM.SheetSetParams.Params),
         };
 
+        // Первичная проверка в конструкторе выполняется до загрузки способа создания (как при создании с нуля),
+        // а пустые поля из конфигурации не вызывают повторной проверки, поэтому перепроверяем с учетом способа создания
+        sheetComponentVM.ValidateAllProperties();
+
         // Добавляем список дополнительных параметров
         SetCustomParametersList(sheetComponentVM, data, sheetSetVM.SheetSetParams.Params);
         return sheetComponentVM;

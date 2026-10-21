@@ -14,6 +14,12 @@ internal class ChildHasErrorsAttribute : ValidationAttribute {
     /// </summary>
     public bool ConditionValue { get; set; } = true;
 
+    /// <summary>
+    /// Не учитывать ошибки элементов коллекции, которые являются модулями со снятой галочкой
+    /// (исключенными из генерации)
+    /// </summary>
+    public bool IgnoreUncheckedModules { get; set; }
+
     protected override ValidationResult IsValid(object value, ValidationContext context) {
         if(!ValidationCondition.IsMet(context, ConditionPropertyName, ConditionValue)) {
             return ValidationResult.Success;
@@ -29,6 +35,9 @@ internal class ChildHasErrorsAttribute : ValidationAttribute {
 
             case IEnumerable enumerable:
                 foreach(var item in enumerable) {
+                    if(IgnoreUncheckedModules && item is ICheckableModule { IsModuleCheck: false }) {
+                        continue;
+                    }
                     if(item is INotifyDataErrorInfo child && child.HasErrors) {
                         return new ValidationResult(ErrorMessage);
                     }

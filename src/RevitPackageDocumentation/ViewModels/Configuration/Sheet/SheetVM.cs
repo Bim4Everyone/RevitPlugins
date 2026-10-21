@@ -115,7 +115,8 @@ internal class SheetVM : ModuleVM {
         set => RaiseAndSetIfChanged(ref _titleBlockType, value);
     }
 
-    [ChildHasErrors(ErrorMessage = "Validation.ErrorInSheetComponents")]
+    // Компоненты, исключенные из генерации, не влияют на ошибки листа
+    [ChildHasErrors(IgnoreUncheckedModules = true, ErrorMessage = "Validation.ErrorInSheetComponents")]
     public ObservableCollection<SheetComponentVM> SheetComponents {
         get => _sheetComponents;
         set => RaiseAndSetIfChanged(ref _sheetComponents, value);

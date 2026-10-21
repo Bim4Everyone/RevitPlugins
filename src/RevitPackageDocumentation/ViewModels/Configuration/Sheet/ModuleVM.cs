@@ -4,9 +4,10 @@ using dosymep.SimpleServices;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.Validation;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
-internal abstract class ModuleVM : BaseParamContainerVM {
+internal abstract class ModuleVM : BaseParamContainerVM, ICheckableModule {
     private bool _isModuleCheck = false;
     private string _moduleName = string.Empty;
     private string _moduleComment = string.Empty;
