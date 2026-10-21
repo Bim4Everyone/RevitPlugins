@@ -65,6 +65,9 @@
     <system:String x:Key="MainWindow.Comments">Comments</system:String>
     <system:String x:Key="MainWindow.FinalSpecName">Final schedule name</system:String>
     <system:String x:Key="MainWindow.ReferenceSpecName">Source schedule name</system:String>
+    <system:String x:Key="MainWindow.FinalViewName">Final view name</system:String>
+    <system:String x:Key="MainWindow.ReferenceViewName">Source view name</system:String>
+    <system:String x:Key="MainWindow.ViewSourceToolTip">Left — create a new view, right — duplicate the selected view</system:String>
     <system:String x:Key="MainWindow.PlacementColumn">Placement column</system:String>
     <system:String x:Key="MainWindow.Filters">Filters</system:String>
     <system:String x:Key="MainWindow.TextNoteType">Text note type</system:String>
@@ -106,6 +109,7 @@
     <system:String x:Key="Validation.LegendViewIsNull">No legend selected for placement</system:String>
     <system:String x:Key="Validation.ViewColumnIsNotCorrect">Column number is incorrect</system:String>
     <system:String x:Key="Validation.ReferenceSpecIsNull">No reference schedule selected for duplication</system:String>
+    <system:String x:Key="Validation.ReferenceViewIsNull">No source view selected for duplication</system:String>
     <system:String x:Key="Validation.ScheduleFiltersIsNotCorrect">Schedule filters are incorrect</system:String>
 
     <system:String x:Key="Validation.TextIsEmpty">Text is empty</system:String>

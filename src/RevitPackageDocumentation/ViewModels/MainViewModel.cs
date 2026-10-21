@@ -45,6 +45,7 @@ internal class MainViewModel : BaseViewModel {
 
     private List<ViewFamilyType> _sectionViewFamilyTypes;
     private List<ViewPlan> _planViewTemplates;
+    private List<ViewPlan> _planViewsForDuplication;
     private List<ViewSection> _sectionViewTemplates;
     private List<ViewFamilyType> _structuralPlanViewFamilyTypes;
     private List<ElementType> _viewportTypes;
@@ -141,6 +142,14 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _planViewTemplates, value);
     }
 
+    /// <summary>
+    /// Виды в плане проекта, которые можно копировать с детализацией - исходные виды для дублирования
+    /// </summary>
+    public List<ViewPlan> PlanViewsForDuplication {
+        get => _planViewsForDuplication;
+        set => RaiseAndSetIfChanged(ref _planViewsForDuplication, value);
+    }
+
     public List<ViewSection> SectionViewTemplates {
         get => _sectionViewTemplates;
         set => RaiseAndSetIfChanged(ref _sectionViewTemplates, value);
@@ -234,6 +243,7 @@ internal class MainViewModel : BaseViewModel {
         PlanViewFamilyTypes = _revitRepository.PlanViewTypes;
         SectionViewFamilyTypes = _revitRepository.SectionViewTypes;
         PlanViewTemplates = _revitRepository.PlanViewTemplates;
+        PlanViewsForDuplication = _revitRepository.PlanViewsForDuplication;
         SectionViewTemplates = _revitRepository.SectionViewTemplates;
         ViewportTypes = _revitRepository.ViewportTypes;
         SpecsInPj = _revitRepository.Specs;

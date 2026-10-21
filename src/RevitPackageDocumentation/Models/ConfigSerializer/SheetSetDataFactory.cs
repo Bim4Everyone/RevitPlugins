@@ -83,6 +83,9 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,
                 SelectedSelectElemParamName = vm.SelectedSelectElemParam?.ParamName,
+                IsDuplicate = vm.IsDuplicate,
+                ReferenceViewName = vm.ReferenceView?.Name,
+                ReferenceViewFilterValues = GetFiltrationComboBoxFilterList(vm.ReferenceViewFilter),
             },
 
             CalloutViewVM vm => new CalloutViewData {

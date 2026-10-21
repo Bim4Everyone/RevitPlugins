@@ -38,6 +38,7 @@ internal class RevitRepository {
         PlanViewTypes = GetFloorPlanViewTypes();
         SectionViewTypes = GetSectionViewTypes();
         PlanViewTemplates = GetPlanViewTemplates();
+        PlanViewsForDuplication = GetPlanViewsForDuplication();
         SectionViewTemplates = GetSectionViewTemplates();
         ViewportTypes = GetViewportTypes();
         TextNoteTypes = GetTextNoteTypes();
@@ -75,6 +76,7 @@ internal class RevitRepository {
     public List<ViewFamilyType> PlanViewTypes { get; }
     public List<ViewFamilyType> SectionViewTypes { get; }
     public List<ViewPlan> PlanViewTemplates { get; }
+    public List<ViewPlan> PlanViewsForDuplication { get; }
     public List<ViewSection> SectionViewTemplates { get; }
     public List<ElementType> ViewportTypes { get; }
     public List<TextNoteType> TextNoteTypes { get; }
@@ -95,6 +97,17 @@ internal class RevitRepository {
         .OfType<ViewFamilyType>()
         .Where(a => ViewFamily.FloorPlan == a.ViewFamily)
         .OrderBy(a => a.Name)
+        .ToList();
+
+    /// <summary>
+    /// Возвращает список видов в плане проекта (кроме шаблонов), которые можно копировать с детализацией
+    /// </summary>
+    private List<ViewPlan> GetPlanViewsForDuplication() => new FilteredElementCollector(Document)
+        .OfClass(typeof(ViewPlan))
+        .WhereElementIsNotElementType()
+        .OfType<ViewPlan>()
+        .Where(v => !v.IsTemplate && v.CanViewBeDuplicated(ViewDuplicateOption.WithDetailing))
+        .OrderBy(v => v.Name)
         .ToList();
 
     private List<ViewFamilyType> GetStructuralPlanViewTypes() => new FilteredElementCollector(Document)

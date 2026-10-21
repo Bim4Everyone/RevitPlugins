@@ -168,7 +168,11 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ViewportTypeFilter = GetFilterList(data.ViewportTypeFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewCount = data.ViewCount ?? "1",
             SelectedSelectElemParam = sheetVM.SheetSet.SheetSetParams.SelectElemParams
-                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
+                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM),
+
+            IsDuplicate = data.IsDuplicate ?? false,
+            ReferenceView = _revitRepository.PlanViewsForDuplication.FirstOrDefault(v => v.Name.Equals(data.ReferenceViewName)),
+            ReferenceViewFilter = GetFilterList(data.ReferenceViewFilterValues, sheetSetVM.SheetSetParams.Params),
         };
 
         // Добавляем список дополнительных параметров

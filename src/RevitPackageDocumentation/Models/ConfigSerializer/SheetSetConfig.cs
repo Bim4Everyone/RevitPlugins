@@ -110,6 +110,9 @@ public class PlanViewData : SheetComponentData {
     public FiltrationComboBoxFilterListData ViewportTypeFilterValues { get; set; }
     public string ViewCount { get; set; }
     public string SelectedSelectElemParamName { get; set; }
+    public bool? IsDuplicate { get; set; }
+    public string ReferenceViewName { get; set; }
+    public FiltrationComboBoxFilterListData ReferenceViewFilterValues { get; set; }
 }
 
 /// <summary>

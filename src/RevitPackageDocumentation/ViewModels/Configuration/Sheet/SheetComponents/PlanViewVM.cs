@@ -30,6 +30,9 @@ internal class PlanViewVM : SheetComponentVM {
     private string _viewCount;
     private SelectElemParamVM _selectedSelectElemParam;
     private ViewPlan _viewInstance;
+    private bool _isDuplicate;
+    private ViewPlan _referenceView;
+    private FiltrationComboBoxFilterListVM _referenceViewFilter;
 
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
     private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
@@ -61,6 +64,41 @@ internal class PlanViewVM : SheetComponentVM {
     public string ViewName {
         get => _viewName;
         set => RaiseAndSetIfChanged(ref _viewName, value);
+    }
+
+    /// <summary>
+    /// Способ создания вида: false - с нуля по привязке к объекту, true - дублированием исходного вида
+    /// </summary>
+    public bool IsDuplicate {
+        get => _isDuplicate;
+        set {
+            if(_isDuplicate == value) {
+                return;
+            }
+            RaiseAndSetIfChanged(ref _isDuplicate, value);
+            RaisePropertyChanged(nameof(IsCreatingFromScratch));
+            // От режима зависит, какие поля обязательны (исходный вид или привязка к объекту)
+            ValidateAllProperties();
+        }
+    }
+
+    /// <summary>
+    /// Вид создается с нуля - доступен выбор привязки к объекту
+    /// </summary>
+    public bool IsCreatingFromScratch => !IsDuplicate;
+
+    /// <summary>
+    /// Исходный вид для дублирования
+    /// </summary>
+    [RequiredIf(nameof(IsDuplicate), ErrorMessage = "Validation.ReferenceViewIsNull")]
+    public ViewPlan ReferenceView {
+        get => _referenceView;
+        set => RaiseAndSetIfChanged(ref _referenceView, value);
+    }
+
+    public FiltrationComboBoxFilterListVM ReferenceViewFilter {
+        get => _referenceViewFilter;
+        set => RaiseAndSetIfChanged(ref _referenceViewFilter, value);
     }
 
     [Required(ErrorMessage = "Validation.ViewFamilyTypeIsNull")]
@@ -107,8 +145,12 @@ internal class PlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
 
-    [Required(ErrorMessage = "Validation.SelectedSelectElemParamIsNull")]
-    [ChildHasErrors(ErrorMessage = "Validation.SelectElemParamSelectedElemIsNull")]
+    // Привязка к объекту нужна только при создании вида с нуля
+    [RequiredIf(nameof(IsDuplicate), false, ErrorMessage = "Validation.SelectedSelectElemParamIsNull")]
+    [ChildHasErrors(
+        ConditionPropertyName = nameof(IsDuplicate),
+        ConditionValue = false,
+        ErrorMessage = "Validation.SelectElemParamSelectedElemIsNull")]
     public SelectElemParamVM SelectedSelectElemParam {
         get => _selectedSelectElemParam;
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
@@ -130,27 +172,30 @@ internal class PlanViewVM : SheetComponentVM {
 
         if(view is null) {
             try {
-                var selectedElem = SelectedSelectElemParam.SelectedElem;
-                var levelId = selectedElem.LevelId;
-                if(levelId is null) {
-                    return null;
+                if(IsDuplicate) {
+                    if(ReferenceView is null || !ReferenceView.CanViewBeDuplicated(ViewDuplicateOption.WithDetailing)) {
+                        return null;
+                    }
+                    // Копирование с детализацией, секущий диапазон остается как у исходного вида
+                    var viewId = ReferenceView.Duplicate(ViewDuplicateOption.WithDetailing);
+                    view = Repository.Document.GetElement(viewId) as ViewPlan;
+                    if(view is null) {
+                        return null;
+                    }
+                    view.Name = ViewName;
+                    SetViewFamilyType(view);
+                    SetViewTemplate(view);
+                } else {
+                    var selectedElem = SelectedSelectElemParam.SelectedElem;
+                    var levelId = selectedElem.LevelId;
+                    if(levelId is null) {
+                        return null;
+                    }
+                    view = ViewPlan.Create(Repository.Document, ViewFamilyType.Id, levelId);
+                    view.Name = ViewName;
+                    SetViewTemplate(view);
+                    SetViewRange(view, selectedElem);
                 }
-                double elementFromLevelOffset = selectedElem.GetParamValue<double>(BuiltInParameter.FLOOR_HEIGHTABOVELEVEL_PARAM);
-
-                view = ViewPlan.Create(Repository.Document, ViewFamilyType.Id, levelId);
-                view.Name = ViewName;
-                view.ViewTemplateId = ViewTemplate.Id;
-
-                PlanViewRange viewRange = view.GetViewRange();
-                viewRange.SetOffset(PlanViewPlane.TopClipPlane,
-                    elementFromLevelOffset + UnitUtilsHelper.ConvertToInternalValue(500));
-                viewRange.SetOffset(PlanViewPlane.CutPlane,
-                    elementFromLevelOffset + UnitUtilsHelper.ConvertToInternalValue(200));
-                viewRange.SetOffset(PlanViewPlane.BottomClipPlane,
-                    elementFromLevelOffset + UnitUtilsHelper.ConvertToInternalValue(-500));
-                viewRange.SetOffset(PlanViewPlane.ViewDepthPlane,
-                    elementFromLevelOffset + UnitUtilsHelper.ConvertToInternalValue(-500));
-                view.SetViewRange(viewRange);
 
                 // Необходимо для перезагрузки габаритов видов перед их размещением, т.к. при назначении 
                 // секущего диапазона, видимых категорий, шаблона вида могут изменяться габариты вида
@@ -163,6 +208,46 @@ internal class PlanViewVM : SheetComponentVM {
             } catch(Exception) { }
         }
         return view;
+    }
+
+    /// <summary>
+    /// Задает секущий диапазон вида, созданного с нуля, относительно отметки элемента привязки
+    /// </summary>
+    private void SetViewRange(ViewPlan view, Element selectedElem) {
+        double elementFromLevelOffset = selectedElem.GetParamValue<double>(BuiltInParameter.FLOOR_HEIGHTABOVELEVEL_PARAM);
+
+        PlanViewRange viewRange = view.GetViewRange();
+        viewRange.SetOffset(PlanViewPlane.TopClipPlane,
+            elementFromLevelOffset + UnitUtilsHelper.ConvertToInternalValue(500));
+        viewRange.SetOffset(PlanViewPlane.CutPlane,
+            elementFromLevelOffset + UnitUtilsHelper.ConvertToInternalValue(200));
+        viewRange.SetOffset(PlanViewPlane.BottomClipPlane,
+            elementFromLevelOffset + UnitUtilsHelper.ConvertToInternalValue(-500));
+        viewRange.SetOffset(PlanViewPlane.ViewDepthPlane,
+            elementFromLevelOffset + UnitUtilsHelper.ConvertToInternalValue(-500));
+        view.SetViewRange(viewRange);
+    }
+
+    /// <summary>
+    /// Назначает типоразмер вида. Revit позволяет сменить типоразмер только в пределах одного семейства видов,
+    /// поэтому если исходный вид из другого семейства (например, план потолка), типоразмер остается как у него
+    /// </summary>
+    private void SetViewFamilyType(ViewPlan view) {
+        if(ViewFamilyType is null
+            || Repository.Document.GetElement(view.GetTypeId()) is not ViewFamilyType currentType
+            || currentType.ViewFamily != ViewFamilyType.ViewFamily) {
+            return;
+        }
+        view.ChangeTypeId(ViewFamilyType.Id);
+    }
+
+    /// <summary>
+    /// Назначает шаблон вида, если он подходит виду (например, шаблон плана этажа не подходит плану потолка)
+    /// </summary>
+    private void SetViewTemplate(View view) {
+        if(ViewTemplate != null && view.IsValidViewTemplate(ViewTemplate.Id)) {
+            view.ViewTemplateId = ViewTemplate.Id;
+        }
     }
 
     public Viewport Place(ViewPlan view) {

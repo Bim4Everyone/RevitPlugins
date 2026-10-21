@@ -4,7 +4,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RevitPackageDocumentation.ViewModels.Validation.Attributes;
 internal class ChildHasErrorsAttribute : ValidationAttribute {
+    /// <summary>
+    /// Имя логического свойства объекта, от которого зависит проверка. Если не задано - проверка выполняется всегда
+    /// </summary>
+    public string ConditionPropertyName { get; set; }
+
+    /// <summary>
+    /// Значение свойства ConditionPropertyName, при котором выполняется проверка
+    /// </summary>
+    public bool ConditionValue { get; set; } = true;
+
     protected override ValidationResult IsValid(object value, ValidationContext context) {
+        if(!ValidationCondition.IsMet(context, ConditionPropertyName, ConditionValue)) {
+            return ValidationResult.Success;
+        }
         switch(value) {
             case null:
                 return ValidationResult.Success;
