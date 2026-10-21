@@ -134,7 +134,7 @@ internal class SectionViewVM : SheetComponentVM {
 
     public ViewSection Create(int number) {
         var viewName = $"{ViewName}_{number}";
-        var view = Repository.GetViewByName(viewName) as ViewSection;
+        var view = Repository.FindViewByName<ViewSection>(viewName);
 
         if(view != null) {
             return view;

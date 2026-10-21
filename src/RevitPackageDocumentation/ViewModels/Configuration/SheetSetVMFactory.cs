@@ -156,6 +156,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleComment = data.ModuleComment ?? string.Empty,
             ModuleCode = "123",
 
+            IsDuplicate = data.IsDuplicate ?? false,
+
             ViewNameFormula = data.ViewNameFormula ?? string.Empty,
             ViewName = data.ViewNameFormula ?? string.Empty,
             ViewFamilyType = _revitRepository.PlanViewTypes.FirstOrDefault(v => v.Name.Equals(data.ViewFamilyTypeName)),
@@ -170,7 +172,6 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             SelectedSelectElemParam = sheetVM.SheetSet.SheetSetParams.SelectElemParams
                 .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM),
 
-            IsDuplicate = data.IsDuplicate ?? false,
             ReferenceView = _revitRepository.PlanViewsForDuplication.FirstOrDefault(v => v.Name.Equals(data.ReferenceViewName)),
             ReferenceViewFilter = GetFilterList(data.ReferenceViewFilterValues, sheetSetVM.SheetSetParams.Params),
         };

@@ -160,7 +160,7 @@ internal class CalloutViewVM : SheetComponentVM {
 
     public View Create(int number) {
         string viewName = $"{ViewName}_{number}";
-        var view = Repository.GetViewByName(viewName);
+        var view = Repository.FindViewByName<View>(viewName);
 
         if(view != null) {
             return view;

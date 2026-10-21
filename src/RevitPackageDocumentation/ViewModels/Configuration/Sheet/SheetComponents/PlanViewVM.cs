@@ -1,11 +1,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
@@ -52,7 +54,13 @@ internal class PlanViewVM : SheetComponentVM {
         SheetVM sheetVM,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, sheetVM, localizationService) {
+        ChangeCreationModeCommand = RelayCommand.Create(ChangeCreationMode);
     }
+
+    /// <summary>
+    /// Команда смены способа создания вида (с нуля / дублированием), вызывается тумблером
+    /// </summary>
+    public ICommand ChangeCreationModeCommand { get; }
 
     [Required(ErrorMessage = "Validation.ViewNameIsEmpty")]
     [RegularExpression(@"^[^\\\/:*?""<>|\[\];~]+$", ErrorMessage = "Validation.ViewNameIsNotCorrect")]
@@ -71,15 +79,7 @@ internal class PlanViewVM : SheetComponentVM {
     /// </summary>
     public bool IsDuplicate {
         get => _isDuplicate;
-        set {
-            if(_isDuplicate == value) {
-                return;
-            }
-            RaiseAndSetIfChanged(ref _isDuplicate, value);
-            RaisePropertyChanged(nameof(IsCreatingFromScratch));
-            // От режима зависит, какие поля обязательны (исходный вид или привязка к объекту)
-            ValidateAllProperties();
-        }
+        set => RaiseAndSetIfChanged(ref _isDuplicate, value);
     }
 
     /// <summary>
@@ -167,8 +167,14 @@ internal class PlanViewVM : SheetComponentVM {
         SetCustomParams(viewPort);
     }
 
+    private void ChangeCreationMode() {
+        RaisePropertyChanged(nameof(IsCreatingFromScratch));
+        // От способа создания зависит, какие поля обязательны (исходный вид или привязка к объекту)
+        ValidateAllProperties();
+    }
+
     public ViewPlan Create() {
-        var view = Repository.GetViewByName(ViewName) as ViewPlan;
+        var view = Repository.FindViewByName<ViewPlan>(ViewName);
 
         if(view is null) {
             try {

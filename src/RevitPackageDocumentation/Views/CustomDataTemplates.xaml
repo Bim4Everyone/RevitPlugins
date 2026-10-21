@@ -89,7 +89,15 @@
                         Margin="5"
                         VerticalAlignment="Center"
                         IsChecked="{Binding IsDuplicate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        ToolTip="{extensions:Localized MainWindow.ViewSourceToolTip}" />
+                        ToolTip="{extensions:Localized MainWindow.ViewSourceToolTip}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="Click">
+                                <i:InvokeCommandAction
+                                    Command="{Binding ChangeCreationModeCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ui:ToggleSwitch>
                 </Grid>
             </WrapPanel>
 

@@ -262,9 +262,22 @@ internal class RevitRepository {
             .FirstOrDefault(o => o.Name.Equals(sheetName));
     }
 
-    public View GetViewByName(string viewName) {
-        return Views
-            .FirstOrDefault(o => o.Name.Equals(viewName));
+    /// <summary>
+    /// Ищет в документе вид указанного класса с указанным именем (кроме шаблонов, листов и спецификаций).
+    /// Поиск выполняется по текущему состоянию документа, поэтому находит и виды, созданные в этом запуске
+    /// </summary>
+    /// <returns>Найденный вид или null</returns>
+    public T FindViewByName<T>(string viewName) where T : View {
+        if(string.IsNullOrEmpty(viewName)) {
+            return null;
+        }
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(T))
+            .OfType<T>()
+            .FirstOrDefault(v => !v.IsTemplate
+                && v is not ViewSheet
+                && v is not ViewSchedule
+                && v.Name.Equals(viewName));
     }
 
     internal ViewSchedule GetSpecByName(string viewName) {
