@@ -17,6 +17,7 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
@@ -37,6 +38,8 @@ internal class SheetVM : ModuleVM {
     private FamilySymbol _titleBlockType;
     private ObservableCollection<SheetComponentVM> _sheetComponents = [];
     private List<FamilySymbol> _titleBlockTypes;
+    private FiltrationComboBoxFilterListVM _titleBlockFamilyFilter;
+    private FiltrationComboBoxFilterListVM _titleBlockTypeFilter;
     private ViewSheet _sheetInstance;
 
     public SheetVM(
@@ -138,6 +141,16 @@ internal class SheetVM : ModuleVM {
         set => RaiseAndSetIfChanged(ref _titleBlockType, value);
     }
 
+    public FiltrationComboBoxFilterListVM TitleBlockFamilyFilter {
+        get => _titleBlockFamilyFilter;
+        set => RaiseAndSetIfChanged(ref _titleBlockFamilyFilter, value);
+    }
+
+    public FiltrationComboBoxFilterListVM TitleBlockTypeFilter {
+        get => _titleBlockTypeFilter;
+        set => RaiseAndSetIfChanged(ref _titleBlockTypeFilter, value);
+    }
+
     // Компоненты, исключенные из генерации, не влияют на ошибки листа
     [ChildHasErrors(IgnoreUncheckedModules = true, ErrorMessage = "Validation.ErrorInSheetComponents")]
     public ObservableCollection<SheetComponentVM> SheetComponents {
@@ -151,6 +164,12 @@ internal class SheetVM : ModuleVM {
     }
 
     private void SelectTitleBlockFamily() {
+        // Команда вызывается при любой смене выбора в списке семейств, в том числе при переключении листов
+        // и автовыборе после фильтрации, поэтому типоразмеры сбрасываются, только если семейство действительно сменилось
+        var currentFamilyId = TitleBlockTypes?.FirstOrDefault()?.Family?.Id;
+        if(TitleBlockFamily != null && currentFamilyId == TitleBlockFamily.Id) {
+            return;
+        }
         TitleBlockType = null;
         SetTitleBlockTypes(TitleBlockFamily);
     }

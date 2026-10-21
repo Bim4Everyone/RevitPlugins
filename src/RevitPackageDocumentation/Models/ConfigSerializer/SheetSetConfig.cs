@@ -86,7 +86,9 @@ public class SheetData : ParamContainerModuleData {
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
     public string TitleBlockFamilyName { get; set; }
+    public FiltrationComboBoxFilterListData TitleBlockFamilyFilterValues { get; set; }
     public string TitleBlockTypeName { get; set; }
+    public FiltrationComboBoxFilterListData TitleBlockTypeFilterValues { get; set; }
     public List<SheetComponentData> Views { get; set; } = [];
 }
 

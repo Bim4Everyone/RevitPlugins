@@ -379,21 +379,14 @@
                                         VerticalAlignment="Center"
                                         Text="{me:LocalizationSource MainWindow.TitleBlockFamily}" />
 
-                                    <ComboBox
+                                    <controls:FiltrationComboBoxControl
                                         Grid.Column="1"
                                         Margin="5"
-                                        Style="{StaticResource ErrorComboBoxStyle}"
-                                        ItemsSource="{Binding Path=TitleBlockFamilies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        DisplayMemberPath="Name"
-                                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger
-                                                EventName="DropDownClosed">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding CurrentSheetSet.SelectedSheet.SelectTitleBlockFamilyCommand}" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </ComboBox>
+                                        ComboBoxSource="{Binding Path=TitleBlockFamilies}"
+                                        ComboBoxSelected="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        FilterList="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockFamilyFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        ComboBoxSelectionChangedCommand="{Binding CurrentSheetSet.SelectedSheet.SelectTitleBlockFamilyCommand}"
+                                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                                 </Grid>
 
                                 <Grid>
@@ -408,14 +401,13 @@
                                         VerticalAlignment="Center"
                                         Text="{me:LocalizationSource MainWindow.TitleBlockType}" />
 
-                                    <ComboBox
+                                    <controls:FiltrationComboBoxControl
                                         Grid.Column="1"
                                         Margin="5"
-                                        Style="{StaticResource ErrorComboBoxStyle}"
-                                        ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        DisplayMemberPath="Name"
-                                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        IsSynchronizedWithCurrentItem="False" />
+                                        ComboBoxSource="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypes}"
+                                        ComboBoxSelected="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        FilterList="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
                                 </Grid>
 
                                 <Grid>

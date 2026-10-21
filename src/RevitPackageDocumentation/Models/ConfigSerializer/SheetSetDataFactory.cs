@@ -60,7 +60,9 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             SheetSize = vm.SheetSize,
             SheetCoefficient = vm.SheetCoefficient,
             TitleBlockFamilyName = vm.TitleBlockFamily?.Name,
+            TitleBlockFamilyFilterValues = GetFiltrationComboBoxFilterList(vm.TitleBlockFamilyFilter),
             TitleBlockTypeName = vm.TitleBlockType?.Name,
+            TitleBlockTypeFilterValues = GetFiltrationComboBoxFilterList(vm.TitleBlockTypeFilter),
             Views = vm.SheetComponents?.Select(CreateComponentData).ToList(),
         };
     }

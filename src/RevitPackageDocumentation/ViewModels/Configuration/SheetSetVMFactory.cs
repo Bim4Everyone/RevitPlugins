@@ -122,8 +122,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             SheetCoefficient = data.SheetCoefficient ?? string.Empty,
 
             TitleBlockFamily = titleBlockFamily,
+            TitleBlockFamilyFilter = GetFilterList(data.TitleBlockFamilyFilterValues, sheetSetVM.SheetSetParams.Params),
             TitleBlockTypes = titleBlockTypes,
             TitleBlockType = titleBlockType,
+            TitleBlockTypeFilter = GetFilterList(data.TitleBlockTypeFilterValues, sheetSetVM.SheetSetParams.Params),
         };
         // Добавляем список дополнительных параметров
         SetCustomParametersList(sheetVM, data, sheetSetVM.SheetSetParams.Params);

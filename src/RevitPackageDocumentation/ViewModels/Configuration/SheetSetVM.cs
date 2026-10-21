@@ -11,6 +11,7 @@ using RevitPackageDocumentation.Models.ConfigSerializer;
 using RevitPackageDocumentation.ViewModels.Configuration.Sheet;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration;
 internal class SheetSetVM : BaseViewModel {
@@ -137,6 +138,8 @@ internal class SheetSetVM : BaseViewModel {
                 ModuleName = "Новый лист",
                 SheetSize = "1",
                 SheetCoefficient = "1",
+                TitleBlockFamilyFilter = new FiltrationComboBoxFilterListVM(SheetSetParams.Params, _stringParamSetService),
+                TitleBlockTypeFilter = new FiltrationComboBoxFilterListVM(SheetSetParams.Params, _stringParamSetService),
             });
     }
 
