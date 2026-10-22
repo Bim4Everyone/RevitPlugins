@@ -41,8 +41,10 @@ internal class CalloutViewVM : SheetComponentVM {
     private string _viewCount;
     private string _viewportNumber;
     private SelectElemParamVM _selectedSelectElemParam;
-    private PlanViewVM _parentPlan;
     private string _parentPlanError = string.Empty;
+
+    // Значение параметра «Показать на» (SECTION_SHOW_IN_ONE_VIEW_ONLY): 0 - пересекающиеся виды, 1 - только родительский вид
+    private const int _showInIntersectingViews = 0;
 
     private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
@@ -127,14 +129,6 @@ internal class CalloutViewVM : SheetComponentVM {
     }
 
     /// <summary>
-    /// Родительский модуль плана - ближайший отмеченный модуль вида в плане выше фрагмента на листе
-    /// </summary>
-    public PlanViewVM ParentPlan {
-        get => _parentPlan;
-        private set => RaiseAndSetIfChanged(ref _parentPlan, value);
-    }
-
-    /// <summary>
     /// Текст ошибки отсутствия родительского плана. Пустая строка - ошибки нет
     /// </summary>
     [ErrorTextIsEmpty]
@@ -144,47 +138,62 @@ internal class CalloutViewVM : SheetComponentVM {
     }
 
     /// <summary>
-    /// Пересчитывает родительский план и ошибку его отсутствия.
-    /// Вызывается листом при добавлении/удалении модулей и смене галочек модулей плана
+    /// Пересчитывает ошибку отсутствия родительского вида: плана на уровне элемента привязки, который уже есть
+    /// в проекте или будет создан модулем плана выше на листе. Вызывается листом при изменении состава модулей,
+    /// элемента привязки и типоразмера фрагмента, а также при изменениях модулей плана
     /// </summary>
     public void UpdateParentPlan() {
-        ParentPlan = FindParentPlan();
-        ParentPlanError = ParentPlan is null
-            ? LocalizationService.GetLocalizedString("Validation.HasNotPlanView")
+        // Пока элемент привязки не выбран, родительский вид искать не по чему - об этом сообщает своя ошибка
+        bool isElemSelected = SelectedSelectElemParam?.SelectedElem != null;
+        bool hasParentView = FindParentPlanView() != null || HasPlanModuleAboveOnLevel();
+        ParentPlanError = isElemSelected && !hasParentView
+            ? LocalizationService.GetLocalizedString("Validation.PlanViewOnLevelNotFound")
             : string.Empty;
     }
 
     /// <summary>
-    /// Возвращает ближайший отмеченный модуль вида в плане выше фрагмента на листе или null
+    /// Проверяет, создаст ли в этом запуске план на уровне элемента привязки модуль плана, стоящий на листе выше
+    /// фрагмента (отмеченный и без ошибок). Такой план к моменту создания фрагмента уже будет в проекте
     /// </summary>
-    private PlanViewVM FindParentPlan() {
+    private bool HasPlanModuleAboveOnLevel() {
+        var levelId = GetElemLevelId();
         var components = Sheet?.SheetComponents;
-        if(components is null) {
-            return null;
+        if(levelId is null || components is null) {
+            return false;
         }
         int index = components.IndexOf(this);
         for(int i = index - 1; i >= 0; i--) {
-            if(components[i] is PlanViewVM plan && plan.IsModuleCheck) {
-                return plan;
+            if(components[i] is PlanViewVM plan
+                && plan.IsModuleCheck
+                && !plan.HasErrors
+                && plan.GetPlanLevelId() is ElementId planLevelId
+                && planLevelId == levelId
+                && Repository.IsCalloutAllowed(plan.GetPlanViewFamily(), ViewFamilyType)) {
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     /// <summary>
-    /// Возвращает вид родительского плана: созданный в этом запуске или существующий в проекте с именем плана
+    /// Возвращает уровень элемента привязки или null, если элемент не выбран или у него нет уровня
     /// </summary>
-    private ViewPlan GetParentPlanView() {
-        var parentPlan = FindParentPlan();
-        if(parentPlan is null) {
-            return null;
-        }
-        return parentPlan.ViewInstance ?? Repository.FindViewByName<ViewPlan>(parentPlan.ViewName);
+    private ElementId GetElemLevelId() {
+        var levelId = SelectedSelectElemParam?.SelectedElem?.LevelId;
+        return levelId is null || levelId == ElementId.InvalidElementId ? null : levelId;
+    }
+
+    /// <summary>
+    /// Возвращает план проекта на уровне элемента привязки, на котором можно создать фрагмент, или null
+    /// </summary>
+    private ViewPlan FindParentPlanView() {
+        var levelId = GetElemLevelId();
+        return levelId is null ? null : Repository.FindPlanViewOnLevel(levelId, ViewFamilyType);
     }
 
 
     public override bool CanCreateComponent() {
-        // Отсутствие родительского плана также является ошибкой модуля (ParentPlanError)
+        // Отсутствие родительского вида также является ошибкой модуля (ParentPlanError)
         return !HasErrors;
     }
 
@@ -207,7 +216,7 @@ internal class CalloutViewVM : SheetComponentVM {
         }
 
         try {
-            var parentView = GetParentPlanView();
+            var parentView = FindParentPlanView();
             if(parentView is null) {
                 return null;
             }
@@ -226,6 +235,14 @@ internal class CalloutViewVM : SheetComponentVM {
                 calloutStart,
                 calloutEnd);
             view.Name = viewName;
+
+            // Родительский вид выбирается любой подходящий по уровню, поэтому фрагмент показывается на всех
+            // пересекающихся видах, а где именно его видно - настраивается видимостью/фильтрами
+            var showInParam = view.get_Parameter(BuiltInParameter.SECTION_SHOW_IN_ONE_VIEW_ONLY);
+            if(showInParam is { IsReadOnly: false }) {
+                showInParam.Set(_showInIntersectingViews);
+            }
+
             view.ViewTemplateId = ViewTemplate.Id;
 
             // Необходимо для перезагрузки габаритов видов перед их размещением, т.к. при назначении 

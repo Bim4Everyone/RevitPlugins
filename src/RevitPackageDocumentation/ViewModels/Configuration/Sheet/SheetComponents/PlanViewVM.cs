@@ -156,6 +156,27 @@ internal class PlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
 
+    /// <summary>
+    /// Уровень плана, который создаст модуль: в режиме дублирования - уровень исходного вида,
+    /// при создании с нуля - уровень элемента привязки. Null, если определить нельзя
+    /// </summary>
+    public ElementId GetPlanLevelId() {
+        var levelId = IsDuplicate
+            ? ReferenceView?.GenLevel?.Id
+            : SelectedSelectElemParam?.SelectedElem?.LevelId;
+        return levelId is null || levelId == ElementId.InvalidElementId ? null : levelId;
+    }
+
+    /// <summary>
+    /// Семейство вида плана, который создаст модуль: в режиме дублирования - семейство исходного вида
+    /// (типоразмер другого семейства ему не назначается), при создании с нуля - семейство выбранного типоразмера
+    /// </summary>
+    public ViewFamily? GetPlanViewFamily() {
+        return IsDuplicate
+            ? Repository.GetViewFamily(ReferenceView)
+            : ViewFamilyType?.ViewFamily;
+    }
+
     public ViewPlan ViewInstance {
         get => _viewInstance;
         set => RaiseAndSetIfChanged(ref _viewInstance, value);

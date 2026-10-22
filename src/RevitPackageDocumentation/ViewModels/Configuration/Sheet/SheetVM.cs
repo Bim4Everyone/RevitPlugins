@@ -68,7 +68,7 @@ internal class SheetVM : ModuleVM {
         DeselectAllComponentsCommand = RelayCommand.Create(DeselectAllComponents);
         SelectComponentsWithoutErrorsCommand = RelayCommand.Create(SelectComponentsWithoutErrors);
 
-        // Родительский план фрагментов зависит от состава модулей листа и галочек модулей плана
+        // Родительский вид фрагмента пересчитывается при добавлении модуля и смене его элемента привязки/типоразмера
         _sheetComponents.CollectionChanged += OnSheetComponentsChanged;
     }
 
@@ -219,8 +219,21 @@ internal class SheetVM : ModuleVM {
     }
 
     private void OnSheetComponentPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        // От галочки модуля плана зависит, какой план будет родительским для фрагментов ниже него
-        if(sender is PlanViewVM && e.PropertyName == nameof(IsModuleCheck)) {
+        // Родительский вид фрагмента зависит от уровня элемента привязки и семейства типоразмера вида
+        if(sender is CalloutViewVM callout
+            && e.PropertyName is nameof(CalloutViewVM.SelectedSelectElemParam) or nameof(CalloutViewVM.ViewFamilyType)) {
+            callout.UpdateParentPlan();
+            return;
+        }
+
+        // Модуль плана выше на листе может создать родительский план для фрагментов - его изменения влияют на них
+        if(sender is PlanViewVM
+            && e.PropertyName is nameof(PlanViewVM.IsModuleCheck)
+                or nameof(PlanViewVM.HasErrors)
+                or nameof(PlanViewVM.SelectedSelectElemParam)
+                or nameof(PlanViewVM.IsDuplicate)
+                or nameof(PlanViewVM.ReferenceView)
+                or nameof(PlanViewVM.ViewFamilyType)) {
             UpdateCalloutParents();
         }
     }
@@ -250,8 +263,8 @@ internal class SheetVM : ModuleVM {
     /// Отмечает модули листа без ошибок и снимает отметку с остальных. Галочка самого листа не меняется
     /// </summary>
     public void SelectComponentsWithoutErrors() {
-        // Модули перебираются сверху вниз: при снятии галочки с плана ошибка отсутствия родительского плана
-        // у фрагментов ниже пересчитывается сразу, поэтому они снимаются по общему правилу
+        // Модули перебираются сверху вниз: при снятии галочки с плана ошибка фрагментов ниже, которые рассчитывали
+        // на этот план, пересчитывается сразу, поэтому они снимаются по общему правилу
         foreach(var component in SheetComponents) {
             component.IsModuleCheck = !component.HasErrors;
         }

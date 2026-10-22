@@ -280,6 +280,54 @@ internal class RevitRepository {
                 && v.Name.Equals(viewName));
     }
 
+    /// <summary>
+    /// Ищет в документе план на указанном уровне, на котором можно создать фрагмент указанного типоразмера:
+    /// не шаблон, не фрагмент, не зависимый вид. По правилам Revit фрагмент создается на плане этажа, плане
+    /// несущих конструкций или плане потолка; типоразмер семейства «Узел» допустим на любом из них, кроме плана
+    /// потолка, остальные - только на виде своего семейства. Если подходящих видов несколько, возвращается первый по имени
+    /// </summary>
+    /// <returns>Найденный план или null</returns>
+    public ViewPlan FindPlanViewOnLevel(ElementId levelId, ViewFamilyType calloutType) {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewPlan))
+            .OfType<ViewPlan>()
+            .Where(v => !v.IsTemplate
+                && !v.IsCallout
+                && v.GetPrimaryViewId() == ElementId.InvalidElementId
+                && v.GenLevel != null
+                && v.GenLevel.Id == levelId)
+            .Where(v => IsCalloutAllowed(v, calloutType))
+            .OrderBy(v => v.Name)
+            .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Возвращает семейство вида (по его типоразмеру) или null
+    /// </summary>
+    public ViewFamily? GetViewFamily(View view) {
+        return view is null ? null : (Document.GetElement(view.GetTypeId()) as ViewFamilyType)?.ViewFamily;
+    }
+
+    private bool IsCalloutAllowed(ViewPlan parentView, ViewFamilyType calloutType) {
+        return IsCalloutAllowed(GetViewFamily(parentView), calloutType);
+    }
+
+    /// <summary>
+    /// Проверяет, можно ли создать на виде указанного семейства фрагмент указанного типоразмера
+    /// (правила ViewSection.CreateCallout)
+    /// </summary>
+    public bool IsCalloutAllowed(ViewFamily? parentFamily, ViewFamilyType calloutType) {
+        if(parentFamily is not (ViewFamily.FloorPlan or ViewFamily.StructuralPlan or ViewFamily.CeilingPlan)) {
+            return false;
+        }
+        if(calloutType is null) {
+            return true;
+        }
+        return calloutType.ViewFamily == ViewFamily.Detail
+            ? parentFamily != ViewFamily.CeilingPlan
+            : parentFamily == calloutType.ViewFamily;
+    }
+
     internal ViewSchedule GetSpecByName(string viewName) {
         return Specs
             .FirstOrDefault(o => o.Name.Equals(viewName));

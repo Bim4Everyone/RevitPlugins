@@ -422,7 +422,8 @@ internal class MainViewModel : BaseViewModel {
     private void SelectElemForParam(SelectElemParamVM vm) {
         _revitElementPickerService.PickElement(onSelected: (element) => {
             vm.SelectedElem = element;
-            vm.ParamValueChangeCommand.Execute(null);
+            // Передаем сам параметр, чтобы обновились модули, зависящие от выбранного элемента (например, фрагменты)
+            vm.ParamValueChangeCommand.Execute(vm);
         });
     }
 }

@@ -68,7 +68,6 @@
     <system:String x:Key="MainWindow.ViewportType">Viewport type</system:String>
     <system:String x:Key="MainWindow.Count">Count</system:String>
     <system:String x:Key="MainWindow.BindingToObject">Binding to object</system:String>
-    <system:String x:Key="MainWindow.ParentView">Parent view</system:String>
     <system:String x:Key="MainWindow.Comments">Comments</system:String>
     <system:String x:Key="MainWindow.FinalSpecName">Final schedule name</system:String>
     <system:String x:Key="MainWindow.ReferenceSpecName">Source schedule name</system:String>
@@ -111,7 +110,7 @@
 
     <system:String x:Key="Validation.ErrorInCustomParams">Not all errors have been fixed in custom parameters</system:String>
 
-    <system:String x:Key="Validation.HasNotPlanView">No checked plan view above the callout on the sheet</system:String>
+    <system:String x:Key="Validation.PlanViewOnLevelNotFound">No plan view found on the level of the bound element</system:String>
 
     <system:String x:Key="Validation.LegendViewIsNull">No legend selected for placement</system:String>
     <system:String x:Key="Validation.ViewColumnIsNotCorrect">Column number is incorrect</system:String>

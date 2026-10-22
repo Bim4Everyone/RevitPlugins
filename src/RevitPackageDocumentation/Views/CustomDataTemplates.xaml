@@ -428,25 +428,6 @@
                         DisplayMemberPath="ParamName"
                         SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
-                <!--Родительский план - ближайший отмеченный модуль вида в плане выше фрагмента на листе-->
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        Grid.Column="0"
-                        Margin="5"
-                        VerticalAlignment="Center"
-                        Text="{extensions:Localized MainWindow.ParentView}" />
-
-                    <ui:TextBox
-                        Grid.Column="1"
-                        Margin="5"
-                        IsEnabled="False"
-                        Text="{Binding ParentPlan.ViewName, Mode=OneWay}" />
-                </Grid>
             </UniformGrid>
 
             <UniformGrid

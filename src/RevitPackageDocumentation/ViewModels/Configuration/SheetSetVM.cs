@@ -183,6 +183,8 @@ internal class SheetSetVM : BaseViewModel {
                 foreach(var component in sheet.SheetComponents) {
                     component.ValidateAllProperties();
                 }
+                // От выбранного элемента зависит уровень, по которому фрагменты ищут родительский вид
+                sheet.UpdateCalloutParents();
             }
             return;
         }
