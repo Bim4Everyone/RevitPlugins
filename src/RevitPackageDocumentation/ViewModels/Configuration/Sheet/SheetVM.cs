@@ -32,6 +32,8 @@ internal class SheetVM : ModuleVM {
     private SheetSetVM _sheetSet;
     private string _sheetNameFormula = string.Empty;
     private string _sheetName;
+    private string _sheetNumberFormula = string.Empty;
+    private string _sheetNumber;
     private string _sheetSize;
     private string _sheetCoefficient;
     private Family _titleBlockFamily;
@@ -108,6 +110,19 @@ internal class SheetVM : ModuleVM {
     public string SheetName {
         get => _sheetName;
         set => RaiseAndSetIfChanged(ref _sheetName, value);
+    }
+
+    /// <summary>
+    /// Формула номера листа. Необязательна: если пустая, номер создаваемого листа назначает Revit
+    /// </summary>
+    public string SheetNumberFormula {
+        get => _sheetNumberFormula;
+        set => RaiseAndSetIfChanged(ref _sheetNumberFormula, value);
+    }
+
+    public string SheetNumber {
+        get => _sheetNumber;
+        set => RaiseAndSetIfChanged(ref _sheetNumber, value);
     }
 
     [Required(ErrorMessage = "Validation.SheetSizeIsEmpty")]
@@ -282,14 +297,28 @@ internal class SheetVM : ModuleVM {
         return !HasErrors;
     }
 
+    /// <summary>
+    /// Назначает номер созданному листу, если он задан. Если номер не задан или Revit его не принял
+    /// (например, такой номер уже занят), остается номер, назначенный Revit, а создание листа продолжается
+    /// </summary>
+    private void SetSheetNumber(ViewSheet sheet) {
+        if(string.IsNullOrWhiteSpace(SheetNumber)) {
+            return;
+        }
+        try {
+            sheet.SheetNumber = SheetNumber;
+        } catch(Exception) { }
+    }
+
     public override void Process(bool processDependent) {
         SheetInstance = null;
-        SheetInstance = Repository.GetSheetByName(SheetName);
+        SheetInstance = Repository.FindSheet(SheetName, SheetNumber);
 
         if(SheetInstance is null) {
             try {
                 SheetInstance = ViewSheet.Create(Repository.Document, TitleBlockType.Id);
                 SheetInstance.Name = SheetName;
+                SetSheetNumber(SheetInstance);
 
                 var titleBlock = Repository.GetTitleBlocks(SheetInstance);
 

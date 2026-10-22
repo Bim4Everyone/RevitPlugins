@@ -83,6 +83,7 @@ public abstract class ParamContainerModuleData {
 /// </summary>
 public class SheetData : ParamContainerModuleData {
     public string SheetNameFormula { get; set; }
+    public string SheetNumberFormula { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
     public string TitleBlockFamilyName { get; set; }

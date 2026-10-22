@@ -56,6 +56,7 @@
     <system:String x:Key="MainWindow.Edit">Edit</system:String>
 
     <system:String x:Key="MainWindow.SheetName">Sheet name</system:String>
+    <system:String x:Key="MainWindow.SheetNumber">Sheet number</system:String>
     <system:String x:Key="MainWindow.SheetSettings">Sheet settings</system:String>
     <system:String x:Key="MainWindow.TitleBlockFamily">Title block family</system:String>
     <system:String x:Key="MainWindow.TitleBlockType">Title block type</system:String>

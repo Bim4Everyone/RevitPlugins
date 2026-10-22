@@ -57,6 +57,7 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
             CustomParamsList = GetCustomParametersList(vm),
 
             SheetNameFormula = vm.SheetNameFormula,
+            SheetNumberFormula = vm.SheetNumberFormula,
             SheetSize = vm.SheetSize,
             SheetCoefficient = vm.SheetCoefficient,
             TitleBlockFamilyName = vm.TitleBlockFamily?.Name,

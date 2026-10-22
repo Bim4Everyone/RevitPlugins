@@ -57,6 +57,7 @@
     <system:String x:Key="MainWindow.Edit">Изменить</system:String>
     
     <system:String x:Key="MainWindow.SheetName">Имя листа</system:String>
+    <system:String x:Key="MainWindow.SheetNumber">Номер листа</system:String>
     <system:String x:Key="MainWindow.SheetSettings">Настройки листа</system:String>
     <system:String x:Key="MainWindow.TitleBlockFamily">Семейство рамки</system:String>
     <system:String x:Key="MainWindow.TitleBlockType">Типоразмер рамки</system:String>

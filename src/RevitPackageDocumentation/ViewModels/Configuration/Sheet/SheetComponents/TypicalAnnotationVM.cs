@@ -32,7 +32,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     private readonly double _annotationRowOffset = UnitUtilsHelper.ConvertToInternalValue(100);
 
     // Шаг по горизонтали в футах между левыми краями соседних аннотаций в ряду
-    private readonly double _annotationStep = UnitUtilsHelper.ConvertToInternalValue(100);
+    private readonly double _annotationStep = UnitUtilsHelper.ConvertToInternalValue(120);
 
     private readonly FamilyLibraryService _familyLibraryService;
     private readonly IOpenFolderDialogService _openFolderDialogService;

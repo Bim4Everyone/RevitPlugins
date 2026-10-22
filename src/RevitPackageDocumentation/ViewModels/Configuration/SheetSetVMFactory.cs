@@ -118,6 +118,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             SheetNameFormula = data.SheetNameFormula ?? string.Empty,
             SheetName = data.SheetNameFormula ?? string.Empty,
+            SheetNumberFormula = data.SheetNumberFormula ?? string.Empty,
+            SheetNumber = data.SheetNumberFormula ?? string.Empty,
             SheetSize = data.SheetSize ?? string.Empty,
             SheetCoefficient = data.SheetCoefficient ?? string.Empty,
 

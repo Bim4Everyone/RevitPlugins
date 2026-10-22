@@ -257,9 +257,19 @@ internal class RevitRepository {
                 new ScheduleTypeInfo(s, _localizationService.GetLocalizedString($"ScheduleFilterType.{s}") ?? s.ToString()))
             .ToList();
 
-    public ViewSheet GetSheetByName(string sheetName) {
-        return Sheets
-            .FirstOrDefault(o => o.Name.Equals(sheetName));
+    /// <summary>
+    /// Ищет в документе лист для доукомплектования. Если номер задан, лист должен совпадать и по имени, и по номеру,
+    /// иначе ищется только по имени. Поиск выполняется по текущему состоянию документа,
+    /// поэтому находит и листы, созданные в этом запуске
+    /// </summary>
+    /// <returns>Найденный лист или null</returns>
+    public ViewSheet FindSheet(string sheetName, string sheetNumber) {
+        bool checkNumber = !string.IsNullOrWhiteSpace(sheetNumber);
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewSheet))
+            .OfType<ViewSheet>()
+            .FirstOrDefault(s => s.Name.Equals(sheetName)
+                && (!checkNumber || s.SheetNumber.Equals(sheetNumber)));
     }
 
     /// <summary>
