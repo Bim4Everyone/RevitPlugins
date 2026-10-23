@@ -55,6 +55,7 @@
 | Плагин                     | Проект                                                                 | Справка                                                                 | Панель         |
 |----------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------------|----------------|
 | Коэффициент армирования    | [RevitReinforcementCoefficient](src/RevitReinforcementCoefficient)     | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=134086754) | ВОР            |
+| Проверка ВОР               | [RevitVORChecker](src/RevitVORChecker)                                 | [README](src/RevitVORChecker/README.md)                                 | ВОР            |
 | Документация пилонов       | [RevitPylonDocumentation](src/RevitPylonDocumentation)                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110562599) | Документация   |
 | Встряхнуть спецификации    | [RevitShakeSpecs](src/RevitShakeSpecs)                                 | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110562599) | Документация   |
 | Расстановщик отметок       | [RevitMarkPlacement](src/RevitMarkPlacement)                           | [Confluence](https://kb.a101.ru/pages/viewpage.action?pageId=110563932) | Отметки        |
