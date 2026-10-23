@@ -250,6 +250,9 @@
   <Project Path="src/RevitVolumeOfWork/RevitVolumeOfWork.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitVORChecker/RevitVORChecker.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitWindowGapPlacement/RevitWindowGapPlacement.csproj">
     <Platform Project="x64" />
   </Project>

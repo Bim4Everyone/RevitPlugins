@@ -1,0 +1,18 @@
+name: publish RevitVORChecker
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [ closed, synchronize, review_requested ]
+    branches: [ main, master ]
+    paths:
+      - '**RevitVORChecker**.cs'
+      - '**RevitVORChecker**.xaml'
+      - '**RevitVORChecker**.csproj'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-plugin.yml
+    with:
+      plugin-name: "RevitVORChecker"
+    secrets: inherit
