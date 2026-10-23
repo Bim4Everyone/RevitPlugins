@@ -80,14 +80,7 @@ internal class ScheduleFilterListVM : ValidatableVM {
             var selectedSpecField =
                 SelectedScheduleFields.FirstOrDefault(f => f.Field.FieldId == scheduleFilterField.FieldId);
 
-            string filterValue = string.Empty;
-            try {
-                if(definition.CanFilterBySubstring(fieldId)) {
-                    filterValue = scheduleFilter.GetStringValue() ?? string.Empty;
-                } else {
-                    filterValue = scheduleFilter.GetIntegerValue().ToString() ?? string.Empty;
-                }
-            } catch(Exception) { }
+            string filterValue = GetFilterValue(definition, scheduleFilter);
 
             var ruleVM = new ScheduleFilterRuleVM(this, StrParamSetService, _localizationService) {
                 SelectedSpecField = selectedSpecField,
@@ -98,6 +91,27 @@ internal class ScheduleFilterListVM : ValidatableVM {
                 FilterValue = filterValue,
             };
             ScheduleFilterRules.Add(ruleVM);
+        }
+    }
+
+    /// <summary>
+    /// Возвращает значение фильтра спецификации в виде, понятном пользователю.
+    /// Для рабочего набора по условию "равно"/"не равно" в фильтре хранится id набора - показываем его имя
+    /// </summary>
+    private string GetFilterValue(ScheduleDefinition definition, ScheduleFilter scheduleFilter) {
+        var fieldId = scheduleFilter.FieldId;
+        try {
+            if(ScheduleView.Repository.IsWorksetField(definition, fieldId)) {
+                return scheduleFilter.IsStringValue
+                    ? scheduleFilter.GetStringValue() ?? string.Empty
+                    : ScheduleView.Repository.GetWorksetName(scheduleFilter.GetIntegerValue()) ?? string.Empty;
+            }
+            if(definition.CanFilterBySubstring(fieldId)) {
+                return scheduleFilter.GetStringValue() ?? string.Empty;
+            }
+            return scheduleFilter.GetIntegerValue().ToString();
+        } catch(Exception) {
+            return string.Empty;
         }
     }
 

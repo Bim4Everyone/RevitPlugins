@@ -273,6 +273,42 @@ internal class RevitRepository {
     }
 
     /// <summary>
+    /// Проверяет, является ли поле спецификации параметром "Рабочий набор"
+    /// </summary>
+    public bool IsWorksetField(ScheduleDefinition definition, ScheduleFieldId fieldId) {
+        var paramId = definition.GetField(fieldId).ParameterId;
+#if REVIT_2024_OR_GREATER
+        return paramId.Value == WorksetParamId.Value;
+#else
+        return paramId.IntegerValue == WorksetParamId.IntegerValue;
+#endif
+    }
+
+    /// <summary>
+    /// Ищет пользовательский рабочий набор с точно таким именем
+    /// </summary>
+    /// <returns>Найденный рабочий набор или null</returns>
+    public Workset FindWorksetByName(string worksetName) {
+        if(string.IsNullOrEmpty(worksetName)) {
+            return null;
+        }
+        return new FilteredWorksetCollector(Document)
+            .OfKind(WorksetKind.UserWorkset)
+            .FirstOrDefault(w => w.Name.Equals(worksetName));
+    }
+
+    /// <summary>
+    /// Возвращает имя рабочего набора по его id
+    /// </summary>
+    /// <returns>Имя рабочего набора или null, если набор не найден</returns>
+    public string GetWorksetName(int worksetId) {
+        return new FilteredWorksetCollector(Document)
+            .OfKind(WorksetKind.UserWorkset)
+            .FirstOrDefault(w => w.Id.IntegerValue == worksetId)
+            ?.Name;
+    }
+
+    /// <summary>
     /// Ищет в документе вид указанного класса с указанным именем (кроме шаблонов, листов и спецификаций).
     /// Поиск выполняется по текущему состоянию документа, поэтому находит и виды, созданные в этом запуске
     /// </summary>

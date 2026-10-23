@@ -218,10 +218,13 @@ internal class ScheduleViewVM : SheetComponentVM {
 
     private void ApplyFilters(ScheduleDefinition definition) {
         foreach(var rule in ScheduleFilterList.ScheduleFilterRules) {
-            var filter = CreateFilter(definition, rule);
-            if(filter != null) {
-                definition.AddFilter(filter);
-            }
+            // Ошибочное правило пропускаем, чтобы остальные фильтры все равно применились
+            try {
+                var filter = CreateFilter(definition, rule);
+                if(filter != null) {
+                    definition.AddFilter(filter);
+                }
+            } catch(System.Exception) { }
         }
     }
 
@@ -234,38 +237,33 @@ internal class ScheduleViewVM : SheetComponentVM {
             return CreateHasFilter(definition, rule);
         }
 
-        // Пытаемся создать фильтр, где поле является параметром рабочего набора
-        var worksetFilter = CreateWorksetFilter(definition, rule);
-
-        if(worksetFilter is null) {
-            // Создаем фильтр для обычного поля
-            return CreateStandardFilter(definition, rule);
-        } else {
-            return worksetFilter;
+        if(Repository.IsWorksetField(definition, rule.SelectedSpecField.Field.FieldId)) {
+            // Создаем фильтр для поля "Рабочий набор"
+            return CreateWorksetFilter(rule);
         }
+
+        // Создаем фильтр для обычного поля
+        return CreateStandardFilter(definition, rule);
     }
 
-    private ScheduleFilter CreateWorksetFilter(ScheduleDefinition definition, ScheduleFilterRuleVM rule) {
-        var paramId = definition.GetField(rule.SelectedSpecField.Field.FieldId).ParameterId;
+    /// <summary>
+    /// Создает фильтр по рабочему набору. Для условий "равно" и "не равно" Revit сравнивает id набора,
+    /// поэтому ищется набор с точно таким именем; если его нет, фильтр не создается.
+    /// Остальные условия (содержит, начинается с и т.д.) Revit сравнивает с именем набора как со строкой,
+    /// поэтому значение передается как есть
+    /// </summary>
+    private ScheduleFilter CreateWorksetFilter(ScheduleFilterRuleVM rule) {
+        var fieldId = rule.SelectedSpecField.Field.FieldId;
+        var filterType = rule.SelectedFilterType.FilterType;
 
-        if(!AreIdsEqual(paramId, Repository.WorksetParamId)) {
-            return null;
+        if(filterType is ScheduleFilterType.Equal or ScheduleFilterType.NotEqual) {
+            var workset = Repository.FindWorksetByName(rule.FilterValue);
+            return workset is null
+                ? null
+                : new ScheduleFilter(fieldId, filterType, workset.Id.IntegerValue);
         }
 
-        // Получаем первый рабочий набор, который содержит нужную строку в имени
-        var workset = new FilteredWorksetCollector(Repository.Document)
-            .OfKind(WorksetKind.UserWorkset)
-            .OrderBy(w => w.Name)
-            .FirstOrDefault(w => w.Name.Contains(rule.FilterValue));
-
-        if(workset is null) {
-            return null;
-        }
-
-        return new ScheduleFilter(
-            rule.SelectedSpecField.Field.FieldId,
-            rule.SelectedFilterType.FilterType,
-            workset.Id.IntegerValue);
+        return new ScheduleFilter(fieldId, filterType, rule.FilterValue ?? string.Empty);
     }
 
     private ScheduleFilter CreateStandardFilter(ScheduleDefinition definition, ScheduleFilterRuleVM rule) {
@@ -297,13 +295,5 @@ internal class ScheduleViewVM : SheetComponentVM {
             return new ScheduleFilter(fieldId, filterType);
         }
         return null;
-    }
-
-    private bool AreIdsEqual(ElementId id1, ElementId id2) {
-#if REVIT_2024_OR_GREATER
-    return id1.Value == id2.Value;
-#else
-        return id1.IntegerValue == id2.IntegerValue;
-#endif
     }
 }
