@@ -139,6 +139,71 @@ namespace RevitMechanicalSpecification.Service {
         }
 
         /// <summary>
+        /// Получение имени фитинга кабельного лотка
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string GetCableTrayFittingName(Element element, string name) {
+            FamilyInstance instance = element as FamilyInstance;
+            List<Connector> connectors = instance?.MEPModel?.ConnectorManager?.Connectors?
+                .Cast<Connector>().ToList() ?? new List<Connector>();
+            string size = GetCableTrayFittingSize(element, connectors);
+            if(string.IsNullOrEmpty(size)) {
+                return name;
+            }
+
+            Connector angleConnector = connectors.FirstOrDefault(item => item.Angle > 0);
+            double angle = angleConnector == null ? 0 : UnitConverter.DoubleToDegree(angleConnector.Angle);
+            if(angle > 0) {
+                if(angle <= 15) {
+                    angle = 15;
+                } else if(angle <= 30) {
+                    angle = 30;
+                } else if(angle <= 45) {
+                    angle = 45;
+                } else if(angle <= 60) {
+                    angle = 60;
+                } else if(angle <= 75) {
+                    angle = 75;
+                } else if(angle <= 90) {
+                    angle = 90;
+                }
+            }
+            string angleName = angle > 0 ? $" {UnitConverter.DoubleToString(angle)}°" : string.Empty;
+
+            return $"{name} {size}{angleName}";
+        }
+
+        private string GetCableTrayFittingSize(Element element, List<Connector> connectors) {
+            List<string> sizes = connectors
+                .Where(connector => connector.Shape == ConnectorProfileType.Rectangular
+                    && connector.Width > 0 && connector.Height > 0)
+                .Select(connector =>
+                    $"{UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(connector.Width))}x" +
+                    UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(connector.Height)))
+                .OrderBy(size => size, StringComparer.Ordinal)
+                .ToList();
+
+            if(sizes.Count > 0) {
+                return connectors.Count <= 2 && sizes.All(size => size == sizes[0])
+                    ? sizes[0]
+                    : string.Join("-", sizes);
+            }
+
+            double width = element.GetParamValueOrDefault<double>(
+                BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM);
+            double height = element.GetParamValueOrDefault<double>(
+                BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM);
+            if(width <= 0 || height <= 0) {
+                return string.Empty;
+            }
+
+            return $"{UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(width))}x" +
+                UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(height));
+        }
+
+        /// <summary>
         /// Получение длины перехода
         /// </summary>
         /// <param name="element"></param>

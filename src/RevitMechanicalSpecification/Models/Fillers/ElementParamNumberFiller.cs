@@ -45,6 +45,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="specificationElement"></param>
         /// <returns></returns>
         private double GetNumber(SpecificationElement specificationElement) {
+            if(specificationElement.BuiltInCategory == BuiltInCategory.OST_CableTrayFitting) {
+                return 1;
+            }
+
             string unit = specificationElement.Element.GetSharedParamValue<string>(Config.TargetNameUnit);
 
             // Для элементов в семейства которых зашит в формулу расчет по старому параметру треубется возвращаение его значения
