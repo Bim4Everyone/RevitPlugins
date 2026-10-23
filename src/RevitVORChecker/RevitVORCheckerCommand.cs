@@ -30,7 +30,7 @@ public class RevitVORCheckerCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitVORCheckerCommand() {
-        PluginName = "RevitVORChecker";
+        PluginName = "Проверка ВОР";
     }
 
     /// <summary>
