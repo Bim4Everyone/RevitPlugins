@@ -88,6 +88,8 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return GetPipeInsulationName(specificationElement);
                 case BuiltInCategory.OST_CableTray:
                     return GetCableTrayName(specificationElement);
+                case BuiltInCategory.OST_CableTrayFitting:
+                    return GetCableTrayFittingName(specificationElement);
                 case BuiltInCategory.OST_FlexDuctCurves:
                     return GetFlexElementName(specificationElement);
                 case BuiltInCategory.OST_FlexPipeCurves:
@@ -142,6 +144,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             height = UnitConverter.DoubleToMilimeters(height);
 
             return $"{_name} {width}x{height}";
+        }
+
+        private string GetCableTrayFittingName(SpecificationElement specificationElement) {
+            return $"{_calculator.GetCableTrayFittingName(specificationElement.Element, _name)} {_nameAddon}".Trim();
         }
 
         /// <summary>

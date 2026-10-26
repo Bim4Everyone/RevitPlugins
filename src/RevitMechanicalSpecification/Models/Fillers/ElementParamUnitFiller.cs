@@ -81,6 +81,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="element"></param>
         /// <returns></returns>
         private string GetUnit(Element element) {
+            if(element.Category.IsId(BuiltInCategory.OST_CableTrayFitting)) {
+                return Config.SingleUnit;
+            }
+
             if(element.InAnyCategory(_linearElements)) {
                 return DefaultCheck(Config.MeterUnit);
             }

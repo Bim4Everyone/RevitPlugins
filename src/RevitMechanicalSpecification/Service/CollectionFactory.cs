@@ -44,7 +44,8 @@ namespace RevitMechanicalSpecification.Service {
                 BuiltInCategory.OST_PipeInsulations,
                 BuiltInCategory.OST_PlumbingFixtures,
                 BuiltInCategory.OST_Sprinklers,
-                BuiltInCategory.OST_CableTray
+                BuiltInCategory.OST_CableTray,
+                BuiltInCategory.OST_CableTrayFitting
             };
             _elementsCanBeInsulated = new List<BuiltInCategory>() {
                 BuiltInCategory.OST_DuctFitting,
