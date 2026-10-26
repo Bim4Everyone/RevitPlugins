@@ -177,12 +177,9 @@ namespace RevitMechanicalSpecification.Service {
 
         private string GetCableTrayFittingSize(Element element, List<Connector> connectors) {
             List<string> sizes = connectors
-                .Where(connector => connector.Shape == ConnectorProfileType.Rectangular
-                    && connector.Width > 0 && connector.Height > 0)
                 .Select(connector =>
                     $"{UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(connector.Width))}x" +
                     UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(connector.Height)))
-                .OrderBy(size => size, StringComparer.Ordinal)
                 .ToList();
 
             if(sizes.Count > 0) {
@@ -195,7 +192,7 @@ namespace RevitMechanicalSpecification.Service {
                 BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM);
             double height = element.GetParamValueOrDefault<double>(
                 BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM);
-            if(width <= 0 || height <= 0) {
+            if(width == 0 || height == 0) {
                 return string.Empty;
             }
 
