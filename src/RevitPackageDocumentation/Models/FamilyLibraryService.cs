@@ -61,6 +61,8 @@ internal class FamilyLibraryService {
     /// Получает сведения о семействе (категория и типоразмеры) без загрузки его в проект.
     /// PartAtom читается напрямую из файла, без вызовов Revit API, поэтому семейство
     /// не открывается и не обновляется до текущей версии Revit.
+    /// Только если так прочитать не удалось (например, категорию не удалось распознать),
+    /// семейство открывается в фоне средствами Revit.
     /// </summary>
     /// <remarks>
     /// Файл читается при каждом вызове, результаты не сохраняются между вызовами
@@ -72,7 +74,7 @@ internal class FamilyLibraryService {
             return false;
         }
 
-        familyInfo = ReadByPartAtom(familyPath) ?? ReadByOpeningDocument(familyPath);
+        familyInfo = ReadPartAtomFromFile(familyPath) ?? ReadByOpeningDocument(familyPath);
         return familyInfo != null;
     }
 
@@ -109,30 +111,6 @@ internal class FamilyLibraryService {
             return ParsePartAtom(XDocument.Load(memoryStream), familyPath);
         } catch(Exception) {
             return null;
-        }
-    }
-
-    /// <summary>
-    /// Чтение сведений о семействе из PartAtom, извлеченного средствами Revit.
-    /// Для семейств старых версий Revit открывает и обновляет файл.
-    /// </summary>
-    private FamilyFileInfo ReadByPartAtom(string familyPath) {
-        string xmlPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.xml");
-        try {
-            _revitRepository.Application.ExtractPartAtomFromFamilyFile(familyPath, xmlPath);
-            if(!File.Exists(xmlPath)) {
-                return null;
-            }
-
-            return ParsePartAtom(XDocument.Load(xmlPath), familyPath);
-        } catch(Exception) {
-            return null;
-        } finally {
-            try {
-                if(File.Exists(xmlPath)) {
-                    File.Delete(xmlPath);
-                }
-            } catch(Exception) { }
         }
     }
 
