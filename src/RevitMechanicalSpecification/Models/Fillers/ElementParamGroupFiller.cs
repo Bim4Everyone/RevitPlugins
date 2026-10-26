@@ -113,7 +113,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                 case BuiltInCategory.OST_CableTray:
                     return "12. Кабельные лотки_";
                 case BuiltInCategory.OST_CableTrayFitting:
-                    return "12. Соединительные детали кабельных лотков_";
+                    return "13. Соединительные детали кабельных лотков_";
             }
 
             return "Неизвестная категория";
