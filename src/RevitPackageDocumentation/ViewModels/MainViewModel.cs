@@ -334,14 +334,22 @@ internal class MainViewModel : BaseViewModel {
 
 
     /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
+    /// Метод применения настроек главного окна. Только сохраняет конфигурацию: листы создаются
+    /// командой после закрытия окна (см. <see cref="ProcessSheets"/>)
     /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
     private void AcceptView() {
         SaveConfig();
+    }
 
+    /// <summary>
+    /// Создает отмеченные листы и их модули в одной транзакции.
+    /// </summary>
+    /// <remarks>
+    /// Вызывается командой после закрытия окна плагина и освобождения его COM-объектов,
+    /// а не из AcceptView: так загрузка и обновление семейств выполняются, когда объекты окна
+    /// уже освобождены. Подробнее - в RevitPackageDocumentationCommand.ReleaseClosedWindowComObjects
+    /// </remarks>
+    public void ProcessSheets() {
         using var transaction = _revitRepository.Document.StartTransaction(
             _localizationService.GetLocalizedString("MainWindow.Title"));
 
