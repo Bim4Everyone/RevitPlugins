@@ -45,6 +45,8 @@ public partial class FiltrationComboBoxControl : UserControl {
 
     public FiltrationComboBoxControl() {
         InitializeComponent();
+        Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
     }
 
     public IEnumerable ComboBoxSource {
@@ -90,6 +92,35 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// </summary>
     public ObservableCollection<object> FilteredItemsSource { get; } = [];
 
+    // Флаг выполнения обновления коллекции ComboBox
+    private bool _isUpdatingItems;
+
+    // Признак того, что во время обновления коллекции потребовалось еще одно обновление
+    private bool _hasPendingUpdate;
+
+    // Список фильтров, на события которого контрол сейчас подписан (null - подписки нет).
+    // Подписка держится только пока контрол загружен: иначе модель фильтров через события
+    // удерживает выгруженный контрол, а через него - все окно плагина
+    private FiltrationComboBoxFilterListVM _subscribedFilterList;
+
+    /// <summary>
+    /// При загрузке контрола подписываемся на текущий список фильтров
+    /// </summary>
+    private void OnLoaded(object sender, RoutedEventArgs e) {
+        if(_subscribedFilterList is null) {
+            SubscribeToFilterList();
+            UpdateFilteredItems();
+        }
+    }
+
+    /// <summary>
+    /// При выгрузке контрола (закрытие окна, пересоздание шаблона) отписываемся от списка фильтров,
+    /// чтобы модель не удерживала контрол и окно в памяти
+    /// </summary>
+    private void OnUnloaded(object sender, RoutedEventArgs e) {
+        UnsubscribeFromFilterList(_subscribedFilterList);
+    }
+
 
     /// <summary>
     /// Выполняем обновление значений ComboBox по фильтрам после привязки источника
@@ -105,22 +136,27 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// </summary>
     private static void OnFilterListSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
         var control = (FiltrationComboBoxControl) d;
-        control.UnsubscribeFromFilterList(e.OldValue as FiltrationComboBoxFilterListVM);
+        control.UnsubscribeFromFilterList(control._subscribedFilterList);
         control.UpdateFilteredItems();
-        control.SubscribeToFilterList();
+        // Незагруженный контрол подпишется в Loaded
+        if(control.IsLoaded) {
+            control.SubscribeToFilterList();
+        }
     }
 
     /// <summary>
     /// Подписываемся на изменения списка фильтров - добавление фильтра, удаление фильтра, изменения значения фильтра
     /// </summary>
     private void SubscribeToFilterList() {
-        if(FilterList?.ValueList == null) { return; }
+        if(_subscribedFilterList != null || FilterList?.ValueList == null) { return; }
+
+        _subscribedFilterList = FilterList;
 
         // Подписываемся на изменения коллекции - добавления и удаления
-        FilterList.ValueList.CollectionChanged += OnValueListCollectionChanged;
+        _subscribedFilterList.ValueList.CollectionChanged += OnValueListCollectionChanged;
 
         // Подписываемся на изменения значения каждого фильтра
-        foreach(var item in FilterList.ValueList) {
+        foreach(var item in _subscribedFilterList.ValueList) {
             SubscribeToFilterItem(item);
         }
     }
@@ -154,6 +190,7 @@ public partial class FiltrationComboBoxControl : UserControl {
     /// Отписывается от предыдущего списка фильтров, чтобы выгруженный контрол не реагировал на его изменения
     /// </summary>
     private void UnsubscribeFromFilterList(FiltrationComboBoxFilterListVM oldFilterList) {
+        _subscribedFilterList = null;
         if(oldFilterList?.ValueList == null) { return; }
 
         oldFilterList.ValueList.CollectionChanged -= OnValueListCollectionChanged;
@@ -193,17 +230,42 @@ public partial class FiltrationComboBoxControl : UserControl {
             return;
         }
 
-        var filters = FilterList.ValueList
-            .Where(x => !string.IsNullOrWhiteSpace(x?.Value))
-            .ToList();
+        // Изменение коллекции может синхронно запустить повторное обновление: удаление выбранного элемента
+        // сбрасывает выбор, ViewModel в ответ заменяет источник (ComboBoxSource), и обновление вызывается снова,
+        // пока текущее еще не завершено. Вложенное изменение коллекции сбивает индексы текущего прохода,
+        // поэтому повторный вызов не выполняется сразу, а только отмечается и выполняется после текущего прохода
+        if(_isUpdatingItems) {
+            _hasPendingUpdate = true;
+            return;
+        }
 
-        var items = ComboBoxSource
-            .OfType<object>()
-            .Where(item => ItemMatchesAllFilters(item, filters))
-            .ToList();
+        _isUpdatingItems = true;
+        try {
+            do {
+                _hasPendingUpdate = false;
 
-        UpdateFilteredItemsSource(items);
+                // Источник или фильтры могли быть сброшены во время предыдущего прохода
+                if(ComboBoxSource is null || FilterList is null) {
+                    return;
+                }
 
+                var filters = FilterList.ValueList
+                    .Where(x => !string.IsNullOrWhiteSpace(x?.Value))
+                    .ToList();
+
+                var items = ComboBoxSource
+                    .OfType<object>()
+                    .Where(item => ItemMatchesAllFilters(item, filters))
+                    .ToList();
+
+                UpdateFilteredItemsSource(items);
+            } while(_hasPendingUpdate);
+        } finally {
+            _isUpdatingItems = false;
+        }
+
+        // Автовыбор выполняется после того, как состав коллекции окончательно приведен к фильтрам:
+        // выбор может снова запустить обновление, и оно должно выполниться полностью, а не отложиться
         if(FilteredItemsSource.Count == 1) {
             ComboBoxSelected = FilteredItemsSource.First();
         }

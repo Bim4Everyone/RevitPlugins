@@ -3,6 +3,10 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 
 namespace RevitPackageDocumentation.Views.Extensions;
+
+/// <summary>
+/// Присоединенные свойства UniformGrid для автоматического выбора числа колонок по ширине
+/// </summary>
 internal static class UniformGridExtensions {
     public static readonly DependencyProperty AutoColumnsProperty =
         DependencyProperty.RegisterAttached(
@@ -23,7 +27,6 @@ internal static class UniformGridExtensions {
 
     public static string GetColumnThresholds(UniformGrid obj) => (string) obj.GetValue(ColumnThresholdsProperty);
     public static void SetColumnThresholds(UniformGrid obj, string value) => obj.SetValue(ColumnThresholdsProperty, value);
-
 
     private static void OnAutoColumnsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
         if(d is UniformGrid uniformGrid) {
@@ -56,7 +59,6 @@ internal static class UniformGridExtensions {
     /// >400  → 2 колонки
     /// ≤400  → 1 колонка
     /// </summary>
-    /// <param name="uniformGrid"></param>
     private static void UpdateColumns(UniformGrid uniformGrid) {
         string thresholds = GetColumnThresholds(uniformGrid);
         int[] widths = thresholds.Split(',').Select(int.Parse).ToArray();

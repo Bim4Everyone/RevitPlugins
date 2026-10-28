@@ -14,6 +14,10 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+
+/// <summary>
+/// Базовый модуль, размещаемый на листе (вид, спецификация, текст, аннотация, легенда)
+/// </summary>
 internal abstract class SheetComponentVM : ModuleVM {
     private readonly SheetVM _sheet;
 
@@ -33,11 +37,25 @@ internal abstract class SheetComponentVM : ModuleVM {
         ErrorsChanged += OnErrorsChanged;
     }
 
-    public ICommand CreateComponentCommand { get; set; }
+    /// <summary>
+    /// Команда создания только этого модуля (лист создается, если его еще нет)
+    /// </summary>
+    public ICommand CreateComponentCommand { get; }
 
     protected ILocalizationService LocalizationService { get; }
 
+    /// <summary>
+    /// Лист, на котором размещается модуль
+    /// </summary>
     public SheetVM Sheet => _sheet;
+
+    protected override void MoveModule(int offset) {
+        Sheet?.MoveComponent(this, offset);
+    }
+
+    protected override bool CanMoveModule(int offset) {
+        return Sheet?.CanMoveComponent(this, offset) ?? false;
+    }
 
     private void OnErrorsChanged(object sender, DataErrorsChangedEventArgs e) {
         // Обновляем состояние команды через CommandManager
@@ -45,8 +63,14 @@ internal abstract class SheetComponentVM : ModuleVM {
     }
 
     /// <summary>
-    /// Получает следующий номер видового экрана на листе с учетом уникального префикса
+    /// Возвращает наибольший номер видового экрана на листе среди номеров, содержащих subStrInViewportNumber,
+    /// в диапазоне (startNumber; endNumber). Если таких номеров нет, возвращает startNumber.
+    /// Следующий свободный номер - результат + 1
     /// </summary>
+    /// <param name="subStrInViewportNumber">
+    /// Невидимый символ, которым плагин помечает номера видовых экранов своего типа модулей,
+    /// чтобы номера разных типов видов на одном листе не конфликтовали
+    /// </param>
     protected int GetLastViewportNumber(
         string subStrInViewportNumber,
         int startNumber = int.MinValue,
@@ -74,6 +98,11 @@ internal abstract class SheetComponentVM : ModuleVM {
         return lastViewportNumber;
     }
 
+    /// <summary>
+    /// Возвращает самый правый видовой экран листа с видом типа TView, подходящий под фильтр, или null
+    /// </summary>
+    /// <param name="viewportFilter">Дополнительное условие отбора. Если null - отбираются все видовые экраны</param>
+    /// <param name="isCallout">Искать видовые экраны фрагментов (true) или обычных видов (false)</param>
     protected Viewport GetLastViewport<TView>(Func<Viewport, bool> viewportFilter = null, bool isCallout = false)
         where TView : View {
         return Repository.GetViewports(Sheet.SheetInstance)
@@ -84,11 +113,15 @@ internal abstract class SheetComponentVM : ModuleVM {
             })
             .Where(x => x.View is TView)
             .Where(x => x.View.IsCallout == isCallout)
-            .Where(x => viewportFilter(x.Viewport))
+            .Where(x => viewportFilter?.Invoke(x.Viewport) ?? true)
             .OrderByDescending(x => x.Center.X)
             .FirstOrDefault()?.Viewport;
     }
 
+    /// <summary>
+    /// Создает модуль в отдельной транзакции. Если лист еще не найден или не создан, сначала создается лист
+    /// без остальных модулей
+    /// </summary>
     public override void CreateComponent() {
         using var transaction = Repository.Document.StartTransaction(
             LocalizationService.GetLocalizedString("MainWindow.Title"));

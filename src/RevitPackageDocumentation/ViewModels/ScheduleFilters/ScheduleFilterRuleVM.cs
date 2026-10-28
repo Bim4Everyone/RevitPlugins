@@ -10,6 +10,10 @@ using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Para
 using RevitPackageDocumentation.ViewModels.Validation;
 
 namespace RevitPackageDocumentation.ViewModels.ScheduleFilters;
+
+/// <summary>
+/// Фильтр спецификации: поле, условие и значение по формуле
+/// </summary>
 internal class ScheduleFilterRuleVM : ValidatableVM {
     private ScheduleFieldInfo _selectedSpecField;
     private string _selectedSpecFieldName;
@@ -76,12 +80,16 @@ internal class ScheduleFilterRuleVM : ValidatableVM {
     }
 
     /// <summary>
-    /// В случае изменения имени параметра конфигурации нужно обновить свойства дополнительного параметра
+    /// В случае изменения имени параметра конфигурации нужно пересчитать значение фильтра
     /// </summary>
     public void UpdateDueParamNameChange() {
         StrParamSetService.SetAll(this, ScheduleFilterList.ScheduleView.Sheet.SheetSet.SheetSetParams.Params);
     }
 
+    /// <summary>
+    /// В случае изменения значения параметра конфигурации нужно пересчитать значение фильтра,
+    /// если оно на него ссылается
+    /// </summary>
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
         StrParamSetService.SetAll(this, ScheduleFilterList.ScheduleView.Sheet.SheetSet.SheetSetParams.Params, stringParam);
     }

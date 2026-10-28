@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -19,13 +18,35 @@ using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration;
 
+/// <summary>
+/// Фабрика моделей представления комплекта по данным конфигурации (DTO)
+/// </summary>
 internal interface ISheetSetVMFactory {
+    /// <summary>
+    /// Создает комплект со всеми параметрами, листами и модулями
+    /// </summary>
     SheetSetVM CreateSheetSetVM(SheetSetData data);
+
+    /// <summary>
+    /// Создает лист со всеми его модулями
+    /// </summary>
     SheetVM CreateSheetVM(SheetSetVM sheetSetVM, SheetData data);
+
+    /// <summary>
+    /// Создает модуль листа по типу данных конфигурации
+    /// </summary>
     SheetComponentVM CreateComponentVM(SheetSetVM sheetSetVM, SheetVM sheetVM, SheetComponentData data);
+
+    /// <summary>
+    /// Создает параметр комплекта по типу данных конфигурации
+    /// </summary>
     PluginParamVM CreateParamVM(SheetSetParametersListVM sheetSetParamsList, PluginParamData data);
 }
 
+/// <remarks>
+/// Значения ModuleCode сейчас не используются - задел для следующей итерации переработки плагина по ТЗ
+/// (см. <see cref="ModuleVM.ModuleCode"/>)
+/// </remarks>
 internal class SheetSetVMFactory : ISheetSetVMFactory {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
@@ -79,7 +100,6 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             sheetSetVM.SheetSetParams.AddSheetSetParam(paramData);
         }
 
-
         foreach(var sheetData in data.Sheets) {
             var sheetVM = CreateSheetVM(sheetSetVM, sheetData);
             sheetSetVM.SheetList.Add(sheetVM);
@@ -118,12 +138,16 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
 
             SheetNameFormula = data.SheetNameFormula ?? string.Empty,
             SheetName = data.SheetNameFormula ?? string.Empty,
+            SheetNumberFormula = data.SheetNumberFormula ?? string.Empty,
+            SheetNumber = data.SheetNumberFormula ?? string.Empty,
             SheetSize = data.SheetSize ?? string.Empty,
             SheetCoefficient = data.SheetCoefficient ?? string.Empty,
 
             TitleBlockFamily = titleBlockFamily,
+            TitleBlockFamilyFilter = GetFilterList(data.TitleBlockFamilyFilterValues, sheetSetVM.SheetSetParams.Params),
             TitleBlockTypes = titleBlockTypes,
             TitleBlockType = titleBlockType,
+            TitleBlockTypeFilter = GetFilterList(data.TitleBlockTypeFilterValues, sheetSetVM.SheetSetParams.Params),
         };
         // Добавляем список дополнительных параметров
         SetCustomParametersList(sheetVM, data, sheetSetVM.SheetSetParams.Params);
@@ -144,7 +168,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             TextNoteData data => CreateTextNoteVM(sheetSetVM, sheetVM, data),
             TypicalAnnotationData data => CreateTypicalAnnotationVM(sheetSetVM, sheetVM, data),
             LegendViewData data => CreateLegendViewVM(sheetSetVM, sheetVM, data),
-            _ => throw new NotSupportedException($"Тип '{sheetComponentData?.GetType().Name}' не поддерживается")
+            _ => throw new NotSupportedException(
+                $"{_localizationService.GetLocalizedString("MainViewModel.Type")} " +
+                $"'{sheetComponentData?.GetType().Name}' " +
+                $"{_localizationService.GetLocalizedString("MainViewModel.NotSupported")}")
         };
     }
 
@@ -155,6 +182,8 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ModuleName = data.ModuleName ?? string.Empty,
             ModuleComment = data.ModuleComment ?? string.Empty,
             ModuleCode = "123",
+
+            IsDuplicate = data.IsDuplicate ?? false,
 
             ViewNameFormula = data.ViewNameFormula ?? string.Empty,
             ViewName = data.ViewNameFormula ?? string.Empty,
@@ -168,8 +197,15 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ViewportTypeFilter = GetFilterList(data.ViewportTypeFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewCount = data.ViewCount ?? "1",
             SelectedSelectElemParam = sheetVM.SheetSet.SheetSetParams.SelectElemParams
-                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
+                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName),
+
+            ReferenceView = _revitRepository.PlanViewsForDuplication.FirstOrDefault(v => v.Name.Equals(data.ReferenceViewName)),
+            ReferenceViewFilter = GetFilterList(data.ReferenceViewFilterValues, sheetSetVM.SheetSetParams.Params),
         };
+
+        // Первичная проверка в конструкторе выполняется до загрузки способа создания (как при создании с нуля),
+        // а пустые поля из конфигурации не вызывают повторной проверки, поэтому перепроверяем с учетом способа создания
+        sheetComponentVM.ValidateAllProperties();
 
         // Добавляем список дополнительных параметров
         SetCustomParametersList(sheetComponentVM, data, sheetSetVM.SheetSetParams.Params);
@@ -196,7 +232,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ViewportTypeFilter = GetFilterList(data.ViewportTypeFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewCount = data.ViewCount ?? "1",
             SelectedSelectElemParam = sheetVM.SheetSet.SheetSetParams.SelectElemParams
-                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
+                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName)
         };
 
         // Добавляем список дополнительных параметров
@@ -224,7 +260,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
             ViewportTypeFilter = GetFilterList(data.ViewportTypeFilterValues, sheetSetVM.SheetSetParams.Params),
             ViewCount = data.ViewCount ?? "1",
             SelectedSelectElemParam = sheetVM.SheetSet.SheetSetParams.SelectElemParams
-                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName && p is SelectElemParamVM)
+                .FirstOrDefault(p => p.ParamName == data.SelectedSelectElemParamName)
         };
 
         // Добавляем список дополнительных параметров
@@ -363,7 +399,7 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
     }
 
     /// <summary>
-    /// Добавляем список фильтров
+    /// Добавляет модулю спецификации список фильтров из конфигурации и сопоставляет их с полями исходной спецификации
     /// </summary>
     private void SetScheduleFilterList(SheetComponentVM sheetComponentVM, SheetComponentData data, ViewSchedule referenceSpec) {
         // Метод предназначен только для модуля спецификаций
@@ -389,7 +425,10 @@ internal class SheetSetVMFactory : ISheetSetVMFactory {
                 sheetSetParamsList, data.ParamName, data.ParamComment, data.StringValue, _localizationService),
             SelectElemParamData data => new SelectElemParamVM(
                 sheetSetParamsList, data.ParamName, data.ParamComment, _localizationService),
-            _ => throw new NotSupportedException($"Тип '{paramData?.GetType().Name}' не поддерживается")
+            _ => throw new NotSupportedException(
+                $"{_localizationService.GetLocalizedString("MainViewModel.ParameterType")} " +
+                $"'{paramData?.GetType().Name}' " +
+                $"{_localizationService.GetLocalizedString("MainViewModel.NotSupported")}")
         };
     }
 }

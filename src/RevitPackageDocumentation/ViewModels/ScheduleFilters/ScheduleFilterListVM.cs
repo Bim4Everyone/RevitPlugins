@@ -15,6 +15,10 @@ using RevitPackageDocumentation.ViewModels.Validation;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.ScheduleFilters;
+
+/// <summary>
+/// Фильтры модуля спецификации, которые заменяют фильтры исходной спецификации в итоговой
+/// </summary>
 internal class ScheduleFilterListVM : ValidatableVM {
     private readonly ILocalizationService _localizationService;
     private ObservableCollection<ScheduleFilterRuleVM> _scheduleFilterRules = [];
@@ -61,6 +65,9 @@ internal class ScheduleFilterListVM : ValidatableVM {
         ScheduleFilterRules.Remove(rule);
     }
 
+    /// <summary>
+    /// Заполняет список полей и фильтры по выбранной исходной спецификации (существующие фильтры модуля заменяются)
+    /// </summary>
     internal void SetSchedule(ViewSchedule schedule) {
         ScheduleFilterRules.Clear();
         SelectedScheduleFields.Clear();
@@ -80,14 +87,7 @@ internal class ScheduleFilterListVM : ValidatableVM {
             var selectedSpecField =
                 SelectedScheduleFields.FirstOrDefault(f => f.Field.FieldId == scheduleFilterField.FieldId);
 
-            string filterValue = string.Empty;
-            try {
-                if(definition.CanFilterBySubstring(fieldId)) {
-                    filterValue = scheduleFilter.GetStringValue() ?? string.Empty;
-                } else {
-                    filterValue = scheduleFilter.GetIntegerValue().ToString() ?? string.Empty;
-                }
-            } catch(Exception) { }
+            string filterValue = GetFilterValue(definition, scheduleFilter);
 
             var ruleVM = new ScheduleFilterRuleVM(this, StrParamSetService, _localizationService) {
                 SelectedSpecField = selectedSpecField,
@@ -101,6 +101,31 @@ internal class ScheduleFilterListVM : ValidatableVM {
         }
     }
 
+    /// <summary>
+    /// Возвращает значение фильтра спецификации в виде, понятном пользователю.
+    /// Для рабочего набора по условию "равно"/"не равно" в фильтре хранится id набора - показываем его имя
+    /// </summary>
+    private string GetFilterValue(ScheduleDefinition definition, ScheduleFilter scheduleFilter) {
+        var fieldId = scheduleFilter.FieldId;
+        try {
+            if(ScheduleView.Repository.IsWorksetField(definition, fieldId)) {
+                return scheduleFilter.IsStringValue
+                    ? scheduleFilter.GetStringValue() ?? string.Empty
+                    : ScheduleView.Repository.GetWorksetName(scheduleFilter.GetIntegerValue()) ?? string.Empty;
+            }
+            if(definition.CanFilterBySubstring(fieldId)) {
+                return scheduleFilter.GetStringValue() ?? string.Empty;
+            }
+            return scheduleFilter.GetIntegerValue().ToString();
+        } catch(Exception) {
+            return string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// Заполняет список полей по исходной спецификации и сопоставляет с ними поля фильтров, загруженных
+    /// из конфигурации (сами фильтры не меняются)
+    /// </summary>
     internal void SetScheduleToRemember(ViewSchedule schedule) {
         if(schedule == null) {
             return;

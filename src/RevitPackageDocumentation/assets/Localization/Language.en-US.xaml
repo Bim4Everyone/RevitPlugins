@@ -9,7 +9,13 @@
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 
     <system:String x:Key="MainWindow.AddSheet">Add sheet</system:String>
+    <system:String x:Key="MainWindow.SelectAllSheets">Select all sheets</system:String>
+    <system:String x:Key="MainWindow.DeselectAllSheets">Deselect all sheets</system:String>
+    <system:String x:Key="MainWindow.SelectSheetsWithoutErrors">Select sheets and modules without errors</system:String>
     <system:String x:Key="MainWindow.AddSheetComponent">Add sheet component</system:String>
+    <system:String x:Key="MainWindow.SelectAllComponents">Select all sheet modules</system:String>
+    <system:String x:Key="MainWindow.DeselectAllComponents">Deselect all sheet modules</system:String>
+    <system:String x:Key="MainWindow.SelectComponentsWithoutErrors">Select sheet modules without errors</system:String>
     <system:String x:Key="MainWindow.AddSheetSetParam">Add parameter</system:String>
     <system:String x:Key="MainWindow.SheetSetParams">Sheet set parameters</system:String>
 
@@ -48,8 +54,11 @@
     <system:String x:Key="MainWindow.PickElement">Select one element</system:String>
     <system:String x:Key="MainWindow.ErrorsNotFound">No errors found</system:String>
     <system:String x:Key="MainWindow.Edit">Edit</system:String>
+    <system:String x:Key="MainWindow.MoveUp">Move up</system:String>
+    <system:String x:Key="MainWindow.MoveDown">Move down</system:String>
 
     <system:String x:Key="MainWindow.SheetName">Sheet name</system:String>
+    <system:String x:Key="MainWindow.SheetNumber">Sheet number</system:String>
     <system:String x:Key="MainWindow.SheetSettings">Sheet settings</system:String>
     <system:String x:Key="MainWindow.TitleBlockFamily">Title block family</system:String>
     <system:String x:Key="MainWindow.TitleBlockType">Title block type</system:String>
@@ -65,6 +74,9 @@
     <system:String x:Key="MainWindow.Comments">Comments</system:String>
     <system:String x:Key="MainWindow.FinalSpecName">Final schedule name</system:String>
     <system:String x:Key="MainWindow.ReferenceSpecName">Source schedule name</system:String>
+    <system:String x:Key="MainWindow.FinalViewName">Final view name</system:String>
+    <system:String x:Key="MainWindow.ReferenceViewName">Source view name</system:String>
+    <system:String x:Key="MainWindow.ViewSourceToolTip">Left — create a new view, right — duplicate the selected view</system:String>
     <system:String x:Key="MainWindow.PlacementColumn">Placement column</system:String>
     <system:String x:Key="MainWindow.Filters">Filters</system:String>
     <system:String x:Key="MainWindow.TextNoteType">Text note type</system:String>
@@ -101,11 +113,12 @@
 
     <system:String x:Key="Validation.ErrorInCustomParams">Not all errors have been fixed in custom parameters</system:String>
 
-    <system:String x:Key="Validation.HasNotPlanView">Place the component after the plan view</system:String>
+    <system:String x:Key="Validation.PlanViewOnLevelNotFound">No plan view found on the level of the bound element</system:String>
 
     <system:String x:Key="Validation.LegendViewIsNull">No legend selected for placement</system:String>
     <system:String x:Key="Validation.ViewColumnIsNotCorrect">Column number is incorrect</system:String>
     <system:String x:Key="Validation.ReferenceSpecIsNull">No reference schedule selected for duplication</system:String>
+    <system:String x:Key="Validation.ReferenceViewIsNull">No source view selected for duplication</system:String>
     <system:String x:Key="Validation.ScheduleFiltersIsNotCorrect">Schedule filters are incorrect</system:String>
 
     <system:String x:Key="Validation.TextIsEmpty">Text is empty</system:String>
@@ -125,6 +138,12 @@
 
     <system:String x:Key="MainViewModel.Export">Export</system:String>
     <system:String x:Key="MainViewModel.ExportIsSuccessful">Export completed successfully!</system:String>
+    <system:String x:Key="MainViewModel.ExportPathIsNotCorrect">Export path is incorrect!</system:String>
+    <system:String x:Key="MainViewModel.ExportCanceled">Export canceled!</system:String>
+    <system:String x:Key="MainViewModel.Error">Error</system:String>
+    <system:String x:Key="MainViewModel.AddComponentError">An error occurred while adding the component!</system:String>
+    <system:String x:Key="MainViewModel.AddParameterError">An error occurred while adding the parameter!</system:String>
+    <system:String x:Key="MainViewModel.NewSheetName">New sheet</system:String>
     <system:String x:Key="MainViewModel.Type">Type</system:String>
     <system:String x:Key="MainViewModel.ParameterType">Parameter type</system:String>
     <system:String x:Key="MainViewModel.NotSupported">not supported</system:String>

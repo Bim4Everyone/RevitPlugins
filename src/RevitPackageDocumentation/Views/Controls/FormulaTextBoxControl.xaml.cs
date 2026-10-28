@@ -6,6 +6,10 @@ using System.Windows.Threading;
 
 namespace RevitPackageDocumentation.Views.Controls;
 
+/// <summary>
+/// Поле ввода формулы с отображением вычисленного значения под ним (если оно отличается от формулы).
+/// Пересчет запускается командой UpdateCommand через 250 мс после окончания ввода
+/// </summary>
 public partial class FormulaTextBoxControl : UserControl {
     private readonly DispatcherTimer _timer;
 
@@ -25,7 +29,6 @@ public partial class FormulaTextBoxControl : UserControl {
     public static readonly DependencyProperty AcceptsReturnProperty =
         DependencyProperty.Register(nameof(AcceptsReturn), typeof(bool), typeof(FormulaTextBoxControl),
             new FrameworkPropertyMetadata(false));
-
 
     public string PropFormula {
         get => (string) GetValue(PropFormulaProperty);
@@ -66,7 +69,7 @@ public partial class FormulaTextBoxControl : UserControl {
     }
 
     /// <summary>
-    /// При инициализации
+    /// При изменении вычисленного значения (в том числе при первой привязке) обновляет его видимость
     /// </summary>
     private static void OnPropResultChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
         var control = d as FormulaTextBoxControl;

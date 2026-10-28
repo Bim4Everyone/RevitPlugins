@@ -10,6 +10,10 @@ using RevitPackageDocumentation.ViewModels.Validation;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
+
+/// <summary>
+/// Список дополнительных параметров модуля
+/// </summary>
 internal class CustomParametersListVM : ValidatableVM {
     private readonly ILocalizationService _localizationService;
     private ObservableCollection<CustomParameterVM> _params = [];
@@ -34,7 +38,6 @@ internal class CustomParametersListVM : ValidatableVM {
 
     public ObservableCollection<PluginParamVM> SheetSetParams { get; }
     public StringParamSetService StrParamSetService { get; }
-
 
     [ChildHasErrors]
     public ObservableCollection<CustomParameterVM> Params {

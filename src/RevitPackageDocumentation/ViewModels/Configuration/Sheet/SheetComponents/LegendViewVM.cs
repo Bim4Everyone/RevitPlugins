@@ -10,6 +10,10 @@ using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Para
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+
+/// <summary>
+/// Модуль легенды: размещает выбранную легенду на листе
+/// </summary>
 internal class LegendViewVM : SheetComponentVM {
     private View _legendView;
     private ElementType _viewportType;
@@ -53,13 +57,18 @@ internal class LegendViewVM : SheetComponentVM {
         SetCustomParams(viewPort);
     }
 
+    /// <summary>
+    /// Размещает легенду слева от рамки листа
+    /// </summary>
+    /// <returns>Созданный видовой экран или null, если листа нет или легенду разместить нельзя</returns>
     public Viewport Place() {
         // Проверяем можем ли разместить на листе легенду
-        if(!Viewport.CanAddViewToSheet(Repository.Document, Sheet.SheetInstance.Id, LegendView.Id)) {
+        if(Sheet.SheetInstance is null
+            || !Viewport.CanAddViewToSheet(Repository.Document, Sheet.SheetInstance.Id, LegendView.Id)) {
             return null;
         }
 
-        // Размещаем легенду на листе
+        // Размещаем легенду на листе (точка вставки в мм в координатах листа)
         var position = new XYZ(
             UnitUtilsHelper.ConvertToInternalValue(-100),
             UnitUtilsHelper.ConvertToInternalValue(350),

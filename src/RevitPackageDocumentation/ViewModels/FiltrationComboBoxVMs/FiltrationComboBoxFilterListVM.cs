@@ -8,6 +8,11 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
+
+/// <summary>
+/// Фильтры выпадающего списка: в списке остаются элементы, имя которых содержит значения всех включающих фильтров
+/// и не содержит значения исключающих. Значения фильтров задаются формулами
+/// </summary>
 internal class FiltrationComboBoxFilterListVM : BaseViewModel {
     private ObservableCollection<FiltrationComboBoxFilterVM> _valueList = [];
 

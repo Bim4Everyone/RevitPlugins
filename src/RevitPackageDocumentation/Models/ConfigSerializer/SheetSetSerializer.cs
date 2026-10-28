@@ -4,11 +4,17 @@ using pyRevitLabs.Json;
 
 namespace RevitPackageDocumentation.Models.ConfigSerializer;
 
+/// <summary>
+/// Сериализатор конфигурации комплекта
+/// </summary>
 public interface ISheetSetSerializer {
     string Serialize<T>(T obj);
     T Deserialize<T>(string json);
 }
 
+/// <summary>
+/// JSON-сериализатор конфигурации комплекта с конвертерами полиморфных DTO (модули листа, параметры комплекта)
+/// </summary>
 public class SheetSetSerializer : ISheetSetSerializer {
     private readonly JsonSerializerSettings _settings;
 

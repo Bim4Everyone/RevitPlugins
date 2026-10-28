@@ -9,6 +9,10 @@ using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Para
 using RevitPackageDocumentation.ViewModels.Validation;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.CustomParameters;
+
+/// <summary>
+/// Дополнительный параметр модуля: имя параметра Revit и значение по формуле, которое записывается в созданный элемент
+/// </summary>
 internal class CustomParameterVM : ValidatableVM {
     private string _paramValueFormula = string.Empty;
     private string _paramName;
@@ -60,6 +64,9 @@ internal class CustomParameterVM : ValidatableVM {
         StrParamSetService.SetAll(this, CustomParamsList.SheetSetParams);
     }
 
+    /// <summary>
+    /// В случае изменения значения параметра конфигурации нужно пересчитать формулу, если она на него ссылается
+    /// </summary>
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
         StrParamSetService.SetAll(this, CustomParamsList.SheetSetParams, stringParam);
     }

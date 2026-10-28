@@ -9,7 +9,13 @@
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     
     <system:String x:Key="MainWindow.AddSheet">Добавить лист</system:String>
+    <system:String x:Key="MainWindow.SelectAllSheets">Выбрать все листы</system:String>
+    <system:String x:Key="MainWindow.DeselectAllSheets">Снять выбор со всех листов</system:String>
+    <system:String x:Key="MainWindow.SelectSheetsWithoutErrors">Выбрать листы и модули без ошибок</system:String>
     <system:String x:Key="MainWindow.AddSheetComponent">Добавить компонент листа</system:String>
+    <system:String x:Key="MainWindow.SelectAllComponents">Выбрать все модули листа</system:String>
+    <system:String x:Key="MainWindow.DeselectAllComponents">Снять выбор со всех модулей листа</system:String>
+    <system:String x:Key="MainWindow.SelectComponentsWithoutErrors">Выбрать модули листа без ошибок</system:String>
     <system:String x:Key="MainWindow.AddSheetSetParam">Добавить параметр</system:String>
     <system:String x:Key="MainWindow.SheetSetParams">Параметры комплекта</system:String>
     
@@ -26,7 +32,7 @@
     <system:String x:Key="ScheduleFilterType.EndsWith">Заканчивается на</system:String>
     <system:String x:Key="ScheduleFilterType.NotEndsWith">Не заканчивается на</system:String>
     <system:String x:Key="ScheduleFilterType.HasValue">Имеет значение</system:String>
-    <system:String x:Key="ScheduleFilterType.HasNoValue">Не имеет значение</system:String>
+    <system:String x:Key="ScheduleFilterType.HasNoValue">Не имеет значения</system:String>
     
     <system:String x:Key="Type.PlanViewVM">Вид в плане</system:String>
     <system:String x:Key="Type.CalloutViewVM">Фрагмент</system:String>
@@ -49,8 +55,11 @@
     <system:String x:Key="MainWindow.PickElement">Выберите один элемент</system:String>
     <system:String x:Key="MainWindow.ErrorsNotFound">Ошибки не найдены</system:String>
     <system:String x:Key="MainWindow.Edit">Изменить</system:String>
+    <system:String x:Key="MainWindow.MoveUp">Переместить выше</system:String>
+    <system:String x:Key="MainWindow.MoveDown">Переместить ниже</system:String>
     
     <system:String x:Key="MainWindow.SheetName">Имя листа</system:String>
+    <system:String x:Key="MainWindow.SheetNumber">Номер листа</system:String>
     <system:String x:Key="MainWindow.SheetSettings">Настройки листа</system:String>
     <system:String x:Key="MainWindow.TitleBlockFamily">Семейство рамки</system:String>
     <system:String x:Key="MainWindow.TitleBlockType">Типоразмер рамки</system:String>
@@ -66,6 +75,9 @@
     <system:String x:Key="MainWindow.Comments">Комментарии</system:String>
     <system:String x:Key="MainWindow.FinalSpecName">Имя итоговой</system:String>
     <system:String x:Key="MainWindow.ReferenceSpecName">Имя исходной</system:String>
+    <system:String x:Key="MainWindow.FinalViewName">Имя итогового</system:String>
+    <system:String x:Key="MainWindow.ReferenceViewName">Имя исходного</system:String>
+    <system:String x:Key="MainWindow.ViewSourceToolTip">Слева — создать вид с нуля, справа — дублировать выбранный вид</system:String>
     <system:String x:Key="MainWindow.PlacementColumn">Ряд размещения</system:String>
     <system:String x:Key="MainWindow.Filters">Фильтры</system:String>
     <system:String x:Key="MainWindow.TextNoteType">Типоразмер текста</system:String>
@@ -102,16 +114,17 @@
     
     <system:String x:Key="Validation.ErrorInCustomParams">Исправлены не все ошибки в дополнительных параметрах</system:String>
 
-    <system:String x:Key="Validation.HasNotPlanView">Расположите компонент после вида в плане</system:String>
+    <system:String x:Key="Validation.PlanViewOnLevelNotFound">Не найден вид в плане на уровне элемента привязки</system:String>
 
     <system:String x:Key="Validation.LegendViewIsNull">Не выбрана легенда для размещения</system:String>
     <system:String x:Key="Validation.ViewColumnIsNotCorrect">Номер столбца задан некорректно</system:String>
     <system:String x:Key="Validation.ReferenceSpecIsNull">Не выбрана эталонная спецификация для дублирования</system:String>
-    <system:String x:Key="Validation.ScheduleFiltersIsNotCorrect">Фильтры спецификации не корректны</system:String>
+    <system:String x:Key="Validation.ReferenceViewIsNull">Не выбран исходный вид для дублирования</system:String>
+    <system:String x:Key="Validation.ScheduleFiltersIsNotCorrect">Фильтры спецификации некорректны</system:String>
 
     <system:String x:Key="Validation.TextIsEmpty">Текст не заполнен</system:String>
     <system:String x:Key="Validation.TextNoteTypeIsNull">Не выбран тип текстовой заметки</system:String>
-    <system:String x:Key="Validation.TextWidthIsNotCorrect">Ширина текста не корректна</system:String>
+    <system:String x:Key="Validation.TextWidthIsNotCorrect">Ширина текста некорректна</system:String>
 
     <system:String x:Key="Validation.FamilyFolderIsEmpty">Не выбрана папка с семействами</system:String>
     <system:String x:Key="Validation.FamilyFolderNotFound">Папка не найдена: {0}</system:String>
@@ -126,8 +139,12 @@
     
     <system:String x:Key="MainViewModel.Export">Экспорт</system:String>
     <system:String x:Key="MainViewModel.ExportIsSuccessful">Экспорт прошел успешно!</system:String>
-    <system:String x:Key="MainViewModel.ExportPathIsNotCorrect">Путь для экспорт не корректен!</system:String>
+    <system:String x:Key="MainViewModel.ExportPathIsNotCorrect">Путь для экспорта некорректен!</system:String>
     <system:String x:Key="MainViewModel.ExportCanceled">Экспорт отменен!</system:String>
+    <system:String x:Key="MainViewModel.Error">Ошибка</system:String>
+    <system:String x:Key="MainViewModel.AddComponentError">При добавлении компонента произошла ошибка!</system:String>
+    <system:String x:Key="MainViewModel.AddParameterError">При добавлении параметра произошла ошибка!</system:String>
+    <system:String x:Key="MainViewModel.NewSheetName">Новый лист</system:String>
     
     <system:String x:Key="MainViewModel.Type">Тип</system:String>
     <system:String x:Key="MainViewModel.ParameterType">Тип параметра</system:String>
@@ -135,7 +152,7 @@
     <system:String x:Key="MainViewModel.FileDeserializationError">Ошибка десериализации файла</system:String>
     <system:String x:Key="MainViewModel.ErrorReadingFile">Ошибка чтения файла</system:String>
     <system:String x:Key="MainViewModel.ErrorWritingFile">Ошибка записи файла</system:String>
-    <system:String x:Key="MainViewModel.SavePathIsNotCorrect">Путь сохранения не корректен!</system:String>
+    <system:String x:Key="MainViewModel.SavePathIsNotCorrect">Путь сохранения некорректен!</system:String>
     <system:String x:Key="MainViewModel.Property">Свойство</system:String>
     <system:String x:Key="MainViewModel.NotFoundInJSON">не найдено в JSON</system:String>
     <system:String x:Key="MainViewModel.UnknownComponentType">Неизвестный тип компонента</system:String>
