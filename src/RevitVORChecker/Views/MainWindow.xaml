@@ -4,23 +4,21 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:local="clr-namespace:RevitVORChecker.Views"
     xmlns:vms="clr-namespace:RevitVORChecker.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-   
+
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    
-    Height="500"
-    Width="700"
-    
-    MinHeight="500"
-    MinWidth="700"
-   
+
+    Height="520"
+    Width="820"
+
+    MinHeight="520"
+    MinWidth="720"
+
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
@@ -35,17 +33,84 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
+        <StackPanel
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            Margin="16,8">
+
+            <TextBlock
+                Margin="0,0,0,4"
+                Text="{me:LocalizationSource MainWindow.ModelsFolder}" />
+            <DockPanel Margin="0,0,0,12">
+                <ui:Button
+                    DockPanel.Dock="Right"
+                    Margin="8,0,0,0"
+                    Width="100"
+                    Content="{me:LocalizationSource MainWindow.Browse}"
+                    Command="{Binding SelectFolderCommand}" />
+                <ui:TextBox Text="{Binding ModelsFolder, UpdateSourceTrigger=LostFocus}" />
+            </DockPanel>
+
+            <TextBlock
+                Margin="0,0,0,4"
+                Text="{me:LocalizationSource MainWindow.ProjectData}" />
+            <DockPanel Margin="0,0,0,12">
+                <ui:Button
+                    DockPanel.Dock="Right"
+                    Margin="8,0,0,0"
+                    Width="160"
+                    Content="{me:LocalizationSource MainWindow.EditProject}"
+                    Command="{Binding EditProjectCommand}" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Opacity="0.7"
+                    TextWrapping="Wrap"
+                    Text="{Binding ProjectSummary}" />
+            </DockPanel>
+
+            <TextBlock
+                Margin="0,0,0,4"
+                Text="{me:LocalizationSource MainWindow.Classifier}" />
+            <DockPanel Margin="0,0,0,12">
+                <ui:Button
+                    DockPanel.Dock="Right"
+                    Margin="8,0,0,0"
+                    Width="100"
+                    Content="{me:LocalizationSource MainWindow.Browse}"
+                    Command="{Binding SelectClassifierCommand}" />
+                <ui:TextBox Text="{Binding ClassifierPath, UpdateSourceTrigger=PropertyChanged}" />
+            </DockPanel>
+
+            <StackPanel
+                Margin="0,0,0,12"
+                Orientation="Horizontal">
+                <TextBlock
+                    Margin="0,0,8,0"
+                    VerticalAlignment="Center"
+                    Text="{me:LocalizationSource MainWindow.ClashTolerance}" />
+                <ui:TextBox
+                    Width="80"
+                    Text="{Binding ClashTolerance, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <CheckBox
+                Margin="0,0,0,4"
+                Content="{me:LocalizationSource MainWindow.TakeScreenshots}"
+                IsChecked="{Binding TakeScreenshots}" />
+            <CheckBox
+                Margin="0,0,0,12"
+                Content="{me:LocalizationSource MainWindow.CheckWorksets}"
+                IsChecked="{Binding CheckWorksets}" />
+
+            <TextBlock
+                Opacity="0.7"
+                TextWrapping="Wrap"
+                Text="{me:LocalizationSource MainWindow.LocalOnly}" />
+        </StackPanel>
 
         <StackPanel
             Grid.Row="2"
@@ -60,15 +125,14 @@
 
             <ui:Button
                 Margin="8"
-                Width="80"
+                Width="180"
                 Appearance="Info"
-                Content="{me:LocalizationSource MainWindow.ButtonOk}"
-                Click="ButtonOk_Click"
+                Content="{me:LocalizationSource MainWindow.ButtonRun}"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
                 Margin="8"
-                Width="80"
+                Width="100"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />

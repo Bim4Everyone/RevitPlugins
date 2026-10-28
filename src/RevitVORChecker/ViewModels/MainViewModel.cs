@@ -1,99 +1,217 @@
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Windows;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
+using Ninject;
+using Ninject.Syntax;
+
 using RevitVORChecker.Models;
+using RevitVORChecker.Models.Project;
+using RevitVORChecker.Services;
+using RevitVORChecker.Views;
 
 namespace RevitVORChecker.ViewModels;
 
 /// <summary>
-/// Основная ViewModel главного окна плагина.
+/// Главное окно: параметры запуска проверки папки с моделями.
 /// </summary>
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
-    private readonly RevitRepository _revitRepository;
+    private readonly CheckProcess _checkProcess;
+    private readonly IResolutionRoot _resolutionRoot;
     private readonly ILocalizationService _localizationService;
+    private string _modelsFolder;
+    private string _classifierPath;
+    private string _clashTolerance;
+    private bool _takeScreenshots;
+    private bool _checkWorksets;
+    private string _projectSummary;
+    private string _errorText;
+    private ProjectCard _projectCard;
 
-    private string? _errorText;
-    private string _saveProperty = string.Empty;
-    
-    /// <summary>
-    /// Создает экземпляр основной ViewModel главного окна.
-    /// </summary>
-    /// <param name="pluginConfig">Настройки плагина.</param>
-    /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(
         PluginConfig pluginConfig,
-        RevitRepository revitRepository,
-        ILocalizationService localizationService) {
-        
+        CheckProcess checkProcess,
+        IResolutionRoot resolutionRoot,
+        ILocalizationService localizationService,
+        IMessageBoxService messageBoxService,
+        IProgressDialogFactory progressDialogFactory,
+        IOpenFolderDialogService openFolderDialogService,
+        IOpenFileDialogService openFileDialogService) {
+
         _pluginConfig = pluginConfig;
-        _revitRepository = revitRepository;
+        _checkProcess = checkProcess;
+        _resolutionRoot = resolutionRoot;
         _localizationService = localizationService;
+        MessageBoxService = messageBoxService;
+        ProgressDialogFactory = progressDialogFactory;
+        OpenFolderDialogService = openFolderDialogService;
+        OpenFileDialogService = openFileDialogService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
+        SelectFolderCommand = RelayCommand.Create(SelectFolder);
+        SelectClassifierCommand = RelayCommand.Create(SelectClassifier);
+        EditProjectCommand = RelayCommand.Create(EditProject, CanEditProject);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
     }
 
     /// <summary>
-    /// Команда загрузки главного окна.
+    /// Окно просит закрыть себя после проверки.
     /// </summary>
+    public event EventHandler CloseRequested;
+
+    public IMessageBoxService MessageBoxService { get; }
+
+    public IProgressDialogFactory ProgressDialogFactory { get; }
+
+    public IOpenFolderDialogService OpenFolderDialogService { get; }
+
+    public IOpenFileDialogService OpenFileDialogService { get; }
+
     public ICommand LoadViewCommand { get; }
-    
-    /// <summary>
-    /// Команда применения настроек главного окна. (запуск плагина)
-    /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
-    public ICommand AcceptViewCommand { get; }
+
+    public ICommand SelectFolderCommand { get; }
+
+    public ICommand SelectClassifierCommand { get; }
+
+    public ICommand EditProjectCommand { get; }
 
     /// <summary>
-    /// Текст ошибки, который отображается при неверном вводе пользователя.
+    /// Запуск проверки.
     /// </summary>
-    public string? ErrorText {
+    public ICommand AcceptViewCommand { get; }
+
+    public string ModelsFolder {
+        get => _modelsFolder;
+        set {
+            RaiseAndSetIfChanged(ref _modelsFolder, value);
+            LoadProjectCard();
+        }
+    }
+
+    /// <summary>
+    /// Классификатор видов работ; пусто — найти в папке с моделями.
+    /// </summary>
+    public string ClassifierPath {
+        get => _classifierPath;
+        set => RaiseAndSetIfChanged(ref _classifierPath, value);
+    }
+
+    public string ClashTolerance {
+        get => _clashTolerance;
+        set => RaiseAndSetIfChanged(ref _clashTolerance, value);
+    }
+
+    public bool TakeScreenshots {
+        get => _takeScreenshots;
+        set => RaiseAndSetIfChanged(ref _takeScreenshots, value);
+    }
+
+    public bool CheckWorksets {
+        get => _checkWorksets;
+        set => RaiseAndSetIfChanged(ref _checkWorksets, value);
+    }
+
+    /// <summary>
+    /// Краткое описание данных проекта.
+    /// </summary>
+    public string ProjectSummary {
+        get => _projectSummary;
+        set => RaiseAndSetIfChanged(ref _projectSummary, value);
+    }
+
+    public string ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    /// <summary>
-    /// Свойство для примера. (требуется удалить)
-    /// </summary>
-    public string SaveProperty {
-        get => _saveProperty;
-        set => RaiseAndSetIfChanged(ref _saveProperty, value);
-    }
-
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
-        LoadConfig();
+        ClassifierPath = _pluginConfig.ClassifierPath;
+        ClashTolerance = string.IsNullOrWhiteSpace(_pluginConfig.ClashToleranceMm) ? "50" : _pluginConfig.ClashToleranceMm;
+        TakeScreenshots = _pluginConfig.TakeScreenshots;
+        CheckWorksets = _pluginConfig.CheckWorksets;
+        ModelsFolder = _pluginConfig.ModelsFolder;
     }
 
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
-    private void AcceptView() {
-        SaveConfig();
+    private void SaveConfig() {
+        _pluginConfig.ModelsFolder = ModelsFolder ?? "";
+        _pluginConfig.ClassifierPath = ClassifierPath ?? "";
+        _pluginConfig.ClashToleranceMm = ClashTolerance ?? "50";
+        _pluginConfig.TakeScreenshots = TakeScreenshots;
+        _pluginConfig.CheckWorksets = CheckWorksets;
+        _pluginConfig.SaveProjectConfig();
     }
 
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
-    /// <remarks>
-    /// В данном методе происходит валидация ввода пользователя и уведомление его о неверных значениях.
-    /// В методе проверяемые свойства окна должны быть отсортированы в таком же порядке как в окне (сверху-вниз)
-    /// </remarks>
+    private void SelectFolder() {
+        if(OpenFolderDialogService.ShowDialog()) {
+            ModelsFolder = OpenFolderDialogService.Folder.FullName;
+        }
+    }
+
+    private void SelectClassifier() {
+        if(OpenFileDialogService.ShowDialog()) {
+            ClassifierPath = OpenFileDialogService.File.FullName;
+        }
+    }
+
+    private void LoadProjectCard() {
+        _projectCard = Directory.Exists(ModelsFolder) ? ProjectCardStorage.Load(ModelsFolder) : null;
+        ProjectSummary = _projectCard != null
+            ? _projectCard.GetSummary()
+            : _localizationService.GetLocalizedString("MainWindow.ProjectNotSet");
+    }
+
+    private bool CanEditProject() {
+        return Directory.Exists(ModelsFolder);
+    }
+
+    private void EditProject() {
+        var window = _resolutionRoot.Get<ProjectCardWindow>();
+        var projectCardViewModel = (ProjectCardViewModel) window.DataContext;
+        if(_projectCard != null) {
+            projectCardViewModel.SetData(_projectCard);
+        }
+
+        if(window.ShowDialog() != true) {
+            return;
+        }
+
+        try {
+            ProjectCardStorage.Save(ModelsFolder, projectCardViewModel.Result);
+        } catch(Exception ex) {
+            ShowMessage(
+                _localizationService.GetLocalizedString("MainWindow.ProjectSaveError") + " " + ex.Message,
+                MessageBoxImage.Error);
+        }
+
+        _projectCard = projectCardViewModel.Result;
+        ProjectSummary = _projectCard.GetSummary();
+    }
+
     private bool CanAcceptView() {
-        if(string.IsNullOrEmpty(SaveProperty)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.HelloCheck");
+        if(!Directory.Exists(ModelsFolder)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.NoFolder");
+            return false;
+        }
+
+        if(!string.IsNullOrWhiteSpace(ClassifierPath) && !File.Exists(ClassifierPath.Trim())) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.NoClassifier");
+            return false;
+        }
+
+        if(!TryParseTolerance(out _)) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.BadTolerance");
+            return false;
+        }
+
+        if(_projectCard == null) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.NoProject");
             return false;
         }
 
@@ -101,23 +219,65 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
-    /// <summary>
-    /// Загрузка настроек плагина.
-    /// </summary>
-    private void LoadConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-
-        SaveProperty = setting?.SaveProperty ?? _localizationService.GetLocalizedString("MainWindow.Hello");
+    private bool TryParseTolerance(out double tolerance) {
+        string text = (ClashTolerance ?? "").Trim().Replace(",", ".");
+        return double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out tolerance) && tolerance > 0;
     }
 
-    /// <summary>
-    /// Сохранение настроек плагина.
-    /// </summary>
-    private void SaveConfig() {
-        RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
-                                ?? _pluginConfig.AddSettings(_revitRepository.Document);
+    private void AcceptView() {
+        SaveConfig();
+        TryParseTolerance(out double tolerance);
+        var settings = new CheckSettings {
+            ModelsFolder = ModelsFolder,
+            ClassifierPath = ClassifierPath,
+            ClashToleranceMm = tolerance,
+            TakeScreenshots = TakeScreenshots,
+            CheckWorksets = CheckWorksets,
+            Project = _projectCard
+        };
 
-        setting.SaveProperty = SaveProperty;
-        _pluginConfig.SaveProjectConfig();
+        CheckResult result;
+        try {
+            using IProgressDialogService progressDialog = ProgressDialogFactory.CreateDialog();
+            progressDialog.StepValue = 1;
+            progressDialog.DisplayTitleFormat = _localizationService.GetLocalizedString("MainWindow.ProgressTitle");
+            progressDialog.MaxValue = CheckProcess.GetStepCount(Models.ModelsFolder.GetModels(ModelsFolder).Count);
+            IProgress<int> progress = progressDialog.CreateProgress();
+            CancellationToken cancellationToken = progressDialog.CreateCancellationToken();
+            progressDialog.Show();
+            result = _checkProcess.Run(settings, progress, cancellationToken);
+        } catch(OperationCanceledException) {
+            ShowMessage(_localizationService.GetLocalizedString("MainWindow.Cancelled"), MessageBoxImage.Information);
+            return;
+        } catch(Exception ex) {
+            string stopped = _localizationService.GetLocalizedString("MainWindow.Stopped");
+            ShowMessage(stopped + "\n" + ex.Message, MessageBoxImage.Error);
+            return;
+        }
+
+        string message = string.Format(
+            _localizationService.GetLocalizedString("MainWindow.Done"),
+            result.FindingCount,
+            result.RegistryPath);
+        MessageBoxResult answer = MessageBoxService.Show(
+            message,
+            _localizationService.GetLocalizedString("MainWindow.Title"),
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Information,
+            MessageBoxResult.Yes);
+        if(answer == MessageBoxResult.Yes) {
+            Process.Start("explorer.exe", "/select,\"" + result.RegistryPath + "\"");
+        }
+
+        CloseRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void ShowMessage(string message, MessageBoxImage image) {
+        MessageBoxService.Show(
+            message,
+            _localizationService.GetLocalizedString("MainWindow.Title"),
+            MessageBoxButton.OK,
+            image,
+            MessageBoxResult.OK);
     }
 }

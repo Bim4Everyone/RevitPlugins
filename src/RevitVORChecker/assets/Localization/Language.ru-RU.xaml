@@ -2,10 +2,66 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
-
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.Title">Проверка ВОР КР</system:String>
+    <system:String x:Key="MainWindow.ModelsFolder">Папка с моделями КР и выгрузками ВОР:</system:String>
+    <system:String x:Key="MainWindow.Browse">Обзор…</system:String>
+    <system:String x:Key="MainWindow.ProjectData">Данные проекта (из ЗнП):</system:String>
+    <system:String x:Key="MainWindow.EditProject">Данные проекта…</system:String>
+    <system:String x:Key="MainWindow.Classifier">Классификатор видов работ (.xlsx; пусто — найти в папке):</system:String>
+    <system:String x:Key="MainWindow.ClashTolerance">Допуск пересечений, мм:</system:String>
+    <system:String x:Key="MainWindow.TakeScreenshots">Делать скриншоты (дольше; без них — только текст и ID)</system:String>
+    <system:String x:Key="MainWindow.CheckWorksets">Проверять распределение элементов ВОР по рабочим наборам</system:String>
+    <system:String x:Key="MainWindow.LocalOnly">Всё выполняется на этом ПК, без сети. Модели открываются отсоединённо и закрываются без сохранения. Реестр замечаний — в «&lt;папка&gt;\Локальная проверка\».</system:String>
+    <system:String x:Key="MainWindow.ButtonRun">Запустить проверку</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="MainWindow.ProjectNotSet">не заданы — нажмите «Данные проекта…»</system:String>
+    <system:String x:Key="MainWindow.ProjectSaveError">Не удалось сохранить данные проекта:</system:String>
+    <system:String x:Key="MainWindow.NoFolder">Укажите существующую папку с моделями.</system:String>
+    <system:String x:Key="MainWindow.NoClassifier">Файл Классификатора не найден.</system:String>
+    <system:String x:Key="MainWindow.BadTolerance">Допуск пересечений — положительное число, мм.</system:String>
+    <system:String x:Key="MainWindow.NoProject">Заполните данные проекта.</system:String>
+    <system:String x:Key="MainWindow.ProgressTitle">Проверка ВОР КР... [{0}]\[{1}]</system:String>
+    <system:String x:Key="MainWindow.Cancelled">Проверка отменена.</system:String>
+    <system:String x:Key="MainWindow.Stopped">Проверка остановлена:</system:String>
+    <system:String x:Key="MainWindow.Done">Проверка завершена, замечаний: {0}.&#x0a;Реестр замечаний:&#x0a;{1}&#x0a;&#x0a;Открыть папку с реестром?</system:String>
+
+    <system:String x:Key="Process.NoFolder">Нет папки:</system:String>
+    <system:String x:Key="Process.NoModels">В папке нет моделей .rvt.</system:String>
+    <system:String x:Key="Process.NoClassifier">Не найден Классификатор видов работ — укажите файл в окне запуска.</system:String>
+    <system:String x:Key="Process.ModelsOpen">В Revit открыты модели из проверяемой папки: {0}. Закройте их (проверка открывает модели сама, отсоединённо) и запустите снова.</system:String>
+
+    <system:String x:Key="ProjectCard.Title">Данные проекта (из ЗнП)</system:String>
+    <system:String x:Key="ProjectCard.Name">Наименование объекта (для шапки реестра):</system:String>
+    <system:String x:Key="ProjectCard.Ats">Номер АТС по ЗнП:</system:String>
+    <system:String x:Key="ProjectCard.Date">Дата ЗнП (ГГГГ-ММ-ДД):</system:String>
+    <system:String x:Key="ProjectCard.Stage">Стадия:</system:String>
+    <system:String x:Key="ProjectCard.Storeys">Этажность жилых корпусов:</system:String>
+    <system:String x:Key="ProjectCard.FoundationRule">ФП при 2+ подземных этажах:</system:String>
+    <system:String x:Key="ProjectCard.ClashDecimals">«Нулевое» пересечение — знаков после запятой (м³):</system:String>
+    <system:String x:Key="ProjectCard.LowRiseBlocks">Корпуса до 9 этажей — при разной этажности (значения ФОП_Блок СМР через запятую, например «Корпус 1, Корпус 2»; остальные корпуса — по столбцу 10–17):</system:String>
+    <system:String x:Key="ProjectCard.TableHint">Таблица 2.6.4 «Расход арматуры на 1 куб м. бетона, не более» — перенесите значения из ЗнП проекта. Прочерк или пустая ячейка — нормы нет.</system:String>
+    <system:String x:Key="ProjectCard.FillDefault">Заполнить типовыми (ЗнП А101)</system:String>
+    <system:String x:Key="ProjectCard.Import">Загрузить из project.json…</system:String>
+    <system:String x:Key="ProjectCard.ColumnNumber">№ п/п</system:String>
+    <system:String x:Key="ProjectCard.ColumnType">Тип конструкции</system:String>
+    <system:String x:Key="ProjectCard.ColumnThickness">Для толщины, мм</system:String>
+    <system:String x:Key="ProjectCard.ColumnLowRise">7–9 эт., кг/м³</system:String>
+    <system:String x:Key="ProjectCard.ColumnHighRise">10–17 эт., кг/м³</system:String>
+    <system:String x:Key="ProjectCard.ColumnAlternative">Допускается также, кг/м³</system:String>
+    <system:String x:Key="ProjectCard.ColumnAlternativeCondition">Когда допускается</system:String>
+    <system:String x:Key="ProjectCard.ButtonSave">Сохранить</system:String>
+    <system:String x:Key="ProjectCard.FoundationToBuilding">к корпусу (база знаний)</system:String>
+    <system:String x:Key="ProjectCard.FoundationToParking">к автостоянке</system:String>
+    <system:String x:Key="ProjectCard.ResidentialGroup">Жилые корпуса</system:String>
+    <system:String x:Key="ProjectCard.ParkingGroup">Паркинг</system:String>
+    <system:String x:Key="ProjectCard.Hint">Жёлтым — значения, по которым будет проверка.</system:String>
+    <system:String x:Key="ProjectCard.HintEighteenPlus">Жёлтым — значения, по которым будет проверка (для 18+ этажей ЗнП предписывает столбец 10–17).</system:String>
+    <system:String x:Key="ProjectCard.HintMixed">Жёлтым — значения, по которым будет проверка (7–9 — для перечисленных корпусов, 10–17 — для остальных).</system:String>
+    <system:String x:Key="ProjectCard.EmptyNormsQuestion">Для выбранной этажности не задан расход: {0}.&#x0a;Армирование этих конструкций проверяться не будет. Продолжить?</system:String>
+    <system:String x:Key="ProjectCard.FillDefaultQuestion">Заменить таблицу типовыми нормами А101 (табл. 2.6.4)?</system:String>
+    <system:String x:Key="ProjectCard.NoName">Укажите наименование объекта.</system:String>
+    <system:String x:Key="ProjectCard.BadDate">Дата ЗнП — в формате ГГГГ-ММ-ДД.</system:String>
+    <system:String x:Key="ProjectCard.BadDecimals">Знаков после запятой — число от 0 до 6.</system:String>
+    <system:String x:Key="ProjectCard.NoLowRiseBlocks">Перечислите корпуса до 9 этажей (как в ФОП_Блок СМР).</system:String>
+    <system:String x:Key="ProjectCard.BadValue">{0}, п.{1}: расход — целое число кг/м³ или прочерк.</system:String>
 </ResourceDictionary>

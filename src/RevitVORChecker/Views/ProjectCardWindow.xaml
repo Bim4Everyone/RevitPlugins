@@ -1,0 +1,368 @@
+<core:WpfUIPlatformWindow
+    x:Class="RevitVORChecker.Views.ProjectCardWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vms="clr-namespace:RevitVORChecker.ViewModels"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+
+    mc:Ignorable="d"
+    Title="{me:LocalizationSource ProjectCard.Title}"
+
+    Height="900"
+    Width="1200"
+
+    MinHeight="600"
+    MinWidth="900"
+
+    d:DataContext="{d:DesignInstance vms:ProjectCardViewModel, IsDesignTimeCreatable=False}">
+
+    <core:WpfUIPlatformWindow.Resources>
+        <CollectionViewSource
+            x:Key="GroupedRows"
+            Source="{Binding Rows}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="GroupTitle" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+
+        <SolidColorBrush
+            x:Key="UsedValueBrush"
+            Color="#4DFFB300" />
+
+        <Style
+            x:Key="FirstValueCell"
+            TargetType="DataGridCell"
+            BasedOn="{StaticResource {x:Type DataGridCell}}">
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding IsFirstValueUsed}"
+                    Value="True">
+                    <Setter
+                        Property="Background"
+                        Value="{StaticResource UsedValueBrush}" />
+                    <Setter
+                        Property="FontWeight"
+                        Value="Bold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="SecondValueCell"
+            TargetType="DataGridCell"
+            BasedOn="{StaticResource {x:Type DataGridCell}}">
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding IsSecondValueUsed}"
+                    Value="True">
+                    <Setter
+                        Property="Background"
+                        Value="{StaticResource UsedValueBrush}" />
+                    <Setter
+                        Property="FontWeight"
+                        Value="Bold" />
+                </DataTrigger>
+                <DataTrigger
+                    Binding="{Binding IsSecondValueReadOnly}"
+                    Value="True">
+                    <Setter
+                        Property="IsEnabled"
+                        Value="False" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="AlternativeValueCell"
+            TargetType="DataGridCell"
+            BasedOn="{StaticResource {x:Type DataGridCell}}">
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding IsAlternativeValueReadOnly}"
+                    Value="True">
+                    <Setter
+                        Property="IsEnabled"
+                        Value="False" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="NumberText"
+            TargetType="TextBlock">
+            <Setter
+                Property="HorizontalAlignment"
+                Value="Center" />
+            <Setter
+                Property="VerticalAlignment"
+                Value="Center" />
+        </Style>
+
+        <Style
+            x:Key="WrappedText"
+            TargetType="TextBlock">
+            <Setter
+                Property="TextWrapping"
+                Value="Wrap" />
+            <Setter
+                Property="VerticalAlignment"
+                Value="Center" />
+        </Style>
+    </core:WpfUIPlatformWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource ProjectCard.Title}" />
+
+        <StackPanel
+            Grid.Row="1"
+            Margin="16,8,16,0">
+
+            <TextBlock
+                Margin="0,0,0,4"
+                Text="{me:LocalizationSource ProjectCard.Name}" />
+            <ui:TextBox
+                Margin="0,0,0,12"
+                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+
+            <WrapPanel Margin="0,0,0,12">
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        Text="{me:LocalizationSource ProjectCard.Ats}" />
+                    <ComboBox
+                        Width="90"
+                        IsEditable="True"
+                        ItemsSource="{Binding AtsOptions}"
+                        Text="{Binding AtsNumber, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        Text="{me:LocalizationSource ProjectCard.Date}" />
+                    <ui:TextBox
+                        Width="130"
+                        Text="{Binding AssignmentDate, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        Text="{me:LocalizationSource ProjectCard.Stage}" />
+                    <ComboBox
+                        Width="70"
+                        ItemsSource="{Binding StageOptions}"
+                        SelectedItem="{Binding Stage}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        Text="{me:LocalizationSource ProjectCard.Storeys}" />
+                    <ComboBox
+                        Width="190"
+                        ItemsSource="{Binding StoreysOptionTitles}"
+                        SelectedIndex="{Binding StoreysIndex}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,16,0">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        Text="{me:LocalizationSource ProjectCard.FoundationRule}" />
+                    <ComboBox
+                        Width="220"
+                        ItemsSource="{Binding FoundationRuleTitles}"
+                        SelectedIndex="{Binding FoundationRuleIndex}" />
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        Text="{me:LocalizationSource ProjectCard.ClashDecimals}" />
+                    <ui:TextBox
+                        Width="70"
+                        HorizontalAlignment="Left"
+                        Text="{Binding ClashVolumeDecimals, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+            </WrapPanel>
+
+            <TextBlock
+                Margin="0,0,0,4"
+                TextWrapping="Wrap"
+                Text="{me:LocalizationSource ProjectCard.LowRiseBlocks}" />
+            <ui:TextBox
+                Margin="0,0,0,12"
+                IsEnabled="{Binding IsLowRiseBlocksEnabled}"
+                Text="{Binding LowRiseBlocks, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock
+                Margin="0,0,0,8"
+                TextWrapping="Wrap"
+                Text="{me:LocalizationSource ProjectCard.TableHint}" />
+            <StackPanel
+                Margin="0,0,0,8"
+                Orientation="Horizontal">
+                <ui:Button
+                    Margin="0,0,8,0"
+                    Content="{me:LocalizationSource ProjectCard.FillDefault}"
+                    Command="{Binding FillDefaultTableCommand}" />
+                <ui:Button
+                    Margin="0,0,16,0"
+                    Content="{me:LocalizationSource ProjectCard.Import}"
+                    Command="{Binding ImportProjectFileCommand}" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Opacity="0.7"
+                    Text="{Binding HighlightHint}" />
+            </StackPanel>
+        </StackPanel>
+
+        <DataGrid
+            Grid.Row="2"
+            Margin="16,0"
+            AutoGenerateColumns="False"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False"
+            CanUserSortColumns="False"
+            CanUserReorderColumns="False"
+            HeadersVisibility="Column"
+            SelectionUnit="Cell"
+            GridLinesVisibility="All"
+            HorizontalGridLinesBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            VerticalGridLinesBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            ItemsSource="{Binding Source={StaticResource GroupedRows}}">
+            <DataGrid.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                Margin="8,6"
+                                FontWeight="Bold"
+                                Text="{Binding Name}" />
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </DataGrid.GroupStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Width="50"
+                    IsReadOnly="True"
+                    ElementStyle="{StaticResource NumberText}"
+                    Binding="{Binding Number}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            TextAlignment="Center"
+                            Text="{me:LocalizationSource ProjectCard.ColumnNumber}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="3*"
+                    IsReadOnly="True"
+                    ElementStyle="{StaticResource WrappedText}"
+                    Binding="{Binding ConstructionType}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            TextAlignment="Center"
+                            Text="{me:LocalizationSource ProjectCard.ColumnType}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="2*"
+                    ElementStyle="{StaticResource WrappedText}"
+                    Binding="{Binding Thickness, UpdateSourceTrigger=PropertyChanged}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            TextAlignment="Center"
+                            Text="{me:LocalizationSource ProjectCard.ColumnThickness}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="110"
+                    CellStyle="{StaticResource FirstValueCell}"
+                    ElementStyle="{StaticResource NumberText}"
+                    Binding="{Binding FirstValue, UpdateSourceTrigger=PropertyChanged}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            TextAlignment="Center"
+                            Text="{me:LocalizationSource ProjectCard.ColumnLowRise}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="110"
+                    CellStyle="{StaticResource SecondValueCell}"
+                    ElementStyle="{StaticResource NumberText}"
+                    Binding="{Binding SecondValue, UpdateSourceTrigger=PropertyChanged}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            TextAlignment="Center"
+                            Text="{me:LocalizationSource ProjectCard.ColumnHighRise}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="110"
+                    CellStyle="{StaticResource AlternativeValueCell}"
+                    ElementStyle="{StaticResource NumberText}"
+                    Binding="{Binding AlternativeValue, UpdateSourceTrigger=PropertyChanged}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            TextAlignment="Center"
+                            Text="{me:LocalizationSource ProjectCard.ColumnAlternative}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    Width="2*"
+                    IsReadOnly="True"
+                    ElementStyle="{StaticResource WrappedText}"
+                    Binding="{Binding AlternativeCondition}">
+                    <DataGridTextColumn.Header>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            TextAlignment="Center"
+                            Text="{me:LocalizationSource ProjectCard.ColumnAlternativeCondition}" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel
+            Grid.Row="3"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
+
+            <ui:TextBlock
+                Margin="8"
+                Foreground="Orange"
+                VerticalAlignment="Center"
+                Text="{Binding ErrorText}" />
+
+            <ui:Button
+                Margin="8"
+                Width="120"
+                Appearance="Info"
+                Content="{me:LocalizationSource ProjectCard.ButtonSave}"
+                Command="{Binding AcceptViewCommand}"
+                Click="ButtonSave_Click" />
+
+            <ui:Button
+                Margin="8"
+                Width="100"
+                Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
+        </StackPanel>
+    </Grid>
+</core:WpfUIPlatformWindow>

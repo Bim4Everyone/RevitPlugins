@@ -6,29 +6,38 @@ using pyRevitLabs.Json;
 namespace RevitVORChecker.Models;
 
 /// <summary>
-/// Класс конфигурации плагина.
-/// (Если не используется удалить)
+/// Настройки плагина: последние значения окна запуска.
 /// </summary>
-internal class PluginConfig : ProjectConfig<RevitSettings> {
-    /// <summary>
-    /// Системное свойство конфигурации. (Не трогать)
-    /// </summary>
+/// <remarks>
+/// Настройки общие, а не по проекту: проверка запускается из любого документа, а проверяемые модели лежат в папке.
+/// Данные проекта (из ЗнП) хранятся в папке с моделями (<see cref="Project.ProjectCardStorage"/>).
+/// </remarks>
+internal class PluginConfig : ProjectConfig {
     [JsonIgnore]
-    public override string? ProjectConfigPath { get; set; }
+    public override string ProjectConfigPath { get; set; }
+
+    [JsonIgnore]
+    public override IConfigSerializer Serializer { get; set; }
 
     /// <summary>
-    /// Системное свойство конфигурации. (Не трогать)
+    /// Папка с моделями КР и выгрузками ВОР.
     /// </summary>
-    [JsonIgnore]
-    public override IConfigSerializer? Serializer { get; set; }
+    public string ModelsFolder { get; set; } = string.Empty;
 
     /// <summary>
-    /// Метод создания конфигурации плагина.
+    /// Классификатор видов работ; пусто — найти в папке с моделями.
     /// </summary>
-    /// <returns>
-	/// <param name="configSerializer">Сериализатор конфигурации.</param>
-    /// Возвращает прочитанную конфигурацию плагина, либо созданный конфиг по умолчанию.
-    /// </returns>
+    public string ClassifierPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Допуск глубины пересечения конструкций, мм.
+    /// </summary>
+    public string ClashToleranceMm { get; set; } = "50";
+
+    public bool TakeScreenshots { get; set; } = true;
+
+    public bool CheckWorksets { get; set; } = true;
+
     public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
             .SetSerializer(configSerializer)
@@ -37,29 +46,4 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
             .SetProjectConfigName(nameof(PluginConfig) + ".json")
             .Build<PluginConfig>();
     }
-}
-
-/// <summary>
-/// Настройки проекта.
-/// В настройках проекта обычно хранится выбор пользователя в основном окне плагина.
-/// </summary>
-/// <remarks>
-/// Проектом по умолчанию является текст до первого нижнего подчеркивания.
-/// <see cref="ProjectConfig" />
-/// https://github.com/dosymep/dosymep.Revit/blob/master/src/dosymep.Bim4Everyone/ProjectConfigs/ProjectConfig.cs#L102
-/// Если плагин работает без открытых проектов,
-/// то требуется данный класс удалять из проекта,
-/// как сделано в плагине RevitServerFolders
-/// https://github.com/Bim4Everyone/RevitPlugins/blob/master/src/RevitServerFolders/Models/PluginConfig.cs#L8
-/// </remarks>
-internal class RevitSettings : ProjectSettings {
-    /// <summary>
-    /// Наименование проекта. Системное свойство. (Не трогать)
-    /// </summary>
-    public override string ProjectName { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
-    /// </summary>
-    public string SaveProperty { get; set; } = string.Empty;
 }

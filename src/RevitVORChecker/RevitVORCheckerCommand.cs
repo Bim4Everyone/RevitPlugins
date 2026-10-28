@@ -13,64 +13,59 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitVORChecker.Models;
+using RevitVORChecker.Services;
 using RevitVORChecker.ViewModels;
 using RevitVORChecker.Views;
 
 namespace RevitVORChecker;
 
 /// <summary>
-/// Класс команды Revit плагина.
+/// Команда «Проверка ВОР»: проверка BIM-моделей КР перед выгрузкой ВОР и реестр замечаний .docx.
 /// </summary>
-/// <remarks>
-/// В данном классе должна быть инициализация контейнера плагина и указание названия команды.
-/// </remarks>
 [Transaction(TransactionMode.Manual)]
 public class RevitVORCheckerCommand : BasePluginCommand {
-    /// <summary>
-    /// Инициализирует команду плагина.
-    /// </summary>
     public RevitVORCheckerCommand() {
         PluginName = "Проверка ВОР";
     }
 
-    /// <summary>
-    /// Метод выполнения основного кода плагина.
-    /// </summary>
-    /// <param name="uiApplication">Интерфейс взаимодействия с Revit.</param>
-    /// <remarks>
-    /// В случаях, когда не используется конфигурация
-    /// или локализация требуется удалять их использование полностью во всем проекте.
-    /// </remarks>
     protected override void Execute(UIApplication uiApplication) {
-        // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
 
-        // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<CheckProcess>()
+            .ToSelf()
+            .InSingletonScope();
 
-        // Настройка конфигурации плагина
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
-        // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
-        // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.BindOtherWindow<ProjectCardViewModel, ProjectCardWindow>();
 
-        // Настройка локализации,
-        // получение имени сборки откуда брать текст
+        kernel.UseWpfUIProgressDialog<MainViewModel>();
+        kernel.UseWpfUIMessageBox<MainViewModel>();
+        kernel.UseWpfUIMessageBox<ProjectCardViewModel>();
+        kernel.UseWpfOpenFolderDialog<MainViewModel>(
+            multiSelect: false,
+            initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+        kernel.UseWpfOpenFileDialog<MainViewModel>(
+            filter: "Excel |*.xlsx",
+            multiSelect: false,
+            initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+        kernel.UseWpfOpenFileDialog<ProjectCardViewModel>(
+            filter: "project.json |*.json",
+            multiSelect: false,
+            initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-
-        // Настройка локализации,
-        // установка дефолтной локализации "ru-RU"
         kernel.UseWpfLocalization(
-            $"/{assemblyName};component/assets/localization/language.xaml",
+            $"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // Вызывает стандартное уведомление
         Notification(kernel.Get<MainWindow>());
     }
 }

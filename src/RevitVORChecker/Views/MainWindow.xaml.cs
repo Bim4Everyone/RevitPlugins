@@ -2,15 +2,14 @@ using System.Windows;
 
 using dosymep.SimpleServices;
 
+using RevitVORChecker.ViewModels;
+
 namespace RevitVORChecker.Views;
 
 /// <summary>
-/// Класс главного окна плагина.
+/// Главное окно плагина: параметры запуска проверки.
 /// </summary>
 public partial class MainWindow {
-    /// <summary>
-    /// Иницализирует главное окно плагина.
-    /// </summary>
     public MainWindow(
         ILoggerService loggerService,
         ISerializationService serializationService,
@@ -21,25 +20,30 @@ public partial class MainWindow {
             languageService, localizationService,
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
+        DataContextChanged += OnDataContextChanged;
     }
 
     /// <summary>
-    /// Наименование плагина.
+    /// Наименование плагина (для сохранения положения окна).
     /// </summary>
-    /// <remarks>
-    /// Используется для сохранения положения окна.
-    /// </remarks>
     public override string PluginName => nameof(RevitVORChecker);
-    
+
     /// <summary>
-    /// Наименование файла конфигурации.
+    /// Наименование файла конфигурации (для сохранения положения окна).
     /// </summary>
-    /// <remarks>
-    /// Используется для сохранения положения окна.
-    /// </remarks>
     public override string ProjectConfigName => nameof(MainWindow);
-    
-    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+
+    private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
+        if(e.OldValue is MainViewModel oldViewModel) {
+            oldViewModel.CloseRequested -= OnCloseRequested;
+        }
+
+        if(e.NewValue is MainViewModel newViewModel) {
+            newViewModel.CloseRequested += OnCloseRequested;
+        }
+    }
+
+    private void OnCloseRequested(object sender, EventArgs e) {
         DialogResult = true;
     }
 

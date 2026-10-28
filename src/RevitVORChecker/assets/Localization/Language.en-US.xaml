@@ -2,12 +2,66 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на американский английский язык (google translate) -->
-
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
-
-    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.Title">Structural quantity takeoff check</system:String>
+    <system:String x:Key="MainWindow.ModelsFolder">Folder with structural models and quantity takeoff exports:</system:String>
+    <system:String x:Key="MainWindow.Browse">Browse…</system:String>
+    <system:String x:Key="MainWindow.ProjectData">Project data (from the design assignment):</system:String>
+    <system:String x:Key="MainWindow.EditProject">Project data…</system:String>
+    <system:String x:Key="MainWindow.Classifier">Work classifier (.xlsx; empty — search in the folder):</system:String>
+    <system:String x:Key="MainWindow.ClashTolerance">Clash tolerance, mm:</system:String>
+    <system:String x:Key="MainWindow.TakeScreenshots">Take screenshots (slower; without them — text and IDs only)</system:String>
+    <system:String x:Key="MainWindow.CheckWorksets">Check that takeoff elements are in takeoff worksets</system:String>
+    <system:String x:Key="MainWindow.LocalOnly">Everything runs on this PC without network access. Models are opened detached and closed without saving. The issue register is saved to «&lt;folder&gt;\Локальная проверка\».</system:String>
+    <system:String x:Key="MainWindow.ButtonRun">Run check</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="MainWindow.ProjectNotSet">not set — click «Project data…»</system:String>
+    <system:String x:Key="MainWindow.ProjectSaveError">Failed to save project data:</system:String>
+    <system:String x:Key="MainWindow.NoFolder">Select an existing folder with models.</system:String>
+    <system:String x:Key="MainWindow.NoClassifier">Classifier file not found.</system:String>
+    <system:String x:Key="MainWindow.BadTolerance">Clash tolerance must be a positive number, mm.</system:String>
+    <system:String x:Key="MainWindow.NoProject">Fill in the project data.</system:String>
+    <system:String x:Key="MainWindow.ProgressTitle">Checking quantity takeoff... [{0}]\[{1}]</system:String>
+    <system:String x:Key="MainWindow.Cancelled">The check was cancelled.</system:String>
+    <system:String x:Key="MainWindow.Stopped">The check was stopped:</system:String>
+    <system:String x:Key="MainWindow.Done">The check is complete, issues: {0}.&#x0a;Issue register:&#x0a;{1}&#x0a;&#x0a;Open the register folder?</system:String>
+
+    <system:String x:Key="Process.NoFolder">Folder not found:</system:String>
+    <system:String x:Key="Process.NoModels">There are no .rvt models in the folder.</system:String>
+    <system:String x:Key="Process.NoClassifier">Work classifier not found — select the file in the main window.</system:String>
+    <system:String x:Key="Process.ModelsOpen">Models from the checked folder are open in Revit: {0}. Close them (the check opens models itself, detached) and run again.</system:String>
+
+    <system:String x:Key="ProjectCard.Title">Project data (from the design assignment)</system:String>
+    <system:String x:Key="ProjectCard.Name">Project name (for the register header):</system:String>
+    <system:String x:Key="ProjectCard.Ats">ATS number:</system:String>
+    <system:String x:Key="ProjectCard.Date">Assignment date (YYYY-MM-DD):</system:String>
+    <system:String x:Key="ProjectCard.Stage">Stage:</system:String>
+    <system:String x:Key="ProjectCard.Storeys">Residential building height:</system:String>
+    <system:String x:Key="ProjectCard.FoundationRule">Foundation slab with 2+ underground floors:</system:String>
+    <system:String x:Key="ProjectCard.ClashDecimals">"Zero" clash — decimal places (m³):</system:String>
+    <system:String x:Key="ProjectCard.LowRiseBlocks">Buildings up to 9 storeys when heights differ (ФОП_Блок СМР values separated by commas, e.g. «Корпус 1, Корпус 2»; other buildings use the 10–17 column):</system:String>
+    <system:String x:Key="ProjectCard.TableHint">Table 2.6.4 "Reinforcement per 1 m³ of concrete, max" — copy the values from the design assignment. A dash or an empty cell means no norm.</system:String>
+    <system:String x:Key="ProjectCard.FillDefault">Fill with standard values (A101)</system:String>
+    <system:String x:Key="ProjectCard.Import">Load from project.json…</system:String>
+    <system:String x:Key="ProjectCard.ColumnNumber">No.</system:String>
+    <system:String x:Key="ProjectCard.ColumnType">Structure type</system:String>
+    <system:String x:Key="ProjectCard.ColumnThickness">For thickness, mm</system:String>
+    <system:String x:Key="ProjectCard.ColumnLowRise">7–9 storeys, kg/m³</system:String>
+    <system:String x:Key="ProjectCard.ColumnHighRise">10–17 storeys, kg/m³</system:String>
+    <system:String x:Key="ProjectCard.ColumnAlternative">Also allowed, kg/m³</system:String>
+    <system:String x:Key="ProjectCard.ColumnAlternativeCondition">When allowed</system:String>
+    <system:String x:Key="ProjectCard.ButtonSave">Save</system:String>
+    <system:String x:Key="ProjectCard.FoundationToBuilding">to the building (knowledge base)</system:String>
+    <system:String x:Key="ProjectCard.FoundationToParking">to the parking</system:String>
+    <system:String x:Key="ProjectCard.ResidentialGroup">Residential buildings</system:String>
+    <system:String x:Key="ProjectCard.ParkingGroup">Parking</system:String>
+    <system:String x:Key="ProjectCard.Hint">Highlighted — values used by the check.</system:String>
+    <system:String x:Key="ProjectCard.HintEighteenPlus">Highlighted — values used by the check (for 18+ storeys the assignment prescribes the 10–17 column).</system:String>
+    <system:String x:Key="ProjectCard.HintMixed">Highlighted — values used by the check (7–9 for the listed buildings, 10–17 for the others).</system:String>
+    <system:String x:Key="ProjectCard.EmptyNormsQuestion">No reinforcement norm is set for the selected height: {0}.&#x0a;Reinforcement of these structures will not be checked. Continue?</system:String>
+    <system:String x:Key="ProjectCard.FillDefaultQuestion">Replace the table with A101 standard norms (table 2.6.4)?</system:String>
+    <system:String x:Key="ProjectCard.NoName">Enter the project name.</system:String>
+    <system:String x:Key="ProjectCard.BadDate">Assignment date format is YYYY-MM-DD.</system:String>
+    <system:String x:Key="ProjectCard.BadDecimals">Decimal places — a number from 0 to 6.</system:String>
+    <system:String x:Key="ProjectCard.NoLowRiseBlocks">List the buildings up to 9 storeys (as in ФОП_Блок СМР).</system:String>
+    <system:String x:Key="ProjectCard.BadValue">{0}, item {1}: the norm must be an integer kg/m³ or a dash.</system:String>
 </ResourceDictionary>
