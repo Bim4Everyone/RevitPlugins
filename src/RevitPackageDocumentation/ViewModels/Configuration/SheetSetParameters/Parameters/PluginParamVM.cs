@@ -7,6 +7,10 @@ using dosymep.WPF.Commands;
 using RevitPackageDocumentation.ViewModels.Validation;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+
+/// <summary>
+/// Базовый параметр комплекта. На параметр ссылаются формулы модулей по имени: {Имя параметра}
+/// </summary>
 internal abstract class PluginParamVM : ValidatableVM {
     private string _paramName;
     private string _paramComment;
@@ -26,11 +30,20 @@ internal abstract class PluginParamVM : ValidatableVM {
         ParamValueChangeCommand = RelayCommand.Create<PluginParamVM>(ParamValueChange);
     }
 
+    /// <summary>
+    /// Команда пересчета формул комплекта после изменения имени параметра
+    /// </summary>
     public ICommand ParamNameChangeCommand { get; }
+
+    /// <summary>
+    /// Команда обновления модулей комплекта после изменения значения параметра
+    /// </summary>
     public ICommand ParamValueChangeCommand { get; }
 
+    /// <summary>
+    /// Список параметров комплекта, которому принадлежит параметр
+    /// </summary>
     public SheetSetParametersListVM SheetSetParamsList { get; }
-
 
     [Required(ErrorMessage = "Validation.ParamNameIsEmpty")]
     public string ParamName {

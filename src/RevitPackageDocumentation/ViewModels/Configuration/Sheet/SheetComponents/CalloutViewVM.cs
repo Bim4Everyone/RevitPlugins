@@ -12,6 +12,11 @@ using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+
+/// <summary>
+/// Модуль фрагментов плана: создает указанное количество фрагментов возле элемента привязки на плане его уровня
+/// и размещает их в ряд под рамкой листа
+/// </summary>
 internal class CalloutViewVM : SheetComponentVM {
     // При разработке документации пользователям необходимо иметь возможность задать одинаковый Номер вида
     // для нескольких компонентов одного листа (значение задается одинаковое, но за счет разного типа вида в заголовке
@@ -19,7 +24,9 @@ internal class CalloutViewVM : SheetComponentVM {
     // По умолчанию в Revit это не допускается, поэтому пользователи используют регламентированные стандартами невидимые
     // символы для различных типов видов. Для отличия Номера вида у фрагментов регламентирован невидимый символ
     // указанный ниже (в Юникоде это Left-to-Right Embedding (LRE))
-    private readonly string _uniqueViewportNumberKey = "‪";
+    private const string _uniqueViewportNumberKey = "\u202A";
+
+    // Размеры задаются в мм и переводятся во внутренние единицы Revit
 
     // Ширина фрагмента
     private readonly double _calloutWidth = UnitUtilsHelper.ConvertToInternalValue(4000);
@@ -39,7 +46,6 @@ internal class CalloutViewVM : SheetComponentVM {
     private ElementType _viewportType;
     private ViewPlan _viewTemplate;
     private string _viewCount;
-    private string _viewportNumber;
     private SelectElemParamVM _selectedSelectElemParam;
     private string _parentPlanError = string.Empty;
 
@@ -116,11 +122,6 @@ internal class CalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
 
-    public string ViewportNumber {
-        get => _viewportNumber;
-        set => RaiseAndSetIfChanged(ref _viewportNumber, value);
-    }
-
     [Required(ErrorMessage = "Validation.SelectedSelectElemParamIsNull")]
     [ChildHasErrors(ErrorMessage = "Validation.SelectElemParamSelectedElemIsNull")]
     public SelectElemParamVM SelectedSelectElemParam {
@@ -191,12 +192,14 @@ internal class CalloutViewVM : SheetComponentVM {
         return levelId is null ? null : Repository.FindPlanViewOnLevel(levelId, ViewFamilyType);
     }
 
-
     public override bool CanCreateComponent() {
         // Отсутствие родительского вида также является ошибкой модуля (ParentPlanError)
         return !HasErrors;
     }
 
+    /// <summary>
+    /// Создает (или находит) ViewCount фрагментов с именами ИмяВида_1..N и размещает их на листе
+    /// </summary>
     public override void Process(bool processDependent = false) {
         int.TryParse(ViewCount, out int viewCountAsInt);
 
@@ -207,9 +210,15 @@ internal class CalloutViewVM : SheetComponentVM {
         }
     }
 
+    /// <summary>
+    /// Возвращает существующий вид ИмяВида_number или создает фрагмент на плане уровня элемента привязки,
+    /// со сдвигом вдоль оси X на number - 1 шагов.
+    /// Null, если родительский план не найден или фрагмент создать не удалось
+    /// </summary>
     public View Create(int number) {
-        string viewName = $"{ViewName}_{number}";
-        var view = Repository.FindViewByName<View>(viewName);
+        string viewName = GetNumberedViewName(number);
+        // Ищется вид того же семейства, что и типоразмер фрагмента: с таким же именем может быть, например, разрез
+        var view = Repository.FindViewByName<View>(viewName, ViewFamilyType?.ViewFamily);
 
         if(view != null) {
             return view;
@@ -257,6 +266,16 @@ internal class CalloutViewVM : SheetComponentVM {
         return view;
     }
 
+    /// <summary>
+    /// Имя вида с порядковым номером: ИмяВида_number
+    /// </summary>
+    public string GetNumberedViewName(int number) => $"{ViewName}_{number}";
+
+    /// <summary>
+    /// Размещает фрагмент под рамкой листа правее последнего размещенного фрагмента.
+    /// Номер видового экрана помечается невидимым символом фрагментов
+    /// </summary>
+    /// <returns>Созданный видовой экран или null, если вид разместить нельзя</returns>
     public Viewport Place(View view, int number) {
         var sheetInstance = Sheet.SheetInstance;
         if(sheetInstance != null
@@ -264,13 +283,10 @@ internal class CalloutViewVM : SheetComponentVM {
             && Viewport.CanAddViewToSheet(Repository.Document, sheetInstance.Id, view.Id)) {
 
             // Получение габаритов рамки листа
-            if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
+            if(Repository.GetTitleBlock(sheetInstance) is not FamilyInstance titleBlock) {
                 return null;
             }
             var boundingBoxXYZ = titleBlock.get_BoundingBox(sheetInstance);
-            double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
-            double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
-
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 

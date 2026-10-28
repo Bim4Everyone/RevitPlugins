@@ -51,6 +51,8 @@ public partial class MainWindow {
         Close();
     }
 
+    // Выпадающие списки добавления модуля и параметра работают как меню: открываются по нажатию в любом месте,
+    // а после выбора (выбор обрабатывает команда) сбрасываются, чтобы тот же пункт можно было выбрать снова
 
     private void SheetSetParamTypesComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
         if(!SheetSetParamTypesComboBox.IsDropDownOpen) {

@@ -28,10 +28,10 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     /// </summary>
     private const BuiltInCategory _builtInCategory = BuiltInCategory.OST_GenericAnnotation;
 
-    // Отступ по вертикали в футах между рядом аннотаций и вышестоящим рядом (фрагменты, разрезы или рамка)
+    // Отступ по вертикали, 100 мм, между рядом аннотаций и вышестоящим рядом (фрагменты, разрезы или рамка)
     private readonly double _annotationRowOffset = UnitUtilsHelper.ConvertToInternalValue(100);
 
-    // Шаг по горизонтали в футах между левыми краями соседних аннотаций в ряду
+    // Шаг по горизонтали, 120 мм, между левыми краями соседних аннотаций в ряду
     private readonly double _annotationStep = UnitUtilsHelper.ConvertToInternalValue(120);
 
     private readonly FamilyLibraryService _familyLibraryService;
@@ -80,6 +80,9 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         SelectTypeCommand = RelayCommand.Create(SelectType);
     }
 
+    /// <summary>
+    /// Команда выбора папки с семействами (доступна в режиме папки)
+    /// </summary>
     public ICommand SelectFolderCommand { get; }
 
     /// <summary>
@@ -120,6 +123,9 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         ? LocalizationService.GetLocalizedString("Validation.FamilyFolderIsEmpty")
         : FamilyFolderPath;
 
+    /// <summary>
+    /// Имена семейств из текущего источника
+    /// </summary>
     public List<string> FamilyNames {
         get => _familyNames;
         private set => RaiseAndSetIfChanged(ref _familyNames, value);
@@ -130,6 +136,9 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _selectedFamilyName, value);
     }
 
+    /// <summary>
+    /// Имена типоразмеров выбранного семейства
+    /// </summary>
     public List<string> TypeNames {
         get => _typeNames;
         private set => RaiseAndSetIfChanged(ref _typeNames, value);
@@ -168,7 +177,6 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     /// Имя типоразмера для сохранения в конфигурацию (включая имя, которое не удалось найти)
     /// </summary>
     public string TypeNameForConfig => SelectedTypeName ?? _missingTypeName ?? string.Empty;
-
 
     /// <summary>
     /// Первичная инициализация из конфигурации: источник, папка, выбор семейства и типоразмера по именам
@@ -399,7 +407,10 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         return IsFromFolder;
     }
 
-
+    /// <summary>
+    /// Получает типоразмер (в режиме папки - с загрузкой семейства), размещает аннотацию и заполняет
+    /// дополнительные параметры
+    /// </summary>
     public override void Process(bool processDependent = false) {
         var annotationType = GetAnnotationType();
         // Если семейство/типоразмер получить не удалось - компонент пропускается
@@ -450,7 +461,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         }
 
         // Без рамки ряд под рамкой не построить - аннотация размещается в фиксированной точке слева от листа
-        if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
+        if(Repository.GetTitleBlock(sheetInstance) is not FamilyInstance titleBlock) {
             var position = new XYZ(
                 UnitUtilsHelper.ConvertToInternalValue(-100),
                 UnitUtilsHelper.ConvertToInternalValue(250),

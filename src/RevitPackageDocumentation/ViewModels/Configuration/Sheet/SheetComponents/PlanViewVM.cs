@@ -15,6 +15,10 @@ using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+/// <summary>
+/// Модуль вида в плане: создает план с нуля на уровне элемента привязки или дублированием исходного вида
+/// и размещает его на листе
+/// </summary>
 internal class PlanViewVM : SheetComponentVM {
     // При разработке документации пользователям необходимо иметь возможность задать одинаковый Номер вида
     // для нескольких компонентов одного листа (значение задается одинаковое, но за счет разного типа вида в заголовке
@@ -22,7 +26,7 @@ internal class PlanViewVM : SheetComponentVM {
     // По умолчанию в Revit это не допускается, поэтому пользователи используют регламентированные стандартами невидимые
     // символы для различных типов видов. Для отличия Номера вида у планов регламентирован невидимый символ
     // указанный ниже (в Юникоде это Left-to-Right Mark (LRM))
-    private readonly string _uniqueViewportNumberKey = "‎";
+    private const string _uniqueViewportNumberKey = "\u200E";
 
     private string _viewNameFormula = string.Empty;
     private string _viewName;
@@ -41,10 +45,10 @@ internal class PlanViewVM : SheetComponentVM {
     private FiltrationComboBoxFilterListVM _viewTemplateFilter;
     private bool _viewTemplateRemoveAfterCreation = false;
 
-    // Смещение по горизонтали в дюймах слева, для размещаемых компонентов листа требуемое, чтобы они попали на лист
+    // Отступ по горизонтали от левого края рамки, 20 мм, чтобы вид попал внутрь рамки (во внутренних единицах Revit)
     private readonly double _titleBlockFrameLeftOffset = UnitUtilsHelper.ConvertToInternalValue(20);
 
-    // Смещение по вертикали в дюймах сверху, для размещаемых компонентов листа требуемое, чтобы они попали на лист
+    // Отступ по вертикали от верхнего края рамки, 15 мм, чтобы вид попал внутрь рамки (во внутренних единицах Revit)
     private readonly double _titleBlockFrameTopOffset = UnitUtilsHelper.ConvertToInternalValue(15);
 
     public PlanViewVM(
@@ -69,6 +73,9 @@ internal class PlanViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewNameFormula, value);
     }
 
+    /// <summary>
+    /// Имя вида, вычисленное по формуле
+    /// </summary>
     public string ViewName {
         get => _viewName;
         set => RaiseAndSetIfChanged(ref _viewName, value);
@@ -177,11 +184,17 @@ internal class PlanViewVM : SheetComponentVM {
             : ViewFamilyType?.ViewFamily;
     }
 
+    /// <summary>
+    /// Найденный или созданный вид в модели
+    /// </summary>
     public ViewPlan ViewInstance {
         get => _viewInstance;
         set => RaiseAndSetIfChanged(ref _viewInstance, value);
     }
 
+    /// <summary>
+    /// Находит или создает вид, размещает его на листе и заполняет дополнительные параметры видового экрана
+    /// </summary>
     public override void Process(bool processDependent = false) {
         ViewInstance = Create();
         var viewPort = Place(ViewInstance);
@@ -194,8 +207,13 @@ internal class PlanViewVM : SheetComponentVM {
         ValidateAllProperties();
     }
 
+    /// <summary>
+    /// Возвращает существующий вид с таким именем или создает новый. Null, если вид создать не удалось
+    /// </summary>
     public ViewPlan Create() {
-        var view = Repository.FindViewByName<ViewPlan>(ViewName);
+        // Ищется план того же семейства, что создаст модуль: план с таким же именем другого типа
+        // (например, план потолка) Revit допускает, и его использовать нельзя
+        var view = Repository.FindViewByName<ViewPlan>(ViewName, GetPlanViewFamily());
 
         if(view is null) {
             try {
@@ -277,6 +295,11 @@ internal class PlanViewVM : SheetComponentVM {
         }
     }
 
+    /// <summary>
+    /// Размещает вид на листе: первый план - в левом верхнем углу рамки, следующие - в ряд над рамкой.
+    /// Номер видового экрана помечается невидимым символом планов
+    /// </summary>
+    /// <returns>Созданный видовой экран или null, если вид разместить нельзя</returns>
     public Viewport Place(ViewPlan view) {
         var sheetInstance = Sheet.SheetInstance;
         if(sheetInstance != null
@@ -284,14 +307,10 @@ internal class PlanViewVM : SheetComponentVM {
             && Viewport.CanAddViewToSheet(Repository.Document, sheetInstance.Id, view.Id)) {
 
             // Получение габаритов рамки листа
-            if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
+            if(Repository.GetTitleBlock(sheetInstance) is not FamilyInstance titleBlock) {
                 return null;
             }
             var boundingBoxXYZ = titleBlock.get_BoundingBox(sheetInstance);
-            double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
-            double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
-
-            double titleBlockMinY = boundingBoxXYZ.Min.Y;
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMaxY = boundingBoxXYZ.Max.Y;
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
@@ -18,9 +19,15 @@ using RevitPackageDocumentation.ViewModels.Validation;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
+
+/// <summary>
+/// Базовый класс модулей со свойствами-формулами и дополнительными параметрами. Отвечает за пересчет формул
+/// при изменении параметров комплекта и за запись дополнительных параметров в созданные элементы
+/// </summary>
 internal abstract class BaseParamContainerVM : ValidatableVM {
-    private CustomParametersListVM _customParamsList;
     private readonly StringParamSetService _strParamSetService;
+
+    private CustomParametersListVM _customParamsList;
 
     protected BaseParamContainerVM(
         RevitRepository repository,
@@ -37,11 +44,22 @@ internal abstract class BaseParamContainerVM : ValidatableVM {
         PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
     }
 
+    /// <summary>
+    /// Команда пересчета свойства по формуле, вызывается при изменении текста формулы.
+    /// Параметр команды - имя свойства формулы
+    /// </summary>
     public ICommand PropUpdateByFormulaCommand { get; }
 
+    /// <summary>
+    /// Параметры комплекта, на которые могут ссылаться формулы
+    /// </summary>
     public ObservableCollection<PluginParamVM> SheetSetParams { get; }
+
     public RevitRepository Repository { get; }
 
+    /// <summary>
+    /// Дополнительные параметры, записываемые в созданный элемент
+    /// </summary>
     [ChildHasErrors(ErrorMessage = "Validation.ErrorInCustomParams")]
     public CustomParametersListVM CustomParamsList {
         get => _customParamsList;
@@ -62,14 +80,9 @@ internal abstract class BaseParamContainerVM : ValidatableVM {
             parameter.UpdateDueParamNameChange();
         }
 
-        // Проходимся по наследникам и ищем свойства FiltrationComboBoxFilterListVM, в фильтрах вызываем метод обновления
-        this.GetType().GetProperties()
-            .Where(p => p.PropertyType == typeof(FiltrationComboBoxFilterListVM))
-            .Select(p => p.GetValue(this) as FiltrationComboBoxFilterListVM)
-            .Where(filterList => filterList != null)
-            .SelectMany(filterList => filterList.ValueList)
-            .ToList()
-            .ForEach(f => f.UpdateDueParamNameChange());
+        foreach(var filter in GetFiltrationComboBoxFilters()) {
+            filter.UpdateDueParamNameChange();
+        }
 
         if(this is ScheduleViewVM scheduleViewVM) {
             foreach(var rule in scheduleViewVM.ScheduleFilterList.ScheduleFilterRules) {
@@ -78,6 +91,10 @@ internal abstract class BaseParamContainerVM : ValidatableVM {
         }
     }
 
+    /// <summary>
+    /// В случае изменения значения текстового параметра конфигурации нужно пересчитать формулы,
+    /// которые на него ссылаются
+    /// </summary>
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
         if(stringParam.StringValue is null) {
             return;
@@ -88,14 +105,9 @@ internal abstract class BaseParamContainerVM : ValidatableVM {
             parameter.UpdateDueParamValueChange(stringParam);
         }
 
-        // Проходимся по наследникам и ищем свойства FiltrationComboBoxFilterListVM, в фильтрах вызываем метод обновления
-        this.GetType().GetProperties()
-            .Where(p => p.PropertyType == typeof(FiltrationComboBoxFilterListVM))
-            .Select(p => p.GetValue(this) as FiltrationComboBoxFilterListVM)
-            .Where(filterList => filterList != null)
-            .SelectMany(filterList => filterList.ValueList)
-            .ToList()
-            .ForEach(f => f.UpdateDueParamValueChange(stringParam));
+        foreach(var filter in GetFiltrationComboBoxFilters()) {
+            filter.UpdateDueParamValueChange(stringParam);
+        }
 
         if(this is ScheduleViewVM scheduleViewVM) {
             foreach(var rule in scheduleViewVM.ScheduleFilterList.ScheduleFilterRules) {
@@ -104,7 +116,23 @@ internal abstract class BaseParamContainerVM : ValidatableVM {
         }
     }
 
+    /// <summary>
+    /// Возвращает значения всех фильтров выпадающих списков модуля: свойства типа FiltrationComboBoxFilterListVM
+    /// ищутся у фактического типа модуля. Список материализуется, так как обновление фильтров меняет свойства модуля
+    /// </summary>
+    private List<FiltrationComboBoxFilterVM> GetFiltrationComboBoxFilters() {
+        return GetType().GetProperties()
+            .Where(p => p.PropertyType == typeof(FiltrationComboBoxFilterListVM))
+            .Select(p => p.GetValue(this) as FiltrationComboBoxFilterListVM)
+            .Where(filterList => filterList != null)
+            .SelectMany(filterList => filterList.ValueList)
+            .ToList();
+    }
 
+    /// <summary>
+    /// Записывает дополнительные параметры в элемент: в параметр экземпляра, а если его нет - в параметр типа.
+    /// Параметры, которых нет или которые доступны только для чтения, пропускаются
+    /// </summary>
     public void SetCustomParams(Element element) {
         if(element is null) {
             return;

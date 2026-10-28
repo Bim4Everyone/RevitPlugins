@@ -136,6 +136,12 @@
 
     <system:String x:Key="MainViewModel.Export">Export</system:String>
     <system:String x:Key="MainViewModel.ExportIsSuccessful">Export completed successfully!</system:String>
+    <system:String x:Key="MainViewModel.ExportPathIsNotCorrect">Export path is incorrect!</system:String>
+    <system:String x:Key="MainViewModel.ExportCanceled">Export canceled!</system:String>
+    <system:String x:Key="MainViewModel.Error">Error</system:String>
+    <system:String x:Key="MainViewModel.AddComponentError">An error occurred while adding the component!</system:String>
+    <system:String x:Key="MainViewModel.AddParameterError">An error occurred while adding the parameter!</system:String>
+    <system:String x:Key="MainViewModel.NewSheetName">New sheet</system:String>
     <system:String x:Key="MainViewModel.Type">Type</system:String>
     <system:String x:Key="MainViewModel.ParameterType">Parameter type</system:String>
     <system:String x:Key="MainViewModel.NotSupported">not supported</system:String>

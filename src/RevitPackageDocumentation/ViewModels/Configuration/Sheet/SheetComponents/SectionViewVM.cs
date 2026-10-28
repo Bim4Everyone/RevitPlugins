@@ -13,6 +13,11 @@ using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+
+/// <summary>
+/// Модуль сечений: создает указанное количество разрезов через элемент привязки
+/// и размещает их в ряд под рамкой листа
+/// </summary>
 internal class SectionViewVM : SheetComponentVM {
     // При разработке документации пользователям необходимо иметь возможность задать одинаковый Номер вида
     // для нескольких компонентов одного листа (значение задается одинаковое, но за счет разного типа вида в заголовке
@@ -20,7 +25,7 @@ internal class SectionViewVM : SheetComponentVM {
     // По умолчанию в Revit это не допускается, поэтому пользователи используют регламентированные стандартами невидимые
     // символы для различных типов видов. Для отличия Номера вида у сечений регламентирован невидимый символ
     // указанный ниже (в Юникоде это Right-to-Left Mark (RLM))
-    private readonly string _uniqueViewportNumberKey = "‏";
+    private const string _uniqueViewportNumberKey = "\u200F";
 
     private string _viewNameFormula = string.Empty;
     private string _viewName;
@@ -35,6 +40,8 @@ internal class SectionViewVM : SheetComponentVM {
     private FiltrationComboBoxFilterListVM _viewTemplateFilter;
     private bool _viewTemplateRemoveAfterCreation = false;
 
+    // Размеры задаются в мм и переводятся во внутренние единицы Revit
+
     // Расстояние до дальней секущей плоскости сечения
     private readonly double _viewDepth = UnitUtilsHelper.ConvertToInternalValue(3000);
 
@@ -46,9 +53,6 @@ internal class SectionViewVM : SheetComponentVM {
 
     // Отступ между сечениями в модели
     private readonly double _viewsOffset = UnitUtilsHelper.ConvertToInternalValue(1500);
-
-    // Отступ между видовыми экранами на листе
-    private readonly double _viewportOffset = UnitUtilsHelper.ConvertToInternalValue(200);
 
     public SectionViewVM(
         RevitRepository repository,
@@ -122,6 +126,9 @@ internal class SectionViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
 
+    /// <summary>
+    /// Создает (или находит) ViewCount сечений с именами ИмяВида_1..N и размещает их на листе
+    /// </summary>
     public override void Process(bool processDependent = false) {
         int.TryParse(ViewCount, out int viewCountAsInt);
 
@@ -132,9 +139,14 @@ internal class SectionViewVM : SheetComponentVM {
         }
     }
 
+    /// <summary>
+    /// Возвращает существующее сечение ИмяВида_number или создает новое через центр элемента привязки,
+    /// со сдвигом вдоль оси X на number - 1 шагов. Null, если сечение создать не удалось
+    /// </summary>
     public ViewSection Create(int number) {
-        var viewName = $"{ViewName}_{number}";
-        var view = Repository.FindViewByName<ViewSection>(viewName);
+        var viewName = GetNumberedViewName(number);
+        // Ищется вид того же семейства: с таким же именем может быть, например, узел или план
+        var view = Repository.FindViewByName<ViewSection>(viewName, ViewFamilyType?.ViewFamily);
 
         if(view != null) {
             return view;
@@ -180,6 +192,16 @@ internal class SectionViewVM : SheetComponentVM {
         return view;
     }
 
+    /// <summary>
+    /// Имя вида с порядковым номером: ИмяВида_number
+    /// </summary>
+    public string GetNumberedViewName(int number) => $"{ViewName}_{number}";
+
+    /// <summary>
+    /// Размещает сечение под рамкой листа правее последнего размещенного сечения.
+    /// Номер видового экрана помечается невидимым символом сечений
+    /// </summary>
+    /// <returns>Созданный видовой экран или null, если вид разместить нельзя</returns>
     public Viewport Place(ViewSection view, int number) {
         var sheetInstance = Sheet.SheetInstance;
         if(sheetInstance != null
@@ -187,13 +209,10 @@ internal class SectionViewVM : SheetComponentVM {
             && Viewport.CanAddViewToSheet(Repository.Document, sheetInstance.Id, view.Id)) {
 
             // Получение габаритов рамки листа
-            if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
+            if(Repository.GetTitleBlock(sheetInstance) is not FamilyInstance titleBlock) {
                 return null;
             }
             var boundingBoxXYZ = titleBlock.get_BoundingBox(sheetInstance);
-            double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
-            double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
-
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 

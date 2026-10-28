@@ -14,6 +14,10 @@ using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Para
 using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration;
+
+/// <summary>
+/// Комплект листов: список листов с их модулями и параметры комплекта, на которые ссылаются формулы
+/// </summary>
 internal class SheetSetVM : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
@@ -49,7 +53,14 @@ internal class SheetSetVM : BaseViewModel {
         SelectSheetsWithoutErrorsCommand = RelayCommand.Create(SelectSheetsWithoutErrors);
     }
 
+    /// <summary>
+    /// Команда добавления нового листа в комплект
+    /// </summary>
     public ICommand AddSheetCommand { get; }
+
+    /// <summary>
+    /// Команда удаления листа из комплекта
+    /// </summary>
     public ICommand RemoveSheetCommand { get; }
 
     /// <summary>
@@ -67,21 +78,33 @@ internal class SheetSetVM : BaseViewModel {
     /// </summary>
     public ICommand SelectSheetsWithoutErrorsCommand { get; }
 
+    /// <summary>
+    /// Имя комплекта (конфигурации)
+    /// </summary>
     public string Name {
         get => _name;
         set => RaiseAndSetIfChanged(ref _name, value);
     }
 
+    /// <summary>
+    /// Листы комплекта
+    /// </summary>
     public ObservableCollection<SheetVM> SheetList {
         get => _sheetList;
         set => RaiseAndSetIfChanged(ref _sheetList, value);
     }
 
+    /// <summary>
+    /// Лист, открытый для редактирования в окне
+    /// </summary>
     public SheetVM SelectedSheet {
         get => _selectedSheet;
         set => RaiseAndSetIfChanged(ref _selectedSheet, value);
     }
 
+    /// <summary>
+    /// Параметры комплекта, значения которых подставляются в формулы листов и модулей
+    /// </summary>
     public SheetSetParametersListVM SheetSetParams {
         get => _sheetSetParams;
         set => RaiseAndSetIfChanged(ref _sheetSetParams, value);
@@ -114,6 +137,9 @@ internal class SheetSetVM : BaseViewModel {
         }
     }
 
+    /// <summary>
+    /// Повторно проверяет все листы и их модули
+    /// </summary>
     public void ValidateAllSheets() {
         foreach(var sheet in SheetList) {
             foreach(var component in sheet.SheetComponents) {
@@ -135,7 +161,7 @@ internal class SheetSetVM : BaseViewModel {
                 _sheetSetVMFactory,
                 _sheetSetDataFactory) {
                 IsModuleCheck = true,
-                ModuleName = "Новый лист",
+                ModuleName = _localizationService.GetLocalizedString("MainViewModel.NewSheetName"),
                 SheetSize = "1",
                 SheetCoefficient = "1",
                 TitleBlockFamilyFilter = new FiltrationComboBoxFilterListVM(SheetSetParams.Params, _stringParamSetService),
@@ -152,32 +178,30 @@ internal class SheetSetVM : BaseViewModel {
         }
     }
 
+    /// <summary>
+    /// Пересчитывает значения всех формул листов и модулей после загрузки конфигурации
+    /// </summary>
     public void UpdateOnInitialization() {
-        foreach(var sheet in SheetList) {
-            sheet.UpdateDueParamNameChange();
-            foreach(var component in sheet.SheetComponents) {
-                component.UpdateDueParamNameChange();
-            }
-        }
+        RecalculateAllFormulas();
     }
 
     /// <summary>
     /// В случае изменения имени параметра нужно обойти все листы и их компоненты, и обновить привязки
     /// </summary>
     public void UpdateDueParamNameChange(PluginParamVM pluginParam) {
-        if(pluginParam is not StringParamVM stringParam) {
+        if(pluginParam is not StringParamVM) {
             return;
         }
-        foreach(var sheet in SheetList) {
-            sheet.UpdateDueParamNameChange();
-            foreach(var component in sheet.SheetComponents) {
-                component.UpdateDueParamNameChange();
-            }
-        }
+        RecalculateAllFormulas();
     }
 
+    /// <summary>
+    /// Обновляет листы и модули после изменения значения параметра комплекта:
+    /// выбор элемента - повторная проверка и обновление родительских видов фрагментов,
+    /// текстовый параметр - пересчет формул, которые на него ссылаются
+    /// </summary>
     public void UpdateDueParamValueChange(PluginParamVM pluginParam) {
-        if(pluginParam is SelectElemParamVM selectElemParam) {
+        if(pluginParam is SelectElemParamVM) {
             foreach(var sheet in SheetList) {
                 sheet.ValidateAllProperties();
                 foreach(var component in sheet.SheetComponents) {
@@ -202,6 +226,18 @@ internal class SheetSetVM : BaseViewModel {
             sheet.UpdateDueParamValueChange(stringParam);
             foreach(var component in sheet.SheetComponents) {
                 component.UpdateDueParamValueChange(stringParam);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Пересчитывает значения всех формул листов и их модулей по текущим параметрам комплекта
+    /// </summary>
+    private void RecalculateAllFormulas() {
+        foreach(var sheet in SheetList) {
+            sheet.UpdateDueParamNameChange();
+            foreach(var component in sheet.SheetComponents) {
+                component.UpdateDueParamNameChange();
             }
         }
     }

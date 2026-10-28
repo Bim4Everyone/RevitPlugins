@@ -7,8 +7,7 @@ using pyRevitLabs.Json;
 namespace RevitPackageDocumentation.Models;
 
 /// <summary>
-/// Класс конфигурации плагина.
-/// (Если не используется удалить)
+/// Класс конфигурации плагина. Хранит настройки по проектам Revit.
 /// </summary>
 internal class PluginConfig : ProjectConfig<RevitSettings> {
     /// <summary>
@@ -26,8 +25,8 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
     /// <summary>
     /// Метод создания конфигурации плагина.
     /// </summary>
+    /// <param name="configSerializer">Сериализатор конфигурации.</param>
     /// <returns>
-	/// <param name="configSerializer">Сериализатор конфигурации.</param>
     /// Возвращает прочитанную конфигурацию плагина, либо созданный конфиг по умолчанию.
     /// </returns>
     public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
@@ -41,26 +40,22 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
 }
 
 /// <summary>
-/// Настройки проекта.
-/// В настройках проекта обычно хранится выбор пользователя в основном окне плагина.
+/// Настройки проекта: путь к последнему файлу конфигурации комплекта, с которым работал пользователь.
 /// </summary>
 /// <remarks>
 /// Проектом по умолчанию является текст до первого нижнего подчеркивания.
 /// <see cref="ProjectConfig" />
 /// https://github.com/dosymep/dosymep.Revit/blob/master/src/dosymep.Bim4Everyone/ProjectConfigs/ProjectConfig.cs#L102
-/// Если плагин работает без открытых проектов,
-/// то требуется данный класс удалять из проекта,
-/// как сделано в плагине RevitServerFolders
-/// https://github.com/Bim4Everyone/RevitPlugins/blob/master/src/RevitServerFolders/Models/PluginConfig.cs#L8
 /// </remarks>
 internal class RevitSettings : ProjectSettings {
     /// <summary>
     /// Наименование проекта. Системное свойство. (Не трогать)
     /// </summary>
     public override string ProjectName { get; set; }
-    
+
     /// <summary>
-    /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
+    /// Путь к последнему импортированному или экспортированному файлу конфигурации комплекта (.json).
+    /// При следующем запуске в этом проекте конфигурация загружается из него автоматически
     /// </summary>
     public string SheetSetDataPath { get; set; }
 }

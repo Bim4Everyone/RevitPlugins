@@ -14,8 +14,8 @@ public class SheetComponentConverter : JsonConverter {
     private readonly ILocalizationService _localizationService;
 
     private const string _componentTypeProperty = "ComponentType";
-    private const string _structuralPlanViewType = "PlanView";
-    private const string _structuralCalloutViewType = "CalloutView";
+    private const string _planViewType = "PlanView";
+    private const string _calloutViewType = "CalloutView";
     private const string _sectionViewType = "SectionView";
     private const string _scheduleViewType = "ScheduleView";
     private const string _textNoteType = "TextNote";
@@ -41,8 +41,8 @@ public class SheetComponentConverter : JsonConverter {
 
         try {
             return componentType switch {
-                _structuralPlanViewType => jObject.ToObject<PlanViewData>(serializer),
-                _structuralCalloutViewType => jObject.ToObject<CalloutViewData>(serializer),
+                _planViewType => jObject.ToObject<PlanViewData>(serializer),
+                _calloutViewType => jObject.ToObject<CalloutViewData>(serializer),
                 _sectionViewType => jObject.ToObject<SectionViewData>(serializer),
                 _scheduleViewType => jObject.ToObject<ScheduleViewData>(serializer),
                 _textNoteType => jObject.ToObject<TextNoteData>(serializer),

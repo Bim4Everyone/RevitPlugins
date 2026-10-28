@@ -15,6 +15,10 @@ using RevitPackageDocumentation.ViewModels.Validation;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.ScheduleFilters;
+
+/// <summary>
+/// Фильтры модуля спецификации, которые заменяют фильтры исходной спецификации в итоговой
+/// </summary>
 internal class ScheduleFilterListVM : ValidatableVM {
     private readonly ILocalizationService _localizationService;
     private ObservableCollection<ScheduleFilterRuleVM> _scheduleFilterRules = [];
@@ -61,6 +65,9 @@ internal class ScheduleFilterListVM : ValidatableVM {
         ScheduleFilterRules.Remove(rule);
     }
 
+    /// <summary>
+    /// Заполняет список полей и фильтры по выбранной исходной спецификации (существующие фильтры модуля заменяются)
+    /// </summary>
     internal void SetSchedule(ViewSchedule schedule) {
         ScheduleFilterRules.Clear();
         SelectedScheduleFields.Clear();
@@ -115,6 +122,10 @@ internal class ScheduleFilterListVM : ValidatableVM {
         }
     }
 
+    /// <summary>
+    /// Заполняет список полей по исходной спецификации и сопоставляет с ними поля фильтров, загруженных
+    /// из конфигурации (сами фильтры не меняются)
+    /// </summary>
     internal void SetScheduleToRemember(ViewSchedule schedule) {
         if(schedule == null) {
             return;

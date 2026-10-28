@@ -21,13 +21,19 @@ using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet;
+
+/// <summary>
+/// Модуль листа комплекта: имя и номер листа, рамка с форматом и модули, размещаемые на листе
+/// </summary>
 internal class SheetVM : ModuleVM {
+    // Параметры рамки листа: коэффициент кратности формата (кириллическая "А") и номер формата (кириллическая "х")
+    private const string _sheetCoefficientParamName = "А";
+    private const string _sheetSizeParamName = "х";
+
     private readonly ILocalizationService _localizationService;
     private readonly IMessageBoxService _messageBoxService;
     private readonly ISheetSetVMFactory _sheetSetVMFactory;
     private readonly ISheetSetDataFactory _sheetSetDataFactory;
-    private readonly string _sheetCoefficientParamName = "А";
-    private readonly string _sheetSizeParamName = "х";
 
     private SheetSetVM _sheetSet;
     private string _sheetNameFormula = string.Empty;
@@ -74,10 +80,24 @@ internal class SheetVM : ModuleVM {
         _sheetComponents.CollectionChanged += OnSheetComponentsChanged;
     }
 
+    /// <summary>
+    /// Команда выбора семейства рамки, вызывается выпадающим списком семейств
+    /// </summary>
     public ICommand SelectTitleBlockFamilyCommand { get; }
+
+    /// <summary>
+    /// Команда создания только этого листа с его модулями
+    /// </summary>
     public ICommand CreateSheetCommand { get; }
 
+    /// <summary>
+    /// Команда добавления модуля выбранного типа на лист
+    /// </summary>
     public ICommand AddComponentCommand { get; }
+
+    /// <summary>
+    /// Команда удаления модуля с листа
+    /// </summary>
     public ICommand RemoveComponentCommand { get; }
 
     /// <summary>
@@ -95,6 +115,9 @@ internal class SheetVM : ModuleVM {
     /// </summary>
     public ICommand SelectComponentsWithoutErrorsCommand { get; }
 
+    /// <summary>
+    /// Комплект, которому принадлежит лист
+    /// </summary>
     public SheetSetVM SheetSet {
         get => _sheetSet;
         set => RaiseAndSetIfChanged(ref _sheetSet, value);
@@ -107,6 +130,9 @@ internal class SheetVM : ModuleVM {
         set => RaiseAndSetIfChanged(ref _sheetNameFormula, value);
     }
 
+    /// <summary>
+    /// Имя листа, вычисленное по формуле
+    /// </summary>
     public string SheetName {
         get => _sheetName;
         set => RaiseAndSetIfChanged(ref _sheetName, value);
@@ -120,11 +146,17 @@ internal class SheetVM : ModuleVM {
         set => RaiseAndSetIfChanged(ref _sheetNumberFormula, value);
     }
 
+    /// <summary>
+    /// Номер листа, вычисленный по формуле
+    /// </summary>
     public string SheetNumber {
         get => _sheetNumber;
         set => RaiseAndSetIfChanged(ref _sheetNumber, value);
     }
 
+    /// <summary>
+    /// Номер формата листа (параметр рамки "х")
+    /// </summary>
     [Required(ErrorMessage = "Validation.SheetSizeIsEmpty")]
     [RegularExpression(@"^-?\d+$", ErrorMessage = "Validation.SheetSizeIsNotCorrect")]
     public string SheetSize {
@@ -132,6 +164,9 @@ internal class SheetVM : ModuleVM {
         set => RaiseAndSetIfChanged(ref _sheetSize, value);
     }
 
+    /// <summary>
+    /// Коэффициент кратности формата листа (параметр рамки "А")
+    /// </summary>
     [Required(ErrorMessage = "Validation.SheetCoefficientIsEmpty")]
     [RegularExpression(@"^-?\d+$", ErrorMessage = "Validation.SheetCoefficientIsNotCorrect")]
     public string SheetCoefficient {
@@ -139,6 +174,9 @@ internal class SheetVM : ModuleVM {
         set => RaiseAndSetIfChanged(ref _sheetCoefficient, value);
     }
 
+    /// <summary>
+    /// Типоразмеры выбранного семейства рамки
+    /// </summary>
     public List<FamilySymbol> TitleBlockTypes {
         get => _titleBlockTypes;
         set => RaiseAndSetIfChanged(ref _titleBlockTypes, value);
@@ -156,11 +194,17 @@ internal class SheetVM : ModuleVM {
         set => RaiseAndSetIfChanged(ref _titleBlockType, value);
     }
 
+    /// <summary>
+    /// Фильтры выпадающего списка семейств рамки
+    /// </summary>
     public FiltrationComboBoxFilterListVM TitleBlockFamilyFilter {
         get => _titleBlockFamilyFilter;
         set => RaiseAndSetIfChanged(ref _titleBlockFamilyFilter, value);
     }
 
+    /// <summary>
+    /// Фильтры выпадающего списка типоразмеров рамки
+    /// </summary>
     public FiltrationComboBoxFilterListVM TitleBlockTypeFilter {
         get => _titleBlockTypeFilter;
         set => RaiseAndSetIfChanged(ref _titleBlockTypeFilter, value);
@@ -173,6 +217,9 @@ internal class SheetVM : ModuleVM {
         set => RaiseAndSetIfChanged(ref _sheetComponents, value);
     }
 
+    /// <summary>
+    /// Лист в модели: найденный существующий или созданный при генерации
+    /// </summary>
     public ViewSheet SheetInstance {
         get => _sheetInstance;
         set => RaiseAndSetIfChanged(ref _sheetInstance, value);
@@ -189,6 +236,9 @@ internal class SheetVM : ModuleVM {
         SetTitleBlockTypes(TitleBlockFamily);
     }
 
+    /// <summary>
+    /// Заполняет список типоразмеров по семейству рамки
+    /// </summary>
     public void SetTitleBlockTypes(Family titleBlockFamily) {
         TitleBlockTypes = titleBlockFamily
             ?.GetFamilySymbolIds()
@@ -215,7 +265,9 @@ internal class SheetVM : ModuleVM {
             component.IsModuleCheck = true;
             SheetComponents.Add(component);
         } catch(Exception) {
-            _messageBoxService.Show("An error occurred while adding the component!", "Error");
+            _messageBoxService.Show(
+                _localizationService.GetLocalizedString("MainViewModel.AddComponentError"),
+                _localizationService.GetLocalizedString("MainViewModel.Error"));
         }
     }
 
@@ -285,6 +337,9 @@ internal class SheetVM : ModuleVM {
         }
     }
 
+    /// <summary>
+    /// Создает лист и его отмеченные модули в отдельной транзакции
+    /// </summary>
     public override void CreateComponent() {
         using var transaction = Repository.Document.StartTransaction(
             _localizationService.GetLocalizedString("MainWindow.Title"));
@@ -310,6 +365,10 @@ internal class SheetVM : ModuleVM {
         } catch(Exception) { }
     }
 
+    /// <summary>
+    /// Находит лист по имени и номеру или создает новый, затем при processDependent = true
+    /// размещает на нем отмеченные модули. Должен вызываться внутри открытой транзакции
+    /// </summary>
     public override void Process(bool processDependent) {
         SheetInstance = null;
         SheetInstance = Repository.FindSheet(SheetName, SheetNumber);
@@ -320,13 +379,14 @@ internal class SheetVM : ModuleVM {
                 SheetInstance.Name = SheetName;
                 SetSheetNumber(SheetInstance);
 
-                var titleBlock = Repository.GetTitleBlocks(SheetInstance);
+                var titleBlock = Repository.GetTitleBlock(SheetInstance);
 
+                // Если у рамки нет параметров формата, остальные параметры листа все равно заполняются
                 double.TryParse(SheetSize, out double sheetSize);
-                titleBlock.LookupParameter(_sheetSizeParamName).Set(sheetSize);
+                titleBlock?.LookupParameter(_sheetSizeParamName)?.Set(sheetSize);
 
                 double.TryParse(SheetCoefficient, out double sheetCoefficient);
-                titleBlock.LookupParameter(_sheetCoefficientParamName).Set(sheetCoefficient);
+                titleBlock?.LookupParameter(_sheetCoefficientParamName)?.Set(sheetCoefficient);
 
                 SetCustomParams(SheetInstance);
 

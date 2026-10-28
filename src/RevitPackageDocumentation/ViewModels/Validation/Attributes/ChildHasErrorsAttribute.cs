@@ -3,6 +3,10 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace RevitPackageDocumentation.ViewModels.Validation.Attributes;
+
+/// <summary>
+/// Ошибка, если у дочернего объекта (или у элемента коллекции) есть ошибки проверки
+/// </summary>
 internal class ChildHasErrorsAttribute : ValidationAttribute {
     /// <summary>
     /// Имя логического свойства объекта, от которого зависит проверка. Если не задано - проверка выполняется всегда
