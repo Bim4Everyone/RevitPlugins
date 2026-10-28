@@ -9,10 +9,12 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:sc="clr-namespace:RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents"
     xmlns:local="clr-namespace:RevitPackageDocumentation.Views.Controls"
+    xmlns:extensions="clr-namespace:RevitPackageDocumentation.Views.Extensions"
     
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=sc:SheetComponentVM}"
     x:Name="root"
+    ContextMenuOpening="OnContextMenuOpening"
     
     d:DesignHeight="450"
     d:DesignWidth="800">
@@ -27,6 +29,20 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+
+    <!--Перемещение модуля по листу. Меню открывается правой кнопкой на свободном месте карточки-->
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <MenuItem
+                Header="{extensions:Localized MainWindow.MoveUp}"
+                Icon="{ui:SymbolIcon ArrowUp24}"
+                Command="{Binding MoveUpCommand}" />
+            <MenuItem
+                Header="{extensions:Localized MainWindow.MoveDown}"
+                Icon="{ui:SymbolIcon ArrowDown24}"
+                Command="{Binding MoveDownCommand}" />
+        </ContextMenu>
+    </UserControl.ContextMenu>
 
     <Border
         Margin="5"

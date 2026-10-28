@@ -71,9 +71,7 @@
             VerticalAlignment="Top"
             DisplayMemberPath="Name"
             Style="{Binding Path=ComboBoxStyle, ElementName=root, TargetNullValue={StaticResource {x:Type ComboBox}}}"
-            ItemsSource="{Binding 
-                Path=DataContext.FilterTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
-                RelativeSource={RelativeSource AncestorType=Window}}"
+            ItemsSource="{Binding Path=ScheduleFilterList.ScheduleView.Repository.FilterTypes}"
             SelectedItem="{Binding SelectedFilterType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
         <controls:FormulaTextBoxControl

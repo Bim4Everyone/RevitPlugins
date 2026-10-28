@@ -246,6 +246,33 @@ internal class SheetVM : ModuleVM {
             ?.ToList();
     }
 
+    /// <summary>
+    /// Перемещает модуль листа на offset позиций. Порядок модулей - порядок их создания и размещения на листе
+    /// </summary>
+    public void MoveComponent(SheetComponentVM component, int offset) {
+        if(!CanMoveComponent(component, offset)) {
+            return;
+        }
+        int index = SheetComponents.IndexOf(component);
+        SheetComponents.Move(index, index + offset);
+    }
+
+    /// <summary>
+    /// Проверяет, можно ли переместить модуль листа на offset позиций, не выходя за границы списка
+    /// </summary>
+    public bool CanMoveComponent(SheetComponentVM component, int offset) {
+        int index = SheetComponents.IndexOf(component);
+        return index >= 0 && index + offset >= 0 && index + offset < SheetComponents.Count;
+    }
+
+    protected override void MoveModule(int offset) {
+        SheetSet?.MoveSheet(this, offset);
+    }
+
+    protected override bool CanMoveModule(int offset) {
+        return SheetSet?.CanMoveSheet(this, offset) ?? false;
+    }
+
     internal void RemoveComponent(SheetComponentVM sheetComponent) {
         if(sheetComponent != null && SheetComponents.Contains(sheetComponent)) {
             SheetComponents.Remove(sheetComponent);
@@ -272,6 +299,12 @@ internal class SheetVM : ModuleVM {
     }
 
     private void OnSheetComponentsChanged(object sender, NotifyCollectionChangedEventArgs e) {
+        // При перемещении модуль приходит и в NewItems, и в OldItems: подписки не меняются,
+        // но от порядка модулей зависят родительские планы фрагментов
+        if(e.Action == NotifyCollectionChangedAction.Move) {
+            UpdateCalloutParents();
+            return;
+        }
         if(e.NewItems != null) {
             foreach(var component in e.NewItems.OfType<SheetComponentVM>()) {
                 component.PropertyChanged += OnSheetComponentPropertyChanged;

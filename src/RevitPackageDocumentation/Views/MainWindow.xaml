@@ -40,6 +40,21 @@
             <SolidColorBrush
                 x:Key="ListBoxItemSelectedBackgroundThemeBrush"
                 Color="#80007ACC" />
+
+            <!--Перемещение листа в списке. Одно меню на все строки, поэтому контекст данных берется
+                из строки, на которой меню открыто (PlacementTarget)-->
+            <ContextMenu
+                x:Key="SheetContextMenu"
+                DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                <MenuItem
+                    Header="{extensions:Localized MainWindow.MoveUp}"
+                    Icon="{ui:SymbolIcon ArrowUp24}"
+                    Command="{Binding MoveUpCommand}" />
+                <MenuItem
+                    Header="{extensions:Localized MainWindow.MoveDown}"
+                    Icon="{ui:SymbolIcon ArrowDown24}"
+                    Command="{Binding MoveDownCommand}" />
+            </ContextMenu>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -141,7 +156,21 @@
                     <ListBox
                         Grid.Row="0"
                         ItemsSource="{Binding CurrentSheetSet.SheetList}"
-                        SelectedItem="{Binding CurrentSheetSet.SelectedSheet}" />
+                        SelectedItem="{Binding CurrentSheetSet.SelectedSheet}">
+                        <!--Меню перемещения на всей строке листа, кроме полей ввода и кнопок-->
+                        <ListBox.ItemContainerStyle>
+                            <Style
+                                TargetType="ListBoxItem"
+                                BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                <Setter
+                                    Property="ContextMenu"
+                                    Value="{StaticResource SheetContextMenu}" />
+                                <EventSetter
+                                    Event="ContextMenuOpening"
+                                    Handler="SheetListItem_ContextMenuOpening" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
 
                     <Grid
                         Grid.Row="1">

@@ -54,6 +54,8 @@
     <system:String x:Key="MainWindow.PickElement">Select one element</system:String>
     <system:String x:Key="MainWindow.ErrorsNotFound">No errors found</system:String>
     <system:String x:Key="MainWindow.Edit">Edit</system:String>
+    <system:String x:Key="MainWindow.MoveUp">Move up</system:String>
+    <system:String x:Key="MainWindow.MoveDown">Move down</system:String>
 
     <system:String x:Key="MainWindow.SheetName">Sheet name</system:String>
     <system:String x:Key="MainWindow.SheetNumber">Sheet number</system:String>

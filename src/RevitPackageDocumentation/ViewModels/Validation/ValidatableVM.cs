@@ -174,14 +174,18 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
         }
 
         NotifyCollectionChangedEventHandler handler = (_, e) => {
-            if(e.NewItems != null) {
-                foreach(var item in e.NewItems) {
-                    SubscribeItem(propertyName, item);
+            // При перемещении элемент приходит и в NewItems, и в OldItems. Он остается в коллекции,
+            // поэтому подписка не меняется: иначе на элемент подписывались бы дважды, а запись о подписке терялась
+            if(e.Action != NotifyCollectionChangedAction.Move) {
+                if(e.NewItems != null) {
+                    foreach(var item in e.NewItems) {
+                        SubscribeItem(propertyName, item);
+                    }
                 }
-            }
-            if(e.OldItems != null) {
-                foreach(var item in e.OldItems) {
-                    UnsubscribeChild(item);
+                if(e.OldItems != null) {
+                    foreach(var item in e.OldItems) {
+                        UnsubscribeChild(item);
+                    }
                 }
             }
             ValidateProperty(propertyName);

@@ -55,6 +55,8 @@
     <system:String x:Key="MainWindow.PickElement">Выберите один элемент</system:String>
     <system:String x:Key="MainWindow.ErrorsNotFound">Ошибки не найдены</system:String>
     <system:String x:Key="MainWindow.Edit">Изменить</system:String>
+    <system:String x:Key="MainWindow.MoveUp">Переместить выше</system:String>
+    <system:String x:Key="MainWindow.MoveDown">Переместить ниже</system:String>
     
     <system:String x:Key="MainWindow.SheetName">Имя листа</system:String>
     <system:String x:Key="MainWindow.SheetNumber">Номер листа</system:String>

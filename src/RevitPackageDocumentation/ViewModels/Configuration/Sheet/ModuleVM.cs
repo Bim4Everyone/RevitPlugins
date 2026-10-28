@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 
 using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
@@ -25,7 +27,19 @@ internal abstract class ModuleVM : BaseParamContainerVM, ICheckableModule {
         ObservableCollection<PluginParamVM> sheetSetParams,
         ILocalizationService localizationService)
         : base(repository, stringParamSetService, sheetSetParams, localizationService) {
+        MoveUpCommand = RelayCommand.Create(MoveUp, CanMoveUp);
+        MoveDownCommand = RelayCommand.Create(MoveDown, CanMoveDown);
     }
+
+    /// <summary>
+    /// Команда перемещения модуля на одну позицию выше в своем списке (контекстное меню модуля)
+    /// </summary>
+    public ICommand MoveUpCommand { get; }
+
+    /// <summary>
+    /// Команда перемещения модуля на одну позицию ниже в своем списке (контекстное меню модуля)
+    /// </summary>
+    public ICommand MoveDownCommand { get; }
 
     /// <summary>
     /// Модуль включен в генерацию
@@ -69,6 +83,32 @@ internal abstract class ModuleVM : BaseParamContainerVM, ICheckableModule {
     public string ModuleTypeName {
         get => _moduleTypeName;
         set => RaiseAndSetIfChanged(ref _moduleTypeName, value);
+    }
+
+    /// <summary>
+    /// Перемещает модуль в его списке (листы комплекта или модули листа) на offset позиций
+    /// </summary>
+    protected abstract void MoveModule(int offset);
+
+    /// <summary>
+    /// Проверяет, можно ли переместить модуль на offset позиций, не выходя за границы списка
+    /// </summary>
+    protected abstract bool CanMoveModule(int offset);
+
+    private void MoveUp() {
+        MoveModule(-1);
+    }
+
+    private bool CanMoveUp() {
+        return CanMoveModule(-1);
+    }
+
+    private void MoveDown() {
+        MoveModule(1);
+    }
+
+    private bool CanMoveDown() {
+        return CanMoveModule(1);
     }
 
     /// <summary>

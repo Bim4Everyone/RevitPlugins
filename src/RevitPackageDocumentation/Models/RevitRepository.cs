@@ -185,14 +185,21 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает список всех типов видовых экранов в проекте
     /// </summary>
+    /// <remarks>
+    /// Типы видовых экранов берутся как типы, на которые можно заменить тип по умолчанию (GetSimilarTypes),
+    /// без перебора всех типоразмеров проекта
+    /// </remarks>
     private List<ElementType> GetViewportTypes() {
-        var defaultElementType = Document.GetElement(
-            Document.GetDefaultElementTypeId(ElementTypeGroup.ViewportType)) as ElementType;
+        if(Document.GetElement(Document.GetDefaultElementTypeId(ElementTypeGroup.ViewportType))
+           is not ElementType defaultElementType) {
+            return [];
+        }
 
-        return new FilteredElementCollector(Document)
-            .OfClass(typeof(ElementType))
-            .OfType<ElementType>()
-            .Where(q => q.FamilyName == defaultElementType.FamilyName)
+        return defaultElementType.GetSimilarTypes()
+            .Append(defaultElementType.Id)
+            .Distinct()
+            .Select(id => Document.GetElement(id) as ElementType)
+            .Where(type => type != null && type.FamilyName == defaultElementType.FamilyName)
             .OrderBy(a => a.Name)
             .ToList();
     }

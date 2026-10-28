@@ -169,6 +169,25 @@ internal class SheetSetVM : BaseViewModel {
             });
     }
 
+    /// <summary>
+    /// Перемещает лист в списке комплекта на offset позиций. Порядок листов - порядок их создания
+    /// </summary>
+    public void MoveSheet(SheetVM sheet, int offset) {
+        if(!CanMoveSheet(sheet, offset)) {
+            return;
+        }
+        int index = SheetList.IndexOf(sheet);
+        SheetList.Move(index, index + offset);
+    }
+
+    /// <summary>
+    /// Проверяет, можно ли переместить лист на offset позиций, не выходя за границы списка
+    /// </summary>
+    public bool CanMoveSheet(SheetVM sheet, int offset) {
+        int index = SheetList.IndexOf(sheet);
+        return index >= 0 && index + offset >= 0 && index + offset < SheetList.Count;
+    }
+
     internal void RemoveSheet(SheetVM sheet) {
         if(sheet != null && SheetList.Contains(sheet)) {
             if(SelectedSheet == sheet) {

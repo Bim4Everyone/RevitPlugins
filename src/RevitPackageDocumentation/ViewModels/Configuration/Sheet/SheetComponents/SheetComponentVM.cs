@@ -49,6 +49,14 @@ internal abstract class SheetComponentVM : ModuleVM {
     /// </summary>
     public SheetVM Sheet => _sheet;
 
+    protected override void MoveModule(int offset) {
+        Sheet?.MoveComponent(this, offset);
+    }
+
+    protected override bool CanMoveModule(int offset) {
+        return Sheet?.CanMoveComponent(this, offset) ?? false;
+    }
+
     private void OnErrorsChanged(object sender, DataErrorsChangedEventArgs e) {
         // Обновляем состояние команды через CommandManager
         CommandManager.InvalidateRequerySuggested();

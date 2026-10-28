@@ -201,7 +201,7 @@
                         Margin="5"
                         Style="{StaticResource ErrorComboBoxStyle}"
                         IsEnabled="{Binding IsCreatingFromScratch}"
-                        ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ItemsSource="{Binding Sheet.SheetSet.SheetSetParams.SelectElemParams}"
                         DisplayMemberPath="ParamName"
                         SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
@@ -424,7 +424,7 @@
                         Grid.Column="1"
                         Margin="5"
                         Style="{StaticResource ErrorComboBoxStyle}"
-                        ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ItemsSource="{Binding Sheet.SheetSet.SheetSetParams.SelectElemParams}"
                         DisplayMemberPath="ParamName"
                         SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
@@ -652,7 +652,7 @@
                         Grid.Column="1"
                         Margin="5"
                         Style="{StaticResource ErrorComboBoxStyle}"
-                        ItemsSource="{Binding DataContext.CurrentSheetSet.SheetSetParams.SelectElemParams, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ItemsSource="{Binding Sheet.SheetSet.SheetSetParams.SelectElemParams}"
                         DisplayMemberPath="ParamName"
                         SelectedItem="{Binding SelectedSelectElemParam, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                 </Grid>
