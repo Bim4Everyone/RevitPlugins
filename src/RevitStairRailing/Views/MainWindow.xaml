@@ -13,8 +13,8 @@
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
 
-    Height="680"
-    Width="1000"
+    Height="760"
+    Width="1080"
 
     MinHeight="600"
     MinWidth="900"
@@ -254,51 +254,157 @@
                             Text="{Binding RodOffsets, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
 
-                    <CheckBox
-                        Margin="0,12,0,6"
-                        FontWeight="SemiBold"
-                        Content="{me:LocalizationSource MainWindow.Plates}"
-                        IsChecked="{Binding HasPlates}" />
-                    <StackPanel IsEnabled="{Binding HasPlates}">
+                    <TextBlock
+                        Style="{StaticResource SectionHeader}"
+                        Text="{me:LocalizationSource MainWindow.Mount}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="200" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="6" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="6" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            Grid.Row="0" Grid.Column="0"
+                            Style="{StaticResource FieldLabel}"
+                            Text="{me:LocalizationSource MainWindow.FlightMount}" />
                         <ComboBox
-                            Margin="0,0,0,6"
-                        DisplayMemberPath="Name"
-                        IsTextSearchEnabled="True"
-                        TextSearch.TextPath="Name"
-                            ItemsSource="{Binding FramingTypes}"
-                            SelectedItem="{Binding PlateType}" />
+                            Grid.Row="0" Grid.Column="1"
+                            ItemsSource="{Binding MountOptions}"
+                            DisplayMemberPath="Name"
+                            SelectedValuePath="Value"
+                            SelectedValue="{Binding FlightMount}" />
+                        <TextBlock
+                            Grid.Row="2" Grid.Column="0"
+                            Style="{StaticResource FieldLabel}"
+                            Text="{me:LocalizationSource MainWindow.LandingMount}" />
+                        <ComboBox
+                            Grid.Row="2" Grid.Column="1"
+                            ItemsSource="{Binding MountOptions}"
+                            DisplayMemberPath="Name"
+                            SelectedValuePath="Value"
+                            SelectedValue="{Binding LandingMount}" />
+                        <TextBlock
+                            Grid.Row="4" Grid.Column="0"
+                            Style="{StaticResource FieldLabel}"
+                            Text="{me:LocalizationSource MainWindow.PlateFamily}" />
+                        <ComboBox
+                            Grid.Row="4" Grid.Column="1"
+                            ItemsSource="{Binding PlateFamilies}"
+                            DisplayMemberPath="Name"
+                            SelectedItem="{Binding PlateFamily}" />
+                    </Grid>
+
+                    <StackPanel IsEnabled="{Binding UsesTopMount}">
+                        <TextBlock
+                            Style="{StaticResource SectionHeader}"
+                            Text="{me:LocalizationSource MainWindow.BasePlate}" />
                         <StackPanel Orientation="Horizontal">
                             <TextBlock
                                 Style="{StaticResource FieldLabel}"
                                 Text="{me:LocalizationSource MainWindow.PlateLength}" />
                             <ui:TextBox
-                                Width="90"
-                        HorizontalAlignment="Left"
-                                Text="{Binding PlateLength, UpdateSourceTrigger=PropertyChanged}" />
+                                Width="70"
+                                Text="{Binding BasePlateLength, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Style="{StaticResource FieldLabel}"
+                                Margin="12,0,8,0"
+                                Text="{me:LocalizationSource MainWindow.PlateWidth}" />
+                            <ui:TextBox
+                                Width="70"
+                                Text="{Binding BasePlateWidth, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Style="{StaticResource FieldLabel}"
+                                Margin="12,0,8,0"
+                                Text="{me:LocalizationSource MainWindow.PlateThickness}" />
+                            <ui:TextBox
+                                Width="60"
+                                Text="{Binding BasePlateThickness, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+
+                        <CheckBox
+                            Margin="0,10,0,6"
+                            Content="{me:LocalizationSource MainWindow.Anchors}"
+                            IsChecked="{Binding HasAnchors}" />
+                        <StackPanel IsEnabled="{Binding HasAnchors}">
+                            <ComboBox
+                                Margin="0,0,0,6"
+                                DisplayMemberPath="Name"
+                                IsTextSearchEnabled="True"
+                                TextSearch.TextPath="Name"
+                                ItemsSource="{Binding AnchorTypes}"
+                                SelectedItem="{Binding AnchorType}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock
+                                    Style="{StaticResource FieldLabel}"
+                                    Text="{me:LocalizationSource MainWindow.AnchorLayout}" />
+                                <ComboBox
+                                    Width="200"
+                                    ItemsSource="{Binding AnchorLayoutOptions}"
+                                    DisplayMemberPath="Name"
+                                    SelectedValuePath="Value"
+                                    SelectedValue="{Binding AnchorLayout}" />
+                                <TextBlock
+                                    Style="{StaticResource FieldLabel}"
+                                    Margin="12,0,8,0"
+                                    Text="{me:LocalizationSource MainWindow.AnchorEdge}" />
+                                <ui:TextBox
+                                    Width="60"
+                                    Text="{Binding AnchorEdgeDistance, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
 
-                    <CheckBox
-                        Margin="0,12,0,6"
-                        FontWeight="SemiBold"
-                        Content="{me:LocalizationSource MainWindow.Anchors}"
-                        IsChecked="{Binding HasAnchors}" />
-                    <StackPanel IsEnabled="{Binding HasAnchors}">
-                        <ComboBox
-                            Margin="0,0,0,6"
-                        DisplayMemberPath="Name"
-                        IsTextSearchEnabled="True"
-                        TextSearch.TextPath="Name"
-                            ItemsSource="{Binding FramingTypes}"
-                            SelectedItem="{Binding AnchorType}" />
+                    <StackPanel IsEnabled="{Binding UsesSideMount}">
+                        <TextBlock
+                            Style="{StaticResource SectionHeader}"
+                            Text="{me:LocalizationSource MainWindow.Cheeks}" />
                         <StackPanel Orientation="Horizontal">
                             <TextBlock
                                 Style="{StaticResource FieldLabel}"
-                                Text="{me:LocalizationSource MainWindow.AnchorLength}" />
+                                Text="{me:LocalizationSource MainWindow.CheekHeight}" />
                             <ui:TextBox
-                                Width="90"
-                        HorizontalAlignment="Left"
-                                Text="{Binding AnchorLength, UpdateSourceTrigger=PropertyChanged}" />
+                                Width="70"
+                                Text="{Binding CheekHeight, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Style="{StaticResource FieldLabel}"
+                                Margin="12,0,8,0"
+                                Text="{me:LocalizationSource MainWindow.PlateWidth}" />
+                            <ui:TextBox
+                                Width="70"
+                                Text="{Binding CheekWidth, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Style="{StaticResource FieldLabel}"
+                                Margin="12,0,8,0"
+                                Text="{me:LocalizationSource MainWindow.PlateThickness}" />
+                            <ui:TextBox
+                                Width="60"
+                                Text="{Binding CheekThickness, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                        <StackPanel
+                            Margin="0,6,0,0"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                Style="{StaticResource FieldLabel}"
+                                Text="{me:LocalizationSource MainWindow.CheekGap}" />
+                            <ui:TextBox
+                                Width="60"
+                                Text="{Binding CheekGap, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Style="{StaticResource FieldLabel}"
+                                Margin="12,0,8,0"
+                                Text="{me:LocalizationSource MainWindow.CheekOrientation}" />
+                            <ComboBox
+                                Width="230"
+                                ItemsSource="{Binding CheekOrientationOptions}"
+                                DisplayMemberPath="Name"
+                                SelectedValuePath="Value"
+                                SelectedValue="{Binding CheekOrientation}" />
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>

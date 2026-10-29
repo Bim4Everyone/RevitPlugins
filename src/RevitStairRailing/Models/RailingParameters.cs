@@ -17,22 +17,12 @@ internal class RailingParameters {
     public ElementId HandrailTypeId { get; set; }
 
     /// <summary>
-    /// Тип продольных прутков.
+    /// Тип продольных прутков; null — прутков нет.
     /// </summary>
     public ElementId RodTypeId { get; set; }
 
     /// <summary>
-    /// Тип опорных пластин; null — пластины не ставятся.
-    /// </summary>
-    public ElementId PlateTypeId { get; set; }
-
-    /// <summary>
-    /// Тип анкеров; null — анкеры не ставятся.
-    /// </summary>
-    public ElementId AnchorTypeId { get; set; }
-
-    /// <summary>
-    /// Высота стоек от траектории до оси поручня.
+    /// Высота от траектории до оси поручня.
     /// </summary>
     public double PostHeight { get; set; }
 
@@ -42,7 +32,7 @@ internal class RailingParameters {
     public double MaxPostStep { get; set; }
 
     /// <summary>
-    /// Угол поворота поперечного сечения стоек, градусы.
+    /// Угол поворота поперечного сечения стоек относительно направления ограждения, градусы.
     /// </summary>
     public double PostRotationDegrees { get; set; }
 
@@ -52,14 +42,56 @@ internal class RailingParameters {
     public List<double> RodOffsets { get; set; } = new();
 
     /// <summary>
-    /// Длина опорной пластины вдоль ограждения.
+    /// Крепление стоек на маршах (наклонных участках).
     /// </summary>
-    public double PlateLength { get; set; }
+    public PostMount FlightMount { get; set; }
 
     /// <summary>
-    /// Длина анкера вниз от низа стойки.
+    /// Крепление стоек на площадках (горизонтальных участках).
     /// </summary>
-    public double AnchorLength { get; set; }
+    public PostMount LandingMount { get; set; }
+
+    /// <summary>
+    /// Семейство пластин (по линии, с параметрами типа «t» — толщина и «h» — ширина);
+    /// типоразмеры нужных размеров находятся или создаются.
+    /// </summary>
+    public ElementId PlateFamilyId { get; set; }
+
+    /// <summary>
+    /// Опорная пластина под стойкой при креплении сверху.
+    /// </summary>
+    public PlateSize BasePlate { get; set; }
+
+    /// <summary>
+    /// Длина опорной пластины вдоль ограждения.
+    /// </summary>
+    public double BasePlateLength { get; set; }
+
+    /// <summary>
+    /// Тип анкеров опорной пластины; null — анкеры не ставятся.
+    /// </summary>
+    public ElementId AnchorTypeId { get; set; }
+
+    public AnchorLayout AnchorLayout { get; set; }
+
+    /// <summary>
+    /// Расстояние от оси анкера до края опорной пластины.
+    /// </summary>
+    public double AnchorEdgeDistance { get; set; }
+
+    /// <summary>
+    /// Пластины-щёки по бокам стойки при боковом креплении (к закладной детали марша).
+    /// </summary>
+    public PlateSize Cheek { get; set; }
+
+    public double CheekHeight { get; set; }
+
+    /// <summary>
+    /// Зазор между щёками — размер стойки между ними.
+    /// </summary>
+    public double CheekGap { get; set; }
+
+    public CheekOrientation CheekOrientation { get; set; }
 
     /// <summary>
     /// Сторона ограждения относительно линий траектории по ходу подъёма.
@@ -83,9 +115,73 @@ internal class RailingParameters {
 }
 
 /// <summary>
+/// Толщина и ширина листовой пластины, мм.
+/// </summary>
+internal class PlateSize {
+    public PlateSize(double thickness, double width) {
+        Thickness = thickness;
+        Width = width;
+    }
+
+    public double Thickness { get; }
+
+    public double Width { get; }
+}
+
+/// <summary>
 /// Сторона ограждения относительно траектории по ходу подъёма.
 /// </summary>
 internal enum RailingSide {
     Left,
     Right
+}
+
+/// <summary>
+/// Крепление стойки.
+/// </summary>
+internal enum PostMount {
+    /// <summary>
+    /// Сверху: стойка на опорной пластине с анкерами.
+    /// </summary>
+    Top,
+
+    /// <summary>
+    /// Сбоку: стойка между двумя вертикальными пластинами-щёками, приваренными к закладной детали марша.
+    /// </summary>
+    Side
+}
+
+/// <summary>
+/// Расстановка анкеров на опорной пластине.
+/// </summary>
+internal enum AnchorLayout {
+    /// <summary>
+    /// Два по диагонали.
+    /// </summary>
+    Diagonal,
+
+    /// <summary>
+    /// Три: два у края со стороны лестницы, один у противоположного края посередине.
+    /// </summary>
+    Triangle,
+
+    /// <summary>
+    /// Четыре по углам.
+    /// </summary>
+    Corners
+}
+
+/// <summary>
+/// Положение щёк относительно ограждения.
+/// </summary>
+internal enum CheekOrientation {
+    /// <summary>
+    /// Щёки в плоскости ограждения: стойка между ними со стороны лестницы и снаружи.
+    /// </summary>
+    AlongRailing,
+
+    /// <summary>
+    /// Щёки поперёк ограждения: стойка между ними по ходу ограждения.
+    /// </summary>
+    AcrossRailing
 }

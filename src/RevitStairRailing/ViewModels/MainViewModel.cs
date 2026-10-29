@@ -11,7 +11,7 @@ using RevitStairRailing.Models;
 namespace RevitStairRailing.ViewModels;
 
 /// <summary>
-/// Главное окно: состав и размеры ограждения, сторона и отступ от траектории, сборка.
+/// Главное окно: состав и размеры ограждения, крепление стоек, сторона и отступ от траектории, сборка.
 /// </summary>
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
@@ -22,16 +22,25 @@ internal class MainViewModel : BaseViewModel {
     private FramingTypeViewModel _postType;
     private FramingTypeViewModel _handrailType;
     private FramingTypeViewModel _rodType;
-    private FramingTypeViewModel _plateType;
-    private FramingTypeViewModel _anchorType;
-    private bool _hasPlates;
-    private bool _hasAnchors;
     private string _postHeight;
     private string _maxPostStep;
     private string _postRotation;
     private string _rodOffsets;
-    private string _plateLength;
-    private string _anchorLength;
+    private PostMount _flightMount;
+    private PostMount _landingMount;
+    private PlateFamilyViewModel _plateFamily;
+    private string _basePlateThickness;
+    private string _basePlateLength;
+    private string _basePlateWidth;
+    private bool _hasAnchors;
+    private FramingTypeViewModel _anchorType;
+    private AnchorLayout _anchorLayout;
+    private string _anchorEdgeDistance;
+    private string _cheekThickness;
+    private string _cheekWidth;
+    private string _cheekHeight;
+    private string _cheekGap;
+    private CheekOrientation _cheekOrientation;
     private bool _isLeftSide;
     private string _edgeOffset;
     private bool _createAssembly;
@@ -51,6 +60,20 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _localizationService = localizationService;
+
+        MountOptions = new List<OptionViewModel<PostMount>> {
+            new(PostMount.Top, GetText("Mount.Top")),
+            new(PostMount.Side, GetText("Mount.Side"))
+        };
+        AnchorLayoutOptions = new List<OptionViewModel<AnchorLayout>> {
+            new(AnchorLayout.Triangle, GetText("AnchorLayout.Triangle")),
+            new(AnchorLayout.Corners, GetText("AnchorLayout.Corners")),
+            new(AnchorLayout.Diagonal, GetText("AnchorLayout.Diagonal"))
+        };
+        CheekOrientationOptions = new List<OptionViewModel<CheekOrientation>> {
+            new(CheekOrientation.AlongRailing, GetText("CheekOrientation.Along")),
+            new(CheekOrientation.AcrossRailing, GetText("CheekOrientation.Across"))
+        };
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -72,7 +95,7 @@ internal class MainViewModel : BaseViewModel {
     public RailingParameters Parameters { get; private set; }
 
     /// <summary>
-    /// Схема пролёта ограждения.
+    /// Схема пролёта ограждения на марше.
     /// </summary>
     public RailingPreviewViewModel Preview { get; } = new();
 
@@ -84,6 +107,19 @@ internal class MainViewModel : BaseViewModel {
     /// Типоразмеры «Каркаса несущего», размещаемые по линии.
     /// </summary>
     public List<FramingTypeViewModel> FramingTypes { get; private set; } = new();
+
+    /// <summary>
+    /// Типоразмеры «Каркаса несущего», размещаемые в точке, — анкеры.
+    /// </summary>
+    public List<FramingTypeViewModel> AnchorTypes { get; private set; } = new();
+
+    public List<PlateFamilyViewModel> PlateFamilies { get; private set; } = new();
+
+    public List<OptionViewModel<PostMount>> MountOptions { get; }
+
+    public List<OptionViewModel<AnchorLayout>> AnchorLayoutOptions { get; }
+
+    public List<OptionViewModel<CheekOrientation>> CheekOrientationOptions { get; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -108,28 +144,8 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _rodType, value);
     }
 
-    public FramingTypeViewModel PlateType {
-        get => _plateType;
-        set => RaiseAndSetIfChanged(ref _plateType, value);
-    }
-
-    public FramingTypeViewModel AnchorType {
-        get => _anchorType;
-        set => RaiseAndSetIfChanged(ref _anchorType, value);
-    }
-
-    public bool HasPlates {
-        get => _hasPlates;
-        set => SetAndUpdatePreview(ref _hasPlates, value);
-    }
-
-    public bool HasAnchors {
-        get => _hasAnchors;
-        set => SetAndUpdatePreview(ref _hasAnchors, value);
-    }
-
     /// <summary>
-    /// Высота стоек от траектории до оси поручня, мм.
+    /// Высота от траектории до оси поручня, мм.
     /// </summary>
     public string PostHeight {
         get => _postHeight;
@@ -145,7 +161,7 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Угол поворота поперечного сечения стоек, градусы.
+    /// Угол поворота поперечного сечения стоек относительно направления ограждения, градусы.
     /// </summary>
     public string PostRotation {
         get => _postRotation;
@@ -160,14 +176,107 @@ internal class MainViewModel : BaseViewModel {
         set => SetAndUpdatePreview(ref _rodOffsets, value);
     }
 
-    public string PlateLength {
-        get => _plateLength;
-        set => SetAndUpdatePreview(ref _plateLength, value);
+    public PostMount FlightMount {
+        get => _flightMount;
+        set {
+            SetAndUpdatePreview(ref _flightMount, value);
+            OnMountChanged();
+        }
     }
 
-    public string AnchorLength {
-        get => _anchorLength;
-        set => SetAndUpdatePreview(ref _anchorLength, value);
+    public PostMount LandingMount {
+        get => _landingMount;
+        set {
+            RaiseAndSetIfChanged(ref _landingMount, value);
+            OnMountChanged();
+        }
+    }
+
+    /// <summary>
+    /// Хотя бы на одном виде участков стойки крепятся сверху — нужны опорные пластины.
+    /// </summary>
+    public bool UsesTopMount => FlightMount == PostMount.Top || LandingMount == PostMount.Top;
+
+    /// <summary>
+    /// Хотя бы на одном виде участков стойки крепятся сбоку — нужны щёки.
+    /// </summary>
+    public bool UsesSideMount => FlightMount == PostMount.Side || LandingMount == PostMount.Side;
+
+    public PlateFamilyViewModel PlateFamily {
+        get => _plateFamily;
+        set => RaiseAndSetIfChanged(ref _plateFamily, value);
+    }
+
+    public string BasePlateThickness {
+        get => _basePlateThickness;
+        set => SetAndUpdatePreview(ref _basePlateThickness, value);
+    }
+
+    /// <summary>
+    /// Длина опорной пластины вдоль ограждения, мм.
+    /// </summary>
+    public string BasePlateLength {
+        get => _basePlateLength;
+        set => SetAndUpdatePreview(ref _basePlateLength, value);
+    }
+
+    /// <summary>
+    /// Ширина опорной пластины поперёк ограждения, мм.
+    /// </summary>
+    public string BasePlateWidth {
+        get => _basePlateWidth;
+        set => SetAndUpdatePreview(ref _basePlateWidth, value);
+    }
+
+    public bool HasAnchors {
+        get => _hasAnchors;
+        set => SetAndUpdatePreview(ref _hasAnchors, value);
+    }
+
+    public FramingTypeViewModel AnchorType {
+        get => _anchorType;
+        set => RaiseAndSetIfChanged(ref _anchorType, value);
+    }
+
+    public AnchorLayout AnchorLayout {
+        get => _anchorLayout;
+        set => SetAndUpdatePreview(ref _anchorLayout, value);
+    }
+
+    /// <summary>
+    /// Расстояние от оси анкера до края опорной пластины, мм.
+    /// </summary>
+    public string AnchorEdgeDistance {
+        get => _anchorEdgeDistance;
+        set => SetAndUpdatePreview(ref _anchorEdgeDistance, value);
+    }
+
+    public string CheekThickness {
+        get => _cheekThickness;
+        set => SetAndUpdatePreview(ref _cheekThickness, value);
+    }
+
+    public string CheekWidth {
+        get => _cheekWidth;
+        set => SetAndUpdatePreview(ref _cheekWidth, value);
+    }
+
+    public string CheekHeight {
+        get => _cheekHeight;
+        set => SetAndUpdatePreview(ref _cheekHeight, value);
+    }
+
+    /// <summary>
+    /// Зазор между щёками — размер стойки между ними, мм.
+    /// </summary>
+    public string CheekGap {
+        get => _cheekGap;
+        set => SetAndUpdatePreview(ref _cheekGap, value);
+    }
+
+    public CheekOrientation CheekOrientation {
+        get => _cheekOrientation;
+        set => SetAndUpdatePreview(ref _cheekOrientation, value);
     }
 
     /// <summary>
@@ -206,24 +315,41 @@ internal class MainViewModel : BaseViewModel {
 
     private void LoadView() {
         FramingTypes = _revitRepository.GetFramingTypes().Select(symbol => new FramingTypeViewModel(symbol)).ToList();
+        AnchorTypes = _revitRepository.GetPointFramingTypes().Select(symbol => new FramingTypeViewModel(symbol)).ToList();
+        PlateFamilies = _revitRepository.GetPlateFamilies().Select(family => new PlateFamilyViewModel(family)).ToList();
         OnPropertyChanged(nameof(FramingTypes));
+        OnPropertyChanged(nameof(AnchorTypes));
+        OnPropertyChanged(nameof(PlateFamilies));
         LoadConfig();
     }
 
     private void AcceptView() {
         SaveConfig();
+        List<double> rodOffsets = ParseRodOffsets(RodOffsets);
         Parameters = new RailingParameters {
             PostTypeId = PostType.Id,
             HandrailTypeId = HandrailType.Id,
-            RodTypeId = RodType?.Id,
-            PlateTypeId = HasPlates ? PlateType.Id : null,
-            AnchorTypeId = HasAnchors ? AnchorType.Id : null,
+            RodTypeId = rodOffsets.Count > 0 ? RodType.Id : null,
             PostHeight = ParseNumber(PostHeight).Value,
             MaxPostStep = ParseNumber(MaxPostStep).Value,
             PostRotationDegrees = ParseNumber(PostRotation).Value,
-            RodOffsets = ParseRodOffsets(RodOffsets),
-            PlateLength = HasPlates ? ParseNumber(PlateLength).Value : 0,
-            AnchorLength = HasAnchors ? ParseNumber(AnchorLength).Value : 0,
+            RodOffsets = rodOffsets,
+            FlightMount = FlightMount,
+            LandingMount = LandingMount,
+            PlateFamilyId = PlateFamily.Id,
+            BasePlate = UsesTopMount
+                ? new PlateSize(ParseNumber(BasePlateThickness).Value, ParseNumber(BasePlateWidth).Value)
+                : null,
+            BasePlateLength = UsesTopMount ? ParseNumber(BasePlateLength).Value : 0,
+            AnchorTypeId = UsesTopMount && HasAnchors ? AnchorType.Id : null,
+            AnchorLayout = AnchorLayout,
+            AnchorEdgeDistance = UsesTopMount && HasAnchors ? ParseNumber(AnchorEdgeDistance).Value : 0,
+            Cheek = UsesSideMount
+                ? new PlateSize(ParseNumber(CheekThickness).Value, ParseNumber(CheekWidth).Value)
+                : null,
+            CheekHeight = UsesSideMount ? ParseNumber(CheekHeight).Value : 0,
+            CheekGap = UsesSideMount ? ParseNumber(CheekGap).Value : 0,
+            CheekOrientation = CheekOrientation,
             Side = IsLeftSide ? RailingSide.Left : RailingSide.Right,
             EdgeOffset = ParseNumber(EdgeOffset).Value,
             CreateAssembly = CreateAssembly,
@@ -235,43 +361,103 @@ internal class MainViewModel : BaseViewModel {
     /// Проверка ввода в порядке полей окна сверху вниз.
     /// </summary>
     private bool CanAcceptView() {
+        string errorKey = GetInputErrorKey();
+        ErrorText = errorKey != null ? GetText(errorKey) : null;
+        return errorKey == null;
+    }
+
+    private string GetInputErrorKey() {
         double? postHeight = ParseNumber(PostHeight);
         List<double> rodOffsets = ParseRodOffsets(RodOffsets);
-        string errorKey = PostType == null ? "MainWindow.NoPostType"
-            : !(postHeight > 0) ? "MainWindow.BadPostHeight"
-            : !(ParseNumber(MaxPostStep) > 0) ? "MainWindow.BadPostStep"
-            : ParseNumber(PostRotation) == null ? "MainWindow.BadPostRotation"
-            : HandrailType == null ? "MainWindow.NoHandrailType"
-            : rodOffsets == null || rodOffsets.Any(offset => offset <= 0 || offset >= postHeight)
-                ? "MainWindow.BadRodOffsets"
-            : rodOffsets.Count > 0 && RodType == null ? "MainWindow.NoRodType"
-            : HasPlates && PlateType == null ? "MainWindow.NoPlateType"
-            : HasPlates && !(ParseNumber(PlateLength) > 0) ? "MainWindow.BadPlateLength"
-            : HasAnchors && AnchorType == null ? "MainWindow.NoAnchorType"
-            : HasAnchors && !(ParseNumber(AnchorLength) > 0) ? "MainWindow.BadAnchorLength"
-            : !(ParseNumber(EdgeOffset) >= 0) ? "MainWindow.BadEdgeOffset"
-            : CreateAssembly && string.IsNullOrWhiteSpace(AssemblyNamePrefix) ? "MainWindow.NoAssemblyName"
-            : null;
-        ErrorText = errorKey != null ? _localizationService.GetLocalizedString(errorKey) : null;
-        return errorKey == null;
+        if(PostType == null) {
+            return "MainWindow.NoPostType";
+        }
+
+        if(!(postHeight > 0)) {
+            return "MainWindow.BadPostHeight";
+        }
+
+        if(!(ParseNumber(MaxPostStep) > 0)) {
+            return "MainWindow.BadPostStep";
+        }
+
+        if(ParseNumber(PostRotation) == null) {
+            return "MainWindow.BadPostRotation";
+        }
+
+        if(HandrailType == null) {
+            return "MainWindow.NoHandrailType";
+        }
+
+        if(rodOffsets == null || rodOffsets.Any(offset => offset <= 0 || offset >= postHeight)) {
+            return "MainWindow.BadRodOffsets";
+        }
+
+        if(rodOffsets.Count > 0 && RodType == null) {
+            return "MainWindow.NoRodType";
+        }
+
+        if(PlateFamily == null) {
+            return "MainWindow.NoPlateFamily";
+        }
+
+        if(UsesTopMount) {
+            double? plateLength = ParseNumber(BasePlateLength);
+            double? plateWidth = ParseNumber(BasePlateWidth);
+            if(!(ParseNumber(BasePlateThickness) > 0) || !(plateLength > 0) || !(plateWidth > 0)) {
+                return "MainWindow.BadBasePlate";
+            }
+
+            if(HasAnchors && AnchorType == null) {
+                return "MainWindow.NoAnchorType";
+            }
+
+            double? edgeDistance = ParseNumber(AnchorEdgeDistance);
+            if(HasAnchors && !(edgeDistance >= 0 && edgeDistance <= Math.Min(plateLength.Value, plateWidth.Value) / 2)) {
+                return "MainWindow.BadAnchorEdge";
+            }
+        }
+
+        if(UsesSideMount
+           && (!(ParseNumber(CheekThickness) > 0) || !(ParseNumber(CheekWidth) > 0)
+               || !(ParseNumber(CheekHeight) > 0) || !(ParseNumber(CheekGap) > 0))) {
+            return "MainWindow.BadCheeks";
+        }
+
+        if(!(ParseNumber(EdgeOffset) >= 0)) {
+            return "MainWindow.BadEdgeOffset";
+        }
+
+        return CreateAssembly && string.IsNullOrWhiteSpace(AssemblyNamePrefix) ? "MainWindow.NoAssemblyName" : null;
     }
 
     private void LoadConfig() {
         RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document) ?? new RevitSettings();
 
-        PostType = FindType(settings.PostType, "Труба_ГОСТ 32931", "30х20х3");
-        HandrailType = FindType(settings.HandrailType, "87341", "40х3");
-        RodType = FindType(settings.RodType, "Стержень арматурный", "12 А240");
-        PlateType = FindType(settings.PlateType, "Пластина_ГОСТ 19903", "-4х40");
-        AnchorType = FindType(settings.AnchorType, "Клиновой анкер", "");
-        HasPlates = settings.HasPlates;
-        HasAnchors = settings.HasAnchors;
+        PostType = FindType(FramingTypes, settings.PostType, "Труба_ГОСТ 32931", "30х20х3");
+        HandrailType = FindType(FramingTypes, settings.HandrailType, "87341", "40х3");
+        RodType = FindType(FramingTypes, settings.RodType, "Стержень арматурный", "12 А240");
+        AnchorType = FindType(AnchorTypes, settings.AnchorType, "анкер", "");
+        PlateFamily = PlateFamilies.FirstOrDefault(family => family.Name == settings.PlateFamily)
+                      ?? PlateFamilies.FirstOrDefault(family => family.Name.Contains("Пластина_ГОСТ 19903"))
+                      ?? PlateFamilies.FirstOrDefault();
         PostHeight = settings.PostHeight;
         MaxPostStep = settings.MaxPostStep;
         PostRotation = settings.PostRotation;
         RodOffsets = settings.RodOffsets;
-        PlateLength = settings.PlateLength;
-        AnchorLength = settings.AnchorLength;
+        FlightMount = settings.FlightMount;
+        LandingMount = settings.LandingMount;
+        BasePlateThickness = settings.BasePlateThickness;
+        BasePlateLength = settings.BasePlateLength;
+        BasePlateWidth = settings.BasePlateWidth;
+        HasAnchors = settings.HasAnchors;
+        AnchorLayout = settings.AnchorLayout;
+        AnchorEdgeDistance = settings.AnchorEdgeDistance;
+        CheekThickness = settings.CheekThickness;
+        CheekWidth = settings.CheekWidth;
+        CheekHeight = settings.CheekHeight;
+        CheekGap = settings.CheekGap;
+        CheekOrientation = settings.CheekOrientation;
         IsLeftSide = settings.Side == RailingSide.Left;
         EdgeOffset = settings.EdgeOffset;
         CreateAssembly = settings.CreateAssembly;
@@ -285,16 +471,25 @@ internal class MainViewModel : BaseViewModel {
         settings.PostType = PostType?.Name;
         settings.HandrailType = HandrailType?.Name;
         settings.RodType = RodType?.Name;
-        settings.PlateType = PlateType?.Name;
         settings.AnchorType = AnchorType?.Name;
-        settings.HasPlates = HasPlates;
-        settings.HasAnchors = HasAnchors;
+        settings.PlateFamily = PlateFamily?.Name;
         settings.PostHeight = PostHeight;
         settings.MaxPostStep = MaxPostStep;
         settings.PostRotation = PostRotation;
         settings.RodOffsets = RodOffsets;
-        settings.PlateLength = PlateLength;
-        settings.AnchorLength = AnchorLength;
+        settings.FlightMount = FlightMount;
+        settings.LandingMount = LandingMount;
+        settings.BasePlateThickness = BasePlateThickness;
+        settings.BasePlateLength = BasePlateLength;
+        settings.BasePlateWidth = BasePlateWidth;
+        settings.HasAnchors = HasAnchors;
+        settings.AnchorLayout = AnchorLayout;
+        settings.AnchorEdgeDistance = AnchorEdgeDistance;
+        settings.CheekThickness = CheekThickness;
+        settings.CheekWidth = CheekWidth;
+        settings.CheekHeight = CheekHeight;
+        settings.CheekGap = CheekGap;
+        settings.CheekOrientation = CheekOrientation;
         settings.Side = IsLeftSide ? RailingSide.Left : RailingSide.Right;
         settings.EdgeOffset = EdgeOffset;
         settings.CreateAssembly = CreateAssembly;
@@ -305,10 +500,20 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Типоразмер из настроек; если его нет — типовой из шаблона КМ по частям имён семейства и типа.
     /// </summary>
-    private FramingTypeViewModel FindType(string savedName, string familyNamePart, string typeNamePart) {
-        return FramingTypes.FirstOrDefault(type => type.Name == savedName)
-               ?? FramingTypes.FirstOrDefault(type => type.FamilyName.Contains(familyNamePart)
-                                                      && type.TypeName.Contains(typeNamePart));
+    private static FramingTypeViewModel FindType(
+        List<FramingTypeViewModel> types,
+        string savedName,
+        string familyNamePart,
+        string typeNamePart) {
+
+        return types.FirstOrDefault(type => type.Name == savedName)
+               ?? types.FirstOrDefault(type => type.FamilyName.Contains(familyNamePart)
+                                               && type.TypeName.Contains(typeNamePart));
+    }
+
+    private void OnMountChanged() {
+        OnPropertyChanged(nameof(UsesTopMount));
+        OnPropertyChanged(nameof(UsesSideMount));
     }
 
     private void SetAndUpdatePreview<T>(ref T field, T value, [CallerMemberName] string propertyName = null) {
@@ -317,12 +522,27 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void UpdatePreview() {
-        Preview.Update(
-            ParseNumber(PostHeight) ?? 0,
-            ParseNumber(MaxPostStep) ?? 0,
-            ParseRodOffsets(RodOffsets) ?? new List<double>(),
-            HasPlates ? ParseNumber(PlateLength) : null,
-            HasAnchors ? ParseNumber(AnchorLength) : null);
+        Preview.Update(new RailingPreviewSizes {
+            PostHeight = ParseNumber(PostHeight),
+            PostStep = ParseNumber(MaxPostStep),
+            RodOffsets = ParseRodOffsets(RodOffsets) ?? new List<double>(),
+            Mount = FlightMount,
+            PlateThickness = ParseNumber(BasePlateThickness),
+            PlateLength = ParseNumber(BasePlateLength),
+            PlateWidth = ParseNumber(BasePlateWidth),
+            HasAnchors = HasAnchors,
+            AnchorLayout = AnchorLayout,
+            AnchorEdgeDistance = ParseNumber(AnchorEdgeDistance),
+            CheekThickness = ParseNumber(CheekThickness),
+            CheekWidth = ParseNumber(CheekWidth),
+            CheekHeight = ParseNumber(CheekHeight),
+            CheekGap = ParseNumber(CheekGap),
+            CheekOrientation = CheekOrientation
+        });
+    }
+
+    private string GetText(string key) {
+        return _localizationService.GetLocalizedString(key);
     }
 
     /// <summary>

@@ -53,14 +53,6 @@ internal class RevitSettings : ProjectSettings {
 
     public string RodType { get; set; }
 
-    public string PlateType { get; set; }
-
-    public string AnchorType { get; set; }
-
-    public bool HasPlates { get; set; } = true;
-
-    public bool HasAnchors { get; set; }
-
     public string PostHeight { get; set; } = "1056";
 
     public string MaxPostStep { get; set; } = "600";
@@ -69,9 +61,35 @@ internal class RevitSettings : ProjectSettings {
 
     public string RodOffsets { get; set; } = "234; 434; 634; 834";
 
-    public string PlateLength { get; set; } = "100";
+    public PostMount FlightMount { get; set; } = PostMount.Top;
 
-    public string AnchorLength { get; set; } = "95";
+    public PostMount LandingMount { get; set; } = PostMount.Top;
+
+    public string PlateFamily { get; set; }
+
+    public string BasePlateThickness { get; set; } = "6";
+
+    public string BasePlateLength { get; set; } = "100";
+
+    public string BasePlateWidth { get; set; } = "100";
+
+    public bool HasAnchors { get; set; } = true;
+
+    public string AnchorType { get; set; }
+
+    public AnchorLayout AnchorLayout { get; set; } = AnchorLayout.Triangle;
+
+    public string AnchorEdgeDistance { get; set; } = "20";
+
+    public string CheekThickness { get; set; } = "6";
+
+    public string CheekWidth { get; set; } = "60";
+
+    public string CheekHeight { get; set; } = "120";
+
+    public string CheekGap { get; set; } = "30";
+
+    public CheekOrientation CheekOrientation { get; set; } = CheekOrientation.AlongRailing;
 
     public RailingSide Side { get; set; } = RailingSide.Left;
 

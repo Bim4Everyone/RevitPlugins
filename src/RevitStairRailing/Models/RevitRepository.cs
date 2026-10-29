@@ -53,6 +53,35 @@ internal class RevitRepository {
     }
 
     /// <summary>
+    /// Типоразмеры семейств «Каркас несущий», размещаемых в точке на рабочей плоскости, — для анкеров.
+    /// </summary>
+    public List<FamilySymbol> GetPointFramingTypes() {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(FamilySymbol))
+            .OfCategory(BuiltInCategory.OST_StructuralFraming)
+            .Cast<FamilySymbol>()
+            .Where(symbol => symbol.Family.FamilyPlacementType is FamilyPlacementType.WorkPlaneBased
+                or FamilyPlacementType.OneLevelBased)
+            .OrderBy(symbol => symbol.FamilyName)
+            .ThenBy(symbol => symbol.Name)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Семейства пластин: «Каркас несущий» по линии с параметрами типа «t» и «h» (толщина и ширина сечения).
+    /// </summary>
+    public List<Family> GetPlateFamilies() {
+        return GetFramingTypes()
+            .Where(symbol => symbol.LookupParameter(RailingBuilder.PlateThicknessParameter) != null
+                             && symbol.LookupParameter(RailingBuilder.PlateWidthParameter) != null)
+            .Select(symbol => symbol.Family)
+            .GroupBy(family => family.Id)
+            .Select(group => group.First())
+            .OrderBy(family => family.Name)
+            .ToList();
+    }
+
+    /// <summary>
     /// Отрезки линий модели, выбранных до запуска плагина; пустой список — линии модели не выбраны.
     /// </summary>
     /// <exception cref="RailingException">Среди выбранных линий есть дуги или сплайны.</exception>

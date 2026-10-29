@@ -20,10 +20,6 @@
     <system:String x:Key="MainWindow.Handrail">Поручень</system:String>
     <system:String x:Key="MainWindow.Rods">Продольные прутки</system:String>
     <system:String x:Key="MainWindow.RodOffsets">Ниже оси поручня, мм (через «;»)</system:String>
-    <system:String x:Key="MainWindow.Plates">Опорные пластины</system:String>
-    <system:String x:Key="MainWindow.PlateLength">Длина вдоль ограждения, мм</system:String>
-    <system:String x:Key="MainWindow.Anchors">Анкеры</system:String>
-    <system:String x:Key="MainWindow.AnchorLength">Длина вниз от низа стойки, мм</system:String>
 
     <system:String x:Key="MainWindow.NoPostType">Выберите типоразмер стоек.</system:String>
     <system:String x:Key="MainWindow.BadPostHeight">Высота стоек — положительное число.</system:String>
@@ -32,12 +28,37 @@
     <system:String x:Key="MainWindow.NoHandrailType">Выберите типоразмер поручня.</system:String>
     <system:String x:Key="MainWindow.BadRodOffsets">Расстояния до прутков — числа через «;», больше 0 и меньше высоты стоек.</system:String>
     <system:String x:Key="MainWindow.NoRodType">Выберите типоразмер прутков.</system:String>
-    <system:String x:Key="MainWindow.NoPlateType">Выберите типоразмер пластин.</system:String>
-    <system:String x:Key="MainWindow.BadPlateLength">Длина пластины — положительное число.</system:String>
     <system:String x:Key="MainWindow.NoAnchorType">Выберите типоразмер анкеров.</system:String>
-    <system:String x:Key="MainWindow.BadAnchorLength">Длина анкера — положительное число.</system:String>
     <system:String x:Key="MainWindow.BadEdgeOffset">Отступ от края марша — число не меньше 0.</system:String>
     <system:String x:Key="MainWindow.NoAssemblyName">Введите имя сборки.</system:String>
+
+    <system:String x:Key="MainWindow.Mount">Крепление стоек</system:String>
+    <system:String x:Key="MainWindow.FlightMount">На маршах</system:String>
+    <system:String x:Key="MainWindow.LandingMount">На площадках</system:String>
+    <system:String x:Key="MainWindow.PlateFamily">Семейство пластин</system:String>
+    <system:String x:Key="MainWindow.BasePlate">Опорная пластина (крепление сверху)</system:String>
+    <system:String x:Key="MainWindow.PlateLength">Длина вдоль, мм</system:String>
+    <system:String x:Key="MainWindow.PlateWidth">Ширина, мм</system:String>
+    <system:String x:Key="MainWindow.PlateThickness">Толщина, мм</system:String>
+    <system:String x:Key="MainWindow.Anchors">Анкеры</system:String>
+    <system:String x:Key="MainWindow.AnchorLayout">Расстановка</system:String>
+    <system:String x:Key="MainWindow.AnchorEdge">От края, мм</system:String>
+    <system:String x:Key="MainWindow.Cheeks">Щёки (крепление сбоку к закладной марша)</system:String>
+    <system:String x:Key="MainWindow.CheekHeight">Высота, мм</system:String>
+    <system:String x:Key="MainWindow.CheekGap">Зазор (стойка), мм</system:String>
+    <system:String x:Key="MainWindow.CheekOrientation">Щёки</system:String>
+    <system:String x:Key="Mount.Top">Сверху на пластине</system:String>
+    <system:String x:Key="Mount.Side">Сбоку, щёки к закладной</system:String>
+    <system:String x:Key="AnchorLayout.Triangle">3 треугольником</system:String>
+    <system:String x:Key="AnchorLayout.Corners">4 по углам</system:String>
+    <system:String x:Key="AnchorLayout.Diagonal">2 по диагонали</system:String>
+    <system:String x:Key="CheekOrientation.Along">в плоскости ограждения</system:String>
+    <system:String x:Key="CheekOrientation.Across">поперёк ограждения</system:String>
+    <system:String x:Key="MainWindow.NoPlateFamily">Выберите семейство пластин (по линии, с параметрами типа «t» и «h»).</system:String>
+    <system:String x:Key="MainWindow.BadBasePlate">Размеры опорной пластины — положительные числа.</system:String>
+    <system:String x:Key="MainWindow.BadAnchorEdge">Отступ анкеров от края — не меньше 0 и не больше половины длины и ширины пластины.</system:String>
+    <system:String x:Key="MainWindow.BadCheeks">Размеры щёк и зазор между ними — положительные числа.</system:String>
+    <system:String x:Key="Build.PlateParameters">У семейства пластин нет параметров типа «t» (толщина) и «h» (ширина).</system:String>
 
     <system:String x:Key="Pick.Prompt">Выберите линии модели траектории ограждения (по краю маршей и площадок) и нажмите «Готово»</system:String>
     <system:String x:Key="Path.NoLines">Не выбрано ни одной линии модели.</system:String>

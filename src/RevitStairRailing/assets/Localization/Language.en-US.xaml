@@ -20,10 +20,6 @@
     <system:String x:Key="MainWindow.Handrail">Handrail</system:String>
     <system:String x:Key="MainWindow.Rods">Longitudinal rods</system:String>
     <system:String x:Key="MainWindow.RodOffsets">Below handrail axis, mm (separated by ";")</system:String>
-    <system:String x:Key="MainWindow.Plates">Base plates</system:String>
-    <system:String x:Key="MainWindow.PlateLength">Length along the railing, mm</system:String>
-    <system:String x:Key="MainWindow.Anchors">Anchors</system:String>
-    <system:String x:Key="MainWindow.AnchorLength">Length down from the post bottom, mm</system:String>
 
     <system:String x:Key="MainWindow.NoPostType">Select the post type.</system:String>
     <system:String x:Key="MainWindow.BadPostHeight">Post height must be a positive number.</system:String>
@@ -32,12 +28,37 @@
     <system:String x:Key="MainWindow.NoHandrailType">Select the handrail type.</system:String>
     <system:String x:Key="MainWindow.BadRodOffsets">Rod offsets must be numbers separated by ";", greater than 0 and less than the post height.</system:String>
     <system:String x:Key="MainWindow.NoRodType">Select the rod type.</system:String>
-    <system:String x:Key="MainWindow.NoPlateType">Select the plate type.</system:String>
-    <system:String x:Key="MainWindow.BadPlateLength">Plate length must be a positive number.</system:String>
     <system:String x:Key="MainWindow.NoAnchorType">Select the anchor type.</system:String>
-    <system:String x:Key="MainWindow.BadAnchorLength">Anchor length must be a positive number.</system:String>
     <system:String x:Key="MainWindow.BadEdgeOffset">Edge offset must be a number not less than 0.</system:String>
     <system:String x:Key="MainWindow.NoAssemblyName">Enter the assembly name.</system:String>
+
+    <system:String x:Key="MainWindow.Mount">Post fixing</system:String>
+    <system:String x:Key="MainWindow.FlightMount">On flights</system:String>
+    <system:String x:Key="MainWindow.LandingMount">On landings</system:String>
+    <system:String x:Key="MainWindow.PlateFamily">Plate family</system:String>
+    <system:String x:Key="MainWindow.BasePlate">Base plate (top fixing)</system:String>
+    <system:String x:Key="MainWindow.PlateLength">Length along, mm</system:String>
+    <system:String x:Key="MainWindow.PlateWidth">Width, mm</system:String>
+    <system:String x:Key="MainWindow.PlateThickness">Thickness, mm</system:String>
+    <system:String x:Key="MainWindow.Anchors">Anchors</system:String>
+    <system:String x:Key="MainWindow.AnchorLayout">Layout</system:String>
+    <system:String x:Key="MainWindow.AnchorEdge">From edge, mm</system:String>
+    <system:String x:Key="MainWindow.Cheeks">Cheek plates (side fixing to the flight embedded part)</system:String>
+    <system:String x:Key="MainWindow.CheekHeight">Height, mm</system:String>
+    <system:String x:Key="MainWindow.CheekGap">Gap (post), mm</system:String>
+    <system:String x:Key="MainWindow.CheekOrientation">Cheeks</system:String>
+    <system:String x:Key="Mount.Top">Top, on a plate</system:String>
+    <system:String x:Key="Mount.Side">Side, cheeks to embedded part</system:String>
+    <system:String x:Key="AnchorLayout.Triangle">3 in a triangle</system:String>
+    <system:String x:Key="AnchorLayout.Corners">4 at corners</system:String>
+    <system:String x:Key="AnchorLayout.Diagonal">2 diagonally</system:String>
+    <system:String x:Key="CheekOrientation.Along">in the railing plane</system:String>
+    <system:String x:Key="CheekOrientation.Across">across the railing</system:String>
+    <system:String x:Key="MainWindow.NoPlateFamily">Select the plate family (line-based, with type parameters "t" and "h").</system:String>
+    <system:String x:Key="MainWindow.BadBasePlate">Base plate dimensions must be positive numbers.</system:String>
+    <system:String x:Key="MainWindow.BadAnchorEdge">Anchor edge distance must be from 0 to half of the plate length and width.</system:String>
+    <system:String x:Key="MainWindow.BadCheeks">Cheek dimensions and the gap must be positive numbers.</system:String>
+    <system:String x:Key="Build.PlateParameters">The plate family has no type parameters "t" (thickness) and "h" (width).</system:String>
 
     <system:String x:Key="Pick.Prompt">Select the model lines of the railing path (along flight and landing edges) and press Finish</system:String>
     <system:String x:Key="Path.NoLines">No model lines selected.</system:String>
