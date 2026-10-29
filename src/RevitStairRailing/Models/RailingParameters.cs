@@ -99,9 +99,15 @@ internal class RailingParameters {
     public RailingSide Side { get; set; }
 
     /// <summary>
-    /// Отступ оси ограждения от линий траектории (края марша) в плане.
+    /// Отступ наружного края опоры стойки (пластины или щёк) от линий траектории — края марша — на маршах;
+    /// отрицательный — опора выступает за край.
     /// </summary>
-    public double EdgeOffset { get; set; }
+    public double FlightEdgeOffset { get; set; }
+
+    /// <summary>
+    /// То же на площадках.
+    /// </summary>
+    public double LandingEdgeOffset { get; set; }
 
     /// <summary>
     /// Собирать построенные элементы в сборку.

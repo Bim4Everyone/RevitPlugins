@@ -9,7 +9,7 @@
     <system:String x:Key="MainWindow.Trajectory">Position relative to the path lines (going up)</system:String>
     <system:String x:Key="MainWindow.SideLeft">Left</system:String>
     <system:String x:Key="MainWindow.SideRight">Right</system:String>
-    <system:String x:Key="MainWindow.EdgeOffset">Offset from the flight edge, mm</system:String>
+    <system:String x:Key="MainWindow.EdgeOffset">Offset of the support edge (plate, cheeks) from the flight edge, mm; below 0 — beyond the edge, top fixing only</system:String>
     <system:String x:Key="MainWindow.CreateAssembly">Create assembly</system:String>
     <system:String x:Key="MainWindow.AssemblyName">Assembly name (number is appended)</system:String>
 
@@ -29,7 +29,7 @@
     <system:String x:Key="MainWindow.BadRodOffsets">Rod offsets must be numbers separated by ";", greater than 0 and less than the post height.</system:String>
     <system:String x:Key="MainWindow.NoRodType">Select the rod type.</system:String>
     <system:String x:Key="MainWindow.NoAnchorType">Select the anchor type.</system:String>
-    <system:String x:Key="MainWindow.BadEdgeOffset">Edge offset must be a number not less than 0.</system:String>
+    <system:String x:Key="MainWindow.BadEdgeOffset">The support edge offset must be a number; below 0 only for top fixing on a plate.</system:String>
     <system:String x:Key="MainWindow.NoAssemblyName">Enter the assembly name.</system:String>
 
     <system:String x:Key="MainWindow.Mount">Post fixing</system:String>

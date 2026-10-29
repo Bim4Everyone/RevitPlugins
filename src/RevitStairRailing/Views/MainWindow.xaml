@@ -151,17 +151,25 @@
                         Content="{me:LocalizationSource MainWindow.SideRight}"
                         IsChecked="{Binding IsRightSide}" />
                 </StackPanel>
-                <StackPanel
-                    Margin="0,6,0,0"
-                    Orientation="Horizontal">
+                <TextBlock
+                    Margin="0,8,0,4"
+                    Text="{me:LocalizationSource MainWindow.EdgeOffset}" />
+                <StackPanel Orientation="Horizontal">
                     <TextBlock
                         Style="{StaticResource FieldLabel}"
-                        Text="{me:LocalizationSource MainWindow.EdgeOffset}" />
+                        Text="{me:LocalizationSource MainWindow.FlightMount}" />
                     <ui:TextBox
                         Tag="Trajectory"
-                        Width="90"
-                        HorizontalAlignment="Left"
-                        Text="{Binding EdgeOffset, UpdateSourceTrigger=PropertyChanged}" />
+                        Width="80"
+                        Text="{Binding FlightEdgeOffset, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock
+                        Style="{StaticResource FieldLabel}"
+                        Margin="16,0,8,0"
+                        Text="{me:LocalizationSource MainWindow.LandingMount}" />
+                    <ui:TextBox
+                        Tag="Trajectory"
+                        Width="80"
+                        Text="{Binding LandingEdgeOffset, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
                 <CheckBox

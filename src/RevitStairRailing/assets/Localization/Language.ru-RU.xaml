@@ -9,7 +9,7 @@
     <system:String x:Key="MainWindow.Trajectory">Положение относительно линий траектории (по ходу подъёма)</system:String>
     <system:String x:Key="MainWindow.SideLeft">Слева</system:String>
     <system:String x:Key="MainWindow.SideRight">Справа</system:String>
-    <system:String x:Key="MainWindow.EdgeOffset">Отступ от края марша, мм</system:String>
+    <system:String x:Key="MainWindow.EdgeOffset">Отступ края опоры (пластины, щёк) от края марша, мм; меньше 0 — опора за краем, только при креплении сверху</system:String>
     <system:String x:Key="MainWindow.CreateAssembly">Собрать в сборку</system:String>
     <system:String x:Key="MainWindow.AssemblyName">Имя сборки (номер добавится)</system:String>
 
@@ -29,7 +29,7 @@
     <system:String x:Key="MainWindow.BadRodOffsets">Расстояния до прутков — числа через «;», больше 0 и меньше высоты стоек.</system:String>
     <system:String x:Key="MainWindow.NoRodType">Выберите типоразмер прутков.</system:String>
     <system:String x:Key="MainWindow.NoAnchorType">Выберите типоразмер анкеров.</system:String>
-    <system:String x:Key="MainWindow.BadEdgeOffset">Отступ от края марша — число не меньше 0.</system:String>
+    <system:String x:Key="MainWindow.BadEdgeOffset">Отступ опоры от края — число; меньше 0 — только при креплении сверху на пластине.</system:String>
     <system:String x:Key="MainWindow.NoAssemblyName">Введите имя сборки.</system:String>
 
     <system:String x:Key="MainWindow.Mount">Крепление стоек</system:String>

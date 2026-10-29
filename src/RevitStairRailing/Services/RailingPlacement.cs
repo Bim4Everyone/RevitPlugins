@@ -11,8 +11,6 @@ namespace RevitStairRailing.Services;
 /// Построение ограждения после закрытия окна: выбор линий траектории, раскладка, создание элементов и сборки.
 /// </summary>
 internal class RailingPlacement {
-    private const double MillimetersToFeet = 1 / 304.8;
-
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
@@ -32,8 +30,8 @@ internal class RailingPlacement {
                 lines = _revitRepository.PickModelLines(GetText("Pick.Prompt"));
             }
 
-            RailingPath path = RailingPath.FromLines(lines)
-                .Offset(parameters.EdgeOffset * MillimetersToFeet, parameters.Side);
+            RailingPath edgePath = RailingPath.FromLines(lines);
+            RailingPath path = edgePath.Offset(RailingLayout.GetAxisOffsets(edgePath, parameters), parameters.Side);
             List<RailingMember> members = RailingLayout.Create(path, parameters);
             RailingResult result = new RailingBuilder(_revitRepository.Document).Build(members, parameters, title);
             _revitRepository.SelectElements(result.Assembly != null

@@ -42,7 +42,8 @@ internal class MainViewModel : BaseViewModel {
     private string _cheekGap;
     private CheekOrientation _cheekOrientation;
     private bool _isLeftSide;
-    private string _edgeOffset;
+    private string _flightEdgeOffset;
+    private string _landingEdgeOffset;
     private bool _createAssembly;
     private string _assemblyNamePrefix;
     private string _activeField;
@@ -305,11 +306,19 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Отступ оси ограждения от линий траектории (края марша) в плане, мм.
+    /// Отступ наружного края опоры от края марша на маршах, мм.
     /// </summary>
-    public string EdgeOffset {
-        get => _edgeOffset;
-        set => RaiseAndSetIfChanged(ref _edgeOffset, value);
+    public string FlightEdgeOffset {
+        get => _flightEdgeOffset;
+        set => RaiseAndSetIfChanged(ref _flightEdgeOffset, value);
+    }
+
+    /// <summary>
+    /// Отступ наружного края опоры от края площадки на площадках, мм.
+    /// </summary>
+    public string LandingEdgeOffset {
+        get => _landingEdgeOffset;
+        set => RaiseAndSetIfChanged(ref _landingEdgeOffset, value);
     }
 
     public bool CreateAssembly {
@@ -360,7 +369,8 @@ internal class MainViewModel : BaseViewModel {
             CheekGap = UsesSideMount ? ParseNumber(CheekGap).Value : 0,
             CheekOrientation = CheekOrientation,
             Side = IsLeftSide ? RailingSide.Left : RailingSide.Right,
-            EdgeOffset = ParseNumber(EdgeOffset).Value,
+            FlightEdgeOffset = ParseNumber(FlightEdgeOffset).Value,
+            LandingEdgeOffset = ParseNumber(LandingEdgeOffset).Value,
             CreateAssembly = CreateAssembly,
             AssemblyNamePrefix = (AssemblyNamePrefix ?? "").Trim()
         };
@@ -433,7 +443,8 @@ internal class MainViewModel : BaseViewModel {
             return "MainWindow.BadCheeks";
         }
 
-        if(!(ParseNumber(EdgeOffset) >= 0)) {
+        // отрицательный отступ (опора за краем) — только у крепления сверху на пластине
+        if(!IsEdgeOffsetValid(FlightEdgeOffset, FlightMount) || !IsEdgeOffsetValid(LandingEdgeOffset, LandingMount)) {
             return "MainWindow.BadEdgeOffset";
         }
 
@@ -468,7 +479,8 @@ internal class MainViewModel : BaseViewModel {
         CheekGap = settings.CheekGap;
         CheekOrientation = settings.CheekOrientation;
         IsLeftSide = settings.Side == RailingSide.Left;
-        EdgeOffset = settings.EdgeOffset;
+        FlightEdgeOffset = settings.FlightEdgeOffset;
+        LandingEdgeOffset = settings.LandingEdgeOffset;
         CreateAssembly = settings.CreateAssembly;
         AssemblyNamePrefix = settings.AssemblyNamePrefix;
     }
@@ -500,7 +512,8 @@ internal class MainViewModel : BaseViewModel {
         settings.CheekGap = CheekGap;
         settings.CheekOrientation = CheekOrientation;
         settings.Side = IsLeftSide ? RailingSide.Left : RailingSide.Right;
-        settings.EdgeOffset = EdgeOffset;
+        settings.FlightEdgeOffset = FlightEdgeOffset;
+        settings.LandingEdgeOffset = LandingEdgeOffset;
         settings.CreateAssembly = CreateAssembly;
         settings.AssemblyNamePrefix = AssemblyNamePrefix;
         _pluginConfig.SaveProjectConfig();
@@ -518,6 +531,11 @@ internal class MainViewModel : BaseViewModel {
         return types.FirstOrDefault(type => type.Name == savedName)
                ?? types.FirstOrDefault(type => type.FamilyName.Contains(familyNamePart)
                                                && type.TypeName.Contains(typeNamePart));
+    }
+
+    private static bool IsEdgeOffsetValid(string text, PostMount mount) {
+        double? offset = ParseNumber(text);
+        return offset != null && (offset >= 0 || mount == PostMount.Top);
     }
 
     private void OnMountChanged() {

@@ -93,7 +93,9 @@ internal class RevitSettings : ProjectSettings {
 
     public RailingSide Side { get; set; } = RailingSide.Left;
 
-    public string EdgeOffset { get; set; } = "50";
+    public string FlightEdgeOffset { get; set; } = "0";
+
+    public string LandingEdgeOffset { get; set; } = "0";
 
     public bool CreateAssembly { get; set; } = true;
 

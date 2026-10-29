@@ -14,9 +14,33 @@ internal static class RailingLayout {
     private const double MillimetersToFeet = 1 / 304.8;
 
     /// <summary>
-    /// Участок с уклоном больше этого — марш, иначе — площадка.
+    /// Смещения оси ограждения от линий траектории (края марша) по участкам, футы:
+    /// заданный отступ до наружного края опоры плюс половина опоры поперёк ограждения.
     /// </summary>
-    private const double FlightMinSlope = 0.05;
+    public static List<double> GetAxisOffsets(RailingPath path, RailingParameters parameters) {
+        var offsets = new List<double>();
+        for(int segmentIndex = 0; segmentIndex < path.SegmentCount; segmentIndex++) {
+            bool isFlight = path.IsFlight(segmentIndex);
+            PostMount mount = isFlight ? parameters.FlightMount : parameters.LandingMount;
+            double edgeOffset = isFlight ? parameters.FlightEdgeOffset : parameters.LandingEdgeOffset;
+            offsets.Add((edgeOffset + GetHalfSupportWidth(mount, parameters)) * MillimetersToFeet);
+        }
+
+        return offsets;
+    }
+
+    /// <summary>
+    /// Половина размера опоры стойки поперёк ограждения, мм.
+    /// </summary>
+    private static double GetHalfSupportWidth(PostMount mount, RailingParameters parameters) {
+        if(mount == PostMount.Top) {
+            return parameters.BasePlate.Width / 2;
+        }
+
+        return parameters.CheekOrientation == CheekOrientation.AlongRailing
+            ? parameters.CheekGap / 2 + parameters.Cheek.Thickness
+            : parameters.Cheek.Width / 2;
+    }
 
     public static List<RailingMember> Create(RailingPath path, RailingParameters parameters) {
         double postHeight = parameters.PostHeight * MillimetersToFeet;
@@ -29,7 +53,7 @@ internal static class RailingLayout {
             var post = new PostPlacement(
                 path.GetPlanDirection(segmentIndex),
                 parameters.Side,
-                Math.Abs(end.Z - start.Z) / planLength > FlightMinSlope ? parameters.FlightMount : parameters.LandingMount);
+                path.IsFlight(segmentIndex) ? parameters.FlightMount : parameters.LandingMount);
 
             members.Add(RailingMember.Linear(RailingMemberRole.Handrail, Raise(start, end, postHeight)));
             foreach(double rodOffset in parameters.RodOffsets) {

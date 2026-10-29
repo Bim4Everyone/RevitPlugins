@@ -12,12 +12,15 @@ internal class RailingPath {
     private const double JoinTolerance = 1 / 304.8;
 
     /// <summary>
-    /// Наибольшее удлинение смещения во внутреннем углу (острые углы не дают «выстрел» в сторону).
+    /// Участок с уклоном больше этого — марш, иначе — площадка.
     /// </summary>
-    private const double MaxMiterRatio = 4;
+    private const double FlightMinSlope = 0.05;
 
-    private RailingPath(List<XYZ> points) {
+    private readonly List<bool> _isFlightSegment;
+
+    private RailingPath(List<XYZ> points, List<bool> isFlightSegment) {
         Points = points;
+        _isFlightSegment = isFlightSegment;
     }
 
     /// <summary>
@@ -30,7 +33,7 @@ internal class RailingPath {
     /// <summary>
     /// Собирает траекторию из отрезков в одну цепочку и направляет её снизу вверх.
     /// </summary>
-    /// <exception cref="RailingException">Линии не отрезки или не образуют одну незамкнутую цепочку.</exception>
+    /// <exception cref="RailingException">Линии не образуют одну незамкнутую цепочку или есть вертикальная.</exception>
     public static RailingPath FromLines(IReadOnlyCollection<Line> lines) {
         if(lines.Count == 0) {
             throw new RailingException("Path.NoLines");
@@ -64,48 +67,64 @@ internal class RailingPath {
             points.Reverse();
         }
 
+        var isFlightSegment = new List<bool>();
         for(int index = 1; index < points.Count; index++) {
-            if(GetPlanVector(points[index - 1], points[index]).GetLength() < JoinTolerance) {
+            double planLength = GetPlanVector(points[index - 1], points[index]).GetLength();
+            if(planLength < JoinTolerance) {
                 throw new RailingException("Path.Vertical");
             }
+
+            isFlightSegment.Add(Math.Abs(points[index].Z - points[index - 1].Z) / planLength > FlightMinSlope);
         }
 
-        return new RailingPath(points);
+        return new RailingPath(points, isFlightSegment);
     }
 
     /// <summary>
-    /// Траектория, смещённая в плане на <paramref name="distance"/> влево или вправо по ходу подъёма.
-    /// Во внутренних вершинах смещение идёт по биссектрисе, чтобы участки сходились в одной точке.
+    /// Участок — марш (наклонный); иначе — площадка.
     /// </summary>
-    public RailingPath Offset(double distance, RailingSide side) {
-        if(distance == 0) {
-            return new RailingPath(Points.ToList());
-        }
+    public bool IsFlight(int segmentIndex) {
+        return _isFlightSegment[segmentIndex];
+    }
 
-        double signedDistance = side == RailingSide.Left ? distance : -distance;
+    /// <summary>
+    /// Траектория, смещённая в плане влево или вправо по ходу подъёма; у каждого участка своё смещение.
+    /// В вершинах смещённые участки сходятся в точке пересечения; у параллельных участков с разным смещением
+    /// добавляется горизонтальная перемычка.
+    /// </summary>
+    public RailingPath Offset(IReadOnlyList<double> segmentDistances, RailingSide side) {
+        double sideSign = side == RailingSide.Left ? 1 : -1;
         var offsetPoints = new List<XYZ>();
-        for(int index = 0; index < Points.Count; index++) {
-            XYZ previousNormal = index > 0 ? GetLeftNormal(Points[index - 1], Points[index]) : null;
-            XYZ nextNormal = index < Points.Count - 1 ? GetLeftNormal(Points[index], Points[index + 1]) : null;
-            XYZ shift;
-            if(previousNormal == null || nextNormal == null) {
-                shift = (previousNormal ?? nextNormal) * signedDistance;
-            } else {
-                XYZ bisector = previousNormal + nextNormal;
-                if(bisector.GetLength() < 1e-9) {
-                    // разворот на 180°: участки параллельны, смещаем по нормали предыдущего
-                    shift = previousNormal * signedDistance;
-                } else {
-                    bisector = bisector.Normalize();
-                    double cosine = Math.Max(bisector.DotProduct(previousNormal), 1 / MaxMiterRatio);
-                    shift = bisector * (signedDistance / cosine);
-                }
+        var isFlightSegment = new List<bool>();
+        offsetPoints.Add(Points[0] + GetLeftNormal(0) * (segmentDistances[0] * sideSign));
+        for(int segmentIndex = 0; segmentIndex < SegmentCount; segmentIndex++) {
+            XYZ vertex = Points[segmentIndex + 1];
+            XYZ shift = GetLeftNormal(segmentIndex) * (segmentDistances[segmentIndex] * sideSign);
+            isFlightSegment.Add(_isFlightSegment[segmentIndex]);
+            if(segmentIndex == SegmentCount - 1) {
+                offsetPoints.Add(vertex + shift);
+                break;
             }
 
-            offsetPoints.Add(Points[index] + shift);
+            XYZ nextShift = GetLeftNormal(segmentIndex + 1) * (segmentDistances[segmentIndex + 1] * sideSign);
+            XYZ corner = IntersectInPlan(
+                vertex + shift,
+                GetPlanDirection(segmentIndex),
+                vertex + nextShift,
+                GetPlanDirection(segmentIndex + 1));
+            if(corner != null) {
+                offsetPoints.Add(new XYZ(corner.X, corner.Y, vertex.Z));
+            } else if((shift - nextShift).GetLength() < JoinTolerance) {
+                offsetPoints.Add(vertex + shift);
+            } else {
+                // участки параллельны, смещения разные: перемычка между ними
+                offsetPoints.Add(vertex + shift);
+                offsetPoints.Add(vertex + nextShift);
+                isFlightSegment.Add(false);
+            }
         }
 
-        return new RailingPath(offsetPoints);
+        return new RailingPath(offsetPoints, isFlightSegment);
     }
 
     /// <summary>
@@ -119,6 +138,25 @@ internal class RailingPath {
         return GetPlanVector(Points[segmentIndex], Points[segmentIndex + 1]).GetLength();
     }
 
+    private XYZ GetLeftNormal(int segmentIndex) {
+        XYZ direction = GetPlanDirection(segmentIndex);
+        return new XYZ(-direction.Y, direction.X, 0);
+    }
+
+    /// <summary>
+    /// Точка пересечения двух прямых в плане; null — прямые параллельны.
+    /// </summary>
+    private static XYZ IntersectInPlan(XYZ firstPoint, XYZ firstDirection, XYZ secondPoint, XYZ secondDirection) {
+        double denominator = firstDirection.X * secondDirection.Y - firstDirection.Y * secondDirection.X;
+        if(Math.Abs(denominator) < 1e-6) {
+            return null;
+        }
+
+        XYZ between = secondPoint - firstPoint;
+        double firstParameter = (between.X * secondDirection.Y - between.Y * secondDirection.X) / denominator;
+        return firstPoint + firstDirection * firstParameter;
+    }
+
     private static bool HasNeighbour(XYZ point, Line line, IEnumerable<Line> lines) {
         return lines.Any(other => !ReferenceEquals(other, line)
                                   && (other.GetEndPoint(0).IsAlmostEqualTo(point, JoinTolerance)
@@ -127,10 +165,5 @@ internal class RailingPath {
 
     private static XYZ GetPlanVector(XYZ start, XYZ end) {
         return new XYZ(end.X - start.X, end.Y - start.Y, 0);
-    }
-
-    private static XYZ GetLeftNormal(XYZ start, XYZ end) {
-        XYZ direction = GetPlanVector(start, end).Normalize();
-        return new XYZ(-direction.Y, direction.X, 0);
     }
 }
