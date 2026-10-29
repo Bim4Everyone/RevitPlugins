@@ -6,21 +6,37 @@ using RevitStairRailing.Models;
 namespace RevitStairRailing.ViewModels;
 
 /// <summary>
-/// Схема одного пролёта ограждения на марше (развёртка): стойки, поручень, прутки, крепление стоек и размеры.
+/// Схема ограждения (развёртка): наклонный участок марша и горизонтальный участок площадки —
+/// стойки, поручень, прутки, крепление стоек и размеры. Элементы активного поля окна выделяются.
 /// </summary>
 internal class RailingPreviewViewModel {
-    public const double CanvasWidth = 380;
-    public const double CanvasHeight = 380;
+    public const double CanvasWidth = 440;
+    public const double CanvasHeight = 400;
 
     private const double LeftMargin = 70;
-    private const double RightMargin = 70;
-    private const double TopMargin = 30;
-    private const double BottomMargin = 70;
+    private const double RightMargin = 60;
+    private const double TopMargin = 40;
+    private const double BottomMargin = 60;
+
+    /// <summary>
+    /// Уклон марша на схеме (подъём к длине в плане).
+    /// </summary>
+    private const double FlightSlope = 0.5;
+
+    /// <summary>
+    /// Пролётов на марше и на площадке на схеме.
+    /// </summary>
+    private const int FlightSpanCount = 2;
+    private const int LandingSpanCount = 1;
 
     /// <summary>
     /// Условная глубина анкера на схеме, мм.
     /// </summary>
     private const double AnchorDepth = 90;
+
+    private RailingPreviewSizes _sizes;
+    private double _scale;
+    private double _surfaceOriginY;
 
     public ObservableCollection<PreviewLine> Lines { get; } = new();
 
@@ -30,89 +46,171 @@ internal class RailingPreviewViewModel {
     /// Перерисовывает схему по размерам (мм); неверные или пустые значения заменяются типовыми.
     /// </summary>
     public void Update(RailingPreviewSizes sizes) {
+        _sizes = sizes;
         Lines.Clear();
         Labels.Clear();
         double postHeight = Positive(sizes.PostHeight, 1000);
         double postStep = Positive(sizes.PostStep, 600);
-        double scale = Math.Min(
-            (CanvasWidth - LeftMargin - RightMargin) / postStep,
-            (CanvasHeight - TopMargin - BottomMargin) / postHeight);
-        double leftPostX = LeftMargin;
-        double rightPostX = LeftMargin + postStep * scale;
-        double handrailY = TopMargin;
-        double surfaceY = TopMargin + postHeight * scale;
+        double flightLength = postStep * FlightSpanCount;
+        double flightRise = flightLength * FlightSlope;
+        double totalLength = postStep * (FlightSpanCount + LandingSpanCount);
+        _scale = Math.Min(
+            (CanvasWidth - LeftMargin - RightMargin) / totalLength,
+            (CanvasHeight - TopMargin - BottomMargin) / (flightRise + postHeight + AnchorDepth));
+        _surfaceOriginY = TopMargin + (flightRise + postHeight) * _scale;
 
-        // траектория (поверхность марша по оси ограждения) и поручень с выпуском за стойки
-        Lines.Add(new PreviewLine(leftPostX - 30, surfaceY, rightPostX + 30, surfaceY, 1, isDashed: true));
-        Lines.Add(new PreviewLine(leftPostX - 20, handrailY, rightPostX + 20, handrailY, 5));
+        // траектория: поверхность марша и площадки по оси ограждения
+        var trajectory = new[] { (X: 0.0, Z: 0.0), (X: flightLength, Z: flightRise), (X: totalLength, Z: flightRise) };
+        for(int index = 1; index < trajectory.Length; index++) {
+            AddLine(trajectory[index - 1].X, trajectory[index - 1].Z, trajectory[index].X, trajectory[index].Z, 1,
+                new[] { PreviewFields.Trajectory }, isDashed: true);
+        }
+
+        // поручень и прутки параллельно траектории
+        AddPolyline(trajectory, postHeight, 5, PreviewFields.Handrail);
         foreach(double rodOffset in sizes.RodOffsets.Where(offset => offset > 0 && offset < postHeight)) {
-            double rodY = handrailY + rodOffset * scale;
-            Lines.Add(new PreviewLine(leftPostX, rodY, rightPostX, rodY, 2));
-            Labels.Add(new PreviewLabel(rightPostX + 24, rodY - 9, Format(rodOffset)));
+            AddPolyline(trajectory, postHeight - rodOffset, 2, PreviewFields.Rods);
+            AddLabel(totalLength, flightRise + postHeight - rodOffset, 8, -9, Format(rodOffset), PreviewFields.Rods);
         }
 
-        double postBottomY = surfaceY;
-        foreach(double postX in new[] { leftPostX, rightPostX }) {
-            postBottomY = sizes.Mount == PostMount.Top
-                ? DrawBasePlate(sizes, postX, surfaceY, scale)
-                : DrawCheeks(sizes, postX, surfaceY, scale);
-            Lines.Add(new PreviewLine(postX, handrailY, postX, postBottomY, 4));
+        // стойки: на марше (включая стойку в переломе) — крепление марша, дальше — крепление площадки
+        bool isBasePlateLabeled = false;
+        bool isCheekLabeled = false;
+        for(int postNumber = 0; postNumber <= FlightSpanCount + LandingSpanCount; postNumber++) {
+            double postX = postNumber * postStep;
+            double surfaceZ = Math.Min(postX, flightLength) * FlightSlope;
+            bool isFlightPost = postNumber <= FlightSpanCount;
+            PostMount mount = isFlightPost ? sizes.FlightMount : sizes.LandingMount;
+            string mountField = isFlightPost ? PreviewFields.FlightMount : PreviewFields.LandingMount;
+            double postBottomZ = mount == PostMount.Top
+                ? DrawBasePlate(postX, surfaceZ, mountField, ref isBasePlateLabeled)
+                : DrawCheeks(postX, surfaceZ, mountField, ref isCheekLabeled);
+            AddLine(postX, postBottomZ, postX, surfaceZ + postHeight, 4, new[] { PreviewFields.Post });
         }
 
-        Labels.Add(new PreviewLabel(4, (handrailY + surfaceY) / 2 - 9, "H = " + Format(postHeight)));
-        Labels.Add(new PreviewLabel((leftPostX + rightPostX) / 2 - 24, surfaceY + 8, "≤ " + Format(postStep)));
-        string mountSize = sizes.Mount == PostMount.Top
-            ? Format(Positive(sizes.PlateLength, 0)) + "×" + Format(Positive(sizes.PlateWidth, 0))
-              + "×" + Format(Positive(sizes.PlateThickness, 0))
-            : Format(Positive(sizes.CheekWidth, 0)) + "×" + Format(Positive(sizes.CheekHeight, 0))
-              + "×" + Format(Positive(sizes.CheekThickness, 0));
-        Labels.Add(new PreviewLabel(leftPostX - 40, surfaceY + 30 + AnchorDepth * scale, mountSize));
+        // размеры: высота — у первой стойки марша, шаг — на площадке
+        AddDimension(-45 / _scale, 0, -45 / _scale, postHeight, "H = " + Format(postHeight), PreviewFields.PostHeight,
+            isVertical: true);
+        double landingStart = flightLength;
+        AddDimension(landingStart, flightRise + postHeight + 30 / _scale, landingStart + postStep,
+            flightRise + postHeight + 30 / _scale, "≤ " + Format(postStep), PreviewFields.PostStep, isVertical: false);
     }
 
     /// <summary>
-    /// Опорная пластина на поверхности и анкеры под ней. Возвращает отметку низа стойки на холсте.
+    /// Опорная пластина на поверхности и анкеры под ней. Возвращает отметку низа стойки.
     /// </summary>
-    private double DrawBasePlate(RailingPreviewSizes sizes, double postX, double surfaceY, double scale) {
-        double halfLength = Math.Max(Positive(sizes.PlateLength, 100) * scale / 2, 4);
-        double plateTopY = surfaceY - Math.Max(Positive(sizes.PlateThickness, 6) * scale, 2);
-        AddRectangle(postX - halfLength, plateTopY, postX + halfLength, surfaceY);
-        if(sizes.HasAnchors) {
-            double anchorOffset = Math.Max(halfLength - Positive(sizes.AnchorEdgeDistance, 20) * scale, 0);
-            var anchorXs = sizes.AnchorLayout == AnchorLayout.Triangle
-                ? new[] { postX - anchorOffset, postX, postX + anchorOffset }
-                : new[] { postX - anchorOffset, postX + anchorOffset };
-            foreach(double anchorX in anchorXs) {
-                Lines.Add(new PreviewLine(anchorX, plateTopY - 3, anchorX, surfaceY + AnchorDepth * scale, 2));
+    private double DrawBasePlate(double postX, double surfaceZ, string mountField, ref bool isLabeled) {
+        double plateLength = Positive(_sizes.PlateLength, 100);
+        double plateThickness = Math.Max(Positive(_sizes.PlateThickness, 6), 2 / _scale);
+        string[] plateFields = { PreviewFields.BasePlate, PreviewFields.Plates, mountField };
+        AddRectangle(postX - plateLength / 2, surfaceZ, postX + plateLength / 2, surfaceZ + plateThickness, plateFields);
+        if(_sizes.HasAnchors) {
+            double anchorOffset = Math.Max(plateLength / 2 - Positive(_sizes.AnchorEdgeDistance, 20), 0);
+            double[] anchorOffsets = _sizes.AnchorLayout == AnchorLayout.Triangle
+                ? new[] { -anchorOffset, 0, anchorOffset }
+                : new[] { -anchorOffset, anchorOffset };
+            foreach(double offset in anchorOffsets) {
+                AddLine(postX + offset, surfaceZ + plateThickness + 3 / _scale, postX + offset, surfaceZ - AnchorDepth, 2,
+                    new[] { PreviewFields.Anchors, mountField });
             }
         }
 
-        return plateTopY;
+        if(!isLabeled) {
+            isLabeled = true;
+            AddLabel(postX, surfaceZ - AnchorDepth, -30, 4,
+                Format(plateLength) + "×" + Format(Positive(_sizes.PlateWidth, 0)) + "×"
+                + Format(Positive(_sizes.PlateThickness, 0)),
+                PreviewFields.BasePlate);
+        }
+
+        return surfaceZ + plateThickness;
     }
 
     /// <summary>
-    /// Щёки по бокам низа стойки. Возвращает отметку низа стойки на холсте.
+    /// Щёки по бокам низа стойки. Возвращает отметку низа стойки.
     /// </summary>
-    private double DrawCheeks(RailingPreviewSizes sizes, double postX, double surfaceY, double scale) {
-        double cheekTopY = surfaceY - Positive(sizes.CheekHeight, 120) * scale;
-        if(sizes.CheekOrientation == CheekOrientation.AlongRailing) {
+    private double DrawCheeks(double postX, double surfaceZ, string mountField, ref bool isLabeled) {
+        double cheekHeight = Positive(_sizes.CheekHeight, 120);
+        string[] cheekFields = { PreviewFields.Cheeks, PreviewFields.Plates, mountField };
+        if(_sizes.CheekOrientation == CheekOrientation.AlongRailing) {
             // щека в плоскости ограждения видна целиком, стойка за ней
-            double halfWidth = Positive(sizes.CheekWidth, 60) * scale / 2;
-            AddRectangle(postX - halfWidth, cheekTopY, postX + halfWidth, surfaceY);
+            double halfWidth = Positive(_sizes.CheekWidth, 60) / 2;
+            AddRectangle(postX - halfWidth, surfaceZ, postX + halfWidth, surfaceZ + cheekHeight, cheekFields);
         } else {
-            double gapHalf = Positive(sizes.CheekGap, 30) * scale / 2;
-            double thickness = Math.Max(Positive(sizes.CheekThickness, 6) * scale, 2);
-            AddRectangle(postX - gapHalf - thickness, cheekTopY, postX - gapHalf, surfaceY);
-            AddRectangle(postX + gapHalf, cheekTopY, postX + gapHalf + thickness, surfaceY);
+            double gapHalf = Positive(_sizes.CheekGap, 30) / 2;
+            double thickness = Math.Max(Positive(_sizes.CheekThickness, 6), 2 / _scale);
+            AddRectangle(postX - gapHalf - thickness, surfaceZ, postX - gapHalf, surfaceZ + cheekHeight, cheekFields);
+            AddRectangle(postX + gapHalf, surfaceZ, postX + gapHalf + thickness, surfaceZ + cheekHeight, cheekFields);
         }
 
-        return surfaceY;
+        if(!isLabeled) {
+            isLabeled = true;
+            AddLabel(postX, surfaceZ, -30, 8,
+                Format(Positive(_sizes.CheekWidth, 0)) + "×" + Format(cheekHeight) + "×"
+                + Format(Positive(_sizes.CheekThickness, 0)),
+                PreviewFields.Cheeks);
+        }
+
+        return surfaceZ;
     }
 
-    private void AddRectangle(double left, double top, double right, double bottom) {
-        Lines.Add(new PreviewLine(left, top, right, top, 1.5));
-        Lines.Add(new PreviewLine(right, top, right, bottom, 1.5));
-        Lines.Add(new PreviewLine(right, bottom, left, bottom, 1.5));
-        Lines.Add(new PreviewLine(left, bottom, left, top, 1.5));
+    /// <summary>
+    /// Ломаная, параллельная траектории, на высоте <paramref name="height"/> над ней.
+    /// </summary>
+    private void AddPolyline((double X, double Z)[] trajectory, double height, double thickness, string field) {
+        for(int index = 1; index < trajectory.Length; index++) {
+            AddLine(trajectory[index - 1].X, trajectory[index - 1].Z + height, trajectory[index].X,
+                trajectory[index].Z + height, thickness, new[] { field });
+        }
+    }
+
+    /// <summary>
+    /// Размер: размерная линия с засечками и текст.
+    /// </summary>
+    private void AddDimension(double x1, double z1, double x2, double z2, string text, string field, bool isVertical) {
+        string[] fields = { field };
+        AddLine(x1, z1, x2, z2, 1, fields);
+        double tick = 5 / _scale;
+        foreach((double X, double Z) end in new[] { (x1, z1), (x2, z2) }) {
+            AddLine(end.X - tick, end.Z - tick, end.X + tick, end.Z + tick, 1, fields);
+        }
+
+        if(isVertical) {
+            AddLabel(x1, (z1 + z2) / 2, -60, -9, text, field);
+        } else {
+            AddLabel((x1 + x2) / 2, z1, -22, -22, text, field);
+        }
+    }
+
+    private void AddRectangle(double left, double bottom, double right, double top, string[] fields) {
+        AddLine(left, top, right, top, 1.5, fields);
+        AddLine(right, top, right, bottom, 1.5, fields);
+        AddLine(right, bottom, left, bottom, 1.5, fields);
+        AddLine(left, bottom, left, top, 1.5, fields);
+    }
+
+    /// <summary>
+    /// Линия по координатам развёртки (мм: вдоль ограждения и по высоте).
+    /// </summary>
+    private void AddLine(double x1, double z1, double x2, double z2, double thickness, string[] fields,
+        bool isDashed = false) {
+        Lines.Add(new PreviewLine(ToCanvasX(x1), ToCanvasY(z1), ToCanvasX(x2), ToCanvasY(z2), thickness, isDashed,
+            fields.Contains(_sizes.ActiveField)));
+    }
+
+    /// <summary>
+    /// Подпись у точки развёртки со смещением в пикселях.
+    /// </summary>
+    private void AddLabel(double x, double z, double shiftX, double shiftY, string text, string field) {
+        Labels.Add(new PreviewLabel(ToCanvasX(x) + shiftX, ToCanvasY(z) + shiftY, text, field == _sizes.ActiveField));
+    }
+
+    private double ToCanvasX(double x) {
+        return LeftMargin + x * _scale;
+    }
+
+    private double ToCanvasY(double z) {
+        return _surfaceOriginY - z * _scale;
     }
 
     private static double Positive(double? value, double defaultValue) {
@@ -125,7 +223,25 @@ internal class RailingPreviewViewModel {
 }
 
 /// <summary>
-/// Размеры для схемы пролёта, мм; null — значение не введено или не число.
+/// Части схемы, которые выделяются при вводе в поле окна (значения — теги полей в окне).
+/// </summary>
+internal static class PreviewFields {
+    public const string Post = "Post";
+    public const string PostHeight = "PostHeight";
+    public const string PostStep = "PostStep";
+    public const string Handrail = "Handrail";
+    public const string Rods = "Rods";
+    public const string FlightMount = "FlightMount";
+    public const string LandingMount = "LandingMount";
+    public const string Plates = "Plates";
+    public const string BasePlate = "BasePlate";
+    public const string Anchors = "Anchors";
+    public const string Cheeks = "Cheeks";
+    public const string Trajectory = "Trajectory";
+}
+
+/// <summary>
+/// Размеры для схемы, мм; null — значение не введено или не число.
 /// </summary>
 internal class RailingPreviewSizes {
     public double? PostHeight { get; set; }
@@ -134,10 +250,9 @@ internal class RailingPreviewSizes {
 
     public IReadOnlyList<double> RodOffsets { get; set; } = new List<double>();
 
-    /// <summary>
-    /// Крепление стоек на маршах.
-    /// </summary>
-    public PostMount Mount { get; set; }
+    public PostMount FlightMount { get; set; }
+
+    public PostMount LandingMount { get; set; }
 
     public double? PlateThickness { get; set; }
 
@@ -160,19 +275,33 @@ internal class RailingPreviewSizes {
     public double? CheekGap { get; set; }
 
     public CheekOrientation CheekOrientation { get; set; }
+
+    /// <summary>
+    /// Часть схемы поля, в котором сейчас ввод (<see cref="PreviewFields"/>); null — ничего не выделять.
+    /// </summary>
+    public string ActiveField { get; set; }
 }
 
 /// <summary>
 /// Линия схемы в координатах холста.
 /// </summary>
 internal class PreviewLine {
-    public PreviewLine(double x1, double y1, double x2, double y2, double thickness, bool isDashed = false) {
+    public PreviewLine(
+        double x1,
+        double y1,
+        double x2,
+        double y2,
+        double thickness,
+        bool isDashed,
+        bool isHighlighted) {
+
         X1 = x1;
         Y1 = y1;
         X2 = x2;
         Y2 = y2;
         Thickness = thickness;
         IsDashed = isDashed;
+        IsHighlighted = isHighlighted;
     }
 
     public double X1 { get; }
@@ -186,16 +315,19 @@ internal class PreviewLine {
     public double Thickness { get; }
 
     public bool IsDashed { get; }
+
+    public bool IsHighlighted { get; }
 }
 
 /// <summary>
 /// Подпись схемы: левый верхний угол текста в координатах холста.
 /// </summary>
 internal class PreviewLabel {
-    public PreviewLabel(double x, double y, string text) {
+    public PreviewLabel(double x, double y, string text, bool isHighlighted) {
         X = x;
         Y = y;
         Text = text;
+        IsHighlighted = isHighlighted;
     }
 
     public double X { get; }
@@ -203,4 +335,6 @@ internal class PreviewLabel {
     public double Y { get; }
 
     public string Text { get; }
+
+    public bool IsHighlighted { get; }
 }

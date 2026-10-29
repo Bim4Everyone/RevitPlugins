@@ -4,8 +4,8 @@
 
     <system:String x:Key="MainWindow.Title">Ограждение лестниц</system:String>
 
-    <system:String x:Key="MainWindow.Preview">Пролёт ограждения</system:String>
-    <system:String x:Key="MainWindow.PreviewNote">Размеры в мм. Пунктир — траектория (линии модели по краю марша со смещением); стойки ставятся равномерно с шагом в плане не больше заданного.</system:String>
+    <system:String x:Key="MainWindow.Preview">Схема: марш и площадка</system:String>
+    <system:String x:Key="MainWindow.PreviewNote">Размеры в мм. Слева марш, справа площадка, у каждого своё крепление стоек. Пунктир — траектория (поверхность по оси ограждения). Красным выделяется то, что задаёт поле, в котором сейчас ввод.</system:String>
     <system:String x:Key="MainWindow.Trajectory">Положение относительно линий траектории (по ходу подъёма)</system:String>
     <system:String x:Key="MainWindow.SideLeft">Слева</system:String>
     <system:String x:Key="MainWindow.SideRight">Справа</system:String>

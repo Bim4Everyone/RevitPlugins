@@ -1,4 +1,8 @@
 using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
+
+using RevitStairRailing.ViewModels;
 
 using dosymep.SimpleServices;
 
@@ -45,5 +49,22 @@ public partial class MainWindow {
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogResult = false;
+    }
+
+    /// <summary>
+    /// Поле, в котором начат ввод, выделяет свою часть схемы: часть схемы — в Tag поля
+    /// (у выпадающих списков фокус получает вложенный элемент, поэтому Tag ищется вверх по дереву).
+    /// </summary>
+    private void Content_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
+        string field = null;
+        for(var element = e.NewFocus as DependencyObject; element != null && element != sender;
+            element = VisualTreeHelper.GetParent(element) ?? LogicalTreeHelper.GetParent(element)) {
+            if(element is FrameworkElement { Tag: string tag }) {
+                field = tag;
+                break;
+            }
+        }
+
+        ((MainViewModel) DataContext).ActiveField = field;
     }
 }

@@ -4,8 +4,8 @@
 
     <system:String x:Key="MainWindow.Title">Stair railing</system:String>
 
-    <system:String x:Key="MainWindow.Preview">Railing span</system:String>
-    <system:String x:Key="MainWindow.PreviewNote">Dimensions in mm. The dashed line is the path (model lines along the flight edge, offset); posts are spaced evenly with a plan step not greater than the given one.</system:String>
+    <system:String x:Key="MainWindow.Preview">Scheme: flight and landing</system:String>
+    <system:String x:Key="MainWindow.PreviewNote">Dimensions in mm. The flight is on the left, the landing on the right, each with its own post fixing. The dashed line is the path (surface along the railing axis). The part set by the field being edited is shown in red.</system:String>
     <system:String x:Key="MainWindow.Trajectory">Position relative to the path lines (going up)</system:String>
     <system:String x:Key="MainWindow.SideLeft">Left</system:String>
     <system:String x:Key="MainWindow.SideRight">Right</system:String>

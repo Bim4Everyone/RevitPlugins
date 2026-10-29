@@ -51,7 +51,8 @@
 
         <Grid
             Grid.Row="1"
-            Margin="16,8">
+            Margin="16,8"
+            PreviewGotKeyboardFocus="Content_PreviewGotKeyboardFocus">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="24" />
@@ -93,6 +94,9 @@
                                             <Setter TargetName="PreviewLine" Property="Stroke"
                                                     Value="{DynamicResource AccentTextFillColorPrimaryBrush}" />
                                         </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                                            <Setter TargetName="PreviewLine" Property="Stroke" Value="Red" />
+                                        </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -112,8 +116,15 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock
+                                        x:Name="PreviewLabel"
                                         FontSize="12"
                                         Text="{Binding Text}" />
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                                            <Setter TargetName="PreviewLabel" Property="Foreground" Value="Red" />
+                                            <Setter TargetName="PreviewLabel" Property="FontWeight" Value="Bold" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -131,10 +142,12 @@
                     Text="{me:LocalizationSource MainWindow.Trajectory}" />
                 <StackPanel Orientation="Horizontal">
                     <RadioButton
+                        Tag="Trajectory"
                         Margin="0,0,16,0"
                         Content="{me:LocalizationSource MainWindow.SideLeft}"
                         IsChecked="{Binding IsLeftSide}" />
                     <RadioButton
+                        Tag="Trajectory"
                         Content="{me:LocalizationSource MainWindow.SideRight}"
                         IsChecked="{Binding IsRightSide}" />
                 </StackPanel>
@@ -145,6 +158,7 @@
                         Style="{StaticResource FieldLabel}"
                         Text="{me:LocalizationSource MainWindow.EdgeOffset}" />
                     <ui:TextBox
+                        Tag="Trajectory"
                         Width="90"
                         HorizontalAlignment="Left"
                         Text="{Binding EdgeOffset, UpdateSourceTrigger=PropertyChanged}" />
@@ -176,6 +190,7 @@
                         Margin="0,0,0,6"
                         Text="{me:LocalizationSource MainWindow.Posts}" />
                     <ComboBox
+                        Tag="Post"
                         Margin="0,0,0,6"
                         DisplayMemberPath="Name"
                         IsTextSearchEnabled="True"
@@ -200,6 +215,7 @@
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.PostHeight}" />
                         <ui:TextBox
+                            Tag="PostHeight"
                             Grid.Row="0" Grid.Column="1"
                             Width="90"
                         HorizontalAlignment="Left"
@@ -209,6 +225,7 @@
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.MaxPostStep}" />
                         <ui:TextBox
+                            Tag="PostStep"
                             Grid.Row="0" Grid.Column="4"
                             Width="90"
                         HorizontalAlignment="Left"
@@ -218,6 +235,7 @@
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.PostRotation}" />
                         <ui:TextBox
+                            Tag="Post"
                             Grid.Row="2" Grid.Column="1"
                             Width="90"
                         HorizontalAlignment="Left"
@@ -228,6 +246,7 @@
                         Style="{StaticResource SectionHeader}"
                         Text="{me:LocalizationSource MainWindow.Handrail}" />
                     <ComboBox
+                        Tag="Handrail"
                         Margin="0,0,0,6"
                         DisplayMemberPath="Name"
                         IsTextSearchEnabled="True"
@@ -239,6 +258,7 @@
                         Style="{StaticResource SectionHeader}"
                         Text="{me:LocalizationSource MainWindow.Rods}" />
                     <ComboBox
+                        Tag="Rods"
                         Margin="0,0,0,6"
                         DisplayMemberPath="Name"
                         IsTextSearchEnabled="True"
@@ -250,6 +270,7 @@
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.RodOffsets}" />
                         <ui:TextBox
+                            Tag="Rods"
                             Width="220"
                             Text="{Binding RodOffsets, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
@@ -274,6 +295,7 @@
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.FlightMount}" />
                         <ComboBox
+                            Tag="FlightMount"
                             Grid.Row="0" Grid.Column="1"
                             ItemsSource="{Binding MountOptions}"
                             DisplayMemberPath="Name"
@@ -284,6 +306,7 @@
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.LandingMount}" />
                         <ComboBox
+                            Tag="LandingMount"
                             Grid.Row="2" Grid.Column="1"
                             ItemsSource="{Binding MountOptions}"
                             DisplayMemberPath="Name"
@@ -294,6 +317,7 @@
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.PlateFamily}" />
                         <ComboBox
+                            Tag="Plates"
                             Grid.Row="4" Grid.Column="1"
                             ItemsSource="{Binding PlateFamilies}"
                             DisplayMemberPath="Name"
@@ -309,6 +333,7 @@
                                 Style="{StaticResource FieldLabel}"
                                 Text="{me:LocalizationSource MainWindow.PlateLength}" />
                             <ui:TextBox
+                                Tag="BasePlate"
                                 Width="70"
                                 Text="{Binding BasePlateLength, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock
@@ -316,6 +341,7 @@
                                 Margin="12,0,8,0"
                                 Text="{me:LocalizationSource MainWindow.PlateWidth}" />
                             <ui:TextBox
+                                Tag="BasePlate"
                                 Width="70"
                                 Text="{Binding BasePlateWidth, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock
@@ -323,16 +349,19 @@
                                 Margin="12,0,8,0"
                                 Text="{me:LocalizationSource MainWindow.PlateThickness}" />
                             <ui:TextBox
+                                Tag="BasePlate"
                                 Width="60"
                                 Text="{Binding BasePlateThickness, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
 
                         <CheckBox
+                            Tag="Anchors"
                             Margin="0,10,0,6"
                             Content="{me:LocalizationSource MainWindow.Anchors}"
                             IsChecked="{Binding HasAnchors}" />
                         <StackPanel IsEnabled="{Binding HasAnchors}">
                             <ComboBox
+                                Tag="Anchors"
                                 Margin="0,0,0,6"
                                 DisplayMemberPath="Name"
                                 IsTextSearchEnabled="True"
@@ -344,6 +373,7 @@
                                     Style="{StaticResource FieldLabel}"
                                     Text="{me:LocalizationSource MainWindow.AnchorLayout}" />
                                 <ComboBox
+                                    Tag="Anchors"
                                     Width="200"
                                     ItemsSource="{Binding AnchorLayoutOptions}"
                                     DisplayMemberPath="Name"
@@ -354,6 +384,7 @@
                                     Margin="12,0,8,0"
                                     Text="{me:LocalizationSource MainWindow.AnchorEdge}" />
                                 <ui:TextBox
+                                    Tag="Anchors"
                                     Width="60"
                                     Text="{Binding AnchorEdgeDistance, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
@@ -369,6 +400,7 @@
                                 Style="{StaticResource FieldLabel}"
                                 Text="{me:LocalizationSource MainWindow.CheekHeight}" />
                             <ui:TextBox
+                                Tag="Cheeks"
                                 Width="70"
                                 Text="{Binding CheekHeight, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock
@@ -376,6 +408,7 @@
                                 Margin="12,0,8,0"
                                 Text="{me:LocalizationSource MainWindow.PlateWidth}" />
                             <ui:TextBox
+                                Tag="Cheeks"
                                 Width="70"
                                 Text="{Binding CheekWidth, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock
@@ -383,6 +416,7 @@
                                 Margin="12,0,8,0"
                                 Text="{me:LocalizationSource MainWindow.PlateThickness}" />
                             <ui:TextBox
+                                Tag="Cheeks"
                                 Width="60"
                                 Text="{Binding CheekThickness, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
@@ -393,6 +427,7 @@
                                 Style="{StaticResource FieldLabel}"
                                 Text="{me:LocalizationSource MainWindow.CheekGap}" />
                             <ui:TextBox
+                                Tag="Cheeks"
                                 Width="60"
                                 Text="{Binding CheekGap, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock
@@ -400,6 +435,7 @@
                                 Margin="12,0,8,0"
                                 Text="{me:LocalizationSource MainWindow.CheekOrientation}" />
                             <ComboBox
+                                Tag="Cheeks"
                                 Width="230"
                                 ItemsSource="{Binding CheekOrientationOptions}"
                                 DisplayMemberPath="Name"

@@ -45,6 +45,7 @@ internal class MainViewModel : BaseViewModel {
     private string _edgeOffset;
     private bool _createAssembly;
     private string _assemblyNamePrefix;
+    private string _activeField;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -95,7 +96,7 @@ internal class MainViewModel : BaseViewModel {
     public RailingParameters Parameters { get; private set; }
 
     /// <summary>
-    /// Схема пролёта ограждения на марше.
+    /// Схема ограждения: участок марша и участок площадки.
     /// </summary>
     public RailingPreviewViewModel Preview { get; } = new();
 
@@ -187,9 +188,17 @@ internal class MainViewModel : BaseViewModel {
     public PostMount LandingMount {
         get => _landingMount;
         set {
-            RaiseAndSetIfChanged(ref _landingMount, value);
+            SetAndUpdatePreview(ref _landingMount, value);
             OnMountChanged();
         }
+    }
+
+    /// <summary>
+    /// Часть схемы поля окна, в котором сейчас ввод (<see cref="PreviewFields"/>); она выделяется на схеме.
+    /// </summary>
+    public string ActiveField {
+        get => _activeField;
+        set => SetAndUpdatePreview(ref _activeField, value);
     }
 
     /// <summary>
@@ -526,7 +535,9 @@ internal class MainViewModel : BaseViewModel {
             PostHeight = ParseNumber(PostHeight),
             PostStep = ParseNumber(MaxPostStep),
             RodOffsets = ParseRodOffsets(RodOffsets) ?? new List<double>(),
-            Mount = FlightMount,
+            FlightMount = FlightMount,
+            LandingMount = LandingMount,
+            ActiveField = ActiveField,
             PlateThickness = ParseNumber(BasePlateThickness),
             PlateLength = ParseNumber(BasePlateLength),
             PlateWidth = ParseNumber(BasePlateWidth),
