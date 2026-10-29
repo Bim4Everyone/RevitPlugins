@@ -27,8 +27,12 @@ namespace RevitVORChecker.Services;
 /// Модели открываются в фоне отсоединённо и закрываются без сохранения; файлы моделей не изменяются.
 /// </remarks>
 internal class CheckProcess {
-    private const string DetachedSuffix = "_отсоединено";
     private const int ScreenshotsPerBatch = 10;
+
+    /// <summary>
+    /// Суффикс имени отсоединённой копии в русском и английском Revit.
+    /// </summary>
+    private static readonly string[] _detachedSuffixes = { "_отсоединено", "_detached" };
 
     private static readonly string[] _scheduleNames = {
         ExcelComparison.VorSchedule, ExcelComparison.InsulationSchedule, ExcelComparison.DirectCalculationSchedule
@@ -43,16 +47,26 @@ internal class CheckProcess {
     }
 
     /// <summary>
-    /// Число шагов прогресса для папки с <paramref name="modelCount"/> моделями.
+    /// Число шагов прогресса для папки с <paramref name="modelCount"/> моделями: выгрузка каждой модели,
+    /// спецификации, правила, скриншоты каждой модели (если включены), реестр.
     /// </summary>
-    public static int GetStepCount(int modelCount) {
-        return modelCount * 2 + 3;
+    public static int GetStepCount(int modelCount, bool takeScreenshots) {
+        return modelCount * (takeScreenshots ? 2 : 1) + 3;
     }
 
     /// <summary>
     /// Выполняет проверку. Возвращает путь реестра; при ошибке бросает исключение с понятным текстом.
     /// </summary>
-    public CheckResult Run(CheckSettings settings, IProgress<int> progress, CancellationToken cancellationToken) {
+    /// <param name="settings">Параметры запуска.</param>
+    /// <param name="progress">Номер выполненного шага (из <see cref="GetStepCount"/>).</param>
+    /// <param name="reportStatus">Текущее действие (записи журнала).</param>
+    /// <param name="cancellationToken">Отмена между шагами.</param>
+    public CheckResult Run(
+        CheckSettings settings,
+        IProgress<int> progress,
+        Action<string> reportStatus,
+        CancellationToken cancellationToken) {
+
         string folder = Path.GetFullPath(settings.ModelsFolder);
         if(!Directory.Exists(folder)) {
             throw new InvalidOperationException(GetText("Process.NoFolder") + " " + folder);
@@ -61,11 +75,14 @@ internal class CheckProcess {
         DateTime startTime = DateTime.Now;
         string outputFolder = ModelsFolder.GetOutputFolder(folder);
         Directory.CreateDirectory(outputFolder);
-        var log = new CheckLog(Path.Combine(outputFolder, "Журнал проверки_" + startTime.ToString("yyyy-MM-dd_HHmm") + ".txt"));
+        var log = new CheckLog(
+            Path.Combine(outputFolder, "Журнал проверки_" + startTime.ToString("yyyy-MM-dd_HHmm") + ".txt"),
+            reportStatus);
         string workFolder = Path.Combine(
             Path.GetTempPath(),
             "ВОР_КР",
-            Path.GetFileName(folder.TrimEnd('\\', '/')) + "_" + startTime.ToString("yyyyMMdd_HHmm"));
+            // с секундами: повторный запуск в ту же минуту не должен взять скриншоты прошлого запуска
+            Path.GetFileName(folder.TrimEnd('\\', '/')) + "_" + startTime.ToString("yyyyMMdd_HHmmss"));
         string imageFolder = Path.Combine(workFolder, "img");
         Directory.CreateDirectory(imageFolder);
         log.Write("Папка: " + folder);
@@ -115,7 +132,7 @@ internal class CheckProcess {
             NextStep();
 
             if(settings.TakeScreenshots) {
-                TakeScreenshots(findings, models, workFolder, imageFolder, log, NextStep);
+                TakeScreenshots(findings, models, workFolder, imageFolder, log, NextStep, cancellationToken);
             }
 
             JsonFiles.Save(Path.Combine(workFolder, "findings.json"), new { findings });
@@ -160,8 +177,8 @@ internal class CheckProcess {
         var openModels = GetOpenDocuments()
             .Where(document => (!string.IsNullOrEmpty(document.PathName)
                                 && string.Equals(Path.GetDirectoryName(document.PathName), folder, StringComparison.OrdinalIgnoreCase))
-                               || (document.Title.EndsWith(DetachedSuffix)
-                                   && models.ContainsKey(document.Title.Substring(0, document.Title.Length - DetachedSuffix.Length))))
+                               || _detachedSuffixes.Any(suffix => document.Title.EndsWith(suffix)
+                                   && models.ContainsKey(document.Title.Substring(0, document.Title.Length - suffix.Length))))
             .Select(document => document.Title)
             .ToList();
         if(openModels.Count > 0) {
@@ -298,12 +315,22 @@ internal class CheckProcess {
         string workFolder,
         string imageFolder,
         CheckLog log,
-        Action nextStep) {
+        Action nextStep,
+        CancellationToken cancellationToken) {
 
         var modelFiles = GetWorkFiles(models, workFolder, "model_");
         OrderedMap<string, List<ScreenshotJob>> jobsByModel = ScreenshotPlanner.Plan(findings, imageFolder, modelFiles);
         bool IsMissing(ScreenshotJob job) {
             return !File.Exists(Path.Combine(imageFolder, job.Name + ".png"));
+        }
+
+        // на скриншоты отведено по шагу на модель (GetStepCount): шаг — после первой попытки по модели
+        int screenshotSteps = 0;
+        void NextScreenshotStep() {
+            if(screenshotSteps < models.Count) {
+                screenshotSteps++;
+                nextStep();
+            }
         }
 
         for(int attempt = 1; attempt <= 2; attempt++) {
@@ -313,22 +340,24 @@ internal class CheckProcess {
                 .ToList();
             foreach((string modelName, List<ScreenshotJob> jobs) in pending) {
                 string modelPath = FindModelPath(models, modelName);
-                if(modelPath == null) {
+                if(modelPath != null) {
+                    log.Write("Скриншоты " + modelName + ": " + jobs.Count + " шт." + (attempt > 1 ? " (повтор)" : ""));
+                    for(int start = 0; start < jobs.Count; start += ScreenshotsPerBatch) {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        TakeScreenshotBatch(modelPath, imageFolder, jobs.Skip(start).Take(ScreenshotsPerBatch), log);
+                    }
+                } else {
                     log.Write("   нет файла модели для " + modelName);
-                    continue;
                 }
 
-                log.Write("Скриншоты " + modelName + ": " + jobs.Count + " шт." + (attempt > 1 ? " (повтор)" : ""));
-                for(int start = 0; start < jobs.Count; start += ScreenshotsPerBatch) {
-                    TakeScreenshotBatch(modelPath, imageFolder, jobs.Skip(start).Take(ScreenshotsPerBatch), log);
+                if(attempt == 1) {
+                    NextScreenshotStep();
                 }
             }
+        }
 
-            if(attempt == 1) {
-                foreach(var _ in jobsByModel) {
-                    nextStep();
-                }
-            }
+        while(screenshotSteps < models.Count) {
+            NextScreenshotStep();
         }
 
         var lostImages = jobsByModel.Values.SelectMany(jobs => jobs).Where(IsMissing).Select(job => job.Name).ToList();
@@ -360,11 +389,12 @@ internal class CheckProcess {
     }
 
     /// <summary>
-    /// Закрывает отсоединённые копии, которые остались открытыми после ошибки.
+    /// Закрывает копии моделей, которые остались открытыми после ошибки: все документы, открытые за время проверки
+    /// (у моделей без совместной работы и в английском Revit нет суффикса «_отсоединено»).
     /// </summary>
     private void CloseOpenedCopies(HashSet<string> openedTitles, CheckLog log) {
         var copies = GetOpenDocuments()
-            .Where(document => !openedTitles.Contains(document.Title) && document.Title.EndsWith(DetachedSuffix))
+            .Where(document => !openedTitles.Contains(document.Title))
             .ToList();
         foreach(Document document in copies) {
             string title = document.Title;

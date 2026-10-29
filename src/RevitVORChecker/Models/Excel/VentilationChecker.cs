@@ -34,10 +34,12 @@ internal static class VentilationChecker {
 
         var foundKinds = new HashSet<string>();
         foreach(string fileName in ventilationFiles) {
-            using var workbook = new XlsxReader(Path.Combine(folder, fileName));
-            foreach(var sheet in workbook.GetSheetPaths()) {
-                CheckSheet(fileName, sheet.Key, workbook.ReadSheet(sheet.Value), vorRecordsByBlock, foundKinds, writer);
-            }
+            ExcelComparison.TryProcessFile(fileName, writer, () => {
+                using var workbook = new XlsxReader(Path.Combine(folder, fileName));
+                foreach(var sheet in workbook.GetSheetPaths()) {
+                    CheckSheet(fileName, sheet.Key, workbook.ReadSheet(sheet.Value), vorRecordsByBlock, foundKinds, writer);
+                }
+            });
         }
 
         foreach(string kind in new[] { VentBlocks, AirValves }.Where(kind => !foundKinds.Contains(kind))) {
@@ -100,10 +102,9 @@ internal static class VentilationChecker {
             }
 
             string level = ExcelText.Normalize(CellText(row, levelColumn));
-            Match floorMatch = Regex.Match(level, @"^(К|П|ТХ|Т|Д)?(\d{2}) этаж");
-            string floor = floorMatch.Success ? floorMatch.Groups[1].Value + floorMatch.Groups[2].Value : level;
+            string floor = GetFloor(level);
             string type = typeColumn != null ? ExcelText.Normalize(CellText(row, typeColumn)) : "";
-            string kind = (type + fileName + sheetName).ToLowerInvariant().Contains("уэрв") ? AirValves : VentBlocks;
+            string kind = GetKind(type, sheetName, fileName);
             foundKinds.Add(kind);
             string block = ExcelText.Normalize(CellText(row, blockColumn));
             string section = ExcelText.Normalize(CellText(row, sectionColumn));
@@ -125,6 +126,38 @@ internal static class VentilationChecker {
         foreach(VentilationGroup group in sortedGroups) {
             CheckGroup(fileName, group, vorRecordsByBlock, writer);
         }
+    }
+
+    /// <summary>
+    /// Этаж из значения столбца «Уровень»/«Этаж»: «03 этаж_К1_…» → «03», «3» → «03»; прочее — как есть.
+    /// </summary>
+    private static string GetFloor(string level) {
+        Match floorMatch = Regex.Match(level, @"^(К|П|ТХ|Т|Д)?(\d{2}) этаж");
+        if(floorMatch.Success) {
+            return floorMatch.Groups[1].Value + floorMatch.Groups[2].Value;
+        }
+
+        // номер этажа числом: ключи этажей всегда двузначные, как в имени уровня
+        return ExcelText.IsDigits(level) ? int.Parse(level).ToString("00") : level;
+    }
+
+    /// <summary>
+    /// Вентблоки или УЭРВ: по типу строки, затем по имени листа, затем по имени файла —
+    /// первое из них, где названо одно из двух.
+    /// </summary>
+    private static string GetKind(string type, string sheetName, string fileName) {
+        foreach(string source in new[] { type, sheetName, fileName }) {
+            string lowerSource = source.ToLowerInvariant();
+            if(lowerSource.Contains("уэрв")) {
+                return AirValves;
+            }
+
+            if(Regex.IsMatch(lowerSource, "вент[а]?блок")) {
+                return VentBlocks;
+            }
+        }
+
+        return VentBlocks;
     }
 
     private static void CheckGroup(

@@ -332,12 +332,17 @@ internal class VorScheduleComparer {
                 .ToList());
         }
 
+        // по первым четырём ячейкам; в строке их может быть меньше, если видимых столбцов нет
         return differences
-            .OrderBy(row => row[0], StringComparer.Ordinal)
-            .ThenBy(row => row[1], StringComparer.Ordinal)
-            .ThenBy(row => row[2], StringComparer.Ordinal)
-            .ThenBy(row => row[3], StringComparer.Ordinal)
+            .OrderBy(row => GetCell(row, 0), StringComparer.Ordinal)
+            .ThenBy(row => GetCell(row, 1), StringComparer.Ordinal)
+            .ThenBy(row => GetCell(row, 2), StringComparer.Ordinal)
+            .ThenBy(row => GetCell(row, 3), StringComparer.Ordinal)
             .ToList();
+    }
+
+    private static string GetCell(List<string> row, int index) {
+        return index < row.Count ? row[index] : "";
     }
 
     private static RowKey PopLast(List<RowKey> keys) {

@@ -79,60 +79,84 @@ internal static class ExcelComparison {
             return schedules.TryGetValue(name, out ScheduleTableData schedule) && !schedule.IsMissing ? schedule : null;
         }
 
+        // блоки всех файлов ВОР (по корпусам их может быть несколько) — для сверки вентблоков
         var vorRecordsByBlock = new OrderedMap<string, List<VorRecord>>();
+        bool isVorScheduleCompared = false;
         foreach(string vorFile in vorFiles) {
             string fileName = Path.GetFileName(vorFile);
-            using var workbook = new XlsxReader(vorFile);
-            OrderedMap<string, string> sheets = workbook.GetSheetPaths();
-            string sourceSheet = sheets.Keys.FirstOrDefault(name => name.Trim().ToLowerInvariant() == "исходная вор");
-            if(sourceSheet == null) {
-                comparisonWriter.Add(fileName + ": нет листа «Исходная ВОР».");
-                continue;
-            }
+            TryProcessFile(fileName, comparisonWriter, () => {
+                using var workbook = new XlsxReader(vorFile);
+                OrderedMap<string, string> sheets = workbook.GetSheetPaths();
+                string sourceSheet = sheets.Keys.FirstOrDefault(name => name.Trim().ToLowerInvariant() == "исходная вор");
+                if(sourceSheet == null) {
+                    comparisonWriter.Add(fileName + ": нет листа «Исходная ВОР».");
+                    return;
+                }
 
-            List<SheetRow> rows = workbook.ReadSheet(sheets[sourceSheet]);
-            vorRecordsByBlock = VolumeIntegrityChecker.Check(VorRecord.ReadAll(rows), models, project, fileName, integrityWriter);
-            List<VorRecord> records = VorRecord.ReadAll(rows);
-            if(FindSchedule(VorSchedule) != null) {
-                schedules.TryGetValue(InsulationSchedule, out ScheduleTableData insulation);
-                new VorScheduleComparer().Compare(schedules[VorSchedule], rows, fileName, comparisonWriter, insulation);
-                ReportUnsortedModels(models, comparisonWriter);
-            }
+                List<SheetRow> rows = workbook.ReadSheet(sheets[sourceSheet]);
+                List<VorRecord> records = VorRecord.ReadAll(rows);
+                var fileRecordsByBlock = VolumeIntegrityChecker.Check(records, models, project, fileName, integrityWriter);
+                foreach(var block in fileRecordsByBlock) {
+                    vorRecordsByBlock.GetOrAdd(block.Key, () => new List<VorRecord>()).AddRange(block.Value);
+                }
 
-            double total = 0;
-            foreach(VorRecord record in records) {
-                total += ExcelText.ParseNumber(record.Get("Количество")) ?? 0;
-            }
+                if(FindSchedule(VorSchedule) != null) {
+                    schedules.TryGetValue(InsulationSchedule, out ScheduleTableData insulation);
+                    new VorScheduleComparer().Compare(schedules[VorSchedule], rows, fileName, comparisonWriter, insulation);
+                    isVorScheduleCompared = true;
+                }
 
-            PivotTableChecker.Check(workbook, sheets, records.Count, total, fileName, comparisonWriter);
+                double total = 0;
+                foreach(VorRecord record in records) {
+                    total += ExcelText.ParseNumber(record.Get("Количество")) ?? 0;
+                }
+
+                PivotTableChecker.Check(workbook, sheets, sourceSheet, records.Count, total, fileName, comparisonWriter);
+            });
+        }
+
+        if(isVorScheduleCompared) {
+            ReportUnsortedModels(models, comparisonWriter);
         }
 
         foreach(string insulationFile in insulationFiles) {
-            using var workbook = new XlsxReader(insulationFile);
-            if(FindSchedule(InsulationSchedule) != null) {
-                List<SheetRow> rows = workbook.ReadSheet(workbook.GetSheetPaths().Values.First());
-                new VorScheduleComparer().Compare(
-                    schedules[InsulationSchedule],
-                    rows,
-                    Path.GetFileName(insulationFile),
-                    comparisonWriter);
-            }
+            string fileName = Path.GetFileName(insulationFile);
+            TryProcessFile(fileName, comparisonWriter, () => {
+                using var workbook = new XlsxReader(insulationFile);
+                if(FindSchedule(InsulationSchedule) != null) {
+                    List<SheetRow> rows = workbook.ReadSheet(workbook.GetSheetPaths().Values.First());
+                    new VorScheduleComparer().Compare(schedules[InsulationSchedule], rows, fileName, comparisonWriter);
+                }
+            });
         }
 
         foreach(string directCalculationFile in directCalculationFiles) {
-            using var workbook = new XlsxReader(directCalculationFile);
-            if(FindSchedule(DirectCalculationSchedule) != null) {
-                List<SheetRow> rows = workbook.ReadSheet(workbook.GetSheetPaths().Values.First());
-                DirectCalculationComparer.Compare(
-                    schedules[DirectCalculationSchedule],
-                    rows,
-                    Path.GetFileName(directCalculationFile),
-                    comparisonWriter);
-            }
+            string fileName = Path.GetFileName(directCalculationFile);
+            TryProcessFile(fileName, comparisonWriter, () => {
+                using var workbook = new XlsxReader(directCalculationFile);
+                if(FindSchedule(DirectCalculationSchedule) != null) {
+                    List<SheetRow> rows = workbook.ReadSheet(workbook.GetSheetPaths().Values.First());
+                    DirectCalculationComparer.Compare(schedules[DirectCalculationSchedule], rows, fileName, comparisonWriter);
+                }
+            });
         }
 
         VentilationChecker.Check(modelsFolder, fileNames, vorRecordsByBlock, ventilationWriter);
         return findings;
+    }
+
+    /// <summary>
+    /// Сверка одного файла Excel: ошибка чтения или сверки файла — замечание, остальные файлы сверяются дальше.
+    /// </summary>
+    public static void TryProcessFile(string fileName, FindingWriter writer, Action process) {
+        try {
+            process();
+        } catch(Exception ex) {
+            writer.Add(
+                fileName + ": файл не прочитан или не сверен (" + ex.GetBaseException().Message + "). Проверить, что это "
+                + "книга .xlsx/.xlsm без пароля, открывается в Excel, и пересохранить её.",
+                FindingKinds.Clarify);
+        }
     }
 
     private static void ReportMissingFiles(

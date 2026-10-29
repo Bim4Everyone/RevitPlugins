@@ -23,6 +23,7 @@
     <system:String x:Key="MainWindow.ProgressTitle">Checking quantity takeoff... [{0}]\[{1}]</system:String>
     <system:String x:Key="MainWindow.Cancelled">The check was cancelled.</system:String>
     <system:String x:Key="MainWindow.Stopped">The check was stopped:</system:String>
+    <system:String x:Key="MainWindow.ErrorReport">Error details are saved to:</system:String>
     <system:String x:Key="MainWindow.Done">The check is complete, issues: {0}.&#x0a;Issue register:&#x0a;{1}&#x0a;&#x0a;Open the register folder?</system:String>
 
     <system:String x:Key="Process.NoFolder">Folder not found:</system:String>
@@ -64,4 +65,12 @@
     <system:String x:Key="ProjectCard.BadDecimals">Decimal places — a number from 0 to 6.</system:String>
     <system:String x:Key="ProjectCard.NoLowRiseBlocks">List the buildings up to 9 storeys (as in ФОП_Блок СМР).</system:String>
     <system:String x:Key="ProjectCard.BadValue">{0}, item {1}: the norm must be an integer kg/m³ or a dash.</system:String>
+
+    <system:String x:Key="Progress.Step">Step {0} of {1}</system:String>
+    <system:String x:Key="Progress.Cancel">Cancel</system:String>
+    <system:String x:Key="Progress.Cancelling">Cancelling after the current step…</system:String>
+    <system:String x:Key="Result.Instruction">The check is complete, issues: {0}</system:String>
+    <system:String x:Key="Result.Registry">Issue register:</system:String>
+    <system:String x:Key="Result.OpenFolder">Open the register folder</system:String>
+    <system:String x:Key="Result.Close">Close</system:String>
 </ResourceDictionary>

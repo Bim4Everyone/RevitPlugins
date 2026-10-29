@@ -21,7 +21,14 @@ internal class XlsxReader : IDisposable {
     public XlsxReader(string path) {
         // файл может быть открыт в Excel — открываем с разрешением совместного доступа
         var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        _archive = new ZipArchive(stream, ZipArchiveMode.Read);
+        try {
+            _archive = new ZipArchive(stream, ZipArchiveMode.Read);
+        } catch(Exception) {
+            // не архив ZIP (книга с паролем, старый .xls, повреждённый файл) — файл не остаётся занятым
+            stream.Dispose();
+            throw;
+        }
+
         XDocument sharedStrings = ReadPart("xl/sharedStrings.xml");
         if(sharedStrings != null) {
             foreach(XElement item in sharedStrings.Root.Elements(SpreadsheetNamespace + "si")) {
@@ -98,12 +105,21 @@ internal class XlsxReader : IDisposable {
     /// </summary>
     public List<SheetRow> ReadSheet(string partPath) {
         var rows = new List<SheetRow>();
+        int previousRowNumber = 0;
         foreach(XElement rowElement in ReadPart(partPath).Descendants(SpreadsheetNamespace + "row")) {
-            var row = new SheetRow(int.Parse((string) rowElement.Attribute("r")));
+            // ссылки r необязательны: без них строка и ячейка идут следом за предыдущими
+            string rowReference = (string) rowElement.Attribute("r");
+            int rowNumber = rowReference != null ? int.Parse(rowReference) : previousRowNumber + 1;
+            previousRowNumber = rowNumber;
+            var row = new SheetRow(rowNumber);
+            int previousColumnIndex = -1;
             foreach(XElement cell in rowElement.Elements(SpreadsheetNamespace + "c")) {
+                string cellReference = (string) cell.Attribute("r");
+                int columnIndex = cellReference != null ? GetColumnIndex(cellReference) : previousColumnIndex + 1;
+                previousColumnIndex = columnIndex;
                 SheetCell sheetCell = ReadCell(cell);
                 if(sheetCell != null) {
-                    row.Cells[GetColumnIndex((string) cell.Attribute("r"))] = sheetCell;
+                    row.Cells[columnIndex] = sheetCell;
                 }
             }
 

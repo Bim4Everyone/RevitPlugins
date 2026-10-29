@@ -198,6 +198,7 @@ internal static class SmrParameterRules {
         }
 
         CheckFloorsWithoutLevel(context, findings);
+        FloorPositionRules.Check(context, findings);
     }
 
     /// <summary>

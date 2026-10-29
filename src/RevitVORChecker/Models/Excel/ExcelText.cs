@@ -42,7 +42,9 @@ internal static class ExcelText {
     /// Число знаков после запятой в записи числа.
     /// </summary>
     public static int CountDecimals(string text) {
-        Match match = Regex.Match(PythonFormat.Trim(text), @"^-?\d+[.,](\d+)$");
+        // пробелы-разделители разрядов («1 234,56») убираются, как в ParseNumber
+        string compact = PythonFormat.Trim(text).Replace(" ", "").Replace(" ", "");
+        Match match = Regex.Match(compact, @"^-?\d+[.,](\d+)$");
         return match.Success ? match.Groups[1].Value.Length : 0;
     }
 

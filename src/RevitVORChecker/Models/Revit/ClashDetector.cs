@@ -56,7 +56,6 @@ internal static class ClashDetector {
             ToleranceMm = toleranceMm,
             ElementCount = elements.Count
         };
-        var checkedPairs = new HashSet<string>();
         foreach(Element first in elements) {
             BoundingBoxXYZ firstBox = first.get_BoundingBox(null);
             var nearElements = new FilteredElementCollector(document, elementIds)
@@ -65,7 +64,8 @@ internal static class ClashDetector {
             foreach(Element second in nearElements) {
                 long firstId = RevitIds.GetValue(first.Id);
                 long secondId = RevitIds.GetValue(second.Id);
-                if(secondId <= firstId || !checkedPairs.Add(firstId + "_" + secondId)) {
+                // каждая пара проверяется один раз — от элемента с меньшим Id
+                if(secondId <= firstId) {
                     continue;
                 }
 

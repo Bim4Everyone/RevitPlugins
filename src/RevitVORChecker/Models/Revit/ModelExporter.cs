@@ -44,6 +44,7 @@ internal static class ModelExporter {
             return worksets?.GetWorkset(element.WorksetId)?.Name;
         }
 
+        View3D levelsView = FindLevelsView(document);
         return new ModelData {
             File = ExportFile(document),
             ProjectInfo = ExportProjectInfo(document),
@@ -59,7 +60,9 @@ internal static class ModelExporter {
                     Id = RevitIds.GetValue(level.Id),
                     Name = level.Name,
                     Elevation = level.Elevation * FeetToMillimeters,
-                    Workset = GetWorkset(level)
+                    Workset = GetWorkset(level),
+                    ProjectElevation = level.ProjectElevation * FeetToMillimeters,
+                    PlanExtent = GetLevelPlanExtent(level, levelsView)
                 })
                 .ToList(),
             Links = ExportLinks(document, GetWorkset),
@@ -132,6 +135,61 @@ internal static class ModelExporter {
             StorageType.Double => NumberText(parameter.AsDouble()),
             _ => null
         };
+    }
+
+    /// <summary>
+    /// 3D-вид, на котором берётся габарит уровней: «{3D}», «3D» или любой изометрический.
+    /// </summary>
+    private static View3D FindLevelsView(Document document) {
+        var views = new FilteredElementCollector(document)
+            .OfClass(typeof(View3D))
+            .Cast<View3D>()
+            .Where(view => !view.IsTemplate && !view.IsPerspective)
+            .ToList();
+        return views.FirstOrDefault(view => view.Name == "{3D}")
+               ?? views.FirstOrDefault(view => view.Name == "3D")
+               ?? views.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Габарит уровня в плане по его геометрии на 3D-виде, мм: [minX, minY, maxX, maxY]; null — не определён.
+    /// </summary>
+    private static List<double> GetLevelPlanExtent(Level level, View3D view) {
+        if(view == null) {
+            return null;
+        }
+
+        try {
+            var options = new Options { View = view, IncludeNonVisibleObjects = true };
+            GeometryElement geometry = level.get_Geometry(options);
+            if(geometry == null) {
+                return null;
+            }
+
+            var points = new List<XYZ>();
+            foreach(GeometryObject geometryObject in geometry) {
+                if(geometryObject is Solid solid) {
+                    foreach(Edge edge in solid.Edges) {
+                        points.AddRange(edge.Tessellate());
+                    }
+                } else if(geometryObject is Curve curve) {
+                    points.AddRange(curve.Tessellate());
+                }
+            }
+
+            if(points.Count == 0) {
+                return null;
+            }
+
+            return new List<double> {
+                points.Min(point => point.X) * FeetToMillimeters,
+                points.Min(point => point.Y) * FeetToMillimeters,
+                points.Max(point => point.X) * FeetToMillimeters,
+                points.Max(point => point.Y) * FeetToMillimeters
+            };
+        } catch(Exception) {
+            return null;
+        }
     }
 
     private static string NumberText(double value) {

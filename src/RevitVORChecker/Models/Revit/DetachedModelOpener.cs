@@ -34,7 +34,14 @@ internal static class DetachedModelOpener {
         }
 
         Document document = application.OpenDocumentFile(modelPath, openOptions);
-        removedLinks = RemoveLinks(document);
+        try {
+            removedLinks = RemoveLinks(document);
+        } catch(Exception) {
+            // вызывающий код не получит документ и не закроет его — закрываем здесь
+            document.Close(false);
+            throw;
+        }
+
         return document;
     }
 

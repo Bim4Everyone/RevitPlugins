@@ -98,6 +98,18 @@ internal class LevelData {
 
     [JsonProperty("ws")]
     public string Workset { get; set; }
+
+    /// <summary>
+    /// Отметка уровня во внутренних координатах модели (как габариты элементов), мм.
+    /// </summary>
+    [JsonProperty("projElev", NullValueHandling = NullValueHandling.Ignore)]
+    public double? ProjectElevation { get; set; }
+
+    /// <summary>
+    /// Габарит уровня в плане, мм: [minX, minY, maxX, maxY]; null — не определён (уровень не виден на 3D-виде).
+    /// </summary>
+    [JsonProperty("extent", NullValueHandling = NullValueHandling.Ignore)]
+    public List<double> PlanExtent { get; set; }
 }
 
 /// <summary>

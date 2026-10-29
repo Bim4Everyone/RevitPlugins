@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Windows;
@@ -13,7 +12,6 @@ using Ninject.Syntax;
 
 using RevitVORChecker.Models;
 using RevitVORChecker.Models.Project;
-using RevitVORChecker.Services;
 using RevitVORChecker.Views;
 
 namespace RevitVORChecker.ViewModels;
@@ -23,7 +21,6 @@ namespace RevitVORChecker.ViewModels;
 /// </summary>
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
-    private readonly CheckProcess _checkProcess;
     private readonly IResolutionRoot _resolutionRoot;
     private readonly ILocalizationService _localizationService;
     private string _modelsFolder;
@@ -37,20 +34,16 @@ internal class MainViewModel : BaseViewModel {
 
     public MainViewModel(
         PluginConfig pluginConfig,
-        CheckProcess checkProcess,
         IResolutionRoot resolutionRoot,
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService,
-        IProgressDialogFactory progressDialogFactory,
         IOpenFolderDialogService openFolderDialogService,
         IOpenFileDialogService openFileDialogService) {
 
         _pluginConfig = pluginConfig;
-        _checkProcess = checkProcess;
         _resolutionRoot = resolutionRoot;
         _localizationService = localizationService;
         MessageBoxService = messageBoxService;
-        ProgressDialogFactory = progressDialogFactory;
         OpenFolderDialogService = openFolderDialogService;
         OpenFileDialogService = openFileDialogService;
 
@@ -62,13 +55,16 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Окно просит закрыть себя после проверки.
+    /// Окно просит закрыть себя: параметры приняты, проверка запускается после закрытия окна.
     /// </summary>
     public event EventHandler CloseRequested;
 
-    public IMessageBoxService MessageBoxService { get; }
+    /// <summary>
+    /// Параметры запуска после нажатия «Запустить проверку».
+    /// </summary>
+    public CheckSettings Settings { get; private set; }
 
-    public IProgressDialogFactory ProgressDialogFactory { get; }
+    public IMessageBoxService MessageBoxService { get; }
 
     public IOpenFolderDialogService OpenFolderDialogService { get; }
 
@@ -227,7 +223,7 @@ internal class MainViewModel : BaseViewModel {
     private void AcceptView() {
         SaveConfig();
         TryParseTolerance(out double tolerance);
-        var settings = new CheckSettings {
+        Settings = new CheckSettings {
             ModelsFolder = ModelsFolder,
             ClassifierPath = ClassifierPath,
             ClashToleranceMm = tolerance,
@@ -235,40 +231,6 @@ internal class MainViewModel : BaseViewModel {
             CheckWorksets = CheckWorksets,
             Project = _projectCard
         };
-
-        CheckResult result;
-        try {
-            using IProgressDialogService progressDialog = ProgressDialogFactory.CreateDialog();
-            progressDialog.StepValue = 1;
-            progressDialog.DisplayTitleFormat = _localizationService.GetLocalizedString("MainWindow.ProgressTitle");
-            progressDialog.MaxValue = CheckProcess.GetStepCount(Models.ModelsFolder.GetModels(ModelsFolder).Count);
-            IProgress<int> progress = progressDialog.CreateProgress();
-            CancellationToken cancellationToken = progressDialog.CreateCancellationToken();
-            progressDialog.Show();
-            result = _checkProcess.Run(settings, progress, cancellationToken);
-        } catch(OperationCanceledException) {
-            ShowMessage(_localizationService.GetLocalizedString("MainWindow.Cancelled"), MessageBoxImage.Information);
-            return;
-        } catch(Exception ex) {
-            string stopped = _localizationService.GetLocalizedString("MainWindow.Stopped");
-            ShowMessage(stopped + "\n" + ex.Message, MessageBoxImage.Error);
-            return;
-        }
-
-        string message = string.Format(
-            _localizationService.GetLocalizedString("MainWindow.Done"),
-            result.FindingCount,
-            result.RegistryPath);
-        MessageBoxResult answer = MessageBoxService.Show(
-            message,
-            _localizationService.GetLocalizedString("MainWindow.Title"),
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Information,
-            MessageBoxResult.Yes);
-        if(answer == MessageBoxResult.Yes) {
-            Process.Start("explorer.exe", "/select,\"" + result.RegistryPath + "\"");
-        }
-
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 

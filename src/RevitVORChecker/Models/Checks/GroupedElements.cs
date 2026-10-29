@@ -18,7 +18,13 @@ internal class GroupedElements {
     /// <summary>
     /// Добавляет замечания по группам: уточнение группы и перечень типоразмеров.
     /// </summary>
-    public void AddFindings(FindingCollection findings, string section, string fileName, int maxTypeCount = 3) {
+    public void AddFindings(
+        FindingCollection findings,
+        string section,
+        string fileName,
+        int maxTypeCount = 3,
+        string kind = FindingKinds.Remark) {
+
         foreach(ElementGroup group in _groups.Values) {
             string detailPrefix = group.Detail != null ? group.Detail + "; " : "";
             findings.Add(
@@ -26,7 +32,8 @@ internal class GroupedElements {
                 group.Text,
                 group.Elements.Select(element => element.Id),
                 fileName,
-                detail: detailPrefix + ModelCheckContext.DescribeTypes(group.Elements, maxTypeCount));
+                kind,
+                detailPrefix + ModelCheckContext.DescribeTypes(group.Elements, maxTypeCount));
         }
     }
 

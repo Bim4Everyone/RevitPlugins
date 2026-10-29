@@ -37,6 +37,9 @@ public class RevitVORCheckerCommand : BasePluginCommand {
         kernel.Bind<CheckProcess>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<CheckRunner>()
+            .ToSelf()
+            .InSingletonScope();
 
         kernel.Bind<PluginConfig>()
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
@@ -46,7 +49,6 @@ public class RevitVORCheckerCommand : BasePluginCommand {
         kernel.BindMainWindow<MainViewModel, MainWindow>();
         kernel.BindOtherWindow<ProjectCardViewModel, ProjectCardWindow>();
 
-        kernel.UseWpfUIProgressDialog<MainViewModel>();
         kernel.UseWpfUIMessageBox<MainViewModel>();
         kernel.UseWpfUIMessageBox<ProjectCardViewModel>();
         kernel.UseWpfOpenFolderDialog<MainViewModel>(
@@ -66,6 +68,10 @@ public class RevitVORCheckerCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        Notification(kernel.Get<MainWindow>());
+        // окно параметров закрывается, проверка идёт с отдельным окном хода проверки
+        var mainWindow = kernel.Get<MainWindow>();
+        if(mainWindow.ShowDialog() == true) {
+            kernel.Get<CheckRunner>().Run(((MainViewModel) mainWindow.DataContext).Settings);
+        }
     }
 }

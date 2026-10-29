@@ -23,6 +23,7 @@
     <system:String x:Key="MainWindow.ProgressTitle">Проверка ВОР КР... [{0}]\[{1}]</system:String>
     <system:String x:Key="MainWindow.Cancelled">Проверка отменена.</system:String>
     <system:String x:Key="MainWindow.Stopped">Проверка остановлена:</system:String>
+    <system:String x:Key="MainWindow.ErrorReport">Подробности ошибки сохранены в файл:</system:String>
     <system:String x:Key="MainWindow.Done">Проверка завершена, замечаний: {0}.&#x0a;Реестр замечаний:&#x0a;{1}&#x0a;&#x0a;Открыть папку с реестром?</system:String>
 
     <system:String x:Key="Process.NoFolder">Нет папки:</system:String>
@@ -64,4 +65,12 @@
     <system:String x:Key="ProjectCard.BadDecimals">Знаков после запятой — число от 0 до 6.</system:String>
     <system:String x:Key="ProjectCard.NoLowRiseBlocks">Перечислите корпуса до 9 этажей (как в ФОП_Блок СМР).</system:String>
     <system:String x:Key="ProjectCard.BadValue">{0}, п.{1}: расход — целое число кг/м³ или прочерк.</system:String>
+
+    <system:String x:Key="Progress.Step">Шаг {0} из {1}</system:String>
+    <system:String x:Key="Progress.Cancel">Отмена</system:String>
+    <system:String x:Key="Progress.Cancelling">Отмена после текущего шага…</system:String>
+    <system:String x:Key="Result.Instruction">Проверка завершена, замечаний: {0}</system:String>
+    <system:String x:Key="Result.Registry">Реестр замечаний:</system:String>
+    <system:String x:Key="Result.OpenFolder">Открыть папку с реестром</system:String>
+    <system:String x:Key="Result.Close">Закрыть</system:String>
 </ResourceDictionary>

@@ -11,9 +11,13 @@ namespace RevitVORChecker.Models;
 /// </remarks>
 internal class CheckLog {
     private readonly string _path;
+    private readonly Action<string> _onWrite;
 
-    public CheckLog(string path) {
+    /// <param name="path">Файл журнала.</param>
+    /// <param name="onWrite">Получает каждую запись (для строки состояния окна прогресса).</param>
+    public CheckLog(string path, Action<string> onWrite = null) {
         _path = path;
+        _onWrite = onWrite;
         try {
             File.WriteAllText(_path, "", new UTF8Encoding(true));
         } catch(IOException) {
@@ -26,6 +30,7 @@ internal class CheckLog {
     public string Path => _path;
 
     public void Write(string message) {
+        _onWrite?.Invoke(message);
         string line = DateTime.Now.ToString("HH:mm:ss") + "  " + message;
         try {
             File.AppendAllText(_path, line + "\r\n", Encoding.UTF8);
