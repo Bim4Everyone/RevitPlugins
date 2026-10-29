@@ -2,10 +2,51 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
+    <system:String x:Key="MainWindow.Title">Ограждение лестниц</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.Preview">Пролёт ограждения</system:String>
+    <system:String x:Key="MainWindow.PreviewNote">Размеры в мм. Пунктир — траектория (линии модели по краю марша со смещением); стойки ставятся равномерно с шагом в плане не больше заданного.</system:String>
+    <system:String x:Key="MainWindow.Trajectory">Положение относительно линий траектории (по ходу подъёма)</system:String>
+    <system:String x:Key="MainWindow.SideLeft">Слева</system:String>
+    <system:String x:Key="MainWindow.SideRight">Справа</system:String>
+    <system:String x:Key="MainWindow.EdgeOffset">Отступ от края марша, мм</system:String>
+    <system:String x:Key="MainWindow.CreateAssembly">Собрать в сборку</system:String>
+    <system:String x:Key="MainWindow.AssemblyName">Имя сборки (номер добавится)</system:String>
+
+    <system:String x:Key="MainWindow.Posts">Стойки</system:String>
+    <system:String x:Key="MainWindow.PostHeight">Высота до оси поручня, мм</system:String>
+    <system:String x:Key="MainWindow.MaxPostStep">Наибольший шаг, мм</system:String>
+    <system:String x:Key="MainWindow.PostRotation">Поворот сечения, °</system:String>
+    <system:String x:Key="MainWindow.Handrail">Поручень</system:String>
+    <system:String x:Key="MainWindow.Rods">Продольные прутки</system:String>
+    <system:String x:Key="MainWindow.RodOffsets">Ниже оси поручня, мм (через «;»)</system:String>
+    <system:String x:Key="MainWindow.Plates">Опорные пластины</system:String>
+    <system:String x:Key="MainWindow.PlateLength">Длина вдоль ограждения, мм</system:String>
+    <system:String x:Key="MainWindow.Anchors">Анкеры</system:String>
+    <system:String x:Key="MainWindow.AnchorLength">Длина вниз от низа стойки, мм</system:String>
+
+    <system:String x:Key="MainWindow.NoPostType">Выберите типоразмер стоек.</system:String>
+    <system:String x:Key="MainWindow.BadPostHeight">Высота стоек — положительное число.</system:String>
+    <system:String x:Key="MainWindow.BadPostStep">Шаг стоек — положительное число.</system:String>
+    <system:String x:Key="MainWindow.BadPostRotation">Поворот сечения стоек — число.</system:String>
+    <system:String x:Key="MainWindow.NoHandrailType">Выберите типоразмер поручня.</system:String>
+    <system:String x:Key="MainWindow.BadRodOffsets">Расстояния до прутков — числа через «;», больше 0 и меньше высоты стоек.</system:String>
+    <system:String x:Key="MainWindow.NoRodType">Выберите типоразмер прутков.</system:String>
+    <system:String x:Key="MainWindow.NoPlateType">Выберите типоразмер пластин.</system:String>
+    <system:String x:Key="MainWindow.BadPlateLength">Длина пластины — положительное число.</system:String>
+    <system:String x:Key="MainWindow.NoAnchorType">Выберите типоразмер анкеров.</system:String>
+    <system:String x:Key="MainWindow.BadAnchorLength">Длина анкера — положительное число.</system:String>
+    <system:String x:Key="MainWindow.BadEdgeOffset">Отступ от края марша — число не меньше 0.</system:String>
+    <system:String x:Key="MainWindow.NoAssemblyName">Введите имя сборки.</system:String>
+
+    <system:String x:Key="Pick.Prompt">Выберите линии модели траектории ограждения (по краю маршей и площадок) и нажмите «Готово»</system:String>
+    <system:String x:Key="Path.NoLines">Не выбрано ни одной линии модели.</system:String>
+    <system:String x:Key="Path.NotLines">Траектория строится только по прямым линиям модели: среди выбранных есть дуги или сплайны.</system:String>
+    <system:String x:Key="Path.Closed">Линии образуют замкнутый контур — у траектории должны быть начало и конец.</system:String>
+    <system:String x:Key="Path.NotChain">Линии не образуют одну цепочку: концы соседних линий должны совпадать, без разрывов и ответвлений.</system:String>
+    <system:String x:Key="Path.Vertical">Среди линий есть вертикальная — траектория идёт по маршам и площадкам в плане.</system:String>
+    <system:String x:Key="Build.NoLevels">В модели нет уровней.</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">Выбрать линии и построить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 </ResourceDictionary>

@@ -4,23 +4,21 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:base="clr-namespace:dosymep.WPF.Views"
-    xmlns:local="clr-namespace:RevitStairRailing.Views"
     xmlns:vms="clr-namespace:RevitStairRailing.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-   
+
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    
-    Height="500"
-    Width="700"
-    
-    MinHeight="500"
-    MinWidth="700"
-   
+
+    Height="680"
+    Width="1000"
+
+    MinHeight="600"
+    MinWidth="900"
+
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
@@ -29,23 +27,272 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
+    <core:WpfUIPlatformWindow.Resources>
+        <Style x:Key="SectionHeader" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,12,0,6" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="TypeComboBox" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="DisplayMemberPath" Value="Name" />
+            <Setter Property="IsTextSearchEnabled" Value="True" />
+            <Setter Property="TextSearch.TextPath" Value="Name" />
+        </Style>
+        <Style x:Key="NumberBox" TargetType="ui:TextBox" BasedOn="{StaticResource {x:Type ui:TextBox}}">
+            <Setter Property="Width" Value="90" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+    </core:WpfUIPlatformWindow.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <ui:TextBox
+        <Grid
             Grid.Row="1"
-            Width="200"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Text="{Binding SaveProperty, UpdateSourceTrigger=PropertyChanged}" />
+            Margin="16,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="24" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Схема пролёта, сторона и отступ, сборка -->
+            <StackPanel Grid.Column="0">
+                <TextBlock
+                    Style="{StaticResource SectionHeader}"
+                    Margin="0,0,0,6"
+                    Text="{me:LocalizationSource MainWindow.Preview}" />
+                <Border
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    CornerRadius="4">
+                    <Grid
+                        Width="{Binding PreviewWidth}"
+                        Height="{Binding PreviewHeight}">
+                        <ItemsControl ItemsSource="{Binding Preview.Lines}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Line
+                                        x:Name="PreviewLine"
+                                        X1="{Binding X1}"
+                                        Y1="{Binding Y1}"
+                                        X2="{Binding X2}"
+                                        Y2="{Binding Y2}"
+                                        StrokeThickness="{Binding Thickness}"
+                                        Stroke="{DynamicResource TextFillColorPrimaryBrush}" />
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsDashed}" Value="True">
+                                            <Setter TargetName="PreviewLine" Property="StrokeDashArray" Value="6 4" />
+                                            <Setter TargetName="PreviewLine" Property="Stroke"
+                                                    Value="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <ItemsControl ItemsSource="{Binding Preview.Labels}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding X}" />
+                                    <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        FontSize="12"
+                                        Text="{Binding Text}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+                <TextBlock
+                    Width="{Binding PreviewWidth}"
+                    Margin="0,6,0,0"
+                    Opacity="0.7"
+                    TextWrapping="Wrap"
+                    Text="{me:LocalizationSource MainWindow.PreviewNote}" />
+
+                <TextBlock
+                    Style="{StaticResource SectionHeader}"
+                    Text="{me:LocalizationSource MainWindow.Trajectory}" />
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton
+                        Margin="0,0,16,0"
+                        Content="{me:LocalizationSource MainWindow.SideLeft}"
+                        IsChecked="{Binding IsLeftSide}" />
+                    <RadioButton
+                        Content="{me:LocalizationSource MainWindow.SideRight}"
+                        IsChecked="{Binding IsRightSide}" />
+                </StackPanel>
+                <StackPanel
+                    Margin="0,6,0,0"
+                    Orientation="Horizontal">
+                    <TextBlock
+                        Style="{StaticResource FieldLabel}"
+                        Text="{me:LocalizationSource MainWindow.EdgeOffset}" />
+                    <ui:TextBox
+                        Style="{StaticResource NumberBox}"
+                        Text="{Binding EdgeOffset, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <CheckBox
+                    Margin="0,12,0,6"
+                    Content="{me:LocalizationSource MainWindow.CreateAssembly}"
+                    IsChecked="{Binding CreateAssembly}" />
+                <StackPanel
+                    Orientation="Horizontal"
+                    IsEnabled="{Binding CreateAssembly}">
+                    <TextBlock
+                        Style="{StaticResource FieldLabel}"
+                        Text="{me:LocalizationSource MainWindow.AssemblyName}" />
+                    <ui:TextBox
+                        Width="200"
+                        Text="{Binding AssemblyNamePrefix, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Состав и размеры -->
+            <ScrollViewer
+                Grid.Column="2"
+                VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="0,0,8,0">
+                    <TextBlock
+                        Style="{StaticResource SectionHeader}"
+                        Margin="0,0,0,6"
+                        Text="{me:LocalizationSource MainWindow.Posts}" />
+                    <ComboBox
+                        Style="{StaticResource TypeComboBox}"
+                        ItemsSource="{Binding FramingTypes}"
+                        SelectedItem="{Binding PostType}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="6" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            Grid.Row="0" Grid.Column="0"
+                            Style="{StaticResource FieldLabel}"
+                            Text="{me:LocalizationSource MainWindow.PostHeight}" />
+                        <ui:TextBox
+                            Grid.Row="0" Grid.Column="1"
+                            Style="{StaticResource NumberBox}"
+                            Text="{Binding PostHeight, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Grid.Row="0" Grid.Column="3"
+                            Style="{StaticResource FieldLabel}"
+                            Text="{me:LocalizationSource MainWindow.MaxPostStep}" />
+                        <ui:TextBox
+                            Grid.Row="0" Grid.Column="4"
+                            Style="{StaticResource NumberBox}"
+                            Text="{Binding MaxPostStep, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Grid.Row="2" Grid.Column="0"
+                            Style="{StaticResource FieldLabel}"
+                            Text="{me:LocalizationSource MainWindow.PostRotation}" />
+                        <ui:TextBox
+                            Grid.Row="2" Grid.Column="1"
+                            Style="{StaticResource NumberBox}"
+                            Text="{Binding PostRotation, UpdateSourceTrigger=PropertyChanged}" />
+                    </Grid>
+
+                    <TextBlock
+                        Style="{StaticResource SectionHeader}"
+                        Text="{me:LocalizationSource MainWindow.Handrail}" />
+                    <ComboBox
+                        Style="{StaticResource TypeComboBox}"
+                        ItemsSource="{Binding FramingTypes}"
+                        SelectedItem="{Binding HandrailType}" />
+
+                    <TextBlock
+                        Style="{StaticResource SectionHeader}"
+                        Text="{me:LocalizationSource MainWindow.Rods}" />
+                    <ComboBox
+                        Style="{StaticResource TypeComboBox}"
+                        ItemsSource="{Binding FramingTypes}"
+                        SelectedItem="{Binding RodType}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Style="{StaticResource FieldLabel}"
+                            Text="{me:LocalizationSource MainWindow.RodOffsets}" />
+                        <ui:TextBox
+                            Width="220"
+                            Text="{Binding RodOffsets, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <CheckBox
+                        Margin="0,12,0,6"
+                        FontWeight="SemiBold"
+                        Content="{me:LocalizationSource MainWindow.Plates}"
+                        IsChecked="{Binding HasPlates}" />
+                    <StackPanel IsEnabled="{Binding HasPlates}">
+                        <ComboBox
+                            Style="{StaticResource TypeComboBox}"
+                            ItemsSource="{Binding FramingTypes}"
+                            SelectedItem="{Binding PlateType}" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Style="{StaticResource FieldLabel}"
+                                Text="{me:LocalizationSource MainWindow.PlateLength}" />
+                            <ui:TextBox
+                                Style="{StaticResource NumberBox}"
+                                Text="{Binding PlateLength, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <CheckBox
+                        Margin="0,12,0,6"
+                        FontWeight="SemiBold"
+                        Content="{me:LocalizationSource MainWindow.Anchors}"
+                        IsChecked="{Binding HasAnchors}" />
+                    <StackPanel IsEnabled="{Binding HasAnchors}">
+                        <ComboBox
+                            Style="{StaticResource TypeComboBox}"
+                            ItemsSource="{Binding FramingTypes}"
+                            SelectedItem="{Binding AnchorType}" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Style="{StaticResource FieldLabel}"
+                                Text="{me:LocalizationSource MainWindow.AnchorLength}" />
+                            <ui:TextBox
+                                Style="{StaticResource NumberBox}"
+                                Text="{Binding AnchorLength, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
 
         <StackPanel
             Grid.Row="2"
@@ -60,7 +307,7 @@
 
             <ui:Button
                 Margin="8"
-                Width="80"
+                Width="200"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
@@ -68,7 +315,7 @@
 
             <ui:Button
                 Margin="8"
-                Width="80"
+                Width="100"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />

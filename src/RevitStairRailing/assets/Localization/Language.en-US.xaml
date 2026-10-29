@@ -2,12 +2,51 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на американский английский язык (google translate) -->
+    <system:String x:Key="MainWindow.Title">Stair railing</system:String>
 
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
+    <system:String x:Key="MainWindow.Preview">Railing span</system:String>
+    <system:String x:Key="MainWindow.PreviewNote">Dimensions in mm. The dashed line is the path (model lines along the flight edge, offset); posts are spaced evenly with a plan step not greater than the given one.</system:String>
+    <system:String x:Key="MainWindow.Trajectory">Position relative to the path lines (going up)</system:String>
+    <system:String x:Key="MainWindow.SideLeft">Left</system:String>
+    <system:String x:Key="MainWindow.SideRight">Right</system:String>
+    <system:String x:Key="MainWindow.EdgeOffset">Offset from the flight edge, mm</system:String>
+    <system:String x:Key="MainWindow.CreateAssembly">Create assembly</system:String>
+    <system:String x:Key="MainWindow.AssemblyName">Assembly name (number is appended)</system:String>
 
-    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.Posts">Posts</system:String>
+    <system:String x:Key="MainWindow.PostHeight">Height to handrail axis, mm</system:String>
+    <system:String x:Key="MainWindow.MaxPostStep">Maximum step, mm</system:String>
+    <system:String x:Key="MainWindow.PostRotation">Cross-section rotation, °</system:String>
+    <system:String x:Key="MainWindow.Handrail">Handrail</system:String>
+    <system:String x:Key="MainWindow.Rods">Longitudinal rods</system:String>
+    <system:String x:Key="MainWindow.RodOffsets">Below handrail axis, mm (separated by ";")</system:String>
+    <system:String x:Key="MainWindow.Plates">Base plates</system:String>
+    <system:String x:Key="MainWindow.PlateLength">Length along the railing, mm</system:String>
+    <system:String x:Key="MainWindow.Anchors">Anchors</system:String>
+    <system:String x:Key="MainWindow.AnchorLength">Length down from the post bottom, mm</system:String>
+
+    <system:String x:Key="MainWindow.NoPostType">Select the post type.</system:String>
+    <system:String x:Key="MainWindow.BadPostHeight">Post height must be a positive number.</system:String>
+    <system:String x:Key="MainWindow.BadPostStep">Post step must be a positive number.</system:String>
+    <system:String x:Key="MainWindow.BadPostRotation">Post rotation must be a number.</system:String>
+    <system:String x:Key="MainWindow.NoHandrailType">Select the handrail type.</system:String>
+    <system:String x:Key="MainWindow.BadRodOffsets">Rod offsets must be numbers separated by ";", greater than 0 and less than the post height.</system:String>
+    <system:String x:Key="MainWindow.NoRodType">Select the rod type.</system:String>
+    <system:String x:Key="MainWindow.NoPlateType">Select the plate type.</system:String>
+    <system:String x:Key="MainWindow.BadPlateLength">Plate length must be a positive number.</system:String>
+    <system:String x:Key="MainWindow.NoAnchorType">Select the anchor type.</system:String>
+    <system:String x:Key="MainWindow.BadAnchorLength">Anchor length must be a positive number.</system:String>
+    <system:String x:Key="MainWindow.BadEdgeOffset">Edge offset must be a number not less than 0.</system:String>
+    <system:String x:Key="MainWindow.NoAssemblyName">Enter the assembly name.</system:String>
+
+    <system:String x:Key="Pick.Prompt">Select the model lines of the railing path (along flight and landing edges) and press Finish</system:String>
+    <system:String x:Key="Path.NoLines">No model lines selected.</system:String>
+    <system:String x:Key="Path.NotLines">The path is built from straight model lines only: the selection contains arcs or splines.</system:String>
+    <system:String x:Key="Path.Closed">The lines form a closed loop — the path must have a start and an end.</system:String>
+    <system:String x:Key="Path.NotChain">The lines do not form one chain: ends of adjacent lines must coincide, without gaps or branches.</system:String>
+    <system:String x:Key="Path.Vertical">One of the lines is vertical — the path follows flights and landings in plan.</system:String>
+    <system:String x:Key="Build.NoLevels">The model has no levels.</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">Select lines and build</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>
