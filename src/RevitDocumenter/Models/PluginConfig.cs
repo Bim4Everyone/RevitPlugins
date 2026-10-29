@@ -68,4 +68,9 @@ internal class RevitSettings : ProjectSettings {
     public List<string> HorizontalRefNames { get; set; }
     public bool PlaceDimensionsAccurately { get; set; }
     public bool CreateMarkedImage { get; set; }
+
+    /// <summary>
+    /// Путь к JSON-файлу настроек образмеривания помещений.
+    /// </summary>
+    public string RoomDimensioningSettingsPath { get; set; }
 }

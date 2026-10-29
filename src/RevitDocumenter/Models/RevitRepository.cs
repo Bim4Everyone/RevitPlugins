@@ -3,6 +3,7 @@ using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 using RevitDocumenter.Models.Dimensions;
@@ -46,6 +47,11 @@ internal class RevitRepository {
     public Document Document => ActiveUIDocument.Document;
 
     /// <summary>
+    /// Активный вид документа.
+    /// </summary>
+    public View ActiveView => Document.ActiveView;
+
+    /// <summary>
     /// Возвращает список типоразмеров размеров
     /// </summary>
     public List<DimensionType> DimensionTypes => new FilteredElementCollector(Document)
@@ -62,6 +68,34 @@ internal class RevitRepository {
           .WhereElementIsNotElementType()
           .OfType<Grid>()
           .ToList();
+    }
+
+    /// <summary>
+    /// Возвращает размещенные помещения (площадь больше нуля), видимые на активном виде.
+    /// </summary>
+    public List<Room> GetRoomsOnActiveView() {
+        return new FilteredElementCollector(Document, Document.ActiveView.Id)
+            .OfCategory(BuiltInCategory.OST_Rooms)
+            .WhereElementIsNotElementType()
+            .OfType<Room>()
+            .Where(r => r.Area > 0)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Удаляет на активном виде размеры с типоразмерами из списка.
+    /// </summary>
+    /// <returns>Количество удаленных размеров.</returns>
+    public int DeleteDimensionsOfTypes(ICollection<string> dimensionTypeNames) {
+        dimensionTypeNames.ThrowIfNull();
+        var ids = GetDimensions()
+            .Where(d => d.DimensionType != null && dimensionTypeNames.Contains(d.DimensionType.Name))
+            .Select(d => d.Id)
+            .ToList();
+        if(ids.Count > 0) {
+            Document.Delete(ids);
+        }
+        return ids.Count;
     }
 
     public List<Dimension> GetDimensions() {

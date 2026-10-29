@@ -1,0 +1,55 @@
+{
+  "PurposeParameterName": "Назначение",
+  "Layout": {
+    "FirstTierOffsetPrintMm": 8,
+    "TierStepPrintMm": 7,
+    "MaxShiftPrintMm": 10,
+    "MaxLeaderPrintMm": 15
+  },
+  "RoomTypes": [
+    {
+      "Name": "Квартира",
+      "PurposeValue": "Квартира",
+      "DimensionTypeName": "я_Основной_Плагин_2.5 мм",
+      "BoundaryLocation": "Finish",
+      "MergeOffsetMm": 10,
+      "MinLineLengthMm": 10,
+      "EqualityToleranceMm": 0.5,
+      "OverallDimMinSegments": 4
+    },
+    {
+      "Name": "Машино-место",
+      "PurposeValue": "Машино-место",
+      "DimensionTypeName": "я_Основной_Плагин_2.5 мм",
+      "BoundaryLocation": "Finish",
+      "MergeOffsetMm": 200,
+      "MinLineLengthMm": 200,
+      "EqualityToleranceMm": 30,
+      "OverallDimMinSegments": 4
+    },
+    {
+      "Name": "НХП",
+      "PurposeValue": "НХП",
+      "DimensionTypeName": "я_Основной_Плагин_2.5 мм",
+      "BoundaryLocation": "Finish",
+      "MergeOffsetMm": 10,
+      "MinLineLengthMm": 10,
+      "EqualityToleranceMm": 0.5,
+      "OverallDimMinSegments": 4
+    },
+    {
+      "Name": "Коммерция",
+      "PurposeValue": "Коммерция",
+      "DimensionTypeName": "я_Основной_Плагин_2.5 мм",
+      "BoundaryLocation": "Finish",
+      "MergeOffsetMm": 200,
+      "MinLineLengthMm": 200,
+      "EqualityToleranceMm": 30,
+      "OverallDimMinSegments": 4
+    }
+  ],
+  "Debug": {
+    "Enabled": true,
+    "OutputFolder": "C:\\Users\\nikita\\Desktop\\Проекты\\Размеры квартир\\Journal"
+  }
+}
