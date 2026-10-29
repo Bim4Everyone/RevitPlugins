@@ -235,6 +235,9 @@
   <Project Path="src/RevitSplitMepCurve/RevitSplitMepCurve.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitStairRailing/RevitStairRailing.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitSuperfilter/RevitSuperfilter.csproj">
     <Platform Project="x64" />
   </Project>

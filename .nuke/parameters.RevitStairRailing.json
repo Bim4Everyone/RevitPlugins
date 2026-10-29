@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.slnx",
+  "PluginName": "RevitStairRailing",
+  "PublishDirectory": "03.KR.extension\\КР.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/3859/stairs",
+  "BundleName": "Ограждение лестниц",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "03.KR.extension\\КР.tab\\КМ.panel"
+}
