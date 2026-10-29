@@ -36,16 +36,6 @@
             <Setter Property="Margin" Value="0,0,8,0" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-        <Style x:Key="TypeComboBox" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
-            <Setter Property="Margin" Value="0,0,0,6" />
-            <Setter Property="DisplayMemberPath" Value="Name" />
-            <Setter Property="IsTextSearchEnabled" Value="True" />
-            <Setter Property="TextSearch.TextPath" Value="Name" />
-        </Style>
-        <Style x:Key="NumberBox" TargetType="ui:TextBox" BasedOn="{StaticResource {x:Type ui:TextBox}}">
-            <Setter Property="Width" Value="90" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-        </Style>
     </core:WpfUIPlatformWindow.Resources>
 
     <Grid>
@@ -155,7 +145,8 @@
                         Style="{StaticResource FieldLabel}"
                         Text="{me:LocalizationSource MainWindow.EdgeOffset}" />
                     <ui:TextBox
-                        Style="{StaticResource NumberBox}"
+                        Width="90"
+                        HorizontalAlignment="Left"
                         Text="{Binding EdgeOffset, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
@@ -185,7 +176,10 @@
                         Margin="0,0,0,6"
                         Text="{me:LocalizationSource MainWindow.Posts}" />
                     <ComboBox
-                        Style="{StaticResource TypeComboBox}"
+                        Margin="0,0,0,6"
+                        DisplayMemberPath="Name"
+                        IsTextSearchEnabled="True"
+                        TextSearch.TextPath="Name"
                         ItemsSource="{Binding FramingTypes}"
                         SelectedItem="{Binding PostType}" />
                     <Grid>
@@ -207,7 +201,8 @@
                             Text="{me:LocalizationSource MainWindow.PostHeight}" />
                         <ui:TextBox
                             Grid.Row="0" Grid.Column="1"
-                            Style="{StaticResource NumberBox}"
+                            Width="90"
+                        HorizontalAlignment="Left"
                             Text="{Binding PostHeight, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBlock
                             Grid.Row="0" Grid.Column="3"
@@ -215,7 +210,8 @@
                             Text="{me:LocalizationSource MainWindow.MaxPostStep}" />
                         <ui:TextBox
                             Grid.Row="0" Grid.Column="4"
-                            Style="{StaticResource NumberBox}"
+                            Width="90"
+                        HorizontalAlignment="Left"
                             Text="{Binding MaxPostStep, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBlock
                             Grid.Row="2" Grid.Column="0"
@@ -223,7 +219,8 @@
                             Text="{me:LocalizationSource MainWindow.PostRotation}" />
                         <ui:TextBox
                             Grid.Row="2" Grid.Column="1"
-                            Style="{StaticResource NumberBox}"
+                            Width="90"
+                        HorizontalAlignment="Left"
                             Text="{Binding PostRotation, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
 
@@ -231,7 +228,10 @@
                         Style="{StaticResource SectionHeader}"
                         Text="{me:LocalizationSource MainWindow.Handrail}" />
                     <ComboBox
-                        Style="{StaticResource TypeComboBox}"
+                        Margin="0,0,0,6"
+                        DisplayMemberPath="Name"
+                        IsTextSearchEnabled="True"
+                        TextSearch.TextPath="Name"
                         ItemsSource="{Binding FramingTypes}"
                         SelectedItem="{Binding HandrailType}" />
 
@@ -239,7 +239,10 @@
                         Style="{StaticResource SectionHeader}"
                         Text="{me:LocalizationSource MainWindow.Rods}" />
                     <ComboBox
-                        Style="{StaticResource TypeComboBox}"
+                        Margin="0,0,0,6"
+                        DisplayMemberPath="Name"
+                        IsTextSearchEnabled="True"
+                        TextSearch.TextPath="Name"
                         ItemsSource="{Binding FramingTypes}"
                         SelectedItem="{Binding RodType}" />
                     <StackPanel Orientation="Horizontal">
@@ -258,7 +261,10 @@
                         IsChecked="{Binding HasPlates}" />
                     <StackPanel IsEnabled="{Binding HasPlates}">
                         <ComboBox
-                            Style="{StaticResource TypeComboBox}"
+                            Margin="0,0,0,6"
+                        DisplayMemberPath="Name"
+                        IsTextSearchEnabled="True"
+                        TextSearch.TextPath="Name"
                             ItemsSource="{Binding FramingTypes}"
                             SelectedItem="{Binding PlateType}" />
                         <StackPanel Orientation="Horizontal">
@@ -266,7 +272,8 @@
                                 Style="{StaticResource FieldLabel}"
                                 Text="{me:LocalizationSource MainWindow.PlateLength}" />
                             <ui:TextBox
-                                Style="{StaticResource NumberBox}"
+                                Width="90"
+                        HorizontalAlignment="Left"
                                 Text="{Binding PlateLength, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </StackPanel>
@@ -278,7 +285,10 @@
                         IsChecked="{Binding HasAnchors}" />
                     <StackPanel IsEnabled="{Binding HasAnchors}">
                         <ComboBox
-                            Style="{StaticResource TypeComboBox}"
+                            Margin="0,0,0,6"
+                        DisplayMemberPath="Name"
+                        IsTextSearchEnabled="True"
+                        TextSearch.TextPath="Name"
                             ItemsSource="{Binding FramingTypes}"
                             SelectedItem="{Binding AnchorType}" />
                         <StackPanel Orientation="Horizontal">
@@ -286,7 +296,8 @@
                                 Style="{StaticResource FieldLabel}"
                                 Text="{me:LocalizationSource MainWindow.AnchorLength}" />
                             <ui:TextBox
-                                Style="{StaticResource NumberBox}"
+                                Width="90"
+                        HorizontalAlignment="Left"
                                 Text="{Binding AnchorLength, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </StackPanel>
