@@ -30,7 +30,10 @@ internal class FindingCollection {
         finding.Entries.Add(new FindingEntry {
             FileName = fileName,
             Detail = detail,
-            ElementIds = (elementIds ?? Enumerable.Empty<long>()).Distinct().OrderBy(id => id).ToList()
+            ElementIds = (elementIds ?? Enumerable.Empty<long>())
+                .Distinct()
+                .OrderBy(id => id)
+                .ToList()
         });
     }
 }

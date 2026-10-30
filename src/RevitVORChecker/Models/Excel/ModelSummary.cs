@@ -32,7 +32,9 @@ internal class ModelSummary {
     }
 
     private static ModelSummary Create(ModelData model) {
-        var materials = model.Materials.GroupBy(material => material.Id).ToDictionary(group => group.Key, group => group.Last());
+        var materials = model.Materials
+            .GroupBy(material => material.Id)
+            .ToDictionary(group => group.Key, group => group.Last());
         var blocks = new List<string>();
         int vorCount = 0;
         int unsortedCount = 0;

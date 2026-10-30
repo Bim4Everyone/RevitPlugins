@@ -87,7 +87,7 @@ internal static class ExcelComparison {
             TryProcessFile(fileName, comparisonWriter, () => {
                 using var workbook = new XlsxReader(vorFile);
                 OrderedMap<string, string> sheets = workbook.GetSheetPaths();
-                string sourceSheet = sheets.Keys.FirstOrDefault(name => name.Trim().ToLowerInvariant() == "исходная вор");
+                string sourceSheet = sheets.Keys.FirstOrDefault(name => string.Equals(name.Trim(), "исходная вор", StringComparison.OrdinalIgnoreCase));
                 if(sourceSheet == null) {
                     comparisonWriter.Add(fileName + ": нет листа «Исходная ВОР».");
                     return;

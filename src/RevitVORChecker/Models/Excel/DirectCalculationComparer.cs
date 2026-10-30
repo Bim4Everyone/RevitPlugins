@@ -95,7 +95,10 @@ internal static class DirectCalculationComparer {
                 continue;
             }
 
-            var numbers = cells.Skip(unitIndex + 1).Where(cell => ExcelText.ParseNumber(cell) != null).ToList();
+            var numbers = cells
+                .Skip(unitIndex + 1)
+                .Where(cell => ExcelText.ParseNumber(cell) != null)
+                .ToList();
             string quantity = numbers.Count > 0 ? numbers[0] : "";
             string rate = numbers.Count > 1 ? PythonFormat.GeneralFormat(ExcelText.ParseNumber(numbers[1]).GetValueOrDefault()) : "";
             var item = new CalculationItem(name, cells[unitIndex], rate);

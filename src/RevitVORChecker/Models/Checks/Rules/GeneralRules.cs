@@ -26,6 +26,11 @@ internal static class GeneralRules {
     private static readonly Regex _fileNamePattern =
         new(@"^[A-Z]{4}-[A-Z]{0,2}\d{2}(\.\d+)?_KR(_[A-Za-z0-9,\-\(\)\.]+)*$");
 
+    /// <summary>
+    /// Обязательные сведения о проекте: системные параметры — по отображаемому имени (так они выгружены),
+    /// «ФОП_Абсолютная отметка нуля проекта» — строкой: в платформе такого параметра нет
+    /// (SharedParamsConfig, проверено 30.10.2026).
+    /// </summary>
     private static readonly string[] _requiredProjectInfo = {
         "Статус проекта", "Заказчик", "Адрес проекта", "Наименование проекта", "Номер проекта",
         "ФОП_Абсолютная отметка нуля проекта"
@@ -86,7 +91,7 @@ internal static class GeneralRules {
 
             int variantRows = schedule.Rows
                 .Skip(1)
-                .Count(row => row.Any(cell => (cell ?? "").ToLowerInvariant().Contains("варианты")));
+                .Count(row => row.Any(cell => (cell ?? "").IndexOf("варианты", StringComparison.OrdinalIgnoreCase) >= 0));
             if(variantRows > 0) {
                 findings.Add(
                     ReportSections.General,

@@ -242,7 +242,10 @@ internal class CheckProcess {
         Document? document = null;
         try {
             document = DetachedModelOpener.Open(_revitRepository.Application, models[mainModel], out _);
-            var linkPaths = models.Where(model => model.Key != mainModel).Select(model => model.Value).ToList();
+            var linkPaths = models
+                .Where(model => model.Key != mainModel)
+                .Select(model => model.Value)
+                .ToList();
             ScheduleTablesData schedules = ScheduleTableReader.Read(document, _scheduleNames, linkPaths);
             JsonFiles.Save(schedulesFile, schedules);
             foreach(string line in schedules.Log.Where(line => line.StartsWith("ОШИБКА"))) {
@@ -360,7 +363,11 @@ internal class CheckProcess {
             NextScreenshotStep();
         }
 
-        var lostImages = jobsByModel.Values.SelectMany(jobs => jobs).Where(IsMissing).Select(job => job.Name).ToList();
+        var lostImages = jobsByModel.Values
+            .SelectMany(jobs => jobs)
+            .Where(IsMissing)
+            .Select(job => job.Name)
+            .ToList();
         if(lostImages.Count > 0) {
             log.Write("Не удалось снять " + lostImages.Count + " скриншотов: " + string.Join(", ", lostImages.Take(20)));
         }

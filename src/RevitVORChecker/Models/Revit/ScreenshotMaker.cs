@@ -97,7 +97,10 @@ internal static class ScreenshotMaker {
         ScreenshotFraming framing,
         string fragmentFile) {
 
-        var boxes = ids.Select(id => document.GetElement(id).get_BoundingBox(null)).Where(box => box != null).ToList();
+        var boxes = ids
+            .Select(id => document.GetElement(id).get_BoundingBox(null))
+            .Where(box => box != null)
+            .ToList();
         if(boxes.Count == 0) {
             return null;
         }
@@ -159,7 +162,7 @@ internal static class ScreenshotMaker {
         View3D view = View3D.CreateIsometric(document, view3DType.Id);
         try {
             view.ViewTemplateId = ElementId.InvalidElementId;
-        } catch(Exception) {
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             // у вида может не быть шаблона
         }
 
@@ -169,7 +172,7 @@ internal static class ScreenshotMaker {
             view.SetSectionBox(frame);
             try {
                 view.IsSectionBoxActive = true;
-            } catch(Exception) {
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 // подрезка уже включена
             }
         }
@@ -232,7 +235,7 @@ internal static class ScreenshotMaker {
                 if(isHidden && view.CanCategoryBeHidden(category.Id)) {
                     view.SetCategoryHidden(category.Id, true);
                 }
-            } catch(Exception) {
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                 // часть категорий нельзя скрыть
             }
         }
@@ -257,7 +260,7 @@ internal static class ScreenshotMaker {
                         view.SetCategoryHidden(element.Category.Id, false);
                         revealedCount++;
                     }
-                } catch(Exception) {
+                } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                     // категорию нельзя включить
                 }
             }
@@ -268,7 +271,7 @@ internal static class ScreenshotMaker {
                         view.SetWorksetVisibility(element.WorksetId, WorksetVisibility.Visible);
                         revealedCount++;
                     }
-                } catch(Exception) {
+                } catch(Autodesk.Revit.Exceptions.ApplicationException) {
                     // рабочий набор нельзя включить
                 }
             }
@@ -306,7 +309,7 @@ internal static class ScreenshotMaker {
     private static void TrySetOverride(View view, ElementId elementId, OverrideGraphicSettings settings) {
         try {
             view.SetElementOverrides(elementId, settings);
-        } catch(Exception) {
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             // у части элементов переопределения недоступны
         }
     }

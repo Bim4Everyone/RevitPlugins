@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 using RevitVORChecker.Core;
@@ -236,7 +237,7 @@ internal static class SmrParameterRules {
                     bool isStandardName = Regex.IsMatch(level.Name, @"^[А-ЯA-Z]{0,2}\d{2} этаж(_|$)");
                     bool hasSameNumber = Regex.IsMatch(
                         levelHead,
-                        @"(?<![\d.,])0*" + int.Parse(floorNumber) + @"(?![\d.,])");
+                        @"(?<![\d.,])0*" + int.Parse(floorNumber, CultureInfo.InvariantCulture) + @"(?![\d.,])");
                     if(!isStandardName
                        && hasSameNumber
                        && (floorPrefix.Length == 0 || levelHead.Contains(floorPrefix))) {

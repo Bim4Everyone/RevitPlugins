@@ -50,7 +50,10 @@ internal class VorScheduleComparer {
             return;
         }
 
-        var missingColumns = columns.Where(column => column.Value == null).Select(column => column.Key).ToList();
+        var missingColumns = columns
+            .Where(column => column.Value == null)
+            .Select(column => column.Key)
+            .ToList();
         if(missingColumns.Count > 0) {
             writer.Add(fileName + ": в Excel нет столбцов спецификации: " + string.Join(", ", missingColumns) + ".");
         }

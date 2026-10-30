@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 
@@ -21,7 +22,8 @@ internal static class VentilationChecker {
 
         var ventilationFiles = fileNames
             .Where(name => Regex.IsMatch(name, "вент[а]?блок|уэрв", RegexOptions.IgnoreCase)
-                           && (name.ToLowerInvariant().EndsWith(".xlsx") || name.ToLowerInvariant().EndsWith(".xlsm"))
+                           && (name.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)
+                               || name.EndsWith(".xlsm", StringComparison.OrdinalIgnoreCase))
                            && !name.StartsWith("~$"))
             .ToList();
         if(ventilationFiles.Count == 0) {
@@ -138,7 +140,7 @@ internal static class VentilationChecker {
         }
 
         // номер этажа числом: ключи этажей всегда двузначные, как в имени уровня
-        return ExcelText.IsDigits(level) ? int.Parse(level).ToString("00") : level;
+        return ExcelText.IsDigits(level) ? int.Parse(level, CultureInfo.InvariantCulture).ToString("00") : level;
     }
 
     /// <summary>
@@ -167,7 +169,11 @@ internal static class VentilationChecker {
         FindingWriter writer) {
 
         OrderedMap<string, double> countByFloor = group.CountByFloor;
-        var floorNumbers = countByFloor.Keys.Where(ExcelText.IsDigits).Select(int.Parse).OrderBy(number => number).ToList();
+        var floorNumbers = countByFloor.Keys
+            .Where(ExcelText.IsDigits)
+            .Select(text => int.Parse(text, CultureInfo.InvariantCulture))
+            .OrderBy(number => number)
+            .ToList();
         if(floorNumbers.Count == 0) {
             return;
         }
@@ -186,7 +192,10 @@ internal static class VentilationChecker {
         }
 
         // типовое количество — самое частое на средних этажах (без первого и последнего)
-        var middleFloors = floorNumbers.Count > 2 ? floorNumbers.Skip(1).Take(floorNumbers.Count - 2).ToList() : new List<int>();
+        var middleFloors = floorNumbers.Count > 2 ? floorNumbers
+            .Skip(1)
+            .Take(floorNumbers.Count - 2)
+            .ToList() : new List<int>();
         if(middleFloors.Count == 0) {
             middleFloors = floorNumbers;
         }
@@ -233,7 +242,10 @@ internal static class VentilationChecker {
 
         var vorFloors = new HashSet<string>(vorRecordsByBlock[candidates[0]]
             .SelectMany(record => ExcelText.ParseFloors(record.Get("Этаж"))));
-        var vorFloorNumbers = vorFloors.Where(ExcelText.IsDigits).Select(int.Parse).ToList();
+        var vorFloorNumbers = vorFloors
+            .Where(ExcelText.IsDigits)
+            .Select(text => int.Parse(text, CultureInfo.InvariantCulture))
+            .ToList();
         int topFloor = vorFloorNumbers.Count > 0 ? vorFloorNumbers.Max() : 0;
         if(topFloor != 0 && lastFloor < topFloor - 1) {
             writer.Add(

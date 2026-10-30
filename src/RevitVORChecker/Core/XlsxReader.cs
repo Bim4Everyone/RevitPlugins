@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Compression;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -105,7 +106,7 @@ internal class XlsxReader : IDisposable {
             return null;
         }
 
-        return cellType == "s" ? _sharedStrings[int.Parse(value.Value)] : value.Value;
+        return cellType == "s" ? _sharedStrings[int.Parse(value.Value, CultureInfo.InvariantCulture)] : value.Value;
     }
 
     /// <summary>
@@ -117,7 +118,7 @@ internal class XlsxReader : IDisposable {
         foreach(XElement rowElement in ReadRequiredPart(partPath).Descendants(SpreadsheetNamespace + "row")) {
             // ссылки r необязательны: без них строка и ячейка идут следом за предыдущими
             string rowReference = (string) rowElement.Attribute("r");
-            int rowNumber = rowReference != null ? int.Parse(rowReference) : previousRowNumber + 1;
+            int rowNumber = rowReference != null ? int.Parse(rowReference, CultureInfo.InvariantCulture) : previousRowNumber + 1;
             previousRowNumber = rowNumber;
             var row = new SheetRow(rowNumber);
             int previousColumnIndex = -1;
@@ -152,7 +153,7 @@ internal class XlsxReader : IDisposable {
         } else if(value == null) {
             return null;
         } else if(cellType == "s") {
-            text = _sharedStrings[int.Parse(value.Value)];
+            text = _sharedStrings[int.Parse(value.Value, CultureInfo.InvariantCulture)];
             isText = true;
         } else {
             text = value.Value ?? "";

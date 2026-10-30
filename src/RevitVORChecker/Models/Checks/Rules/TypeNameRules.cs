@@ -100,7 +100,7 @@ internal static class TypeNameRules {
 
         var penetronMismatch = context.ConcreteElements
             .Where(element => element.TypeName.Contains("Пенетрон") != context.GetVorMaterials(element)
-                                  .Any(material => (material.Name ?? "").ToLowerInvariant().Contains("пенетрон"))
+                                  .Any(material => (material.Name ?? "").IndexOf("пенетрон", StringComparison.OrdinalIgnoreCase) >= 0)
                               && !element.TypeName.Contains("БПодготовка"))
             .ToList();
         if(penetronMismatch.Count > 0) {

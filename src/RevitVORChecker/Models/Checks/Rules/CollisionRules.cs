@@ -57,7 +57,9 @@ internal static class CollisionRules {
             findings.Add(
                 ReportSections.Collisions,
                 "Дублирование элементов: два одинаковых элемента в одном месте — двойной объём в ВОР.",
-                pairs.Select(pair => pair.FirstId).Concat(pairs.Select(pair => pair.SecondId)),
+                pairs
+                    .Select(pair => pair.FirstId)
+                    .Concat(pairs.Select(pair => pair.SecondId)),
                 fileName,
                 detail: typeDuplicates.Key + ", пар: " + pairs.Count);
         }
@@ -109,7 +111,9 @@ internal static class CollisionRules {
                 "Пересечение конструкций " + what + " глубиной не менее " + tolerance
                 + " мм — двойной учёт объёма бетона в ВОР. Проверить соединение (Join) и примыкание "
                 + "по статье «КР. Мод. Опалубка и отверстия».",
-                pairs.Select(pair => pair.FirstId).Concat(pairs.Select(pair => pair.SecondId)),
+                pairs
+                    .Select(pair => pair.FirstId)
+                    .Concat(pairs.Select(pair => pair.SecondId)),
                 fileName,
                 detail: "пар: " + pairs.Count + ", объём пересечений ≈ " + PythonFormat.FormatFixed(totalVolume, 2)
                         + " м³. Пары ID: " + pairIds);

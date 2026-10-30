@@ -200,7 +200,7 @@ internal class ProjectCardViewModel : BaseViewModel {
             FoundationSlabRule = FoundationRuleIndex == 1
                 ? ProjectCard.ParkingFoundationRule
                 : ProjectCard.KnowledgeBaseFoundationRule,
-            ClashVolumeDecimals = int.Parse(ClashVolumeDecimals.Trim()),
+            ClashVolumeDecimals = int.Parse(ClashVolumeDecimals.Trim(), CultureInfo.InvariantCulture),
             ReinforcementRules = ReinforcementNorms.CreateRules(table, Storeys, lowRiseBlocks),
             ReinforcementTable = ReinforcementNorms.ToTableValues(table),
             LowRiseBlocks = isMixed ? lowRiseBlocks : new List<string>()
@@ -328,7 +328,7 @@ internal class ProjectCardViewModel : BaseViewModel {
             return false;
         }
 
-        if(!int.TryParse((ClashVolumeDecimals ?? "").Trim(), out int decimals) || decimals < 0 || decimals > 6) {
+        if(!int.TryParse((ClashVolumeDecimals ?? "").Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int decimals) || decimals < 0 || decimals > 6) {
             ErrorText = _localizationService.GetLocalizedString("ProjectCard.BadDecimals");
             return false;
         }

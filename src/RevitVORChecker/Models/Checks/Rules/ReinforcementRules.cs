@@ -126,6 +126,7 @@ internal static class ReinforcementRules {
     }
 
     private static void CheckAtsNumber(ModelCheckContext context, FindingCollection findings) {
+        // «ФОП_Номер АТС» в платформе нет (SharedParamsConfig, проверено 30.10.2026) — имя строкой
         string modelAts = context.Model.ProjectInfo != null
                           && context.Model.ProjectInfo.TryGetValue("ФОП_Номер АТС", out string value)
             ? PythonFormat.Trim(value)

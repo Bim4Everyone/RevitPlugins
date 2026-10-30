@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 using RevitVORChecker.Core;
@@ -67,10 +68,12 @@ internal static class VolumeIntegrityChecker {
     private static void CheckVariants(List<VorRecord> records, string fileName, FindingWriter writer) {
         string[] columns = { "Блок", "Секция", "Этаж" };
         bool HasVariants(VorRecord record, string column) {
-            return record.Get(column).ToLowerInvariant().Contains("варианты");
+            return record.Get(column).IndexOf("варианты", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        var variantRecords = records.Where(record => columns.Any(column => HasVariants(record, column))).ToList();
+        var variantRecords = records
+            .Where(record => columns.Any(column => HasVariants(record, column)))
+            .ToList();
         if(variantRecords.Count == 0) {
             return;
         }
@@ -150,8 +153,12 @@ internal static class VolumeIntegrityChecker {
         string fileName,
         FindingWriter writer) {
 
-        var floorNumbers = floors.Where(ExcelText.IsDigits).Select(int.Parse).OrderBy(number => number).ToList();
-        if(records.Any(record => record.Get("Этаж").ToLowerInvariant().Contains("варианты"))) {
+        var floorNumbers = floors
+            .Where(ExcelText.IsDigits)
+            .Select(text => int.Parse(text, CultureInfo.InvariantCulture))
+            .OrderBy(number => number)
+            .ToList();
+        if(records.Any(record => record.Get("Этаж").IndexOf("варианты", StringComparison.OrdinalIgnoreCase) >= 0)) {
             floorNumbers.Clear();
         }
 

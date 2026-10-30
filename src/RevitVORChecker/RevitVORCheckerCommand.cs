@@ -72,15 +72,23 @@ public class RevitVORCheckerCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // окно параметров закрывается, проверка идёт с отдельным окном хода проверки
+        // Окно показывается здесь, а не через Notification(window) шаблона: тот сразу после закрытия окна
+        // выдаёт уведомление «завершено успешно», а проверка идёт после окна. Уведомление платформы —
+        // после проверки (Notification(true)); при отмене окна Notification(false) завершает команду отменой.
         var mainWindow = kernel.Get<MainWindow>();
-        if(mainWindow.ShowDialog() != true
-           || ((MainViewModel) mainWindow.DataContext).Settings is not { } settings) {
+        bool? dialogResult = mainWindow.ShowDialog();
+        if(dialogResult != true) {
+            Notification(dialogResult);
             return;
         }
 
+        CheckSettings settings = ((MainViewModel) mainWindow.DataContext).Settings
+                                 ?? throw new InvalidOperationException("Check settings are not set.");
         CheckOutcome outcome = kernel.Get<CheckRunner>().Run(settings);
         ShowOutcome(outcome, kernel.Get<IMessageBoxService>(), kernel.Get<ILocalizationService>());
+        if(outcome.Result != null) {
+            Notification(true);
+        }
     }
 
     /// <summary>

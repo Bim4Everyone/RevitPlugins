@@ -16,7 +16,9 @@
     WindowStartupLocation="CenterScreen">
 
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo x:Name="TaskbarProgress" ProgressState="Normal" />
+        <TaskbarItemInfo
+            x:Name="TaskbarProgress"
+            ProgressState="Normal" />
     </Window.TaskbarItemInfo>
 
     <Grid Margin="16">

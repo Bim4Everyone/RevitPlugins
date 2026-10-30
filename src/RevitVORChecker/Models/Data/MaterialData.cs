@@ -6,10 +6,10 @@ namespace RevitVORChecker.Models.Data;
 /// Материал модели с параметрами, которые нужны для проверки ВОР.
 /// </summary>
 internal class MaterialData {
-    public const string ChapterNameParameter = "ФОП_МТР_Наименование главы";
-    public const string WorkNameParameter = "ФОП_МТР_Наименование работы";
-    public const string UnitParameter = "ФОП_МТР_Единица измерения";
-    public const string CountTypeParameter = "ФОП_МТР_Тип подсчета";
+    public static string ChapterNameParameter => PlatformParamNames.MtrChapterTitle;
+    public static string WorkNameParameter => PlatformParamNames.MtrWorkTitle;
+    public static string UnitParameter => PlatformParamNames.MtrMeasurementUnit;
+    public static string CountTypeParameter => PlatformParamNames.MtrCountingType;
 
     /// <summary>
     /// Параметры материала, которые выгружаются по имени.
@@ -19,6 +19,8 @@ internal class MaterialData {
         WorkNameParameter,
         UnitParameter,
         CountTypeParameter,
+
+        // этих параметров в платформе нет (SharedParamsConfig, проверено 30.10.2026) — имена строками
         "ФОП_МТР_Наименование",
         "ФОП_МТР_Индекс материала"
     };

@@ -1,3 +1,4 @@
+using System.Globalization;
 using dosymep.WPF.ViewModels;
 
 using RevitVORChecker.Models.Project;
@@ -102,7 +103,7 @@ internal class ReinforcementRowViewModel : BaseViewModel {
             return true;
         }
 
-        if(int.TryParse(trimmed, out int number) && number > 0) {
+        if(int.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out int number) && number > 0) {
             value = number;
             return true;
         }

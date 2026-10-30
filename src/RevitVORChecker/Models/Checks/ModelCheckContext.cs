@@ -11,9 +11,12 @@ namespace RevitVORChecker.Models.Checks;
 /// Данные одной модели, подготовленные для правил проверки: элементы ВОР, материалы, признаки модели.
 /// </summary>
 internal class ModelCheckContext {
-    public const string BlockParameter = "ФОП_Блок СМР";
-    public const string SectionParameter = "ФОП_Секция СМР";
-    public const string FloorParameter = "ФОП_Этаж СМР";
+    public static string BlockParameter => PlatformParamNames.Block;
+    public static string SectionParameter => PlatformParamNames.Section;
+    public static string FloorParameter => PlatformParamNames.Floor;
+
+    // параметров ниже в платформе нет (SharedParamsConfig, проверено 30.10.2026) — имена строками;
+    // при добавлении параметров в платформу заменить на PlatformParamNames
     public const string LocationParameter = "ФОП_ТИП_Местоположение";
     public const string PurposeParameter = "ФОП_ТИП_Назначение";
     public const string MaterialTypeParameter = "ФОП_ТИП_Тип материала";

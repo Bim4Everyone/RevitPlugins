@@ -110,6 +110,11 @@ internal static class ModelExporter {
     /// <summary>
     /// Значение параметра как текст (как в спецификации), null — нет значения.
     /// </summary>
+    /// <remarks>
+    /// Выгружаются параметры разных типов по имени, а значение нужно в том виде, в каком его показывает
+    /// спецификация ВОР (с единицами и форматом проекта), поэтому используется <c>AsValueString</c> самого
+    /// параметра: методы платформы возвращают значение во внутренних единицах.
+    /// </remarks>
     public static string? GetParameterText(Parameter parameter) {
         if(parameter == null) {
             return null;
@@ -295,9 +300,10 @@ internal static class ModelExporter {
                 Id = RevitIds.GetValue(material.Id),
                 Name = material.Name,
                 MaterialClass = material.MaterialClass,
-                Keynote = material.get_Parameter(BuiltInParameter.KEYNOTE_PARAM)?.AsString(),
-                Description = material.get_Parameter(BuiltInParameter.ALL_MODEL_DESCRIPTION)?.AsString()
+                Keynote = material.GetParamValueOrDefault<string>(BuiltInParameter.KEYNOTE_PARAM),
+                Description = material.GetParamValueOrDefault<string>(BuiltInParameter.ALL_MODEL_DESCRIPTION)
             };
+            // параметр может отсутствовать у материала — LookupParameter вернёт null, значения не будет
             foreach(string parameterName in MaterialData.ExportedParameters) {
                 data.SetParameter(parameterName, GetParameterText(material.LookupParameter(parameterName)));
             }
@@ -326,26 +332,28 @@ internal static class ModelExporter {
 
     private static ElementData ExportElement(Document document, Element element, Func<Element, string?> getWorkset) {
         ElementType? elementType = element.GetElementType();
-        Parameter volume = element.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED);
+        double? volume = element.GetParamValueOrDefault<double?>(BuiltInParameter.HOST_VOLUME_COMPUTED);
         var familyInstance = element as FamilyInstance;
+
+        // имя стадии — как в спецификации (AsValueString); метода, который возвращает его, в платформе нет
         Parameter phaseCreated = element.get_Parameter(BuiltInParameter.PHASE_CREATED);
         Parameter phaseDemolished = element.get_Parameter(BuiltInParameter.PHASE_DEMOLISHED);
         var data = new ElementData {
             Id = RevitIds.GetValue(element.Id),
             Category = element.Category.Name,
-            BuiltInCategory = ((BuiltInCategory) RevitIds.GetValue(element.Category.Id)).ToString(),
+            BuiltInCategory = element.Category.Id.AsBuiltInCategory().ToString(),
             FamilyName = elementType?.FamilyName,
             TypeName = elementType != null ? elementType.Name : element.Name,
             Workset = getWorkset(element),
             LevelName = GetLevelName(document, element),
-            IsInGroup = element.GroupId != ElementId.InvalidElementId,
+            IsInGroup = element.GroupId.IsNotNull(),
             IsInPlace = familyInstance?.Symbol != null && familyInstance.Symbol.Family.IsInPlace,
             SuperComponentId = familyInstance?.SuperComponent != null
                 ? RevitIds.GetValue(familyInstance.SuperComponent.Id)
                 : null,
             PhaseCreated = phaseCreated?.AsValueString(),
             PhaseDemolished = phaseDemolished?.AsValueString(),
-            Volume = volume != null && volume.HasValue ? FiniteOrNull(volume.AsDouble() * _cubicFeetToCubicMeters) : null
+            Volume = volume.HasValue ? FiniteOrNull(volume.Value * _cubicFeetToCubicMeters) : null
         };
 
         BoundingBoxXYZ boundingBox = element.get_BoundingBox(null);
@@ -357,6 +365,7 @@ internal static class ModelExporter {
             };
         }
 
+        // параметр ищется у экземпляра, затем у типа; отсутствие параметра — не ошибка (LookupParameter → null)
         foreach(string parameterName in ElementData.ExportedParameters) {
             Parameter parameter = element.LookupParameter(parameterName);
             string owner = "i";
@@ -378,13 +387,13 @@ internal static class ModelExporter {
                     FiniteOrNull(element.GetMaterialArea(materialId, false) * _squareFeetToSquareMeters)
                 });
             }
-        } catch(Exception) {
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             // у части элементов материалы не читаются — элемент выгружается без материалов
         }
 
         try {
             data.PaintMaterialIds = element.GetMaterialIds(true).Select(RevitIds.GetValue).ToList();
-        } catch(Exception) {
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             data.PaintMaterialIds = new List<long>();
         }
 
@@ -392,7 +401,7 @@ internal static class ModelExporter {
     }
 
     private static string? GetLevelName(Document document, Element element) {
-        if(element.LevelId != null && element.LevelId != ElementId.InvalidElementId) {
+        if(element.LevelId != null && element.LevelId.IsNotNull()) {
             Element level = document.GetElement(element.LevelId);
             if(level != null) {
                 return level.Name;
@@ -400,9 +409,9 @@ internal static class ModelExporter {
         }
 
         foreach(BuiltInParameter levelParameter in _levelParameters) {
-            Parameter parameter = element.get_Parameter(levelParameter);
-            if(parameter != null && parameter.AsElementId() != ElementId.InvalidElementId) {
-                Element level = document.GetElement(parameter.AsElementId());
+            ElementId? levelId = element.GetParamValueOrDefault<ElementId>(levelParameter);
+            if(levelId != null && levelId.IsNotNull()) {
+                Element level = document.GetElement(levelId);
                 if(level != null) {
                     return level.Name;
                 }
@@ -451,7 +460,7 @@ internal static class ModelExporter {
                     : "";
                 filters.Add(field.GetName() + " " + filter.FilterType + " " + value);
             }
-        } catch(Exception) {
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             // фильтры, которые не читаются API, пропускаются
         }
 
@@ -471,7 +480,7 @@ internal static class ModelExporter {
 
                 rows.Add(cells);
             }
-        } catch(Exception) {
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
             // спецификация не читается — без строк
         }
 

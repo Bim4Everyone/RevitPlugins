@@ -26,7 +26,7 @@ internal static class IntegrityRules {
 
         // замечание — только РН «Скрытые»; «На скрытие» допустим (его элементы просто исключаются из проверки)
         var hiddenWorksets = context.Model.Worksets
-            .Where(workset => workset.ToLowerInvariant().Contains("скрытые"))
+            .Where(workset => workset.IndexOf("скрытые", StringComparison.OrdinalIgnoreCase) >= 0)
             .ToList();
         if(hiddenWorksets.Count > 0) {
             findings.Add(

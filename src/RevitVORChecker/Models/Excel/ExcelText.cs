@@ -60,8 +60,8 @@ internal static class ExcelText {
         foreach(string part in Regex.Split((value ?? "").Replace("этаж", " "), @"[,()\s]+")) {
             Match range = Regex.Match(part, @"^(К|П|ТХ|Т|Д)?(\d{2})-(К|П|ТХ|Т|Д)?(\d{2})$");
             if(range.Success) {
-                int first = int.Parse(range.Groups[2].Value);
-                int last = int.Parse(range.Groups[4].Value);
+                int first = int.Parse(range.Groups[2].Value, CultureInfo.InvariantCulture);
+                int last = int.Parse(range.Groups[4].Value, CultureInfo.InvariantCulture);
                 for(int number = first; number <= last; number++) {
                     floors.Add(range.Groups[1].Value + number.ToString("00"));
                 }

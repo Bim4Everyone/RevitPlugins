@@ -94,16 +94,31 @@ internal static class ScreenshotPlanner {
     /// Мелкие элементы, разбросанные по модели: на общем виде их не различить.
     /// </summary>
     private static bool AreSmallAndScattered(List<long> elementIds, Dictionary<long, ElementData> elementsById) {
-        var elements = elementIds.Where(elementsById.ContainsKey).Select(id => elementsById[id]).ToList();
+        var elements = elementIds
+            .Where(elementsById.ContainsKey)
+            .Select(id => elementsById[id])
+            .ToList();
         if(elements.Count < 2) {
             return false;
         }
 
-        var boxes = elements.Select(element => element.BoundingBox!.Select(value => value.GetValueOrDefault()).ToArray()).ToList();
-        var volumes = elements.Select(element => element.Volume ?? 0).OrderBy(volume => volume).ToList();
-        var diagonals = boxes.Select(box => Distance(box, 0, box, 3)).OrderBy(diagonal => diagonal).ToList();
-        double[] minimum = Enumerable.Range(0, 3).Select(axis => boxes.Min(box => box[axis])).ToArray();
-        double[] maximum = Enumerable.Range(0, 3).Select(axis => boxes.Max(box => box[axis + 3])).ToArray();
+        var boxes = elements
+            .Select(element => element.BoundingBox!.Select(value => value.GetValueOrDefault()).ToArray())
+            .ToList();
+        var volumes = elements
+            .Select(element => element.Volume ?? 0)
+            .OrderBy(volume => volume)
+            .ToList();
+        var diagonals = boxes
+            .Select(box => Distance(box, 0, box, 3))
+            .OrderBy(diagonal => diagonal)
+            .ToList();
+        double[] minimum = Enumerable.Range(0, 3)
+            .Select(axis => boxes.Min(box => box[axis]))
+            .ToArray();
+        double[] maximum = Enumerable.Range(0, 3)
+            .Select(axis => boxes.Max(box => box[axis + 3]))
+            .ToArray();
         return volumes[(int) (volumes.Count * 0.9)] < 0.25
                && diagonals[diagonals.Count / 2] * 25 < Distance(minimum, 0, maximum, 0);
     }

@@ -29,6 +29,10 @@
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
 
+        <!--
+            Полупрозрачный янтарный: выделяет нормы, которые пойдут в проверку, одинаково читается
+            на светлой и тёмной теме (в палитре WpfUI подходящего полупрозрачного цвета нет).
+        -->
         <SolidColorBrush
             x:Key="UsedValueBrush"
             Color="#4DFFB300" />

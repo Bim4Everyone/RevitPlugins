@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -19,7 +20,7 @@ internal static class PivotTableChecker {
         string fileName,
         FindingWriter writer) {
 
-        string pivotSheet = sheets.Keys.FirstOrDefault(name => name.ToLowerInvariant().Contains("сводн"));
+        string pivotSheet = sheets.Keys.FirstOrDefault(name => name.IndexOf("сводн", StringComparison.OrdinalIgnoreCase) >= 0);
         if(pivotSheet == null) {
             writer.Add(fileName + ": нет листа «Сводная ВОР».");
             return;
@@ -93,7 +94,7 @@ internal static class PivotTableChecker {
                 continue;
             }
 
-            if(recordCount != null && int.Parse(recordCount) != sourceRowCount) {
+            if(recordCount != null && int.Parse(recordCount, CultureInfo.InvariantCulture) != sourceRowCount) {
                 writer.Add(
                     fileName + ": сводная таблица не обновлена — в кэше " + recordCount
                     + " строк, на листе «Исходная ВОР» " + sourceRowCount

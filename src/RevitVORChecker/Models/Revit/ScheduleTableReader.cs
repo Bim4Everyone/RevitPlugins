@@ -2,6 +2,8 @@ using System.IO;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitVORChecker.Models.Data;
 
 namespace RevitVORChecker.Models.Revit;
@@ -106,7 +108,7 @@ internal static class ScheduleTableReader {
                 document,
                 ModelPathUtils.ConvertUserVisiblePathToModelPath(linkPath),
                 options);
-            if(loadResult.ElementId == ElementId.InvalidElementId || document.GetElement(loadResult.ElementId) is not RevitLinkType) {
+            if(loadResult.ElementId.IsNull() || document.GetElement(loadResult.ElementId) is not RevitLinkType) {
                 log.Add("ОШИБКА подгрузки " + fileName + ": " + loadResult.LoadResult
                         + " (возможно, это копия той же модели или файл другой версии)");
                 return;

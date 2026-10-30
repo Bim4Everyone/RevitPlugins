@@ -104,7 +104,10 @@ internal static class FloorPositionRules {
             }
         }
 
-        bool isSingleBuilding = candidates.Select(level => level.BuildingCode).Distinct().Count() <= 1;
+        bool isSingleBuilding = candidates
+            .Select(level => level.BuildingCode)
+            .Distinct()
+            .Count() <= 1;
         return isSingleBuilding ? candidates : new List<FloorLevel>();
     }
 
