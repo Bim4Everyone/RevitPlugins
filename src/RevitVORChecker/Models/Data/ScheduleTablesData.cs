@@ -7,7 +7,7 @@ namespace RevitVORChecker.Models.Data;
 /// </summary>
 internal class ScheduleTablesData {
     [JsonProperty("file")]
-    public string FileTitle { get; set; }
+    public string FileTitle { get; set; } = string.Empty;
 
     [JsonProperty("schedules")]
     public List<ScheduleTableData> Schedules { get; set; } = new();
@@ -21,7 +21,7 @@ internal class ScheduleTablesData {
 /// </summary>
 internal class ScheduleTableData {
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Спецификации нет в модели.

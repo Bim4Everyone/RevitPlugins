@@ -10,8 +10,8 @@ namespace RevitVORChecker.Models.Excel;
 /// Файлы с количеством вентблоков и УЭРВ: есть, заполнены по всем этажам, совпадают с этажностью ВОР.
 /// </summary>
 internal static class VentilationChecker {
-    private const string VentBlocks = "Вентблоки";
-    private const string AirValves = "УЭРВ";
+    private const string _ventBlocks = "Вентблоки";
+    private const string _airValves = "УЭРВ";
 
     public static void Check(
         string folder,
@@ -42,7 +42,7 @@ internal static class VentilationChecker {
             });
         }
 
-        foreach(string kind in new[] { VentBlocks, AirValves }.Where(kind => !foundKinds.Contains(kind))) {
+        foreach(string kind in new[] { _ventBlocks, _airValves }.Where(kind => !foundKinds.Contains(kind))) {
             writer.Add("Нет данных о количестве: " + kind + " (файлы: " + string.Join(", ", ventilationFiles) + ").");
         }
     }
@@ -56,7 +56,7 @@ internal static class VentilationChecker {
         FindingWriter writer) {
 
         int headerIndex = -1;
-        Dictionary<string, int> columns = null;
+        var columns = new Dictionary<string, int>();
         for(int rowIndex = 0; rowIndex < rows.Count; rowIndex++) {
             var columnByTitle = new Dictionary<string, int>();
             foreach(var cell in rows[rowIndex].Cells) {
@@ -149,15 +149,15 @@ internal static class VentilationChecker {
         foreach(string source in new[] { type, sheetName, fileName }) {
             string lowerSource = source.ToLowerInvariant();
             if(lowerSource.Contains("уэрв")) {
-                return AirValves;
+                return _airValves;
             }
 
             if(Regex.IsMatch(lowerSource, "вент[а]?блок")) {
-                return VentBlocks;
+                return _ventBlocks;
             }
         }
 
-        return VentBlocks;
+        return _ventBlocks;
     }
 
     private static void CheckGroup(

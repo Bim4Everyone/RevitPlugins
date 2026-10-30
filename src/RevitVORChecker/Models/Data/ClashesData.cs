@@ -7,7 +7,7 @@ namespace RevitVORChecker.Models.Data;
 /// </summary>
 internal class ClashesData {
     [JsonProperty("file")]
-    public string FileTitle { get; set; }
+    public string FileTitle { get; set; } = string.Empty;
 
     /// <summary>
     /// Допуск глубины пересечения, мм.
@@ -48,10 +48,10 @@ internal class DuplicateData {
     public long SecondId { get; set; }
 
     [JsonProperty("cat")]
-    public string Category { get; set; }
+    public string Category { get; set; } = string.Empty;
 
     [JsonProperty("type")]
-    public string TypeName { get; set; }
+    public string TypeName { get; set; } = string.Empty;
 }
 
 /// <summary>
@@ -68,19 +68,19 @@ internal class ClashData {
     /// Группа первого элемента: «ЖБ» или «Прочее».
     /// </summary>
     [JsonProperty("ga")]
-    public string FirstGroup { get; set; }
+    public string FirstGroup { get; set; } = string.Empty;
 
     [JsonProperty("gb")]
-    public string SecondGroup { get; set; }
+    public string SecondGroup { get; set; } = string.Empty;
 
     /// <summary>
     /// «Категория: Тип» первого элемента.
     /// </summary>
     [JsonProperty("ta")]
-    public string FirstTitle { get; set; }
+    public string FirstTitle { get; set; } = string.Empty;
 
     [JsonProperty("tb")]
-    public string SecondTitle { get; set; }
+    public string SecondTitle { get; set; } = string.Empty;
 
     [JsonProperty("vol_m3")]
     public double VolumeM3 { get; set; }

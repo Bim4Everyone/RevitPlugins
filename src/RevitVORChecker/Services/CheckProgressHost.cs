@@ -10,9 +10,9 @@ namespace RevitVORChecker.Services;
 internal sealed class CheckProgressHost : IProgress<int>, IDisposable {
     private readonly CancellationTokenSource _cancellation = new();
     private readonly ManualResetEventSlim _windowReady = new(false);
-    private Thread _thread;
-    private Dispatcher _dispatcher;
-    private CheckProgressWindow _window;
+    private Thread? _thread;
+    private Dispatcher? _dispatcher;
+    private CheckProgressWindow? _window;
 
     private CheckProgressHost() {
     }

@@ -2,6 +2,8 @@ using System.IO;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitVORChecker.Core;
 using RevitVORChecker.Models.Data;
 
@@ -11,9 +13,9 @@ namespace RevitVORChecker.Models.Revit;
 /// Выгрузка из модели данных, нужных для проверки ВОР. Модель не изменяется.
 /// </summary>
 internal static class ModelExporter {
-    private const double FeetToMillimeters = 304.8;
-    private const double SquareFeetToSquareMeters = 0.09290304;
-    private const double CubicFeetToCubicMeters = 0.028316846592;
+    private const double _feetToMillimeters = 304.8;
+    private const double _squareFeetToSquareMeters = 0.09290304;
+    private const double _cubicFeetToCubicMeters = 0.028316846592;
 
     private static readonly BuiltInCategory[] _elementCategories = {
         BuiltInCategory.OST_Floors, BuiltInCategory.OST_Roofs, BuiltInCategory.OST_StructuralFraming,
@@ -36,15 +38,15 @@ internal static class ModelExporter {
         "ВОР", "!ВОР", "Параметры ВОР", "КЖ_Изоляция", "Параметры_ФОП_ТИП"
     };
 
-    private const int MaxScheduleRows = 3000;
+    private const int _maxScheduleRows = 3000;
 
     public static ModelData Export(Document document) {
-        WorksetTable worksets = document.IsWorkshared ? document.GetWorksetTable() : null;
-        string GetWorkset(Element element) {
+        WorksetTable? worksets = document.IsWorkshared ? document.GetWorksetTable() : null;
+        string? GetWorkset(Element element) {
             return worksets?.GetWorkset(element.WorksetId)?.Name;
         }
 
-        View3D levelsView = FindLevelsView(document);
+        View3D? levelsView = FindLevelsView(document);
         return new ModelData {
             File = ExportFile(document),
             ProjectInfo = ExportProjectInfo(document),
@@ -59,10 +61,10 @@ internal static class ModelExporter {
                 .Select(level => new LevelData {
                     Id = RevitIds.GetValue(level.Id),
                     Name = level.Name,
-                    Elevation = level.Elevation * FeetToMillimeters,
+                    Elevation = level.Elevation * _feetToMillimeters,
                     Workset = GetWorkset(level),
-                    ProjectElevation = level.ProjectElevation * FeetToMillimeters,
-                    PlanExtent = GetLevelPlanExtent(level, levelsView)
+                    ProjectElevation = level.ProjectElevation * _feetToMillimeters,
+                    PlanExtent = TryGetLevelPlanExtent(level, levelsView, out List<double> extent) ? extent : null
                 })
                 .ToList(),
             Links = ExportLinks(document, GetWorkset),
@@ -108,7 +110,7 @@ internal static class ModelExporter {
     /// <summary>
     /// Значение параметра как текст (как в спецификации), null — нет значения.
     /// </summary>
-    public static string GetParameterText(Parameter parameter) {
+    public static string? GetParameterText(Parameter parameter) {
         if(parameter == null) {
             return null;
         }
@@ -140,7 +142,7 @@ internal static class ModelExporter {
     /// <summary>
     /// 3D-вид, на котором берётся габарит уровней: «{3D}», «3D» или любой изометрический.
     /// </summary>
-    private static View3D FindLevelsView(Document document) {
+    private static View3D? FindLevelsView(Document document) {
         var views = new FilteredElementCollector(document)
             .OfClass(typeof(View3D))
             .Cast<View3D>()
@@ -152,21 +154,23 @@ internal static class ModelExporter {
     }
 
     /// <summary>
-    /// Габарит уровня в плане по его геометрии на 3D-виде, мм: [minX, minY, maxX, maxY]; null — не определён.
+    /// Габарит уровня в плане по его геометрии на 3D-виде, мм: [minX, minY, maxX, maxY].
     /// </summary>
-    private static List<double> GetLevelPlanExtent(Level level, View3D view) {
+    /// <returns>false — габарит не определён (нет 3D-вида, геометрии или она не читается).</returns>
+    private static bool TryGetLevelPlanExtent(Level level, View3D? view, out List<double> extent) {
+        extent = new List<double>();
         if(view == null) {
-            return null;
+            return false;
         }
 
+        var points = new List<XYZ>();
         try {
             var options = new Options { View = view, IncludeNonVisibleObjects = true };
-            GeometryElement geometry = level.get_Geometry(options);
+            GeometryElement? geometry = level.get_Geometry(options);
             if(geometry == null) {
-                return null;
+                return false;
             }
 
-            var points = new List<XYZ>();
             foreach(GeometryObject geometryObject in geometry) {
                 if(geometryObject is Solid solid) {
                     foreach(Edge edge in solid.Edges) {
@@ -176,23 +180,25 @@ internal static class ModelExporter {
                     points.AddRange(curve.Tessellate());
                 }
             }
-
-            if(points.Count == 0) {
-                return null;
-            }
-
-            return new List<double> {
-                points.Min(point => point.X) * FeetToMillimeters,
-                points.Min(point => point.Y) * FeetToMillimeters,
-                points.Max(point => point.X) * FeetToMillimeters,
-                points.Max(point => point.Y) * FeetToMillimeters
-            };
-        } catch(Exception) {
-            return null;
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+            // геометрия уровня на этом виде не читается — габарит не определён
+            return false;
         }
+
+        if(points.Count == 0) {
+            return false;
+        }
+
+        extent.AddRange(new[] {
+            points.Min(point => point.X) * _feetToMillimeters,
+            points.Min(point => point.Y) * _feetToMillimeters,
+            points.Max(point => point.X) * _feetToMillimeters,
+            points.Max(point => point.Y) * _feetToMillimeters
+        });
+        return true;
     }
 
-    private static string NumberText(double value) {
+    private static string? NumberText(double value) {
         return double.IsNaN(value) || double.IsInfinity(value) ? null : value.ToString("R", PythonFormat.Invariant);
     }
 
@@ -210,7 +216,7 @@ internal static class ModelExporter {
             size = -1;
         }
 
-        string centralPath = null;
+        string? centralPath = null;
         try {
             if(document.IsWorkshared) {
                 centralPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(document.GetWorksharingCentralModelPath());
@@ -233,8 +239,8 @@ internal static class ModelExporter {
     private static Dictionary<string, string> ExportProjectInfo(Document document) {
         var projectInfo = new Dictionary<string, string>();
         foreach(Parameter parameter in document.ProjectInformation.Parameters) {
-            string value = GetParameterText(parameter);
-            if(!string.IsNullOrEmpty(value)) {
+            string? value = GetParameterText(parameter);
+            if(value is { Length: > 0 }) {
                 projectInfo[parameter.Definition.Name] = value;
             }
         }
@@ -242,9 +248,9 @@ internal static class ModelExporter {
         return projectInfo;
     }
 
-    private static Dictionary<string, string> ExportUnits(Document document) {
+    private static Dictionary<string, string?> ExportUnits(Document document) {
         Units units = document.GetUnits();
-        string Describe(ForgeTypeId spec) {
+        string? Describe(ForgeTypeId spec) {
             try {
                 FormatOptions options = units.GetFormatOptions(spec);
                 return options.GetUnitTypeId().TypeId + "|acc=" + NumberText(options.Accuracy);
@@ -253,7 +259,7 @@ internal static class ModelExporter {
             }
         }
 
-        return new Dictionary<string, string> {
+        return new Dictionary<string, string?> {
             ["length"] = Describe(SpecTypeId.Length),
             ["area"] = Describe(SpecTypeId.Area),
             ["volume"] = Describe(SpecTypeId.Volume),
@@ -261,7 +267,7 @@ internal static class ModelExporter {
         };
     }
 
-    private static List<LinkData> ExportLinks(Document document, Func<Element, string> getWorkset) {
+    private static List<LinkData> ExportLinks(Document document, Func<Element, string?> getWorkset) {
         var links = new List<LinkData>();
         foreach(RevitLinkType linkType in new FilteredElementCollector(document).OfClass(typeof(RevitLinkType))) {
             var instances = new FilteredElementCollector(document)
@@ -302,7 +308,7 @@ internal static class ModelExporter {
         return materials;
     }
 
-    private static List<ElementData> ExportElements(Document document, Func<Element, string> getWorkset) {
+    private static List<ElementData> ExportElements(Document document, Func<Element, string?> getWorkset) {
         var elements = new List<ElementData>();
         var collector = new FilteredElementCollector(document)
             .WherePasses(new ElementMulticategoryFilter(_elementCategories))
@@ -318,8 +324,8 @@ internal static class ModelExporter {
         return elements;
     }
 
-    private static ElementData ExportElement(Document document, Element element, Func<Element, string> getWorkset) {
-        var elementType = document.GetElement(element.GetTypeId()) as ElementType;
+    private static ElementData ExportElement(Document document, Element element, Func<Element, string?> getWorkset) {
+        ElementType? elementType = element.GetElementType();
         Parameter volume = element.get_Parameter(BuiltInParameter.HOST_VOLUME_COMPUTED);
         var familyInstance = element as FamilyInstance;
         Parameter phaseCreated = element.get_Parameter(BuiltInParameter.PHASE_CREATED);
@@ -339,15 +345,15 @@ internal static class ModelExporter {
                 : null,
             PhaseCreated = phaseCreated?.AsValueString(),
             PhaseDemolished = phaseDemolished?.AsValueString(),
-            Volume = volume != null && volume.HasValue ? FiniteOrNull(volume.AsDouble() * CubicFeetToCubicMeters) : null
+            Volume = volume != null && volume.HasValue ? FiniteOrNull(volume.AsDouble() * _cubicFeetToCubicMeters) : null
         };
 
         BoundingBoxXYZ boundingBox = element.get_BoundingBox(null);
         if(boundingBox != null) {
             data.BoundingBox = new List<double?> {
-                boundingBox.Min.X * FeetToMillimeters, boundingBox.Min.Y * FeetToMillimeters,
-                boundingBox.Min.Z * FeetToMillimeters, boundingBox.Max.X * FeetToMillimeters,
-                boundingBox.Max.Y * FeetToMillimeters, boundingBox.Max.Z * FeetToMillimeters
+                boundingBox.Min.X * _feetToMillimeters, boundingBox.Min.Y * _feetToMillimeters,
+                boundingBox.Min.Z * _feetToMillimeters, boundingBox.Max.X * _feetToMillimeters,
+                boundingBox.Max.Y * _feetToMillimeters, boundingBox.Max.Z * _feetToMillimeters
             };
         }
 
@@ -360,7 +366,7 @@ internal static class ModelExporter {
             }
 
             if(parameter != null) {
-                data.Parameters[parameterName] = new List<string> { GetParameterText(parameter), owner };
+                data.Parameters[parameterName] = new List<string?> { GetParameterText(parameter), owner };
             }
         }
 
@@ -368,8 +374,8 @@ internal static class ModelExporter {
             foreach(ElementId materialId in element.GetMaterialIds(false)) {
                 data.Materials.Add(new List<double?> {
                     RevitIds.GetValue(materialId),
-                    FiniteOrNull(element.GetMaterialVolume(materialId) * CubicFeetToCubicMeters),
-                    FiniteOrNull(element.GetMaterialArea(materialId, false) * SquareFeetToSquareMeters)
+                    FiniteOrNull(element.GetMaterialVolume(materialId) * _cubicFeetToCubicMeters),
+                    FiniteOrNull(element.GetMaterialArea(materialId, false) * _squareFeetToSquareMeters)
                 });
             }
         } catch(Exception) {
@@ -385,7 +391,7 @@ internal static class ModelExporter {
         return data;
     }
 
-    private static string GetLevelName(Document document, Element element) {
+    private static string? GetLevelName(Document document, Element element) {
         if(element.LevelId != null && element.LevelId != ElementId.InvalidElementId) {
             Element level = document.GetElement(element.LevelId);
             if(level != null) {
@@ -438,7 +444,7 @@ internal static class ModelExporter {
         try {
             foreach(ScheduleFilter filter in definition.GetFilters()) {
                 ScheduleField field = definition.GetField(filter.FieldId);
-                string value = filter.IsStringValue ? filter.GetStringValue()
+                string? value = filter.IsStringValue ? filter.GetStringValue()
                     : filter.IsDoubleValue ? NumberText(filter.GetDoubleValue())
                     : filter.IsElementIdValue ? RevitIds.GetValue(filter.GetElementIdValue()).ToString()
                     : filter.IsIntegerValue ? filter.GetIntegerValue().ToString()
@@ -456,7 +462,7 @@ internal static class ModelExporter {
         var rows = new List<List<string>>();
         try {
             TableSectionData body = schedule.GetTableData().GetSectionData(SectionType.Body);
-            int rowCount = Math.Min(body.NumberOfRows, MaxScheduleRows);
+            int rowCount = Math.Min(body.NumberOfRows, _maxScheduleRows);
             for(int row = 0; row < rowCount; row++) {
                 var cells = new List<string>();
                 for(int column = 0; column < body.NumberOfColumns; column++) {

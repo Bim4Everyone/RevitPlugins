@@ -29,7 +29,7 @@ internal class XlsxReader : IDisposable {
             throw;
         }
 
-        XDocument sharedStrings = ReadPart("xl/sharedStrings.xml");
+        XDocument? sharedStrings = ReadPart("xl/sharedStrings.xml");
         if(sharedStrings != null) {
             foreach(XElement item in sharedStrings.Root.Elements(SpreadsheetNamespace + "si")) {
                 _sharedStrings.Add(string.Concat(item.Descendants(SpreadsheetNamespace + "t").Select(t => t.Value)));
@@ -37,7 +37,15 @@ internal class XlsxReader : IDisposable {
         }
     }
 
-    public XDocument ReadPart(string name) {
+    /// <summary>
+    /// Обязательная часть книги.
+    /// </summary>
+    /// <exception cref="InvalidDataException">Части нет — файл не книга Excel.</exception>
+    public XDocument ReadRequiredPart(string name) {
+        return ReadPart(name) ?? throw new InvalidDataException("No part " + name);
+    }
+
+    public XDocument? ReadPart(string name) {
         ZipArchiveEntry entry = _archive.GetEntry(name);
         if(entry == null) {
             return null;
@@ -58,7 +66,7 @@ internal class XlsxReader : IDisposable {
     /// Имена листов в порядке книги.
     /// </summary>
     public List<string> GetSheetNames() {
-        return ReadPart("xl/workbook.xml")
+        return ReadRequiredPart("xl/workbook.xml")
             .Descendants(SpreadsheetNamespace + "sheet")
             .Select(sheet => (string) sheet.Attribute("name"))
             .ToList();
@@ -68,10 +76,10 @@ internal class XlsxReader : IDisposable {
     /// Листы книги (имя → путь части архива) в порядке книги.
     /// </summary>
     public OrderedMap<string, string> GetSheetPaths() {
-        var targets = ReadPart("xl/_rels/workbook.xml.rels").Root.Elements()
+        var targets = ReadRequiredPart("xl/_rels/workbook.xml.rels").Root.Elements()
             .ToDictionary(relation => (string) relation.Attribute("Id"), relation => (string) relation.Attribute("Target"));
         var sheets = new OrderedMap<string, string>();
-        foreach(XElement sheet in ReadPart("xl/workbook.xml").Descendants(SpreadsheetNamespace + "sheet")) {
+        foreach(XElement sheet in ReadRequiredPart("xl/workbook.xml").Descendants(SpreadsheetNamespace + "sheet")) {
             string target = targets[(string) sheet.Attribute(RelationshipsNamespace + "id")].TrimStart('/');
             if(!target.StartsWith("xl/")) {
                 target = "xl/" + target;
@@ -86,7 +94,7 @@ internal class XlsxReader : IDisposable {
     /// <summary>
     /// Значение ячейки как строка: общие строки, inlineStr, числа — как записаны в XML.
     /// </summary>
-    public string GetCellText(XElement cell) {
+    public string? GetCellText(XElement cell) {
         string cellType = (string) cell.Attribute("t");
         if(cellType == "inlineStr") {
             return string.Concat(cell.Descendants(SpreadsheetNamespace + "t").Select(t => t.Value));
@@ -106,7 +114,7 @@ internal class XlsxReader : IDisposable {
     public List<SheetRow> ReadSheet(string partPath) {
         var rows = new List<SheetRow>();
         int previousRowNumber = 0;
-        foreach(XElement rowElement in ReadPart(partPath).Descendants(SpreadsheetNamespace + "row")) {
+        foreach(XElement rowElement in ReadRequiredPart(partPath).Descendants(SpreadsheetNamespace + "row")) {
             // ссылки r необязательны: без них строка и ячейка идут следом за предыдущими
             string rowReference = (string) rowElement.Attribute("r");
             int rowNumber = rowReference != null ? int.Parse(rowReference) : previousRowNumber + 1;
@@ -117,7 +125,7 @@ internal class XlsxReader : IDisposable {
                 string cellReference = (string) cell.Attribute("r");
                 int columnIndex = cellReference != null ? GetColumnIndex(cellReference) : previousColumnIndex + 1;
                 previousColumnIndex = columnIndex;
-                SheetCell sheetCell = ReadCell(cell);
+                SheetCell? sheetCell = ReadCell(cell);
                 if(sheetCell != null) {
                     row.Cells[columnIndex] = sheetCell;
                 }
@@ -133,7 +141,7 @@ internal class XlsxReader : IDisposable {
         _archive.Dispose();
     }
 
-    private SheetCell ReadCell(XElement cell) {
+    private SheetCell? ReadCell(XElement cell) {
         XElement value = cell.Element(SpreadsheetNamespace + "v");
         string cellType = (string) cell.Attribute("t");
         string text;

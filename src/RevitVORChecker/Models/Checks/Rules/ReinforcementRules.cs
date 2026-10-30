@@ -164,7 +164,7 @@ internal static class ReinforcementRules {
         var emptyElements = new List<ElementData>();
         var outdatedElements = new List<ElementData>();
         foreach(ElementData element in context.VorElements) {
-            string value = element.GetParameter(ModelCheckContext.AdditionalSortingParameter);
+            string? value = element.GetParameter(ModelCheckContext.AdditionalSortingParameter);
             if(value == null || value.Trim().Length == 0) {
                 emptyElements.Add(element);
                 continue;

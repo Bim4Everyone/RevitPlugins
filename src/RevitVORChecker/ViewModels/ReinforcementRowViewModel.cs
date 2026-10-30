@@ -95,7 +95,7 @@ internal class ReinforcementRowViewModel : BaseViewModel {
     /// <summary>
     /// Разбирает значение ячейки: целое больше нуля или прочерк / пусто (null).
     /// </summary>
-    public static bool TryParse(string text, out int? value) {
+    public static bool TryParse(string? text, out int? value) {
         string trimmed = (text ?? "").Trim();
         value = null;
         if(trimmed.Length == 0 || trimmed == "-" || trimmed == "—" || trimmed == "–") {
@@ -113,7 +113,7 @@ internal class ReinforcementRowViewModel : BaseViewModel {
     /// <summary>
     /// Строка таблицы с введёнными значениями или null, если значение не число.
     /// </summary>
-    public ReinforcementTableRow ToTableRow() {
+    public ReinforcementTableRow? ToTableRow() {
         if(!TryParse(FirstValue, out int? firstValue)
            || (!IsParking && !TryParse(SecondValue, out _))
            || !TryParse(AlternativeValue, out _)) {

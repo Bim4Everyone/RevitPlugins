@@ -102,7 +102,7 @@ internal static class TypeParameterRules {
                 continue;
             }
 
-            string expectedSize = GetExpectedSize(element, typeName);
+            string? expectedSize = GetExpectedSize(element, typeName);
             bool isExempt = typeName.Contains("Приям") || typeName.Contains("Перепад") || typeName.Contains("ФПлита");
             if(expectedSize != null && !isExempt && Regex.Replace(value, @"\D", "") != expectedSize) {
                 problems.Add("ФОП_Размер не равен толщине конструкции.", "«" + value + "» вместо " + expectedSize + " мм", element);
@@ -115,8 +115,8 @@ internal static class TypeParameterRules {
     /// <summary>
     /// Толщина конструкции, мм: из параметра «Толщина» / «Площадка_Толщина» или из имени типа «…-200 (…)».
     /// </summary>
-    private static string GetExpectedSize(ElementData element, string typeName) {
-        string thickness = element.GetParameter("Толщина");
+    private static string? GetExpectedSize(ElementData element, string typeName) {
+        string? thickness = element.GetParameter("Толщина");
         if(string.IsNullOrEmpty(thickness)) {
             thickness = element.GetParameter("Площадка_Толщина");
         }

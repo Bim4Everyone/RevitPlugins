@@ -19,7 +19,7 @@ internal static class ExcelText {
     /// <summary>
     /// Текст ячейки без переводов строк и лишних пробелов.
     /// </summary>
-    public static string Normalize(string text) {
+    public static string Normalize(string? text) {
         string singleLine = (text ?? "").Replace("\r", " ").Replace("\n", " ");
         return Regex.Replace(singleLine, @"\s+", " ").Trim();
     }
@@ -27,7 +27,7 @@ internal static class ExcelText {
     /// <summary>
     /// Число из текста ячейки (запятая или точка, пробелы-разделители разрядов) или null.
     /// </summary>
-    public static double? ParseNumber(string text) {
+    public static double? ParseNumber(string? text) {
         string compact = (text ?? "").Trim().Replace(" ", "").Replace(" ", "");
         if(compact.Length == 0 || !Regex.IsMatch(compact, @"^-?\d+([.,]\d+)?([eE]-?\d+)?$")) {
             return null;
@@ -41,7 +41,7 @@ internal static class ExcelText {
     /// <summary>
     /// Число знаков после запятой в записи числа.
     /// </summary>
-    public static int CountDecimals(string text) {
+    public static int CountDecimals(string? text) {
         // пробелы-разделители разрядов («1 234,56») убираются, как в ParseNumber
         string compact = PythonFormat.Trim(text).Replace(" ", "").Replace(" ", "");
         Match match = Regex.Match(compact, @"^-?\d+[.,](\d+)$");
@@ -55,7 +55,7 @@ internal static class ExcelText {
     /// <summary>
     /// Этажи из значения столбца «Этаж»: «02-04 этаж» → 02, 03, 04; «П01, 01 этаж» → П01, 01.
     /// </summary>
-    public static HashSet<string> ParseFloors(string value) {
+    public static HashSet<string> ParseFloors(string? value) {
         var floors = new HashSet<string>();
         foreach(string part in Regex.Split((value ?? "").Replace("этаж", " "), @"[,()\s]+")) {
             Match range = Regex.Match(part, @"^(К|П|ТХ|Т|Д)?(\d{2})-(К|П|ТХ|Т|Д)?(\d{2})$");

@@ -27,16 +27,16 @@ internal class ProjectCardViewModel : BaseViewModel {
     };
 
     private readonly ILocalizationService _localizationService;
-    private string _name;
-    private string _atsNumber;
-    private string _assignmentDate;
-    private string _stage;
+    private string _name = string.Empty;
+    private string _atsNumber = string.Empty;
+    private string _assignmentDate = string.Empty;
+    private string _stage = string.Empty;
     private int _storeysIndex;
     private int _foundationRuleIndex;
-    private string _clashVolumeDecimals;
-    private string _lowRiseBlocks;
-    private string _highlightHint;
-    private string _errorText;
+    private string _clashVolumeDecimals = string.Empty;
+    private string _lowRiseBlocks = string.Empty;
+    private string _highlightHint = string.Empty;
+    private string? _errorText;
 
     public ProjectCardViewModel(
         ILocalizationService localizationService,
@@ -83,7 +83,7 @@ internal class ProjectCardViewModel : BaseViewModel {
     /// <summary>
     /// Данные проекта после сохранения.
     /// </summary>
-    public ProjectCard Result { get; private set; }
+    public ProjectCard? Result { get; private set; }
 
     public string Name {
         get => _name;
@@ -139,7 +139,7 @@ internal class ProjectCardViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _highlightHint, value);
     }
 
-    public string ErrorText {
+    public string? ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
@@ -171,7 +171,8 @@ internal class ProjectCardViewModel : BaseViewModel {
             return false;
         }
 
-        var table = Rows.Select(row => row.ToTableRow()).ToList();
+        // строки с неверными значениями отсеяны проверкой ввода
+        var table = Rows.Select(row => row.ToTableRow()).OfType<ReinforcementTableRow>().ToList();
         var lowRiseBlocks = ParseLowRiseBlocks();
         List<string> emptyNorms = FindEmptyNorms(table);
         if(emptyNorms.Count > 0) {

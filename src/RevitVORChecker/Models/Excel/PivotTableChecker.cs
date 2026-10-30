@@ -82,9 +82,9 @@ internal static class PivotTableChecker {
         var cacheParts = workbook.GetEntryNames()
             .Where(name => Regex.IsMatch(name, @"^xl/pivotCache/pivotCacheDefinition\d+\.xml$"));
         foreach(string cachePart in cacheParts) {
-            XElement cache = workbook.ReadPart(cachePart).Root;
+            XElement cache = workbook.ReadRequiredPart(cachePart).Root;
             string recordCount = (string) cache.Attribute("recordCount");
-            XElement source = cache.Element(XlsxReader.SpreadsheetNamespace + "cacheSource")
+            XElement? source = cache.Element(XlsxReader.SpreadsheetNamespace + "cacheSource")
                 ?.Element(XlsxReader.SpreadsheetNamespace + "worksheetSource");
 
             // сводные по другим листам книги не сверяются с «Исходной ВОР»; источник-таблица (без листа) — сверяется

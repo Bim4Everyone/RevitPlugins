@@ -21,7 +21,7 @@ internal class ModelData {
     /// Единицы проекта: вид величины (length, area, volume, angle) → «unit:...|acc=точность».
     /// </summary>
     [JsonProperty("units")]
-    public Dictionary<string, string> Units { get; set; } = new();
+    public Dictionary<string, string?> Units { get; set; } = new();
 
     [JsonProperty("worksets")]
     public List<string> Worksets { get; set; } = new();
@@ -59,13 +59,13 @@ internal class ModelData {
 /// </summary>
 internal class ModelFileData {
     [JsonProperty("title")]
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     [JsonProperty("path")]
-    public string Path { get; set; }
+    public string Path { get; set; } = string.Empty;
 
     [JsonProperty("central")]
-    public string CentralPath { get; set; }
+    public string? CentralPath { get; set; }
 
     /// <summary>
     /// Размер файла в байтах; -1 — размер неизвестен.
@@ -77,10 +77,10 @@ internal class ModelFileData {
     public bool IsWorkshared { get; set; }
 
     [JsonProperty("revit")]
-    public string RevitVersion { get; set; }
+    public string RevitVersion { get; set; } = string.Empty;
 
     [JsonProperty("exportedAt")]
-    public string ExportedAt { get; set; }
+    public string ExportedAt { get; set; } = string.Empty;
 }
 
 internal class LevelData {
@@ -88,7 +88,7 @@ internal class LevelData {
     public long Id { get; set; }
 
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Отметка уровня, мм.
@@ -97,7 +97,7 @@ internal class LevelData {
     public double Elevation { get; set; }
 
     [JsonProperty("ws")]
-    public string Workset { get; set; }
+    public string? Workset { get; set; }
 
     /// <summary>
     /// Отметка уровня во внутренних координатах модели (как габариты элементов), мм.
@@ -109,7 +109,7 @@ internal class LevelData {
     /// Габарит уровня в плане, мм: [minX, minY, maxX, maxY]; null — не определён (уровень не виден на 3D-виде).
     /// </summary>
     [JsonProperty("extent", NullValueHandling = NullValueHandling.Ignore)]
-    public List<double> PlanExtent { get; set; }
+    public List<double>? PlanExtent { get; set; }
 }
 
 /// <summary>
@@ -117,7 +117,7 @@ internal class LevelData {
 /// </summary>
 internal class LinkData {
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Связь загружена; null — неизвестно (связь удалена при открытии модели для проверки).
@@ -126,7 +126,7 @@ internal class LinkData {
     public bool? IsLoaded { get; set; }
 
     [JsonProperty("attachment")]
-    public string Attachment { get; set; }
+    public string Attachment { get; set; } = string.Empty;
 
     [JsonProperty("instances")]
     public int InstanceCount { get; set; }
@@ -135,10 +135,10 @@ internal class LinkData {
     /// Рабочие наборы экземпляров связи.
     /// </summary>
     [JsonProperty("ws")]
-    public List<string> InstanceWorksets { get; set; } = new();
+    public List<string?> InstanceWorksets { get; set; } = new();
 
     [JsonProperty("typeWs")]
-    public string TypeWorkset { get; set; }
+    public string? TypeWorkset { get; set; }
 
     [JsonProperty("removedOnOpen")]
     public bool RemovedOnOpen { get; set; }
@@ -152,7 +152,7 @@ internal class ImportData {
     public long Id { get; set; }
 
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [JsonProperty("linked")]
     public bool IsLinked { get; set; }
@@ -161,7 +161,7 @@ internal class ImportData {
     public bool IsViewSpecific { get; set; }
 
     [JsonProperty("ws")]
-    public string Workset { get; set; }
+    public string? Workset { get; set; }
 }
 
 internal class View3DData {
@@ -169,7 +169,7 @@ internal class View3DData {
     public long Id { get; set; }
 
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [JsonProperty("cropBox")]
     public bool IsCropBoxActive { get; set; }
@@ -183,10 +183,10 @@ internal class View3DData {
 /// </summary>
 internal class WarningData {
     [JsonProperty("text")]
-    public string Text { get; set; }
+    public string Text { get; set; } = string.Empty;
 
     [JsonProperty("sev")]
-    public string Severity { get; set; }
+    public string Severity { get; set; } = string.Empty;
 
     [JsonProperty("ids")]
     public List<long> ElementIds { get; set; } = new();
@@ -197,7 +197,7 @@ internal class WarningData {
 /// </summary>
 internal class ScheduleData {
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [JsonProperty("includeLinks")]
     public bool IncludeLinks { get; set; }

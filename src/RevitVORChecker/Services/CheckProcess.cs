@@ -27,7 +27,7 @@ namespace RevitVORChecker.Services;
 /// Модели открываются в фоне отсоединённо и закрываются без сохранения; файлы моделей не изменяются.
 /// </remarks>
 internal class CheckProcess {
-    private const int ScreenshotsPerBatch = 10;
+    private const int _screenshotsPerBatch = 10;
 
     /// <summary>
     /// Суффикс имени отсоединённой копии в русском и английском Revit.
@@ -95,8 +95,8 @@ internal class CheckProcess {
         }
 
         log.Write("Моделей: " + models.Count + " — " + string.Join(", ", models.Keys));
-        string classifierPath = ModelsFolder.FindClassifier(folder, settings.ClassifierPath, settings.Project);
-        if(string.IsNullOrEmpty(classifierPath) || !File.Exists(classifierPath)) {
+        string? classifierPath = ModelsFolder.FindClassifier(folder, settings.ClassifierPath, settings.Project);
+        if(classifierPath is not { Length: > 0 } || !File.Exists(classifierPath)) {
             throw new InvalidOperationException(GetText("Process.NoClassifier"));
         }
 
@@ -201,7 +201,7 @@ internal class CheckProcess {
         foreach(var model in models) {
             modelNumber++;
             log.Write("[" + modelNumber + "/" + models.Count + "] Выгрузка " + model.Key);
-            Document document = null;
+            Document? document = null;
             try {
                 document = DetachedModelOpener.Open(_revitRepository.Application, model.Value, out List<LinkData> links);
                 JsonFiles.Save(Path.Combine(workFolder, "links_" + model.Key + ".json"), links);
@@ -239,7 +239,7 @@ internal class CheckProcess {
         }
 
         log.Write("Сводная модель: " + mainModel + " — чтение спецификаций ВОР со связями");
-        Document document = null;
+        Document? document = null;
         try {
             document = DetachedModelOpener.Open(_revitRepository.Application, models[mainModel], out _);
             var linkPaths = models.Where(model => model.Key != mainModel).Select(model => model.Value).ToList();
@@ -342,9 +342,9 @@ internal class CheckProcess {
                 string modelPath = FindModelPath(models, modelName);
                 if(modelPath != null) {
                     log.Write("Скриншоты " + modelName + ": " + jobs.Count + " шт." + (attempt > 1 ? " (повтор)" : ""));
-                    for(int start = 0; start < jobs.Count; start += ScreenshotsPerBatch) {
+                    for(int start = 0; start < jobs.Count; start += _screenshotsPerBatch) {
                         cancellationToken.ThrowIfCancellationRequested();
-                        TakeScreenshotBatch(modelPath, imageFolder, jobs.Skip(start).Take(ScreenshotsPerBatch), log);
+                        TakeScreenshotBatch(modelPath, imageFolder, jobs.Skip(start).Take(_screenshotsPerBatch), log);
                     }
                 } else {
                     log.Write("   нет файла модели для " + modelName);
@@ -367,7 +367,7 @@ internal class CheckProcess {
     }
 
     private void TakeScreenshotBatch(string modelPath, string imageFolder, IEnumerable<ScreenshotJob> jobs, CheckLog log) {
-        Document document = null;
+        Document? document = null;
         try {
             document = DetachedModelOpener.Open(_revitRepository.Application, modelPath, out _);
             foreach(string line in ScreenshotMaker.Take(document, imageFolder, jobs).Where(line => line.Contains("ОШИБКА"))) {

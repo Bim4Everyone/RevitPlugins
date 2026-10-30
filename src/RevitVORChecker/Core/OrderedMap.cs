@@ -12,7 +12,7 @@ internal class OrderedMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>
     private readonly Dictionary<TKey, TValue> _values;
     private readonly List<TKey> _keys = new();
 
-    public OrderedMap(IEqualityComparer<TKey> comparer = null) {
+    public OrderedMap(IEqualityComparer<TKey>? comparer = null) {
         _values = new Dictionary<TKey, TValue>(comparer ?? EqualityComparer<TKey>.Default);
     }
 

@@ -15,14 +15,14 @@ namespace RevitVORChecker.Models.Report;
 /// Разделы без замечаний — «Замечаний нет».
 /// </remarks>
 internal static class RegistryDocumentBuilder {
-    private const int MaxListedIds = 10;
+    private const int _maxListedIds = 10;
 
     /// <summary>
     /// Ширина рисунка, EMU (75% от 16,5 см).
     /// </summary>
-    private const long ImageWidthEmu = (long) (16.5 * 360000 * 0.75);
+    private const long _imageWidthEmu = (long) (16.5 * 360000 * 0.75);
 
-    private const long MaxImageHeightEmu = 9 * 360000;
+    private const long _maxImageHeightEmu = 9 * 360000;
 
     /// <summary>
     /// Столбцы таблицы реестра и их ширина (в пятидесятых долях процента).
@@ -148,11 +148,11 @@ internal static class RegistryDocumentBuilder {
                 parts.Add("Файл " + entry.FileName);
             }
 
-            if(!string.IsNullOrEmpty(entry.Detail)) {
-                parts.Add(entry.Detail);
+            if(entry.Detail is { Length: > 0 } detail) {
+                parts.Add(detail);
             }
 
-            string idsText = DescribeElementIds(entry);
+            string? idsText = DescribeElementIds(entry);
             if(idsText != null) {
                 parts.Add(idsText);
             }
@@ -161,8 +161,8 @@ internal static class RegistryDocumentBuilder {
                 content.Append(WordXml.Paragraph("• " + string.Join(". ", parts.Select(part => part.TrimEnd('.'))) + "."));
             }
 
-            if(!string.IsNullOrEmpty(entry.ImagePath) && File.Exists(entry.ImagePath)) {
-                content.Append(AddImage(entry.ImagePath, images));
+            if(entry.ImagePath is { Length: > 0 } imagePath && File.Exists(imagePath)) {
+                content.Append(AddImage(imagePath, images));
             }
         }
 
@@ -177,13 +177,13 @@ internal static class RegistryDocumentBuilder {
     /// <summary>
     /// Текст об ID элементов записи; null — ID не выводятся (нет элементов или пары ID уже в уточнении).
     /// </summary>
-    private static string DescribeElementIds(FindingEntry entry) {
+    private static string? DescribeElementIds(FindingEntry entry) {
         List<long> ids = entry.ElementIds;
         if(ids.Count == 0 || (entry.Detail ?? "").Contains("Пары ID:")) {
             return null;
         }
 
-        if(ids.Count <= MaxListedIds) {
+        if(ids.Count <= _maxListedIds) {
             return "ID: " + string.Join(", ", ids);
         }
 
@@ -205,10 +205,10 @@ internal static class RegistryDocumentBuilder {
         string relationId = "rIdVor" + imageNumber;
         images.Add((relationId, fileName, File.ReadAllBytes(imagePath)));
         (int width, int height) = GetPngSize(imagePath);
-        long widthEmu = ImageWidthEmu;
+        long widthEmu = _imageWidthEmu;
         long heightEmu = (long) (widthEmu * height / (double) width);
-        if(heightEmu > MaxImageHeightEmu) {
-            heightEmu = MaxImageHeightEmu;
+        if(heightEmu > _maxImageHeightEmu) {
+            heightEmu = _maxImageHeightEmu;
             widthEmu = (long) (heightEmu * width / (double) height);
         }
 

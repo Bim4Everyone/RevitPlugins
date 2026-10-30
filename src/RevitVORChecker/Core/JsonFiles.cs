@@ -14,12 +14,14 @@ internal static class JsonFiles {
         FloatParseHandling = FloatParseHandling.Double
     };
 
+    /// <exception cref="InvalidDataException">В файле нет объекта (пустой файл или null).</exception>
     public static T Load<T>(string path) {
-        return JsonConvert.DeserializeObject<T>(File.ReadAllText(path, Encoding.UTF8), _settings);
+        return JsonConvert.DeserializeObject<T>(File.ReadAllText(path, Encoding.UTF8), _settings)
+               ?? throw new InvalidDataException("Empty JSON: " + path);
     }
 
     public static void Save(string path, object value, bool indented = false) {
-        string directory = Path.GetDirectoryName(path);
+        string? directory = Path.GetDirectoryName(path);
         if(!string.IsNullOrEmpty(directory)) {
             Directory.CreateDirectory(directory);
         }

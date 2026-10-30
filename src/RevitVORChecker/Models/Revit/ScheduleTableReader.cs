@@ -14,7 +14,7 @@ namespace RevitVORChecker.Models.Revit;
 /// «Включать элементы из связей». Все изменения делаются в транзакции, которая откатывается.
 /// </remarks>
 internal static class ScheduleTableReader {
-    private const string LinksWorkset = "00_Связи_RVT_02_КР_П";
+    private const string _linksWorkset = "00_Связи_RVT_02_КР_П";
 
     public static ScheduleTablesData Read(Document document, IEnumerable<string> scheduleNames, IList<string> linkPaths) {
         var result = new ScheduleTablesData { FileTitle = document.Title };
@@ -49,7 +49,7 @@ internal static class ScheduleTableReader {
             }
         }
 
-        WorksetId previousWorkset = SelectLinksWorkset(document, linkPaths.Count > 0, log);
+        WorksetId? previousWorkset = SelectLinksWorkset(document, linkPaths.Count > 0, log);
         foreach(string linkPath in linkPaths) {
             string fileName = Path.GetFileName(linkPath);
             if(string.Equals(linkPath, document.PathName, StringComparison.OrdinalIgnoreCase)) {
@@ -77,7 +77,7 @@ internal static class ScheduleTableReader {
     /// <summary>
     /// Делает активным рабочий набор связей, если он открыт. Возвращает прежний активный набор.
     /// </summary>
-    private static WorksetId SelectLinksWorkset(Document document, bool hasLinks, List<string> log) {
+    private static WorksetId? SelectLinksWorkset(Document document, bool hasLinks, List<string> log) {
         if(!document.IsWorkshared || !hasLinks) {
             return null;
         }
@@ -86,12 +86,12 @@ internal static class ScheduleTableReader {
         WorksetId previousWorkset = worksets.GetActiveWorksetId();
         Workset linksWorkset = new FilteredWorksetCollector(document)
             .OfKind(WorksetKind.UserWorkset)
-            .FirstOrDefault(workset => workset.Name == LinksWorkset);
+            .FirstOrDefault(workset => workset.Name == _linksWorkset);
         if(linksWorkset != null && linksWorkset.IsOpen) {
             worksets.SetActiveWorksetId(linksWorkset.Id);
-            log.Add("связи размещаются в РН " + LinksWorkset);
+            log.Add("связи размещаются в РН " + _linksWorkset);
         } else {
-            log.Add("РН " + LinksWorkset + " " + (linksWorkset == null ? "отсутствует" : "закрыт")
+            log.Add("РН " + _linksWorkset + " " + (linksWorkset == null ? "отсутствует" : "закрыт")
                     + " — связи временно размещены в активном РН");
         }
 
@@ -175,10 +175,6 @@ internal static class ScheduleTableReader {
     /// Управляющие символы (кроме переводов строк и табуляции) заменяются пробелом.
     /// </summary>
     private static string CleanCellText(string text) {
-        if(text == null) {
-            return null;
-        }
-
         return new string(text.Select(character =>
             character < 32 && character != '\n' && character != '\r' && character != '\t' ? ' ' : character).ToArray());
     }

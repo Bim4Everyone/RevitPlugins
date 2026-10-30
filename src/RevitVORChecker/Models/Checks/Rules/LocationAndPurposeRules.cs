@@ -103,7 +103,7 @@ internal static class LocationAndPurposeRules {
     private static void CheckJointPurpose(GroupedElements problems, ElementData element, string typeName, string purpose) {
         bool isWall = typeName.Contains("Стена");
         bool isSlab = typeName.Contains("Плита");
-        string expectedPurpose = isWall && !isSlab
+        string? expectedPurpose = isWall && !isSlab
             ? "Дефшов вертикальный"
             : isSlab && !isWall
                 ? "Дефшов горизонтальный"

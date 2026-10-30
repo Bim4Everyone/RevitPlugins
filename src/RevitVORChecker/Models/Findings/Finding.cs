@@ -10,19 +10,19 @@ internal class Finding {
     /// Ключ раздела реестра (<see cref="ReportSections"/>).
     /// </summary>
     [JsonProperty("section")]
-    public string Section { get; set; }
+    public string Section { get; set; } = string.Empty;
 
     [JsonProperty("title")]
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
     /// Вид замечания (<see cref="FindingKinds"/>).
     /// </summary>
     [JsonProperty("kind")]
-    public string Kind { get; set; }
+    public string Kind { get; set; } = string.Empty;
 
     [JsonProperty("text")]
-    public string Text { get; set; }
+    public string Text { get; set; } = string.Empty;
 
     [JsonProperty("entries")]
     public List<FindingEntry> Entries { get; set; } = new();
@@ -37,7 +37,7 @@ internal class Finding {
     /// Таблица расхождений, которая выводится в реестр под текстом замечания.
     /// </summary>
     [JsonProperty("table", NullValueHandling = NullValueHandling.Ignore)]
-    public FindingTable Table { get; set; }
+    public FindingTable? Table { get; set; }
 }
 
 /// <summary>
@@ -45,10 +45,10 @@ internal class Finding {
 /// </summary>
 internal class FindingEntry {
     [JsonProperty("file")]
-    public string FileName { get; set; }
+    public string? FileName { get; set; }
 
     [JsonProperty("detail")]
-    public string Detail { get; set; }
+    public string? Detail { get; set; }
 
     [JsonProperty("ids")]
     public List<long> ElementIds { get; set; } = new();
@@ -57,7 +57,7 @@ internal class FindingEntry {
     /// Путь к скриншоту элементов.
     /// </summary>
     [JsonProperty("image")]
-    public string ImagePath { get; set; }
+    public string? ImagePath { get; set; }
 }
 
 /// <summary>

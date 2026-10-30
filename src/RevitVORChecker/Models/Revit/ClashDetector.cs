@@ -2,6 +2,8 @@ using System.Diagnostics;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitVORChecker.Models.Data;
 
 namespace RevitVORChecker.Models.Revit;
@@ -13,9 +15,9 @@ namespace RevitVORChecker.Models.Revit;
 /// Аналог проверок Navisworks «КР-КР». Изоляция (типы с «Изол») не проверяется — она по технологии примыкает к бетону.
 /// </remarks>
 internal static class ClashDetector {
-    private const double FeetToMillimeters = 304.8;
-    private const double CubicFeetToCubicMeters = 0.028316846592;
-    private const double MinSolidVolume = 1e-6;
+    private const double _feetToMillimeters = 304.8;
+    private const double _cubicFeetToCubicMeters = 0.028316846592;
+    private const double _minSolidVolume = 1e-6;
 
     private static readonly BuiltInCategory[] _categories = {
         BuiltInCategory.OST_Floors, BuiltInCategory.OST_Roofs, BuiltInCategory.OST_StructuralFraming,
@@ -30,14 +32,14 @@ internal static class ClashDetector {
 
     public static ClashesData Detect(Document document, double toleranceMm) {
         var stopwatch = Stopwatch.StartNew();
-        double tolerance = toleranceMm / FeetToMillimeters;
-        WorksetTable worksets = document.IsWorkshared ? document.GetWorksetTable() : null;
+        double tolerance = toleranceMm / _feetToMillimeters;
+        WorksetTable? worksets = document.IsWorkshared ? document.GetWorksetTable() : null;
         string GetWorkset(Element element) {
             return worksets?.GetWorkset(element.WorksetId)?.Name ?? "";
         }
 
         string GetTypeName(Element element) {
-            Element type = document.GetElement(element.GetTypeId());
+            ElementType? type = element.GetElementType();
             return type == null ? element.Name : type.Name;
         }
 
@@ -93,8 +95,8 @@ internal static class ClashDetector {
                         SecondGroup = GetGroup(GetTypeName(second)),
                         FirstTitle = (first.Category.Name + ": " + GetTypeName(first)).Replace("\"", "'"),
                         SecondTitle = (second.Category.Name + ": " + GetTypeName(second)).Replace("\"", "'"),
-                        VolumeM3 = Math.Round(volume * CubicFeetToCubicMeters, 4, MidpointRounding.AwayFromZero),
-                        DepthMm = Math.Round(depth * FeetToMillimeters, MidpointRounding.AwayFromZero),
+                        VolumeM3 = Math.Round(volume * _cubicFeetToCubicMeters, 4, MidpointRounding.AwayFromZero),
+                        DepthMm = Math.Round(depth * _feetToMillimeters, MidpointRounding.AwayFromZero),
                         IsJoined = AreJoined(document, first, second)
                     });
                 }
@@ -109,7 +111,7 @@ internal static class ClashDetector {
     /// Дубль: та же категория и тип, габариты совпадают с точностью 1 мм.
     /// </summary>
     private static bool IsDuplicate(Element first, Element second, BoundingBoxXYZ firstBox, BoundingBoxXYZ secondBox) {
-        double precision = 1 / FeetToMillimeters;
+        double precision = 1 / _feetToMillimeters;
         return first.Category.Id == second.Category.Id
                && first.GetTypeId() == second.GetTypeId()
                && firstBox.Min.DistanceTo(secondBox.Min) < precision
@@ -139,7 +141,7 @@ internal static class ClashDetector {
                     continue;
                 }
 
-                if(intersection == null || intersection.Volume < MinSolidVolume) {
+                if(intersection == null || intersection.Volume < _minSolidVolume) {
                     continue;
                 }
 
@@ -175,7 +177,7 @@ internal static class ClashDetector {
 
         while(pending.Count > 0) {
             foreach(GeometryObject geometryObject in pending.Pop()) {
-                if(geometryObject is Solid solid && solid.Volume > MinSolidVolume) {
+                if(geometryObject is Solid solid && solid.Volume > _minSolidVolume) {
                     solids.Add(solid);
                 } else if(geometryObject is GeometryInstance instance) {
                     GeometryElement instanceGeometry = instance.GetInstanceGeometry();

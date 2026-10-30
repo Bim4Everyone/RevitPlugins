@@ -14,8 +14,8 @@ namespace RevitVORChecker.Models.Revit;
 /// Все изменения делаются в транзакции, которая откатывается: в модели ничего не остаётся.
 /// </remarks>
 internal static class ScreenshotMaker {
-    private const double FeetToMillimeters = 304.8;
-    private const int ContextTransparency = 75;
+    private const double _feetToMillimeters = 304.8;
+    private const int _contextTransparency = 75;
 
     /// <summary>
     /// Снимает скриншоты по заданиям. Возвращает строки отчёта по каждому заданию.
@@ -58,19 +58,19 @@ internal static class ScreenshotMaker {
             File.Delete(fragmentFile);
         }
 
-        BoundingBoxXYZ frame = GetFrame(document, ids, job.Framing, fragmentFile);
+        BoundingBoxXYZ? frame = GetFrame(document, ids, job.Framing, fragmentFile);
         if(frame == null) {
             return job.Name + ": нет габаритов";
         }
 
-        string lastError = null;
+        string? lastError = null;
         for(int attempt = 0; attempt < 2; attempt++) {
             // повтор после внутренней ошибки Revit: без подрезки и без подсветки остальных элементов
             bool isSimplified = attempt == 1;
             using var transaction = new Transaction(document, "Проверка ВОР: скриншот (откат)");
             transaction.Start();
             try {
-                string result = Export(document, imageFolder, job, ids, frame, view3DType, solidFill, isSimplified);
+                string? result = Export(document, imageFolder, job, ids, frame, view3DType, solidFill, isSimplified);
                 if(result != null) {
                     return result;
                 }
@@ -91,7 +91,7 @@ internal static class ScreenshotMaker {
     /// <summary>
     /// Габарит подрезки вида с запасом.
     /// </summary>
-    private static BoundingBoxXYZ GetFrame(
+    private static BoundingBoxXYZ? GetFrame(
         Document document,
         List<ElementId> ids,
         ScreenshotFraming framing,
@@ -123,7 +123,7 @@ internal static class ScreenshotMaker {
                 .OrderBy(length => length)
                 .ElementAt(boxes.Count / 2);
             XYZ firstCenter = (boxes[0].Min + boxes[0].Max) / 2;
-            double radius = Math.Max(1500 / FeetToMillimeters, medianDiagonal);
+            double radius = Math.Max(1500 / _feetToMillimeters, medianDiagonal);
             var nearBoxes = boxes.Where(box => ((box.Min + box.Max) / 2 - firstCenter).GetLength() <= radius).ToList();
             minimum = new XYZ(nearBoxes.Min(box => box.Min.X), nearBoxes.Min(box => box.Min.Y), nearBoxes.Min(box => box.Min.Z));
             maximum = new XYZ(nearBoxes.Max(box => box.Max.X), nearBoxes.Max(box => box.Max.Y), nearBoxes.Max(box => box.Max.Z));
@@ -137,8 +137,8 @@ internal static class ScreenshotMaker {
         }
 
         double margin = isIntersection || isFragment
-            ? 1500 / FeetToMillimeters
-            : Math.Max(3000 / FeetToMillimeters, (maximum - minimum).GetLength() * 0.15);
+            ? 1500 / _feetToMillimeters
+            : Math.Max(3000 / _feetToMillimeters, (maximum - minimum).GetLength() * 0.15);
         var marginVector = new XYZ(margin, margin, margin);
         return new BoundingBoxXYZ { Min = minimum - marginVector, Max = maximum + marginVector };
     }
@@ -146,7 +146,7 @@ internal static class ScreenshotMaker {
     /// <summary>
     /// Создаёт временный вид и сохраняет PNG. Возвращает строку отчёта или null, если файл не появился.
     /// </summary>
-    private static string Export(
+    private static string? Export(
         Document document,
         string imageFolder,
         ScreenshotJob job,
@@ -281,7 +281,7 @@ internal static class ScreenshotMaker {
 
     private static OverrideGraphicSettings CreateContextOverride() {
         var settings = new OverrideGraphicSettings();
-        settings.SetSurfaceTransparency(ContextTransparency);
+        settings.SetSurfaceTransparency(_contextTransparency);
         settings.SetHalftone(true);
         return settings;
     }

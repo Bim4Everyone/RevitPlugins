@@ -4,16 +4,16 @@ namespace RevitVORChecker.Models.Report;
 /// Служебные части пакета .docx реестра: типы содержимого, связи, стили, настройки.
 /// </summary>
 internal static class OpenXmlParts {
-    private const string XmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+    private const string _xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
 
-    private const string RelationshipsNamespace =
+    private const string _relationshipsNamespace =
         "http://schemas.openxmlformats.org/package/2006/relationships";
 
-    private const string DocumentRelationshipType =
+    private const string _documentRelationshipType =
         "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 
     public static string ContentTypes =>
-        XmlHeader
+        _xmlHeader
         + "<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">"
         + "<Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/>"
         + "<Default Extension=\"xml\" ContentType=\"application/xml\"/>"
@@ -27,16 +27,16 @@ internal static class OpenXmlParts {
         + "</Types>";
 
     public static string PackageRelations =>
-        XmlHeader
-        + $"<Relationships xmlns=\"{RelationshipsNamespace}\">"
-        + $"<Relationship Id=\"rId1\" Type=\"{DocumentRelationshipType}/officeDocument\" Target=\"word/document.xml\"/>"
+        _xmlHeader
+        + $"<Relationships xmlns=\"{_relationshipsNamespace}\">"
+        + $"<Relationship Id=\"rId1\" Type=\"{_documentRelationshipType}/officeDocument\" Target=\"word/document.xml\"/>"
         + "</Relationships>";
 
     /// <summary>
     /// Стили: шрифт Calibri 12 пт без интервалов после абзаца.
     /// </summary>
     public static string Styles =>
-        XmlHeader
+        _xmlHeader
         + "<w:styles xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">"
         + "<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii=\"Calibri\" w:eastAsia=\"Calibri\" w:hAnsi=\"Calibri\" "
         + "w:cs=\"Calibri\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:lang w:val=\"ru-RU\" w:eastAsia=\"ru-RU\"/>"
@@ -50,7 +50,7 @@ internal static class OpenXmlParts {
         + "</w:styles>";
 
     public static string Settings =>
-        XmlHeader
+        _xmlHeader
         + "<w:settings xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">"
         + "<w:defaultTabStop w:val=\"708\"/><w:characterSpacingControl w:val=\"doNotCompress\"/>"
         + "<w:compat><w:compatSetting w:name=\"compatibilityMode\" w:uri=\"http://schemas.microsoft.com/office/word\" "
@@ -58,11 +58,11 @@ internal static class OpenXmlParts {
 
     public static string DocumentRelations(IEnumerable<(string RelationId, string Target)> images) {
         string imageRelations = string.Concat(images.Select(image =>
-            $"<Relationship Id=\"{image.RelationId}\" Type=\"{DocumentRelationshipType}/image\" Target=\"{image.Target}\"/>"));
-        return XmlHeader
-               + $"<Relationships xmlns=\"{RelationshipsNamespace}\">"
-               + $"<Relationship Id=\"rIdStyles\" Type=\"{DocumentRelationshipType}/styles\" Target=\"styles.xml\"/>"
-               + $"<Relationship Id=\"rIdSettings\" Type=\"{DocumentRelationshipType}/settings\" Target=\"settings.xml\"/>"
+            $"<Relationship Id=\"{image.RelationId}\" Type=\"{_documentRelationshipType}/image\" Target=\"{image.Target}\"/>"));
+        return _xmlHeader
+               + $"<Relationships xmlns=\"{_relationshipsNamespace}\">"
+               + $"<Relationship Id=\"rIdStyles\" Type=\"{_documentRelationshipType}/styles\" Target=\"styles.xml\"/>"
+               + $"<Relationship Id=\"rIdSettings\" Type=\"{_documentRelationshipType}/settings\" Target=\"settings.xml\"/>"
                + imageRelations
                + "</Relationships>";
     }
@@ -71,7 +71,7 @@ internal static class OpenXmlParts {
     /// Документ: альбомный A3, поля 12,7 мм.
     /// </summary>
     public static string WrapDocument(string body) {
-        return XmlHeader
+        return _xmlHeader
                + "<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" "
                + "xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" "
                + "xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" "

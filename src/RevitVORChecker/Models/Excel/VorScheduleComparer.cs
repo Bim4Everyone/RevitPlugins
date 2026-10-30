@@ -8,7 +8,7 @@ namespace RevitVORChecker.Models.Excel;
 /// Сверка листа ВОР в Excel со спецификацией сводной модели построчно (с учётом кратности строк).
 /// </summary>
 internal class VorScheduleComparer {
-    private const string QuantityColumn = "Количество";
+    private const string _quantityColumn = "Количество";
 
     /// <summary>
     /// Столбцы, которые показываются в таблице расхождений.
@@ -17,7 +17,7 @@ internal class VorScheduleComparer {
 
     private readonly Dictionary<string, int> _precisionByColumn = new();
     private readonly List<(int RowNumber, string Value)> _textQuantities = new();
-    private List<string> _header;
+    private List<string> _header = new();
 
     /// <summary>
     /// Сверяет таблицу Excel <paramref name="excelRows"/> со спецификацией <paramref name="schedule"/>.
@@ -30,10 +30,10 @@ internal class VorScheduleComparer {
         List<SheetRow> excelRows,
         string fileName,
         FindingWriter writer,
-        ScheduleTableData insulationSchedule = null) {
+        ScheduleTableData? insulationSchedule = null) {
 
         string scheduleName = schedule.Name;
-        (List<string> header, List<List<string>> modelRows) = ReadModelTable(schedule);
+        (List<string>? header, List<List<string>> modelRows) = ReadModelTable(schedule);
         if(header == null) {
             writer.Add(
                 "Спецификация «" + scheduleName + "» в модели не прочитана (нет столбца «Количество»).",
@@ -42,7 +42,7 @@ internal class VorScheduleComparer {
         }
 
         _header = header;
-        (OrderedMap<string, int?> columns, List<(int RowNumber, Dictionary<string, SheetCell> Cells)> excelData) =
+        (OrderedMap<string, int?>? columns, List<(int RowNumber, Dictionary<string, SheetCell?> Cells)> excelData) =
             ReadExcelTable(excelRows, header);
         if(columns == null) {
             writer.Add(fileName + ": не найдена строка заголовков со столбцами спецификации «" + scheduleName + "» ("
@@ -113,15 +113,15 @@ internal class VorScheduleComparer {
     /// <summary>
     /// Шапка и строки данных спецификации модели (строки с заполненным количеством).
     /// </summary>
-    public static (List<string> Header, List<List<string>> Rows) ReadModelTable(ScheduleTableData schedule) {
+    public static (List<string>? Header, List<List<string>> Rows) ReadModelTable(ScheduleTableData schedule) {
         List<List<string>> body = schedule.BodyRows;
-        int headerIndex = body.FindIndex(row => row.Contains(QuantityColumn));
+        int headerIndex = body.FindIndex(row => row.Contains(_quantityColumn));
         if(headerIndex < 0) {
             return (null, new List<List<string>>());
         }
 
         var header = body[headerIndex].Select(ExcelText.Normalize).ToList();
-        int quantityIndex = header.IndexOf(QuantityColumn);
+        int quantityIndex = header.IndexOf(_quantityColumn);
         var rows = body.Skip(headerIndex + 1)
             .Where(row => row.Any(cell => PythonFormat.Trim(cell).Length > 0)
                           && PythonFormat.Trim(row[quantityIndex]).Length > 0)
@@ -132,7 +132,7 @@ internal class VorScheduleComparer {
     /// <summary>
     /// Находит в листе Excel строку заголовков со столбцами спецификации и читает строки данных под ней.
     /// </summary>
-    private static (OrderedMap<string, int?> Columns, List<(int RowNumber, Dictionary<string, SheetCell> Cells)> Data)
+    private static (OrderedMap<string, int?>? Columns, List<(int RowNumber, Dictionary<string, SheetCell?> Cells)> Data)
         ReadExcelTable(List<SheetRow> rows, List<string> requiredColumns) {
 
         for(int rowIndex = 0; rowIndex < rows.Count; rowIndex++) {
@@ -142,7 +142,7 @@ internal class VorScheduleComparer {
             }
 
             int foundColumns = requiredColumns.Count(columnByTitle.ContainsKey);
-            if(!columnByTitle.ContainsKey(QuantityColumn) || foundColumns < Math.Max(3, requiredColumns.Count - 2)) {
+            if(!columnByTitle.ContainsKey(_quantityColumn) || foundColumns < Math.Max(3, requiredColumns.Count - 2)) {
                 continue;
             }
 
@@ -151,13 +151,13 @@ internal class VorScheduleComparer {
                 columns[column] = columnByTitle.TryGetValue(column, out int index) ? index : null;
             }
 
-            var data = new List<(int RowNumber, Dictionary<string, SheetCell> Cells)>();
+            var data = new List<(int RowNumber, Dictionary<string, SheetCell?> Cells)>();
             foreach(SheetRow row in rows.Skip(rowIndex + 1)) {
                 if(!row.Cells.Values.Any(cell => PythonFormat.Trim(cell.Text).Length > 0)) {
                     continue;
                 }
 
-                var cells = new Dictionary<string, SheetCell>();
+                var cells = new Dictionary<string, SheetCell?>();
                 foreach(var column in columns) {
                     if(column.Value == null) {
                         continue;
@@ -172,7 +172,7 @@ internal class VorScheduleComparer {
             return (columns, data);
         }
 
-        return (null, new List<(int RowNumber, Dictionary<string, SheetCell> Cells)>());
+        return (null, new List<(int RowNumber, Dictionary<string, SheetCell?> Cells)>());
     }
 
     private int GetPrecision(string column) {
@@ -192,13 +192,13 @@ internal class VorScheduleComparer {
         return new RowKey(items);
     }
 
-    private RowKey CreateExcelKey(int rowNumber, Dictionary<string, SheetCell> cells) {
+    private RowKey CreateExcelKey(int rowNumber, Dictionary<string, SheetCell?> cells) {
         var items = new List<RowKeyItem>();
         foreach(string column in _header) {
-            cells.TryGetValue(column, out SheetCell cell);
+            cells.TryGetValue(column, out SheetCell? cell);
             string value = cell != null ? cell.Text : "";
             double? number = ExcelText.ParseNumber(value);
-            if(column == QuantityColumn && cell != null && cell.IsText) {
+            if(column == _quantityColumn && cell != null && cell.IsText) {
                 _textQuantities.Add((rowNumber, value));
             }
 
@@ -206,9 +206,9 @@ internal class VorScheduleComparer {
             bool compareAsNumber = number != null
                                    && (GetPrecision(column) != 0
                                        || number.Value == Math.Truncate(number.Value)
-                                       || column == QuantityColumn);
+                                       || column == _quantityColumn);
             items.Add(compareAsNumber
-                ? new RowKeyItem { IsNumber = true, Number = PythonFormat.Round(number.Value, GetPrecision(column)) }
+                ? new RowKeyItem { IsNumber = true, Number = PythonFormat.Round(number.GetValueOrDefault(), GetPrecision(column)) }
                 : new RowKeyItem { Text = ExcelText.Normalize(value) });
         }
 
@@ -221,7 +221,7 @@ internal class VorScheduleComparer {
         string fileName,
         FindingWriter writer) {
 
-        (List<string> insulationHeader, List<List<string>> insulationRows) = ReadModelTable(insulationSchedule);
+        (List<string>? insulationHeader, List<List<string>> insulationRows) = ReadModelTable(insulationSchedule);
         if(insulationHeader == null || !insulationHeader.SequenceEqual(_header)) {
             return extraInExcel;
         }
@@ -258,7 +258,7 @@ internal class VorScheduleComparer {
     /// затем с теми же видимыми столбцами; оставшиеся — строки только в модели или только в Excel.
     /// </summary>
     private List<List<string>> DescribeDifferences(List<RowKey> missingInExcel, List<RowKey> extraInExcel) {
-        int quantityIndex = _header.IndexOf(QuantityColumn);
+        int quantityIndex = _header.IndexOf(_quantityColumn);
         var displayColumns = _displayColumns.Where(_header.Contains).ToList();
 
         string WithoutQuantity(RowKey key) {
@@ -285,7 +285,7 @@ internal class VorScheduleComparer {
                 RowKey excelRow = PopLast(candidates);
                 differences.Add(DisplayValues(modelRow)
                     .Concat(new[] {
-                        GetDisplayValue(modelRow, QuantityColumn), GetDisplayValue(excelRow, QuantityColumn),
+                        GetDisplayValue(modelRow, _quantityColumn), GetDisplayValue(excelRow, _quantityColumn),
                         "другое количество"
                     })
                     .ToList());
@@ -305,13 +305,13 @@ internal class VorScheduleComparer {
                 RowKey excelRow = PopLast(candidates);
                 var otherDifferences = _header
                     .Where(column => !displayColumns.Contains(column)
-                                     && column != QuantityColumn
+                                     && column != _quantityColumn
                                      && GetDisplayValue(modelRow, column) != GetDisplayValue(excelRow, column))
                     .Select(column => column + ": " + GetDisplayValue(modelRow, column) + " / "
                                       + GetDisplayValue(excelRow, column));
                 differences.Add(DisplayValues(modelRow)
                     .Concat(new[] {
-                        GetDisplayValue(modelRow, QuantityColumn), GetDisplayValue(excelRow, QuantityColumn),
+                        GetDisplayValue(modelRow, _quantityColumn), GetDisplayValue(excelRow, _quantityColumn),
                         "отличаются: " + string.Join("; ", otherDifferences)
                     })
                     .ToList());
@@ -322,13 +322,13 @@ internal class VorScheduleComparer {
 
         foreach(RowKey modelRow in onlyInModel) {
             differences.Add(DisplayValues(modelRow)
-                .Concat(new[] { GetDisplayValue(modelRow, QuantityColumn), "нет", "строки нет в Excel" })
+                .Concat(new[] { GetDisplayValue(modelRow, _quantityColumn), "нет", "строки нет в Excel" })
                 .ToList());
         }
 
         foreach(RowKey excelRow in extraByDisplay.Values.SelectMany(rows => rows)) {
             differences.Add(DisplayValues(excelRow)
-                .Concat(new[] { "нет", GetDisplayValue(excelRow, QuantityColumn), "строки нет в модели" })
+                .Concat(new[] { "нет", GetDisplayValue(excelRow, _quantityColumn), "строки нет в модели" })
                 .ToList());
         }
 

@@ -2,7 +2,7 @@
     <PropertyGroup>
         <UseWpfUI>true</UseWpfUI>
         <LangVersion>latest</LangVersion>
-        <Nullable>disable</Nullable>
+        <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 

@@ -11,11 +11,11 @@ namespace RevitVORChecker.Models;
 /// </remarks>
 internal class CheckLog {
     private readonly string _path;
-    private readonly Action<string> _onWrite;
+    private readonly Action<string>? _onWrite;
 
     /// <param name="path">Файл журнала.</param>
     /// <param name="onWrite">Получает каждую запись (для строки состояния окна прогресса).</param>
-    public CheckLog(string path, Action<string> onWrite = null) {
+    public CheckLog(string path, Action<string>? onWrite = null) {
         _path = path;
         _onWrite = onWrite;
         try {

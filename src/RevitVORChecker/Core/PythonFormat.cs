@@ -104,7 +104,7 @@ internal static class PythonFormat {
     /// <summary>
     /// Нормализация текста для сравнения: «ё» → «е», кавычки-ёлочки → прямые, пробелы схлопываются.
     /// </summary>
-    public static string NormalizeText(string text) {
+    public static string NormalizeText(string? text) {
         string replaced = (text ?? "")
             .Replace("ё", "е")
             .Replace("Ё", "Е")
@@ -113,7 +113,7 @@ internal static class PythonFormat {
         return Regex.Replace(replaced, @"\s+", " ").Trim();
     }
 
-    public static string Trim(string text) {
+    public static string Trim(string? text) {
         return (text ?? "").Trim();
     }
 

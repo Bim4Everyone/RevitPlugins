@@ -1,7 +1,4 @@
-using System.Diagnostics;
 using System.IO;
-
-using Autodesk.Revit.UI;
 
 using dosymep.SimpleServices;
 
@@ -10,8 +7,12 @@ using RevitVORChecker.Models;
 namespace RevitVORChecker.Services;
 
 /// <summary>
-/// Запуск проверки после закрытия окна параметров: окно хода проверки, итог и ошибки — в окне Revit.
+/// Запуск проверки после закрытия окна параметров: окно хода проверки и итог проверки.
 /// </summary>
+/// <remarks>
+/// Итог показывает команда: сообщения — только через сервис сообщений, а окно хода проверки
+/// к этому моменту закрыто (оно поверх остальных окон).
+/// </remarks>
 internal class CheckRunner {
     private readonly CheckProcess _checkProcess;
     private readonly ILocalizationService _localizationService;
@@ -21,37 +22,27 @@ internal class CheckRunner {
         _localizationService = localizationService;
     }
 
-    public void Run(CheckSettings settings) {
-        string title = GetText("MainWindow.Title");
-        CheckResult result = null;
-        Exception error = null;
+    public CheckOutcome Run(CheckSettings settings) {
         try {
             int stepCount = CheckProcess.GetStepCount(
                 ModelsFolder.GetModels(settings.ModelsFolder).Count,
                 settings.TakeScreenshots);
 
-            // итог и ошибки показываются после закрытия окна хода проверки: оно поверх остальных окон
             using CheckProgressHost progressHost = CheckProgressHost.Show(
-                title,
+                GetText("MainWindow.Title"),
                 GetText("Progress.Step"),
                 GetText("Progress.Cancel"),
                 GetText("Progress.Cancelling"),
                 stepCount);
-            result = _checkProcess.Run(
+            return CheckOutcome.Completed(_checkProcess.Run(
                 settings,
                 progressHost,
                 progressHost.ReportStatus,
-                progressHost.CancellationToken);
+                progressHost.CancellationToken));
+        } catch(OperationCanceledException) {
+            return CheckOutcome.Cancelled();
         } catch(Exception ex) {
-            error = ex;
-        }
-
-        if(error is OperationCanceledException) {
-            TaskDialog.Show(title, GetText("MainWindow.Cancelled"));
-        } else if(error != null) {
-            ShowError(title, settings, error);
-        } else {
-            ShowResult(title, result);
+            return CheckOutcome.Failed(ex, WriteErrorReport(settings.ModelsFolder, ex));
         }
     }
 
@@ -59,41 +50,57 @@ internal class CheckRunner {
         return _localizationService.GetLocalizedString(key);
     }
 
-    private void ShowResult(string title, CheckResult result) {
-        var dialog = new TaskDialog(title) {
-            MainInstruction = string.Format(GetText("Result.Instruction"), result.FindingCount),
-            MainContent = GetText("Result.Registry") + "\n" + result.RegistryPath
-        };
-        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, GetText("Result.OpenFolder"));
-        dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, GetText("Result.Close"));
-        if(dialog.Show() == TaskDialogResult.CommandLink1) {
-            Process.Start("explorer.exe", "/select,\"" + result.RegistryPath + "\"");
-        }
-    }
-
-    private void ShowError(string title, CheckSettings settings, Exception exception) {
-        string reportPath = WriteErrorReport(settings.ModelsFolder, exception);
-        string details = reportPath != null ? "\n\n" + GetText("MainWindow.ErrorReport") + "\n" + reportPath : "";
-        var dialog = new TaskDialog(title) {
-            MainIcon = TaskDialogIcon.TaskDialogIconError,
-            MainInstruction = GetText("MainWindow.Stopped"),
-            MainContent = exception.GetBaseException().Message + details
-        };
-        dialog.Show();
-    }
-
     /// <summary>
     /// Полный текст ошибки в «&lt;папка&gt;\Локальная проверка». Возвращает путь файла или null.
     /// </summary>
-    private static string WriteErrorReport(string modelsFolder, Exception exception) {
+    private static string? WriteErrorReport(string modelsFolder, Exception exception) {
         try {
             string folder = ModelsFolder.GetOutputFolder(modelsFolder);
             Directory.CreateDirectory(folder);
             string path = Path.Combine(folder, "Ошибка проверки_" + DateTime.Now.ToString("yyyy-MM-dd_HHmmss") + ".txt");
             File.WriteAllText(path, exception.ToString());
             return path;
-        } catch(Exception) {
+        } catch(IOException) {
+            return null;
+        } catch(UnauthorizedAccessException) {
             return null;
         }
+    }
+}
+
+/// <summary>
+/// Итог запуска проверки: выполнена, отменена или остановлена ошибкой.
+/// </summary>
+internal class CheckOutcome {
+    private CheckOutcome() {
+    }
+
+    /// <summary>
+    /// Итог выполненной проверки; null — проверка отменена или остановлена.
+    /// </summary>
+    public CheckResult? Result { get; private set; }
+
+    public bool IsCancelled { get; private set; }
+
+    /// <summary>
+    /// Ошибка, остановившая проверку; null — ошибки не было.
+    /// </summary>
+    public Exception? Error { get; private set; }
+
+    /// <summary>
+    /// Файл с полным текстом ошибки; null — не записан.
+    /// </summary>
+    public string? ErrorReportPath { get; private set; }
+
+    public static CheckOutcome Completed(CheckResult result) {
+        return new CheckOutcome { Result = result };
+    }
+
+    public static CheckOutcome Cancelled() {
+        return new CheckOutcome { IsCancelled = true };
+    }
+
+    public static CheckOutcome Failed(Exception error, string? errorReportPath) {
+        return new CheckOutcome { Error = error, ErrorReportPath = errorReportPath };
     }
 }

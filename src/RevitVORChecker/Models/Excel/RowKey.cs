@@ -10,7 +10,7 @@ internal class RowKeyItem {
 
     public double Number { get; set; }
 
-    public string Text { get; set; }
+    public string Text { get; set; } = string.Empty;
 }
 
 /// <summary>

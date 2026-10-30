@@ -10,10 +10,10 @@ namespace RevitVORChecker.Models.Checks.Rules;
 /// Разделы 4–6: параметры СМР ФОП_Блок СМР, ФОП_Секция СМР, ФОП_Этаж СМР.
 /// </summary>
 internal static class SmrParameterRules {
-    private const string AllowedCharacters = @"А-Яа-яЁё0-9 ,()\.\-";
-    private const string FloorToken = @"(К|П|Т|ТХ|Д)?\d{2}";
+    private const string _allowedCharacters = @"А-Яа-яЁё0-9 ,()\.\-";
+    private const string _floorToken = @"(К|П|Т|ТХ|Д)?\d{2}";
 
-    private static readonly Regex _allowedValue = new("^[" + AllowedCharacters + "]*$");
+    private static readonly Regex _allowedValue = new("^[" + _allowedCharacters + "]*$");
 
     private static readonly Regex _blockPattern =
         new(@"^(Корпус \d+\.\d+|Пристройка \d+\.\d+\.\d+|Автостоянка|ДОО( \d+)?|ОО( \d+)?)$");
@@ -21,7 +21,7 @@ internal static class SmrParameterRules {
     private static readonly Regex _sectionPattern = new(@"^(С\d+|ТБ\d+)$");
 
     private static readonly Regex _floorPattern = new(
-        "^" + FloorToken + "((-|, ?)" + FloorToken + ")*( \\(" + FloorToken + "((-|, ?)" + FloorToken + ")*\\))? этаж$");
+        "^" + _floorToken + "((-|, ?)" + _floorToken + ")*( \\(" + _floorToken + "((-|, ?)" + _floorToken + ")*\\))? этаж$");
 
     /// <summary>
     /// Конструкции, которые под корпусом могут относиться к −2 этажу и ниже.
@@ -77,7 +77,7 @@ internal static class SmrParameterRules {
 
                 invalidValuesByParameter[parameter.Name].Add(invalidValue.Key);
                 string invalidCharacters = string.Concat(PythonFormat.SortOrdinal(
-                    Regex.Matches(invalidValue.Key, "[^" + AllowedCharacters + "]")
+                    Regex.Matches(invalidValue.Key, "[^" + _allowedCharacters + "]")
                         .Cast<Match>()
                         .Select(match => match.Value)
                         .Distinct()));

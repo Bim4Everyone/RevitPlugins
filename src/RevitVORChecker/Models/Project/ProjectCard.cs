@@ -29,7 +29,7 @@ internal class ProjectCard {
     /// Дата ЗнП в формате ГГГГ-ММ-ДД.
     /// </summary>
     [JsonProperty("znp_date")]
-    public string AssignmentDate { get; set; }
+    public string AssignmentDate { get; set; } = string.Empty;
 
     /// <summary>
     /// Стадия проектирования: «П» или «Р».
@@ -41,7 +41,7 @@ internal class ProjectCard {
     /// Этажность жилых корпусов (текст из <see cref="StoreysOptions.Titles"/>).
     /// </summary>
     [JsonProperty("storeys")]
-    public string Storeys { get; set; }
+    public string Storeys { get; set; } = string.Empty;
 
     /// <summary>
     /// К чему относится фундаментная плита корпуса при 2 и более подземных этажах.
@@ -77,10 +77,10 @@ internal class ProjectCard {
     /// Путь к Классификатору видов работ, если он задан в данных проекта.
     /// </summary>
     [JsonProperty("classifier_file", NullValueHandling = NullValueHandling.Ignore)]
-    public string ClassifierFile { get; set; }
+    public string? ClassifierFile { get; set; }
 
     [JsonProperty("_saved", NullValueHandling = NullValueHandling.Ignore)]
-    public string SavedAt { get; set; }
+    public string? SavedAt { get; set; }
 
     /// <summary>
     /// Краткое описание для главного окна.
@@ -96,10 +96,10 @@ internal class ProjectCard {
 /// </summary>
 internal class ReinforcementTableValue {
     [JsonProperty("key")]
-    public string Key { get; set; }
+    public string Key { get; set; } = string.Empty;
 
     [JsonProperty("thick")]
-    public string Thickness { get; set; }
+    public string Thickness { get; set; } = string.Empty;
 
     [JsonProperty("a")]
     public int? FirstValue { get; set; }

@@ -6,7 +6,7 @@ namespace RevitVORChecker.Models.Project;
 /// Нормы армирования по табл. 2.6.4 ЗнП А101 и построение из них правил проверки ФОП_ТИП_Армирование.
 /// </summary>
 internal static class ReinforcementNorms {
-    private const string Parking = "Автостоянка";
+    private const string _parking = "Автостоянка";
 
     private static readonly string[] _slabKeys = { "Перекрытие", "Покрытие", "Капитель", "Балка", "Бортик", "Рампа" };
     private static readonly string[] _innerWallPurposes = { "Внутренние", "Диафрагма", "ЛЛБ" };
@@ -62,7 +62,7 @@ internal static class ReinforcementNorms {
     public static List<ReinforcementRule> CreateRules(
         List<ReinforcementTableRow> table,
         StoreysOption storeys,
-        IList<string> lowRiseBlocks) {
+        IList<string>? lowRiseBlocks) {
 
         var builder = new RulesBuilder(table);
         builder.AddParkingRules();
@@ -168,8 +168,8 @@ internal static class ReinforcementNorms {
         public List<ReinforcementRule> Rules { get; } = new();
 
         public void AddParkingRules() {
-            string[] parking = { Parking };
-            ReinforcementTableRow row = FindRow("P1");
+            string[] parking = { _parking };
+            ReinforcementTableRow? row = FindRow("P1");
             Add(parking, null, new[] { "ФПлита" }, null, null, row?.FirstValue, AlternativeOf(row),
                 "Паркинг п.1 — фундаментная плита");
 
@@ -203,15 +203,15 @@ internal static class ReinforcementNorms {
         /// Правила для жилых корпусов по столбцу 7–9 (<paramref name="isLowRise"/>) или 10–17.
         /// </summary>
         public void AddResidentialRules(bool isLowRise, string[] blocks, string columnTitle, bool isEighteenPlus) {
-            int? ColumnValue(ReinforcementTableRow row) {
+            int? ColumnValue(ReinforcementTableRow? row) {
                 return row == null ? null : isLowRise ? row.FirstValue : row.SecondValue;
             }
 
-            ReinforcementTableRow FirstFilled(params string[] keys) {
+            ReinforcementTableRow? FirstFilled(params string[] keys) {
                 return keys.Select(FindRow).FirstOrDefault(row => ColumnValue(row).HasValue);
             }
 
-            ReinforcementTableRow row = FirstFilled("K1", "K2");
+            ReinforcementTableRow? row = FirstFilled("K1", "K2");
             if(row != null) {
                 string houseHeight = row.Key == "K1" ? "9" : "17";
                 string eighteenNote = isEighteenPlus ? " — 18+ эт.: по столбцу 10–17" : "";
@@ -247,22 +247,22 @@ internal static class ReinforcementNorms {
                 "Корпуса п.11 — плиты типовых этажей и покрытие; балки, капители, парапеты — как плита");
         }
 
-        private ReinforcementTableRow FindRow(string key) {
+        private ReinforcementTableRow? FindRow(string key) {
             return _table.FirstOrDefault(row => row.Key == key);
         }
 
-        private static int[] AlternativeOf(ReinforcementTableRow row) {
+        private static int[]? AlternativeOf(ReinforcementTableRow? row) {
             return row?.SecondValue == null ? null : new[] { row.SecondValue.Value };
         }
 
         private void Add(
-            string[] blocks,
-            string[] cycles,
-            string[] typeKeys,
-            string[] purposes,
-            string[] floors,
+            string[]? blocks,
+            string[]? cycles,
+            string[]? typeKeys,
+            string[]? purposes,
+            string[]? floors,
             int? value,
-            int[] alternativeValues,
+            int[]? alternativeValues,
             string note) {
 
             if(!value.HasValue) {

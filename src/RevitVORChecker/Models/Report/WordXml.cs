@@ -6,10 +6,10 @@ namespace RevitVORChecker.Models.Report;
 /// Фрагменты разметки WordprocessingML для реестра.
 /// </summary>
 internal static class WordXml {
-    private const string SectionFill = "DBE5F1";
-    private const string BorderColor = "000000";
+    private const string _sectionFill = "DBE5F1";
+    private const string _borderColor = "000000";
 
-    public static string Escape(string text) {
+    public static string Escape(string? text) {
         return (text ?? "").Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
     }
 
@@ -47,7 +47,7 @@ internal static class WordXml {
 
     public static string TableStart(IEnumerable<int> widths) {
         string borders = string.Concat(new[] { "top", "left", "bottom", "right", "insideH", "insideV" }
-            .Select(side => $"<w:{side} w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"{BorderColor}\"/>"));
+            .Select(side => $"<w:{side} w:val=\"single\" w:sz=\"4\" w:space=\"0\" w:color=\"{_borderColor}\"/>"));
         return "<w:tbl><w:tblPr><w:tblW w:w=\"5000\" w:type=\"pct\"/><w:tblBorders>" + borders + "</w:tblBorders>"
                + "<w:tblLayout w:type=\"fixed\"/><w:tblCellMar><w:left w:w=\"115\" w:type=\"dxa\"/>"
                + "<w:right w:w=\"115\" w:type=\"dxa\"/></w:tblCellMar></w:tblPr><w:tblGrid>"
@@ -67,7 +67,7 @@ internal static class WordXml {
     /// </summary>
     public static string SectionRow(string title, IEnumerable<int> widths) {
         var cells = widths.Select((width, index) =>
-            Cell(Paragraph(index == 1 ? title : "", bold: index == 1), width, SectionFill));
+            Cell(Paragraph(index == 1 ? title : "", bold: index == 1), width, _sectionFill));
         return "<w:tr><w:trPr><w:cantSplit/></w:trPr>" + string.Concat(cells) + "</w:tr>";
     }
 
@@ -118,7 +118,7 @@ internal static class WordXml {
                + "</a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>";
     }
 
-    private static string Cell(string content, int width, string fill) {
+    private static string Cell(string content, int width, string? fill) {
         string shading = fill != null ? $"<w:shd w:val=\"clear\" w:color=\"auto\" w:fill=\"{fill}\"/>" : "";
         return $"<w:tc><w:tcPr><w:tcW w:w=\"{width}\" w:type=\"pct\"/>{shading}<w:vAlign w:val=\"center\"/></w:tcPr>"
                + content + "</w:tc>";

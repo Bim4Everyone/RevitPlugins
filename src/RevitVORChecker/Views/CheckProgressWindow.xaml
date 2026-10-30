@@ -1,3 +1,8 @@
+<!--
+    plugin-check: ignore J2 — окно хода проверки работает в отдельном потоке без сервисов платформы:
+    стандартный диалог прогресса WpfUI падает в Revit из-за второй копии Microsoft.Xaml.Behaviors,
+    загруженной другой надстройкой (WpfThemeBehavior), поэтому окно обычное WPF, без ui:TitleBar.
+-->
 <Window
     x:Class="RevitVORChecker.Views.CheckProgressWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"

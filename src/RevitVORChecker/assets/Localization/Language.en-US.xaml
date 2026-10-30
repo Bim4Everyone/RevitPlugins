@@ -20,11 +20,9 @@
     <system:String x:Key="MainWindow.NoClassifier">Classifier file not found.</system:String>
     <system:String x:Key="MainWindow.BadTolerance">Clash tolerance must be a positive number, mm.</system:String>
     <system:String x:Key="MainWindow.NoProject">Fill in the project data.</system:String>
-    <system:String x:Key="MainWindow.ProgressTitle">Checking quantity takeoff... [{0}]\[{1}]</system:String>
     <system:String x:Key="MainWindow.Cancelled">The check was cancelled.</system:String>
     <system:String x:Key="MainWindow.Stopped">The check was stopped:</system:String>
     <system:String x:Key="MainWindow.ErrorReport">Error details are saved to:</system:String>
-    <system:String x:Key="MainWindow.Done">The check is complete, issues: {0}.&#x0a;Issue register:&#x0a;{1}&#x0a;&#x0a;Open the register folder?</system:String>
 
     <system:String x:Key="Process.NoFolder">Folder not found:</system:String>
     <system:String x:Key="Process.NoModels">There are no .rvt models in the folder.</system:String>
@@ -71,6 +69,5 @@
     <system:String x:Key="Progress.Cancelling">Cancelling after the current step…</system:String>
     <system:String x:Key="Result.Instruction">The check is complete, issues: {0}</system:String>
     <system:String x:Key="Result.Registry">Issue register:</system:String>
-    <system:String x:Key="Result.OpenFolder">Open the register folder</system:String>
-    <system:String x:Key="Result.Close">Close</system:String>
+    <system:String x:Key="Result.OpenFolder">Open the registry folder?</system:String>
 </ResourceDictionary>

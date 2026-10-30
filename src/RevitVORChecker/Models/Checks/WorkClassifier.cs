@@ -17,7 +17,7 @@ internal class WorkClassifier {
                 continue;
             }
 
-            XDocument sheet = reader.ReadPart("xl/worksheets/sheet" + sheetNumber + ".xml");
+            XDocument sheet = reader.ReadRequiredPart("xl/worksheets/sheet" + sheetNumber + ".xml");
             if(sheet == null) {
                 continue;
             }
@@ -41,7 +41,7 @@ internal class WorkClassifier {
     /// <summary>
     /// Единица измерения в едином написании: «м3» → «м³», «шт» → «шт.».
     /// </summary>
-    public static string NormalizeUnit(string unit) {
+    public static string NormalizeUnit(string? unit) {
         string normalized = (unit ?? "").Trim()
             .Replace("м3", "м³")
             .Replace("м2", "м²")

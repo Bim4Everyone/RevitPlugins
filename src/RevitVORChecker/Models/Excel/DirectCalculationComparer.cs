@@ -97,7 +97,7 @@ internal static class DirectCalculationComparer {
 
             var numbers = cells.Skip(unitIndex + 1).Where(cell => ExcelText.ParseNumber(cell) != null).ToList();
             string quantity = numbers.Count > 0 ? numbers[0] : "";
-            string rate = numbers.Count > 1 ? PythonFormat.GeneralFormat(ExcelText.ParseNumber(numbers[1]).Value) : "";
+            string rate = numbers.Count > 1 ? PythonFormat.GeneralFormat(ExcelText.ParseNumber(numbers[1]).GetValueOrDefault()) : "";
             var item = new CalculationItem(name, cells[unitIndex], rate);
             items.GetOrAdd(item.Code, () => item).Quantities.Add(quantity);
         }
@@ -117,7 +117,7 @@ internal static class DirectCalculationComparer {
             }
 
             var columnOrder = cells.Keys.OrderBy(column => column).ToList();
-            int? unitColumn = columnOrder.Cast<int?>().FirstOrDefault(column => ExcelText.Units.Contains(cells[column.Value].Text));
+            int? unitColumn = columnOrder.Cast<int?>().FirstOrDefault(column => ExcelText.Units.Contains(cells[column.GetValueOrDefault()].Text));
             if(unitColumn == null) {
                 continue;
             }
@@ -138,7 +138,7 @@ internal static class DirectCalculationComparer {
             int? quantityColumn = numberColumns.Count > 0 ? numberColumns[0] : null;
             string quantity = quantityColumn != null ? cells[quantityColumn.Value].Text : "";
             string rate = numberColumns.Count > 1
-                ? PythonFormat.GeneralFormat(ExcelText.ParseNumber(cells[numberColumns[1]].Text).Value)
+                ? PythonFormat.GeneralFormat(ExcelText.ParseNumber(cells[numberColumns[1]].Text).GetValueOrDefault())
                 : "";
             if(quantityColumn != null && cells[quantityColumn.Value].IsText) {
                 textQuantities.Add((row.RowNumber, quantity));
@@ -162,7 +162,7 @@ internal static class DirectCalculationComparer {
 
         double sum = 0;
         foreach(string quantity in numericQuantities) {
-            sum += ExcelText.ParseNumber(quantity).Value;
+            sum += ExcelText.ParseNumber(quantity).GetValueOrDefault();
         }
 
         return (sum, numericQuantities.Select(ExcelText.CountDecimals).Max());

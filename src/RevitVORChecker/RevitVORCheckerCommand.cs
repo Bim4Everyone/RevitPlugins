@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -7,6 +9,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -49,6 +52,7 @@ public class RevitVORCheckerCommand : BasePluginCommand {
         kernel.BindMainWindow<MainViewModel, MainWindow>();
         kernel.BindOtherWindow<ProjectCardViewModel, ProjectCardWindow>();
 
+        kernel.UseWpfUIMessageBox();
         kernel.UseWpfUIMessageBox<MainViewModel>();
         kernel.UseWpfUIMessageBox<ProjectCardViewModel>();
         kernel.UseWpfOpenFolderDialog<MainViewModel>(
@@ -70,8 +74,57 @@ public class RevitVORCheckerCommand : BasePluginCommand {
 
         // окно параметров закрывается, проверка идёт с отдельным окном хода проверки
         var mainWindow = kernel.Get<MainWindow>();
-        if(mainWindow.ShowDialog() == true) {
-            kernel.Get<CheckRunner>().Run(((MainViewModel) mainWindow.DataContext).Settings);
+        if(mainWindow.ShowDialog() != true
+           || ((MainViewModel) mainWindow.DataContext).Settings is not { } settings) {
+            return;
         }
+
+        CheckOutcome outcome = kernel.Get<CheckRunner>().Run(settings);
+        ShowOutcome(outcome, kernel.Get<IMessageBoxService>(), kernel.Get<ILocalizationService>());
+    }
+
+    /// <summary>
+    /// Итог проверки: число замечаний и путь реестра (с предложением открыть папку), отмена или ошибка.
+    /// </summary>
+    private static void ShowOutcome(
+        CheckOutcome outcome,
+        IMessageBoxService messageBoxService,
+        ILocalizationService localizationService) {
+
+        string title = localizationService.GetLocalizedString("MainWindow.Title");
+        if(outcome.Result is { } result) {
+            string message = localizationService.GetLocalizedString("Result.Instruction", result.FindingCount)
+                             + "\n\n" + localizationService.GetLocalizedString("Result.Registry")
+                             + "\n" + result.RegistryPath
+                             + "\n\n" + localizationService.GetLocalizedString("Result.OpenFolder");
+            MessageBoxResult answer = messageBoxService.Show(
+                message,
+                title,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Information,
+                MessageBoxResult.Yes);
+            if(answer == MessageBoxResult.Yes) {
+                Process.Start("explorer.exe", "/select,\"" + result.RegistryPath + "\"");
+            }
+
+            return;
+        }
+
+        if(outcome.IsCancelled) {
+            messageBoxService.Show(
+                localizationService.GetLocalizedString("MainWindow.Cancelled"),
+                title,
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
+
+        string errorMessage = localizationService.GetLocalizedString("MainWindow.Stopped")
+                              + "\n" + outcome.Error?.GetBaseException().Message;
+        if(outcome.ErrorReportPath is { } reportPath) {
+            errorMessage += "\n\n" + localizationService.GetLocalizedString("MainWindow.ErrorReport") + "\n" + reportPath;
+        }
+
+        messageBoxService.Show(errorMessage, title, MessageBoxButton.OK, MessageBoxImage.Error);
     }
 }

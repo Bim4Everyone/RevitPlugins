@@ -11,12 +11,12 @@ namespace RevitVORChecker.Models.Excel;
 /// Сводка по модели для сверки ВОР: основной блок, подземные этажи, заполненность ФОП_ТИП_Доп. сортировка.
 /// </summary>
 internal class ModelSummary {
-    public string FileTitle { get; private set; }
+    public string FileTitle { get; private set; } = string.Empty;
 
     /// <summary>
     /// Самое частое значение ФОП_Блок СМР у элементов ВОР.
     /// </summary>
-    public string Block { get; private set; }
+    public string Block { get; private set; } = string.Empty;
 
     public int UndergroundFloorCount { get; private set; }
 
@@ -43,8 +43,8 @@ internal class ModelSummary {
                 continue;
             }
 
-            string block = element.GetParameter(ModelCheckContext.BlockParameter);
-            if(!string.IsNullOrEmpty(block)) {
+            string? block = element.GetParameter(ModelCheckContext.BlockParameter);
+            if(block is { Length: > 0 }) {
                 blocks.Add(block);
             }
 

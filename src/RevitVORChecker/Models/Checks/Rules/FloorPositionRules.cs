@@ -22,12 +22,12 @@ internal static class FloorPositionRules {
     /// <summary>
     /// Насколько выше низа элемента берётся точка для поиска этажа, мм.
     /// </summary>
-    private const double MaxProbeHeightMm = 300;
+    private const double _maxProbeHeightMm = 300;
 
     /// <summary>
     /// Допуск попадания элемента в габарит уровня в плане, мм.
     /// </summary>
-    private const double PlanToleranceMm = 100;
+    private const double _planToleranceMm = 100;
 
     private static readonly Regex _floorName = new(@"^((К|П|Т|ТХ|Д)?\d{2}) этаж$");
     private static readonly Regex _firstFloorToken = new(@"^(К|П|Т|ТХ|Д)?\d{2}");
@@ -48,7 +48,7 @@ internal static class FloorPositionRules {
                 continue;
             }
 
-            FloorLevel expected = FindFloor(element, SelectBuildingLevels(element, levels));
+            FloorLevel? expected = FindFloor(element, SelectBuildingLevels(element, levels));
             if(expected == null || expected.FloorToken == valueToken) {
                 continue;
             }
@@ -85,7 +85,7 @@ internal static class FloorPositionRules {
     /// Уровни корпуса элемента; пустой список — корпус не определён однозначно.
     /// </summary>
     private static List<FloorLevel> SelectBuildingLevels(ElementData element, List<FloorLevel> levels) {
-        string building = GetBuildingCode(element.LevelName);
+        string? building = GetBuildingCode(element.LevelName);
         if(building != null) {
             var buildingLevels = levels.Where(level => level.BuildingCode == building).ToList();
             if(buildingLevels.Count > 0) {
@@ -93,11 +93,11 @@ internal static class FloorPositionRules {
             }
         }
 
-        List<double?> box = element.BoundingBox;
+        List<double?>? box = element.BoundingBox;
         var candidates = levels;
         if(box?.Count >= 6 && box.All(value => value.HasValue)) {
-            double centerX = (box[0].Value + box[3].Value) / 2;
-            double centerY = (box[1].Value + box[4].Value) / 2;
+            double centerX = (box[0].GetValueOrDefault() + box[3].GetValueOrDefault()) / 2;
+            double centerY = (box[1].GetValueOrDefault() + box[4].GetValueOrDefault()) / 2;
             var levelsInPlan = levels.Where(level => level.Contains(centerX, centerY)).ToList();
             if(levelsInPlan.Count > 0) {
                 candidates = levelsInPlan;
@@ -111,7 +111,7 @@ internal static class FloorPositionRules {
     /// <summary>
     /// Корпус из имени уровня «13 этаж_К3_С4_38.600» → «К3»; null — имя не по Стандарту.
     /// </summary>
-    private static string GetBuildingCode(string levelName) {
+    private static string? GetBuildingCode(string? levelName) {
         string[] parts = (levelName ?? "").Split('_');
         return parts.Length >= 3 && _floorName.IsMatch(parts[0]) ? parts[1] : null;
     }
@@ -119,15 +119,15 @@ internal static class FloorPositionRules {
     /// <summary>
     /// Этаж, на котором стоит элемент; null — у элемента нет габарита или нет уровней.
     /// </summary>
-    private static FloorLevel FindFloor(ElementData element, List<FloorLevel> levels) {
-        List<double?> box = element.BoundingBox;
+    private static FloorLevel? FindFloor(ElementData element, List<FloorLevel> levels) {
+        List<double?>? box = element.BoundingBox;
         if(levels.Count == 0 || box == null || box.Count < 6 || box.Any(value => !value.HasValue)) {
             return null;
         }
 
-        double bottom = box[2].Value;
-        double height = box[5].Value - bottom;
-        double probeZ = bottom + Math.Min(MaxProbeHeightMm, height / 2);
+        double bottom = box[2].GetValueOrDefault();
+        double height = box[5].GetValueOrDefault() - bottom;
+        double probeZ = bottom + Math.Min(_maxProbeHeightMm, height / 2);
         var levelsInPlan = levels;
 
         FloorLevel levelBelow = levelsInPlan
@@ -143,11 +143,11 @@ internal static class FloorPositionRules {
     /// Уровень этажа: отметка, габарит в плане и этаж из имени уровня.
     /// </summary>
     private class FloorLevel {
-        private readonly List<double> _planExtent;
+        private readonly List<double>? _planExtent;
 
         public FloorLevel(LevelData level, string floorName, string floorToken) {
             LevelName = level.Name;
-            Elevation = level.ProjectElevation.Value;
+            Elevation = level.ProjectElevation.GetValueOrDefault();
             FloorName = floorName;
             FloorToken = floorToken;
             BuildingCode = GetBuildingCode(level.Name);
@@ -171,7 +171,7 @@ internal static class FloorPositionRules {
         /// <summary>
         /// Корпус из имени уровня, например «К3»; null — в имени нет корпуса.
         /// </summary>
-        public string BuildingCode { get; }
+        public string? BuildingCode { get; }
 
         /// <summary>
         /// Точка попадает в габарит уровня в плане; уровень без габарита подходит для любой точки.
@@ -181,10 +181,10 @@ internal static class FloorPositionRules {
                 return true;
             }
 
-            return x >= _planExtent[0] - PlanToleranceMm
-                   && y >= _planExtent[1] - PlanToleranceMm
-                   && x <= _planExtent[2] + PlanToleranceMm
-                   && y <= _planExtent[3] + PlanToleranceMm;
+            return x >= _planExtent[0] - _planToleranceMm
+                   && y >= _planExtent[1] - _planToleranceMm
+                   && x <= _planExtent[2] + _planToleranceMm
+                   && y <= _planExtent[3] + _planToleranceMm;
         }
     }
 }

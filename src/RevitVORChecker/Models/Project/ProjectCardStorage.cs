@@ -22,7 +22,7 @@ internal static class ProjectCardStorage {
     /// <summary>
     /// Данные проекта папки или null, если их нет или файл не читается.
     /// </summary>
-    public static ProjectCard Load(string modelsFolder) {
+    public static ProjectCard? Load(string modelsFolder) {
         try {
             string path = GetPath(modelsFolder);
             return File.Exists(path) ? JsonFiles.Load<ProjectCard>(path) : null;

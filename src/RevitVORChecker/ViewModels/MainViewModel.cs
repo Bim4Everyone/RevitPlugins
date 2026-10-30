@@ -23,14 +23,14 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly IResolutionRoot _resolutionRoot;
     private readonly ILocalizationService _localizationService;
-    private string _modelsFolder;
-    private string _classifierPath;
-    private string _clashTolerance;
+    private string _modelsFolder = string.Empty;
+    private string _classifierPath = string.Empty;
+    private string _clashTolerance = string.Empty;
     private bool _takeScreenshots;
     private bool _checkWorksets;
-    private string _projectSummary;
-    private string _errorText;
-    private ProjectCard _projectCard;
+    private string _projectSummary = string.Empty;
+    private string? _errorText;
+    private ProjectCard? _projectCard;
 
     public MainViewModel(
         PluginConfig pluginConfig,
@@ -57,12 +57,12 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Окно просит закрыть себя: параметры приняты, проверка запускается после закрытия окна.
     /// </summary>
-    public event EventHandler CloseRequested;
+    public event EventHandler? CloseRequested;
 
     /// <summary>
     /// Параметры запуска после нажатия «Запустить проверку».
     /// </summary>
-    public CheckSettings Settings { get; private set; }
+    public CheckSettings? Settings { get; private set; }
 
     public IMessageBoxService MessageBoxService { get; }
 
@@ -122,7 +122,7 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _projectSummary, value);
     }
 
-    public string ErrorText {
+    public string? ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
@@ -178,16 +178,20 @@ internal class MainViewModel : BaseViewModel {
             return;
         }
 
+        if(projectCardViewModel.Result is not { } projectCard) {
+            return;
+        }
+
         try {
-            ProjectCardStorage.Save(ModelsFolder, projectCardViewModel.Result);
+            ProjectCardStorage.Save(ModelsFolder, projectCard);
         } catch(Exception ex) {
             ShowMessage(
                 _localizationService.GetLocalizedString("MainWindow.ProjectSaveError") + " " + ex.Message,
                 MessageBoxImage.Error);
         }
 
-        _projectCard = projectCardViewModel.Result;
-        ProjectSummary = _projectCard.GetSummary();
+        _projectCard = projectCard;
+        ProjectSummary = projectCard.GetSummary();
     }
 
     private bool CanAcceptView() {
@@ -221,6 +225,11 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AcceptView() {
+        // команда доступна только с данными проекта (CanAcceptView)
+        if(_projectCard is null) {
+            return;
+        }
+
         SaveConfig();
         TryParseTolerance(out double tolerance);
         Settings = new CheckSettings {

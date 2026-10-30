@@ -27,16 +27,16 @@ internal class MaterialData {
     public long Id { get; set; }
 
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [JsonProperty("class")]
-    public string MaterialClass { get; set; }
+    public string? MaterialClass { get; set; }
 
     [JsonProperty("keynote")]
-    public string Keynote { get; set; }
+    public string? Keynote { get; set; }
 
     [JsonProperty("description")]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// Прочие параметры материала (имена из <see cref="ExportedParameters"/>).
@@ -45,13 +45,13 @@ internal class MaterialData {
     public IDictionary<string, pyRevitLabs.Json.Linq.JToken> ExtraParameters { get; set; } =
         new Dictionary<string, pyRevitLabs.Json.Linq.JToken>();
 
-    public string GetParameter(string name) {
+    public string? GetParameter(string name) {
         return ExtraParameters.TryGetValue(name, out var token) && token.Type != pyRevitLabs.Json.Linq.JTokenType.Null
             ? token.ToString()
             : null;
     }
 
-    public void SetParameter(string name, string value) {
+    public void SetParameter(string name, string? value) {
         ExtraParameters[name] = value == null
             ? pyRevitLabs.Json.Linq.JValue.CreateNull()
             : new pyRevitLabs.Json.Linq.JValue(value);

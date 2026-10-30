@@ -10,7 +10,7 @@ namespace RevitVORChecker.Models.Checks.Rules;
 /// Раздел 3 «Общие замечания»: спецификации ВОР, предупреждения, связи, уровни, файл, сведения о проекте, единицы.
 /// </summary>
 internal static class GeneralRules {
-    private const long MaxFileSizeBytes = 500L * 1024 * 1024;
+    private const long _maxFileSizeBytes = 500L * 1024 * 1024;
 
     /// <summary>
     /// Фрагменты текста предупреждений Revit, которые влияют на объёмы.
@@ -162,7 +162,7 @@ internal static class GeneralRules {
                     detail: link.Name);
             }
 
-            foreach(string workset in link.InstanceWorksets) {
+            foreach(string? workset in link.InstanceWorksets) {
                 bool isLinkWorkset = (workset ?? "").Replace("_", " ").Contains("Связи RVT")
                                      || (workset ?? "").Contains("Связи_RVT");
                 if(!string.IsNullOrEmpty(workset) && !isLinkWorkset) {
@@ -225,7 +225,7 @@ internal static class GeneralRules {
         }
 
         var levelsInWrongWorkset = levels
-            .Where(level => !string.IsNullOrEmpty(level.Workset) && !level.Workset.Contains("Уровн"))
+            .Where(level => level.Workset is { Length: > 0 } workset && !workset.Contains("Уровн"))
             .ToList();
         if(levelsInWrongWorkset.Count > 0) {
             findings.Add(
@@ -279,7 +279,7 @@ internal static class GeneralRules {
 
     private static void CheckProjectInfo(ModelCheckContext context, FindingCollection findings) {
         Dictionary<string, string> projectInfo = context.Model.ProjectInfo ?? new Dictionary<string, string>();
-        string GetInfo(string name) {
+        string? GetInfo(string name) {
             return projectInfo.TryGetValue(name, out string value) ? value : null;
         }
 
@@ -322,7 +322,7 @@ internal static class GeneralRules {
     private static void CheckFile(ModelCheckContext context, FindingCollection findings) {
         ModelFileData file = context.Model.File;
         long size = file.SizeBytes ?? -1;
-        if(size != 0 && size > MaxFileSizeBytes) {
+        if(size != 0 && size > _maxFileSizeBytes) {
             findings.Add(
                 ReportSections.General,
                 "Размер файла превышает 500 МБ (Стандарт п. 2.8).",
@@ -347,9 +347,9 @@ internal static class GeneralRules {
             (Quantity: "volume", Unit: "cubicMeters", Accuracy: 0.01, AccuracyText: "0,01", Title: "объём, м³"),
             (Quantity: "angle", Unit: "degrees", Accuracy: 0.01, AccuracyText: "0,01", Title: "угол, °")
         };
-        Dictionary<string, string> units = context.Model.Units ?? new Dictionary<string, string>();
+        Dictionary<string, string?> units = context.Model.Units ?? new Dictionary<string, string?>();
         foreach(var required in requiredUnits) {
-            string unitText = units.TryGetValue(required.Quantity, out string value) ? value ?? "" : "";
+            string unitText = units.TryGetValue(required.Quantity, out string? value) ? value ?? "" : "";
             Match match = Regex.Match(unitText, @"unit:(\w+)-.*acc=([\d.Ee-]+)");
             bool isCorrect = match.Success
                              && match.Groups[1].Value == required.Unit

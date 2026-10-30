@@ -29,9 +29,9 @@ internal static class ModelsFolder {
     /// <summary>
     /// Классификатор видов работ: указанный файл, файл «*лассификатор*.xlsx» в папке или файл из данных проекта.
     /// </summary>
-    public static string FindClassifier(string folder, string classifierPath, ProjectCard project) {
-        if(!string.IsNullOrWhiteSpace(classifierPath)) {
-            return classifierPath.Trim();
+    public static string? FindClassifier(string folder, string? classifierPath, ProjectCard project) {
+        if(classifierPath is { } path && !string.IsNullOrWhiteSpace(path)) {
+            return path.Trim();
         }
 
         return Directory.GetFiles(folder, "*.xlsx").FirstOrDefault(path => Path.GetFileName(path).Contains("лассификатор"))

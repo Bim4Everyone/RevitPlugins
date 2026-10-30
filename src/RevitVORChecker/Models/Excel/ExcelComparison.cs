@@ -75,7 +75,7 @@ internal static class ExcelComparison {
         ReportMissingFiles(vorFiles, insulationFiles, directCalculationFiles, comparisonWriter);
         ReportUnknownFiles(fileNames, modelsFolder, vorFiles, insulationFiles, directCalculationFiles, comparisonWriter);
 
-        ScheduleTableData FindSchedule(string name) {
+        ScheduleTableData? FindSchedule(string name) {
             return schedules.TryGetValue(name, out ScheduleTableData schedule) && !schedule.IsMissing ? schedule : null;
         }
 

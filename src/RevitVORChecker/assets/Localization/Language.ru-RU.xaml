@@ -20,11 +20,9 @@
     <system:String x:Key="MainWindow.NoClassifier">Файл Классификатора не найден.</system:String>
     <system:String x:Key="MainWindow.BadTolerance">Допуск пересечений — положительное число, мм.</system:String>
     <system:String x:Key="MainWindow.NoProject">Заполните данные проекта.</system:String>
-    <system:String x:Key="MainWindow.ProgressTitle">Проверка ВОР КР... [{0}]\[{1}]</system:String>
     <system:String x:Key="MainWindow.Cancelled">Проверка отменена.</system:String>
     <system:String x:Key="MainWindow.Stopped">Проверка остановлена:</system:String>
     <system:String x:Key="MainWindow.ErrorReport">Подробности ошибки сохранены в файл:</system:String>
-    <system:String x:Key="MainWindow.Done">Проверка завершена, замечаний: {0}.&#x0a;Реестр замечаний:&#x0a;{1}&#x0a;&#x0a;Открыть папку с реестром?</system:String>
 
     <system:String x:Key="Process.NoFolder">Нет папки:</system:String>
     <system:String x:Key="Process.NoModels">В папке нет моделей .rvt.</system:String>
@@ -71,6 +69,5 @@
     <system:String x:Key="Progress.Cancelling">Отмена после текущего шага…</system:String>
     <system:String x:Key="Result.Instruction">Проверка завершена, замечаний: {0}</system:String>
     <system:String x:Key="Result.Registry">Реестр замечаний:</system:String>
-    <system:String x:Key="Result.OpenFolder">Открыть папку с реестром</system:String>
-    <system:String x:Key="Result.Close">Закрыть</system:String>
+    <system:String x:Key="Result.OpenFolder">Открыть папку с реестром?</system:String>
 </ResourceDictionary>

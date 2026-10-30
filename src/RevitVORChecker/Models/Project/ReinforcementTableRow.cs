@@ -15,7 +15,7 @@ internal class ReinforcementTableRow {
         string thickness,
         int? firstValue,
         int? secondValue,
-        string alternativeCondition = null) {
+        string? alternativeCondition = null) {
 
         Key = key;
         Number = number;
@@ -47,7 +47,7 @@ internal class ReinforcementTableRow {
     /// <summary>
     /// Когда для паркинга допускается значение <see cref="SecondValue"/>; null — особого случая нет.
     /// </summary>
-    public string AlternativeCondition { get; }
+    public string? AlternativeCondition { get; }
 
     public bool IsParking => Key.StartsWith("P");
 }

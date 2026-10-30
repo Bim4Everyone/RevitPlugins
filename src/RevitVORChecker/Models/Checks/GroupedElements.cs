@@ -10,7 +10,7 @@ namespace RevitVORChecker.Models.Checks;
 internal class GroupedElements {
     private readonly OrderedMap<string, ElementGroup> _groups = new();
 
-    public void Add(string text, string detail, ElementData element) {
+    public void Add(string text, string? detail, ElementData element) {
         string key = text + "\u0001" + (detail ?? "\u0002");
         _groups.GetOrAdd(key, () => new ElementGroup(text, detail)).Elements.Add(element);
     }
@@ -38,14 +38,14 @@ internal class GroupedElements {
     }
 
     private class ElementGroup {
-        public ElementGroup(string text, string detail) {
+        public ElementGroup(string text, string? detail) {
             Text = text;
             Detail = detail;
         }
 
         public string Text { get; }
 
-        public string Detail { get; }
+        public string? Detail { get; }
 
         public List<ElementData> Elements { get; } = new();
     }

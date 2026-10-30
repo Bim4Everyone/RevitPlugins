@@ -79,7 +79,7 @@ internal static class DetachedModelOpener {
         }
     }
 
-    private static bool IsLinkWorkset(string name) {
+    private static bool IsLinkWorkset(string? name) {
         string lowerName = (name ?? "").ToLowerInvariant();
         return lowerName.Contains("связ") || lowerName.Contains("rvt") || lowerName.Contains("dwg") || lowerName.Contains("link");
     }
@@ -89,7 +89,7 @@ internal static class DetachedModelOpener {
             .OfClass(typeof(RevitLinkType))
             .Cast<RevitLinkType>()
             .ToList();
-        WorksetTable worksets = document.IsWorkshared ? document.GetWorksetTable() : null;
+        WorksetTable? worksets = document.IsWorkshared ? document.GetWorksetTable() : null;
         var links = new List<LinkData>();
         foreach(RevitLinkType linkType in linkTypes) {
             var instances = new FilteredElementCollector(document)
@@ -103,7 +103,7 @@ internal static class DetachedModelOpener {
                 Attachment = linkType.AttachmentType.ToString(),
                 InstanceCount = instances.Count,
                 InstanceWorksets = instances
-                    .Select(instance => worksets?.GetWorkset(instance.WorksetId)?.Name ?? "")
+                    .Select(instance => (string?) (worksets?.GetWorkset(instance.WorksetId)?.Name ?? ""))
                     .ToList(),
                 RemovedOnOpen = true
             });

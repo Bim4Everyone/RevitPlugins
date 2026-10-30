@@ -25,25 +25,25 @@ internal class ElementData {
     /// Имя категории.
     /// </summary>
     [JsonProperty("cat")]
-    public string Category { get; set; }
+    public string Category { get; set; } = string.Empty;
 
     /// <summary>
     /// Встроенная категория (имя значения BuiltInCategory).
     /// </summary>
     [JsonProperty("bic")]
-    public string BuiltInCategory { get; set; }
+    public string BuiltInCategory { get; set; } = string.Empty;
 
     [JsonProperty("family")]
-    public string FamilyName { get; set; }
+    public string? FamilyName { get; set; }
 
     [JsonProperty("type")]
-    public string TypeName { get; set; }
+    public string TypeName { get; set; } = string.Empty;
 
     [JsonProperty("ws")]
-    public string Workset { get; set; }
+    public string? Workset { get; set; }
 
     [JsonProperty("level")]
-    public string LevelName { get; set; }
+    public string? LevelName { get; set; }
 
     [JsonProperty("inGroup")]
     public bool IsInGroup { get; set; }
@@ -58,10 +58,10 @@ internal class ElementData {
     public long? SuperComponentId { get; set; }
 
     [JsonProperty("phase")]
-    public string PhaseCreated { get; set; }
+    public string? PhaseCreated { get; set; }
 
     [JsonProperty("demolished")]
-    public string PhaseDemolished { get; set; }
+    public string? PhaseDemolished { get; set; }
 
     /// <summary>
     /// Объём элемента, м³.
@@ -73,13 +73,13 @@ internal class ElementData {
     /// Габарит, мм: [minX, minY, minZ, maxX, maxY, maxZ].
     /// </summary>
     [JsonProperty("bb")]
-    public List<double?> BoundingBox { get; set; }
+    public List<double?>? BoundingBox { get; set; }
 
     /// <summary>
     /// Параметры: имя → [значение, «i» — экземпляра / «t» — типа].
     /// </summary>
     [JsonProperty("p")]
-    public Dictionary<string, List<string>> Parameters { get; set; } = new();
+    public Dictionary<string, List<string?>> Parameters { get; set; } = new();
 
     /// <summary>
     /// Материалы: [id материала, объём м³, площадь м²].
@@ -96,8 +96,8 @@ internal class ElementData {
     /// <summary>
     /// Значение параметра или null, если параметра нет.
     /// </summary>
-    public string GetParameter(string name) {
-        return Parameters.TryGetValue(name, out List<string> value) && value.Count > 0 ? value[0] : null;
+    public string? GetParameter(string name) {
+        return Parameters.TryGetValue(name, out List<string?>? value) && value.Count > 0 ? value[0] : null;
     }
 
     /// <summary>
@@ -110,6 +110,6 @@ internal class ElementData {
     public IEnumerable<long> GetMaterialIds() {
         return Materials
             .Where(material => material.Count > 0 && material[0].HasValue)
-            .Select(material => (long) material[0].Value);
+            .Select(material => (long) material[0].GetValueOrDefault());
     }
 }

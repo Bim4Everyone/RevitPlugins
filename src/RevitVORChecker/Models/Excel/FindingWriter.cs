@@ -16,7 +16,7 @@ internal class FindingWriter {
         _title = title;
     }
 
-    public void Add(string text, string kind = FindingKinds.Remark, FindingTable table = null) {
+    public void Add(string text, string kind = FindingKinds.Remark, FindingTable? table = null) {
         _findings.Add(new Finding {
             Section = _section,
             Title = _title,

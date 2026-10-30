@@ -14,10 +14,10 @@ namespace RevitVORChecker.Models;
 /// </remarks>
 internal class PluginConfig : ProjectConfig {
     [JsonIgnore]
-    public override string ProjectConfigPath { get; set; }
+    public override string? ProjectConfigPath { get; set; }
 
     [JsonIgnore]
-    public override IConfigSerializer Serializer { get; set; }
+    public override IConfigSerializer? Serializer { get; set; }
 
     /// <summary>
     /// Папка с моделями КР и выгрузками ВОР.

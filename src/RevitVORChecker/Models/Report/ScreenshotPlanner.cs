@@ -11,8 +11,8 @@ namespace RevitVORChecker.Models.Report;
 /// Задания на скриншоты: для записей замечаний с более чем 10 элементами и для коллизий (по первой паре).
 /// </summary>
 internal static class ScreenshotPlanner {
-    private const int MaxListedIds = 10;
-    private const int MaxIdsPerScreenshot = 2000;
+    private const int _maxListedIds = 10;
+    private const int _maxIdsPerScreenshot = 2000;
 
     /// <summary>
     /// Возвращает задания по файлам моделей и проставляет записям замечаний путь к будущему скриншоту.
@@ -28,17 +28,17 @@ internal static class ScreenshotPlanner {
             Finding finding = findings[findingNumber - 1];
             for(int entryNumber = 1; entryNumber <= finding.Entries.Count; entryNumber++) {
                 FindingEntry entry = finding.Entries[entryNumber - 1];
-                if(entry.ElementIds.Count == 0 || string.IsNullOrEmpty(entry.FileName)) {
+                if(entry.ElementIds.Count == 0 || entry.FileName is not { Length: > 0 } fileName) {
                     continue;
                 }
 
                 string name = finding.Section + "_" + findingNumber.ToString("000") + "_" + entryNumber.ToString("00");
-                ScreenshotJob job = CreateJob(finding, entry, name, elementsById);
+                ScreenshotJob? job = CreateJob(finding, entry, name, elementsById);
                 if(job == null) {
                     continue;
                 }
 
-                jobsByFile.GetOrAdd(entry.FileName, () => new List<ScreenshotJob>()).Add(job);
+                jobsByFile.GetOrAdd(fileName, () => new List<ScreenshotJob>()).Add(job);
                 entry.ImagePath = Path.Combine(imageFolder, name + ".png");
             }
         }
@@ -51,7 +51,7 @@ internal static class ScreenshotPlanner {
         return sortedJobs;
     }
 
-    private static ScreenshotJob CreateJob(
+    private static ScreenshotJob? CreateJob(
         Finding finding,
         FindingEntry entry,
         string name,
@@ -67,11 +67,11 @@ internal static class ScreenshotPlanner {
             return new ScreenshotJob(name, pairIds, ScreenshotFraming.Intersection);
         }
 
-        if(entry.ElementIds.Count > MaxListedIds) {
+        if(entry.ElementIds.Count > _maxListedIds) {
             ScreenshotFraming framing = AreSmallAndScattered(entry.ElementIds, elementsById)
                 ? ScreenshotFraming.Fragment
                 : ScreenshotFraming.Union;
-            return new ScreenshotJob(name, entry.ElementIds.Take(MaxIdsPerScreenshot).ToList(), framing);
+            return new ScreenshotJob(name, entry.ElementIds.Take(_maxIdsPerScreenshot).ToList(), framing);
         }
 
         return null;
@@ -99,7 +99,7 @@ internal static class ScreenshotPlanner {
             return false;
         }
 
-        var boxes = elements.Select(element => element.BoundingBox.Select(value => value.Value).ToArray()).ToList();
+        var boxes = elements.Select(element => element.BoundingBox!.Select(value => value.GetValueOrDefault()).ToArray()).ToList();
         var volumes = elements.Select(element => element.Volume ?? 0).OrderBy(volume => volume).ToList();
         var diagonals = boxes.Select(box => Distance(box, 0, box, 3)).OrderBy(diagonal => diagonal).ToList();
         double[] minimum = Enumerable.Range(0, 3).Select(axis => boxes.Min(box => box[axis])).ToArray();

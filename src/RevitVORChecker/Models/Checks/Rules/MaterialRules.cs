@@ -72,7 +72,7 @@ internal static class MaterialRules {
                 fileName);
         }
 
-        string chapter = material.GetParameter(MaterialData.ChapterNameParameter);
+        string? chapter = material.GetParameter(MaterialData.ChapterNameParameter);
         if(PythonFormat.Trim(chapter).Length > 0) {
             findings.Add(
                 ReportSections.MaterialChapter,
@@ -90,7 +90,7 @@ internal static class MaterialRules {
                 fileName);
         }
 
-        string unit = material.GetParameter(MaterialData.UnitParameter);
+        string? unit = material.GetParameter(MaterialData.UnitParameter);
         if(WorkClassifier.NormalizeUnit(unit) != "м³") {
             findings.Add(
                 ReportSections.MaterialUnit,
@@ -99,7 +99,7 @@ internal static class MaterialRules {
                 fileName);
         }
 
-        string countType = material.GetParameter(MaterialData.CountTypeParameter);
+        string? countType = material.GetParameter(MaterialData.CountTypeParameter);
         if(PythonFormat.Trim(countType) != "3") {
             findings.Add(
                 ReportSections.MaterialCountType,
@@ -161,11 +161,11 @@ internal static class MaterialRules {
         string reference) {
 
         string chapterCode = keynote.Length >= 6 ? keynote.Substring(0, 6) : keynote;
-        string expectedChapter =
-            context.Classifier.Chapters.TryGetValue(chapterCode, out string classifierChapter)
+        string? expectedChapter =
+            context.Classifier.Chapters.TryGetValue(chapterCode, out string? classifierChapter)
             && !string.IsNullOrEmpty(classifierChapter)
                 ? classifierChapter
-                : _defaultChapters.TryGetValue(chapterCode, out string defaultChapter)
+                : _defaultChapters.TryGetValue(chapterCode, out string? defaultChapter)
                     ? defaultChapter
                     : null;
         string chapter = PythonFormat.Trim(material.GetParameter(MaterialData.ChapterNameParameter));
@@ -199,7 +199,7 @@ internal static class MaterialRules {
                 fileName);
         }
 
-        string unit = material.GetParameter(MaterialData.UnitParameter);
+        string? unit = material.GetParameter(MaterialData.UnitParameter);
         if(WorkClassifier.NormalizeUnit(unit) != work.Unit) {
             findings.Add(
                 ReportSections.MaterialUnit,
@@ -221,7 +221,7 @@ internal static class MaterialRules {
         }
     }
 
-    private static string EmptyToNull(string text) {
+    private static string? EmptyToNull(string? text) {
         return string.IsNullOrEmpty(text) ? null : text;
     }
 }

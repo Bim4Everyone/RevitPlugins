@@ -15,10 +15,10 @@ internal class FindingCollection {
     public void Add(
         string section,
         string text,
-        IEnumerable<long> elementIds = null,
-        string fileName = null,
+        IEnumerable<long>? elementIds = null,
+        string? fileName = null,
         string kind = FindingKinds.Remark,
-        string detail = null) {
+        string? detail = null) {
 
         string key = section + "\u0001" + kind + "\u0001" + text;
         Finding finding = _findings.GetOrAdd(key, () => new Finding {
