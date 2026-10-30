@@ -30,6 +30,7 @@ public class RevitStairRailingCommand : BasePluginCommand {
     /// Инициализирует команду плагина.
     /// </summary>
     public RevitStairRailingCommand() {
+        // имя плагина в журнале и окнах платформы — как на кнопке; в шаблонах платформы задаётся строкой
         PluginName = "Ограждение лестниц";
     }
 
@@ -60,17 +61,25 @@ public class RevitStairRailingCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // окно закрывается до выбора линий: выбор в Revit идёт без открытого модального окна
+        // Окно показывается здесь, а не через Notification(window) шаблона: тот сразу после закрытия окна
+        // выдаёт уведомление «завершено успешно», а линии выбираются и ограждение строится после окна
+        // (выбор в Revit идёт без открытого модального окна). Уведомление платформы — после построения
+        // (Notification(true)); при отмене окна Notification(false) завершает команду отменой.
         var mainWindow = kernel.Get<MainWindow>();
-        if(mainWindow.ShowDialog() != true
-           || ((MainViewModel) mainWindow.DataContext).Parameters is not { } parameters) {
+        bool? dialogResult = mainWindow.ShowDialog();
+        if(dialogResult != true) {
+            Notification(dialogResult);
             return;
         }
 
+        RailingParameters parameters = ((MainViewModel) mainWindow.DataContext).Parameters
+                                       ?? throw new InvalidOperationException("Railing parameters are not set.");
         try {
             kernel.Get<RailingPlacement>().Run(parameters);
+            Notification(true);
         } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
-            // выбор линий отменён — ничего не строим
+            // Esc при выборе линий в Revit — обычная отмена пользователем, а не ошибка: ничего не строится
+            // и окно ошибки платформы не нужно, поэтому исключение дальше не передаётся.
         } catch(RailingException ex) {
             var localizationService = kernel.Get<ILocalizationService>();
             kernel.Get<IMessageBoxService>().Show(

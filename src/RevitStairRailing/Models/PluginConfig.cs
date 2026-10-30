@@ -99,5 +99,7 @@ internal class RevitSettings : ProjectSettings {
 
     public bool CreateAssembly { get; set; } = true;
 
+    // начало имени сборки — данные модели (имена сборок по стандарту КМ), а не текст интерфейса,
+    // поэтому не в ресурсах локализации; пользователь меняет его в окне
     public string AssemblyNamePrefix { get; set; } = "Ограждение Ом";
 }

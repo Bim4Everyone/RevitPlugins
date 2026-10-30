@@ -3,6 +3,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.Revit;
+
 namespace RevitStairRailing.Models;
 
 /// <summary>
@@ -72,8 +74,8 @@ internal class RevitRepository {
     /// </summary>
     public List<Family> GetPlateFamilies() {
         return GetFramingTypes()
-            .Where(symbol => symbol.LookupParameter(RailingBuilder.PlateThicknessParameter) != null
-                             && symbol.LookupParameter(RailingBuilder.PlateWidthParameter) != null)
+            .Where(symbol => symbol.IsExistsParam(RailingBuilder.PlateThicknessParameter)
+                             && symbol.IsExistsParam(RailingBuilder.PlateWidthParameter))
             .Select(symbol => symbol.Family)
             .GroupBy(family => family.Id)
             .Select(group => group.First())
@@ -86,7 +88,7 @@ internal class RevitRepository {
     /// </summary>
     /// <exception cref="RailingException">Среди выбранных линий есть дуги или сплайны.</exception>
     public List<Line> GetSelectedModelLines() {
-        return ToLines(ActiveUIDocument.Selection.GetElementIds().Select(id => Document.GetElement(id)));
+        return ToLines(ActiveUIDocument.GetSelectedElements());
     }
 
     /// <summary>
@@ -103,7 +105,7 @@ internal class RevitRepository {
     }
 
     public void SelectElements(ICollection<ElementId> elementIds) {
-        ActiveUIDocument.Selection.SetElementIds(elementIds);
+        ActiveUIDocument.SetSelectedElements(elementIds);
     }
 
     private static List<Line> ToLines(IEnumerable<Element> elements) {

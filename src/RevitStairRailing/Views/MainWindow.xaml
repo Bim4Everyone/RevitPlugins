@@ -89,13 +89,18 @@
                                         StrokeThickness="{Binding Thickness}"
                                         Stroke="{DynamicResource TextFillColorPrimaryBrush}" />
                                     <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding IsDashed}" Value="True">
+                                        <DataTrigger
+                                            Binding="{Binding IsDashed}"
+                                            Value="True">
                                             <Setter TargetName="PreviewLine" Property="StrokeDashArray" Value="6 4" />
                                             <Setter TargetName="PreviewLine" Property="Stroke"
                                                     Value="{DynamicResource AccentTextFillColorPrimaryBrush}" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
-                                            <Setter TargetName="PreviewLine" Property="Stroke" Value="Red" />
+                                        <DataTrigger
+                                            Binding="{Binding IsHighlighted}"
+                                            Value="True">
+                                            <Setter TargetName="PreviewLine" Property="Stroke"
+                                                    Value="{DynamicResource SystemFillColorCriticalBrush}" />
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>
@@ -120,8 +125,11 @@
                                         FontSize="12"
                                         Text="{Binding Text}" />
                                     <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
-                                            <Setter TargetName="PreviewLabel" Property="Foreground" Value="Red" />
+                                        <DataTrigger
+                                            Binding="{Binding IsHighlighted}"
+                                            Value="True">
+                                            <Setter TargetName="PreviewLabel" Property="Foreground"
+                                                    Value="{DynamicResource SystemFillColorCriticalBrush}" />
                                             <Setter TargetName="PreviewLabel" Property="FontWeight" Value="Bold" />
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
@@ -219,32 +227,38 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <TextBlock
-                            Grid.Row="0" Grid.Column="0"
+                            Grid.Row="0"
+                            Grid.Column="0"
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.PostHeight}" />
                         <ui:TextBox
                             Tag="PostHeight"
-                            Grid.Row="0" Grid.Column="1"
+                            Grid.Row="0"
+                            Grid.Column="1"
                             Width="90"
                         HorizontalAlignment="Left"
                             Text="{Binding PostHeight, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBlock
-                            Grid.Row="0" Grid.Column="3"
+                            Grid.Row="0"
+                            Grid.Column="3"
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.MaxPostStep}" />
                         <ui:TextBox
                             Tag="PostStep"
-                            Grid.Row="0" Grid.Column="4"
+                            Grid.Row="0"
+                            Grid.Column="4"
                             Width="90"
                         HorizontalAlignment="Left"
                             Text="{Binding MaxPostStep, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBlock
-                            Grid.Row="2" Grid.Column="0"
+                            Grid.Row="2"
+                            Grid.Column="0"
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.PostRotation}" />
                         <ui:TextBox
                             Tag="Post"
-                            Grid.Row="2" Grid.Column="1"
+                            Grid.Row="2"
+                            Grid.Column="1"
                             Width="90"
                         HorizontalAlignment="Left"
                             Text="{Binding PostRotation, UpdateSourceTrigger=PropertyChanged}" />
@@ -299,34 +313,40 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <TextBlock
-                            Grid.Row="0" Grid.Column="0"
+                            Grid.Row="0"
+                            Grid.Column="0"
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.FlightMount}" />
                         <ComboBox
                             Tag="FlightMount"
-                            Grid.Row="0" Grid.Column="1"
+                            Grid.Row="0"
+                            Grid.Column="1"
                             ItemsSource="{Binding MountOptions}"
                             DisplayMemberPath="Name"
                             SelectedValuePath="Value"
                             SelectedValue="{Binding FlightMount}" />
                         <TextBlock
-                            Grid.Row="2" Grid.Column="0"
+                            Grid.Row="2"
+                            Grid.Column="0"
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.LandingMount}" />
                         <ComboBox
                             Tag="LandingMount"
-                            Grid.Row="2" Grid.Column="1"
+                            Grid.Row="2"
+                            Grid.Column="1"
                             ItemsSource="{Binding MountOptions}"
                             DisplayMemberPath="Name"
                             SelectedValuePath="Value"
                             SelectedValue="{Binding LandingMount}" />
                         <TextBlock
-                            Grid.Row="4" Grid.Column="0"
+                            Grid.Row="4"
+                            Grid.Column="0"
                             Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.PlateFamily}" />
                         <ComboBox
                             Tag="Plates"
-                            Grid.Row="4" Grid.Column="1"
+                            Grid.Row="4"
+                            Grid.Column="1"
                             ItemsSource="{Binding PlateFamilies}"
                             DisplayMemberPath="Name"
                             SelectedItem="{Binding PlateFamily}" />

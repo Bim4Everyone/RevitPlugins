@@ -459,6 +459,8 @@ internal class MainViewModel : BaseViewModel {
     private void LoadConfig() {
         RevitSettings settings = _pluginConfig.GetSettings(_revitRepository.Document) ?? new RevitSettings();
 
+        // типы по умолчанию — фрагменты имён семейств и типоразмеров шаблона КМ (данные модели, не текст
+        // интерфейса); если таких нет, берётся первый подходящий тип
         PostType = FindType(FramingTypes, settings.PostType, "Труба_ГОСТ 32931", "30х20х3");
         HandrailType = FindType(FramingTypes, settings.HandrailType, "87341", "40х3");
         RodType = FindType(FramingTypes, settings.RodType, "Стержень арматурный", "12 А240");

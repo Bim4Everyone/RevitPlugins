@@ -24,6 +24,14 @@ internal class RailingBuilder {
     /// </summary>
     public const string PlateThicknessParameter = "t";
     public const string PlateWidthParameter = "h";
+
+    /// <summary>
+    /// Наименование типа пластины для спецификаций.
+    /// </summary>
+    /// <remarks>
+    /// Параметра ADSK_Наименование нет в общих параметрах платформы (SharedParamsConfig, проверено 30.10.2026),
+    /// поэтому имя задано строкой. Это параметр семейства КМ; если его нет, наименование не заполняется.
+    /// </remarks>
     private const string _plateNameParameter = "ADSK_Наименование";
 
     /// <summary>
@@ -113,11 +121,11 @@ internal class RailingBuilder {
         StructuralFramingUtils.DisallowJoinAtEnd(instance, 0);
         StructuralFramingUtils.DisallowJoinAtEnd(instance, 1);
         if(member.BendAngle != null) {
-            instance.get_Parameter(BuiltInParameter.STRUCTURAL_BEND_DIR_ANGLE)?.Set(member.BendAngle.Value);
+            instance.SetParamValue(BuiltInParameter.STRUCTURAL_BEND_DIR_ANGLE, member.BendAngle.Value);
         }
 
         if(member.PlateSize != null) {
-            instance.get_Parameter(BuiltInParameter.Z_JUSTIFICATION)?.Set(_centerZJustification);
+            instance.SetParamValue(BuiltInParameter.Z_JUSTIFICATION, _centerZJustification);
         }
 
         return instance;
@@ -135,6 +143,8 @@ internal class RailingBuilder {
     /// с именем «-tхh».
     /// </summary>
     private FamilySymbol GetPlateType(ElementId familyId, PlateSize size) {
+        // «х» (кириллица) — как в именах типоразмеров семейств КМ («-10х200»); это имя типа в модели,
+        // а не текст интерфейса, поэтому не в ресурсах локализации
         string name = "-" + FormatSize(size.Thickness) + "х" + FormatSize(size.Width);
         if(_plateTypes.TryGetValue(name, out FamilySymbol cached)) {
             return cached;
@@ -146,14 +156,13 @@ internal class RailingBuilder {
             .ToList();
         double thickness = size.Thickness * _millimetersToFeet;
         double width = size.Width * _millimetersToFeet;
-        if(symbols[0].LookupParameter(PlateThicknessParameter) == null
-           || symbols[0].LookupParameter(PlateWidthParameter) == null) {
+        if(!symbols[0].IsExistsParam(PlateThicknessParameter) || !symbols[0].IsExistsParam(PlateWidthParameter)) {
             throw new RailingException("Build.PlateParameters");
         }
 
         FamilySymbol plateType = symbols.FirstOrDefault(symbol =>
-            Math.Abs(symbol.LookupParameter(PlateThicknessParameter).AsDouble() - thickness) < _sizeTolerance
-            && Math.Abs(symbol.LookupParameter(PlateWidthParameter).AsDouble() - width) < _sizeTolerance);
+            Math.Abs(symbol.GetParamValue<double>(PlateThicknessParameter) - thickness) < _sizeTolerance
+            && Math.Abs(symbol.GetParamValue<double>(PlateWidthParameter) - width) < _sizeTolerance);
         if(plateType == null) {
             string uniqueName = name;
             for(int copyNumber = 1; symbols.Any(symbol => symbol.Name == uniqueName); copyNumber++) {
@@ -161,8 +170,10 @@ internal class RailingBuilder {
             }
 
             plateType = (FamilySymbol) symbols[0].Duplicate(uniqueName);
-            plateType.LookupParameter(PlateThicknessParameter).Set(thickness);
-            plateType.LookupParameter(PlateWidthParameter).Set(width);
+            plateType.SetParamValue(PlateThicknessParameter, thickness);
+            plateType.SetParamValue(PlateWidthParameter, width);
+            // не SetParamValue: параметра может не быть, он может быть формулой (только чтение) или не текстом —
+            // тогда наименование пропускается, а SetParamValue выбросил бы исключение
             Parameter nameParameter = plateType.LookupParameter(_plateNameParameter);
             if(nameParameter is { IsReadOnly: false, StorageType: StorageType.String }) {
                 nameParameter.Set(FormatSize(size.Thickness) + "х" + FormatSize(size.Width));
@@ -205,7 +216,7 @@ internal class RailingBuilder {
             .OfClass(typeof(AssemblyType))
             .Select(assemblyType => numberPattern.Match(assemblyType.Name))
             .Where(match => match.Success)
-            .Select(match => int.Parse(match.Groups[1].Value))
+            .Select(match => int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture))
             .ToList();
         return usedNumbers.Count > 0 ? usedNumbers.Max() + 1 : 1;
     }
