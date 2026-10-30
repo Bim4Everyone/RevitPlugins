@@ -66,6 +66,7 @@
     <system:String x:Key="Path.Closed">The lines form a closed loop — the path must have a start and an end.</system:String>
     <system:String x:Key="Path.NotChain">The lines do not form one chain: ends of adjacent lines must coincide, without gaps or branches.</system:String>
     <system:String x:Key="Path.Vertical">One of the lines is vertical — the path follows flights and landings in plan.</system:String>
+    <system:String x:Key="Build.TransactionName">Stair railing: build</system:String>
     <system:String x:Key="Build.NoLevels">The model has no levels.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">Select lines and build</system:String>

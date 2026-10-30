@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -7,6 +8,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -49,6 +51,7 @@ public class RevitStairRailingCommand : BasePluginCommand {
             .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
 
         kernel.UseWpfUIThemeUpdater();
+        kernel.UseWpfUIMessageBox();
 
         kernel.BindMainWindow<MainViewModel, MainWindow>();
 
@@ -59,8 +62,22 @@ public class RevitStairRailingCommand : BasePluginCommand {
 
         // окно закрывается до выбора линий: выбор в Revit идёт без открытого модального окна
         var mainWindow = kernel.Get<MainWindow>();
-        if(mainWindow.ShowDialog() == true) {
-            kernel.Get<RailingPlacement>().Run(((MainViewModel) mainWindow.DataContext).Parameters);
+        if(mainWindow.ShowDialog() != true
+           || ((MainViewModel) mainWindow.DataContext).Parameters is not { } parameters) {
+            return;
+        }
+
+        try {
+            kernel.Get<RailingPlacement>().Run(parameters);
+        } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
+            // выбор линий отменён — ничего не строим
+        } catch(RailingException ex) {
+            var localizationService = kernel.Get<ILocalizationService>();
+            kernel.Get<IMessageBoxService>().Show(
+                localizationService.GetLocalizedString(ex.MessageKey),
+                localizationService.GetLocalizedString("MainWindow.Title"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
         }
     }
 }

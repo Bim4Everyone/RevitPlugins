@@ -66,6 +66,7 @@
     <system:String x:Key="Path.Closed">Линии образуют замкнутый контур — у траектории должны быть начало и конец.</system:String>
     <system:String x:Key="Path.NotChain">Линии не образуют одну цепочку: концы соседних линий должны совпадать, без разрывов и ответвлений.</system:String>
     <system:String x:Key="Path.Vertical">Среди линий есть вертикальная — траектория идёт по маршам и площадкам в плане.</system:String>
+    <system:String x:Key="Build.TransactionName">Ограждение лестниц: построение</system:String>
     <system:String x:Key="Build.NoLevels">В модели нет уровней.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">Выбрать линии и построить</system:String>

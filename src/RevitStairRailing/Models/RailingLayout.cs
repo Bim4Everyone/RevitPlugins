@@ -11,7 +11,7 @@ namespace RevitStairRailing.Models;
 /// (угол 0 — ширина сечения вдоль +X, 90° — вдоль −Y), поэтому он пересчитывается от направления участка.
 /// </remarks>
 internal static class RailingLayout {
-    private const double MillimetersToFeet = 1 / 304.8;
+    private const double _millimetersToFeet = 1 / 304.8;
 
     /// <summary>
     /// Смещения оси ограждения от линий траектории (края марша) по участкам, футы:
@@ -23,7 +23,7 @@ internal static class RailingLayout {
             bool isFlight = path.IsFlight(segmentIndex);
             PostMount mount = isFlight ? parameters.FlightMount : parameters.LandingMount;
             double edgeOffset = isFlight ? parameters.FlightEdgeOffset : parameters.LandingEdgeOffset;
-            offsets.Add((edgeOffset + GetHalfSupportWidth(mount, parameters)) * MillimetersToFeet);
+            offsets.Add((edgeOffset + GetHalfSupportWidth(mount, parameters)) * _millimetersToFeet);
         }
 
         return offsets;
@@ -43,8 +43,8 @@ internal static class RailingLayout {
     }
 
     public static List<RailingMember> Create(RailingPath path, RailingParameters parameters) {
-        double postHeight = parameters.PostHeight * MillimetersToFeet;
-        double maxPostStep = parameters.MaxPostStep * MillimetersToFeet;
+        double postHeight = parameters.PostHeight * _millimetersToFeet;
+        double maxPostStep = parameters.MaxPostStep * _millimetersToFeet;
         var members = new List<RailingMember>();
         for(int segmentIndex = 0; segmentIndex < path.SegmentCount; segmentIndex++) {
             XYZ start = path.Points[segmentIndex];
@@ -59,7 +59,7 @@ internal static class RailingLayout {
             foreach(double rodOffset in parameters.RodOffsets) {
                 members.Add(RailingMember.Linear(
                     RailingMemberRole.Rod,
-                    Raise(start, end, postHeight - rodOffset * MillimetersToFeet)));
+                    Raise(start, end, postHeight - rodOffset * _millimetersToFeet)));
             }
 
             // стойки равномерно, с шагом в плане не больше заданного; общая вершина участков — одна стойка
@@ -84,9 +84,9 @@ internal static class RailingLayout {
         double postBendAngle = parameters.PostRotationDegrees * Math.PI / 180 + GetBendAngle(post.Direction);
         if(post.Mount == PostMount.Top) {
             // пластина лежит на поверхности, стойка стоит на пластине
-            double plateThickness = parameters.BasePlate.Thickness * MillimetersToFeet;
+            double plateThickness = parameters.BasePlate.Thickness * _millimetersToFeet;
             XYZ plateTop = trajectoryPoint + XYZ.BasisZ * plateThickness;
-            XYZ halfLength = post.Direction * (parameters.BasePlateLength * MillimetersToFeet / 2);
+            XYZ halfLength = post.Direction * (parameters.BasePlateLength * _millimetersToFeet / 2);
             XYZ plateAxis = trajectoryPoint + XYZ.BasisZ * (plateThickness / 2);
             members.Add(RailingMember.Linear(
                 RailingMemberRole.BasePlate,
@@ -107,8 +107,8 @@ internal static class RailingLayout {
         bool isAlongRailing = parameters.CheekOrientation == CheekOrientation.AlongRailing;
         XYZ cheekPlaneDirection = isAlongRailing ? post.Direction : post.StairNormal;
         XYZ cheekShiftDirection = isAlongRailing ? post.StairNormal : post.Direction;
-        double cheekShift = (parameters.CheekGap + parameters.Cheek.Thickness) / 2 * MillimetersToFeet;
-        double cheekHeight = parameters.CheekHeight * MillimetersToFeet;
+        double cheekShift = (parameters.CheekGap + parameters.Cheek.Thickness) / 2 * _millimetersToFeet;
+        double cheekHeight = parameters.CheekHeight * _millimetersToFeet;
         foreach(double sign in new[] { -1.0, 1.0 }) {
             XYZ cheekBottom = trajectoryPoint + cheekShiftDirection * (cheekShift * sign);
             members.Add(RailingMember.Linear(
@@ -125,8 +125,8 @@ internal static class RailingLayout {
     /// Точки анкеров на верхней грани опорной пластины.
     /// </summary>
     private static IEnumerable<XYZ> GetAnchorPoints(XYZ plateTopCenter, PostPlacement post, RailingParameters parameters) {
-        double alongOffset = (parameters.BasePlateLength / 2 - parameters.AnchorEdgeDistance) * MillimetersToFeet;
-        double acrossOffset = (parameters.BasePlate.Width / 2 - parameters.AnchorEdgeDistance) * MillimetersToFeet;
+        double alongOffset = (parameters.BasePlateLength / 2 - parameters.AnchorEdgeDistance) * _millimetersToFeet;
+        double acrossOffset = (parameters.BasePlate.Width / 2 - parameters.AnchorEdgeDistance) * _millimetersToFeet;
         XYZ Point(double along, double across) {
             return plateTopCenter + post.Direction * along + post.StairNormal * across;
         }
@@ -197,9 +197,12 @@ internal class RailingMember {
     /// <summary>
     /// Линия размещения; null — элемент ставится в точке.
     /// </summary>
-    public Line Line { get; private set; }
+    public Line? Line { get; private set; }
 
-    public XYZ Point { get; private set; }
+    /// <summary>
+    /// Точка размещения; null — элемент ставится по линии.
+    /// </summary>
+    public XYZ? Point { get; private set; }
 
     /// <summary>
     /// Угол поворота сечения, радианы; null — не задаётся.
@@ -209,13 +212,13 @@ internal class RailingMember {
     /// <summary>
     /// Размер пластины; задан — сечение по центру линии, типоразмер находится или создаётся по размеру.
     /// </summary>
-    public PlateSize PlateSize { get; private set; }
+    public PlateSize? PlateSize { get; private set; }
 
     public static RailingMember Linear(
         RailingMemberRole role,
         Line line,
         double? bendAngle = null,
-        PlateSize plateSize = null) {
+        PlateSize? plateSize = null) {
 
         return new RailingMember(role) { Line = line, BendAngle = bendAngle, PlateSize = plateSize };
     }

@@ -18,35 +18,35 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
 
-    private string _errorText;
-    private FramingTypeViewModel _postType;
-    private FramingTypeViewModel _handrailType;
-    private FramingTypeViewModel _rodType;
-    private string _postHeight;
-    private string _maxPostStep;
-    private string _postRotation;
-    private string _rodOffsets;
+    private string? _errorText;
+    private FramingTypeViewModel? _postType;
+    private FramingTypeViewModel? _handrailType;
+    private FramingTypeViewModel? _rodType;
+    private string _postHeight = string.Empty;
+    private string _maxPostStep = string.Empty;
+    private string _postRotation = string.Empty;
+    private string _rodOffsets = string.Empty;
     private PostMount _flightMount;
     private PostMount _landingMount;
-    private PlateFamilyViewModel _plateFamily;
-    private string _basePlateThickness;
-    private string _basePlateLength;
-    private string _basePlateWidth;
+    private PlateFamilyViewModel? _plateFamily;
+    private string _basePlateThickness = string.Empty;
+    private string _basePlateLength = string.Empty;
+    private string _basePlateWidth = string.Empty;
     private bool _hasAnchors;
-    private FramingTypeViewModel _anchorType;
+    private FramingTypeViewModel? _anchorType;
     private AnchorLayout _anchorLayout;
-    private string _anchorEdgeDistance;
-    private string _cheekThickness;
-    private string _cheekWidth;
-    private string _cheekHeight;
-    private string _cheekGap;
+    private string _anchorEdgeDistance = string.Empty;
+    private string _cheekThickness = string.Empty;
+    private string _cheekWidth = string.Empty;
+    private string _cheekHeight = string.Empty;
+    private string _cheekGap = string.Empty;
     private CheekOrientation _cheekOrientation;
     private bool _isLeftSide;
-    private string _flightEdgeOffset;
-    private string _landingEdgeOffset;
+    private string _flightEdgeOffset = string.Empty;
+    private string _landingEdgeOffset = string.Empty;
     private bool _createAssembly;
-    private string _assemblyNamePrefix;
-    private string _activeField;
+    private string _assemblyNamePrefix = string.Empty;
+    private string? _activeField;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -94,7 +94,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Параметры ограждения после нажатия «Построить».
     /// </summary>
-    public RailingParameters Parameters { get; private set; }
+    public RailingParameters? Parameters { get; private set; }
 
     /// <summary>
     /// Схема ограждения: участок марша и участок площадки.
@@ -126,22 +126,22 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
     /// </summary>
-    public string ErrorText {
+    public string? ErrorText {
         get => _errorText;
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
-    public FramingTypeViewModel PostType {
+    public FramingTypeViewModel? PostType {
         get => _postType;
         set => RaiseAndSetIfChanged(ref _postType, value);
     }
 
-    public FramingTypeViewModel HandrailType {
+    public FramingTypeViewModel? HandrailType {
         get => _handrailType;
         set => RaiseAndSetIfChanged(ref _handrailType, value);
     }
 
-    public FramingTypeViewModel RodType {
+    public FramingTypeViewModel? RodType {
         get => _rodType;
         set => RaiseAndSetIfChanged(ref _rodType, value);
     }
@@ -197,7 +197,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Часть схемы поля окна, в котором сейчас ввод (<see cref="PreviewFields"/>); она выделяется на схеме.
     /// </summary>
-    public string ActiveField {
+    public string? ActiveField {
         get => _activeField;
         set => SetAndUpdatePreview(ref _activeField, value);
     }
@@ -212,7 +212,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     public bool UsesSideMount => FlightMount == PostMount.Side || LandingMount == PostMount.Side;
 
-    public PlateFamilyViewModel PlateFamily {
+    public PlateFamilyViewModel? PlateFamily {
         get => _plateFamily;
         set => RaiseAndSetIfChanged(ref _plateFamily, value);
     }
@@ -243,7 +243,7 @@ internal class MainViewModel : BaseViewModel {
         set => SetAndUpdatePreview(ref _hasAnchors, value);
     }
 
-    public FramingTypeViewModel AnchorType {
+    public FramingTypeViewModel? AnchorType {
         get => _anchorType;
         set => RaiseAndSetIfChanged(ref _anchorType, value);
     }
@@ -342,37 +342,42 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AcceptView() {
+        // команда доступна только после проверки ввода (CanAcceptView): типы выбраны, числа разобраны
+        if(PostType is null || HandrailType is null || PlateFamily is null) {
+            return;
+        }
+
         SaveConfig();
-        List<double> rodOffsets = ParseRodOffsets(RodOffsets);
+        TryParseRodOffsets(RodOffsets, out List<double> rodOffsets);
         Parameters = new RailingParameters {
             PostTypeId = PostType.Id,
             HandrailTypeId = HandrailType.Id,
-            RodTypeId = rodOffsets.Count > 0 ? RodType.Id : null,
-            PostHeight = ParseNumber(PostHeight).Value,
-            MaxPostStep = ParseNumber(MaxPostStep).Value,
-            PostRotationDegrees = ParseNumber(PostRotation).Value,
+            RodTypeId = rodOffsets.Count > 0 ? RodType?.Id : null,
+            PostHeight = ParseValidNumber(PostHeight),
+            MaxPostStep = ParseValidNumber(MaxPostStep),
+            PostRotationDegrees = ParseValidNumber(PostRotation),
             RodOffsets = rodOffsets,
             FlightMount = FlightMount,
             LandingMount = LandingMount,
             PlateFamilyId = PlateFamily.Id,
             BasePlate = UsesTopMount
-                ? new PlateSize(ParseNumber(BasePlateThickness).Value, ParseNumber(BasePlateWidth).Value)
-                : null,
-            BasePlateLength = UsesTopMount ? ParseNumber(BasePlateLength).Value : 0,
-            AnchorTypeId = UsesTopMount && HasAnchors ? AnchorType.Id : null,
+                ? new PlateSize(ParseValidNumber(BasePlateThickness), ParseValidNumber(BasePlateWidth))
+                : new PlateSize(0, 0),
+            BasePlateLength = UsesTopMount ? ParseValidNumber(BasePlateLength) : 0,
+            AnchorTypeId = UsesTopMount && HasAnchors ? AnchorType?.Id : null,
             AnchorLayout = AnchorLayout,
-            AnchorEdgeDistance = UsesTopMount && HasAnchors ? ParseNumber(AnchorEdgeDistance).Value : 0,
+            AnchorEdgeDistance = UsesTopMount && HasAnchors ? ParseValidNumber(AnchorEdgeDistance) : 0,
             Cheek = UsesSideMount
-                ? new PlateSize(ParseNumber(CheekThickness).Value, ParseNumber(CheekWidth).Value)
-                : null,
-            CheekHeight = UsesSideMount ? ParseNumber(CheekHeight).Value : 0,
-            CheekGap = UsesSideMount ? ParseNumber(CheekGap).Value : 0,
+                ? new PlateSize(ParseValidNumber(CheekThickness), ParseValidNumber(CheekWidth))
+                : new PlateSize(0, 0),
+            CheekHeight = UsesSideMount ? ParseValidNumber(CheekHeight) : 0,
+            CheekGap = UsesSideMount ? ParseValidNumber(CheekGap) : 0,
             CheekOrientation = CheekOrientation,
             Side = IsLeftSide ? RailingSide.Left : RailingSide.Right,
-            FlightEdgeOffset = ParseNumber(FlightEdgeOffset).Value,
-            LandingEdgeOffset = ParseNumber(LandingEdgeOffset).Value,
+            FlightEdgeOffset = ParseValidNumber(FlightEdgeOffset),
+            LandingEdgeOffset = ParseValidNumber(LandingEdgeOffset),
             CreateAssembly = CreateAssembly,
-            AssemblyNamePrefix = (AssemblyNamePrefix ?? "").Trim()
+            AssemblyNamePrefix = AssemblyNamePrefix.Trim()
         };
     }
 
@@ -380,14 +385,14 @@ internal class MainViewModel : BaseViewModel {
     /// Проверка ввода в порядке полей окна сверху вниз.
     /// </summary>
     private bool CanAcceptView() {
-        string errorKey = GetInputErrorKey();
+        string? errorKey = GetInputErrorKey();
         ErrorText = errorKey != null ? GetText(errorKey) : null;
         return errorKey == null;
     }
 
-    private string GetInputErrorKey() {
+    private string? GetInputErrorKey() {
         double? postHeight = ParseNumber(PostHeight);
-        List<double> rodOffsets = ParseRodOffsets(RodOffsets);
+        bool areRodOffsetsNumbers = TryParseRodOffsets(RodOffsets, out List<double> rodOffsets);
         if(PostType == null) {
             return "MainWindow.NoPostType";
         }
@@ -408,7 +413,7 @@ internal class MainViewModel : BaseViewModel {
             return "MainWindow.NoHandrailType";
         }
 
-        if(rodOffsets == null || rodOffsets.Any(offset => offset <= 0 || offset >= postHeight)) {
+        if(!areRodOffsetsNumbers || rodOffsets.Any(offset => offset <= 0 || offset >= postHeight)) {
             return "MainWindow.BadRodOffsets";
         }
 
@@ -522,9 +527,9 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Типоразмер из настроек; если его нет — типовой из шаблона КМ по частям имён семейства и типа.
     /// </summary>
-    private static FramingTypeViewModel FindType(
+    private static FramingTypeViewModel? FindType(
         List<FramingTypeViewModel> types,
-        string savedName,
+        string? savedName,
         string familyNamePart,
         string typeNamePart) {
 
@@ -543,7 +548,7 @@ internal class MainViewModel : BaseViewModel {
         OnPropertyChanged(nameof(UsesSideMount));
     }
 
-    private void SetAndUpdatePreview<T>(ref T field, T value, [CallerMemberName] string propertyName = null) {
+    private void SetAndUpdatePreview<T>(ref T field, T value, [CallerMemberName] string? propertyName = null) {
         RaiseAndSetIfChanged(ref field, value, propertyName);
         UpdatePreview();
     }
@@ -552,7 +557,7 @@ internal class MainViewModel : BaseViewModel {
         Preview.Update(new RailingPreviewSizes {
             PostHeight = ParseNumber(PostHeight),
             PostStep = ParseNumber(MaxPostStep),
-            RodOffsets = ParseRodOffsets(RodOffsets) ?? new List<double>(),
+            RodOffsets = TryParseRodOffsets(RodOffsets, out List<double> rodOffsets) ? rodOffsets : new List<double>(),
             FlightMount = FlightMount,
             LandingMount = LandingMount,
             ActiveField = ActiveField,
@@ -575,6 +580,13 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
+    /// Число из поля, уже прошедшего проверку ввода.
+    /// </summary>
+    private static double ParseValidNumber(string text) {
+        return ParseNumber(text) ?? 0;
+    }
+
+    /// <summary>
     /// Число из поля ввода (точка или запятая); null — не число.
     /// </summary>
     private static double? ParseNumber(string text) {
@@ -585,10 +597,12 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Расстояния до прутков через «;» по возрастанию; пусто — прутков нет; null — есть не число.
+    /// Расстояния до прутков через «;» по возрастанию; пусто — прутков нет.
     /// </summary>
-    private static List<double> ParseRodOffsets(string text) {
-        var offsets = new List<double>();
+    /// <returns>false — среди значений есть не число (тогда список — только разобранные числа).</returns>
+    private static bool TryParseRodOffsets(string text, out List<double> offsets) {
+        offsets = new List<double>();
+        bool isValid = true;
         foreach(string part in (text ?? "").Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
             if(string.IsNullOrWhiteSpace(part)) {
                 continue;
@@ -596,12 +610,14 @@ internal class MainViewModel : BaseViewModel {
 
             double? offset = ParseNumber(part);
             if(offset == null) {
-                return null;
+                isValid = false;
+                continue;
             }
 
             offsets.Add(offset.Value);
         }
 
-        return offsets.OrderBy(offset => offset).ToList();
+        offsets.Sort();
+        return isValid;
     }
 }

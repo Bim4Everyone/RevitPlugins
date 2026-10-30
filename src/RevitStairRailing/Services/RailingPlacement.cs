@@ -1,5 +1,4 @@
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.SimpleServices;
 
@@ -22,26 +21,22 @@ internal class RailingPlacement {
     /// <summary>
     /// Строит ограждение по линиям модели: выбранным до запуска или указанным пользователем сейчас.
     /// </summary>
+    /// <exception cref="Autodesk.Revit.Exceptions.OperationCanceledException">Пользователь отменил выбор линий.</exception>
+    /// <exception cref="RailingException">Линии не образуют траекторию или ограждение не построить.</exception>
     public void Run(RailingParameters parameters) {
-        string title = GetText("MainWindow.Title");
-        try {
-            List<Line> lines = _revitRepository.GetSelectedModelLines();
-            if(lines.Count == 0) {
-                lines = _revitRepository.PickModelLines(GetText("Pick.Prompt"));
-            }
-
-            RailingPath edgePath = RailingPath.FromLines(lines);
-            RailingPath path = edgePath.Offset(RailingLayout.GetAxisOffsets(edgePath, parameters), parameters.Side);
-            List<RailingMember> members = RailingLayout.Create(path, parameters);
-            RailingResult result = new RailingBuilder(_revitRepository.Document).Build(members, parameters, title);
-            _revitRepository.SelectElements(result.Assembly != null
-                ? new List<ElementId> { result.Assembly.Id }
-                : result.ElementIds);
-        } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
-            // выбор линий отменён — ничего не строим
-        } catch(RailingException ex) {
-            TaskDialog.Show(title, GetText(ex.MessageKey));
+        List<Line> lines = _revitRepository.GetSelectedModelLines();
+        if(lines.Count == 0) {
+            lines = _revitRepository.PickModelLines(GetText("Pick.Prompt"));
         }
+
+        RailingPath edgePath = RailingPath.FromLines(lines);
+        RailingPath path = edgePath.Offset(RailingLayout.GetAxisOffsets(edgePath, parameters), parameters.Side);
+        List<RailingMember> members = RailingLayout.Create(path, parameters);
+        RailingResult result = new RailingBuilder(_revitRepository.Document)
+            .Build(members, parameters, GetText("Build.TransactionName"));
+        _revitRepository.SelectElements(result.Assembly != null
+            ? new List<ElementId> { result.Assembly.Id }
+            : result.ElementIds);
     }
 
     private string GetText(string key) {

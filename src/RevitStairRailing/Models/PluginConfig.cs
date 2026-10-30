@@ -13,13 +13,13 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
     /// Системное свойство конфигурации. (Не трогать)
     /// </summary>
     [JsonIgnore]
-    public override string ProjectConfigPath { get; set; }
+    public override string? ProjectConfigPath { get; set; }
 
     /// <summary>
     /// Системное свойство конфигурации. (Не трогать)
     /// </summary>
     [JsonIgnore]
-    public override IConfigSerializer Serializer { get; set; }
+    public override IConfigSerializer? Serializer { get; set; }
 
     /// <summary>
     /// Метод создания конфигурации плагина.
@@ -47,11 +47,11 @@ internal class RevitSettings : ProjectSettings {
     /// </summary>
     public override string ProjectName { get; set; } = string.Empty;
 
-    public string PostType { get; set; }
+    public string? PostType { get; set; }
 
-    public string HandrailType { get; set; }
+    public string? HandrailType { get; set; }
 
-    public string RodType { get; set; }
+    public string? RodType { get; set; }
 
     public string PostHeight { get; set; } = "1056";
 
@@ -65,7 +65,7 @@ internal class RevitSettings : ProjectSettings {
 
     public PostMount LandingMount { get; set; } = PostMount.Top;
 
-    public string PlateFamily { get; set; }
+    public string? PlateFamily { get; set; }
 
     public string BasePlateThickness { get; set; } = "6";
 
@@ -75,7 +75,7 @@ internal class RevitSettings : ProjectSettings {
 
     public bool HasAnchors { get; set; } = true;
 
-    public string AnchorType { get; set; }
+    public string? AnchorType { get; set; }
 
     public AnchorLayout AnchorLayout { get; set; } = AnchorLayout.Triangle;
 

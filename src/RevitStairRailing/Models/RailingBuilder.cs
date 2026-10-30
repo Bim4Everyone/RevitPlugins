@@ -12,24 +12,24 @@ namespace RevitStairRailing.Models;
 /// Создание элементов ограждения в модели и сборки из них.
 /// </summary>
 internal class RailingBuilder {
-    private const double MillimetersToFeet = 1 / 304.8;
+    private const double _millimetersToFeet = 1 / 304.8;
 
     /// <summary>
     /// Допуск при выборе уровня под элементом и сравнении размеров пластин, футы (0,01 мм).
     /// </summary>
-    private const double SizeTolerance = 0.01 / 304.8;
+    private const double _sizeTolerance = 0.01 / 304.8;
 
     /// <summary>
     /// Параметры типа семейства пластины: толщина и ширина сечения.
     /// </summary>
     public const string PlateThicknessParameter = "t";
     public const string PlateWidthParameter = "h";
-    private const string PlateNameParameter = "ADSK_Наименование";
+    private const string _plateNameParameter = "ADSK_Наименование";
 
     /// <summary>
     /// Значение «Привязка по Z» — «По центру».
     /// </summary>
-    private const int CenterZJustification = 1;
+    private const int _centerZJustification = 1;
 
     private readonly Document _document;
     private readonly Dictionary<string, FamilySymbol> _plateTypes = new();
@@ -42,7 +42,7 @@ internal class RailingBuilder {
     /// Создаёт элементы ограждения и (по параметрам) сборку.
     /// </summary>
     public RailingResult Build(List<RailingMember> members, RailingParameters parameters, string transactionName) {
-        var typeIds = new Dictionary<RailingMemberRole, ElementId> {
+        var typeIds = new Dictionary<RailingMemberRole, ElementId?> {
             [RailingMemberRole.Post] = parameters.PostTypeId,
             [RailingMemberRole.Handrail] = parameters.HandrailTypeId,
             [RailingMemberRole.Rod] = parameters.RodTypeId,
@@ -65,25 +65,21 @@ internal class RailingBuilder {
             foreach(RailingMember member in members) {
                 FamilySymbol symbol = member.PlateSize != null
                     ? GetPlateType(parameters.PlateFamilyId, member.PlateSize)
-                    : (FamilySymbol) _document.GetElement(typeIds[member.Role]);
+                    : GetMemberType(typeIds, member.Role);
                 if(!symbol.IsActive) {
                     symbol.Activate();
                 }
 
-                FamilyInstance instance = member.Line != null
-                    ? CreateLinear(member, symbol, levels)
-                    : _document.Create.NewFamilyInstance(
-                        member.Point,
-                        symbol,
-                        GetLevelBelow(levels, member.Point.Z),
-                        StructuralType.NonStructural);
+                FamilyInstance instance = member.Line is { } line
+                    ? CreateLinear(member, line, symbol, levels)
+                    : CreateAtPoint(member, symbol, levels);
                 createdIds.Add(instance.Id);
             }
 
             transaction.Commit();
         }
 
-        AssemblyInstance assembly = null;
+        AssemblyInstance? assembly = null;
         if(parameters.CreateAssembly && createdIds.Count > 0) {
             assembly = CreateAssembly(createdIds, parameters.AssemblyNamePrefix, transactionName);
         }
@@ -92,9 +88,26 @@ internal class RailingBuilder {
         return new RailingResult(createdIds, assembly);
     }
 
-    private FamilyInstance CreateLinear(RailingMember member, FamilySymbol symbol, List<Level> levels) {
-        Level level = GetLevelBelow(levels, Math.Min(member.Line.GetEndPoint(0).Z, member.Line.GetEndPoint(1).Z));
-        FamilyInstance instance = _document.Create.NewFamilyInstance(member.Line, symbol, level, StructuralType.Beam);
+    /// <summary>
+    /// Тип элемента ограждения; элементы без типа (прутки, анкеры) в раскладку не попадают.
+    /// </summary>
+    private FamilySymbol GetMemberType(Dictionary<RailingMemberRole, ElementId?> typeIds, RailingMemberRole role) {
+        ElementId typeId = typeIds[role] ?? throw new InvalidOperationException("Type is not set for " + role);
+        return (FamilySymbol) _document.GetElement(typeId);
+    }
+
+    private FamilyInstance CreateAtPoint(RailingMember member, FamilySymbol symbol, List<Level> levels) {
+        XYZ point = member.Point ?? throw new InvalidOperationException("Point is not set for " + member.Role);
+        return _document.Create.NewFamilyInstance(
+            point,
+            symbol,
+            GetLevelBelow(levels, point.Z),
+            StructuralType.NonStructural);
+    }
+
+    private FamilyInstance CreateLinear(RailingMember member, Line line, FamilySymbol symbol, List<Level> levels) {
+        Level level = GetLevelBelow(levels, Math.Min(line.GetEndPoint(0).Z, line.GetEndPoint(1).Z));
+        FamilyInstance instance = _document.Create.NewFamilyInstance(line, symbol, level, StructuralType.Beam);
 
         // профили ограждения не подрезаются соседними балками
         StructuralFramingUtils.DisallowJoinAtEnd(instance, 0);
@@ -104,7 +117,7 @@ internal class RailingBuilder {
         }
 
         if(member.PlateSize != null) {
-            instance.get_Parameter(BuiltInParameter.Z_JUSTIFICATION)?.Set(CenterZJustification);
+            instance.get_Parameter(BuiltInParameter.Z_JUSTIFICATION)?.Set(_centerZJustification);
         }
 
         return instance;
@@ -114,7 +127,7 @@ internal class RailingBuilder {
     /// Ближайший уровень не выше точки; ниже всех уровней — самый нижний.
     /// </summary>
     private static Level GetLevelBelow(List<Level> levels, double elevation) {
-        return levels.LastOrDefault(level => level.ProjectElevation <= elevation + SizeTolerance) ?? levels[0];
+        return levels.LastOrDefault(level => level.ProjectElevation <= elevation + _sizeTolerance) ?? levels[0];
     }
 
     /// <summary>
@@ -131,16 +144,16 @@ internal class RailingBuilder {
         List<FamilySymbol> symbols = family.GetFamilySymbolIds()
             .Select(id => (FamilySymbol) _document.GetElement(id))
             .ToList();
-        double thickness = size.Thickness * MillimetersToFeet;
-        double width = size.Width * MillimetersToFeet;
+        double thickness = size.Thickness * _millimetersToFeet;
+        double width = size.Width * _millimetersToFeet;
         if(symbols[0].LookupParameter(PlateThicknessParameter) == null
            || symbols[0].LookupParameter(PlateWidthParameter) == null) {
             throw new RailingException("Build.PlateParameters");
         }
 
         FamilySymbol plateType = symbols.FirstOrDefault(symbol =>
-            Math.Abs(symbol.LookupParameter(PlateThicknessParameter).AsDouble() - thickness) < SizeTolerance
-            && Math.Abs(symbol.LookupParameter(PlateWidthParameter).AsDouble() - width) < SizeTolerance);
+            Math.Abs(symbol.LookupParameter(PlateThicknessParameter).AsDouble() - thickness) < _sizeTolerance
+            && Math.Abs(symbol.LookupParameter(PlateWidthParameter).AsDouble() - width) < _sizeTolerance);
         if(plateType == null) {
             string uniqueName = name;
             for(int copyNumber = 1; symbols.Any(symbol => symbol.Name == uniqueName); copyNumber++) {
@@ -150,7 +163,7 @@ internal class RailingBuilder {
             plateType = (FamilySymbol) symbols[0].Duplicate(uniqueName);
             plateType.LookupParameter(PlateThicknessParameter).Set(thickness);
             plateType.LookupParameter(PlateWidthParameter).Set(width);
-            Parameter nameParameter = plateType.LookupParameter(PlateNameParameter);
+            Parameter nameParameter = plateType.LookupParameter(_plateNameParameter);
             if(nameParameter is { IsReadOnly: false, StorageType: StorageType.String }) {
                 nameParameter.Set(FormatSize(size.Thickness) + "х" + FormatSize(size.Width));
             }
@@ -202,7 +215,7 @@ internal class RailingBuilder {
 /// Итог построения ограждения.
 /// </summary>
 internal class RailingResult {
-    public RailingResult(List<ElementId> elementIds, AssemblyInstance assembly) {
+    public RailingResult(List<ElementId> elementIds, AssemblyInstance? assembly) {
         ElementIds = elementIds;
         Assembly = assembly;
     }
@@ -212,5 +225,5 @@ internal class RailingResult {
     /// <summary>
     /// Сборка ограждения; null — сборка не создавалась.
     /// </summary>
-    public AssemblyInstance Assembly { get; }
+    public AssemblyInstance? Assembly { get; }
 }

@@ -9,17 +9,17 @@ internal class RailingParameters {
     /// <summary>
     /// Тип стоек.
     /// </summary>
-    public ElementId PostTypeId { get; set; }
+    public ElementId PostTypeId { get; set; } = ElementId.InvalidElementId;
 
     /// <summary>
     /// Тип поручня.
     /// </summary>
-    public ElementId HandrailTypeId { get; set; }
+    public ElementId HandrailTypeId { get; set; } = ElementId.InvalidElementId;
 
     /// <summary>
     /// Тип продольных прутков; null — прутков нет.
     /// </summary>
-    public ElementId RodTypeId { get; set; }
+    public ElementId? RodTypeId { get; set; }
 
     /// <summary>
     /// Высота от траектории до оси поручня.
@@ -55,12 +55,12 @@ internal class RailingParameters {
     /// Семейство пластин (по линии, с параметрами типа «t» — толщина и «h» — ширина);
     /// типоразмеры нужных размеров находятся или создаются.
     /// </summary>
-    public ElementId PlateFamilyId { get; set; }
+    public ElementId PlateFamilyId { get; set; } = ElementId.InvalidElementId;
 
     /// <summary>
-    /// Опорная пластина под стойкой при креплении сверху.
+    /// Опорная пластина под стойкой при креплении сверху (нули — крепления сверху нет).
     /// </summary>
-    public PlateSize BasePlate { get; set; }
+    public PlateSize BasePlate { get; set; } = new(0, 0);
 
     /// <summary>
     /// Длина опорной пластины вдоль ограждения.
@@ -70,7 +70,7 @@ internal class RailingParameters {
     /// <summary>
     /// Тип анкеров опорной пластины; null — анкеры не ставятся.
     /// </summary>
-    public ElementId AnchorTypeId { get; set; }
+    public ElementId? AnchorTypeId { get; set; }
 
     public AnchorLayout AnchorLayout { get; set; }
 
@@ -80,9 +80,9 @@ internal class RailingParameters {
     public double AnchorEdgeDistance { get; set; }
 
     /// <summary>
-    /// Пластины-щёки по бокам стойки при боковом креплении (к закладной детали марша).
+    /// Пластины-щёки по бокам стойки при боковом креплении к закладной детали марша (нули — бокового крепления нет).
     /// </summary>
-    public PlateSize Cheek { get; set; }
+    public PlateSize Cheek { get; set; } = new(0, 0);
 
     public double CheekHeight { get; set; }
 
@@ -117,7 +117,7 @@ internal class RailingParameters {
     /// <summary>
     /// Начало имени сборки; к нему добавляется следующий свободный номер.
     /// </summary>
-    public string AssemblyNamePrefix { get; set; }
+    public string AssemblyNamePrefix { get; set; } = string.Empty;
 }
 
 /// <summary>

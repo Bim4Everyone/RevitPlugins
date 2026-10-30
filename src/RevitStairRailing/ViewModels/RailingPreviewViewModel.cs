@@ -13,28 +13,28 @@ internal class RailingPreviewViewModel {
     public const double CanvasWidth = 440;
     public const double CanvasHeight = 400;
 
-    private const double LeftMargin = 70;
-    private const double RightMargin = 60;
-    private const double TopMargin = 40;
-    private const double BottomMargin = 60;
+    private const double _leftMargin = 70;
+    private const double _rightMargin = 60;
+    private const double _topMargin = 40;
+    private const double _bottomMargin = 60;
 
     /// <summary>
     /// Уклон марша на схеме (подъём к длине в плане).
     /// </summary>
-    private const double FlightSlope = 0.5;
+    private const double _flightSlope = 0.5;
 
     /// <summary>
     /// Пролётов на марше и на площадке на схеме.
     /// </summary>
-    private const int FlightSpanCount = 2;
-    private const int LandingSpanCount = 1;
+    private const int _flightSpanCount = 2;
+    private const int _landingSpanCount = 1;
 
     /// <summary>
     /// Условная глубина анкера на схеме, мм.
     /// </summary>
-    private const double AnchorDepth = 90;
+    private const double _anchorDepth = 90;
 
-    private RailingPreviewSizes _sizes;
+    private RailingPreviewSizes _sizes = new();
     private double _scale;
     private double _surfaceOriginY;
 
@@ -51,13 +51,13 @@ internal class RailingPreviewViewModel {
         Labels.Clear();
         double postHeight = Positive(sizes.PostHeight, 1000);
         double postStep = Positive(sizes.PostStep, 600);
-        double flightLength = postStep * FlightSpanCount;
-        double flightRise = flightLength * FlightSlope;
-        double totalLength = postStep * (FlightSpanCount + LandingSpanCount);
+        double flightLength = postStep * _flightSpanCount;
+        double flightRise = flightLength * _flightSlope;
+        double totalLength = postStep * (_flightSpanCount + _landingSpanCount);
         _scale = Math.Min(
-            (CanvasWidth - LeftMargin - RightMargin) / totalLength,
-            (CanvasHeight - TopMargin - BottomMargin) / (flightRise + postHeight + AnchorDepth));
-        _surfaceOriginY = TopMargin + (flightRise + postHeight) * _scale;
+            (CanvasWidth - _leftMargin - _rightMargin) / totalLength,
+            (CanvasHeight - _topMargin - _bottomMargin) / (flightRise + postHeight + _anchorDepth));
+        _surfaceOriginY = _topMargin + (flightRise + postHeight) * _scale;
 
         // траектория: поверхность марша и площадки по оси ограждения
         var trajectory = new[] { (X: 0.0, Z: 0.0), (X: flightLength, Z: flightRise), (X: totalLength, Z: flightRise) };
@@ -76,10 +76,10 @@ internal class RailingPreviewViewModel {
         // стойки: на марше (включая стойку в переломе) — крепление марша, дальше — крепление площадки
         bool isBasePlateLabeled = false;
         bool isCheekLabeled = false;
-        for(int postNumber = 0; postNumber <= FlightSpanCount + LandingSpanCount; postNumber++) {
+        for(int postNumber = 0; postNumber <= _flightSpanCount + _landingSpanCount; postNumber++) {
             double postX = postNumber * postStep;
-            double surfaceZ = Math.Min(postX, flightLength) * FlightSlope;
-            bool isFlightPost = postNumber <= FlightSpanCount;
+            double surfaceZ = Math.Min(postX, flightLength) * _flightSlope;
+            bool isFlightPost = postNumber <= _flightSpanCount;
             PostMount mount = isFlightPost ? sizes.FlightMount : sizes.LandingMount;
             string mountField = isFlightPost ? PreviewFields.FlightMount : PreviewFields.LandingMount;
             double postBottomZ = mount == PostMount.Top
@@ -110,14 +110,14 @@ internal class RailingPreviewViewModel {
                 ? new[] { -anchorOffset, 0, anchorOffset }
                 : new[] { -anchorOffset, anchorOffset };
             foreach(double offset in anchorOffsets) {
-                AddLine(postX + offset, surfaceZ + plateThickness + 3 / _scale, postX + offset, surfaceZ - AnchorDepth, 2,
+                AddLine(postX + offset, surfaceZ + plateThickness + 3 / _scale, postX + offset, surfaceZ - _anchorDepth, 2,
                     new[] { PreviewFields.Anchors, mountField });
             }
         }
 
         if(!isLabeled) {
             isLabeled = true;
-            AddLabel(postX, surfaceZ - AnchorDepth, -30, 4,
+            AddLabel(postX, surfaceZ - _anchorDepth, -30, 4,
                 Format(plateLength) + "×" + Format(Positive(_sizes.PlateWidth, 0)) + "×"
                 + Format(Positive(_sizes.PlateThickness, 0)),
                 PreviewFields.BasePlate);
@@ -206,7 +206,7 @@ internal class RailingPreviewViewModel {
     }
 
     private double ToCanvasX(double x) {
-        return LeftMargin + x * _scale;
+        return _leftMargin + x * _scale;
     }
 
     private double ToCanvasY(double z) {
@@ -279,7 +279,7 @@ internal class RailingPreviewSizes {
     /// <summary>
     /// Часть схемы поля, в котором сейчас ввод (<see cref="PreviewFields"/>); null — ничего не выделять.
     /// </summary>
-    public string ActiveField { get; set; }
+    public string? ActiveField { get; set; }
 }
 
 /// <summary>

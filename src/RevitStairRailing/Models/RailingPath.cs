@@ -9,12 +9,12 @@ internal class RailingPath {
     /// <summary>
     /// Допуск совпадения концов соседних линий, футы (1 мм).
     /// </summary>
-    private const double JoinTolerance = 1 / 304.8;
+    private const double _joinTolerance = 1 / 304.8;
 
     /// <summary>
     /// Участок с уклоном больше этого — марш, иначе — площадка.
     /// </summary>
-    private const double FlightMinSlope = 0.05;
+    private const double _flightMinSlope = 0.05;
 
     private readonly List<bool> _isFlightSegment;
 
@@ -53,14 +53,14 @@ internal class RailingPath {
             : new List<XYZ> { first.GetEndPoint(1), first.GetEndPoint(0) };
         while(remaining.Count > 0) {
             XYZ last = points[points.Count - 1];
-            Line next = remaining.FirstOrDefault(line => line.GetEndPoint(0).IsAlmostEqualTo(last, JoinTolerance)
-                                                         || line.GetEndPoint(1).IsAlmostEqualTo(last, JoinTolerance));
+            Line next = remaining.FirstOrDefault(line => line.GetEndPoint(0).IsAlmostEqualTo(last, _joinTolerance)
+                                                         || line.GetEndPoint(1).IsAlmostEqualTo(last, _joinTolerance));
             if(next == null) {
                 throw new RailingException("Path.NotChain");
             }
 
             remaining.Remove(next);
-            points.Add(next.GetEndPoint(0).IsAlmostEqualTo(last, JoinTolerance) ? next.GetEndPoint(1) : next.GetEndPoint(0));
+            points.Add(next.GetEndPoint(0).IsAlmostEqualTo(last, _joinTolerance) ? next.GetEndPoint(1) : next.GetEndPoint(0));
         }
 
         if(points[points.Count - 1].Z < points[0].Z) {
@@ -70,11 +70,11 @@ internal class RailingPath {
         var isFlightSegment = new List<bool>();
         for(int index = 1; index < points.Count; index++) {
             double planLength = GetPlanVector(points[index - 1], points[index]).GetLength();
-            if(planLength < JoinTolerance) {
+            if(planLength < _joinTolerance) {
                 throw new RailingException("Path.Vertical");
             }
 
-            isFlightSegment.Add(Math.Abs(points[index].Z - points[index - 1].Z) / planLength > FlightMinSlope);
+            isFlightSegment.Add(Math.Abs(points[index].Z - points[index - 1].Z) / planLength > _flightMinSlope);
         }
 
         return new RailingPath(points, isFlightSegment);
@@ -107,14 +107,14 @@ internal class RailingPath {
             }
 
             XYZ nextShift = GetLeftNormal(segmentIndex + 1) * (segmentDistances[segmentIndex + 1] * sideSign);
-            XYZ corner = IntersectInPlan(
+            XYZ? corner = IntersectInPlan(
                 vertex + shift,
                 GetPlanDirection(segmentIndex),
                 vertex + nextShift,
                 GetPlanDirection(segmentIndex + 1));
             if(corner != null) {
                 offsetPoints.Add(new XYZ(corner.X, corner.Y, vertex.Z));
-            } else if((shift - nextShift).GetLength() < JoinTolerance) {
+            } else if((shift - nextShift).GetLength() < _joinTolerance) {
                 offsetPoints.Add(vertex + shift);
             } else {
                 // участки параллельны, смещения разные: перемычка между ними
@@ -146,7 +146,7 @@ internal class RailingPath {
     /// <summary>
     /// Точка пересечения двух прямых в плане; null — прямые параллельны.
     /// </summary>
-    private static XYZ IntersectInPlan(XYZ firstPoint, XYZ firstDirection, XYZ secondPoint, XYZ secondDirection) {
+    private static XYZ? IntersectInPlan(XYZ firstPoint, XYZ firstDirection, XYZ secondPoint, XYZ secondDirection) {
         double denominator = firstDirection.X * secondDirection.Y - firstDirection.Y * secondDirection.X;
         if(Math.Abs(denominator) < 1e-6) {
             return null;
@@ -159,8 +159,8 @@ internal class RailingPath {
 
     private static bool HasNeighbour(XYZ point, Line line, IEnumerable<Line> lines) {
         return lines.Any(other => !ReferenceEquals(other, line)
-                                  && (other.GetEndPoint(0).IsAlmostEqualTo(point, JoinTolerance)
-                                      || other.GetEndPoint(1).IsAlmostEqualTo(point, JoinTolerance)));
+                                  && (other.GetEndPoint(0).IsAlmostEqualTo(point, _joinTolerance)
+                                      || other.GetEndPoint(1).IsAlmostEqualTo(point, _joinTolerance)));
     }
 
     private static XYZ GetPlanVector(XYZ start, XYZ end) {

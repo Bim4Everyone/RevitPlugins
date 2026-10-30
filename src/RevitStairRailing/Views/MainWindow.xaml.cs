@@ -56,8 +56,8 @@ public partial class MainWindow {
     /// (у выпадающих списков фокус получает вложенный элемент, поэтому Tag ищется вверх по дереву).
     /// </summary>
     private void Content_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
-        string field = null;
-        for(var element = e.NewFocus as DependencyObject; element != null && element != sender;
+        string? field = null;
+        for(DependencyObject? element = e.NewFocus as DependencyObject; element != null && element != sender;
             element = VisualTreeHelper.GetParent(element) ?? LogicalTreeHelper.GetParent(element)) {
             if(element is FrameworkElement { Tag: string tag }) {
                 field = tag;
