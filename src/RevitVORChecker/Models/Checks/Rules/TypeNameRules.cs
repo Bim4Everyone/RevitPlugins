@@ -33,7 +33,13 @@ internal static class TypeNameRules {
             elementsByProblem.GetOrAdd(problem, () => new List<ElementData>()).Add(element);
         }
 
-        foreach(ElementData element in context.ConcreteElements) {
+        // сборные ж/б марши — с материалом по Классификатору, а не «Бетон», но имя типоразмера по тем же правилам
+        var concreteElements = new HashSet<ElementData>(context.ConcreteElements);
+        List<ElementData> namedElements = context.ConcreteElements
+            .Concat(context.VorElements.Where(element => !concreteElements.Contains(element)
+                                                         && ModelCheckContext.IsPrecastFlight(element)))
+            .ToList();
+        foreach(ElementData element in namedElements) {
             string typeName = element.TypeName;
             int bracketIndex = typeName.IndexOf('(');
             string insideBrackets = bracketIndex >= 0 ? typeName.Substring(bracketIndex + 1) : "";

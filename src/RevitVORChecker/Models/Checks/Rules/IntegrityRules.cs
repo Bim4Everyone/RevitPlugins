@@ -11,6 +11,19 @@ namespace RevitVORChecker.Models.Checks.Rules;
 /// </summary>
 internal static class IntegrityRules {
     /// <summary>
+    /// Единица штучного учёта в едином написании (<see cref="WorkClassifier.NormalizeUnit"/>).
+    /// </summary>
+    private const string _pieceUnit = "шт.";
+
+    private const string _precastFlightWithoutCode =
+        "Сборные ж/б лестничные марши: у материала нет кода работы из Классификатора видов работ. Сборные марши "
+        + "считаются поштучно — назначить материал с кодом работы «Устройство сборных ж/б лестничных маршей» (шт.).";
+
+    private const string _precastFlightNotPieceWork =
+        "Сборные ж/б лестничные марши: код работы материала в Классификаторе измеряется не в штуках. Сборные марши "
+        + "считаются поштучно — назначить материал с кодом работы «Устройство сборных ж/б лестничных маршей» (шт.).";
+
+    /// <summary>
     /// Рабочие наборы, предназначенные для геометрии ВОР.
     /// </summary>
     private static readonly string[] _vorWorksets = {
@@ -43,6 +56,7 @@ internal static class IntegrityRules {
             CheckVorWorksets(context, findings, fileName);
             CheckElementsWithoutVorMaterial(context, findings, fileName);
             CheckConstructionCycle(context, findings, fileName);
+            CheckPrecastFlights(context, findings, fileName);
         }
 
         var paintedElements = context.Elements.Where(element => element.PaintMaterialIds.Count > 0).ToList();
@@ -154,6 +168,57 @@ internal static class IntegrityRules {
                 fileName,
                 detail: string.Join(", ", categoriesAndTypes.Take(6)));
         }
+    }
+
+    /// <summary>
+    /// Сборные ж/б лестничные марши считаются поштучно: материал с кодом работы Классификатора, единица работы
+    /// которой «шт.» («Устройство сборных ж/б лестничных маршей»). Материал «Бетон» с кодом «г02» — только для
+    /// монолитных конструкций (статья «КР. ВОР. Основная информация»).
+    /// </summary>
+    /// <remarks>
+    /// Параметры такого материала (глава, работа, ФОП_МТР_Единица измерения «шт», тип подсчёта 4) проверяются
+    /// по Классификатору в разделах материалов (<see cref="MaterialRules"/>), здесь не повторяются.
+    /// </remarks>
+    private static void CheckPrecastFlights(ModelCheckContext context, FindingCollection findings, string fileName) {
+        var problems = new GroupedElements();
+        IEnumerable<ElementData> precastFlights = context.Elements
+            .Where(element => ModelCheckContext.IsPrecastFlight(element) && !ModelCheckContext.IsOpeningOrVoid(element));
+        foreach(ElementData flight in precastFlights) {
+            List<MaterialData> materials = flight.GetMaterialIds()
+                .Where(context.Materials.ContainsKey)
+                .Select(id => context.Materials[id])
+                .ToList();
+            List<MaterialData> classifiedMaterials = materials
+                .Where(material => context.Classifier.Works.ContainsKey(PythonFormat.Trim(material.Keynote)))
+                .ToList();
+            if(classifiedMaterials.Count == 0) {
+                problems.Add(_precastFlightWithoutCode, DescribeMaterials(materials), flight);
+                continue;
+            }
+
+            bool hasPieceWork = classifiedMaterials
+                .Any(material => context.Classifier.Works[PythonFormat.Trim(material.Keynote)].Unit == _pieceUnit);
+            if(!hasPieceWork) {
+                problems.Add(_precastFlightNotPieceWork, DescribeMaterials(classifiedMaterials), flight);
+            }
+        }
+
+        problems.AddFindings(findings, ReportSections.Integrity, fileName, maxTypeCount: 4);
+    }
+
+    /// <summary>
+    /// Материалы для уточнения замечания: имя и код ключевой пометки.
+    /// </summary>
+    private static string DescribeMaterials(List<MaterialData> materials) {
+        if(materials.Count == 0) {
+            return "материал не назначен";
+        }
+
+        IEnumerable<string> descriptions = materials
+            .Select(material => "«" + material.Name + "» (код «"
+                                + (PythonFormat.Trim(material.Keynote) is { Length: > 0 } keynote ? keynote : "не задан")
+                                + "»)");
+        return "материалы: " + string.Join(", ", PythonFormat.SortOrdinal(descriptions));
     }
 
     private static void CheckConstructionCycle(ModelCheckContext context, FindingCollection findings, string fileName) {

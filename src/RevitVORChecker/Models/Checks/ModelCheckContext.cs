@@ -33,6 +33,11 @@ internal class ModelCheckContext {
         "бетон", "бетон с пенетроном", "железобетон", "железобетон с пенетроном"
     };
 
+    /// <summary>
+    /// Признак сборного изделия в имени типа: «_Сб» отдельным словом («ВН_ЛМарш (ЖБ B25)_Сб_МЛ33-60-10»).
+    /// </summary>
+    private static readonly Regex _precastMark = new(@"_Сб(_|\s|$)");
+
     private static readonly string[] _voidKeys = {
         "Отверстие", "Ниша", "Скошенный угол", "Модель грунта", "Проем", "Проём"
     };
@@ -160,6 +165,22 @@ internal class ModelCheckContext {
 
     public static bool IsInsulation(ElementData element) {
         return element.Category == "Соединения несущих конструкций" || element.TypeName.Contains("Изол");
+    }
+
+    /// <summary>
+    /// Сборный лестничный марш: «ЛМарш» или «Лестничный марш» в имени семейства или типа и признак сборного —
+    /// «Сборн» или «_Сб».
+    /// </summary>
+    /// <remarks>
+    /// Площадки исключаются: в имени их типа бывает «Марши - Сборные» (тип опирания маршей).
+    /// </remarks>
+    public static bool IsPrecastFlight(ElementData element) {
+        string names = element.TypeName + " " + (element.FamilyName ?? "");
+        return (names.IndexOf("ЛМарш", StringComparison.OrdinalIgnoreCase) >= 0
+                || names.IndexOf("Лестничный марш", StringComparison.OrdinalIgnoreCase) >= 0)
+               && names.IndexOf("Площадк", StringComparison.OrdinalIgnoreCase) < 0
+               && (names.IndexOf("сборн", StringComparison.OrdinalIgnoreCase) >= 0
+                   || _precastMark.IsMatch(names));
     }
 
     public static bool IsThermalInsert(ElementData element) {
