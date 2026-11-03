@@ -96,6 +96,9 @@ internal class RoomDimensioningService {
                     var options = new PlanningOptions {
                         Offset = offset,
                         TextAllowance = DimensionTextHelper.GetTextAllowance(dimensionType, scale),
+                        TextSize = DimensionTextHelper.GetTextSize(dimensionType, scale),
+                        TextGap = DimensionTextHelper.GetTextGap(dimensionType, scale),
+                        TextWidthScale = DimensionTextHelper.GetTextWidthScale(dimensionType),
                         // Плоскости и значения сравниваются с допуском типа помещения, но не точнее 0.5 мм
                         CoordinateTolerance = UnitUtilsHelper.ConvertToInternalValue(
                             Math.Max(0.5, roomType.EqualityToleranceMm)),

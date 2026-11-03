@@ -140,4 +140,9 @@ internal class VirtualDimension {
     public string Status { get; set; }
 
     public string Error { get; set; }
+
+    /// <summary>
+    /// Конфликты текстов этого размера по модели текста (TextConflictCounter): вид на каждый случай.
+    /// </summary>
+    public List<string> TextIssues { get; } = [];
 }

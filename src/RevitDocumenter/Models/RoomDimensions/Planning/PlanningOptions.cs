@@ -15,6 +15,21 @@ internal class PlanningOptions {
     public double TextAllowance { get; set; }
 
     /// <summary>
+    /// Высота текста размера (модель текста, D62).
+    /// </summary>
+    public double TextSize { get; set; }
+
+    /// <summary>
+    /// Зазор текста от размерной линии.
+    /// </summary>
+    public double TextGap { get; set; }
+
+    /// <summary>
+    /// Коэффициент ширины текста типоразмера.
+    /// </summary>
+    public double TextWidthScale { get; set; } = 1;
+
+    /// <summary>
     /// Допуск совпадения плоскостей привязки и равенства значений.
     /// </summary>
     public double CoordinateTolerance { get; set; }

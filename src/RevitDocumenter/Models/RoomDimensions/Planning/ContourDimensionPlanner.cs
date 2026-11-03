@@ -38,10 +38,14 @@ internal class ContourDimensionPlanner {
         var dimensions = CreateVirtualDimensions(contour, options, log);
 
         // У пилона оставляем по одному собственному размеру на ось: от него строится тип 3.
-        // Сторона - верхняя/левая, если там хватает места под линию и текст, иначе - где места больше
+        // Сторона - верхняя/левая, если там хватает места под линию и текст, тексты не налезают
+        // на размеры стен (D65), параллельный размер стены (D66) или другого пилона (D67) не ближе шага яруса,
+        // иначе - где места больше
+        var wallDimensions = dimensions.Where(d => !d.InvolvesInner).ToList();
+        var pylonDimensions = dimensions.Where(d => d.Kind == "Contour" && d.InvolvesInner).ToList();
         dimensions = RemoveDuplicates(
             dimensions, options, log, d => d.Kind == "Contour" && d.InvolvesInner,
-            d => GetPylonSidePriority(contour, d, options));
+            d => GetPylonSidePriority(contour, d, wallDimensions, pylonDimensions, options));
 
         // Тип 3 строится от оставшихся размеров пилонов, чтобы встать на их линию.
         // Встречные размеры между двумя пилонами убираются сразу.
@@ -62,6 +66,9 @@ internal class ContourDimensionPlanner {
         for(int i = 0; i < dimensions.Count; i++) {
             dimensions[i].Id = i;
         }
+
+        // Модель текста (D62): конфликты текстов и линий пока только записываются в журнал
+        TextConflictCounter.Count(dimensions, options, log);
         return dimensions;
     }
 
@@ -324,14 +331,15 @@ internal class ContourDimensionPlanner {
             var others = regular
                 .Where(d => d != dimension && IsSameDirection(d, dimension) && Overlaps(d, dimension, options))
                 .ToList();
-            double? position = FindFreePosition(shape, dimension, others, options);
+            double? position = FindFreePosition(shape, dimension, others, regular, options);
             if(position is null) {
                 log.Add($"Размер {Names(dimension)}: размерная линия выходит за пределы помещения; "
                         + "свободного положения нет, оставлен на месте");
                 continue;
             }
             log.Add($"Размер {Names(dimension)}: размерная линия выходит за пределы помещения; "
-                    + $"перенесен на {Mm(Math.Abs(position.Value - dimension.LinePosition))} мм");
+                    + $"перенесен на {Mm(Math.Abs(position.Value - dimension.LinePosition))} мм"
+                    + RemainingTextConflict(dimension, position.Value, regular, options));
             dimension.LinePosition = position.Value;
         }
 
@@ -340,14 +348,21 @@ internal class ContourDimensionPlanner {
                 .Where(d => IsSameDirection(d, overall) && Overlaps(d, overall, options))
                 .ToList();
             string conflict = GetPlacementConflict(shape, overall, overall.LinePosition, parallel, options);
+            string textConflict = TextConflictCounter.FindConflict(overall, overall.LinePosition, result, options);
+            conflict ??= textConflict is null ? null : $"конфликт {textConflict}";
             if(conflict is null) {
                 result.Add(overall);
                 continue;
             }
 
-            double? found = FindFreePosition(shape, overall, parallel, options);
+            double? found = FindFreePosition(shape, overall, parallel, result, options);
             if(found is null) {
                 log.Add($"Общий размер {Names(overall)}: {conflict}; свободного положения внутри помещения нет, не создан");
+                continue;
+            }
+            if(Math.Abs(found.Value - overall.LinePosition) <= options.CoordinateTolerance) {
+                log.Add($"Общий размер {Names(overall)}: {conflict}; положения без конфликта текста нет, оставлен на месте");
+                result.Add(overall);
                 continue;
             }
             var neighbor = parallel
@@ -355,7 +370,8 @@ internal class ContourDimensionPlanner {
                 .OrderBy(d => d.Anchors.Count)
                 .FirstOrDefault();
             log.Add($"Общий размер {Names(overall)}: {conflict}; перенесен на {Mm(Math.Abs(found.Value - overall.LinePosition))} мм"
-                    + (neighbor is null ? " к грани контура" : $" ярусом за размером {Names(neighbor)}"));
+                    + (neighbor is null ? " к грани контура" : $" ярусом за размером {Names(neighbor)}")
+                    + RemainingTextConflict(overall, found.Value, result, options));
             overall.LinePosition = found.Value;
             result.Add(overall);
         }
@@ -363,33 +379,56 @@ internal class ContourDimensionPlanner {
     }
 
     /// <summary>
+    /// Приписка в журнал, если в новом положении конфликт текста остался (свободного от конфликтов места не нашлось).
+    /// </summary>
+    private static string RemainingTextConflict(
+        VirtualDimension dimension,
+        double position,
+        List<VirtualDimension> placed,
+        PlanningOptions options) {
+        string conflict = TextConflictCounter.FindConflict(dimension, position, placed, options);
+        return conflict is null ? "" : $"; конфликт {conflict} не устранен";
+    }
+
+    /// <summary>
     /// Ближайшее к текущему свободное положение размерной линии. Кандидаты - у граней контура с отступом
-    /// (и с местом под текст) и ярусом за параллельными размерами. Null, если свободного положения нет.
+    /// (и с местом под текст) и ярусом за параллельными размерами. Предпочитается положение, где тексты не
+    /// конфликтуют с размерами placed (D65); если такого нет - ближайшее по остальным условиям.
+    /// Null, если свободного положения нет.
     /// </summary>
     private static double? FindFreePosition(
         RoomShape shape,
         VirtualDimension dimension,
         List<VirtualDimension> parallel,
+        List<VirtualDimension> placed,
         PlanningOptions options) {
         var perpendicular = dimension.Perpendicular;
         double textOffset = options.Offset + options.TextAllowance;
+        // Текущее положение - тоже кандидат: если без конфликтов текста места нет, размер не сдвигается зря
         var candidates = shape.Segments
             .SelectMany(seg => new[] { seg.Start.Dot(perpendicular), seg.End.Dot(perpendicular) })
             .SelectMany(v => new[] { v + options.Offset, v - options.Offset, v + textOffset, v - textOffset })
             .Concat(parallel.SelectMany(d => new[] { d.LinePosition + options.TierStep, d.LinePosition - options.TierStep }))
+            .Append(dimension.LinePosition)
             .Distinct()
             .OrderBy(c => Math.Abs(c - dimension.LinePosition));
+        double? fallback = null;
         foreach(double candidate in candidates) {
-            if(GetPlacementConflict(shape, dimension, candidate, parallel, options) is null) {
+            if(GetPlacementConflict(shape, dimension, candidate, parallel, options) != null) {
+                continue;
+            }
+            if(TextConflictCounter.FindConflict(dimension, candidate, placed, options) is null) {
                 return candidate;
             }
+            fallback ??= candidate;
         }
-        return null;
+        return fallback;
     }
 
     /// <summary>
     /// Почему размерная линия в положении position мешает: null, если положение свободно.
     /// Проверяются выход за пределы помещения, отступ линии и текста от контура и шаг яруса до параллельных размеров.
+    /// Тексты (модель текста) - мягкое условие, проверяются отдельно в FindFreePosition.
     /// </summary>
     private static string GetPlacementConflict(
         RoomShape shape,
@@ -613,12 +652,41 @@ internal class ContourDimensionPlanner {
     }
 
     /// <summary>
-    /// Приоритет стороны собственного размера пилона. Если на стороне хватает места под отступ и текст,
-    /// стороны равноценны (остается верхняя/левая), иначе выбирается сторона с большим свободным местом.
+    /// Приоритет стороны собственного размера пилона. Если на стороне хватает места под отступ и текст и сторона
+    /// свободна от размеров стен, стороны равноценны (остается верхняя/левая), иначе выбирается сторона
+    /// с большим свободным местом.
+    /// Размер пилона потом продлевается цепочкой до стен, поэтому параллельный размер стены ближе шага яруса
+    /// на его длине означает будущее слипание линий и текстов (D66), даже если короткий размер пилона его пока
+    /// не задевает. Размеры стен вне длины пилона (короткие стены рукава) не мешают: с ними цепочка собирается в линию.
+    /// Так же сторона не годится, если рядом любой из собственных размеров другого пилона, перекрывающего этот
+    /// (D67): какой из них останется, еще не известно, поэтому учитываются обе стороны соседа.
     /// </summary>
-    private static double GetPylonSidePriority(RoomContour contour, VirtualDimension dimension, PlanningOptions options) {
+    private static double GetPylonSidePriority(
+        RoomContour contour,
+        VirtualDimension dimension,
+        List<VirtualDimension> wallDimensions,
+        List<VirtualDimension> pylonDimensions,
+        PlanningOptions options) {
         double free = GetFreeSpace(contour, dimension, options);
-        return free >= options.Offset + options.TextAllowance - options.CoordinateTolerance ? double.MaxValue : free;
+        bool enough = free >= options.Offset + options.TextAllowance - options.CoordinateTolerance;
+        bool clear = TextConflictCounter.FindConflict(dimension, dimension.LinePosition, wallDimensions, options) is null
+                     && !wallDimensions.Any(d => IsSameDirection(d, dimension)
+                                                 && Overlaps(d, dimension, options)
+                                                 && Math.Abs(d.LinePosition - dimension.LinePosition)
+                                                 < options.TierStep - options.CoordinateTolerance)
+                     && !pylonDimensions.Any(d => d.SourceLoopIndex != dimension.SourceLoopIndex
+                                                  && IsSameDirection(d, dimension)
+                                                  && Overlaps(d, dimension, options)
+                                                  && IsTooClose(d, dimension, options));
+        return enough && clear ? double.MaxValue : free;
+    }
+
+    /// <summary>
+    /// Размерные линии ближе шага яруса, но не на одной линии: на одной линии размеры соберутся в цепочку.
+    /// </summary>
+    private static bool IsTooClose(VirtualDimension a, VirtualDimension b, PlanningOptions options) {
+        double distance = Math.Abs(a.LinePosition - b.LinePosition);
+        return distance > options.CoordinateTolerance && distance < options.TierStep - options.CoordinateTolerance;
     }
 
     /// <summary>
