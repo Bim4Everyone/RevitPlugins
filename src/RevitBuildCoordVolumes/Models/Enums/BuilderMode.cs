@@ -3,5 +3,6 @@ internal enum BuilderMode {
     AutomaticBuilder,
     ContourBuilder,
     ColumnBuilder,
-    SlabBuilder
+    SlabIntersectBuilder,
+    SlabExtrudeBuilder
 }

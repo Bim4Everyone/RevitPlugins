@@ -11,15 +11,12 @@ namespace RevitBuildCoordVolumes.Models;
 internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
     private readonly ISpatialElementDividerService _spatialElementDividerService;
     private readonly IColumnFactory _columnFactory;
-    private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeServices _services;
     private readonly BuildCoordVolumeSettings _settings;
 
     public SlabBasedCoordVolumeBuilder(
-        RevitRepository revitRepository,
         BuildCoordVolumeServices services,
         BuildCoordVolumeSettings settings) {
-        _revitRepository = revitRepository;
         _services = services;
         _spatialElementDividerService = _services.SpatialDivider;
         _columnFactory = _services.ColumnFactory;
@@ -42,7 +39,13 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
         var columnGroups = _columnFactory.CreateColumnGroups(polygons, filteredSlabs, progressService);
 
         // Финальная сборка
-        var geomObjects = _services.GeomObjectsBuildService.CreateGeomObjects(_settings, columnGroups, polygons, spatialObject, progressService);
+        var geomObjects = _services.GeomObjectsBuildService.CreateGeomObjects(
+            _settings, 
+            filteredSlabs,
+            columnGroups, 
+            polygons, 
+            spatialObject, 
+            progressService);
 
         return geomObjects;
     }

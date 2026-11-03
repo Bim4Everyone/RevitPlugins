@@ -327,6 +327,8 @@ internal class MainViewModel : BaseViewModel {
         var typeZones = CommonSettingViewModel.SelectedTypeZones.Select(typeZone => typeZone.Name).ToList();
         var paramMaps = CommonSettingViewModel.Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
         var builderMode = SlabBasedSettingViewModel.SelectedBuilderMode.BuilderMode;
+        var slabExtrudeMode = SlabBasedSettingViewModel.SelectedSlabExtrudeMode.SlabExtrudeMode;
+        bool cutVolumes = SlabBasedSettingViewModel.SplitVolumes;
         var documents = SlabBasedSettingViewModel.FilteredDocuments.Where(vm => vm.IsChecked).Select(d => d.Document).ToList();
         var typeSlabs = SlabBasedSettingViewModel.FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
         var levels = SlabBasedSettingViewModel.FilteredLevels.Where(vm => vm.IsChecked).Select(vm => vm.Level).ToList();
@@ -336,6 +338,8 @@ internal class MainViewModel : BaseViewModel {
 
         _settings.AlgorithmType = algorithmType;
         _settings.BuilderMode = builderMode;
+        _settings.SlabExtrudeMode = slabExtrudeMode;
+        _settings.SplitVolumes = cutVolumes;
         _settings.UnionVolumes = unionVolumes;
         _settings.Documents = documents;
         _settings.TypeSlabs = typeSlabs;

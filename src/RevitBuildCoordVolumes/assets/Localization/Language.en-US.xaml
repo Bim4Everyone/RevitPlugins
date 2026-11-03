@@ -28,10 +28,17 @@
     <system:String x:Key="SlabBasedSettingEditControl.BuilderMode">Algorithm builder mode</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Selecting the algorithm operating mode within a floor</system:String>
     
-    <system:String x:Key="SlabBasedSettingEditControl.UnionMode">Volume Union</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.UnionModeDescription">Union volumes by the bottom slab elevation</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.UnionModeOnContent">Enabled</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.UnionModeOffContent">Disabled</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SlabExtrudeMode">Extrusion Slab Settings</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SlabExtrudeModeDescription">Slab Contour Extrusion Mode</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.SplitVolumes">Mutual Volume Cutting</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SplitVolumesDescription">Cut volumes relative to each other</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.UnionVolumes">Final Volume Union</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.UnionVolumesDescription">Union volumes by the bottom slab elevation</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.ToggleSwitchOnContent">Enabled</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.ToggleSwitchOffContent">Disabled</system:String>
 
     <system:String x:Key="SlabBasedSettingEditControl.SourceFiles">Source files</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SourceFilesDescription">Files containing floor slabs</system:String>
@@ -77,9 +84,13 @@
     <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Used to calculate volume</system:String>
 
     <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Automatic Algorithm Selection</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Union of Contours from Square Grid</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Separate Volumes from Square Grid</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.SlabBuilder">Volumes from Slab Contours</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Volume generation by extruding merged cell contours</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Volume generation by extruding cells between slabs</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.SlabIntersectBuilder">Volume generation by intersecting opposing slab extrusions</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.SlabExtrudeBuilder">Volume generation by simple slab contour extrusion</system:String>
+    
+    <system:String x:Key="SlabBasedSettingViewModel.TopSlabExtrude">Extrude top slab to down</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.BottomSlabExtrude">Extrude down slab to up</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Zone check required</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Zone type parameter must be enabled</system:String>

@@ -32,7 +32,10 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         _revitRepository = revitRepository;
     }
     
-    public List<GeomObject> CreateIndividualColumnsGeomObjects(IList<ColumnGroupObject> columnGroups, IList<PolygonObject> polygons, ProgressService progressService) {
+    public List<GeomObject> CreateIndividualColumnsGeomObjects(
+        IList<ColumnGroupObject> columnGroups, 
+        IList<PolygonObject> polygons, 
+        ProgressService progressService) {
         var geomObjects = new List<GeomObject>();
         foreach(var columnGroup in columnGroups) {
             var sepObjects = CreateIndividualColumnsGeomObjects(columnGroup, polygons, progressService);
@@ -41,7 +44,10 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         return geomObjects;
     }
     
-    public List<GeomObject> CreateUnitedContourGeomObjects(IList<ColumnGroupObject> columnGroups, IList<PolygonObject> polygons, ProgressService progressService) {
+    public List<GeomObject> CreateUnitedContourGeomObjects(
+        IList<ColumnGroupObject> columnGroups, 
+        IList<PolygonObject> polygons, 
+        ProgressService progressService) {
         var geomObjects = new List<GeomObject>();
         foreach(var columnGroup in columnGroups) {
             if(columnGroup.ColumnObjects.Count == 0) {
@@ -49,8 +55,10 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             }
             var firstRandomColumnObject = columnGroup.ColumnObjects[0];
             bool groupContainOneColumn = columnGroup.ColumnObjects.Count == 1;
-            bool groupContainCurved = firstRandomColumnObject.StartSlab.SlabType == SlabType.Ruled || firstRandomColumnObject.FinishSlab.SlabType == SlabType.Ruled;
-            bool groupContainSlope = firstRandomColumnObject.StartSlab.SlabType == SlabType.SlopedPlanar || firstRandomColumnObject.FinishSlab.SlabType == SlabType.SlopedPlanar;
+            bool groupContainCurved = firstRandomColumnObject.StartSlab.SlabType == SlabType.Ruled 
+                                      || firstRandomColumnObject.FinishSlab.SlabType == SlabType.Ruled;
+            bool groupContainSlope = firstRandomColumnObject.StartSlab.SlabType == SlabType.SlopedPlanar 
+                                     || firstRandomColumnObject.FinishSlab.SlabType == SlabType.SlopedPlanar;
             
             if(groupContainOneColumn || groupContainCurved || groupContainSlope) {
                 var unitedObjects = CreateIndividualAndUnitedObjects(columnGroup, polygons, progressService);
@@ -63,7 +71,12 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         return geomObjects;
     }
     
-    public List<GeomObject> CreateSlabContourGeomObjects(IList<ColumnGroupObject> columnGroups, IList<PolygonObject> polygons, SpatialObject spatialObject, ProgressService progressService) {
+    public List<GeomObject> CreateSlabIntersectionGeomObjects(
+        BuildCoordVolumeSettings settings, 
+        IList<ColumnGroupObject> columnGroups, 
+        IList<PolygonObject> polygons, 
+        SpatialObject spatialObject, 
+        ProgressService progressService) {
         progressService?.BeginStage(ProgressType.BuildVolumes);
         int total = columnGroups.Count;
         int processed = 0;
@@ -77,17 +90,19 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             }
             
             var firstRandomColumnObject = columnGroup.ColumnObjects[0];
-            bool groupContainCurved = firstRandomColumnObject.StartSlab.SlabType == SlabType.Ruled || firstRandomColumnObject.FinishSlab.SlabType == SlabType.Ruled;
-            bool groupContainSlope = firstRandomColumnObject.StartSlab.SlabType == SlabType.SlopedPlanar || firstRandomColumnObject.FinishSlab.SlabType == SlabType.SlopedPlanar;
+            bool groupContainCurved = firstRandomColumnObject.StartSlab.SlabType == SlabType.Ruled 
+                                      || firstRandomColumnObject.FinishSlab.SlabType == SlabType.Ruled;
+            bool groupContainSlope = firstRandomColumnObject.StartSlab.SlabType == SlabType.SlopedPlanar 
+                                     || firstRandomColumnObject.FinishSlab.SlabType == SlabType.SlopedPlanar;
             
             if (groupContainCurved) {
                 var unitedObjects = CreateIndividualAndUnitedObjects(columnGroup, polygons, progressService);
                 geomObjects.AddRange(unitedObjects);
             } else if (groupContainSlope) {
-                var slopedObjects = CreateSlopeSlabContourGeomObjects(columnGroup, spatialObject.CheckingSolid, progressService);
+                var slopedObjects = CreateSlopeSlabIntersectionGeomObjects(columnGroup, spatialObject.CheckingSolid);
                 geomObjects.AddRange(slopedObjects);
             } else {
-                var flatObjects = CreateFlatSlabContourGeomObjects(columnGroup, spatialObject.CheckingSolid, progressService);
+                var flatObjects = CreateFlatSlabIntersectionGeomObjects(columnGroup, spatialObject.CheckingSolid);
                 geomObjects.AddRange(flatObjects);
             }
             processed++;
@@ -112,13 +127,20 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         if (firstColumnObject == null) {
             return [];
         }
-        
-        var finalObjects = _geomObjectsSplitter.SplitGeomObjects(geomObjects, progressService);
-        
-        return finalObjects;
+
+        return settings.SplitVolumes 
+            ? _geomObjectsSplitter.SplitGeomObjects(geomObjects, progressService) 
+            : geomObjects;
     }
-    
-    public List<GeomObject> CreateSpatialExtrudeGeomObjects(BuildCoordVolumeSettings settings, SpatialObject spatialObject, ProgressService progressService) {
+
+    public List<GeomObject> CreateSlabExtrudeGeomObjects(BuildCoordVolumeSettings settings, IList<SlabElement> filteredSlabs, SpatialObject spatialObject, ProgressService progressService) {
+        throw new System.NotImplementedException();
+    }
+
+    public List<GeomObject> CreateSpatialExtrudeGeomObjects(
+        BuildCoordVolumeSettings settings, 
+        SpatialObject spatialObject, 
+        ProgressService progressService) {
         progressService?.BeginStage(ProgressType.BuildVolumes);
         var spatialElement = spatialObject.SpatialElement;
         
@@ -148,12 +170,18 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             }];
     }
 
-    private List<GeomObject> CreateIndividualAndUnitedObjects(ColumnGroupObject columnGroup, IList<PolygonObject> polygons, ProgressService progressService) {
+    private List<GeomObject> CreateIndividualAndUnitedObjects(
+        ColumnGroupObject columnGroup, 
+        IList<PolygonObject> polygons, 
+        ProgressService progressService) {
         var sepObjects = CreateIndividualColumnsGeomObjects(columnGroup, polygons, progressService);
         return _geomObjectConnector.UnionGeomObjects(sepObjects, progressService);
     }
 
-    private List<GeomObject> CreateUnitedContourGeomObjects(ColumnGroupObject columnGroupObject, IList<PolygonObject> polygons, ProgressService progressService) {
+    private List<GeomObject> CreateUnitedContourGeomObjects(
+        ColumnGroupObject columnGroupObject, 
+        IList<PolygonObject> polygons, 
+        ProgressService progressService) {
         var columns = columnGroupObject.ColumnObjects;
         double spatialElementPosition = polygons[0].Sides[0].GetEndPoint(0).Z;
         var firstElement = columns[0];
@@ -179,7 +207,10 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             })];
     }
 
-    private List<GeomObject> CreateIndividualColumnsGeomObjects(ColumnGroupObject columnGroupObject, IList<PolygonObject> polygons, ProgressService progressService) {
+    private List<GeomObject> CreateIndividualColumnsGeomObjects(
+        ColumnGroupObject columnGroupObject, 
+        IList<PolygonObject> polygons, 
+        ProgressService progressService) {
         var columns = columnGroupObject.ColumnObjects;
         double spatialElementPosition = polygons[0].Sides[0].GetEndPoint(0).Z;
         var solids = new List<GeometryObject>();
@@ -220,11 +251,11 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         }];
     }
 
-    private List<GeomObject> CreateFlatSlabContourGeomObjects(ColumnGroupObject columnGroupObject, Solid spatialSolid, ProgressService progressService) {
+    private List<GeomObject> CreateFlatSlabIntersectionGeomObjects(ColumnGroupObject columnGroupObject, Solid spatialSolid) {
         var columns = columnGroupObject.ColumnObjects;
         var firstColumnObject = columns[0];
         
-        var solid = _slabContourSolidService.CreateFlatSlabContourSolid(firstColumnObject, spatialSolid);
+        var solid = _slabContourSolidService.CreateFlatSlabIntersectionSolid(firstColumnObject, spatialSolid);
 
         if(solid is null) {
             return [];
@@ -237,11 +268,11 @@ internal class GeomObjectFactory : IGeomObjectFactory {
         }];
     }
 
-    private List<GeomObject> CreateSlopeSlabContourGeomObjects(ColumnGroupObject columnGroupObject, Solid spatialSolid, ProgressService progressService) {
+    private List<GeomObject> CreateSlopeSlabIntersectionGeomObjects(ColumnGroupObject columnGroupObject, Solid spatialSolid) {
         var columns = columnGroupObject.ColumnObjects;
         var firstElement = columns[0];
 
-        var solids = _slabContourSolidService.CreateSlopedSlabContourSolids(firstElement, spatialSolid);
+        var solids = _slabContourSolidService.CreateSlopedSlabIntersectionSolids(firstElement, spatialSolid);
 
         if(solids.Count == 0) {
             return [];

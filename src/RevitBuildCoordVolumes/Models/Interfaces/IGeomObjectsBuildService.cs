@@ -14,6 +14,7 @@ internal interface IGeomObjectsBuildService {
     /// В данном методе производится генерация GeomObject в зависимости от настроек пользователя.
     /// </remarks>
     /// <param name="settings">Настройки, приходящие от пользователя.</param>
+    /// <param name="filteredSlabs">перекрытия, входящие в зону</param>
     /// <param name="columnGroups">Сгруппированные ColumnObject.</param>
     /// <param name="polygons">Список полигонов, на которые была разбита зона.</param>
     /// <param name="spatialObject">Обрабатываемая зона</param>
@@ -23,6 +24,7 @@ internal interface IGeomObjectsBuildService {
     /// </returns>
     List<GeomObject> CreateGeomObjects(
         BuildCoordVolumeSettings settings,
+        IList<SlabElement> filteredSlabs,
         IList<ColumnGroupObject> columnGroups,
         IList<PolygonObject> polygons,
         SpatialObject spatialObject,

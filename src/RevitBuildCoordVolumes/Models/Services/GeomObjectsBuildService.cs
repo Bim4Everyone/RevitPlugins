@@ -19,6 +19,7 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
 
     public List<GeomObject> CreateGeomObjects(
     BuildCoordVolumeSettings settings,
+    IList<SlabElement> filteredSlabs,
     IList<ColumnGroupObject> columnGroups,
     IList<PolygonObject> polygons,
     SpatialObject spatialObject,
@@ -42,8 +43,20 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
 
                 geomObjects.AddRange(sepObjects);
                 break;
-            } case BuilderMode.SlabBuilder or BuilderMode.AutomaticBuilder: {
-                var sepObjects = _geomObjectFactory.CreateSlabContourGeomObjects(
+                
+            } case BuilderMode.SlabExtrudeBuilder: {
+                var sepObjects = _geomObjectFactory.CreateSlabExtrudeGeomObjects(
+                    settings,
+                    filteredSlabs,
+                    spatialObject,
+                    progressService);
+
+                geomObjects.AddRange(sepObjects);
+                break;
+                
+            } case BuilderMode.SlabIntersectBuilder or BuilderMode.AutomaticBuilder: {
+                var sepObjects = _geomObjectFactory.CreateSlabIntersectionGeomObjects(
+                    settings,
                     columnGroups,
                     polygons,
                     spatialObject,

@@ -28,10 +28,17 @@
     <system:String x:Key="SlabBasedSettingEditControl.BuilderMode">Режим работы алгоритма</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Выбор режима работы алгоритма в пределах этажа</system:String>
     
-    <system:String x:Key="SlabBasedSettingEditControl.UnionMode">Объединение объемов</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.UnionModeDescription">Объединять объемы по уровню нижней плиты</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.UnionModeOnContent">Включено</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.UnionModeOffContent">Выключено</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SlabExtrudeMode">Настройки экструдера плит</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SlabExtrudeModeDescription">Режим работы экструдера контуров плит</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.SplitVolumes">Взаимное вырезание объемов</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SplitVolumesDescription">Вырезать объемы относительно друг друга</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.UnionVolumes">Финальное объединение объемов</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.UnionVolumesDescription">Объединять объемы по уровню нижней плиты</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.ToggleSwitchOnContent">Включено</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.ToggleSwitchOffContent">Выключено</system:String>
     
     <system:String x:Key="SlabBasedSettingEditControl.SourceFiles">Файлы с плитами перекрытий</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SourceFilesDescription">Файлы, где расположены плиты перекрытий</system:String>
@@ -77,9 +84,13 @@
     <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Используется для вычисления объёма</system:String>
 
     <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Автоматический выбор алгоритма</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Объединение контуров из сетки квадратов</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Раздельные объемы из сетки квадратов</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.SlabBuilder">Объемы из контуров перекрытий</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Построение объёмов экструзией контуров объединенных ячеек</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Построение объёмов экструзией ячеек между плитами</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.SlabIntersectBuilder">Построение объёмов пересечением встречных экструзий плит</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.SlabExtrudeBuilder">Построение объёмов простой экструзией контура плит</system:String>
+    
+    <system:String x:Key="SlabBasedSettingViewModel.TopSlabExtrude">Выдавливание верхней плиты вниз</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.BottomSlabExtrude">Выдавливание нижней плиты вверх</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Требуется проверить зоны</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Параметр типа зон обязателен к использованию</system:String>

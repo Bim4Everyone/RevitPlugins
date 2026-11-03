@@ -3,6 +3,7 @@
 using Autodesk.Revit.DB;
 
 using RevitBuildCoordVolumes.Models.Geometry;
+using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
@@ -20,7 +21,9 @@ internal interface ISlabContourSolidService {
     /// Солид контура между плитами, ограниченный пространственным солидом,
     /// или <c>null</c>, если создание или пересечение солидов не удалось.
     /// </returns>
-    Solid CreateFlatSlabContourSolid(ColumnObject columnObject, Solid spatialSolid);
+    Solid CreateFlatSlabIntersectionSolid(
+        ColumnObject columnObject, 
+        Solid spatialSolid);
 
     /// <summary>
     /// Создание солидов контура между плитами с наклонной геометрией.
@@ -40,5 +43,7 @@ internal interface ISlabContourSolidService {
     /// Если необходимые солиды не созданы или результат обработки отсутствует,
     /// возвращается пустой список.
     /// </returns>
-    IList<Solid> CreateSlopedSlabContourSolids(ColumnObject columnObject, Solid spatialSolid);
+    IList<Solid> CreateSlopedSlabIntersectionSolids(
+        ColumnObject columnObject, 
+        Solid spatialSolid);
 }

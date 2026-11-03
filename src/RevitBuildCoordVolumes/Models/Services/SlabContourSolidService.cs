@@ -13,7 +13,8 @@ using RevitBuildCoordVolumes.Models.Utilites;
 namespace RevitBuildCoordVolumes.Models.Services;
 
 internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlabContourSolidService {
-    public Solid CreateFlatSlabContourSolid(ColumnObject columnObject, Solid spatialSolid) {
+    public Solid CreateFlatSlabIntersectionSolid(ColumnObject columnObject, Solid spatialSolid) {
+        
         if(spatialSolid is null) {
             return null;
         }
@@ -24,6 +25,7 @@ internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlab
             return null;
         }
         
+        
         var lastSolid = SolidUtility.ExtrudeSolid(columnObject.FinishSlab.TopContour, columnObject.StartPosition, columnObject.FinishPosition, false);
         
         if(lastSolid is null ) {
@@ -32,19 +34,17 @@ internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlab
         
         SolidUtility.TryGetBooleanSolid(firstSolid, lastSolid, BooleanOperationsType.Intersect, out var result);
         
-        if(result is null) {
-            return null;
-        }
-        
-        SolidUtility.TryGetBooleanSolid(result, spatialSolid, BooleanOperationsType.Intersect, out var finalResult);
-        
-        return finalResult;
+        return result is null 
+            ? null 
+            : IntersectBySpatialSolid(result, spatialSolid);
     }
     
-     public IList<Solid> CreateSlopedSlabContourSolids(ColumnObject columnObject, Solid spatialSolid) {
+     public IList<Solid> CreateSlopedSlabIntersectionSolids(ColumnObject columnObject, Solid spatialSolid) {
+        
          if(spatialSolid is null) {
              return [];
          }
+         
         var startSlab = columnObject.StartSlab;
         var finishSlab = columnObject.FinishSlab;
         
@@ -71,7 +71,7 @@ internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlab
             return [];
         }
         
-        SolidUtility.TryGetBooleanSolid(result, spatialSolid, BooleanOperationsType.Intersect, out var finalResult);
+        var finalResult = IntersectBySpatialSolid(result, spatialSolid);
         
         if(finalResult is null) {
             return [];
@@ -147,6 +147,14 @@ internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlab
         }
 
         return result;
+    }
+
+    private static Solid IntersectBySpatialSolid(Solid solid, Solid spatialSolid) {
+        if(solid is null) {
+            return null;
+        }
+        SolidUtility.TryGetBooleanSolid(solid, spatialSolid, BooleanOperationsType.Intersect, out var finalResult);
+        return finalResult;
     }
     
     private List<CurveLoop> GetStartSlabContour(SlabElement startSlab, double minPointZ) {

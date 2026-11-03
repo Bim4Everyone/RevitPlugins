@@ -52,13 +52,37 @@ internal interface IGeomObjectFactory {
     /// <param name="columnGroups">Список объектов колонн, содержащих информацию о начальной и конечной плитах.</param>   
     /// <param name="polygons">Список всех полигонов зоны.</param>
     /// <param name="spatialObject">Обрабатываемая зона</param>
+    /// <param name="settings">Настройки плагина</param>
     /// <param name="progressService">Сервис отслеживания прогресса выполнения операции.</param>
     /// <returns>
     /// Список геометрических объектов с контуром плиты и его объемом.
     /// </returns>
-    List<GeomObject> CreateSlabContourGeomObjects(
+    List<GeomObject> CreateSlabIntersectionGeomObjects(
+        BuildCoordVolumeSettings settings,
         IList<ColumnGroupObject> columnGroups, 
         IList<PolygonObject> polygons, 
+        SpatialObject spatialObject,
+        ProgressService progressService);
+    
+    /// <summary>
+    /// Получение геометрии контура плиты между начальной и конечной отметками.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе создаются солиды на основе верхних контуров плит.
+    /// Полученный результат используется для формирования
+    /// геометрического объекта с указанием этажа и объема.
+    /// Если исходные солиды отсутствуют, возвращается пустой список.
+    /// </remarks>
+    /// /// <param name="settings">Настройки плагина</param>
+    /// <param name="filteredSlabs">Список плит перекрытий, входящих в зону.</param>   
+    /// <param name="spatialObject">Обрабатываемая зона</param>
+    /// <param name="progressService">Сервис отслеживания прогресса выполнения операции.</param>
+    /// <returns>
+    /// Список геометрических объектов с контуром плиты и его объемом.
+    /// </returns>
+    List<GeomObject> CreateSlabExtrudeGeomObjects(
+        BuildCoordVolumeSettings settings,
+        IList<SlabElement> filteredSlabs,
         SpatialObject spatialObject,
         ProgressService progressService);
     

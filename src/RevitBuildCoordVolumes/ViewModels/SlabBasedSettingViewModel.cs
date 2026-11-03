@@ -24,7 +24,11 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
     private readonly BuildCoordVolumeSettings _settings;
     private readonly ILocalizationService _localizationService;
     private ObservableCollection<BuilderModeViewModel> _builderModes;
+    private ObservableCollection<SlabExtrudeModeViewModel> _slabExtrudeModes;
     private BuilderModeViewModel _selectedBuilderMode;
+    private bool _isSlabExtrudeMode;
+    private bool _isSlabIntersectMode;
+    private SlabExtrudeModeViewModel _selectedSlabExtrudeMode;
     private ObservableCollection<DocumentViewModel> _documents;
     private ObservableCollection<DocumentViewModel> _filteredDocuments;
     private string _searchTextDocs;
@@ -36,6 +40,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
     private string _searchTextLevels;
     private string _squareSideMm;
     private string _squareAngleDeg;
+    private bool _splitVolumes;
     private bool _unionVolumes;
 
     public SlabBasedSettingViewModel(
@@ -46,6 +51,8 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         _settings = buildCoordVolumeSettings;
         _services = buildCoordVolumeServices;
         _localizationService = _services.LocalizationService;
+        
+        PropertyChanged += OnPropertyChanged;
 
         LoadView();
 
@@ -55,7 +62,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         CheckAllLevelsCommand = RelayCommand.Create(CheckAllLevels);
         UncheckAllLevelsCommand = RelayCommand.Create(UncheckAllLevels);
     }
-    
+
     public ICommand SearchDocsCommand { get; }
     public ICommand SearchSlabsCommand { get; }
     public ICommand SearchLevelsCommand { get; }
@@ -66,9 +73,29 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         get => _builderModes;
         set => RaiseAndSetIfChanged(ref _builderModes, value);
     }
+    public ObservableCollection<SlabExtrudeModeViewModel> SlabExtrudeModes {
+        get => _slabExtrudeModes;
+        set => RaiseAndSetIfChanged(ref _slabExtrudeModes, value);
+    }
     public BuilderModeViewModel SelectedBuilderMode {
         get => _selectedBuilderMode;
         set => RaiseAndSetIfChanged(ref _selectedBuilderMode, value);
+    }
+    public SlabExtrudeModeViewModel SelectedSlabExtrudeMode {
+        get => _selectedSlabExtrudeMode;
+        set => RaiseAndSetIfChanged(ref _selectedSlabExtrudeMode, value);
+    }
+    public bool IsSlabExtrudeMode {
+        get => _isSlabExtrudeMode;
+        set => RaiseAndSetIfChanged(ref _isSlabExtrudeMode, value);
+    }
+    public bool IsSlabIntersectMode {
+        get => _isSlabIntersectMode;
+        set => RaiseAndSetIfChanged(ref _isSlabIntersectMode, value);
+    }
+    public bool SplitVolumes {
+        get => _splitVolumes;
+        set => RaiseAndSetIfChanged(ref _splitVolumes, value);
     }
     public bool UnionVolumes {
         get => _unionVolumes;
@@ -269,6 +296,25 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
                 BuilderMode = builderMode
             });
     }
+    
+    // Метод получения коллекции SlabExtrudeModeViewModel для SlabExtrudeModes
+    private IEnumerable<SlabExtrudeModeViewModel> GetSlabExtrudeModeViewModels() {
+        var extrudeModes = Enum.GetValues(typeof(SlabExtrudeMode)).Cast<SlabExtrudeMode>();
+        return extrudeModes
+            .Select(extrudeMode => new SlabExtrudeModeViewModel {
+                Name = _localizationService.GetLocalizedString($"SlabBasedSettingViewModel.{extrudeMode}"),
+                SlabExtrudeMode = extrudeMode
+            });
+    }
+    
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        switch(e.PropertyName) {
+            case nameof(SelectedBuilderMode):
+                IsSlabExtrudeMode = SelectedBuilderMode.BuilderMode == BuilderMode.SlabExtrudeBuilder;
+                IsSlabIntersectMode = SelectedBuilderMode.BuilderMode == BuilderMode.SlabIntersectBuilder;
+                break;
+        }
+    }
 
     // Метод загрузки окна
     private void LoadView() {
@@ -276,6 +322,12 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         SelectedBuilderMode = BuilderModes
             .OrderByDescending(mode => mode.BuilderMode == _settings.BuilderMode)
             .FirstOrDefault();
+        
+        SlabExtrudeModes = new ObservableCollection<SlabExtrudeModeViewModel>(GetSlabExtrudeModeViewModels());
+        SelectedSlabExtrudeMode = SlabExtrudeModes
+            .LastOrDefault();
+        
+        SplitVolumes = true;
 
         UnionVolumes = _settings.UnionVolumes;
 
