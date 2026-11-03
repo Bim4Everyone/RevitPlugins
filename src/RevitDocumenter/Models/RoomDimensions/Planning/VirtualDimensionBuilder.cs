@@ -57,9 +57,36 @@ internal class VirtualDimensionBuilder {
                                                                                 && Math.Abs(a.Value - e) <= _valueToleranceMm)
                                .All(ok => ok);
             dimension.Status = matches ? "Ok" : "ValueMismatch";
+            if(dimension.TextOffsets.Count > 0) {
+                ApplyTextOffsets(created, dimension);
+            }
         } catch(Exception ex) {
             dimension.Status = "Exception";
             dimension.Error = $"{ex.GetType().Name}: {ex.Message}";
+        }
+    }
+
+    /// <summary>
+    /// Сдвигает тексты сегментов на TextOffsets от положения Revit по умолчанию (D68).
+    /// </summary>
+    private static void ApplyTextOffsets(Dimension created, VirtualDimension dimension) {
+        // Положение текста по умолчанию Revit считает при регенерации
+        created.Document.Regenerate();
+        foreach(var pair in dimension.TextOffsets) {
+            var shift = dimension.Direction * pair.Value.Along + dimension.Perpendicular * pair.Value.Across;
+            var delta = new XYZ(shift.X, shift.Y, 0);
+            try {
+                if(created.NumberOfSegments <= 1) {
+                    created.TextPosition += delta;
+                } else if(pair.Key < created.Segments.Size) {
+                    var segment = created.Segments.get_Item(pair.Key);
+                    segment.TextPosition += delta;
+                } else {
+                    dimension.TextIssues.Add($"текст сегмента {pair.Key} не сдвинут: нет сегмента");
+                }
+            } catch(Exception ex) {
+                dimension.TextIssues.Add($"текст сегмента {pair.Key} не сдвинут: {ex.GetType().Name}");
+            }
         }
     }
 

@@ -67,7 +67,8 @@ internal class ContourDimensionPlanner {
             dimensions[i].Id = i;
         }
 
-        // Модель текста (D62): конфликты текстов и линий пока только записываются в журнал
+        // Модель текста (D62): тексты с конфликтами сдвигаются (D68), оставшиеся конфликты - в журнал
+        TextConflictCounter.Place(dimensions, shape.ContainsShape, shape.Segments, options, log);
         TextConflictCounter.Count(dimensions, options, log);
         return dimensions;
     }
@@ -493,6 +494,30 @@ internal class ContourDimensionPlanner {
                 return false;
             }
             var middle = (start + end) * 0.5;
+            return IsPointInPolygon(middle, _outerPolygon)
+                   && !_innerPolygons.Any(p => IsPointInPolygon(middle, p));
+        }
+
+        /// <summary>
+        /// Выпуклый многоугольник или отрезок points целиком внутри помещения (D69): его стороны не пересекают
+        /// контур, внутри нет углов контура, середина - внутри внешней петли и вне внутренних.
+        /// </summary>
+        public bool ContainsShape(IReadOnlyList<Point2D> points) {
+            if(_outerPolygon.Count < 3) {
+                return true;
+            }
+            for(int i = 0; i < points.Count; i++) {
+                var a = points[i];
+                var b = points[(i + 1) % points.Count];
+                if(Segments.Any(s => SegmentsIntersect(a, b, s.Start, s.End))) {
+                    return false;
+                }
+            }
+            var polygon = points.ToList();
+            if(polygon.Count > 2 && Segments.Any(s => IsPointInPolygon(s.Start, polygon))) {
+                return false;
+            }
+            var middle = polygon.Aggregate((a, b) => a + b) * (1.0 / polygon.Count);
             return IsPointInPolygon(middle, _outerPolygon)
                    && !_innerPolygons.Any(p => IsPointInPolygon(middle, p));
         }

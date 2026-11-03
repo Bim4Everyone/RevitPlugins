@@ -145,4 +145,34 @@ internal class VirtualDimension {
     /// Конфликты текстов этого размера по модели текста (TextConflictCounter): вид на каждый случай.
     /// </summary>
     public List<string> TextIssues { get; } = [];
+
+    /// <summary>
+    /// Сдвиги текстов по индексу сегмента (D68): задает TextConflictCounter.Place, применяет VirtualDimensionBuilder.
+    /// </summary>
+    public Dictionary<int, TextOffset> TextOffsets { get; } = new();
+}
+
+/// <summary>
+/// Сдвиг текста сегмента от положения Revit по умолчанию, футы: вдоль Direction и по оси Perpendicular.
+/// </summary>
+internal class TextOffset {
+    public TextOffset(double along, double across, string mode, bool leader = false) {
+        Along = along;
+        Across = across;
+        Mode = mode;
+        Leader = leader;
+    }
+
+    public double Along { get; }
+    public double Across { get; }
+
+    /// <summary>
+    /// Текст поднят над линией и вынесен за сегмент: Revit рисует к нему выноску (D70).
+    /// </summary>
+    public bool Leader { get; }
+
+    /// <summary>
+    /// Вид сдвига для журнала.
+    /// </summary>
+    public string Mode { get; }
 }
