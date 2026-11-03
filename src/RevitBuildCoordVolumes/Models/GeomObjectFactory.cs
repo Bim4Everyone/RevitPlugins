@@ -133,8 +133,12 @@ internal class GeomObjectFactory : IGeomObjectFactory {
             : geomObjects;
     }
 
-    public List<GeomObject> CreateSlabExtrudeGeomObjects(BuildCoordVolumeSettings settings, IList<SlabElement> filteredSlabs, SpatialObject spatialObject, ProgressService progressService) {
-        throw new System.NotImplementedException();
+    public List<GeomObject> CreateSlabExtrudeGeomObjects(BuildCoordVolumeSettings settings, IList<SlabElement> filteredSlabs, SpatialObject spatialObject) {
+        var extrusionSlabGeomObjects = settings.SlabExtrudeMode == SlabExtrudeMode.BottomSlabExtrude 
+            ? CreateBottomExtrusionSlabGeomObjects(filteredSlabs, spatialObject) 
+            : CreateTopExtrusionSlabGeomObjects(filteredSlabs, spatialObject);
+
+        return extrusionSlabGeomObjects;
     }
 
     public List<GeomObject> CreateSpatialExtrudeGeomObjects(
@@ -168,6 +172,34 @@ internal class GeomObjectFactory : IGeomObjectFactory {
                 GeometryObjects = [solid],
                 Volume = solid.Volume
             }];
+    }
+
+    private List<GeomObject> CreateBottomExtrusionSlabGeomObjects(IList<SlabElement> filteredSlabs, SpatialObject spatialObject) {
+        var solids = _slabContourSolidService.CreateBottomSlabExtrudeSolids(filteredSlabs, spatialObject.CheckingSolid);
+
+        if(solids.Count == 0) {
+            return [];
+        }
+        
+        return solids.Select(solidObject => new GeomObject {
+            GeometryObjects = [solidObject.Solid],
+            Volume = solidObject.Solid.Volume,
+            LevelName = solidObject.LevelName
+        }).ToList();
+    }
+    
+    private List<GeomObject> CreateTopExtrusionSlabGeomObjects(IList<SlabElement> filteredSlabs, SpatialObject spatialObject) {
+        var solids = _slabContourSolidService.CreateTopSlabExtrudeSolids(filteredSlabs, spatialObject.CheckingSolid);
+
+        if(solids.Count == 0) {
+            return [];
+        }
+        
+        return solids.Select(solidObject => new GeomObject {
+            GeometryObjects = [solidObject.Solid],
+            Volume = solidObject.Solid.Volume,
+            LevelName = solidObject.LevelName
+        }).ToList();
     }
 
     private List<GeomObject> CreateIndividualAndUnitedObjects(

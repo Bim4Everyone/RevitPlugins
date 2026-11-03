@@ -5,14 +5,13 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit.Geometry;
 
-using RevitBuildCoordVolumes.Models.Enums;
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Utilites;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 
-internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlabContourSolidService {
+internal class SlabContourSolidService : ISlabContourSolidService {
     public Solid CreateFlatSlabIntersectionSolid(ColumnObject columnObject, Solid spatialSolid) {
         
         if(spatialSolid is null) {
@@ -48,10 +47,10 @@ internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlab
         var startSlab = columnObject.StartSlab;
         var finishSlab = columnObject.FinishSlab;
         
-        double minPointZ = slabFaceService.GetMinPointZ(startSlab.TopFaces);
-        double maxPointZ = slabFaceService.GetMaxPointZ(finishSlab.TopFaces);
+        double minPointZ = startSlab.MinPointZ;
+        double maxPointZ = finishSlab.MaxPointZ;
         
-        var startContour = GetStartSlabContour(startSlab, minPointZ);
+        var startContour = startSlab.BottomContour;
         
         var firstSolid = SolidUtility.ExtrudeSolid(startContour, minPointZ, maxPointZ);
         
@@ -129,7 +128,56 @@ internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlab
         
         return SolidExtensions.CreateUnitedSolids(uniSolid).ToList();
     }
-    
+
+    public IList<SolidObject> CreateBottomSlabExtrudeSolids(IList<SlabElement> filteredSlabs, Solid spatialSolid) {
+        var sortedSlabs = filteredSlabs
+            .OrderBy(x => x.MinPointZ)
+            .ToList();
+        var result = new List<SolidObject>();
+        for(int i = 0; i < sortedSlabs.Count - 1; i++) {
+            var bottomSlab = sortedSlabs[i];
+            var topSlab = sortedSlabs[i + 1];
+
+            var solid = SolidUtility.ExtrudeSolid(bottomSlab.BottomContour, bottomSlab.MinPointZ, topSlab.MinPointZ);
+
+            if(solid is null) {
+                continue;
+            }
+            var finalResult = IntersectBySpatialSolid(solid, spatialSolid);
+            
+            if(finalResult is null) {
+                continue;
+            }
+            result.Add(new SolidObject {Solid = finalResult, LevelName = bottomSlab.LevelName});
+        }
+        return result;
+    }
+
+    public IList<SolidObject> CreateTopSlabExtrudeSolids(IList<SlabElement> filteredSlabs, Solid spatialSolid) {
+        var sortedSlabs = filteredSlabs
+            .OrderByDescending(x => x.MinPointZ)
+            .ToList();
+        
+        var result = new List<SolidObject>();
+        for(int i = 0; i < sortedSlabs.Count - 1; i++) {
+            var topSlab = sortedSlabs[i];
+            var bottomSlab  = sortedSlabs[i + 1];
+
+            var solid = SolidUtility.ExtrudeSolid(topSlab.TopContour, topSlab.MinPointZ, bottomSlab.MinPointZ, false);
+
+            if(solid is null) {
+                continue;
+            }
+            var finalResult = IntersectBySpatialSolid(solid, spatialSolid);
+            
+            if(finalResult is null) {
+                continue;
+            }
+            result.Add(new SolidObject {Solid = finalResult, LevelName = topSlab.LevelName});
+        }
+        return result;
+    }
+
     // Метод, в котором список солидов разделяется секущими плоскостями
     private static List<Solid> SplitSolids(List<Solid> solids, DividePlane dividePlane) {
         var result = new List<Solid>();
@@ -156,20 +204,4 @@ internal class SlabContourSolidService(ISlabFaceService slabFaceService) : ISlab
         SolidUtility.TryGetBooleanSolid(solid, spatialSolid, BooleanOperationsType.Intersect, out var finalResult);
         return finalResult;
     }
-    
-    private List<CurveLoop> GetStartSlabContour(SlabElement startSlab, double minPointZ) {
-        if(startSlab.SlabType == SlabType.Planar) {
-            return startSlab.TopContour;
-        }
-
-        double maxPointStartSlab = slabFaceService.GetMaxPointZ(startSlab.TopFaces);
-        var startContour = startSlab.TopContour;
-        var transform = GeometryUtility.CreateZTranslation(maxPointStartSlab, minPointZ);
-        foreach(var loop in startContour) {
-            loop.Transform(transform);
-        }
-        return startContour;
-    }
-    
-    
 }

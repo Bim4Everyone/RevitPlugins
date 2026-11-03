@@ -103,7 +103,10 @@ internal class SlabService(
             FloorName = floor.Name,
             Level = level,
             LevelName = levelName,
-            TopContour = geometryData.Contour,
+            TopContour = geometryData.TopContour,
+            BottomContour = geometryData.BottomContour,
+            MaxPointZ = geometryData.MaxPointZ,
+            MinPointZ = geometryData.MinPointZ,
             TopFaces = geometryData.TopFaces,
             SlabType = geometryData.SlabType,
             CheckingSolids = geometryData.CheckingSolids

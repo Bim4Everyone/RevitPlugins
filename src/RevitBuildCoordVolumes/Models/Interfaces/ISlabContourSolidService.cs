@@ -3,7 +3,6 @@
 using Autodesk.Revit.DB;
 
 using RevitBuildCoordVolumes.Models.Geometry;
-using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
@@ -46,4 +45,34 @@ internal interface ISlabContourSolidService {
     IList<Solid> CreateSlopedSlabIntersectionSolids(
         ColumnObject columnObject, 
         Solid spatialSolid);
+    
+    /// <summary>
+    /// Создание солидов контуров нижних плит с плоской геометрией.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе выполняется экструзия верхних контуров нижних плит вверх,
+    /// и ограничение результата пространственным солидом.
+    /// </remarks>
+    /// <param name="filteredSlabs">Объект колонны с данными о начальной и конечной плитах.</param>
+    /// <param name="spatialSolid">Солид, ограничивающий пространственную область.</param>
+    /// <returns>
+    /// Солиды контура между плитами, ограниченные пространственным солидом,
+    /// или <c>пустой список</c>, если создание солидов не удалось.
+    /// </returns>
+    IList<SolidObject> CreateBottomSlabExtrudeSolids(IList<SlabElement> filteredSlabs, Solid spatialSolid);
+    
+    /// <summary>
+    /// Создание солидов контуров верхних плит с плоской геометрией.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе выполняется экструзия верхних контуров верхних плит вниз,
+    /// и ограничение результата пространственным солидом.
+    /// </remarks>
+    /// <param name="filteredSlabs">Объект колонны с данными о начальной и конечной плитах.</param>
+    /// <param name="spatialSolid">Солид, ограничивающий пространственную область.</param>
+    /// <returns>
+    /// Солиды контура между плитами, ограниченные пространственным солидом,
+    /// или <c>пустой список</c>, если создание солидов не удалось.
+    /// </returns>
+    IList<SolidObject> CreateTopSlabExtrudeSolids(IList<SlabElement> filteredSlabs, Solid spatialSolid);
 }

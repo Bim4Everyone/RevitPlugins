@@ -38,21 +38,57 @@ internal class SlabGeometryService(
         var validSolids = RemoveInnerSolids(checkingSolids);
 
         // 4. Контур берём из проверочных solids
-        var contour = validSolids
+        var topContour = validSolids
             .Select(x => x.Loop)
             .ToList();
 
         // 5. Верхние грани зависят от типа перекрытия
-        var topFaces = slabType is SlabType.Ruled or SlabType.SlopedPlanar
+        var topFaces = slabType is not SlabType.Planar
             ? realTopFaces
             : slabFaceService.GetFlatTopFaces(validSolids);
-
+        
+        double maxPointZ = slabType is not SlabType.Planar 
+            ? GetMaxPointZByFaces(topFaces)
+            : GetPointZByContour(topContour);
+        
+        double minPointZ = slabType is not SlabType.Planar 
+            ? GetMinPointZByFaces(topFaces) 
+            : maxPointZ;
+        
+        var bottomContour = slabType is not SlabType.Planar 
+            ? GetBottomSlabContour(maxPointZ, minPointZ, topContour)
+            : topContour;
+        
         return new SlabGeometryData {
-            Contour = contour,
+            TopContour = topContour,
+            BottomContour = bottomContour,
+            MaxPointZ = maxPointZ,
+            MinPointZ = minPointZ,
             TopFaces = topFaces,
             CheckingSolids = validSolids.Select(x => x.Solid).ToList(),
             SlabType = slabType
         };
+    }
+    
+    private static List<CurveLoop> GetBottomSlabContour(double maxPointZ, double minPointZ, List<CurveLoop> topContour) {
+        
+        var transform = GeometryUtility.CreateZTranslation(maxPointZ, minPointZ);
+        
+        return topContour
+            .Select(loop => CurveLoop.CreateViaTransform(loop, transform))
+            .ToList();
+    }
+
+    private static double GetPointZByContour(List<CurveLoop> topContour) {
+        return topContour[0].First().GetEndPoint(0).Z;
+    }
+
+    private double GetMaxPointZByFaces(List<Face> topFaces) {
+        return slabFaceService.GetMaxPointZ(topFaces);
+    }
+    
+    private double GetMinPointZByFaces(List<Face> topFaces) {
+        return slabFaceService.GetMinPointZ(topFaces);
     }
 
     // Метод получения проверочных солидов плиты

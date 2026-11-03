@@ -15,6 +15,9 @@ internal class SlabElement {
     public Level Level { get; set; }
     public string LevelName { get; set; }
     public List<CurveLoop> TopContour { get; set; }
+    public List<CurveLoop> BottomContour { get; set; }
+    public double MaxPointZ { get; set; }
+    public double MinPointZ { get; set; }
     public List<Face> TopFaces { get; set; }
     public List<Solid> CheckingSolids { get; set; }
 }

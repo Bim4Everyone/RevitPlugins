@@ -76,15 +76,13 @@ internal interface IGeomObjectFactory {
     /// /// <param name="settings">Настройки плагина</param>
     /// <param name="filteredSlabs">Список плит перекрытий, входящих в зону.</param>   
     /// <param name="spatialObject">Обрабатываемая зона</param>
-    /// <param name="progressService">Сервис отслеживания прогресса выполнения операции.</param>
     /// <returns>
     /// Список геометрических объектов с контуром плиты и его объемом.
     /// </returns>
     List<GeomObject> CreateSlabExtrudeGeomObjects(
         BuildCoordVolumeSettings settings,
         IList<SlabElement> filteredSlabs,
-        SpatialObject spatialObject,
-        ProgressService progressService);
+        SpatialObject spatialObject);
     
     /// <summary>
     /// Метод получения списка геометрических объектов по исходной зоне.

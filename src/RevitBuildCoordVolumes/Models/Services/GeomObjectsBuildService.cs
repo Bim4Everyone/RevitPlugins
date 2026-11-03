@@ -48,8 +48,7 @@ internal class GeomObjectsBuildService : IGeomObjectsBuildService {
                 var sepObjects = _geomObjectFactory.CreateSlabExtrudeGeomObjects(
                     settings,
                     filteredSlabs,
-                    spatialObject,
-                    progressService);
+                    spatialObject);
 
                 geomObjects.AddRange(sepObjects);
                 break;
