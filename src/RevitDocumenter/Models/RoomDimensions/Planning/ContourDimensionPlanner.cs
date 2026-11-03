@@ -37,8 +37,11 @@ internal class ContourDimensionPlanner {
         var shape = new RoomShape(contour);
         var dimensions = CreateVirtualDimensions(contour, options, log);
 
-        // У пилона оставляем по одному собственному размеру на ось: от него строится тип 3
-        dimensions = RemoveDuplicates(dimensions, options, log, d => d.Kind == "Contour" && d.InvolvesInner);
+        // У пилона оставляем по одному собственному размеру на ось: от него строится тип 3.
+        // Сторона - верхняя/левая, если там хватает места под линию и текст, иначе - где места больше
+        dimensions = RemoveDuplicates(
+            dimensions, options, log, d => d.Kind == "Contour" && d.InvolvesInner,
+            d => GetPylonSidePriority(contour, d, options));
 
         // Тип 3 строится от оставшихся размеров пилонов, чтобы встать на их линию.
         // Встречные размеры между двумя пилонами убираются сразу.
@@ -303,7 +306,8 @@ internal class ContourDimensionPlanner {
     /// и на высоту текста) и не ближе шага яруса к параллельным размерам, иначе он режет их текст.
     /// Иначе он переносится в ближайшее свободное положение: у граней контура с отступом или следующим
     /// ярусом за параллельным размером; если такого нет - не ставится.
-    /// Для остальных размеров выход за пределы помещения пишется в журнал.
+    /// Остальные размеры, вышедшие за пределы помещения (например, линия стены проходит через пилон у стены),
+    /// переносятся так же; если свободного положения нет - остаются на месте с записью в журнал.
     /// </summary>
     private static List<VirtualDimension> KeepInsideRoom(
         RoomShape shape,
@@ -311,11 +315,24 @@ internal class ContourDimensionPlanner {
         PlanningOptions options,
         List<string> log) {
         var result = new List<VirtualDimension>();
-        foreach(var dimension in dimensions.Where(d => d.Kind != "Overall")) {
-            if(!shape.Contains(dimension, dimension.LinePosition)) {
-                log.Add($"Размер {Names(dimension)}: размерная линия выходит за пределы помещения");
-            }
+        var regular = dimensions.Where(d => d.Kind != "Overall").ToList();
+        foreach(var dimension in regular) {
             result.Add(dimension);
+            if(shape.Contains(dimension, dimension.LinePosition)) {
+                continue;
+            }
+            var others = regular
+                .Where(d => d != dimension && IsSameDirection(d, dimension) && Overlaps(d, dimension, options))
+                .ToList();
+            double? position = FindFreePosition(shape, dimension, others, options);
+            if(position is null) {
+                log.Add($"Размер {Names(dimension)}: размерная линия выходит за пределы помещения; "
+                        + "свободного положения нет, оставлен на месте");
+                continue;
+            }
+            log.Add($"Размер {Names(dimension)}: размерная линия выходит за пределы помещения; "
+                    + $"перенесен на {Mm(Math.Abs(position.Value - dimension.LinePosition))} мм");
+            dimension.LinePosition = position.Value;
         }
 
         foreach(var overall in dimensions.Where(d => d.Kind == "Overall")) {
@@ -328,25 +345,7 @@ internal class ContourDimensionPlanner {
                 continue;
             }
 
-            // Кандидаты - у граней контура с отступом (и с местом под текст) и ярусом за параллельными размерами,
-            // от ближайшего к желаемому положению
-            var perpendicular = overall.Perpendicular;
-            double textOffset = options.Offset + options.TextAllowance;
-            var candidates = shape.Segments
-                .SelectMany(seg => new[] { seg.Start.Dot(perpendicular), seg.End.Dot(perpendicular) })
-                .SelectMany(v => new[] { v + options.Offset, v - options.Offset, v + textOffset, v - textOffset })
-                .Concat(parallel.SelectMany(d => new[] { d.LinePosition + options.TierStep, d.LinePosition - options.TierStep }))
-                .Distinct()
-                .OrderBy(c => Math.Abs(c - overall.LinePosition))
-                .ToList();
-            double? found = null;
-            foreach(double candidate in candidates) {
-                if(GetPlacementConflict(shape, overall, candidate, parallel, options) is null) {
-                    found = candidate;
-                    break;
-                }
-            }
-
+            double? found = FindFreePosition(shape, overall, parallel, options);
             if(found is null) {
                 log.Add($"Общий размер {Names(overall)}: {conflict}; свободного положения внутри помещения нет, не создан");
                 continue;
@@ -361,6 +360,31 @@ internal class ContourDimensionPlanner {
             result.Add(overall);
         }
         return result;
+    }
+
+    /// <summary>
+    /// Ближайшее к текущему свободное положение размерной линии. Кандидаты - у граней контура с отступом
+    /// (и с местом под текст) и ярусом за параллельными размерами. Null, если свободного положения нет.
+    /// </summary>
+    private static double? FindFreePosition(
+        RoomShape shape,
+        VirtualDimension dimension,
+        List<VirtualDimension> parallel,
+        PlanningOptions options) {
+        var perpendicular = dimension.Perpendicular;
+        double textOffset = options.Offset + options.TextAllowance;
+        var candidates = shape.Segments
+            .SelectMany(seg => new[] { seg.Start.Dot(perpendicular), seg.End.Dot(perpendicular) })
+            .SelectMany(v => new[] { v + options.Offset, v - options.Offset, v + textOffset, v - textOffset })
+            .Concat(parallel.SelectMany(d => new[] { d.LinePosition + options.TierStep, d.LinePosition - options.TierStep }))
+            .Distinct()
+            .OrderBy(c => Math.Abs(c - dimension.LinePosition));
+        foreach(double candidate in candidates) {
+            if(GetPlacementConflict(shape, dimension, candidate, parallel, options) is null) {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     /// <summary>
@@ -564,8 +588,14 @@ internal class ContourDimensionPlanner {
         List<VirtualDimension> dimensions,
         PlanningOptions options,
         List<string> log,
-        Func<VirtualDimension, bool> scope) {
-        var ordered = dimensions.Where(scope).OrderByDescending(d => d.LinePosition).ToList();
+        Func<VirtualDimension, bool> scope,
+        Func<VirtualDimension, double> priority = null) {
+        // Из дублей остается первый: с большим приоритетом, затем верхний/левый
+        priority ??= _ => 0;
+        var ordered = dimensions.Where(scope)
+            .OrderByDescending(priority)
+            .ThenByDescending(d => d.LinePosition)
+            .ToList();
         var kept = dimensions.Where(d => !scope(d)).ToList();
         int outsideCount = kept.Count;
         foreach(var dimension in ordered) {
@@ -580,6 +610,43 @@ internal class ContourDimensionPlanner {
             kept.Add(dimension);
         }
         return kept;
+    }
+
+    /// <summary>
+    /// Приоритет стороны собственного размера пилона. Если на стороне хватает места под отступ и текст,
+    /// стороны равноценны (остается верхняя/левая), иначе выбирается сторона с большим свободным местом.
+    /// </summary>
+    private static double GetPylonSidePriority(RoomContour contour, VirtualDimension dimension, PlanningOptions options) {
+        double free = GetFreeSpace(contour, dimension, options);
+        return free >= options.Offset + options.TextAllowance - options.CoordinateTolerance ? double.MaxValue : free;
+    }
+
+    /// <summary>
+    /// Свободное место перед образмериваемой линией: расстояние до ближайшей параллельной линии другой петли,
+    /// которая перекрывает размер вдоль его направления.
+    /// </summary>
+    private static double GetFreeSpace(RoomContour contour, VirtualDimension dimension, PlanningOptions options) {
+        var direction = dimension.Direction;
+        var perpendicular = dimension.Perpendicular;
+        double free = double.MaxValue;
+        foreach(var loop in contour.Loops.Where(l => l.Index != dimension.SourceLoopIndex)) {
+            foreach(var line in loop.Lines.Where(l => !l.IsArc)) {
+                if(Math.Abs(line.Segment.Direction.Dot(perpendicular)) > _angleTolerance) {
+                    continue;
+                }
+                double a = line.Segment.Start.Dot(direction);
+                double b = line.Segment.End.Dot(direction);
+                double overlap = Math.Min(Math.Max(a, b), dimension.Max) - Math.Max(Math.Min(a, b), dimension.Min);
+                if(overlap <= options.CoordinateTolerance) {
+                    continue;
+                }
+                double distance = (line.Segment.Start.Dot(perpendicular) - dimension.ContourPosition) * dimension.SideSign;
+                if(distance > options.CoordinateTolerance) {
+                    free = Math.Min(free, distance);
+                }
+            }
+        }
+        return free;
     }
 
     /// <summary>
