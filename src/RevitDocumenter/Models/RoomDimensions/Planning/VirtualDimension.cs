@@ -11,11 +11,19 @@ namespace RevitDocumenter.Models.RoomDimensions.Planning;
 /// Привязка виртуального размера: Reference и его положение вдоль направления размера.
 /// </summary>
 internal class DimensionAnchor {
-    public DimensionAnchor(Reference reference, double coordinate, int loopIndex, int elementIndex) {
+    public DimensionAnchor(
+        Reference reference,
+        double coordinate,
+        int loopIndex,
+        int elementIndex,
+        double extentMin,
+        double extentMax) {
         Reference = reference;
         Coordinate = coordinate;
         LoopIndex = loopIndex;
         ElementIndex = elementIndex;
+        ExtentMin = System.Math.Min(extentMin, extentMax);
+        ExtentMax = System.Math.Max(extentMin, extentMax);
     }
 
     public Reference Reference { get; }
@@ -27,6 +35,20 @@ internal class DimensionAnchor {
 
     public int LoopIndex { get; }
     public int ElementIndex { get; }
+
+    /// <summary>
+    /// Протяженность элемента привязки поперек размера (по оси Perpendicular размера), футы.
+    /// </summary>
+    public double ExtentMin { get; }
+    public double ExtentMax { get; }
+
+    /// <summary>
+    /// Длина вспомогательной линии от элемента до размерной линии в заданном положении, футы.
+    /// Ноль, если размерная линия проходит в пределах элемента.
+    /// </summary>
+    public double WitnessLength(double linePosition) {
+        return System.Math.Max(0, System.Math.Max(ExtentMin - linePosition, linePosition - ExtentMax));
+    }
 }
 
 /// <summary>
@@ -83,6 +105,11 @@ internal class VirtualDimension {
     public double ContourPosition { get; set; }
 
     public double Z { get; set; }
+
+    /// <summary>
+    /// Самая длинная вспомогательная линия размера в его текущем положении, футы.
+    /// </summary>
+    public double MaxWitnessLength => Anchors.Count == 0 ? 0 : Anchors.Max(a => a.WitnessLength(LinePosition));
 
     /// <summary>
     /// Привязки в порядке возрастания координаты.

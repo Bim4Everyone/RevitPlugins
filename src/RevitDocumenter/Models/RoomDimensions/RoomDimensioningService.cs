@@ -63,8 +63,7 @@ internal class RoomDimensioningService {
         // Значения раскладки: мм на печати * масштаб вида -> мм модели -> футы
         int scale = _revitRepository.ActiveView.Scale;
         double offset = UnitUtilsHelper.ConvertToInternalValue(settings.Layout.FirstTierOffsetPrintMm * scale);
-        double maxShift = UnitUtilsHelper.ConvertToInternalValue(settings.Layout.MaxShiftPrintMm * scale);
-        double maxLeader = UnitUtilsHelper.ConvertToInternalValue(settings.Layout.MaxLeaderPrintMm * scale);
+        double maxWitnessLine = UnitUtilsHelper.ConvertToInternalValue(settings.Layout.MaxWitnessLinePrintMm * scale);
         double tierStep = UnitUtilsHelper.ConvertToInternalValue(settings.Layout.TierStepPrintMm * scale);
 
         var warningSwallower = new WarningSwallower();
@@ -100,10 +99,13 @@ internal class RoomDimensioningService {
                         // Плоскости и значения сравниваются с допуском типа помещения, но не точнее 0.5 мм
                         CoordinateTolerance = UnitUtilsHelper.ConvertToInternalValue(
                             Math.Max(0.5, roomType.EqualityToleranceMm)),
-                        MaxShift = maxShift,
-                        MaxLeader = maxLeader,
+                        MergeChains = roomType.MergeChains,
+                        MaxWitnessLine = maxWitnessLine,
                         TierStep = tierStep,
-                        OverallMinSegments = roomType.OverallDimMinSegments
+                        OverallMinSegments = roomType.OverallDimMinSegments,
+                        DuplicateMaxDistance = UnitUtilsHelper.ConvertToInternalValue(
+                            Math.Max(0, roomType.DuplicateMaxDistanceMm)),
+                        PylonDuplicatesAcrossPylons = roomType.PylonDuplicatesAcrossPylons
                     };
                     roomResult.Dimensions = _planner.Plan(contour, options, roomResult.PlanningLog);
                     foreach(var dimension in roomResult.Dimensions) {

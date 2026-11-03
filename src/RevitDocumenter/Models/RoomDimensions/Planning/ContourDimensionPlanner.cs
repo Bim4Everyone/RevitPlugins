@@ -17,18 +17,24 @@ namespace RevitDocumenter.Models.RoomDimensions.Planning;
 /// </summary>
 /// <remarks>
 /// Отложенные варианты (записаны в схеме):
-/// - из дублей оставлять тот, на стороне которого меньше других размеров (сейчас - верхний/левый);
+/// - из дублей оставлять тот, на стороне которого меньше других размеров
+///   (сейчас - тот, у кого текст не обращен к стене, затем верхний/левый);
+/// - удалять дубль, только если между размерными линиями нет других параллельных размеров
+///   (сейчас - по расстоянию DuplicateMaxDistance);
 /// - объединять в цепочки только размеры одной петли (сейчас - разрешено между петлями помещения).
 /// </remarks>
 internal class ContourDimensionPlanner {
     private const double _angleTolerance = 1e-4;
     private const double _axisTolerance = 1e-6;
+    // Укорочение размерной линии с концов при проверке "внутри помещения", футы (~5 мм)
+    private const double _insideTrim = 5.0 / 304.8;
 
     public List<VirtualDimension> Plan(RoomContour contour, PlanningOptions options, List<string> log) {
         contour.ThrowIfNull();
         options.ThrowIfNull();
         log.ThrowIfNull();
 
+        var shape = new RoomShape(contour);
         var dimensions = CreateVirtualDimensions(contour, options, log);
 
         // У пилона оставляем по одному собственному размеру на ось: от него строится тип 3
@@ -39,13 +45,16 @@ internal class ContourDimensionPlanner {
         dimensions.AddRange(CreateInternalDimensions(contour, dimensions, options, log));
         dimensions = RemoveDuplicates(dimensions, options, log, d => d.Kind == "Internal");
 
-        dimensions = MergeIntoChains(dimensions, options, log);
+        dimensions = MergeIntoChains(dimensions, shape, options, log);
 
-        // Дубли удаляются после объединения: убирается только одиночный размер,
-        // повторяющий другой одиночный размер или сегмент цепочки
-        dimensions = RemoveDuplicateSingles(dimensions, options, log);
+        // Дубли удаляются после объединения по одному правилу для размеров и цепочек:
+        // все сегменты уже есть у другого размера и размерные линии ближе DuplicateMaxDistance
+        dimensions = RemoveDuplicatesAfterChaining(dimensions, options, log);
 
         dimensions.AddRange(CreateOverallDimensions(contour, dimensions, options, log));
+
+        // Размерная линия должна целиком лежать внутри помещения; общий размер еще и свободно от других размеров
+        dimensions = KeepInsideRoom(shape, dimensions, options, log);
 
         for(int i = 0; i < dimensions.Count; i++) {
             dimensions[i].Id = i;
@@ -86,8 +95,8 @@ internal class ContourDimensionPlanner {
 
                 // Плоскость соседнего элемента проходит через общий конец с линией
                 var anchors = new List<DimensionAnchor> {
-                    new(previous.Reference, line.Segment.Start.Dot(direction), loop.Index, previous.Index),
-                    new(next.Reference, line.Segment.End.Dot(direction), loop.Index, next.Index)
+                    CreateAnchor(previous, line.Segment.Start.Dot(direction), loop.Index, perpendicular),
+                    CreateAnchor(next, line.Segment.End.Dot(direction), loop.Index, perpendicular)
                 };
 
                 dimensions.Add(new VirtualDimension {
@@ -142,11 +151,11 @@ internal class ContourDimensionPlanner {
                 }
 
                 var (line, loopIndex) = target.Value;
-                var targetAnchor = new DimensionAnchor(
-                    line.Reference,
+                var targetAnchor = CreateAnchor(
+                    line,
                     line.Segment.Start.Dot(pylonDimension.Direction),
                     loopIndex,
-                    line.Index);
+                    pylonDimension.Perpendicular);
                 result.Add(new VirtualDimension {
                     Kind = "Internal",
                     InvolvesInner = true,
@@ -289,6 +298,218 @@ internal class ContourDimensionPlanner {
     }
 
     /// <summary>
+    /// Проверяет, что размерная линия целиком лежит внутри помещения и не пересекает контуры.
+    /// Общий размер, кроме того, должен стоять свободно: с отступом от контура (со стороны текста - еще
+    /// и на высоту текста) и не ближе шага яруса к параллельным размерам, иначе он режет их текст.
+    /// Иначе он переносится в ближайшее свободное положение: у граней контура с отступом или следующим
+    /// ярусом за параллельным размером; если такого нет - не ставится.
+    /// Для остальных размеров выход за пределы помещения пишется в журнал.
+    /// </summary>
+    private static List<VirtualDimension> KeepInsideRoom(
+        RoomShape shape,
+        List<VirtualDimension> dimensions,
+        PlanningOptions options,
+        List<string> log) {
+        var result = new List<VirtualDimension>();
+        foreach(var dimension in dimensions.Where(d => d.Kind != "Overall")) {
+            if(!shape.Contains(dimension, dimension.LinePosition)) {
+                log.Add($"Размер {Names(dimension)}: размерная линия выходит за пределы помещения");
+            }
+            result.Add(dimension);
+        }
+
+        foreach(var overall in dimensions.Where(d => d.Kind == "Overall")) {
+            var parallel = result
+                .Where(d => IsSameDirection(d, overall) && Overlaps(d, overall, options))
+                .ToList();
+            string conflict = GetPlacementConflict(shape, overall, overall.LinePosition, parallel, options);
+            if(conflict is null) {
+                result.Add(overall);
+                continue;
+            }
+
+            // Кандидаты - у граней контура с отступом (и с местом под текст) и ярусом за параллельными размерами,
+            // от ближайшего к желаемому положению
+            var perpendicular = overall.Perpendicular;
+            double textOffset = options.Offset + options.TextAllowance;
+            var candidates = shape.Segments
+                .SelectMany(seg => new[] { seg.Start.Dot(perpendicular), seg.End.Dot(perpendicular) })
+                .SelectMany(v => new[] { v + options.Offset, v - options.Offset, v + textOffset, v - textOffset })
+                .Concat(parallel.SelectMany(d => new[] { d.LinePosition + options.TierStep, d.LinePosition - options.TierStep }))
+                .Distinct()
+                .OrderBy(c => Math.Abs(c - overall.LinePosition))
+                .ToList();
+            double? found = null;
+            foreach(double candidate in candidates) {
+                if(GetPlacementConflict(shape, overall, candidate, parallel, options) is null) {
+                    found = candidate;
+                    break;
+                }
+            }
+
+            if(found is null) {
+                log.Add($"Общий размер {Names(overall)}: {conflict}; свободного положения внутри помещения нет, не создан");
+                continue;
+            }
+            var neighbor = parallel
+                .Where(d => Math.Abs(Math.Abs(d.LinePosition - found.Value) - options.TierStep) <= options.CoordinateTolerance)
+                .OrderBy(d => d.Anchors.Count)
+                .FirstOrDefault();
+            log.Add($"Общий размер {Names(overall)}: {conflict}; перенесен на {Mm(Math.Abs(found.Value - overall.LinePosition))} мм"
+                    + (neighbor is null ? " к грани контура" : $" ярусом за размером {Names(neighbor)}"));
+            overall.LinePosition = found.Value;
+            result.Add(overall);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Почему размерная линия в положении position мешает: null, если положение свободно.
+    /// Проверяются выход за пределы помещения, отступ линии и текста от контура и шаг яруса до параллельных размеров.
+    /// </summary>
+    private static string GetPlacementConflict(
+        RoomShape shape,
+        VirtualDimension dimension,
+        double position,
+        List<VirtualDimension> parallel,
+        PlanningOptions options) {
+        if(!shape.Contains(dimension, position)) {
+            return "размерная линия выходит за пределы помещения";
+        }
+        // Текст стоит с одной стороны линии: с этой стороны нужен отступ плюс высота текста
+        int textSign = DimensionTextHelper.GetTextSide(dimension.Direction).Dot(dimension.Perpendicular) > 0 ? 1 : -1;
+        double from = position - textSign * options.Offset;
+        double to = position + textSign * (options.Offset + options.TextAllowance);
+        // Полоса, ровно касающаяся грани контура, допустима
+        double tolerance = options.CoordinateTolerance;
+        if(!shape.ContainsBand(dimension, Math.Min(from, to) + tolerance, Math.Max(from, to) - tolerance)) {
+            return "размерная линия или ее текст ближе отступа к контуру";
+        }
+        var near = parallel.FirstOrDefault(
+            d => Math.Abs(d.LinePosition - position) < options.TierStep - options.CoordinateTolerance);
+        if(near != null) {
+            return $"размерная линия ближе шага яруса к размеру {Names(near)}";
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Размеры перекрываются вдоль своего направления.
+    /// </summary>
+    private static bool Overlaps(VirtualDimension a, VirtualDimension b, PlanningOptions options) {
+        return Math.Min(a.Max, b.Max) - Math.Max(a.Min, b.Min) > options.CoordinateTolerance;
+    }
+
+    /// <summary>
+    /// Геометрия помещения на плане для проверки, лежит ли размерная линия внутри помещения.
+    /// </summary>
+    private class RoomShape {
+        private readonly List<Point2D> _outerPolygon;
+        private readonly List<List<Point2D>> _innerPolygons;
+
+        public RoomShape(RoomContour contour) {
+            Segments = contour.Loops.SelectMany(l => l.Lines.Select(x => x.Segment)).ToList();
+            _outerPolygon = contour.Outer?.Lines.Select(l => l.Segment.Start).ToList() ?? new List<Point2D>();
+            _innerPolygons = contour.Inners.Select(l => l.Lines.Select(x => x.Segment.Start).ToList()).ToList();
+        }
+
+        public List<Segment2D> Segments { get; }
+
+        /// <summary>
+        /// Размерная линия в положении position целиком внутри помещения и не пересекает контуры.
+        /// </summary>
+        public bool Contains(VirtualDimension dimension, double position) {
+            if(_outerPolygon.Count < 3) {
+                return true;
+            }
+            // Концы размерной линии лежат на плоскостях привязки, поэтому проверяем линию чуть короче
+            double trim = Math.Min(_insideTrim, (dimension.Max - dimension.Min) / 4);
+            var start = dimension.Direction * (dimension.Min + trim) + dimension.Perpendicular * position;
+            var end = dimension.Direction * (dimension.Max - trim) + dimension.Perpendicular * position;
+            if(Segments.Any(s => SegmentsIntersect(start, end, s.Start, s.End))) {
+                return false;
+            }
+            var middle = (start + end) * 0.5;
+            return IsPointInPolygon(middle, _outerPolygon)
+                   && !_innerPolygons.Any(p => IsPointInPolygon(middle, p));
+        }
+
+        /// <summary>
+        /// Полоса между положениями from и to (по оси Perpendicular) на длине размера целиком внутри помещения:
+        /// ее не пересекает ни одна линия контура и в ней нет ни одного угла контура.
+        /// </summary>
+        public bool ContainsBand(VirtualDimension dimension, double from, double to) {
+            if(_outerPolygon.Count < 3) {
+                return true;
+            }
+            double trim = Math.Min(_insideTrim, (dimension.Max - dimension.Min) / 4);
+            double alongMin = dimension.Min + trim;
+            double alongMax = dimension.Max - trim;
+            var direction = dimension.Direction;
+            var perpendicular = dimension.Perpendicular;
+            Point2D Corner(double along, double across) => direction * along + perpendicular * across;
+            var corners = new[] {
+                Corner(alongMin, from), Corner(alongMax, from), Corner(alongMax, to), Corner(alongMin, to)
+            };
+            for(int i = 0; i < corners.Length; i++) {
+                var a = corners[i];
+                var b = corners[(i + 1) % corners.Length];
+                if(Segments.Any(s => SegmentsIntersect(a, b, s.Start, s.End))) {
+                    return false;
+                }
+            }
+            bool IsInside(Point2D point) {
+                double along = point.Dot(direction);
+                double across = point.Dot(perpendicular);
+                return along > alongMin && along < alongMax && across > from && across < to;
+            }
+            if(Segments.Any(s => IsInside(s.Start) || IsInside(s.End))) {
+                return false;
+            }
+            var middle = Corner((alongMin + alongMax) / 2, (from + to) / 2);
+            return IsPointInPolygon(middle, _outerPolygon)
+                   && !_innerPolygons.Any(p => IsPointInPolygon(middle, p));
+        }
+    }
+
+    /// <summary>
+    /// Пересекаются ли отрезки AB и CD (включая касание и наложение).
+    /// </summary>
+    private static bool SegmentsIntersect(Point2D a, Point2D b, Point2D c, Point2D d) {
+        double o1 = (b - a).Cross(c - a);
+        double o2 = (b - a).Cross(d - a);
+        double o3 = (d - c).Cross(a - c);
+        double o4 = (d - c).Cross(b - c);
+        const double eps = 1e-9;
+        if(Math.Abs(o1) < eps && Math.Abs(o2) < eps) {
+            // Отрезки на одной прямой: пересекаются, если перекрываются проекции
+            var direction = b - a;
+            double t1 = (c - a).Dot(direction);
+            double t2 = (d - a).Dot(direction);
+            double length = direction.Dot(direction);
+            return Math.Max(t1, t2) >= 0 && Math.Min(t1, t2) <= length;
+        }
+        // Концы CD по разные стороны от AB и концы AB по разные стороны от CD (касание считается пересечением)
+        return o1 * o2 <= 0 && o3 * o4 <= 0;
+    }
+
+    /// <summary>
+    /// Точка внутри многоугольника (метод луча).
+    /// </summary>
+    private static bool IsPointInPolygon(Point2D point, List<Point2D> polygon) {
+        bool inside = false;
+        for(int i = 0, j = polygon.Count - 1; i < polygon.Count; j = i++) {
+            var pi = polygon[i];
+            var pj = polygon[j];
+            if((pi.Y > point.Y) != (pj.Y > point.Y)
+               && point.X < (pj.X - pi.X) * (point.Y - pi.Y) / (pj.Y - pi.Y) + pi.X) {
+                inside = !inside;
+            }
+        }
+        return inside;
+    }
+
+    /// <summary>
     /// Крайние плоскости внешнего контура вдоль направления: линии, перпендикулярные направлению,
     /// и контурные точки. На одной координате берется самая длинная линия.
     /// </summary>
@@ -296,6 +517,7 @@ internal class ContourDimensionPlanner {
         ContourLoop outer,
         Point2D direction,
         PlanningOptions options) {
+        var perpendicular = direction.PerpendicularLeft();
         var candidates = new List<(DimensionAnchor Anchor, double Length)>();
         foreach(var element in outer.Elements) {
             if(element.Reference is null) {
@@ -304,12 +526,12 @@ internal class ContourDimensionPlanner {
             switch(element) {
                 case ContourLine line when !line.IsArc
                                            && Math.Abs(line.Segment.Direction.Dot(direction)) <= _angleTolerance:
-                    candidates.Add((new DimensionAnchor(
-                        line.Reference, line.Segment.Start.Dot(direction), outer.Index, line.Index), line.Segment.Length));
+                    candidates.Add((CreateAnchor(
+                        line, line.Segment.Start.Dot(direction), outer.Index, perpendicular), line.Segment.Length));
                     break;
                 case ContourPoint point:
-                    candidates.Add((new DimensionAnchor(
-                        point.Reference, point.Location.Dot(direction), outer.Index, point.Index), 0));
+                    candidates.Add((CreateAnchor(
+                        point, point.Location.Dot(direction), outer.Index, perpendicular), 0));
                     break;
             }
         }
@@ -349,7 +571,8 @@ internal class ContourDimensionPlanner {
         foreach(var dimension in ordered) {
             var duplicateOf = kept.Skip(outsideCount).FirstOrDefault(k => IsSameDirection(k, dimension)
                                                        && Math.Abs(k.Min - dimension.Min) <= options.CoordinateTolerance
-                                                       && Math.Abs(k.Max - dimension.Max) <= options.CoordinateTolerance);
+                                                       && Math.Abs(k.Max - dimension.Max) <= options.CoordinateTolerance
+                                                       && (options.PylonDuplicatesAcrossPylons || IsSameLoops(k, dimension)));
             if(duplicateOf != null) {
                 log.Add($"Размер {Names(dimension)} ({Mm(dimension.Max - dimension.Min)} мм) - дубль {Names(duplicateOf)}, удален");
                 continue;
@@ -360,54 +583,106 @@ internal class ContourDimensionPlanner {
     }
 
     /// <summary>
-    /// Удаляет одиночный размер, если такой же уже есть сегментом цепочки или другим одиночным размером.
-    /// Цепочки не удаляются. Из одиночных дублей остается верхний/левый.
+    /// Размеры привязаны к одним и тем же петлям: собственные размеры одного пилона,
+    /// размеры одного пилона до стены, встречные размеры между двумя пилонами.
     /// </summary>
-    private static List<VirtualDimension> RemoveDuplicateSingles(
+    private static bool IsSameLoops(VirtualDimension a, VirtualDimension b) {
+        var loopsA = a.Anchors.Select(x => x.LoopIndex).Distinct().OrderBy(x => x);
+        var loopsB = b.Anchors.Select(x => x.LoopIndex).Distinct().OrderBy(x => x);
+        return loopsA.SequenceEqual(loopsB);
+    }
+
+    /// <summary>
+    /// Удаляет размер или цепочку, если все их сегменты уже есть у другого размера того же направления
+    /// и размерные линии ближе DuplicateMaxDistance (0 - на любом расстоянии). Далеко разнесенные дубли остаются.
+    /// Правило одно для одиночных размеров и цепочек. Из дублей остается тот, у кого больше сегментов;
+    /// при равенстве - тот, у кого текст не обращен к стене (он ближе к стене, текст не зажат):
+    /// на прямых стенах это нижний/правый; если и это равно - верхний/левый.
+    /// </summary>
+    private static List<VirtualDimension> RemoveDuplicatesAfterChaining(
         List<VirtualDimension> dimensions,
         PlanningOptions options,
         List<string> log) {
-        var kept = dimensions.Where(d => d.Anchors.Count > 2).ToList();
-        foreach(var single in dimensions.Where(d => d.Anchors.Count == 2).OrderByDescending(d => d.LinePosition)) {
-            var duplicateOf = kept.FirstOrDefault(k => IsSameDirection(k, single) && ContainsSegment(k, single, options));
+        var kept = new List<VirtualDimension>();
+        var ordered = dimensions
+            .OrderByDescending(d => d.Anchors.Count)
+            .ThenBy(d => DimensionTextHelper.TextFacesContour(d.Direction, d.Side))
+            .ThenByDescending(d => d.LinePosition);
+        foreach(var dimension in ordered) {
+            var covering = kept
+                .Where(k => IsSameDirection(k, dimension) && ContainsAllSegments(k, dimension, options))
+                .ToList();
+            var duplicateOf = covering.FirstOrDefault(k => IsNearForDuplicate(k, dimension, options));
             if(duplicateOf != null) {
-                log.Add($"Размер {Names(single)} ({Mm(single.Max - single.Min)} мм) повторяет "
-                        + $"{(duplicateOf.Anchors.Count > 2 ? "сегмент цепочки" : "размер")} {Names(duplicateOf)}, удален");
+                log.Add($"Размер {Names(dimension)} ({SegmentsText(dimension)} мм) повторяет "
+                        + $"{(duplicateOf.Anchors.Count > 2 ? "сегменты цепочки" : "размер")} {Names(duplicateOf)} "
+                        + $"в {Mm(Math.Abs(duplicateOf.LinePosition - dimension.LinePosition))} мм, удален");
                 continue;
             }
-            kept.Add(single);
+            if(covering.Count > 0) {
+                var nearest = covering.OrderBy(k => Math.Abs(k.LinePosition - dimension.LinePosition)).First();
+                log.Add($"Размер {Names(dimension)} ({SegmentsText(dimension)} мм) повторяет {Names(nearest)}, "
+                        + $"но далеко ({Mm(Math.Abs(nearest.LinePosition - dimension.LinePosition))} мм "
+                        + $"> {Mm(options.DuplicateMaxDistance)} мм), оставлен");
+            }
+            kept.Add(dimension);
         }
         return kept;
     }
 
     /// <summary>
-    /// Есть ли у размера сегмент между теми же плоскостями, что и у одиночного размера.
+    /// Размерные линии достаточно близко, чтобы считать размер дублем.
     /// </summary>
-    private static bool ContainsSegment(VirtualDimension dimension, VirtualDimension single, PlanningOptions options) {
-        return dimension.Anchors
-            .Zip(dimension.Anchors.Skip(1), (a, b) => (a.Coordinate, b.Coordinate))
-            .Any(s => Math.Abs(s.Item1 - single.Min) <= options.CoordinateTolerance
-                      && Math.Abs(s.Item2 - single.Max) <= options.CoordinateTolerance);
+    private static bool IsNearForDuplicate(VirtualDimension a, VirtualDimension b, PlanningOptions options) {
+        return options.DuplicateMaxDistance <= 0
+               || Math.Abs(a.LinePosition - b.LinePosition) <= options.DuplicateMaxDistance + options.CoordinateTolerance;
     }
 
     /// <summary>
-    /// Объединяет размеры с общей плоскостью в цепочки. Цепочка ставится на линию самого дальнего
-    /// от контура размера группы. Размер, которому для этого нужен сдвиг больше MaxShift
-    /// или выноска длиннее MaxLeader, остается отдельным.
+    /// Каждый сегмент размера part есть сегментом размера whole (те же соседние плоскости привязки).
+    /// </summary>
+    private static bool ContainsAllSegments(VirtualDimension whole, VirtualDimension part, PlanningOptions options) {
+        var wholeSegments = GetSegments(whole);
+        return GetSegments(part).All(
+            p => wholeSegments.Any(w => Math.Abs(w.Min - p.Min) <= options.CoordinateTolerance
+                                        && Math.Abs(w.Max - p.Max) <= options.CoordinateTolerance));
+    }
+
+    private static List<(double Min, double Max)> GetSegments(VirtualDimension dimension) {
+        return dimension.Anchors
+            .Zip(dimension.Anchors.Skip(1), (a, b) => (a.Coordinate, b.Coordinate))
+            .ToList();
+    }
+
+    private static string SegmentsText(VirtualDimension dimension) {
+        return string.Join(" | ", dimension.ExpectedSegments.Select(Mm));
+    }
+
+    /// <summary>
+    /// Объединяет размеры с общей плоскостью в цепочки. Исходное расстояние между размерами не ограничено,
+    /// ограничена длина вспомогательных линий: на линии цепочки ни одна не длиннее MaxWitnessLine.
+    /// Линия цепочки не ближе к контуру, чем линия любого размера группы (иначе нарушится отступ и текст
+    /// прижмется к стене), то есть на линии самого дальнего размера; при этом она должна лежать внутри помещения.
     /// </summary>
     private static List<VirtualDimension> MergeIntoChains(
         List<VirtualDimension> dimensions,
+        RoomShape shape,
         PlanningOptions options,
         List<string> log) {
+        if(!options.MergeChains) {
+            log.Add("Объединение в цепочки выключено (MergeChains)");
+            return dimensions;
+        }
         var result = new List<VirtualDimension>();
         foreach(var component in GetConnectedComponents(dimensions, options)) {
-            ProcessComponent(component, options, log, result);
+            ProcessComponent(component, shape, options, log, result);
         }
         return result;
     }
 
     private static void ProcessComponent(
         List<VirtualDimension> component,
+        RoomShape shape,
         PlanningOptions options,
         List<string> log,
         List<VirtualDimension> result) {
@@ -416,23 +691,73 @@ internal class ContourDimensionPlanner {
             return;
         }
 
-        // Самый дальний от контура размер задает линию цепочки
-        var farthest = component.OrderByDescending(d => d.LinePosition * d.SideSign).First();
-        double target = farthest.LinePosition;
-        bool fits = component.All(d => Math.Abs(target - d.LinePosition) <= options.MaxShift
-                                       && Math.Abs(target - d.ContourPosition) <= options.MaxLeader);
-        if(fits) {
-            result.Add(CreateChain(component, target, options));
-            log.Add($"Цепочка из {Names(component)} на линии размера {Names(farthest)}");
+        // Кандидаты на линию цепочки - положения размеров группы, от ближайшего к стене.
+        // Сторона размеров одна, поэтому "ближе к стене" - меньше положение вдоль стороны.
+        int sideSign = component[0].SideSign;
+        var candidates = component
+            .Select(d => d.LinePosition)
+            .Distinct()
+            .OrderBy(p => p * sideSign)
+            .ToList();
+
+        double? bestPosition = null;
+        List<VirtualDimension> bestViolators = null;
+        foreach(double position in candidates) {
+            // Отступ каждого размера от своего контура должен сохраниться
+            if(component.Any(d => (position - d.LinePosition) * sideSign < -options.CoordinateTolerance)) {
+                continue;
+            }
+            var probe = CreateChain(component, position, options);
+            if(!shape.Contains(probe, position)) {
+                continue;
+            }
+            var violators = component
+                .Where(d => d.Anchors.Any(a => a.WitnessLength(position) > options.MaxWitnessLine))
+                .ToList();
+            if(bestViolators is null || violators.Count < bestViolators.Count) {
+                bestPosition = position;
+                bestViolators = violators;
+            }
+            if(violators.Count == 0) {
+                break;
+            }
+        }
+
+        if(bestPosition is null) {
+            // Линию группы задают самые дальние от стены размеры. Если на ней цепочка выходит за пределы
+            // помещения, они выводятся из группы, остальные собираются заново на более близкой линии
+            double farthest = candidates[candidates.Count - 1];
+            var farthestMembers = component
+                .Where(d => Math.Abs(d.LinePosition - farthest) <= options.CoordinateTolerance)
+                .ToList();
+            if(farthestMembers.Count == component.Count) {
+                log.Add($"Размеры {Names(component)} не объединены: на их линии цепочка выходит за пределы помещения");
+                result.AddRange(component);
+                return;
+            }
+            log.Add($"Размеры {Names(farthestMembers)} выведены из группы: на их линии цепочка группы "
+                    + "выходит за пределы помещения, остальные собираются отдельно");
+            var remaining = component.Except(farthestMembers).ToList();
+            foreach(var subComponent in GetConnectedComponents(remaining, options)
+                        .Concat(GetConnectedComponents(farthestMembers, options))) {
+                ProcessComponent(subComponent, shape, options, log, result);
+            }
+            return;
+        }
+        if(bestViolators.Count == 0) {
+            result.Add(CreateChain(component, bestPosition.Value, options));
+            log.Add($"Цепочка из {Names(component)}, самая длинная вспомогательная линия "
+                    + $"{Mm(result[result.Count - 1].MaxWitnessLength)} мм");
             return;
         }
 
-        // Дальний размер не дает остальным встать в линию: оставляем его отдельно и пробуем снова
-        log.Add($"Размер {Names(farthest)} не вошел в цепочку: превышен сдвиг или длина выноски");
-        result.Add(farthest);
-        var rest = component.Where(d => d != farthest).ToList();
-        foreach(var subComponent in GetConnectedComponents(rest, options)) {
-            ProcessComponent(subComponent, options, log, result);
+        // Размеры с длинными вспомогательными линиями выводятся из группы, остальные собираются заново
+        log.Add($"Размеры {Names(bestViolators)} выведены из группы: вспомогательные линии длиннее "
+                + $"{Mm(options.MaxWitnessLine)} мм, остальные собираются отдельно");
+        var rest = component.Except(bestViolators).ToList();
+        foreach(var subComponent in GetConnectedComponents(rest, options)
+                    .Concat(GetConnectedComponents(bestViolators, options))) {
+            ProcessComponent(subComponent, shape, options, log, result);
         }
     }
 
@@ -467,7 +792,8 @@ internal class ContourDimensionPlanner {
 
     /// <summary>
     /// Компоненты связности: размеры связаны, если у них одно направление и сторона, общая плоскость
-    /// привязки, они не перекрываются и их линии отстоят не больше чем на MaxShift.
+    /// привязки и они не перекрываются. Расстояние между линиями не ограничено - его ограничивают
+    /// вспомогательные линии при выборе положения цепочки.
     /// </summary>
     private static List<List<VirtualDimension>> GetConnectedComponents(
         List<VirtualDimension> dimensions,
@@ -501,14 +827,36 @@ internal class ContourDimensionPlanner {
         if(!IsSameDirection(a, b) || a.SideSign != b.SideSign) {
             return false;
         }
-        if(Math.Abs(a.LinePosition - b.LinePosition) > options.MaxShift) {
-            return false;
-        }
         double overlap = Math.Min(a.Max, b.Max) - Math.Max(a.Min, b.Min);
         if(overlap > options.CoordinateTolerance) {
             return false;
         }
         return a.Anchors.Any(x => b.Anchors.Any(y => Math.Abs(x.Coordinate - y.Coordinate) <= options.CoordinateTolerance));
+    }
+
+    /// <summary>
+    /// Привязка к элементу контура с его протяженностью поперек размера (для расчета вспомогательных линий).
+    /// </summary>
+    private static DimensionAnchor CreateAnchor(
+        ContourElement element,
+        double coordinate,
+        int loopIndex,
+        Point2D perpendicular) {
+        double a;
+        double b;
+        switch(element) {
+            case ContourLine line:
+                a = line.Segment.Start.Dot(perpendicular);
+                b = line.Segment.End.Dot(perpendicular);
+                break;
+            case ContourPoint point:
+                a = b = point.Location.Dot(perpendicular);
+                break;
+            default:
+                a = b = 0;
+                break;
+        }
+        return new DimensionAnchor(element.Reference, coordinate, loopIndex, element.Index, a, b);
     }
 
     private static bool IsSameDirection(VirtualDimension a, VirtualDimension b) {

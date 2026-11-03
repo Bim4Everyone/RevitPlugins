@@ -3,8 +3,7 @@
   "Layout": {
     "FirstTierOffsetPrintMm": 8,
     "TierStepPrintMm": 7,
-    "MaxShiftPrintMm": 10,
-    "MaxLeaderPrintMm": 15
+    "MaxWitnessLinePrintMm": 15
   },
   "RoomTypes": [
     {
@@ -15,7 +14,10 @@
       "MergeOffsetMm": 10,
       "MinLineLengthMm": 10,
       "EqualityToleranceMm": 0.5,
-      "OverallDimMinSegments": 4
+      "OverallDimMinSegments": 4,
+      "MergeChains": true,
+      "DuplicateMaxDistanceMm": 3000,
+      "PylonDuplicatesAcrossPylons": false
     },
     {
       "Name": "Машино-место",
@@ -25,7 +27,10 @@
       "MergeOffsetMm": 200,
       "MinLineLengthMm": 200,
       "EqualityToleranceMm": 30,
-      "OverallDimMinSegments": 4
+      "OverallDimMinSegments": 4,
+      "MergeChains": true,
+      "DuplicateMaxDistanceMm": 3000,
+      "PylonDuplicatesAcrossPylons": false
     },
     {
       "Name": "НХП",
@@ -35,7 +40,10 @@
       "MergeOffsetMm": 10,
       "MinLineLengthMm": 10,
       "EqualityToleranceMm": 0.5,
-      "OverallDimMinSegments": 4
+      "OverallDimMinSegments": 4,
+      "MergeChains": true,
+      "DuplicateMaxDistanceMm": 3000,
+      "PylonDuplicatesAcrossPylons": false
     },
     {
       "Name": "Коммерция",
@@ -45,7 +53,10 @@
       "MergeOffsetMm": 200,
       "MinLineLengthMm": 200,
       "EqualityToleranceMm": 30,
-      "OverallDimMinSegments": 4
+      "OverallDimMinSegments": 4,
+      "MergeChains": true,
+      "DuplicateMaxDistanceMm": 3000,
+      "PylonDuplicatesAcrossPylons": false
     }
   ],
   "Debug": {

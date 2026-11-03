@@ -42,14 +42,9 @@ internal class LayoutSettings {
     public double TierStepPrintMm { get; set; } = 7;
 
     /// <summary>
-    /// Максимальный сдвиг размера при объединении размеров в одну линию.
+    /// Максимальная длина вспомогательной линии при объединении размеров в цепочку.
     /// </summary>
-    public double MaxShiftPrintMm { get; set; } = 10;
-
-    /// <summary>
-    /// Максимальная длина выноски размера.
-    /// </summary>
-    public double MaxLeaderPrintMm { get; set; } = 15;
+    public double MaxWitnessLinePrintMm { get; set; } = 15;
 }
 
 /// <summary>
@@ -95,6 +90,24 @@ internal class RoomTypeSettings {
     /// Общий размер ставится, если в цепочке вдоль оси больше этого числа сегментов.
     /// </summary>
     public int OverallDimMinSegments { get; set; } = 4;
+
+    /// <summary>
+    /// Объединять размеры с общими плоскостями в цепочки.
+    /// </summary>
+    public bool MergeChains { get; set; } = true;
+
+    /// <summary>
+    /// Размер или цепочка удаляются как дубль, только если их размерная линия ближе этого расстояния
+    /// к размеру с теми же сегментами. Дальше - остаются оба. 0 - удалять на любом расстоянии.
+    /// </summary>
+    public double DuplicateMaxDistanceMm { get; set; } = 3000;
+
+    /// <summary>
+    /// Одинаковые собственные размеры разных пилонов и их размеры до стен считать дублями:
+    /// true - остается один размер на ось на все пилоны (на любом расстоянии);
+    /// false - у каждого пилона свой размер, лишние повторы удаляются по DuplicateMaxDistanceMm.
+    /// </summary>
+    public bool PylonDuplicatesAcrossPylons { get; set; }
 }
 
 /// <summary>

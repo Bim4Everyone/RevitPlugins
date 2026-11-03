@@ -20,14 +20,14 @@ internal class PlanningOptions {
     public double CoordinateTolerance { get; set; }
 
     /// <summary>
-    /// Максимальный сдвиг размерной линии при объединении в цепочку.
+    /// Объединять размеры с общими плоскостями в цепочки.
     /// </summary>
-    public double MaxShift { get; set; }
+    public bool MergeChains { get; set; } = true;
 
     /// <summary>
-    /// Максимальная длина выноски от контура до размерной линии цепочки.
+    /// Максимальная длина вспомогательной линии при объединении размеров в цепочку.
     /// </summary>
-    public double MaxLeader { get; set; }
+    public double MaxWitnessLine { get; set; }
 
     /// <summary>
     /// Шаг между ярусами размеров.
@@ -38,4 +38,15 @@ internal class PlanningOptions {
     /// Общий размер ставится, если в самой длинной цепочке вдоль оси больше этого числа сегментов.
     /// </summary>
     public int OverallMinSegments { get; set; }
+
+    /// <summary>
+    /// Дубль удаляется, только если размерные линии ближе этого расстояния. 0 - на любом расстоянии.
+    /// </summary>
+    public double DuplicateMaxDistance { get; set; }
+
+    /// <summary>
+    /// Одинаковые собственные размеры разных пилонов считать дублями (остается один на ось на все пилоны).
+    /// false - у каждого пилона свой размер, повторы между пилонами решает удаление дублей после цепочек.
+    /// </summary>
+    public bool PylonDuplicatesAcrossPylons { get; set; }
 }
