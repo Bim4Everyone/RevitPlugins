@@ -37,17 +37,31 @@ internal class RevitRepository {
             .ToList();
     }
 
-    internal List<RevitParameter> GetParamsForRead(List<ElementId> categoryIds) {
+    internal List<RevitParameter> GetParamsForRead(List<ElementId> categoryIds, List<RevitElement> revitElements) {
         return ParameterFilterUtilities
         .GetFilterableParametersInCommon(Document, categoryIds)
-        .Select(id => new RevitParameter(id, Document))
+        .Select(id => new RevitParameter(id, Document, FindSampleParameter(revitElements, id)))
         .OrderBy(rP => rP.ParamName)
         .ToList();
     }
 
+    /// <summary>
+    /// Возвращает параметры, в которые плагин умеет записывать значения:
+    /// текст, целое, да/нет и вещественные числа с единицами (число, денежная единица, длина, площадь и т.д.)
+    /// </summary>
     internal List<RevitParameter> GetParamsForWrite(List<RevitParameter> parameters) {
         return parameters
-        .Where(p => p.ParamStorageType == StorageType.String)
+        .Where(p => p.ValueKind != ParamValueKind.Unsupported)
         .ToList();
+    }
+
+    internal ParamValueParser CreateParamValueParser() {
+        return new ParamValueParser(Document, _localizationService);
+    }
+
+    private static Parameter FindSampleParameter(List<RevitElement> revitElements, ElementId paramId) {
+        return revitElements
+            .Select(revitElement => revitElement.FindParameter(paramId))
+            .FirstOrDefault(parameter => parameter is not null);
     }
 }

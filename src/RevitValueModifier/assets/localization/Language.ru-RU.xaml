@@ -26,6 +26,10 @@
     <system:String x:Key="MainWindow.ParamByIdError">Не найден выбранный для записи параметр в элементе с id:</system:String>
     <system:String x:Key="MainWindow.SettingValueError">Не удалось произвести запись в элемент с id:</system:String>
     <system:String x:Key="MainWindow.ValueUnknown">Значение неизвестно</system:String>
+    <system:String x:Key="MainWindow.ParamNotFound">У элемента нет выбранного параметра</system:String>
+    <system:String x:Key="MainWindow.ParamIsReadOnly">Параметр у элемента доступен только для чтения</system:String>
+    <system:String x:Key="MainWindow.ValueParseError">Значение не соответствует типу выбранного параметра</system:String>
+    <system:String x:Key="MainWindow.InvalidValuesCount">Значение нельзя записать у элементов: {0}. Причина во всплывающей подсказке у значения</system:String>
     
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
