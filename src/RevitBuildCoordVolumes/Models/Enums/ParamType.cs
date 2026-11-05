@@ -5,7 +5,7 @@ internal enum ParamType {
     BlockParam,
     SectionParam,
     FloorParam,
-    FloorDEParam,
+    FloorDeParam,
     ZoneParam,
     BottomZoneParam,
     TopZoneParam,

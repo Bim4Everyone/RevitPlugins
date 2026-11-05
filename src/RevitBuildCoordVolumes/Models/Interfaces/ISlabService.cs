@@ -32,14 +32,14 @@ internal interface ISlabService {
     IEnumerable<SlabElement> GetSlabsByTypesDocsAndLevels(
         IEnumerable<string> typeSlabs, IEnumerable<Document> documents, List<Level> levels);
     /// <summary>
-    /// Метод получения перекрытий.
+    /// Метод получения имен типов перекрытий.
     /// </summary>
     /// <remarks>
-    /// В данном методе производится получения плит перекрытий по документам.
+    /// В данном методе производится получения имен типов плит перекрытий по документам.
     /// </remarks>            
     /// <param name="documents">Коллекция документов.</param>         
     /// <returns>
-    /// Коллекция SlabElement.
+    /// Коллекция имен типов перекрытий.
     /// </returns>
-    IEnumerable<SlabElement> GetSlabsByDocs(IEnumerable<Document> documents);
+    IEnumerable<string> GetTypeSlabsByDocs(IEnumerable<Document> documents);
 }

@@ -9,18 +9,16 @@ using RevitBuildCoordVolumes.Models.Geometry;
 namespace RevitBuildCoordVolumes.ViewModels;
 
 internal class WarningElementViewModel : BaseViewModel {
-    private readonly SpatialObject _spatialObject;
     private ElementId _elementId;
     private string _name;
     private string _levelName;
     private string _description;
 
     public WarningElementViewModel(SpatialObject spatialObject) {
-        _spatialObject = spatialObject;
-        ElementId = _spatialObject.SpatialElement.Id;
-        Name = _spatialObject.SpatialElement.Name;
-        LevelName = _spatialObject.LevelName;
-        Description = _spatialObject.Description;
+        ElementId = spatialObject.SpatialElement.Id;
+        Name = spatialObject.SpatialElement.Name;
+        LevelName = spatialObject.LevelName;
+        Description = spatialObject.Description;
     }
 
     public ICommand ShowElementCommand { get; set; }

@@ -10,16 +10,14 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 
 namespace RevitBuildCoordVolumes.Models.Services;
 
-internal class SlabService : ISlabService {
+internal class SlabService(
+    IDocumentService documentsService,
+    ISlabGeometryService slabGeometryService,
+    SystemPluginConfig systemPluginConfig)
+    : ISlabService {
+    //private readonly Dictionary<string, IReadOnlyList<SlabElement>> _slabsByDocName = [];
     private readonly Dictionary<string, IEnumerable<SlabElement>> _slabsByDocName = [];
-    private readonly IDocumentService _documentsService;
-    private readonly SystemPluginConfig _systemPluginConfig;
-
-    public SlabService(IDocumentService documentsService, SystemPluginConfig systemPluginConfig) {
-        _documentsService = documentsService;
-        _systemPluginConfig = systemPluginConfig;
-    }
-
+    
     public IEnumerable<SlabElement> GetSlabsByTypesAndDocs(IEnumerable<string> typeSlabs, IEnumerable<Document> documents) {
         if(typeSlabs == null || !typeSlabs.Any()) {
             return [];
@@ -37,8 +35,15 @@ internal class SlabService : ISlabService {
         return slabs
             .Where(slab => levelIds.Contains(slab.Level.Id));
     }
-
-    public IEnumerable<SlabElement> GetSlabsByDocs(IEnumerable<Document> documents) {
+    
+    public IEnumerable<string> GetTypeSlabsByDocs(IEnumerable<Document> documents) {
+        return GetSlabsByDocs(documents)
+            .Select(slab => slab.Floor.Name)
+            .Distinct();
+    }
+    
+    // Метод получения перекрытий из документов
+    private IEnumerable<SlabElement> GetSlabsByDocs(IEnumerable<Document> documents) {
         var result = new List<SlabElement>();
 
         foreach(var doc in documents) {
@@ -52,52 +57,73 @@ internal class SlabService : ISlabService {
         }
         return result;
     }
+    
+    // Метод получения перекрытий из документа
+    private IList<SlabElement> LoadSlabsFromDocument(Document doc) {
+        var categories = systemPluginConfig.SlabCategories;
 
-    // Метод получения перекрытий и плит из одного документа   
-    private IEnumerable<SlabElement> LoadSlabsFromDocument(Document doc) {
-        var categoryFilters = _systemPluginConfig.SlabCategories
-            .Select(cat => (ElementFilter) new ElementCategoryFilter(cat))
+        if (categories == null || categories.Count == 0) {
+            return new List<SlabElement>();
+        }
+
+        var filters = categories
+            .Distinct()
+            .Select(ElementFilter (cat) => new ElementCategoryFilter(cat))
             .ToList();
 
-        var multiFilter = new LogicalOrFilter(categoryFilters);
+        var categoryFilter = new LogicalOrFilter(filters);
 
-        return new FilteredElementCollector(doc)
-            .WherePasses(multiFilter)
+        var floors = new FilteredElementCollector(doc)
             .WhereElementIsNotElementType()
-            .OfType<Floor>()
-            .Where(floor => !string.IsNullOrWhiteSpace(floor.Name))
-            .Select(floor => {
-                var tansform = _documentsService.GetTransformByName(doc.GetUniqId());
-                var level = GetLevel(doc, floor);
-                return new SlabElement {
-                    Floor = floor,
-                    FloorName = floor.Name,
-                    Level = level,
-                    LevelName = GetLevelName(level),
-                    Profile = GetProfile(doc, floor),
-                    Guid = Guid.NewGuid(),
-                    Transform = tansform
-                };
-            });
+            .WherePasses(categoryFilter)
+            .OfClass(typeof(Floor))
+            .Cast<Floor>();
+
+        var result = new List<SlabElement>();
+
+        foreach (var floor in floors) {
+            if (string.IsNullOrWhiteSpace(floor.Name)) {
+                continue;
+            }
+            result.Add(CreateSlabElement(doc, floor));
+        }
+
+        return result;
+    }
+    
+    // Метод создания SlabElement
+    private SlabElement CreateSlabElement(Document doc, Floor floor) {
+        var transformFromDoc = documentsService.GetTransformByName(doc.GetUniqId());
+        var geometryData = slabGeometryService.GetSlabGeometryData(floor, transformFromDoc);
+        var level = GetSlabLevel(floor);
+        string levelName = GetLevelName(level);
+        return new SlabElement {
+            Guid = Guid.NewGuid(),
+            Floor = floor,
+            FloorName = floor.Name,
+            Level = level,
+            LevelName = levelName,
+            TopContour = geometryData.TopContour,
+            BottomContour = geometryData.BottomContour,
+            MaxPointZ = geometryData.MaxPointZ,
+            MinPointZ = geometryData.MinPointZ,
+            TopFaces = geometryData.TopFaces,
+            SlabType = geometryData.SlabType,
+            CheckingSolids = geometryData.CheckingSolids
+        };
     }
 
     // Метод получения уровня, на котором расположена плита
-    private Level GetLevel(Document doc, Floor floor) {
+    private static Level GetSlabLevel(Floor floor) {
+        var doc = floor.Document;
         var elementId = floor.GetParamValueOrDefault<ElementId>(BuiltInParameter.LEVEL_PARAM);
         return doc.GetElement(elementId) as Level;
     }
 
     // Метод получения имени уровня
-    private string GetLevelName(Level level) {
+    private static string GetLevelName(Level level) {
         string levelName = level.Name;
-        string modifyLevelName = levelName.Split(['_']).FirstOrDefault();
+        string modifyLevelName = levelName.Split('_').FirstOrDefault();
         return modifyLevelName ?? string.Empty;
-    }
-
-    // Метод получения профиля плиты
-    private CurveArrArray GetProfile(Document doc, Floor floor) {
-        var profileId = floor.SketchId;
-        var sketch = doc.GetElement(profileId) as Sketch;
-        return sketch.Profile;
     }
 }

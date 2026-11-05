@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
@@ -11,65 +10,13 @@ using dosymep.Revit;
 
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Interfaces;
-using RevitBuildCoordVolumes.Models.Services;
-using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
 
-internal class RevitRepository {
-    private readonly IDocumentService _documentsService;
-    private readonly ISlabService _slabsService;
-    private readonly SystemPluginConfig _systemPluginConfig;
-
-    public RevitRepository(UIApplication uiApp, SystemPluginConfig systemPluginConfig) {
-        UIApplication = uiApp;
-        _systemPluginConfig = systemPluginConfig;
-        _documentsService = new DocumentService(Document);
-        _slabsService = new SlabService(_documentsService, _systemPluginConfig);
-    }
-
-    public UIApplication UIApplication { get; }
-    public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    public Application Application => UIApplication.Application;
-    public Document Document => ActiveUIDocument.Document;
-
-    /// <summary>
-    /// Метод получения всех документов
-    /// </summary>
-    public IEnumerable<Document> GetAllDocuments() {
-        return _documentsService.GetAllDocuments();
-    }
-
-    /// <summary>
-    /// Метод получения документа по части его имени или по имени целиком
-    /// </summary>
-    public Document FindDocumentsByName(string name) {
-        return _documentsService.GetDocumentByName(name);
-    }
-
-    /// <summary>
-    /// Получение всех типов перекрытий и фундаментных плит
-    /// </summary>
-    public IEnumerable<string> GetTypeSlabsByDocs(IEnumerable<Document> documents) {
-        return _slabsService.GetSlabsByDocs(documents)
-            .Select(slab => slab.FloorName)
-            .Distinct();
-    }
-
-    /// <summary>
-    /// Получение всех типов перекрытий и фундаментных плит по именам типов и документам
-    /// </summary>
-    public IEnumerable<SlabElement> GetSlabsByTypesAndDocs(IEnumerable<string> typeSlabs, IEnumerable<Document> documents) {
-        return _slabsService.GetSlabsByTypesAndDocs(typeSlabs, documents);
-    }
-
-    /// <summary>
-    /// Получение всех типов перекрытий и фундаментных плит по именам типов, документам и уровням
-    /// </summary>
-    public IEnumerable<SlabElement> GetSlabsByTypesDocsAndLevels(BuildCoordVolumeSettings settings) {
-        return _slabsService.GetSlabsByTypesDocsAndLevels(settings.TypeSlabs, settings.Documents, settings.Levels);
-    }
-
+internal class RevitRepository(UIApplication uiApp, ISpatialSolidService spatialSolidService) {
+    public UIApplication UiApplication { get; } = uiApp;
+    public UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
+    public Document Document => ActiveUiDocument.Document;
 
     /// <summary>
     /// Метод получения всех вариантов значений зон по заданному параметру
@@ -95,7 +42,8 @@ internal class RevitRepository {
                 return new SpatialObject {
                     SpatialElement = spatialElement,
                     LevelName = levelName,
-                    Description = description
+                    Description = description,
+                    CheckingSolid = spatialSolidService.CreateSpatialSolid(spatialElement)
                 };
             })
             .Where(spatialObject => {
@@ -120,7 +68,7 @@ internal class RevitRepository {
     /// </summary>
     public void SetSelected(ElementId elementId) {
         List<ElementId> listElements = [elementId];
-        ActiveUIDocument.SetSelectedElements(listElements);
+        ActiveUiDocument.SetSelectedElements(listElements);
     }
 
     /// <summary>
@@ -158,4 +106,3 @@ internal class RevitRepository {
         return value ?? string.Empty;
     }
 }
-

@@ -6,17 +6,15 @@ using dosymep.Bim4Everyone.Templates;
 namespace RevitBuildCoordVolumes.Models;
 
 internal class CheckProjectParams {
-    private readonly Application _application;
     private readonly Document _document;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly ProjectParameters _projectParameters;
     private readonly bool _isChecked = true;
 
     public CheckProjectParams(Application application, Document document, SystemPluginConfig systemPluginConfig) {
-        _application = application;
         _document = document;
         _systemPluginConfig = systemPluginConfig;
-        _projectParameters = ProjectParameters.Create(_application);
+        _projectParameters = ProjectParameters.Create(application);
     }
 
     /// <summary>

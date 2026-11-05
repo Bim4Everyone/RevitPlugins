@@ -4,7 +4,7 @@
 
     <system:String x:Key="MainWindow.Title">Построить объемы СМР</system:String>
     <system:String x:Key="MainWindow.CommonSettings">Общие настройки</system:String>
-    <system:String x:Key="MainWindow.SlabBasedAlgorythmSettings">Настройки алгоритма на основе перекрытий</system:String>
+    <system:String x:Key="MainWindow.SlabBasedAlgorithmSettings">Настройки алгоритма на основе перекрытий</system:String>
     <system:String x:Key="MainWindow.ButtonCheckArea">Проверить зоны</system:String>
     <system:String x:Key="MainWindow.ButtonOk">Построить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отменить</system:String>
@@ -28,26 +28,38 @@
     <system:String x:Key="SlabBasedSettingEditControl.BuilderMode">Режим работы алгоритма</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Выбор режима работы алгоритма в пределах этажа</system:String>
     
+    <system:String x:Key="SlabBasedSettingEditControl.SlabExtrudeMode">Настройки экструдера плит</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SlabExtrudeModeDescription">Режим работы экструдера контуров плит</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.SplitVolumes">Взаимное вырезание объемов</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SplitVolumesDescription">Вырезать объемы относительно друг друга</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.UnionVolumes">Финальное объединение объемов</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.UnionVolumesDescription">Объединять объемы по уровню нижней плиты</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.ToggleSwitchOnContent">Включено</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.ToggleSwitchOffContent">Выключено</system:String>
+    
     <system:String x:Key="SlabBasedSettingEditControl.SourceFiles">Файлы с плитами перекрытий</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SourceFilesDescription">Файлы, где расположены плиты перекрытий</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SearchTextDocs">Поиск по имени файла</system:String>    
 
     <system:String x:Key="SlabBasedSettingEditControl.TypeSlabs">Типоразмеры плит перекрытий</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.TypeSlabsDescription">Типоразмеры плит использующихся для определения основы</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.TypeSlabsDescription">Типоразмеры плит, использующихся для определения основы</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SearchTextSlabs">Поиск по имени типоразмера</system:String>
     
     <system:String x:Key="SlabBasedSettingEditControl.Levels">Уровни плит перекрытий</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.LevelsDescription">Уровни плит использующихся для определения основы</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.LevelsDescription">Уровни плит, использующихся для определения основы</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.CheckedAllLevels">Выбрать все уровни</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SearchTextLevels">Поиск по имени уровня</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.NotCheckedAllLevels">Сбросить выбор уровней</system:String>
 
-    <system:String x:Key="SlabBasedSettingEditControl.SquareSide">Длина стороны квадрата в мм</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.SquareSideDescription">Зона разбивается на сетку квадратов с заданной стороной</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareSide">Длина стороны ячейки в мм</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareSideDescription">Зона разбивается на сетку ячеек с заданной стороной</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SquareSideTooltip">Влияет на производительность и точность. Меньше значение - меньше производительность, но больше точность</system:String>
 
-    <system:String x:Key="SlabBasedSettingEditControl.SquareAngle">Угол поворота квадрата в градусах</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.SquareAngleDescription">Сетка квадратов поворачивается на заданный угол</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareAngle">Угол поворота сетки ячеек в градусах</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareAngleDescription">Сетка ячеек поворачивается на заданный угол</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SquareAngleTooltip">Поворот налево - положительное значение, направо - отрицательное</system:String>    
 
     <system:String x:Key="CommonSettingViewModel.SlabBasedAlgorithm">На основе перекрытий (автоматический)</system:String>
@@ -60,8 +72,8 @@
     <system:String x:Key="CommonSettingViewModel.SectionParamDetailDescription">Используется для определения секции здания</system:String>
     <system:String x:Key="CommonSettingViewModel.FloorParamDescription">Параметр этажа СМР</system:String>
     <system:String x:Key="CommonSettingViewModel.FloorParamDetailDescription">Используется для определения этажа здания</system:String>
-    <system:String x:Key="CommonSettingViewModel.FloorDEParamDescription">Дополнительный параметр этажа СМР</system:String>
-    <system:String x:Key="CommonSettingViewModel.FloorDEParamDetailDescription">Используется для определения этажа здания</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorDeParamDescription">Дополнительный параметр этажа СМР</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorDeParamDetailDescription">Используется для определения этажа здания</system:String>
     <system:String x:Key="CommonSettingViewModel.ZoneParamDescription">Параметр зоны СМР</system:String>
     <system:String x:Key="CommonSettingViewModel.ZoneParamDetailDescription">Используется для определения зоны СМР</system:String>
     <system:String x:Key="CommonSettingViewModel.BottomZoneParamDescription">Параметр низа СМР</system:String>
@@ -71,9 +83,14 @@
     <system:String x:Key="CommonSettingViewModel.VolumeParamDescription">Параметр объёма СМР</system:String>
     <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Используется для вычисления объёма</system:String>
 
-    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Общий объем</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Отдельные объемы</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Отдельные объемы сеткой квадратов</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Автоматический выбор алгоритма</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Построение объёмов экструзией контуров объединенных ячеек</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Построение объёмов экструзией ячеек между плитами</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.SlabIntersectBuilder">Построение объёмов пересечением встречных экструзий плит</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.SlabExtrudeBuilder">Построение объёмов простой экструзией контура плит</system:String>
+    
+    <system:String x:Key="SlabBasedSettingViewModel.TopSlabExtrude">Выдавливание верхней плиты вниз</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.BottomSlabExtrude">Выдавливание нижней плиты вверх</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Требуется проверить зоны</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Параметр типа зон обязателен к использованию</system:String>
@@ -112,19 +129,19 @@
 
     <system:String x:Key="WarningsViewModel.Redundant">Избыточные зоны</system:String>
     <system:String x:Key="WarningsViewModel.RedundantDescription">Зоны, находящиеся в одной окруженной области</system:String>
-    <system:String x:Key="WarningsViewModel.NotEnclosed">Не окруженные зоны / Не размещенные зоны</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Не окруженные зоны / Не размещённые зоны</system:String>
     <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Зоны, не имеющие границ или не размещенные на плане</system:String>
     <system:String x:Key="WarningsViewModel.BrokenContour">Зоны с поврежденным контуром</system:String>
     <system:String x:Key="WarningsViewModel.BrokenContourDescription">Зоны, имеющие поврежденный контур (ограничить разделителями)</system:String>
-    <system:String x:Key="WarningsViewModel.NotFilledParam">Зоны с не заполненными параметрами</system:String>
-    <system:String x:Key="WarningsViewModel.NotFilledParamDescription">Зоны с не заполненными параметрами, необходимыми для построения</system:String>
+    <system:String x:Key="WarningsViewModel.NotFilledParam">Зоны с незаполненными параметрами</system:String>
+    <system:String x:Key="WarningsViewModel.NotFilledParamDescription">Зоны с незаполненными параметрами, необходимыми для построения</system:String>
     <system:String x:Key="WarningsViewModel.WrongFilledParam">Зоны с неверно заполненными параметрами</system:String>
     <system:String x:Key="WarningsViewModel.WrongFilledParamDescription">Отметка низа находится выше или равна отметке верха</system:String>
 
-    <system:String x:Key="DivideSpatial.ProgressTitle">Деление зоны {0}%</system:String>
-    <system:String x:Key="SlabNormalize.ProgressTitle">Обработка плит {0}%</system:String>
-    <system:String x:Key="BuildContour.ProgressTitle">Генерация контуров {0}%</system:String>
+    <system:String x:Key="DivideSpatial.ProgressTitle">Обработка зоны {0}%</system:String>
+    <system:String x:Key="BuildContour.ProgressTitle">Обработка плит {0}%</system:String>
     <system:String x:Key="BuildVolumes.ProgressTitle">Генерация объемов {0}%</system:String>
     <system:String x:Key="UnionVolumes.ProgressTitle">Объединение объемов {0}%</system:String>   
+    <system:String x:Key="ProcessingVolumes.ProgressTitle">Обработка объемов {0}%</system:String>   
     
 </ResourceDictionary>

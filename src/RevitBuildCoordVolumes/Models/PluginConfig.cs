@@ -48,7 +48,7 @@ internal class SystemPluginConfig {
     // Параметр этажа СМР
     private static readonly RevitParam _floorParam = SharedParamsConfig.Instance.BuildingWorksLevel;
     // Параметр этажа СМР - денежная единица
-    private static readonly RevitParam _floorDEParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency;
+    private static readonly RevitParam _floorDeParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency;
     // Параметр зоны СМР
     private static readonly RevitParam _zoneParam = SharedParamsConfig.Instance.BuildingWorksZone;
     // Параметр низа СМР
@@ -85,10 +85,10 @@ internal class SystemPluginConfig {
             TargetParam = _floorParam
         },
         new ParamMap {
-            Type = ParamType.FloorDEParam,
+            Type = ParamType.FloorDeParam,
             TypeValue = ParamTypeValue.CurrencyParam,
-            SourceParam = _floorDEParam,
-            TargetParam = _floorDEParam
+            SourceParam = _floorDeParam,
+            TargetParam = _floorDeParam
         },
         new ParamMap {
             Type = ParamType.ZoneParam,
@@ -150,14 +150,14 @@ internal class SystemPluginConfig {
     // Строка в имени уровня, определяющая этаж
     public string DefaultStringFloor => "этаж";
 
-    // Самое распространенное имя типа зоны для записи координат
-    public string DefaultStringTypeZone => "Координаты СМР";
-
     // Наиболее оптимальная сторона фигуры для поиска плиты в миллиметрах
-    public double SquareSideMm => 100;
+    public double SquareSideMm => 200;
 
     // Угол поворота квадрата по умолчанию
     public double SquareAngleDeg => 0;
+    
+    // Длина экструзии для проверочного солида зоны в миллиметрах
+    public double ExtrusionLengthMm => 1000;
 
     // Части имен типоразмеров плит перекрытий КР
     public List<string> DefaultSlabTypeNames => [

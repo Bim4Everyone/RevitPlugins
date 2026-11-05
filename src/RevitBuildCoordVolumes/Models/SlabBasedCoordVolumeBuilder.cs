@@ -10,20 +10,15 @@ namespace RevitBuildCoordVolumes.Models;
 
 internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
     private readonly ISpatialElementDividerService _spatialElementDividerService;
-    private readonly ISlabNormalizeService _slabNormalizeService;
     private readonly IColumnFactory _columnFactory;
-    private readonly RevitRepository _revitRepository;
     private readonly BuildCoordVolumeServices _services;
     private readonly BuildCoordVolumeSettings _settings;
 
     public SlabBasedCoordVolumeBuilder(
-        RevitRepository revitRepository,
         BuildCoordVolumeServices services,
         BuildCoordVolumeSettings settings) {
-        _revitRepository = revitRepository;
         _services = services;
         _spatialElementDividerService = _services.SpatialDivider;
-        _slabNormalizeService = _services.SlabNormalizer;
         _columnFactory = _services.ColumnFactory;
         _settings = settings;
     }
@@ -33,16 +28,24 @@ internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
         var polygons = _spatialElementDividerService.DivideSpatialElement(spatialObject.SpatialElement, _settings, progressService);
 
         // Получение всех плит перекрытия из настроек
-        var allSlabs = _revitRepository.GetSlabsByTypesDocsAndLevels(_settings).ToList();
-
-        // Получение всех плит без отверстий (для плоских)
-        var normalizedSlabs = _slabNormalizeService.GetNormalizeSlabs(allSlabs, progressService);
-
+        var allSlabs = _services.SlabService.GetSlabsByTypesDocsAndLevels(
+            _settings.TypeSlabs, _settings.Documents, _settings.Levels)
+            .ToList();
+        
+        // Фильтрация плит перекрытий по зоне
+        var filteredSlabs = _services.SlabFilteredService.FilterSlabBySpatialObject(allSlabs, spatialObject);
+        
         // Построение групп колонн
-        var columnGroups = _columnFactory.GenerateColumnGroups(polygons, normalizedSlabs, progressService);
+        var columnGroups = _columnFactory.CreateColumnGroups(polygons, filteredSlabs, progressService);
 
         // Финальная сборка
-        var geomObjects = _services.GeomObjectsBuildService.GetGeomObjects(_settings, columnGroups, polygons, progressService);
+        var geomObjects = _services.GeomObjectsBuildService.CreateGeomObjects(
+            _settings, 
+            filteredSlabs,
+            columnGroups, 
+            polygons, 
+            spatialObject, 
+            progressService);
 
         return geomObjects;
     }

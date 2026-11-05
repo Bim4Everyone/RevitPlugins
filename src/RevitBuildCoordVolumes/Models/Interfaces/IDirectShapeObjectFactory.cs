@@ -6,7 +6,7 @@ namespace RevitBuildCoordVolumes.Models.Interfaces;
 
 internal interface IDirectShapeObjectFactory {
     /// <summary>
-    /// Основной метод для построение объемных элементов Revit.
+    /// Основной метод для построения объемных элементов Revit.
     /// </summary>
     /// <remarks>
     /// В данном методе производится построение объемных элементов Revit - DirectShape.
@@ -14,7 +14,7 @@ internal interface IDirectShapeObjectFactory {
     /// <param name="geomObjects">Список объемных элементов GeomObject.</param>    
     /// <param name="revitRepository">Репозиторий Revit.</param>    
     /// <returns>
-    /// Список DirectShapeObject дальнейшего присвоение параметров.
+    /// Список DirectShapeObject дальнейшего присвоения параметров.
     /// </returns>
-    List<DirectShapeObject> GetDirectShapeObjects(List<GeomObject> geomObjects, RevitRepository revitRepository);
+    List<DirectShapeObject> CreateDirectShapeObjects(List<GeomObject> geomObjects, RevitRepository revitRepository);
 }

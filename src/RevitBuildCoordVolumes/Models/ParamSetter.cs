@@ -35,7 +35,7 @@ internal class ParamSetter : IParamSetter {
             }
             if(paramMap.SourceParam != null && paramMap.TargetParam != null) {
                 if(spatialElement.IsExistsParam(paramMap.SourceParam.Name) && directShape.IsExistsParam(paramMap.TargetParam.Name)) {
-                    if(paramMap.Type == ParamType.FloorDEParam) {
+                    if(paramMap.Type == ParamType.FloorDeParam) {
                         SetFloorDEParam(spatialElement, directShapeObject, paramMap, algorithm);
                     } else if(paramMap.Type == ParamType.FloorParam) {
                         SetFloorParam(spatialElement, directShapeObject, paramMap, algorithm);

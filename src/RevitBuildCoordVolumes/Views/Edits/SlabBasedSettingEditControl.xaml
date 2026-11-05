@@ -5,10 +5,15 @@
     xmlns:edits="clr-namespace:RevitBuildCoordVolumes.Views.Edits"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:vms="clr-namespace:RevitBuildCoordVolumes.ViewModels">
 
     <UserControl.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="SlabExtrudeVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
         <Style
             TargetType="ToolTip">
             <Setter
@@ -18,16 +23,6 @@
     </UserControl.Resources>
 
     <StackPanel>
-        <edits:CustomEditControl
-            Icon="{ui:SymbolIcon brainCircuit24}"
-            Header="{me:LocalizationSource SlabBasedSettingEditControl.BuilderMode}"
-            Description="{me:LocalizationSource SlabBasedSettingEditControl.BuilderModeDescription}">
-            <ComboBox
-                ItemsSource="{Binding BuilderModes}"
-                SelectedValue="{Binding SelectedBuilderMode}"
-                DisplayMemberPath="Name" />
-        </edits:CustomEditControl>
-        
         <edits:CustomGroupEditControl
             Icon="{ui:SymbolIcon scanText24}"
             Header="{me:LocalizationSource SlabBasedSettingEditControl.SourceFiles}"
@@ -183,6 +178,52 @@
                 </StackPanel>
             </edits:CustomGroupEditControl.EditControl>
         </edits:CustomGroupEditControl>
+        
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon brainCircuit24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.BuilderMode}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.BuilderModeDescription}">
+            <ComboBox
+                ItemsSource="{Binding BuilderModes}"
+                SelectedValue="{Binding SelectedBuilderMode}"
+                DisplayMemberPath="Name" />
+        </edits:CustomEditControl>
+        
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon alignStretchVertical20}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.SlabExtrudeMode}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.SlabExtrudeModeDescription}"
+            Visibility="{Binding IsSlabExtrudeMode, Converter={StaticResource SlabExtrudeVisible}}">
+            <ComboBox
+                ItemsSource="{Binding SlabExtrudeModes}"
+                SelectedValue="{Binding SelectedSlabExtrudeMode}"
+                DisplayMemberPath="Name" />
+        </edits:CustomEditControl>
+        
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon arrowMinimizeVertical24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.SplitVolumes}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.SplitVolumesDescription}"
+            Visibility="{Binding IsSlabIntersectMode, Converter={StaticResource SlabExtrudeVisible}}">
+            <ui:ToggleSwitch
+                Margin="10,0,10,0"
+                OnContent="{me:LocalizationSource SlabBasedSettingEditControl.ToggleSwitchOnContent}"
+                OffContent="{me:LocalizationSource SlabBasedSettingEditControl.ToggleSwitchOffContent}"
+                IsChecked="{Binding SplitVolumes, Mode=TwoWay}"/>
+        </edits:CustomEditControl>
+        
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon shapeUnion24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.UnionVolumes}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.UnionVolumesDescription}">
+            <ui:ToggleSwitch
+                Margin="10,0,10,0"
+                OnContent="{me:LocalizationSource SlabBasedSettingEditControl.ToggleSwitchOnContent}"
+                OffContent="{me:LocalizationSource SlabBasedSettingEditControl.ToggleSwitchOffContent}"
+                IsChecked="{Binding UnionVolumes, Mode=TwoWay}"/>
+        </edits:CustomEditControl>
+        
+        
         
         <edits:CustomEditControl
             Icon="{ui:SymbolIcon fullScreenMaximize24}"
