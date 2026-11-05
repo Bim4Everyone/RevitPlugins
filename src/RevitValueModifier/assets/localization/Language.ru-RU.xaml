@@ -4,6 +4,7 @@
     
     <system:String x:Key="MainWindow.Title">Изменить значение</system:String>
     <system:String x:Key="MainWindow.ParamValueMask">Введите маску</system:String>
+    <system:String x:Key="MainWindow.NoElementsSelected">Не выбрано ни одного элемента. Закройте окно, выберите элементы в модели и запустите плагин снова</system:String>
     <system:String x:Key="MainWindow.ParamValueMaskEmpty">Маска значения пуста</system:String>
     
     <system:String x:Key="MainWindow.SelectParamToRecord">Выберите параметр для записи</system:String>

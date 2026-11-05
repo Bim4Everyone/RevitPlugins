@@ -4,6 +4,7 @@
 
     <system:String x:Key="MainWindow.Title">Change value</system:String>
     <system:String x:Key="MainWindow.ParamValueMask">Enter mask</system:String>
+    <system:String x:Key="MainWindow.NoElementsSelected">No elements are selected. Close the window, select elements in the model and run the plugin again</system:String>
     <system:String x:Key="MainWindow.ParamValueMaskEmpty">Value mask is empty</system:String>
 
     <system:String x:Key="MainWindow.SelectParamToRecord">Select an option to record</system:String>

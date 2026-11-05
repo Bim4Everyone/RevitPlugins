@@ -156,6 +156,12 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanAcceptView() {
+        // Без выбранных элементов списки параметров пусты и записывать некуда
+        if(RevitElementVMs is null || RevitElementVMs.Count == 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.NoElementsSelected");
+            return false;
+        }
+
         if(string.IsNullOrEmpty(ParamValueMask)
             || ParamValueMask == _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask")) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ParamValueMaskEmpty");
@@ -167,7 +173,7 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        int invalidValuesCount = RevitElementVMs?.Count(revitElement => !revitElement.IsParamValueValid) ?? 0;
+        int invalidValuesCount = RevitElementVMs.Count(revitElement => !revitElement.IsParamValueValid);
         if(invalidValuesCount > 0) {
             ErrorText = string.Format(
                 _localizationService.GetLocalizedString("MainWindow.InvalidValuesCount"),
