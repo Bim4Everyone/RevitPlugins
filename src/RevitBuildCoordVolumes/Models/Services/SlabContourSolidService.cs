@@ -163,7 +163,7 @@ internal class SlabContourSolidService : ISlabContourSolidService {
             var topSlab = sortedSlabs[i];
             var bottomSlab  = sortedSlabs[i + 1];
 
-            var solid = SolidUtility.ExtrudeSolid(topSlab.TopContour, topSlab.MinPointZ, bottomSlab.MinPointZ, false);
+            var solid = SolidUtility.ExtrudeSolid(topSlab.TopContour, bottomSlab.MinPointZ, topSlab.MinPointZ, false);
 
             if(solid is null) {
                 continue;

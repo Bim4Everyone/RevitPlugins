@@ -11,7 +11,6 @@ internal class BuildCoordVolumesProcessor {
     private readonly BuildCoordVolumeSettings _settings;
     private readonly BuildCoordVolumeServices _services;
     private readonly ICoordVolumeBuilder _builder;
-    private readonly BuilderFactory _builderFactory;
 
     public BuildCoordVolumesProcessor(
         RevitRepository revitRepository,
@@ -20,8 +19,8 @@ internal class BuildCoordVolumesProcessor {
         _revitRepository = revitRepository;
         _settings = settings;
         _services = services;
-        _builderFactory = new BuilderFactory(_revitRepository, _settings, _services);
-        _builder = _builderFactory.Create(_settings.AlgorithmType);
+        var builderFactory = new BuilderFactory(_settings, _services);
+        _builder = builderFactory.Create(_settings.AlgorithmType);
     }
     /// <summary>
     /// Основной метод построения и обработки объемных элементов.

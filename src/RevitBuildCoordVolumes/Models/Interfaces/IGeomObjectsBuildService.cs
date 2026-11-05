@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 
 using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
+
 internal interface IGeomObjectsBuildService {
     /// <summary>
     /// Метод генерации GeomObject в зависимости от настроек пользователя.

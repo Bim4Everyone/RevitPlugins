@@ -84,7 +84,7 @@
                 <GroupBox
                     Margin="0,0,0,10"
                     BorderThickness="0"
-                    Header="{me:LocalizationSource MainWindow.SlabBasedAlgorythmSettings}"
+                    Header="{me:LocalizationSource MainWindow.SlabBasedAlgorithmSettings}"
                     FontWeight="DemiBold"
                     Visibility="{Binding IsSlabBasedAlgorithm, Converter={StaticResource SlabSettingsVisible}}">
                     <edits:SlabBasedSettingEditControl

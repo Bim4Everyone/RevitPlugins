@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 

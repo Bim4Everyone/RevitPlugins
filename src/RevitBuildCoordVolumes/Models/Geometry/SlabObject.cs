@@ -1,5 +1,3 @@
-using System;
-
 namespace RevitBuildCoordVolumes.Models.Geometry;
 
 internal class SlabObject {

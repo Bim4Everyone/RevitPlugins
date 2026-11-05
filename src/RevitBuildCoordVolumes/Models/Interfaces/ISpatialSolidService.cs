@@ -1,7 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 
-using RevitBuildCoordVolumes.Models.Geometry;
-
 namespace RevitBuildCoordVolumes.Models.Interfaces;
 
 internal interface ISpatialSolidService {

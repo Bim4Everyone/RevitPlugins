@@ -6,6 +6,7 @@ using RevitBuildCoordVolumes.Models.Interfaces;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models.Services;
+
 internal class GeomObjectsBuildService : IGeomObjectsBuildService {
     private readonly IGeomObjectFactory _geomObjectFactory;
     private readonly IGeomObjectConnector _geomObjectConnector;

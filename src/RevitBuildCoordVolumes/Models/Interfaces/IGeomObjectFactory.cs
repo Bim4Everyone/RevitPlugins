@@ -5,6 +5,7 @@ using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
+
 internal interface IGeomObjectFactory {
     /// <summary>
     /// Метод получения списка геометрических объектов по списку колонн.

@@ -4,6 +4,7 @@ using RevitBuildCoordVolumes.Models.Geometry;
 using RevitBuildCoordVolumes.Models.Services;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
+
 internal interface IGeomObjectConnector {
     /// <summary>
     /// Метод объединения объектов GeomObject.
