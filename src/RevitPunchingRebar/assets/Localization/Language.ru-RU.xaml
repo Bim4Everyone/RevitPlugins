@@ -2,12 +2,44 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на русский язык (google translate) -->
-
-    <system:String x:Key="MainWindow.Title">Пример команды</system:String>
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
-
+    <system:String x:Key="MainWindow.Title">Поперечное армирование</system:String>
+    <system:String x:Key="MainWindow.GeneralSettings">Общие настройки</system:String>
+    <system:String x:Key="MainWindow.PylonsFromModel">Пилоны из модели</system:String>
+    <system:String x:Key="MainWindow.PylonsFromLink">Пилоны из связи</system:String>
+    <system:String x:Key="MainWindow.SelectedPylons">Пилонов выбрано:</system:String>
+    <system:String x:Key="MainWindow.FromModel">из модели:</system:String>
+    <system:String x:Key="MainWindow.FromLink">из связи:</system:String>
+    <system:String x:Key="MainWindow.Slab">Плита</system:String>
+    <system:String x:Key="MainWindow.SlabSelected">Плита выбрана:</system:String>
+    <system:String x:Key="MainWindow.Yes">Да</system:String>
+    <system:String x:Key="MainWindow.No">Нет</system:String>
+    <system:String x:Key="MainWindow.ButtonSelect">Выбрать</system:String>
+    <system:String x:Key="MainWindow.SlabRebar">Арматура плиты</system:String>
+    <system:String x:Key="MainWindow.RebarDiameter">Диаметр стержней, мм</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromSlab">Использовать защ. слой из плиты</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromUser">Ввести защ. слой вручную</system:String>
+    <system:String x:Key="MainWindow.RebarCoverTop">Защ. слой сверху, мм</system:String>
+    <system:String x:Key="MainWindow.RebarCoverBottom">Защ. слой снизу, мм</system:String>
+    <system:String x:Key="MainWindow.FrameRebar">Арматура каркасов</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Имя семейства</system:String>
+    <system:String x:Key="MainWindow.FamilyType">Имя типа</system:String>
+    <system:String x:Key="MainWindow.RebarClass">Класс стержней</system:String>
+    <system:String x:Key="MainWindow.StirrupStep">Шаг хомутов, мм</system:String>
+    <system:String x:Key="MainWindow.FrameWidth">Ширина каркаса, мм</system:String>
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String x:Key="MainWindow.ErrorSelectPylons">Выберите пилоны</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectSlab">Выберите плиту</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverTop">Введите корректный верхний защитный слой</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverBottom">Введите корректный нижний защитный слой</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamily">Выберите семейство арматурных каркасов</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamilyType">Выберите тип арматурных каркасов</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectRebarClass">Выберите класс арматурных стержней</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupStep">Введите корректный шаг хомутов</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameWidth">Введите корректную ширину каркаса</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Расстановка каркасов</system:String>
+
+    <system:String x:Key="RevitUI.PickSlab">Выберите плиту</system:String>
+    <system:String x:Key="RevitUI.PickPylons">Выберите пилоны</system:String>
 </ResourceDictionary>

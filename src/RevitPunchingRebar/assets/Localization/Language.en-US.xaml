@@ -2,12 +2,44 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Пример перевода на английский американский язык (google translate) -->
-
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
-
+    <system:String x:Key="MainWindow.Title">Punching shear reinforcement</system:String>
+    <system:String x:Key="MainWindow.GeneralSettings">General settings</system:String>
+    <system:String x:Key="MainWindow.PylonsFromModel">Pylons from model</system:String>
+    <system:String x:Key="MainWindow.PylonsFromLink">Pylons from link</system:String>
+    <system:String x:Key="MainWindow.SelectedPylons">Pylons selected:</system:String>
+    <system:String x:Key="MainWindow.FromModel">from model:</system:String>
+    <system:String x:Key="MainWindow.FromLink">from link:</system:String>
+    <system:String x:Key="MainWindow.Slab">Slab</system:String>
+    <system:String x:Key="MainWindow.SlabSelected">Slab selected:</system:String>
+    <system:String x:Key="MainWindow.Yes">Yes</system:String>
+    <system:String x:Key="MainWindow.No">No</system:String>
+    <system:String x:Key="MainWindow.ButtonSelect">Select</system:String>
+    <system:String x:Key="MainWindow.SlabRebar">Slab reinforcement</system:String>
+    <system:String x:Key="MainWindow.RebarDiameter">Bar diameter, mm</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromSlab">Use slab rebar cover</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromUser">Enter rebar cover manually</system:String>
+    <system:String x:Key="MainWindow.RebarCoverTop">Top cover, mm</system:String>
+    <system:String x:Key="MainWindow.RebarCoverBottom">Bottom cover, mm</system:String>
+    <system:String x:Key="MainWindow.FrameRebar">Frame reinforcement</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Family name</system:String>
+    <system:String x:Key="MainWindow.FamilyType">Type name</system:String>
+    <system:String x:Key="MainWindow.RebarClass">Bar grade</system:String>
+    <system:String x:Key="MainWindow.StirrupStep">Stirrup spacing, mm</system:String>
+    <system:String x:Key="MainWindow.FrameWidth">Frame width, mm</system:String>
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="MainWindow.ErrorSelectPylons">Select pylons</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectSlab">Select a slab</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverTop">Enter a valid top rebar cover</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverBottom">Enter a valid bottom rebar cover</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamily">Select the reinforcement frame family</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamilyType">Select the reinforcement frame type</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectRebarClass">Select the bar grade</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupStep">Enter a valid stirrup spacing</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameWidth">Enter a valid frame width</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Placing reinforcement frames</system:String>
+
+    <system:String x:Key="RevitUI.PickSlab">Select a slab</system:String>
+    <system:String x:Key="RevitUI.PickPylons">Select pylons</system:String>
 </ResourceDictionary>

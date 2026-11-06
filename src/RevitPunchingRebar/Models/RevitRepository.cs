@@ -6,6 +6,8 @@ using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.SimpleServices;
+
 using RevitPunchingRebar.Models.Interfaces;
 using RevitPunchingRebar.Models.SelectionFilters;
 
@@ -20,12 +22,16 @@ namespace RevitPunchingRebar.Models;
 /// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
 /// </remarks>
 internal class RevitRepository {
+    private readonly ILocalizationService _localizationService;
+
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
     /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
-    public RevitRepository(UIApplication uiApplication) {
+    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
+    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
         UIApplication = uiApplication;
+        _localizationService = localizationService;
     }
 
     /// <summary>
@@ -54,7 +60,7 @@ internal class RevitRepository {
     /// <returns>Id выбранной плиты.</returns>
     public ElementId PickSlab() {
         Reference reference = ActiveUIDocument.Selection.PickObject(
-            ObjectType.Element, new SlabFilter(), "Выберите плиту");
+            ObjectType.Element, new SlabFilter(), _localizationService.GetLocalizedString("RevitUI.PickSlab"));
 
         return reference.ElementId;
     }
@@ -65,7 +71,9 @@ internal class RevitRepository {
     /// <returns>Id выбранных пилонов.</returns>
     public List<ElementId> PickPylonsFromModel() {
         IList<Reference> references = ActiveUIDocument.Selection.PickObjects(
-            ObjectType.Element, new PylonFromModelFilter(), "Выберите пилоны");
+            ObjectType.Element,
+            new PylonFromModelFilter(),
+            _localizationService.GetLocalizedString("RevitUI.PickPylons"));
 
         return references
             .Select(reference => reference.ElementId)
@@ -78,7 +86,9 @@ internal class RevitRepository {
     /// <returns>Ссылки на выбранные пилоны с указанием экземпляра связи.</returns>
     public List<LinkedPylonReference> PickPylonsFromLink() {
         IList<Reference> references = ActiveUIDocument.Selection.PickObjects(
-            ObjectType.LinkedElement, new PylonFromLinkFilter(Document), "Выберите пилоны");
+            ObjectType.LinkedElement,
+            new PylonFromLinkFilter(Document),
+            _localizationService.GetLocalizedString("RevitUI.PickPylons"));
 
         return references
             .Select(reference => new LinkedPylonReference(reference.ElementId, reference.LinkedElementId))

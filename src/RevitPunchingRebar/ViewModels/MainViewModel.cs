@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -21,6 +22,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly IPunchingRebarPlacementService _placementService;
+    private readonly ILocalizationService _localizationService;
 
     private List<ElementId> _pylonsFromModel = [];
     private List<LinkedPylonReference> _pylonsFromLink = [];
@@ -54,13 +56,16 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="pluginConfig">Настройки плагина.</param>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
     /// <param name="placementService">Сервис расстановки каркасов.</param>
+    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository,
-        IPunchingRebarPlacementService placementService) {
+        IPunchingRebarPlacementService placementService,
+        ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
         _placementService = placementService;
+        _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
@@ -285,12 +290,12 @@ internal class MainViewModel : BaseViewModel {
     /// </remarks>
     private bool CanAcceptView() {
         if(SelectedPylonsCount == 0) {
-            ErrorText = "Выберите пилоны";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectPylons");
             return false;
         }
 
         if(_slab == null) {
-            ErrorText = "Выберите плиту";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectSlab");
             return false;
         }
 
@@ -298,37 +303,37 @@ internal class MainViewModel : BaseViewModel {
         double rebarCoverBottom = UnitUtilsHelper.FromMm(RebarCoverBottom);
 
         if(rebarCoverTop <= 0 || rebarCoverTop > _slab.Thickness * 0.5) {
-            ErrorText = "Введите корректный верхний защитный слой";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorRebarCoverTop");
             return false;
         }
 
         if(rebarCoverBottom <= 0 || rebarCoverBottom > _slab.Thickness * 0.5) {
-            ErrorText = "Введите корректный нижний защитный слой";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorRebarCoverBottom");
             return false;
         }
 
         if(string.IsNullOrEmpty(SelectedFamilyName)) {
-            ErrorText = "Выберите семейство арматурных каркасов";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectFamily");
             return false;
         }
 
         if(string.IsNullOrEmpty(SelectedFamilyType)) {
-            ErrorText = "Выберите тип арматурных каркасов";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectFamilyType");
             return false;
         }
 
         if(string.IsNullOrEmpty(SelectedRebarClass)) {
-            ErrorText = "Выберите класс арматурных стержней";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectRebarClass");
             return false;
         }
 
         if(StirrupStep <= 0) {
-            ErrorText = "Введите корректный шаг хомутов";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorStirrupStep");
             return false;
         }
 
         if(FrameWidth <= 0) {
-            ErrorText = "Введите корректную ширину каркаса";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorFrameWidth");
             return false;
         }
 
@@ -402,7 +407,8 @@ internal class MainViewModel : BaseViewModel {
     /// Расставляет каркасы у выбранных пилонов по сохраненным настройкам.
     /// </summary>
     private void PlaceFrames(RevitSettings settings) {
-        using Transaction transaction = _revitRepository.Document.StartTransaction("Расстановка каркасов");
+        string transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
+        using Transaction transaction = _revitRepository.Document.StartTransaction(transactionName);
 
         List<IPylon> pylons = _revitRepository.GetPylons(_pylonsFromModel, _pylonsFromLink);
 

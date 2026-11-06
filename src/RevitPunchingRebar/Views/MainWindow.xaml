@@ -14,7 +14,7 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
    
     mc:Ignorable="d"
-    Title="Расстановка каркасов"
+    Title="{me:LocalizationSource MainWindow.Title}"
     
     Height="600"
     Width="700"
@@ -62,7 +62,7 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Title="Расстановка каркасов"/>
+            Title="{me:LocalizationSource MainWindow.Title}"/>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -76,7 +76,7 @@
                 
                 <ui:TextBlock
                     Style="{StaticResource groupName}"
-                    Text="Общие настройки"/>
+                    Text="{me:LocalizationSource MainWindow.GeneralSettings}"/>
 
                 <Border Style="{StaticResource uiBorder}">
                     <Grid>
@@ -97,38 +97,38 @@
                             Grid.Column="0"
                             Grid.Row="0"
                             Style="{StaticResource itemName}"
-                            Text="Пилоны из модели"/>
+                            Text="{me:LocalizationSource MainWindow.PylonsFromModel}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="1"
                             Style="{StaticResource itemName}"
-                            Text="Пилоны из связи"/>
+                            Text="{me:LocalizationSource MainWindow.PylonsFromLink}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="2"
                             Style="{StaticResource itemName}"
-                            Text="Пилонов выбрано:"/>
+                            Text="{me:LocalizationSource MainWindow.SelectedPylons}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="3"
                             Style="{StaticResource itemName}"
-                            Text="Плита"/>
+                            Text="{me:LocalizationSource MainWindow.Slab}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="4"
                             Style="{StaticResource itemName}"
-                            Text="Плита выбрана:"/>
+                            Text="{me:LocalizationSource MainWindow.SlabSelected}"/>
 
 
 
                         <ui:Button
                             Grid.Column="1"
                             Grid.Row="0"
-                            Content="Выбрать"
+                            Content="{me:LocalizationSource MainWindow.ButtonSelect}"
                             Width="150"
                             Height="30"
                             Command="{Binding SelectPylonsFromModelCommand}"
@@ -137,7 +137,7 @@
                         <ui:Button
                             Grid.Column="1"
                             Grid.Row="1"
-                            Content="Выбрать"
+                            Content="{me:LocalizationSource MainWindow.ButtonSelect}"
                             Width="150"
                             Height="30"
                             Command="{Binding SelectPylonsFromLinkCommand}"
@@ -146,19 +146,13 @@
                         <TextBlock
                             Grid.Column="1"
                             Grid.Row="2">
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="{}{0} (из модели: {1}, из связи: {2})">
-                                    <Binding Path="SelectedPylonsCount" />
-                                    <Binding Path="PylonsFromModelCount" />
-                                    <Binding Path="PylonsFromLinkCount" />
-                                </MultiBinding>
-                            </TextBlock.Text>
+                            <Run Text="{Binding SelectedPylonsCount, Mode=OneWay}" /> (<Run Text="{DynamicResource MainWindow.FromModel}" /> <Run Text="{Binding PylonsFromModelCount, Mode=OneWay}" />, <Run Text="{DynamicResource MainWindow.FromLink}" /> <Run Text="{Binding PylonsFromLinkCount, Mode=OneWay}" />)
                         </TextBlock>
 
                         <ui:Button
                             Grid.Column="1"
                             Grid.Row="3"
-                            Content="Выбрать"
+                            Content="{me:LocalizationSource MainWindow.ButtonSelect}"
                             Width="150"
                             Height="30"
                             Command="{Binding SelectSlabCommand}"
@@ -169,10 +163,10 @@
                             Grid.Row="4">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
-                                    <Setter Property="Text" Value="Нет" />
+                                    <Setter Property="Text" Value="{DynamicResource MainWindow.No}" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsSlabSelected}" Value="True">
-                                            <Setter Property="Text" Value="Да" />
+                                            <Setter Property="Text" Value="{DynamicResource MainWindow.Yes}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -183,7 +177,7 @@
 
                 <ui:TextBlock
                     Style="{StaticResource groupName}"
-                    Text="Арматура плиты"/>
+                    Text="{me:LocalizationSource MainWindow.SlabRebar}"/>
 
                 <Border Style="{StaticResource uiBorder}">
                     <Grid>
@@ -204,13 +198,13 @@
                             Grid.Column="0"
                             Grid.Row="0"
                             Style="{StaticResource itemName}"
-                            Text="Диаметр стержней, мм"/>
+                            Text="{me:LocalizationSource MainWindow.RebarDiameter}"/>
 
                         <RadioButton
                             Grid.Column="0"
                             Grid.Row="1"
                             Grid.ColumnSpan="2"
-                            Content="Использовать защ. слой из плиты"
+                            Content="{me:LocalizationSource MainWindow.RebarCoverFromSlab}"
                             GroupName="1"
                             IsChecked="{Binding IsRebarCoverFromSlab}"/>
 
@@ -218,7 +212,7 @@
                             Grid.Column="0"
                             Grid.Row="2"
                             Grid.ColumnSpan="2"
-                            Content="Ввести защ. слой вручную"
+                            Content="{me:LocalizationSource MainWindow.RebarCoverFromUser}"
                             GroupName="1"
                             IsChecked="{Binding IsRebarCoverFromUser}"/>
 
@@ -226,14 +220,14 @@
                             Grid.Column="0"
                             Grid.Row="3"
                             Style="{StaticResource itemName}"
-                            Text="Защ. слой сверху, мм"
+                            Text="{me:LocalizationSource MainWindow.RebarCoverTop}"
                             IsEnabled="{Binding IsRebarCoverFromUser}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="4"
                             Style="{StaticResource itemName}"
-                            Text="Защ. слой снизу, мм"
+                            Text="{me:LocalizationSource MainWindow.RebarCoverBottom}"
                             IsEnabled="{Binding IsRebarCoverFromUser}"/>
 
 
@@ -270,7 +264,7 @@
                 
                 <ui:TextBlock
                     Style="{StaticResource groupName}"
-                    Text="Арматура каркасов"/>
+                    Text="{me:LocalizationSource MainWindow.FrameRebar}"/>
 
                 <Border Style="{StaticResource uiBorder}">
                     <Grid>
@@ -292,37 +286,37 @@
                             Grid.Column="0"
                             Grid.Row="0"
                             Style="{StaticResource itemName}"
-                            Text="Имя семейства"/>
+                            Text="{me:LocalizationSource MainWindow.FamilyName}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="1"
                             Style="{StaticResource itemName}"
-                            Text="Имя типа"/>
+                            Text="{me:LocalizationSource MainWindow.FamilyType}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="2"
                             Style="{StaticResource itemName}"
-                            Text="Диаметр стержней, мм"/>
+                            Text="{me:LocalizationSource MainWindow.RebarDiameter}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="3"
                             Style="{StaticResource itemName}"
-                            Text="Класс стержней"/>
+                            Text="{me:LocalizationSource MainWindow.RebarClass}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="4"
                             Style="{StaticResource itemName}"
-                            Text="Шаг хомутов, мм"/>
+                            Text="{me:LocalizationSource MainWindow.StirrupStep}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="5"
                             Style="{StaticResource itemName}"
-                            Text="Ширина каркаса, мм"/>
+                            Text="{me:LocalizationSource MainWindow.FrameWidth}"/>
 
 
 
