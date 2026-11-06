@@ -117,7 +117,10 @@ internal class RevitRepository {
             RevitLinkInstance linkInstance = (RevitLinkInstance) Document.GetElement(linkedPylon.LinkInstanceId);
             Document linkedDoc = linkInstance.GetLinkDocument();
 
-            pylons.Add(new StructColumnPylon(linkedDoc.GetElement(linkedPylon.PylonId)));
+            // Координаты пилона переводятся из связи в текущий проект с учетом размещения экземпляра связи
+            pylons.Add(new StructColumnPylon(
+                linkedDoc.GetElement(linkedPylon.PylonId),
+                linkInstance.GetTotalTransform()));
         }
 
         return pylons;
@@ -169,10 +172,14 @@ internal class RevitRepository {
         return frame;
     }
 
+    /// <summary>
+    /// Возвращает имена семейств категории «Несущая арматура», к которой относятся семейства каркасов.
+    /// </summary>
     public IList<string> GetFamilyNames() {
         IList<string> familyNames = new FilteredElementCollector(Document)
         .OfClass(typeof(Family))
         .Cast<Family>()
+        .Where(f => f.FamilyCategory?.GetBuiltInCategory() == BuiltInCategory.OST_Rebar)
         .Select(f => f.Name)
         .OrderBy(n => n)
         .ToList();

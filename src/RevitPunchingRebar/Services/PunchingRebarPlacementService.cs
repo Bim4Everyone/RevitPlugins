@@ -23,6 +23,9 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     // Расстояние до вспомогательных точек при построении плоскости отражения
     private const double _planePointOffset = 10;
 
+    // Допуск при сравнении углов, радианы
+    private const double _angleTolerance = 1e-6;
+
     private readonly RevitRepository _revitRepository;
 
     /// <summary>
@@ -65,7 +68,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         //Делаем геометрические преобразования
         MoveFrameDown(frame1, frameParams);
-        RotateFrame(frame1, pylon.FacingOrientation.AngleTo(frame1.FrameInstance.FacingOrientation));
+        RotateFrame(frame1, GetAlignAngle(frame1.FrameInstance.FacingOrientation, pylon.FacingOrientation));
         MoveFrameCrossColumn(pylon, frame1, frameParams);
         MoveFrameAlongColumn(pylon, frame1, frameParams);
         CopyFrame(pylon, frame1, frameParams, -pylon.FacingOrientation);
@@ -78,7 +81,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         Frame frame2 = _revitRepository.CreateFrame(frameSymbol, frameParams, location);
 
         MoveFrameDown(frame2, frameParams);
-        RotateFrame(frame2, pylon.FacingOrientation.AngleTo(frame2.FrameInstance.FacingOrientation) + Math.PI / 2);
+        RotateFrame(frame2, GetAlignAngle(frame2.FrameInstance.FacingOrientation, pylon.FacingOrientation) + Math.PI / 2);
         MoveFrameCrossColumn(pylon, frame2, frameParams);
         MoveFrameAlongColumn(pylon, frame2, frameParams);
 
@@ -120,6 +123,27 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     /// </summary>
     private double GetStirrupBendFactor(RebarClass rebarClass) {
         return rebarClass == RebarClass.A240 ? _stirrupBendFactorA240 : _stirrupBendFactorA500C;
+    }
+
+    /// <summary>
+    /// Возвращает угол поворота против часовой стрелки вокруг вертикальной оси, после которого
+    /// направление каркаса станет параллельно направлению пилона (совпадет с ним или будет противоположно).
+    /// </summary>
+    /// <remarks>
+    /// Угол со знаком берется через AngleOnPlaneTo: AngleTo не учитывает направление поворота,
+    /// и при части ориентаций пилона каркас поворачивался не туда.
+    /// Результат лежит в диапазоне [0, π]: для пилонов, которые раньше обрабатывались верно,
+    /// ориентация каркаса остается прежней.
+    /// </remarks>
+    private double GetAlignAngle(XYZ frameDirection, XYZ pylonDirection) {
+        double angle = frameDirection.AngleOnPlaneTo(pylonDirection, XYZ.BasisZ);
+
+        // Направления почти совпадают: угол чуть меньше 2π из-за погрешности вычислений
+        if(angle > 2 * Math.PI - _angleTolerance) {
+            return angle - 2 * Math.PI;
+        }
+
+        return angle <= Math.PI + _angleTolerance ? angle : angle - Math.PI;
     }
 
     /// <summary>
