@@ -16,6 +16,7 @@ internal class RevitElement {
     private readonly ILocalizationService _localizationService;
     private readonly List<Parameter> _instanceParameters;
     private readonly List<Parameter> _typeParameters = [];
+    private readonly Element _elemType;
 
     // Значение, подготовленное для записи: string, int или double (во внутренних единицах Revit)
     private object _valueToWrite;
@@ -31,9 +32,9 @@ internal class RevitElement {
         // Поэтому в случае, если типа у элемента нет, то параметры у него не запрашиваем
         var elemTypeId = element.GetTypeId();
         if(elemTypeId != ElementId.InvalidElementId) {
-            var elemType = element.Document.GetElement(elemTypeId);
-            if(elemType is not null) {
-                _typeParameters.AddRange(elemType.Parameters.Cast<Parameter>());
+            _elemType = element.Document.GetElement(elemTypeId);
+            if(_elemType is not null) {
+                _typeParameters.AddRange(_elemType.Parameters.Cast<Parameter>());
             }
         }
     }
@@ -56,9 +57,25 @@ internal class RevitElement {
     public bool IsParamValueValid { get; private set; } = true;
 
     /// <summary>
-    /// Причина, по которой значение нельзя записать
+    /// Элемент пропускается при записи: в нетекстовый параметр по маске получено пустое значение
+    /// (параметров из маски у элемента нет или они не заполнены)
     /// </summary>
-    public string ParamValueError { get; private set; } = string.Empty;
+    public bool IsParamValueSkipped { get; private set; }
+
+    /// <summary>
+    /// Пояснение к значению: причина, по которой значение нельзя записать или элемент пропускается
+    /// </summary>
+    public string ParamValueMessage { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Параметры экземпляра и типа, которые показываются в палитре свойств
+    /// </summary>
+    public IEnumerable<Parameter> GetVisibleParameters() {
+        IEnumerable<Parameter> parameters = Elem.GetOrderedParameters();
+        return _elemType is null
+            ? parameters
+            : parameters.Concat(_elemType.GetOrderedParameters());
+    }
 
     /// <summary>
     /// Ищет параметр по имени. Параметры экземпляра имеют приоритет над параметрами типа
@@ -77,6 +94,9 @@ internal class RevitElement {
     }
 
     public void WriteParamValue(RevitParameter revitParameter) {
+        if(IsParamValueSkipped) {
+            return;
+        }
         var parameter = FindParameter(revitParameter.Id)
             ?? throw new Exception($"{_localizationService.GetLocalizedString("MainWindow.ParamByIdError")}" + Elem.Id.ToString());
 
@@ -111,7 +131,8 @@ internal class RevitElement {
             match => GetValueByParameter(FindParameter(match.Groups[1].Value)));
         _valueToWrite = null;
         IsParamValueValid = true;
-        ParamValueError = string.Empty;
+        IsParamValueSkipped = false;
+        ParamValueMessage = string.Empty;
 
         if(targetParameter is null) {
             return;
@@ -124,6 +145,15 @@ internal class RevitElement {
         }
         if(parameter.IsReadOnly) {
             SetError("MainWindow.ParamIsReadOnly");
+            return;
+        }
+
+        // Пустое значение в текст записывается как есть, а для остальных типов элемент пропускается,
+        // чтобы одной маской можно было заполнять элементы с разным набором параметров
+        if(targetParameter.ValueKind != ParamValueKind.Text && string.IsNullOrWhiteSpace(ParamValue)) {
+            IsParamValueSkipped = true;
+            ParamValueMessage = _localizationService.GetLocalizedString("MainWindow.ValueSkipped");
+            ParamValue = ParamValueMessage;
             return;
         }
 
@@ -166,6 +196,6 @@ internal class RevitElement {
 
     private void SetError(string resourceKey) {
         IsParamValueValid = false;
-        ParamValueError = _localizationService.GetLocalizedString(resourceKey);
+        ParamValueMessage = _localizationService.GetLocalizedString(resourceKey);
     }
 }

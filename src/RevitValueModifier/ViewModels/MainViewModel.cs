@@ -6,8 +6,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-using Autodesk.Revit.DB;
-
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -133,9 +131,8 @@ internal class MainViewModel : BaseViewModel {
 
         _paramValueParser = _revitRepository.CreateParamValueParser();
 
-        List<ElementId> categoryIds = _revitRepository.GetCategoryIds(revitElements);
-        CommonParamsForRead = _revitRepository.GetParamsForRead(categoryIds, revitElements);
-        CommonParamsForWrite = _revitRepository.GetParamsForWrite(CommonParamsForRead);
+        CommonParamsForRead = _revitRepository.GetParamsForRead(revitElements);
+        CommonParamsForWrite = _revitRepository.GetParamsForWrite(CommonParamsForRead, revitElements);
 
         LoadConfig();
         ParamUpdateCommand.Execute(null);

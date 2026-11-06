@@ -18,6 +18,10 @@
     
     <system:String x:Key="MainWindow.SystemParameter">Системный параметр</system:String>
     <system:String x:Key="MainWindow.SharedParameter">Общий параметр</system:String>
+    <system:String x:Key="MainWindow.InstanceParameter">Экземпляр</system:String>
+    <system:String x:Key="MainWindow.TypeParameter">Тип</system:String>
+    <system:String x:Key="MainWindow.InstanceAndTypeParameter">Экземпляр и тип</system:String>
+    <system:String x:Key="MainWindow.FamilyParameter">Параметр семейства</system:String>
     <system:String x:Key="MainWindow.ProjectParameter">Параметр проекта</system:String>
 
     <system:String x:Key="MainWindow.True">Да</system:String>
@@ -29,6 +33,7 @@
     <system:String x:Key="MainWindow.ValueUnknown">Значение неизвестно</system:String>
     <system:String x:Key="MainWindow.ParamNotFound">У элемента нет выбранного параметра</system:String>
     <system:String x:Key="MainWindow.ParamIsReadOnly">Параметр у элемента доступен только для чтения</system:String>
+    <system:String x:Key="MainWindow.ValueSkipped">Пропускается: по маске получено пустое значение, текущее значение параметра не изменится</system:String>
     <system:String x:Key="MainWindow.ValueParseError">Значение не соответствует типу выбранного параметра</system:String>
     <system:String x:Key="MainWindow.InvalidValuesCount">Значение нельзя записать у элементов: {0}. Причина во всплывающей подсказке у значения</system:String>
     

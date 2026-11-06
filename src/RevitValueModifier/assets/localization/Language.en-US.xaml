@@ -18,6 +18,10 @@
 
     <system:String x:Key="MainWindow.SystemParameter">System parameter</system:String>
     <system:String x:Key="MainWindow.SharedParameter">Shared parameter</system:String>
+    <system:String x:Key="MainWindow.InstanceParameter">Instance</system:String>
+    <system:String x:Key="MainWindow.TypeParameter">Type</system:String>
+    <system:String x:Key="MainWindow.InstanceAndTypeParameter">Instance and type</system:String>
+    <system:String x:Key="MainWindow.FamilyParameter">Family parameter</system:String>
     <system:String x:Key="MainWindow.ProjectParameter">Project parameter</system:String>
 
     <system:String x:Key="MainWindow.True">True</system:String>
@@ -29,6 +33,7 @@
     <system:String x:Key="MainWindow.ValueUnknown">Value unknown</system:String>
     <system:String x:Key="MainWindow.ParamNotFound">The element does not have the selected parameter</system:String>
     <system:String x:Key="MainWindow.ParamIsReadOnly">The parameter of the element is read-only</system:String>
+    <system:String x:Key="MainWindow.ValueSkipped">Skipped: the mask produced an empty value, the current parameter value will not change</system:String>
     <system:String x:Key="MainWindow.ValueParseError">The value does not match the data type of the selected parameter</system:String>
     <system:String x:Key="MainWindow.InvalidValuesCount">The value cannot be written for elements: {0}. See the tooltip on the value for the reason</system:String>
 

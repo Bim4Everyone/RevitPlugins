@@ -30,28 +30,31 @@ internal class RevitRepository {
             .ToList();
     }
 
-    internal List<ElementId> GetCategoryIds(List<RevitElement> revitElements) {
+    /// <summary>
+    /// Возвращает параметры экземпляра и типа, которые есть хотя бы у одного выбранного элемента,
+    /// в том числе параметры, недоступные для фильтров видов (например, "Толщина" у перекрытий)
+    /// </summary>
+    internal List<RevitParameter> GetParamsForRead(List<RevitElement> revitElements) {
         return revitElements
-            .Select(rE => rE.Elem.Category.Id)
-            .Distinct()
-            .ToList();
-    }
-
-    internal List<RevitParameter> GetParamsForRead(List<ElementId> categoryIds, List<RevitElement> revitElements) {
-        return ParameterFilterUtilities
-        .GetFilterableParametersInCommon(Document, categoryIds)
-        .Select(id => new RevitParameter(id, Document, FindSampleParameter(revitElements, id)))
+        .SelectMany(revitElement => revitElement.GetVisibleParameters())
+        .GroupBy(parameter => parameter.Id)
+        .Select(group => new RevitParameter(group.ToList(), Document))
         .OrderBy(rP => rP.ParamName)
         .ToList();
     }
 
     /// <summary>
     /// Возвращает параметры, в которые плагин умеет записывать значения:
-    /// текст, целое, да/нет и вещественные числа с единицами (число, денежная единица, длина, площадь и т.д.)
+    /// текст, целое, да/нет и вещественные числа с единицами (число, денежная единица, длина, площадь и т.д.).
+    /// Остаются только параметры, которые есть у каждого выбранного элемента (у экземпляра или его типа).
+    /// Параметры, доступные только для чтения у всех выбранных элементов, исключаются
     /// </summary>
-    internal List<RevitParameter> GetParamsForWrite(List<RevitParameter> parameters) {
+    internal List<RevitParameter> GetParamsForWrite(List<RevitParameter> parameters, List<RevitElement> revitElements) {
+        HashSet<ElementId> commonParamIds = GetCommonParamIds(revitElements);
         return parameters
-        .Where(p => p.ValueKind != ParamValueKind.Unsupported)
+        .Where(p => p.ValueKind != ParamValueKind.Unsupported
+            && !p.IsReadOnly
+            && commonParamIds.Contains(p.Id))
         .ToList();
     }
 
@@ -59,9 +62,19 @@ internal class RevitRepository {
         return new ParamValueParser(Document, _localizationService);
     }
 
-    private static Parameter FindSampleParameter(List<RevitElement> revitElements, ElementId paramId) {
-        return revitElements
-            .Select(revitElement => revitElement.FindParameter(paramId))
-            .FirstOrDefault(parameter => parameter is not null);
+    /// <summary>
+    /// Возвращает Id параметров, которые есть одновременно у всех выбранных элементов
+    /// </summary>
+    private static HashSet<ElementId> GetCommonParamIds(List<RevitElement> revitElements) {
+        HashSet<ElementId> commonParamIds = null;
+        foreach(RevitElement revitElement in revitElements) {
+            var paramIds = revitElement.GetVisibleParameters().Select(parameter => parameter.Id);
+            if(commonParamIds is null) {
+                commonParamIds = new HashSet<ElementId>(paramIds);
+            } else {
+                commonParamIds.IntersectWith(paramIds);
+            }
+        }
+        return commonParamIds ?? [];
     }
 }

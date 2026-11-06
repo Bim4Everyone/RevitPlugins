@@ -32,9 +32,9 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <local:ParamTypeConverter 
-                x:Key="paramTypeConverter" 
-                LocalizationService="{Binding ElementName=window, Path=LocalizationService}"/>
+            <local:ParamDescriptionConverter
+                x:Key="paramDescriptionConverter"
+                LocalizationService="{Binding ElementName=window, Path=LocalizationService}" />
             
             <ui:TextBlock
                 x:Key="DataColumnRevitElementHeader"
@@ -103,16 +103,11 @@
                             <DataTemplate>
                                 <ui:TextBlock>
                                     <ui:TextBlock Text="{Binding Path=ParamName}"/>
-                                    <ui:TextBlock 
-                                        Foreground="DarkGray"
-                                        Text="{Binding
-                                            Path=ParamTypeName,
-                                            StringFormat=({0}),
-                                            Converter={StaticResource paramTypeConverter}}"/>
+                                    <!--Описание вида "(Общий параметр, Экземпляр, Текст)"-->
                                     <ui:TextBlock
                                         Margin="4 0 0 0"
                                         Foreground="DarkGray"
-                                        Text="{Binding Path=DataTypeName}" />
+                                        Text="{Binding Converter={StaticResource paramDescriptionConverter}}" />
                                 </ui:TextBlock>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
@@ -156,16 +151,11 @@
                             <DataTemplate>
                                 <ui:TextBlock>
                                     <ui:TextBlock Text="{Binding Path=ParamName}"/>
-                                    <ui:TextBlock 
-                                        Foreground="DarkGray"
-                                        Text="{Binding
-                                            Path=ParamTypeName,
-                                            StringFormat=({0}),
-                                            Converter={StaticResource paramTypeConverter}}"/>
+                                    <!--Описание вида "(Общий параметр, Экземпляр, Текст)"-->
                                     <ui:TextBlock
                                         Margin="4 0 0 0"
                                         Foreground="DarkGray"
-                                        Text="{Binding Path=DataTypeName}" />
+                                        Text="{Binding Converter={StaticResource paramDescriptionConverter}}" />
                                 </ui:TextBlock>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
@@ -254,17 +244,23 @@
                             Header="{StaticResource DataColumnElementParamValueHeader}"
                             IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
-                                <!--Значение, которое нельзя записать в выбранный параметр, выделяется цветом,
-                                    причина показывается во всплывающей подсказке-->
+                                <!--Значение, которое нельзя записать в выбранный параметр, выделяется оранжевым,
+                                    пропускаемый элемент - серым, пояснение показывается во всплывающей подсказке-->
                                 <Style
                                     TargetType="TextBlock"
                                     BasedOn="{x:Static DataGridTextColumn.DefaultElementStyle}">
                                     <Style.Triggers>
                                         <DataTrigger
+                                            Binding="{Binding IsParamValueSkipped}"
+                                            Value="True">
+                                            <Setter Property="Foreground" Value="Gray" />
+                                            <Setter Property="ToolTip" Value="{Binding ParamValueMessage}" />
+                                        </DataTrigger>
+                                        <DataTrigger
                                             Binding="{Binding IsParamValueValid}"
                                             Value="False">
                                             <Setter Property="Foreground" Value="Orange" />
-                                            <Setter Property="ToolTip" Value="{Binding ParamValueError}" />
+                                            <Setter Property="ToolTip" Value="{Binding ParamValueMessage}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

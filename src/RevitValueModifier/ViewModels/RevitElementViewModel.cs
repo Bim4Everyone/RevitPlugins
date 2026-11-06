@@ -8,7 +8,8 @@ namespace RevitValueModifier.ViewModels;
 internal class RevitElementViewModel : BaseViewModel {
     private string _paramValue = string.Empty;
     private bool _isParamValueValid = true;
-    private string _paramValueError = string.Empty;
+    private bool _isParamValueSkipped;
+    private string _paramValueMessage = string.Empty;
     private string _elemName;
     private ElementId _elemId;
     private readonly RevitElement _revitElem;
@@ -39,9 +40,14 @@ internal class RevitElementViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _isParamValueValid, value);
     }
 
-    public string ParamValueError {
-        get => _paramValueError;
-        set => RaiseAndSetIfChanged(ref _paramValueError, value);
+    public bool IsParamValueSkipped {
+        get => _isParamValueSkipped;
+        set => RaiseAndSetIfChanged(ref _isParamValueSkipped, value);
+    }
+
+    public string ParamValueMessage {
+        get => _paramValueMessage;
+        set => RaiseAndSetIfChanged(ref _paramValueMessage, value);
     }
 
     public void WriteParamValue(RevitParameter revitParameter) {
@@ -52,6 +58,7 @@ internal class RevitElementViewModel : BaseViewModel {
         _revitElem.SetParamValue(paramValueMask, targetParameter, paramValueParser);
         ParamValue = _revitElem.ParamValue;
         IsParamValueValid = _revitElem.IsParamValueValid;
-        ParamValueError = _revitElem.ParamValueError;
+        IsParamValueSkipped = _revitElem.IsParamValueSkipped;
+        ParamValueMessage = _revitElem.ParamValueMessage;
     }
 }
