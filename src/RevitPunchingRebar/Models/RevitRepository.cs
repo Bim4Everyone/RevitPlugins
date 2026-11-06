@@ -47,14 +47,6 @@ internal class RevitRepository {
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
-    public double FromMmToFt(int mm) {
-        return mm / 304.8;
-    }
-
-    public double FromFtToMm(double ft) {
-        return ft * 304.8;
-    }
-
     public Slab GetSlab(string slabUniqId) {
         Element slabElement = Document.GetElement(slabUniqId);
 

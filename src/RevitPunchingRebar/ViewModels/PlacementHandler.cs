@@ -40,19 +40,15 @@ internal class PlacementHandler : IExternalEventHandler {
             frameParams.FrameFamilyTypeName = Settings.FamilyType;
             frameParams.HostSlab = _revitRepository.GetSlab(Settings.SlabId);
             frameParams.SlabThickness = frameParams.HostSlab.Thickness;
-            frameParams.RebarCoverTop = _revitRepository.FromMmToFt(Settings.RebarCoverTop);
-            frameParams.RebarCoverBottom = _revitRepository.FromMmToFt(Settings.RebarCoverBottom);
-            frameParams.PlateRebarDiameter = _revitRepository.FromMmToFt(Settings.SlabRebarDiameter);
+            frameParams.RebarCoverTop = UnitUtilsHelper.FromMm(Settings.RebarCoverTop);
+            frameParams.RebarCoverBottom = UnitUtilsHelper.FromMm(Settings.RebarCoverBottom);
+            frameParams.PlateRebarDiameter = UnitUtilsHelper.FromMm(Settings.SlabRebarDiameter);
 
-            if(Settings.RebarClass == "А500С") {
-                frameParams.StirrupRebarClass = 501;
-            } else {
-                frameParams.StirrupRebarClass = 240;
-            }
+            frameParams.StirrupRebarClass = Settings.RebarClass == "А500С" ? RebarClass.A500C : RebarClass.A240;
 
-            frameParams.StirrupRebarDiameter = _revitRepository.FromMmToFt(Settings.StirrupDiameter);
-            frameParams.StirrupStep = _revitRepository.FromMmToFt(Settings.StirrupStep);
-            frameParams.FrameWidth = _revitRepository.FromMmToFt(Settings.FrameWidth);
+            frameParams.StirrupRebarDiameter = UnitUtilsHelper.FromMm(Settings.StirrupDiameter);
+            frameParams.StirrupStep = UnitUtilsHelper.FromMm(Settings.StirrupStep);
+            frameParams.FrameWidth = UnitUtilsHelper.FromMm(Settings.FrameWidth);
 
             PunchingRebarPlacementService punchingRebarPlacementService = new PunchingRebarPlacementService();
             punchingRebarPlacementService.Run(pylons, frameParams, _revitRepository);

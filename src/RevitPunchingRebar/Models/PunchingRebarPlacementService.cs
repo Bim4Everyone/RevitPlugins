@@ -10,6 +10,16 @@ using RevitPunchingRebar.Models.Interfaces;
 
 namespace RevitPunchingRebar.Models;
 internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
+    // Диаметр оправки загиба хомута в долях диаметра хомута для классов А240 и А500С
+    private const double _stirrupBendFactorA240 = 2.5;
+    private const double _stirrupBendFactorA500C = 5;
+
+    // Угол между каркасом и пилоном, при котором каркас стоит у коротких граней пилона, градусы
+    private const double _crossAngle = 90;
+
+    // Расстояние до вспомогательных точек при построении плоскости отражения
+    private const double _planePointOffset = 10;
+
     public void Run(IEnumerable<IPylon> pylons, IFrameParams frameParams, RevitRepository revitRepository) {
         foreach(IPylon pylon in pylons) {
             CreateFrames(pylon, frameParams, revitRepository);
@@ -68,31 +78,26 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     /// </summary>
     private void MoveFrameDown(Frame frame, IFrameParams frameParams) {
         XYZ startPoint = frame.GetLocation();
-        XYZ endPoint;
+        double bendFactor = GetStirrupBendFactor(frameParams.StirrupRebarClass);
 
-        if(frameParams.StirrupRebarClass == 240) {
-            endPoint = new XYZ
-                (
-                    startPoint.X,
-                    startPoint.Y,
-                    startPoint.Z + (frameParams.StirrupRebarDiameter + 0.5 * 2.5 * frameParams.StirrupRebarDiameter) -
-                                    0.5 * frame.LongRebarDiameter -
-                                    frameParams.RebarCoverTop -
-                                    frameParams.PlateRebarDiameter
-                );
-        } else {
-            endPoint = new XYZ
-                (
-                    startPoint.X,
-                    startPoint.Y,
-                    startPoint.Z + (frameParams.StirrupRebarDiameter + 0.5 * 5 * frameParams.StirrupRebarDiameter) -
-                                    0.5 * frame.LongRebarDiameter -
-                                    frameParams.RebarCoverTop -
-                                    frameParams.PlateRebarDiameter
-                );
-        }
+        XYZ endPoint = new XYZ
+            (
+                startPoint.X,
+                startPoint.Y,
+                startPoint.Z + (frameParams.StirrupRebarDiameter + 0.5 * bendFactor * frameParams.StirrupRebarDiameter) -
+                                0.5 * frame.LongRebarDiameter -
+                                frameParams.RebarCoverTop -
+                                frameParams.PlateRebarDiameter
+            );
 
         frame.FrameInstance.Location.Move(endPoint - startPoint);
+    }
+
+    /// <summary>
+    /// Возвращает диаметр оправки загиба хомута в долях диаметра хомута
+    /// </summary>
+    private double GetStirrupBendFactor(RebarClass rebarClass) {
+        return rebarClass == RebarClass.A240 ? _stirrupBendFactorA240 : _stirrupBendFactorA500C;
     }
 
     /// <summary>
@@ -114,7 +119,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         double angle = GetAngleBetweenInstances(pylon, frame);
 
-        if(angle == 90) {
+        if(angle == _crossAngle) {
             int frameCount = GetFramesCount(pylon, frame, frameParams);
 
             endPoint = new XYZ
@@ -148,7 +153,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         double angle = GetAngleBetweenInstances(pylon, frame);
         int frameCount = GetFramesCount(pylon, frame, frameParams);
 
-        if(angle == 90) {
+        if(angle == _crossAngle) {
             double frameLength = frameParams.GetFrameLength();
             double afterPylonDistance = frameParams.GetAfterPylonDistance();
 
@@ -180,7 +185,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         double angle = GetAngleBetweenInstances(pylon, frame);
 
-        if(angle == 90) {
+        if(angle == _crossAngle) {
             double punchingZone = frameParams.GetPunchingZone();
             punchingLength = pylon.Width + 2 * punchingZone;
             framesCount = Convert.ToInt32(Math.Ceiling((punchingLength / frameParams.FrameWidth + 1) / 2));
@@ -216,14 +221,14 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         Plane plane = null;
         double angle = GetAngleBetweenInstances(pylon, frame);
 
-        if(angle == 90) {
+        if(angle == _crossAngle) {
             plane = Plane.CreateByThreePoints
                     (
                         pylon.GetLocation(),
                         new XYZ
                         (
-                            pylon.GetLocation().X - 10 * pylon.FacingOrientation.Y,
-                            pylon.GetLocation().Y + 10 * pylon.FacingOrientation.X,
+                            pylon.GetLocation().X - _planePointOffset * pylon.FacingOrientation.Y,
+                            pylon.GetLocation().Y + _planePointOffset * pylon.FacingOrientation.X,
                             pylon.GetLocation().Z
                         ),
 
@@ -231,7 +236,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
                         (
                             pylon.GetLocation().X,
                             pylon.GetLocation().Y,
-                            pylon.GetLocation().Z + 10
+                            pylon.GetLocation().Z + _planePointOffset
                         )
                     );
         } else {
@@ -240,15 +245,15 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
                     pylon.GetLocation(),
                     new XYZ
                         (
-                            pylon.GetLocation().X + 10 * pylon.FacingOrientation.X,
-                            pylon.GetLocation().Y + 10 * pylon.FacingOrientation.Y,
+                            pylon.GetLocation().X + _planePointOffset * pylon.FacingOrientation.X,
+                            pylon.GetLocation().Y + _planePointOffset * pylon.FacingOrientation.Y,
                             pylon.GetLocation().Z
                         ),
                     new XYZ
                         (
                             pylon.GetLocation().X,
                             pylon.GetLocation().Y,
-                            pylon.GetLocation().Z + 10
+                            pylon.GetLocation().Z + _planePointOffset
                         )
                 );
         }

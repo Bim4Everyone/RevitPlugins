@@ -9,7 +9,7 @@ internal interface IFrameParams {
     double RebarCoverBottom { get; set; }
     double PlateRebarDiameter { get; set; }
 
-    int StirrupRebarClass { get; set; }
+    RebarClass StirrupRebarClass { get; set; }
     double StirrupRebarDiameter { get; set; }
     double StirrupStep { get; set; }
 

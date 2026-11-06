@@ -4,6 +4,15 @@ using RevitPunchingRebar.Models.Interfaces;
 
 namespace RevitPunchingRebar.Models;
 internal class FrameParams : IFrameParams {
+    // Шаг округления расстояний зоны продавливания, мм
+    private const double _roundingStepMm = 10;
+
+    // Ширина зоны продавливания в долях рабочей высоты сечения
+    private const double _punchingZoneFactor = 1.5;
+
+    // Расстояние от грани пилона до первого хомута: рабочая высота сечения, деленная на это число
+    private const double _afterPylonDistanceDivider = 3;
+
     public string FrameFamilyName { get; set; }
     public string FrameFamilyTypeName { get; set; }
 
@@ -15,7 +24,7 @@ internal class FrameParams : IFrameParams {
 
     public double PlateRebarDiameter { get; set; }
 
-    public int StirrupRebarClass { get; set; }
+    public RebarClass StirrupRebarClass { get; set; }
     public double StirrupRebarDiameter { get; set; }
     public double StirrupStep { get; set; }
     public double FrameWidth { get; set; }
@@ -31,7 +40,7 @@ internal class FrameParams : IFrameParams {
     public double GetFrameLength() {
         double afterColumnDistance = GetAfterPylonDistance();
         double punchingZoneLength = GetPunchingZone();
-        double punchingZoneLengthRounded = Math.Ceiling(punchingZoneLength * 304.8 / 10) * 10 / 304.8;
+        double punchingZoneLengthRounded = UnitUtilsHelper.CeilingToMm(punchingZoneLength, _roundingStepMm);
         double frameLength = Math.Ceiling((punchingZoneLengthRounded - afterColumnDistance) / StirrupStep) * StirrupStep;
 
         return frameLength;
@@ -43,8 +52,8 @@ internal class FrameParams : IFrameParams {
     /// <returns></returns>
     public double GetAfterPylonDistance() {
         double workingHeight = GetWorkingHeight();
-        double afterColumnDistance = workingHeight / 3;
-        double afterColumnDistanceRounded = Math.Ceiling((afterColumnDistance * 304.8) / 10) * 10 / 304.8;
+        double afterColumnDistance = workingHeight / _afterPylonDistanceDivider;
+        double afterColumnDistanceRounded = UnitUtilsHelper.CeilingToMm(afterColumnDistance, _roundingStepMm);
 
         return afterColumnDistanceRounded;
     }
@@ -55,7 +64,7 @@ internal class FrameParams : IFrameParams {
     /// <returns></returns>
     public double GetPunchingZone() {
         double workingHeight = GetWorkingHeight();
-        double punchingZone = Math.Ceiling((1.5 * workingHeight * 304.8) / 10) * 10 / 304.8;
+        double punchingZone = UnitUtilsHelper.CeilingToMm(_punchingZoneFactor * workingHeight, _roundingStepMm);
 
         return punchingZone;
     }

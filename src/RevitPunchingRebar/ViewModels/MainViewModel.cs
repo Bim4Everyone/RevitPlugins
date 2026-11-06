@@ -317,8 +317,8 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        double rebarCoverTopFt = _revitRepository.FromMmToFt(RebarCoverTop);
-        double rebarCoverBottomFt = _revitRepository.FromMmToFt(RebarCoverBottom);
+        double rebarCoverTopFt = UnitUtilsHelper.FromMm(RebarCoverTop);
+        double rebarCoverBottomFt = UnitUtilsHelper.FromMm(RebarCoverBottom);
         Slab slab = _revitRepository.GetSlab(SelectedSlabId);
 
         if(rebarCoverTopFt <= 0 || rebarCoverTopFt > slab.Thickness * 0.5) {
@@ -400,8 +400,8 @@ internal class MainViewModel : BaseViewModel {
         if(IsRebarCoverFromSlab) {
             Slab slab = _revitRepository.GetSlab(SelectedSlabId);
 
-            setting.RebarCoverTop = Convert.ToInt32(_revitRepository.FromFtToMm(slab.RebarCoverTop));
-            setting.RebarCoverBottom = Convert.ToInt32(_revitRepository.FromFtToMm(slab.RebarCoverBottom));
+            setting.RebarCoverTop = Convert.ToInt32(UnitUtilsHelper.ToMm(slab.RebarCoverTop));
+            setting.RebarCoverBottom = Convert.ToInt32(UnitUtilsHelper.ToMm(slab.RebarCoverBottom));
         } else {
             setting.RebarCoverTop = RebarCoverTop;
             setting.RebarCoverBottom = RebarCoverBottom;
