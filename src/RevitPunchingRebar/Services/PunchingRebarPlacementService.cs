@@ -110,7 +110,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
                 startPoint.X,
                 startPoint.Y,
                 startPoint.Z + (frameParams.StirrupRebarDiameter + 0.5 * bendFactor * frameParams.StirrupRebarDiameter) -
-                                0.5 * frame.LongRebarDiameter -
+                                0.5 * frameParams.LongRebarDiameter -
                                 frameParams.RebarCoverTop -
                                 frameParams.PlateRebarDiameter
             );

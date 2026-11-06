@@ -27,6 +27,9 @@
     <system:String x:Key="MainWindow.StirrupRebarClass">Класс стержней хомутов</system:String>
     <system:String x:Key="MainWindow.StirrupStep">Шаг хомутов, мм</system:String>
     <system:String x:Key="MainWindow.FrameWidth">Ширина каркаса, мм</system:String>
+    <system:String x:Key="MainWindow.StirrupBendLength">Длина отгибов хомутов, мм</system:String>
+    <system:String x:Key="MainWindow.LongRebarDiameter">Диаметр продольных стержней, мм</system:String>
+    <system:String x:Key="MainWindow.LongRebarAnchorageLength">Выпуск продольных стержней, мм</system:String>
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 
@@ -38,6 +41,8 @@
     <system:String x:Key="MainWindow.ErrorSelectFamilyType">Выберите тип арматурных каркасов</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupStep">Введите корректный шаг хомутов</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidth">Введите корректную ширину каркаса</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupBendLength">Введите корректную длину отгибов хомутов</system:String>
+    <system:String x:Key="MainWindow.ErrorLongRebarAnchorageLength">Введите корректный выпуск продольных стержней</system:String>
     <system:String x:Key="MainWindow.ErrorFrameParamsMissing">В семействе каркаса нет параметров: {0}</system:String>
     <system:String x:Key="MainWindow.ErrorFramePlacement">Не удалось разместить экземпляр выбранного типа каркаса</system:String>
     <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">У плиты не назначен защитный слой сверху или снизу</system:String>

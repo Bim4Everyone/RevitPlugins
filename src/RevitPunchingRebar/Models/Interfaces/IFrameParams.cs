@@ -16,6 +16,21 @@ internal interface IFrameParams {
     double FrameWidth { get; }
 
     /// <summary>
+    /// Диаметр продольных стержней каркаса
+    /// </summary>
+    double LongRebarDiameter { get; }
+
+    /// <summary>
+    /// Длина выпуска продольных стержней за крайние хомуты
+    /// </summary>
+    double LongRebarAnchorageLength { get; }
+
+    /// <summary>
+    /// Длина отгибов хомутов
+    /// </summary>
+    double StirrupBendLength { get; }
+
+    /// <summary>
     /// Находит длину каркаса (без учета "хвостиков")
     /// </summary>
     /// <returns></returns>
@@ -26,7 +41,7 @@ internal interface IFrameParams {
     /// продольных стержней)
     /// </summary>
     /// <returns></returns>
-    double GetFrameHeight(double longRebarDiameter);
+    double GetFrameHeight();
 
     /// <summary>
     /// Находит расстояние от грани колонны до первого хомута каркаса

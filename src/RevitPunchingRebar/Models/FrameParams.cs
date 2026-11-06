@@ -14,6 +14,21 @@ internal class FrameParams : IFrameParams {
     private const double _afterPylonDistanceDivider = 3;
 
     /// <summary>
+    /// Диаметр продольных стержней каркаса по умолчанию, мм.
+    /// </summary>
+    public const int DefaultLongRebarDiameterMm = 10;
+
+    /// <summary>
+    /// Длина выпуска продольных стержней за крайние хомуты по умолчанию, мм.
+    /// </summary>
+    public const int DefaultLongRebarAnchorageLengthMm = 50;
+
+    /// <summary>
+    /// Длина отгибов хомутов по умолчанию, мм.
+    /// </summary>
+    public const int DefaultStirrupBendLengthMm = 90;
+
+    /// <summary>
     /// Создает параметры каркасов по настройкам пользователя.
     /// </summary>
     /// <param name="settings">Настройки плагина для текущего проекта (размеры в мм).</param>
@@ -25,14 +40,26 @@ internal class FrameParams : IFrameParams {
         HostSlab = hostSlab;
         SlabThickness = hostSlab.Thickness;
 
-        RebarCoverTop = UnitUtilsHelper.FromMm(settings.RebarCoverTop);
-        RebarCoverBottom = UnitUtilsHelper.FromMm(settings.RebarCoverBottom);
+        // В режиме "из плиты" берется защитный слой плиты, иначе - введенный вручную
+        RebarCoverTop = settings.IsRebarCoverFromUser
+            ? UnitUtilsHelper.FromMm(settings.RebarCoverTop)
+            : hostSlab.RebarCoverTop.Value;
+        RebarCoverBottom = settings.IsRebarCoverFromUser
+            ? UnitUtilsHelper.FromMm(settings.RebarCoverBottom)
+            : hostSlab.RebarCoverBottom.Value;
         PlateRebarDiameter = UnitUtilsHelper.FromMm(settings.SlabRebarDiameter);
 
         StirrupRebarClass = settings.StirrupRebarClass ?? RebarClass.A500C;
         StirrupRebarDiameter = UnitUtilsHelper.FromMm(settings.StirrupDiameter);
         StirrupStep = UnitUtilsHelper.FromMm(settings.StirrupStep);
         FrameWidth = UnitUtilsHelper.FromMm(settings.FrameWidth);
+
+        LongRebarDiameter = UnitUtilsHelper.FromMm(
+            settings.LongRebarDiameter ?? DefaultLongRebarDiameterMm);
+        LongRebarAnchorageLength = UnitUtilsHelper.FromMm(
+            settings.LongRebarAnchorageLength ?? DefaultLongRebarAnchorageLengthMm);
+        StirrupBendLength = UnitUtilsHelper.FromMm(
+            settings.StirrupBendLength ?? DefaultStirrupBendLengthMm);
     }
 
     public string FrameFamilyName { get; }
@@ -51,10 +78,14 @@ internal class FrameParams : IFrameParams {
     public double StirrupStep { get; }
     public double FrameWidth { get; }
 
-    public double GetFrameHeight(double longRebarDiameter) {
+    public double LongRebarDiameter { get; }
+    public double LongRebarAnchorageLength { get; }
+    public double StirrupBendLength { get; }
+
+    public double GetFrameHeight() {
         double height = SlabThickness - (RebarCoverTop + PlateRebarDiameter) -
                                         (RebarCoverBottom + 2 * PlateRebarDiameter) -
-                                        longRebarDiameter;
+                                        LongRebarDiameter;
 
         return height;
     }

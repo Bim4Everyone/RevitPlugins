@@ -57,5 +57,8 @@ internal class RevitSettings : ProjectSettings {
     public RebarClass? StirrupRebarClass { get; set; }
     public int StirrupStep { get; set; }
     public int FrameWidth { get; set; }
+    public int? LongRebarDiameter { get; set; }
+    public int? LongRebarAnchorageLength { get; set; }
+    public int? StirrupBendLength { get; set; }
 
 }

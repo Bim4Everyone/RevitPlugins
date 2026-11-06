@@ -280,6 +280,9 @@
                             <RowDefinition Height="35"/>
                             <RowDefinition Height="35"/>
                             <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
                         </Grid.RowDefinitions>
 
                         <ui:TextBlock
@@ -317,6 +320,24 @@
                             Grid.Row="5"
                             Style="{StaticResource itemName}"
                             Text="{me:LocalizationSource MainWindow.FrameWidth}"/>
+
+                        <ui:TextBlock
+                            Grid.Column="0"
+                            Grid.Row="6"
+                            Style="{StaticResource itemName}"
+                            Text="{me:LocalizationSource MainWindow.StirrupBendLength}"/>
+
+                        <ui:TextBlock
+                            Grid.Column="0"
+                            Grid.Row="7"
+                            Style="{StaticResource itemName}"
+                            Text="{me:LocalizationSource MainWindow.LongRebarDiameter}"/>
+
+                        <ui:TextBlock
+                            Grid.Column="0"
+                            Grid.Row="8"
+                            Style="{StaticResource itemName}"
+                            Text="{me:LocalizationSource MainWindow.LongRebarAnchorageLength}"/>
 
 
 
@@ -367,6 +388,22 @@
                             Grid.Column="1"
                             Grid.Row="5"
                             Text="{Binding FrameWidth}"/>
+
+                        <ui:TextBox
+                            Grid.Column="1"
+                            Grid.Row="6"
+                            Text="{Binding StirrupBendLength}"/>
+
+                        <ComboBox
+                            Grid.Column="1"
+                            Grid.Row="7"
+                            ItemsSource="{Binding RebarDiameters}"
+                            SelectedItem="{Binding SelectedLongRebarDiameter}"/>
+
+                        <ui:TextBox
+                            Grid.Column="1"
+                            Grid.Row="8"
+                            Text="{Binding LongRebarAnchorageLength}"/>
 
                     </Grid>
                 </Border>

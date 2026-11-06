@@ -38,15 +38,6 @@ internal class Frame {
     // Значение параметра "мод_Х_Изменить привязку"
     private const int _stirrupChangeBindingValue = 1;
 
-    // Длина выпуска продольных стержней за крайние хомуты, мм
-    private const double _anchorageLengthMm = 50;
-
-    // Длина отгиба хомута, мм
-    private const double _stirrupBendLengthMm = 90;
-
-    // Диаметр продольных стержней каркаса, мм
-    private const double _longRebarDiameterMm = 10;
-
     // Класс продольных стержней каркаса
     private const RebarClass _longRebarClass = RebarClass.A500C;
 
@@ -80,12 +71,6 @@ internal class Frame {
     /// </summary>
     public const string DefaultFamilyTypeName = "Х_1501";
 
-    // Диаметр продольных стержней каркаса
-    public readonly double LongRebarDiameter = UnitUtilsHelper.FromMm(_longRebarDiameterMm);
-
-    private readonly double _anchorageLength = UnitUtilsHelper.FromMm(_anchorageLengthMm);
-    private readonly double _stirrupBendLength = UnitUtilsHelper.FromMm(_stirrupBendLengthMm);
-
     internal Frame(FamilyInstance familyInstance, IFrameParams frameParams) {
         FrameInstance = familyInstance;
 
@@ -113,18 +98,19 @@ internal class Frame {
         SetParam(_longRebarCodeParam, (int) _longRebarClass);
         SetParam(_stirrupCodeParam, (int) frameParams.StirrupRebarClass);
 
-        SetParam(_widthStepParam, frameParams.FrameWidth - frameParams.StirrupRebarDiameter - LongRebarDiameter);
-        SetParam(_heightStepParam, frameParams.GetFrameHeight(LongRebarDiameter));
+        SetParam(_widthStepParam,
+                 frameParams.FrameWidth - frameParams.StirrupRebarDiameter - frameParams.LongRebarDiameter);
+        SetParam(_heightStepParam, frameParams.GetFrameHeight());
 
-        SetParam(_anchorageTop1Param, _anchorageLength);
-        SetParam(_anchorageTop2Param, _anchorageLength);
-        SetParam(_anchorageBottom1Param, _anchorageLength);
-        SetParam(_anchorageBottom2Param, _anchorageLength);
+        SetParam(_anchorageTop1Param, frameParams.LongRebarAnchorageLength);
+        SetParam(_anchorageTop2Param, frameParams.LongRebarAnchorageLength);
+        SetParam(_anchorageBottom1Param, frameParams.LongRebarAnchorageLength);
+        SetParam(_anchorageBottom2Param, frameParams.LongRebarAnchorageLength);
 
         SetParam(_stirrupChangeBindingParam, _stirrupChangeBindingValue);
 
         SetParam(_stirrupDiameterParam, frameParams.StirrupRebarDiameter);
-        SetParam(_stirrupBendLengthParam, _stirrupBendLength);
+        SetParam(_stirrupBendLengthParam, frameParams.StirrupBendLength);
         SetParam(_stirrupStepParam, frameParams.StirrupStep);
         SetParam(_stirrupCountParam, frameParams.GetFrameLength() / frameParams.StirrupStep + 1);
 

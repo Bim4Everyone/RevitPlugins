@@ -53,6 +53,9 @@ internal class MainViewModel : BaseViewModel {
     private RebarClass _selectedRebarClass;
     private int _stirrupStep;
     private int _frameWidth;
+    private int _selectedLongRebarDiameter;
+    private int _longRebarAnchorageLength;
+    private int _stirrupBendLength;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -276,6 +279,30 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
+    /// Длина отгибов хомутов, мм.
+    /// </summary>
+    public int StirrupBendLength {
+        get => _stirrupBendLength;
+        set => RaiseAndSetIfChanged(ref _stirrupBendLength, value);
+    }
+
+    /// <summary>
+    /// Диаметр продольных стержней каркаса, мм.
+    /// </summary>
+    public int SelectedLongRebarDiameter {
+        get => _selectedLongRebarDiameter;
+        set => RaiseAndSetIfChanged(ref _selectedLongRebarDiameter, value);
+    }
+
+    /// <summary>
+    /// Длина выпуска продольных стержней за крайние хомуты, мм.
+    /// </summary>
+    public int LongRebarAnchorageLength {
+        get => _longRebarAnchorageLength;
+        set => RaiseAndSetIfChanged(ref _longRebarAnchorageLength, value);
+    }
+
+    /// <summary>
     /// Метод загрузки главного окна.
     /// </summary>
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
@@ -358,6 +385,16 @@ internal class MainViewModel : BaseViewModel {
 
         if(FrameWidth <= 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorFrameWidth");
+            return false;
+        }
+
+        if(StirrupBendLength <= 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorStirrupBendLength");
+            return false;
+        }
+
+        if(LongRebarAnchorageLength < 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorLongRebarAnchorageLength");
             return false;
         }
 
@@ -492,6 +529,9 @@ internal class MainViewModel : BaseViewModel {
         SelectedRebarClass = setting?.StirrupRebarClass ?? RebarClass.A500C;
         StirrupStep = setting?.StirrupStep ?? 200;
         FrameWidth = setting?.FrameWidth ?? 200;
+        StirrupBendLength = setting?.StirrupBendLength ?? FrameParams.DefaultStirrupBendLengthMm;
+        SelectedLongRebarDiameter = setting?.LongRebarDiameter ?? FrameParams.DefaultLongRebarDiameterMm;
+        LongRebarAnchorageLength = setting?.LongRebarAnchorageLength ?? FrameParams.DefaultLongRebarAnchorageLengthMm;
     }
 
     /// <summary>
@@ -516,13 +556,9 @@ internal class MainViewModel : BaseViewModel {
         setting.SlabRebarDiameter = SelectedSlabRebarDiameter;
         setting.IsRebarCoverFromUser = IsRebarCoverFromUser;
 
-        if(IsRebarCoverFromSlab) {
-            setting.RebarCoverTop = Convert.ToInt32(UnitUtilsHelper.ToMm(_slab.RebarCoverTop.Value));
-            setting.RebarCoverBottom = Convert.ToInt32(UnitUtilsHelper.ToMm(_slab.RebarCoverBottom.Value));
-        } else {
-            setting.RebarCoverTop = RebarCoverTop;
-            setting.RebarCoverBottom = RebarCoverBottom;
-        }
+        // Сохраняются введенные вручную значения; в режиме "из плиты" слой берется из плиты при расстановке
+        setting.RebarCoverTop = RebarCoverTop;
+        setting.RebarCoverBottom = RebarCoverBottom;
 
         setting.FamilyName = SelectedFamilyName;
         setting.FamilyType = SelectedFamilyType;
@@ -530,6 +566,9 @@ internal class MainViewModel : BaseViewModel {
         setting.StirrupRebarClass = SelectedRebarClass;
         setting.StirrupStep = StirrupStep;
         setting.FrameWidth = FrameWidth;
+        setting.StirrupBendLength = StirrupBendLength;
+        setting.LongRebarDiameter = SelectedLongRebarDiameter;
+        setting.LongRebarAnchorageLength = LongRebarAnchorageLength;
 
         _pluginConfig.SaveProjectConfig();
         return setting;

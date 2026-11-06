@@ -27,6 +27,9 @@
     <system:String x:Key="MainWindow.StirrupRebarClass">Stirrup bar grade</system:String>
     <system:String x:Key="MainWindow.StirrupStep">Stirrup spacing, mm</system:String>
     <system:String x:Key="MainWindow.FrameWidth">Frame width, mm</system:String>
+    <system:String x:Key="MainWindow.StirrupBendLength">Stirrup hook length, mm</system:String>
+    <system:String x:Key="MainWindow.LongRebarDiameter">Longitudinal bar diameter, mm</system:String>
+    <system:String x:Key="MainWindow.LongRebarAnchorageLength">Longitudinal bar extension, mm</system:String>
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 
@@ -38,6 +41,8 @@
     <system:String x:Key="MainWindow.ErrorSelectFamilyType">Select the reinforcement frame type</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupStep">Enter a valid stirrup spacing</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidth">Enter a valid frame width</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupBendLength">Enter a valid stirrup hook length</system:String>
+    <system:String x:Key="MainWindow.ErrorLongRebarAnchorageLength">Enter a valid longitudinal bar extension</system:String>
     <system:String x:Key="MainWindow.ErrorFrameParamsMissing">The frame family lacks parameters: {0}</system:String>
     <system:String x:Key="MainWindow.ErrorFramePlacement">Failed to place an instance of the selected frame type</system:String>
     <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">The slab has no top or bottom rebar cover assigned</system:String>
