@@ -11,6 +11,12 @@
     <system:String x:Key="MainWindow.SlabNotSelected">Плита (не выбрана)</system:String>
     <system:String x:Key="MainWindow.ButtonSelect">Выбрать</system:String>
 
+    <system:String x:Key="MainWindow.SchemeTitle">Схема раскладки каркасов в плане</system:String>
+    <system:String x:Key="MainWindow.SchemeFrames">Каркасы, зазор между ними — ширина каркаса</system:String>
+    <system:String x:Key="MainWindow.SchemeFirstRow">a₀ = h₀/3 — от грани пилона до каркасов</system:String>
+    <system:String x:Key="MainWindow.SchemeZone">1,5·h₀ — граница зоны продавливания</system:String>
+    <system:String x:Key="MainWindow.SchemeWorkingHeight">h₀ — рабочая высота сечения плиты</system:String>
+
     <system:String x:Key="MainWindow.SlabRebar">Арматура плиты</system:String>
     <system:String x:Key="MainWindow.RebarDiameter">Диаметр стержней, мм</system:String>
     <system:String x:Key="MainWindow.RebarCover">Защитный слой</system:String>

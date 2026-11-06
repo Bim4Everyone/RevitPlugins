@@ -18,10 +18,10 @@
     WindowStartupLocation="CenterOwner"
     Title="{me:LocalizationSource MainWindow.Title}"
 
-    Height="770"
-    Width="1000"
-    MinHeight="600"
-    MinWidth="900"
+    Height="780"
+    Width="950"
+    MinHeight="780"
+    MinWidth="950"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -77,6 +77,37 @@
             <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
         </Style>
 
+        <!-- Схема раскладки каркасов -->
+        <Style x:Key="SchemeZone" TargetType="Rectangle">
+            <Setter Property="Stroke" Value="{DynamicResource TextFillColorTertiaryBrush}" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="StrokeDashArray" Value="4 3" />
+        </Style>
+
+        <Style x:Key="SchemeFrames" TargetType="Path">
+            <Setter Property="Fill" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+            <Setter Property="Opacity" Value="0.7" />
+        </Style>
+
+        <Style x:Key="SchemeFrameSwatch" TargetType="Rectangle">
+            <Setter Property="Fill" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+            <Setter Property="Opacity" Value="0.7" />
+        </Style>
+
+        <Style x:Key="SchemeFirstRow" TargetType="Rectangle">
+            <Setter Property="Stroke" Value="Orange" />
+            <Setter Property="StrokeThickness" Value="1.2" />
+        </Style>
+
+        <Style x:Key="SchemePylon" TargetType="Rectangle">
+            <Setter Property="Fill" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        </Style>
+
+        <Style x:Key="SchemeLegendText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -176,6 +207,121 @@
                                 Content="{me:LocalizationSource MainWindow.ButtonSelect}"
                                 Command="{Binding SelectSlabCommand}"
                                 CommandParameter="{Binding ElementName=mainWindow}" />
+                        </Grid>
+
+                        <Grid Margin="0 8 0 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Viewbox
+                                Grid.Column="0"
+                                MaxHeight="72"
+                                Margin="5 0 10 0"
+                                VerticalAlignment="Top"
+                                Stretch="Uniform"
+                                ToolTip="{me:LocalizationSource MainWindow.SchemeTitle}">
+                                <Canvas
+                                    Width="180"
+                                    Height="100">
+                                    <!-- Граница зоны продавливания 1,5·h0 -->
+                                    <Rectangle
+                                        Canvas.Left="5"
+                                        Canvas.Top="5"
+                                        Width="170"
+                                        Height="90"
+                                        Style="{StaticResource SchemeZone}" />
+
+                                    <!-- Каркасы у длинных и коротких граней пилона -->
+                                    <Path
+                                        Style="{StaticResource SchemeFrames}"
+                                        Data="M39,5 h6 v27.5 h-6 Z M39,67.5 h6 v27.5 h-6 Z M51,5 h6 v27.5 h-6 Z M51,67.5 h6 v27.5 h-6 Z M63,5 h6 v27.5 h-6 Z M63,67.5 h6 v27.5 h-6 Z M75,5 h6 v27.5 h-6 Z M75,67.5 h6 v27.5 h-6 Z M87,5 h6 v27.5 h-6 Z M87,67.5 h6 v27.5 h-6 Z M99,5 h6 v27.5 h-6 Z M99,67.5 h6 v27.5 h-6 Z M111,5 h6 v27.5 h-6 Z M111,67.5 h6 v27.5 h-6 Z M123,5 h6 v27.5 h-6 Z M123,67.5 h6 v27.5 h-6 Z M135,5 h6 v27.5 h-6 Z M135,67.5 h6 v27.5 h-6 Z M5,5 h27.5 v6 h-27.5 Z M147.5,5 h27.5 v6 h-27.5 Z M5,17 h27.5 v6 h-27.5 Z M147.5,17 h27.5 v6 h-27.5 Z M5,29 h27.5 v6 h-27.5 Z M147.5,29 h27.5 v6 h-27.5 Z M5,41 h27.5 v6 h-27.5 Z M147.5,41 h27.5 v6 h-27.5 Z M5,53 h27.5 v6 h-27.5 Z M147.5,53 h27.5 v6 h-27.5 Z M5,65 h27.5 v6 h-27.5 Z M147.5,65 h27.5 v6 h-27.5 Z M5,77 h27.5 v6 h-27.5 Z M147.5,77 h27.5 v6 h-27.5 Z M5,89 h27.5 v6 h-27.5 Z M147.5,89 h27.5 v6 h-27.5 Z" />
+
+                                    <!-- Отступ a0 = h0/3 от граней пилона до каркасов -->
+                                    <Rectangle
+                                        Canvas.Left="32.5"
+                                        Canvas.Top="32.5"
+                                        Width="115"
+                                        Height="35"
+                                        Style="{StaticResource SchemeFirstRow}" />
+
+                                    <!-- Пилон -->
+                                    <Rectangle
+                                        Canvas.Left="40"
+                                        Canvas.Top="40"
+                                        Width="100"
+                                        Height="20"
+                                        Style="{StaticResource SchemePylon}" />
+                                </Canvas>
+                            </Viewbox>
+
+                            <Grid
+                                Grid.Column="1"
+                                VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <Rectangle
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Width="16"
+                                    Height="8"
+                                    Margin="0 0 6 0"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource SchemeFrameSwatch}" />
+
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SchemeLegendText}"
+                                    Text="{me:LocalizationSource MainWindow.SchemeFrames}" />
+
+                                <Rectangle
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Width="16"
+                                    Height="8"
+                                    Margin="0 0 6 0"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource SchemeFirstRow}" />
+
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SchemeLegendText}"
+                                    Text="{me:LocalizationSource MainWindow.SchemeFirstRow}" />
+
+                                <Rectangle
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Width="16"
+                                    Height="8"
+                                    Margin="0 0 6 0"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource SchemeZone}" />
+
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SchemeLegendText}"
+                                    Text="{me:LocalizationSource MainWindow.SchemeZone}" />
+
+                                <TextBlock
+                                    Grid.Row="3"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SchemeLegendText}"
+                                    Text="{me:LocalizationSource MainWindow.SchemeWorkingHeight}" />
+                            </Grid>
                         </Grid>
                     </StackPanel>
                 </Border>

@@ -11,6 +11,12 @@
     <system:String x:Key="MainWindow.SlabNotSelected">Slab (not selected)</system:String>
     <system:String x:Key="MainWindow.ButtonSelect">Select</system:String>
 
+    <system:String x:Key="MainWindow.SchemeTitle">Frame layout in plan</system:String>
+    <system:String x:Key="MainWindow.SchemeFrames">Frames, gap between them equals frame width</system:String>
+    <system:String x:Key="MainWindow.SchemeFirstRow">a₀ = h₀/3 — from pylon face to frames</system:String>
+    <system:String x:Key="MainWindow.SchemeZone">1.5·h₀ — punching shear zone boundary</system:String>
+    <system:String x:Key="MainWindow.SchemeWorkingHeight">h₀ — effective depth of the slab</system:String>
+
     <system:String x:Key="MainWindow.SlabRebar">Slab reinforcement</system:String>
     <system:String x:Key="MainWindow.RebarDiameter">Bar diameter, mm</system:String>
     <system:String x:Key="MainWindow.RebarCover">Rebar cover</system:String>
