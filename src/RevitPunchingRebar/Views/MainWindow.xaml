@@ -336,7 +336,13 @@
                             Grid.Column="1"
                             Grid.Row="1"
                             ItemsSource="{Binding FamilyTypes}"
-                            SelectedItem="{Binding SelectedFamilyType}"/>
+                            SelectedItem="{Binding SelectedFamilyType}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding CheckFrameTypeCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ComboBox>
 
                         <ComboBox
                             Grid.Column="1"

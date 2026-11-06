@@ -3,36 +3,42 @@ using Autodesk.Revit.DB.Structure;
 
 namespace RevitPunchingRebar.Models;
 internal class Slab {
-    public Floor SlabInstance { get; }
-    public double RebarCoverTop { get; }
-    public double RebarCoverBottom { get; }
-    public double Thickness { get; }
-
     internal Slab(Element element) {
         if(element != null) {
             SlabInstance = element as Floor;
             Thickness = element.get_Parameter(BuiltInParameter.FLOOR_ATTR_THICKNESS_PARAM).AsDouble();
 
-            RebarCoverTop = GetRebarCoverTop();
-            RebarCoverBottom = GetRebarCoverBottom();
+            RebarCoverTop = GetRebarCover(BuiltInParameter.CLEAR_COVER_TOP);
+            RebarCoverBottom = GetRebarCover(BuiltInParameter.CLEAR_COVER_BOTTOM);
         }
     }
 
-    private double GetRebarCoverTop() {
-        Document doc = SlabInstance.Document;
+    public Floor SlabInstance { get; }
 
-        RebarCoverType rebarCoverTopType = doc.GetElement(SlabInstance.get_Parameter(BuiltInParameter.CLEAR_COVER_TOP).AsElementId()) as RebarCoverType;
-        double rebarCoverUp = rebarCoverTopType.CoverDistance;
+    /// <summary>
+    /// Защитный слой сверху из типа защитного слоя плиты. null, если тип защитного слоя не назначен.
+    /// </summary>
+    public double? RebarCoverTop { get; }
 
-        return rebarCoverUp;
-    }
+    /// <summary>
+    /// Защитный слой снизу из типа защитного слоя плиты. null, если тип защитного слоя не назначен.
+    /// </summary>
+    public double? RebarCoverBottom { get; }
 
-    private double GetRebarCoverBottom() {
-        Document doc = SlabInstance.Document;
+    public double Thickness { get; }
 
-        RebarCoverType rebarCoverBottomType = doc.GetElement(SlabInstance.get_Parameter(BuiltInParameter.CLEAR_COVER_BOTTOM).AsElementId()) as RebarCoverType;
-        double rebarCoverBottom = rebarCoverBottomType.CoverDistance;
+    /// <summary>
+    /// Назначены ли плите типы защитного слоя сверху и снизу.
+    /// </summary>
+    public bool HasRebarCover => RebarCoverTop.HasValue && RebarCoverBottom.HasValue;
 
-        return rebarCoverBottom;
+    private double? GetRebarCover(BuiltInParameter coverParam) {
+        ElementId coverTypeId = SlabInstance?.get_Parameter(coverParam)?.AsElementId();
+        if(coverTypeId == null) {
+            return null;
+        }
+
+        RebarCoverType coverType = SlabInstance.Document.GetElement(coverTypeId) as RebarCoverType;
+        return coverType?.CoverDistance;
     }
 }

@@ -14,6 +14,8 @@ using RevitPunchingRebar.Models;
 using RevitPunchingRebar.Models.Interfaces;
 using RevitPunchingRebar.Services;
 
+using Frame = RevitPunchingRebar.Models.Frame;
+
 namespace RevitPunchingRebar.ViewModels;
 
 /// <summary>
@@ -28,6 +30,7 @@ internal class MainViewModel : BaseViewModel {
     private List<ElementId> _pylonsFromModel = [];
     private List<LinkedPylonReference> _pylonsFromLink = [];
     private Slab _slab;
+    private string _frameTypeError;
 
     private string _errorText;
 
@@ -75,6 +78,7 @@ internal class MainViewModel : BaseViewModel {
         SelectPylonsFromLinkCommand = RelayCommand.Create<Window>(SelectPylonsFromLink);
         SelectSlabCommand = RelayCommand.Create<Window>(SelectSlab);
         LoadFamilyTypesCommand = RelayCommand.Create(LoadFamilyTypes);
+        CheckFrameTypeCommand = RelayCommand.Create(CheckFrameType);
 
         RebarClasses = [
             new RebarClassVM(RebarClass.A500C, _localizationService.GetLocalizedString("RebarClass.A500C")),
@@ -111,6 +115,11 @@ internal class MainViewModel : BaseViewModel {
     /// Команда загрузки типов выбранного семейства каркаса.
     /// </summary>
     public ICommand LoadFamilyTypesCommand { get; }
+
+    /// <summary>
+    /// Команда проверки выбранного типа каркаса.
+    /// </summary>
+    public ICommand CheckFrameTypeCommand { get; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -305,8 +314,17 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        double rebarCoverTop = UnitUtilsHelper.FromMm(RebarCoverTop);
-        double rebarCoverBottom = UnitUtilsHelper.FromMm(RebarCoverBottom);
+        if(IsRebarCoverFromSlab && !_slab.HasRebarCover) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSlabRebarCoverMissing");
+            return false;
+        }
+
+        double rebarCoverTop = IsRebarCoverFromSlab
+            ? _slab.RebarCoverTop.Value
+            : UnitUtilsHelper.FromMm(RebarCoverTop);
+        double rebarCoverBottom = IsRebarCoverFromSlab
+            ? _slab.RebarCoverBottom.Value
+            : UnitUtilsHelper.FromMm(RebarCoverBottom);
 
         if(rebarCoverTop <= 0 || rebarCoverTop > _slab.Thickness * 0.5) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorRebarCoverTop");
@@ -325,6 +343,11 @@ internal class MainViewModel : BaseViewModel {
 
         if(string.IsNullOrEmpty(SelectedFamilyType)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectFamilyType");
+            return false;
+        }
+
+        if(_frameTypeError != null) {
+            ErrorText = _frameTypeError;
             return false;
         }
 
@@ -405,6 +428,34 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
+    /// Проверяет, что у выбранного типа каркаса есть все параметры, которые заполняет плагин.
+    /// </summary>
+    private void CheckFrameType() {
+        _frameTypeError = null;
+        if(string.IsNullOrEmpty(SelectedFamilyName) || string.IsNullOrEmpty(SelectedFamilyType)) {
+            return;
+        }
+
+        FamilySymbol symbol = _revitRepository.GetFrameSymbol(SelectedFamilyName, SelectedFamilyType);
+        if(symbol == null) {
+            _frameTypeError = _localizationService.GetLocalizedString("MainWindow.ErrorSelectFamilyType");
+            return;
+        }
+
+        try {
+            List<string> missingParams = _revitRepository.GetMissingFrameParams(symbol, Frame.RequiredParamNames);
+            if(missingParams.Count > 0) {
+                _frameTypeError = string.Format(
+                    _localizationService.GetLocalizedString("MainWindow.ErrorFrameParamsMissing"),
+                    string.Join(", ", missingParams));
+            }
+        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+            // Экземпляр выбранного типа не удалось разместить без основы
+            _frameTypeError = _localizationService.GetLocalizedString("MainWindow.ErrorFramePlacement");
+        }
+    }
+
+    /// <summary>
     /// Расставляет каркасы у выбранных пилонов по сохраненным настройкам.
     /// </summary>
     private void PlaceFrames(RevitSettings settings) {
@@ -426,9 +477,10 @@ internal class MainViewModel : BaseViewModel {
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        SelectedFamilyName = setting?.FamilyName ?? string.Empty;
+        SelectedFamilyName = GetAvailableValue(FamilyNames, setting?.FamilyName, Frame.DefaultFamilyName);
         LoadFamilyTypes();
-        SelectedFamilyType = setting?.FamilyType ?? string.Empty;
+        SelectedFamilyType = GetAvailableValue(FamilyTypes, setting?.FamilyType, Frame.DefaultFamilyTypeName);
+        CheckFrameType();
 
         SelectedSlabRebarDiameter = setting?.SlabRebarDiameter ?? 10;
         IsRebarCoverFromUser = setting?.IsRebarCoverFromUser ?? true;
@@ -443,6 +495,17 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
+    /// Возвращает сохраненное значение, если оно есть в списке, иначе значение по умолчанию, если есть оно.
+    /// </summary>
+    private static string GetAvailableValue(IList<string> values, string savedValue, string defaultValue) {
+        if(savedValue != null && values.Contains(savedValue)) {
+            return savedValue;
+        }
+
+        return values.Contains(defaultValue) ? defaultValue : null;
+    }
+
+    /// <summary>
     /// Сохранение настроек плагина.
     /// </summary>
     /// <returns>Сохраненные настройки текущего проекта.</returns>
@@ -454,8 +517,8 @@ internal class MainViewModel : BaseViewModel {
         setting.IsRebarCoverFromUser = IsRebarCoverFromUser;
 
         if(IsRebarCoverFromSlab) {
-            setting.RebarCoverTop = Convert.ToInt32(UnitUtilsHelper.ToMm(_slab.RebarCoverTop));
-            setting.RebarCoverBottom = Convert.ToInt32(UnitUtilsHelper.ToMm(_slab.RebarCoverBottom));
+            setting.RebarCoverTop = Convert.ToInt32(UnitUtilsHelper.ToMm(_slab.RebarCoverTop.Value));
+            setting.RebarCoverBottom = Convert.ToInt32(UnitUtilsHelper.ToMm(_slab.RebarCoverBottom.Value));
         } else {
             setting.RebarCoverTop = RebarCoverTop;
             setting.RebarCoverBottom = RebarCoverBottom;

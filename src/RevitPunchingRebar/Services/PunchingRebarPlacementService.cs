@@ -34,12 +34,21 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     }
 
     public void Run(IEnumerable<IPylon> pylons, IFrameParams frameParams) {
+        FamilySymbol frameSymbol = _revitRepository.GetFrameSymbol(
+            frameParams.FrameFamilyName, frameParams.FrameFamilyTypeName);
+
+        // Тип, который еще не размещался в проекте, нужно активировать до создания экземпляров
+        if(!frameSymbol.IsActive) {
+            frameSymbol.Activate();
+            _revitRepository.Document.Regenerate();
+        }
+
         foreach(IPylon pylon in pylons) {
-            CreateFrames(pylon, frameParams);
+            CreateFrames(pylon, frameSymbol, frameParams);
         }
     }
 
-    private void CreateFrames(IPylon pylon, IFrameParams frameParams) {
+    private void CreateFrames(IPylon pylon, FamilySymbol frameSymbol, IFrameParams frameParams) {
         XYZ location = new XYZ();
 
         if(frameParams.HostSlab.SlabInstance.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralFoundation) {
@@ -52,7 +61,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         }
 
         //Создаем каркас в первом направлении
-        Frame frame1 = _revitRepository.CreateFrame(frameParams, location);
+        Frame frame1 = _revitRepository.CreateFrame(frameSymbol, frameParams, location);
 
         //Делаем геометрические преобразования
         MoveFrameDown(frame1, frameParams);
@@ -66,7 +75,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         CopyFrame(pylon, mirroredFrame1, frameParams, -pylon.FacingOrientation);
 
         //Создаем каркас во втором направлении
-        Frame frame2 = _revitRepository.CreateFrame(frameParams, location);
+        Frame frame2 = _revitRepository.CreateFrame(frameSymbol, frameParams, location);
 
         MoveFrameDown(frame2, frameParams);
         RotateFrame(frame2, pylon.FacingOrientation.AngleTo(frame2.FrameInstance.FacingOrientation) + Math.PI / 2);

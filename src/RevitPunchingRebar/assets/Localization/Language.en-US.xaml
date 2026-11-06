@@ -38,9 +38,13 @@
     <system:String x:Key="MainWindow.ErrorSelectFamilyType">Select the reinforcement frame type</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupStep">Enter a valid stirrup spacing</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidth">Enter a valid frame width</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameParamsMissing">The frame family lacks parameters: {0}</system:String>
+    <system:String x:Key="MainWindow.ErrorFramePlacement">Failed to place an instance of the selected frame type</system:String>
+    <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">The slab has no top or bottom rebar cover assigned</system:String>
     <system:String x:Key="MainWindow.TransactionName">Placing reinforcement frames</system:String>
 
     <system:String x:Key="RevitUI.PickSlab">Select a slab</system:String>
+    <system:String x:Key="RevitUI.CheckFrameTypeTransaction">Checking the frame type</system:String>
     <system:String x:Key="RevitUI.PickPylons">Select pylons</system:String>
 
     <system:String x:Key="RebarClass.A500C">A500C</system:String>

@@ -38,9 +38,13 @@
     <system:String x:Key="MainWindow.ErrorSelectFamilyType">Выберите тип арматурных каркасов</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupStep">Введите корректный шаг хомутов</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidth">Введите корректную ширину каркаса</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameParamsMissing">В семействе каркаса нет параметров: {0}</system:String>
+    <system:String x:Key="MainWindow.ErrorFramePlacement">Не удалось разместить экземпляр выбранного типа каркаса</system:String>
+    <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">У плиты не назначен защитный слой сверху или снизу</system:String>
     <system:String x:Key="MainWindow.TransactionName">Расстановка каркасов</system:String>
 
     <system:String x:Key="RevitUI.PickSlab">Выберите плиту</system:String>
+    <system:String x:Key="RevitUI.CheckFrameTypeTransaction">Проверка типа каркаса</system:String>
     <system:String x:Key="RevitUI.PickPylons">Выберите пилоны</system:String>
 
     <system:String x:Key="RebarClass.A500C">А500С</system:String>

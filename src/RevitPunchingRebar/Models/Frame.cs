@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
@@ -49,6 +49,36 @@ internal class Frame {
 
     // Класс продольных стержней каркаса
     private const RebarClass _longRebarClass = RebarClass.A500C;
+
+    /// <summary>
+    /// Параметры, которые обязательно должны быть у экземпляра семейства каркаса.
+    /// </summary>
+    public static readonly IReadOnlyList<string> RequiredParamNames = [
+        _longRebarCodeParam,
+        _stirrupCodeParam,
+        _widthStepParam,
+        _heightStepParam,
+        _anchorageTop1Param,
+        _anchorageTop2Param,
+        _anchorageBottom1Param,
+        _anchorageBottom2Param,
+        _stirrupChangeBindingParam,
+        _stirrupDiameterParam,
+        _stirrupBendLengthParam,
+        _stirrupStepParam,
+        _stirrupCountParam,
+        _krGroupParam
+    ];
+
+    /// <summary>
+    /// Семейство каркаса по умолчанию.
+    /// </summary>
+    public const string DefaultFamilyName = "IFC_Каркас_!КГор_№1";
+
+    /// <summary>
+    /// Тип каркаса по умолчанию.
+    /// </summary>
+    public const string DefaultFamilyTypeName = "Х_1501";
 
     // Диаметр продольных стержней каркаса
     public readonly double LongRebarDiameter = UnitUtilsHelper.FromMm(_longRebarDiameterMm);
@@ -111,7 +141,7 @@ internal class Frame {
         Parameter param = FrameInstance.LookupParameter(paramName);
 
         if(param == null) {
-            throw new NullReferenceException($"Параметр {paramName} не существет");
+            throw new InvalidOperationException($"Параметр {paramName} не существует");
         }
 
         param.Set(paramValue);
@@ -121,7 +151,7 @@ internal class Frame {
         Parameter param = FrameInstance.LookupParameter(paramName);
 
         if(param == null) {
-            throw new NullReferenceException($"Параметр {paramName} не существет");
+            throw new InvalidOperationException($"Параметр {paramName} не существует");
         }
 
         param.Set(paramValue);
@@ -131,7 +161,7 @@ internal class Frame {
         Parameter param = FrameInstance.LookupParameter(paramName);
 
         if(param == null) {
-            throw new NullReferenceException($"Параметр {paramName} не существет");
+            throw new InvalidOperationException($"Параметр {paramName} не существует");
         }
 
         param.Set(paramValue);
@@ -141,25 +171,60 @@ internal class Frame {
         Parameter param = hostElement.LookupParameter(paramName);
 
         if(param == null) {
-            throw new NullReferenceException($"Параметр {paramName} не существет");
+            throw new InvalidOperationException($"Параметр {paramName} не существует");
         }
 
         return (T) param.AsObject();
     }
 
     /// <summary>
-    /// Копируем параметры из опалубки
+    /// Копирует параметры из опалубки.
     /// </summary>
-    /// <param name="hostElement"></param>
+    /// <remarks>
+    /// Каждый параметр копируется независимо: если параметра нет у плиты или у каркаса,
+    /// он пропускается, а остальные копируются.
+    /// </remarks>
+    /// <param name="hostElement">Плита, в которой расставляются каркасы.</param>
     private void CopyParametersFromSlab(Element hostElement) {
-        try {
-            FrameInstance.SetParamValue(SharedParamsConfig.Instance.BuildingWorksBlock, hostElement.GetParamValue<string>(SharedParamsConfig.Instance.BuildingWorksBlock));
-            FrameInstance.SetParamValue(SharedParamsConfig.Instance.BuildingWorksSection, hostElement.GetParamValue<string>(SharedParamsConfig.Instance.BuildingWorksSection));
-            FrameInstance.SetParamValue(SharedParamsConfig.Instance.BuildingWorksLevel, hostElement.GetParamValue<string>(SharedParamsConfig.Instance.BuildingWorksLevel));
+        string[] paramNames = [
+            SharedParamsConfig.Instance.BuildingWorksBlock.Name,
+            SharedParamsConfig.Instance.BuildingWorksSection.Name,
+            SharedParamsConfig.Instance.BuildingWorksLevel.Name,
+            _projectSectionParam,
+            _consumptionMarkParam,
+            _orgLevelParam
+        ];
 
-            SetParam(_projectSectionParam, GetParam<string>(hostElement, _projectSectionParam));
-            SetParam(_consumptionMarkParam, GetParam<string>(hostElement, _consumptionMarkParam));
-            SetParam(_orgLevelParam, GetParam<double>(hostElement, _orgLevelParam));
-        } catch { }
+        foreach(string paramName in paramNames) {
+            CopyParam(hostElement, paramName);
+        }
+    }
+
+    private void CopyParam(Element sourceElement, string paramName) {
+        Parameter sourceParam = sourceElement.LookupParameter(paramName);
+        Parameter targetParam = FrameInstance.LookupParameter(paramName);
+
+        if(sourceParam == null
+           || targetParam == null
+           || targetParam.IsReadOnly
+           || !sourceParam.HasValue
+           || sourceParam.StorageType != targetParam.StorageType) {
+            return;
+        }
+
+        switch(sourceParam.StorageType) {
+            case StorageType.String:
+                targetParam.Set(sourceParam.AsString());
+                break;
+            case StorageType.Double:
+                targetParam.Set(sourceParam.AsDouble());
+                break;
+            case StorageType.Integer:
+                targetParam.Set(sourceParam.AsInteger());
+                break;
+            case StorageType.ElementId:
+                targetParam.Set(sourceParam.AsElementId());
+                break;
+        }
     }
 }

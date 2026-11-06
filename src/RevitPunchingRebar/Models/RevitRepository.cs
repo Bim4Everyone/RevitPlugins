@@ -6,6 +6,7 @@ using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitPunchingRebar.Models.Interfaces;
@@ -122,14 +123,46 @@ internal class RevitRepository {
         return pylons;
     }
 
-    public Frame CreateFrame(IFrameParams frameParams, XYZ location) {
-        FilteredElementCollector collector = new FilteredElementCollector(Document).OfClass(typeof(FamilySymbol));
-        FamilySymbol frameFS = collector.ToElements().Cast<FamilySymbol>()
-                                            .Where(x => x.get_Parameter(BuiltInParameter.SYMBOL_FAMILY_NAME_PARAM).AsString() == frameParams.FrameFamilyName)
-                                            .Where(x => x.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString() == frameParams.FrameFamilyTypeName)
-                                            .FirstOrDefault();
+    /// <summary>
+    /// Возвращает тип каркаса по имени семейства и типа, или null, если такого типа нет в проекте.
+    /// </summary>
+    public FamilySymbol GetFrameSymbol(string familyName, string typeName) {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(FamilySymbol))
+            .Cast<FamilySymbol>()
+            .FirstOrDefault(symbol => symbol.FamilyName == familyName && symbol.Name == typeName);
+    }
 
-        FamilyInstance frameInstance = Document.Create.NewFamilyInstance(location, frameFS, StructuralType.NonStructural);
+    /// <summary>
+    /// Проверяет, каких параметров не хватает экземпляру типа каркаса.
+    /// </summary>
+    /// <remarks>
+    /// Создает пробный экземпляр во временной транзакции и откатывает ее, поэтому учитываются
+    /// и параметры семейства, и параметры проекта, назначенные категории семейства.
+    /// </remarks>
+    /// <param name="symbol">Тип каркаса.</param>
+    /// <param name="paramNames">Имена обязательных параметров.</param>
+    /// <returns>Имена отсутствующих параметров.</returns>
+    public List<string> GetMissingFrameParams(FamilySymbol symbol, IEnumerable<string> paramNames) {
+        string transactionName = _localizationService.GetLocalizedString("RevitUI.CheckFrameTypeTransaction");
+        using Transaction transaction = Document.StartTransaction(transactionName);
+
+        if(!symbol.IsActive) {
+            symbol.Activate();
+        }
+
+        FamilyInstance instance = Document.Create.NewFamilyInstance(XYZ.Zero, symbol, StructuralType.NonStructural);
+        List<string> missingParams = paramNames
+            .Where(paramName => instance.LookupParameter(paramName) == null)
+            .ToList();
+
+        transaction.RollBack();
+        return missingParams;
+    }
+
+    public Frame CreateFrame(FamilySymbol frameSymbol, IFrameParams frameParams, XYZ location) {
+        FamilyInstance frameInstance = Document.Create.NewFamilyInstance(
+            location, frameSymbol, StructuralType.NonStructural);
 
         Frame frame = new Frame(frameInstance, frameParams);
 
