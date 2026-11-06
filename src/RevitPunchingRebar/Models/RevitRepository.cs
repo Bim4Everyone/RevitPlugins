@@ -1,18 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
-
-using dosymep.Revit;
 
 using RevitPunchingRebar.Models.Interfaces;
-using RevitPunchingRebar.Models.SelectionFilters;
 
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
@@ -37,26 +31,21 @@ internal class RevitRepository {
     /// Класс доступа к интерфейсу Revit.
     /// </summary>
     public UIApplication UIApplication { get; }
-    
+
     /// <summary>
     /// Класс доступа к интерфейсу документа Revit.
     /// </summary>
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-    
+
     /// <summary>
     /// Класс доступа к приложению Revit.
     /// </summary>
     public Application Application => UIApplication.Application;
-    
+
     /// <summary>
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
-
-    /// <summary>
-    /// Содержит ID связанного файла, из которого выбирают пилоны
-    /// </summary>
-    public int LinkDocumentId {  get; private set; }
 
     public double FromMmToFt(int mm) {
         return mm / 304.8;
@@ -113,7 +102,6 @@ internal class RevitRepository {
                                             .FirstOrDefault();
 
         FamilyInstance frameInstance = Document.Create.NewFamilyInstance(location, frameFS, StructuralType.NonStructural);
-
 
         Frame frame = new Frame(frameInstance, frameParams);
 

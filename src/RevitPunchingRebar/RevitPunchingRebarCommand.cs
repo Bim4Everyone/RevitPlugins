@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Annotations;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -52,7 +51,6 @@ public class RevitPunchingRebarCommand : BasePluginCommand {
         try {
             // Создание контейнера зависимостей плагина с сервисами из платформы
             using IKernel kernel = uiApplication.CreatePlatformServices();
-            //IKernel kernel = uiApplication.CreatePlatformServices();
 
             // Настройка доступа к Revit
             kernel.Bind<RevitRepository>()
@@ -66,17 +64,8 @@ public class RevitPunchingRebarCommand : BasePluginCommand {
             // Используем сервис обновления тем для WinUI
             kernel.UseWpfUIThemeUpdater();
 
-
             kernel.Bind<IPunchingRebarPlacementService>()
                 .To<PunchingRebarPlacementService>()
-                .InSingletonScope();
-
-            kernel.Bind<IFrameParams>()
-                .To<FrameParams>()
-                .InSingletonScope();
-
-            kernel.Bind<IPylon>()
-                .To<StructColumnPylon>()
                 .InSingletonScope();
 
             // Настройка запуска окна
@@ -99,17 +88,7 @@ public class RevitPunchingRebarCommand : BasePluginCommand {
                 $"/{assemblyName};component/assets/localization/language.xaml",
                 CultureInfo.GetCultureInfo("ru-RU"));
 
-            var revitRepository = kernel.Get<RevitRepository>();
-
-            //Notification(kernel.Get<MainWindow>());
             kernel.Get<MainWindow>().Show();
-
-
         } catch(Exception ex) { MessageBox.Show(ex.ToString()); }
-        
-       
-        
-
-
     }
 }

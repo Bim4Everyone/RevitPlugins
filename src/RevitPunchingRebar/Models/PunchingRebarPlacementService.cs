@@ -1,15 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Xml;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Revit;
 
@@ -19,7 +12,6 @@ namespace RevitPunchingRebar.Models;
 internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     public void Run(IEnumerable<IPylon> pylons, IFrameParams frameParams, RevitRepository revitRepository) {
         foreach(IPylon pylon in pylons) {
-
             CreateFrames(pylon, frameParams, revitRepository);
         }
     }
@@ -38,7 +30,6 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         //Создаем каркас в первом направлении
         Frame frame1 = revitRepository.CreateFrame(frameParams, location);
-
 
         //Делаем геометрические преобразования
         MoveFrameDown(frame1, frameParams);
@@ -79,7 +70,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         XYZ startPoint = frame.GetLocation();
         XYZ endPoint;
 
-        if (frameParams.StirrupRebarClass == 240) {
+        if(frameParams.StirrupRebarClass == 240) {
             endPoint = new XYZ
                 (
                     startPoint.X,
@@ -123,7 +114,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         double angle = GetAngleBetweenInstances(pylon, frame);
 
-        if (angle == 90) {
+        if(angle == 90) {
             int frameCount = GetFramesCount(pylon, frame, frameParams);
 
             endPoint = new XYZ
@@ -142,7 +133,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
                     pylon.GetLocation().Y + pylon.FacingOrientation.X * (frameLength / 2 + pylon.Width / 2 + afterPylonDistance),
                     startPoint.Z
                 );
-        } 
+        }
 
         frame.FrameInstance.Location.Move(endPoint - startPoint);
     }
@@ -174,7 +165,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
                         startPoint.Y + pylon.FacingOrientation.Y * 0.5 * (frameCount * (2 * frameParams.FrameWidth) - 2 * frameParams.FrameWidth),
                         startPoint.Z
                     );
-        } 
+        }
 
         frame.FrameInstance.Location.Move(endPoint - startPoint);
     }

@@ -1,11 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.Revit.DB;
-
 namespace RevitPunchingRebar.Models.Interfaces;
 internal interface IFrameParams {
     string FrameFamilyName { get; set; }
@@ -16,7 +8,7 @@ internal interface IFrameParams {
     double RebarCoverTop { get; set; }
     double RebarCoverBottom { get; set; }
     double PlateRebarDiameter { get; set; }
-    
+
     int StirrupRebarClass { get; set; }
     double StirrupRebarDiameter { get; set; }
     double StirrupStep { get; set; }
@@ -30,7 +22,7 @@ internal interface IFrameParams {
     double GetFrameLength();
 
     /// <summary>
-    /// Находит высоту каркаса (расстояние между ц.т. 
+    /// Находит высоту каркаса (расстояние между ц.т.
     /// продольных стержней)
     /// </summary>
     /// <returns></returns>
@@ -47,5 +39,4 @@ internal interface IFrameParams {
     /// </summary>
     /// <returns></returns>
     double GetPunchingZone();
-      
 }

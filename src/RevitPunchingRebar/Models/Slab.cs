@@ -1,15 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
-
-using dosymep.Bim4Everyone;
-using dosymep.Bim4Everyone.SystemParams;
-using dosymep.Revit;
 
 namespace RevitPunchingRebar.Models;
 internal class Slab {
@@ -44,5 +34,5 @@ internal class Slab {
         double rebarCoverBottom = rebarCoverBottomType.CoverDistance;
 
         return rebarCoverBottom;
-    } 
+    }
 }

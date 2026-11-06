@@ -1,4 +1,3 @@
-using System;
 using System.Windows;
 
 using dosymep.SimpleServices;
@@ -56,7 +55,7 @@ public partial class MainWindow {
     /// Используется для сохранения положения окна.
     /// </remarks>
     public override string PluginName => nameof(RevitPunchingRebar);
-    
+
     /// <summary>
     /// Наименование файла конфигурации.
     /// </summary>

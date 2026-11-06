@@ -1,22 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Windows;
 using System.Windows.Input;
-using System.Xml.Linq;
 
-using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 
-using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPunchingRebar.Models;
-using RevitPunchingRebar.Models.Interfaces;
-using RevitPunchingRebar.Models.SelectionFilters;
 
 namespace RevitPunchingRebar.ViewModels;
 
@@ -50,7 +41,7 @@ internal class MainViewModel : BaseViewModel {
     private string _selectedSlabId;
     public string SelectedSlabId {
         get { return _selectedSlabId; }
-        set { 
+        set {
             _selectedSlabId = value;
             SelectedSlabeChanged();
         }
@@ -62,7 +53,7 @@ internal class MainViewModel : BaseViewModel {
         set {
             _selectedPylonsFromModel = value;
 
-            if (value.Count != 0) {
+            if(value.Count != 0) {
                 SelectedPylonsFromLink.Clear();
                 SelectedPylonsCount = _selectedPylonsFromModel.Count;
             }
@@ -85,7 +76,7 @@ internal class MainViewModel : BaseViewModel {
     private int _selectedPylonsCount;
     public int SelectedPylonsCount {
         get { return _selectedPylonsCount; }
-        set { 
+        set {
             _selectedPylonsCount = value;
             OnPropertyChanged(nameof(SelectedPylonsCount));
         }
@@ -95,20 +86,17 @@ internal class MainViewModel : BaseViewModel {
 
     public string IsSlabSelected {
         get { return _isSlabSelected; }
-        set { 
+        set {
             _isSlabSelected = value;
             OnPropertyChanged(nameof(IsSlabSelected));
         }
     }
 
-
-
-
     //Арматура плиты
     private int _selectedSlabRebarDiameter;
     public int SelectedSlabRebarDiameter {
         get { return _selectedSlabRebarDiameter; }
-        set { 
+        set {
             _selectedSlabRebarDiameter = value;
             OnPropertyChanged(nameof(SelectedSlabRebarDiameter));
         }
@@ -117,7 +105,7 @@ internal class MainViewModel : BaseViewModel {
     private bool _isRebarCoverFromSlab;
     public bool IsRebarCoverFromSlab {
         get { return _isRebarCoverFromSlab; }
-        set { 
+        set {
             _isRebarCoverFromSlab = value;
             IsControlEnabled = !value;
             OnPropertyChanged();
@@ -136,8 +124,8 @@ internal class MainViewModel : BaseViewModel {
     private bool _isControlEnabled;
     public bool IsControlEnabled {
         get { return _isControlEnabled; }
-        set { 
-            _isControlEnabled = value; 
+        set {
+            _isControlEnabled = value;
             OnPropertyChanged(nameof(IsControlEnabled));
         }
     }
@@ -160,16 +148,13 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
-
-
-
     //Арматура каркасов
     public IList<string> FamilyNames { get; set; }
 
     private string _selectedFamilyName;
     public string SelectedFamilyName {
         get { return _selectedFamilyName; }
-        set { 
+        set {
             _selectedFamilyName = value;
             FamilyTypes = _revitRepository.GetFamilyTypes(value);
             OnPropertyChanged(nameof(SelectedFamilyName));
@@ -179,8 +164,8 @@ internal class MainViewModel : BaseViewModel {
     private IList<string> _familyTypes;
     public IList<string> FamilyTypes {
         get { return _familyTypes; }
-        set { 
-            _familyTypes = value; 
+        set {
+            _familyTypes = value;
             OnPropertyChanged(nameof(FamilyTypes));
         }
     }
@@ -188,7 +173,7 @@ internal class MainViewModel : BaseViewModel {
     private string _selectedFamilyType;
     public string SelectedFamilyType {
         get { return _selectedFamilyType; }
-        set { 
+        set {
             _selectedFamilyType = value;
             OnPropertyChanged(nameof(SelectedFamilyType));
         }
@@ -206,7 +191,7 @@ internal class MainViewModel : BaseViewModel {
     private string _selectedRebarClass;
     public string SelectedRebarClass {
         get { return _selectedRebarClass; }
-        set { 
+        set {
             _selectedRebarClass = value;
             OnPropertyChanged(nameof(SelectedRebarClass));
         }
@@ -215,7 +200,7 @@ internal class MainViewModel : BaseViewModel {
     private int _stirrupStep;
     public int StirrupStep {
         get { return _stirrupStep; }
-        set { 
+        set {
             _stirrupStep = value;
             OnPropertyChanged(nameof(StirrupStep));
         }
@@ -224,8 +209,8 @@ internal class MainViewModel : BaseViewModel {
     private int _frameWidth;
     public int FrameWidth {
         get { return _frameWidth; }
-        set { 
-            _frameWidth = value; 
+        set {
+            _frameWidth = value;
             OnPropertyChanged(nameof(FrameWidth));
         }
     }
@@ -239,7 +224,6 @@ internal class MainViewModel : BaseViewModel {
     public MainViewModel(
         PluginConfig pluginConfig,
         RevitRepository revitRepository) {
-
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
 
@@ -273,7 +257,7 @@ internal class MainViewModel : BaseViewModel {
     /// Команда загрузки главного окна.
     /// </summary>
     public ICommand LoadViewCommand { get; }
-    
+
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
@@ -418,7 +402,6 @@ internal class MainViewModel : BaseViewModel {
 
             setting.RebarCoverTop = Convert.ToInt32(_revitRepository.FromFtToMm(slab.RebarCoverTop));
             setting.RebarCoverBottom = Convert.ToInt32(_revitRepository.FromFtToMm(slab.RebarCoverBottom));
-
         } else {
             setting.RebarCoverTop = RebarCoverTop;
             setting.RebarCoverBottom = RebarCoverBottom;

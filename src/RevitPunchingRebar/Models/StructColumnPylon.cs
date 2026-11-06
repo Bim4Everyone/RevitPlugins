@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
@@ -52,8 +46,7 @@ internal class StructColumnPylon : IPylon {
                     downLevelMark + downOffset);
 
             return columnLocation;
-        }
-        else {
+        } else {
             return null;
         }
     }

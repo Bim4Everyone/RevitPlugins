@@ -1,11 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
@@ -68,7 +63,7 @@ internal class Frame {
         SetParam("мод_Х_Шаг", frameParams.StirrupStep);
         SetParam("мод_Х_Количество", frameParams.GetFrameLength() / frameParams.StirrupStep + 1);
 
-        if (frameParams.HostSlab.SlabInstance.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralFoundation) {
+        if(frameParams.HostSlab.SlabInstance.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralFoundation) {
             SetParam("обр_ФОП_Группа КР", "ФП_Каркасы_Продавливание");
         } else {
             SetParam("обр_ФОП_Группа КР", "ПП_Каркасы_Продавливание");
@@ -130,7 +125,6 @@ internal class Frame {
             SetParam("обр_ФОП_Раздел проекта", GetParam<string>(hostElement, "обр_ФОП_Раздел проекта"));
             SetParam("обр_ФОП_Марка ведомости расхода", GetParam<string>(hostElement, "обр_ФОП_Марка ведомости расхода"));
             SetParam("обр_ФОП_Орг. уровень", GetParam<double>(hostElement, "обр_ФОП_Орг. уровень"));
-        }
-        catch { }
+        } catch { }
     }
 }
