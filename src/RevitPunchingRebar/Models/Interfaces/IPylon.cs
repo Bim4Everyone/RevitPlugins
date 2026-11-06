@@ -2,14 +2,14 @@ using Autodesk.Revit.DB;
 
 namespace RevitPunchingRebar.Models.Interfaces;
 internal interface IPylon {
-    Element PylonInstance { get; set; }
+    Element PylonInstance { get; }
 
     // вектор нормали к одной из коротких сторон пилона
-    XYZ FacingOrientation { get; set; }
+    XYZ FacingOrientation { get; }
 
-    double Length { get; set; }
-    double Width { get; set; }
-    double Height { get; set; }
+    double Length { get; }
+    double Width { get; }
+    double Height { get; }
 
     /// <summary>
     /// Возвращает нижнюю центральную точку

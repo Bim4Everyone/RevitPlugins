@@ -35,11 +35,13 @@
     <system:String x:Key="MainWindow.ErrorRebarCoverBottom">Enter a valid bottom rebar cover</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamily">Select the reinforcement frame family</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamilyType">Select the reinforcement frame type</system:String>
-    <system:String x:Key="MainWindow.ErrorSelectRebarClass">Select the bar grade</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupStep">Enter a valid stirrup spacing</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidth">Enter a valid frame width</system:String>
     <system:String x:Key="MainWindow.TransactionName">Placing reinforcement frames</system:String>
 
     <system:String x:Key="RevitUI.PickSlab">Select a slab</system:String>
     <system:String x:Key="RevitUI.PickPylons">Select pylons</system:String>
+
+    <system:String x:Key="RebarClass.A500C">A500C</system:String>
+    <system:String x:Key="RebarClass.A240">A240</system:String>
 </ResourceDictionary>

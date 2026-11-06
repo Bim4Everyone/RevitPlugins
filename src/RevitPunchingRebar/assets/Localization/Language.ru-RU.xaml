@@ -35,11 +35,13 @@
     <system:String x:Key="MainWindow.ErrorRebarCoverBottom">Введите корректный нижний защитный слой</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamily">Выберите семейство арматурных каркасов</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamilyType">Выберите тип арматурных каркасов</system:String>
-    <system:String x:Key="MainWindow.ErrorSelectRebarClass">Выберите класс арматурных стержней</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupStep">Введите корректный шаг хомутов</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidth">Введите корректную ширину каркаса</system:String>
     <system:String x:Key="MainWindow.TransactionName">Расстановка каркасов</system:String>
 
     <system:String x:Key="RevitUI.PickSlab">Выберите плиту</system:String>
     <system:String x:Key="RevitUI.PickPylons">Выберите пилоны</system:String>
+
+    <system:String x:Key="RebarClass.A500C">А500С</system:String>
+    <system:String x:Key="RebarClass.A240">А240</system:String>
 </ResourceDictionary>

@@ -54,7 +54,7 @@ internal class RevitSettings : ProjectSettings {
     public string FamilyName { get; set; }
     public string FamilyType { get; set; }
     public int StirrupDiameter { get; set; }
-    public string RebarClass { get; set; }
+    public RebarClass? StirrupRebarClass { get; set; }
     public int StirrupStep { get; set; }
     public int FrameWidth { get; set; }
 

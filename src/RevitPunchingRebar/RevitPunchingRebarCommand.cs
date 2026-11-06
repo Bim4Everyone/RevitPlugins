@@ -16,7 +16,7 @@ using dosymep.Xpf.Core.Ninject;
 using Ninject;
 
 using RevitPunchingRebar.Models;
-using RevitPunchingRebar.Models.Interfaces;
+using RevitPunchingRebar.Services;
 using RevitPunchingRebar.ViewModels;
 using RevitPunchingRebar.Views;
 

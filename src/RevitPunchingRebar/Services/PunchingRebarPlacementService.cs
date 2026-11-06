@@ -6,9 +6,12 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using RevitPunchingRebar.Models;
 using RevitPunchingRebar.Models.Interfaces;
 
-namespace RevitPunchingRebar.Models;
+using Frame = RevitPunchingRebar.Models.Frame;
+
+namespace RevitPunchingRebar.Services;
 internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     // Диаметр оправки загиба хомута в долях диаметра хомута для классов А240 и А500С
     private const double _stirrupBendFactorA240 = 2.5;
@@ -20,13 +23,23 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     // Расстояние до вспомогательных точек при построении плоскости отражения
     private const double _planePointOffset = 10;
 
-    public void Run(IEnumerable<IPylon> pylons, IFrameParams frameParams, RevitRepository revitRepository) {
+    private readonly RevitRepository _revitRepository;
+
+    /// <summary>
+    /// Создает сервис расстановки каркасов.
+    /// </summary>
+    /// <param name="revitRepository">Класс доступа к документу Revit.</param>
+    public PunchingRebarPlacementService(RevitRepository revitRepository) {
+        _revitRepository = revitRepository;
+    }
+
+    public void Run(IEnumerable<IPylon> pylons, IFrameParams frameParams) {
         foreach(IPylon pylon in pylons) {
-            CreateFrames(pylon, frameParams, revitRepository);
+            CreateFrames(pylon, frameParams);
         }
     }
 
-    private void CreateFrames(IPylon pylon, IFrameParams frameParams, RevitRepository revitRepository) {
+    private void CreateFrames(IPylon pylon, IFrameParams frameParams) {
         XYZ location = new XYZ();
 
         if(frameParams.HostSlab.SlabInstance.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralFoundation) {
@@ -39,7 +52,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         }
 
         //Создаем каркас в первом направлении
-        Frame frame1 = revitRepository.CreateFrame(frameParams, location);
+        Frame frame1 = _revitRepository.CreateFrame(frameParams, location);
 
         //Делаем геометрические преобразования
         MoveFrameDown(frame1, frameParams);
@@ -53,7 +66,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         CopyFrame(pylon, mirroredFrame1, frameParams, -pylon.FacingOrientation);
 
         //Создаем каркас во втором направлении
-        Frame frame2 = revitRepository.CreateFrame(frameParams, location);
+        Frame frame2 = _revitRepository.CreateFrame(frameParams, location);
 
         MoveFrameDown(frame2, frameParams);
         RotateFrame(frame2, pylon.FacingOrientation.AngleTo(frame2.FrameInstance.FacingOrientation) + Math.PI / 2);

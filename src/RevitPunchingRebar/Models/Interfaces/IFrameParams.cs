@@ -1,19 +1,19 @@
 namespace RevitPunchingRebar.Models.Interfaces;
 internal interface IFrameParams {
-    string FrameFamilyName { get; set; }
-    string FrameFamilyTypeName { get; set; }
+    string FrameFamilyName { get; }
+    string FrameFamilyTypeName { get; }
 
-    double SlabThickness { get; set; }
-    Slab HostSlab { get; set; }
-    double RebarCoverTop { get; set; }
-    double RebarCoverBottom { get; set; }
-    double PlateRebarDiameter { get; set; }
+    double SlabThickness { get; }
+    Slab HostSlab { get; }
+    double RebarCoverTop { get; }
+    double RebarCoverBottom { get; }
+    double PlateRebarDiameter { get; }
 
-    RebarClass StirrupRebarClass { get; set; }
-    double StirrupRebarDiameter { get; set; }
-    double StirrupStep { get; set; }
+    RebarClass StirrupRebarClass { get; }
+    double StirrupRebarDiameter { get; }
+    double StirrupStep { get; }
 
-    double FrameWidth { get; set; }
+    double FrameWidth { get; }
 
     /// <summary>
     /// Находит длину каркаса (без учета "хвостиков")

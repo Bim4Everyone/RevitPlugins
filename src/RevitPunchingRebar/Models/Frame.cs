@@ -63,7 +63,7 @@ internal class Frame {
         SetParams(frameParams);
     }
 
-    public FamilyInstance FrameInstance { get; set; }
+    public FamilyInstance FrameInstance { get; }
 
     public XYZ GetLocation() {
         XYZ location = ((LocationPoint) FrameInstance.Location).Point;

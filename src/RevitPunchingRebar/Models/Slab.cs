@@ -3,10 +3,10 @@ using Autodesk.Revit.DB.Structure;
 
 namespace RevitPunchingRebar.Models;
 internal class Slab {
-    public Floor SlabInstance { get; set; } = null;
-    public double RebarCoverTop { get; set; } = 0;
-    public double RebarCoverBottom { get; set; } = 0;
-    public double Thickness { get; set; } = 0;
+    public Floor SlabInstance { get; }
+    public double RebarCoverTop { get; }
+    public double RebarCoverBottom { get; }
+    public double Thickness { get; }
 
     internal Slab(Element element) {
         if(element != null) {

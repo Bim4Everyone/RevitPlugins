@@ -8,12 +8,12 @@ using RevitPunchingRebar.Models.Interfaces;
 
 namespace RevitPunchingRebar.Models;
 internal class StructColumnPylon : IPylon {
-    public Element PylonInstance { get; set; } = null;
-    public XYZ FacingOrientation { get; set; } = null;
+    public Element PylonInstance { get; }
+    public XYZ FacingOrientation { get; }
 
-    public double Length { get; set; }
-    public double Width { get; set; }
-    public double Height { get; set; }
+    public double Length { get; }
+    public double Width { get; }
+    public double Height { get; }
 
     internal StructColumnPylon(Element element) {
         PylonInstance = element;

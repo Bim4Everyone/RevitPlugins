@@ -13,21 +13,43 @@ internal class FrameParams : IFrameParams {
     // Расстояние от грани пилона до первого хомута: рабочая высота сечения, деленная на это число
     private const double _afterPylonDistanceDivider = 3;
 
-    public string FrameFamilyName { get; set; }
-    public string FrameFamilyTypeName { get; set; }
+    /// <summary>
+    /// Создает параметры каркасов по настройкам пользователя.
+    /// </summary>
+    /// <param name="settings">Настройки плагина для текущего проекта (размеры в мм).</param>
+    /// <param name="hostSlab">Плита, в которой расставляются каркасы.</param>
+    public FrameParams(RevitSettings settings, Slab hostSlab) {
+        FrameFamilyName = settings.FamilyName;
+        FrameFamilyTypeName = settings.FamilyType;
 
-    public double SlabThickness { get; set; }
-    public Slab HostSlab { get; set; }
+        HostSlab = hostSlab;
+        SlabThickness = hostSlab.Thickness;
 
-    public double RebarCoverTop { get; set; }
-    public double RebarCoverBottom { get; set; }
+        RebarCoverTop = UnitUtilsHelper.FromMm(settings.RebarCoverTop);
+        RebarCoverBottom = UnitUtilsHelper.FromMm(settings.RebarCoverBottom);
+        PlateRebarDiameter = UnitUtilsHelper.FromMm(settings.SlabRebarDiameter);
 
-    public double PlateRebarDiameter { get; set; }
+        StirrupRebarClass = settings.StirrupRebarClass ?? RebarClass.A500C;
+        StirrupRebarDiameter = UnitUtilsHelper.FromMm(settings.StirrupDiameter);
+        StirrupStep = UnitUtilsHelper.FromMm(settings.StirrupStep);
+        FrameWidth = UnitUtilsHelper.FromMm(settings.FrameWidth);
+    }
 
-    public RebarClass StirrupRebarClass { get; set; }
-    public double StirrupRebarDiameter { get; set; }
-    public double StirrupStep { get; set; }
-    public double FrameWidth { get; set; }
+    public string FrameFamilyName { get; }
+    public string FrameFamilyTypeName { get; }
+
+    public double SlabThickness { get; }
+    public Slab HostSlab { get; }
+
+    public double RebarCoverTop { get; }
+    public double RebarCoverBottom { get; }
+
+    public double PlateRebarDiameter { get; }
+
+    public RebarClass StirrupRebarClass { get; }
+    public double StirrupRebarDiameter { get; }
+    public double StirrupStep { get; }
+    public double FrameWidth { get; }
 
     public double GetFrameHeight(double longRebarDiameter) {
         double height = SlabThickness - (RebarCoverTop + PlateRebarDiameter) -

@@ -347,8 +347,10 @@
                         <ComboBox
                             Grid.Column="1"
                             Grid.Row="3"
+                            DisplayMemberPath="Name"
+                            SelectedValuePath="Value"
                             ItemsSource="{Binding RebarClasses}"
-                            SelectedItem="{Binding SelectedRebarClass}"/>
+                            SelectedValue="{Binding SelectedRebarClass}"/>
 
                         <ui:TextBox
                             Grid.Column="1"

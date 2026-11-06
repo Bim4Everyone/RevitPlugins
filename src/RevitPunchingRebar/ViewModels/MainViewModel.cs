@@ -12,6 +12,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitPunchingRebar.Models;
 using RevitPunchingRebar.Models.Interfaces;
+using RevitPunchingRebar.Services;
 
 namespace RevitPunchingRebar.ViewModels;
 
@@ -46,7 +47,7 @@ internal class MainViewModel : BaseViewModel {
     private IList<string> _familyTypes;
     private string _selectedFamilyType;
     private int _selectedStirrupDiameter;
-    private string _selectedRebarClass;
+    private RebarClass _selectedRebarClass;
     private int _stirrupStep;
     private int _frameWidth;
 
@@ -74,6 +75,11 @@ internal class MainViewModel : BaseViewModel {
         SelectPylonsFromLinkCommand = RelayCommand.Create<Window>(SelectPylonsFromLink);
         SelectSlabCommand = RelayCommand.Create<Window>(SelectSlab);
         LoadFamilyTypesCommand = RelayCommand.Create(LoadFamilyTypes);
+
+        RebarClasses = [
+            new RebarClassVM(RebarClass.A500C, _localizationService.GetLocalizedString("RebarClass.A500C")),
+            new RebarClassVM(RebarClass.A240, _localizationService.GetLocalizedString("RebarClass.A240"))
+        ];
     }
 
     /// <summary>
@@ -122,7 +128,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Доступные классы арматуры хомутов.
     /// </summary>
-    public List<string> RebarClasses { get; } = ["А500С", "А240"];
+    public IReadOnlyList<RebarClassVM> RebarClasses { get; }
 
     /// <summary>
     /// Количество пилонов, выбранных в текущем проекте.
@@ -239,7 +245,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Класс арматуры хомутов.
     /// </summary>
-    public string SelectedRebarClass {
+    public RebarClass SelectedRebarClass {
         get => _selectedRebarClass;
         set => RaiseAndSetIfChanged(ref _selectedRebarClass, value);
     }
@@ -319,11 +325,6 @@ internal class MainViewModel : BaseViewModel {
 
         if(string.IsNullOrEmpty(SelectedFamilyType)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectFamilyType");
-            return false;
-        }
-
-        if(string.IsNullOrEmpty(SelectedRebarClass)) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectRebarClass");
             return false;
         }
 
@@ -412,21 +413,9 @@ internal class MainViewModel : BaseViewModel {
 
         List<IPylon> pylons = _revitRepository.GetPylons(_pylonsFromModel, _pylonsFromLink);
 
-        FrameParams frameParams = new FrameParams();
+        IFrameParams frameParams = new FrameParams(settings, _slab);
 
-        frameParams.FrameFamilyName = settings.FamilyName;
-        frameParams.FrameFamilyTypeName = settings.FamilyType;
-        frameParams.HostSlab = _slab;
-        frameParams.SlabThickness = _slab.Thickness;
-        frameParams.RebarCoverTop = UnitUtilsHelper.FromMm(settings.RebarCoverTop);
-        frameParams.RebarCoverBottom = UnitUtilsHelper.FromMm(settings.RebarCoverBottom);
-        frameParams.PlateRebarDiameter = UnitUtilsHelper.FromMm(settings.SlabRebarDiameter);
-        frameParams.StirrupRebarClass = settings.RebarClass == "А500С" ? RebarClass.A500C : RebarClass.A240;
-        frameParams.StirrupRebarDiameter = UnitUtilsHelper.FromMm(settings.StirrupDiameter);
-        frameParams.StirrupStep = UnitUtilsHelper.FromMm(settings.StirrupStep);
-        frameParams.FrameWidth = UnitUtilsHelper.FromMm(settings.FrameWidth);
-
-        _placementService.Run(pylons, frameParams, _revitRepository);
+        _placementService.Run(pylons, frameParams);
 
         transaction.Commit();
     }
@@ -448,7 +437,7 @@ internal class MainViewModel : BaseViewModel {
         RebarCoverBottom = setting?.RebarCoverBottom ?? 40;
 
         SelectedStirrupDiameter = setting?.StirrupDiameter ?? 10;
-        SelectedRebarClass = setting?.RebarClass ?? "А500С";
+        SelectedRebarClass = setting?.StirrupRebarClass ?? RebarClass.A500C;
         StirrupStep = setting?.StirrupStep ?? 200;
         FrameWidth = setting?.FrameWidth ?? 200;
     }
@@ -475,7 +464,7 @@ internal class MainViewModel : BaseViewModel {
         setting.FamilyName = SelectedFamilyName;
         setting.FamilyType = SelectedFamilyType;
         setting.StirrupDiameter = SelectedStirrupDiameter;
-        setting.RebarClass = SelectedRebarClass;
+        setting.StirrupRebarClass = SelectedRebarClass;
         setting.StirrupStep = StirrupStep;
         setting.FrameWidth = FrameWidth;
 
