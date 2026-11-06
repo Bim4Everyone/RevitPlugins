@@ -166,8 +166,18 @@
 
                         <TextBlock
                             Grid.Column="1"
-                            Grid.Row="4"
-                            Text="{Binding IsSlabSelected}"/>
+                            Grid.Row="4">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="Нет" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSlabSelected}" Value="True">
+                                            <Setter Property="Text" Value="Да" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                     </Grid>
                 </Border>
 
@@ -217,14 +227,14 @@
                             Grid.Row="3"
                             Style="{StaticResource itemName}"
                             Text="Защ. слой сверху, мм"
-                            IsEnabled="{Binding IsControlEnabled}"/>
+                            IsEnabled="{Binding IsRebarCoverFromUser}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="4"
                             Style="{StaticResource itemName}"
                             Text="Защ. слой снизу, мм"
-                            IsEnabled="{Binding IsControlEnabled}"/>
+                            IsEnabled="{Binding IsRebarCoverFromUser}"/>
 
 
 
@@ -239,13 +249,13 @@
                         <ui:TextBox
                             Grid.Column="1"
                             Grid.Row="3"
-                            IsEnabled="{Binding IsControlEnabled}"
+                            IsEnabled="{Binding IsRebarCoverFromUser}"
                             Text="{Binding RebarCoverTop}"/>
 
                         <ui:TextBox
                             Grid.Column="1"
                             Grid.Row="4"
-                            IsEnabled="{Binding IsControlEnabled}"
+                            IsEnabled="{Binding IsRebarCoverFromUser}"
                             Text="{Binding RebarCoverBottom}"/>
                     </Grid>
                 </Border>
@@ -320,7 +330,13 @@
                             Grid.Column="1"
                             Grid.Row="0"
                             ItemsSource="{Binding FamilyNames}"
-                            SelectedItem="{Binding SelectedFamilyName}"/>
+                            SelectedItem="{Binding SelectedFamilyName}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding LoadFamilyTypesCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ComboBox>
                         
                         <ComboBox
                             Grid.Column="1"
