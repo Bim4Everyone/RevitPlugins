@@ -1,0 +1,73 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Поперечное армирование</system:String>
+
+    <system:String x:Key="MainWindow.GeneralSettings">Общие настройки</system:String>
+    <system:String x:Key="MainWindow.PylonsFromModel">Пилоны из модели (выбрано {0})</system:String>
+    <system:String x:Key="MainWindow.PylonsFromLink">Пилоны из связи (выбрано {0})</system:String>
+    <system:String x:Key="MainWindow.SlabSelected">Плита (выбрана)</system:String>
+    <system:String x:Key="MainWindow.SlabNotSelected">Плита (не выбрана)</system:String>
+    <system:String x:Key="MainWindow.ButtonSelect">Выбрать</system:String>
+
+    <system:String x:Key="MainWindow.SchemeTitle">Схема раскладки каркасов в плане</system:String>
+    <system:String x:Key="MainWindow.SchemeFrames">Каркасы, зазор между ними — ширина каркаса</system:String>
+    <system:String x:Key="MainWindow.SchemeFirstRow">a₀ = h₀/3 — от грани пилона до каркасов</system:String>
+    <system:String x:Key="MainWindow.SchemeZone">1,5·h₀ — граница зоны продавливания</system:String>
+    <system:String x:Key="MainWindow.SchemeWorkingHeight">h₀ — рабочая высота сечения плиты</system:String>
+
+    <system:String x:Key="MainWindow.SlabRebar">Арматура плиты</system:String>
+    <system:String x:Key="MainWindow.RebarDiameter">Диаметр стержней, мм</system:String>
+    <system:String x:Key="MainWindow.RebarCover">Защитный слой</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromSlab">Из плиты</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromUser">Вручную</system:String>
+    <system:String x:Key="MainWindow.RebarCoverTop">Сверху, мм</system:String>
+    <system:String x:Key="MainWindow.RebarCoverBottom">Снизу, мм</system:String>
+
+    <system:String x:Key="MainWindow.FrameRebar">Арматура каркасов</system:String>
+    <system:String x:Key="MainWindow.FrameGroup">Каркас</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Семейство</system:String>
+    <system:String x:Key="MainWindow.FamilyType">Тип</system:String>
+    <system:String x:Key="MainWindow.FrameWidth">Ширина, мм</system:String>
+    <system:String x:Key="MainWindow.StirrupsGroup">Хомуты</system:String>
+    <system:String x:Key="MainWindow.StirrupDiameter">Диаметр, мм</system:String>
+    <system:String x:Key="MainWindow.StirrupRebarClass">Класс стержней</system:String>
+    <system:String x:Key="MainWindow.StirrupStep">Шаг, мм</system:String>
+    <system:String x:Key="MainWindow.StirrupBendLength">Длина отгибов, мм</system:String>
+    <system:String x:Key="MainWindow.LongRebarGroup">Продольные стержни</system:String>
+    <system:String x:Key="MainWindow.LongRebarDiameter">Диаметр, мм</system:String>
+    <system:String x:Key="MainWindow.LongRebarAnchorageLength">Выпуск за крайние хомуты, мм</system:String>
+
+    <system:String x:Key="MainWindow.ResetToDefault">Сбросить к значению по умолчанию: {0}</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String x:Key="MainWindow.ErrorSelectPylons">Выберите пилоны</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectSlab">Выберите плиту</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverTop">Защитный слой сверху: нужно целое число мм больше 0 и не больше половины толщины плиты</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverBottom">Защитный слой снизу: нужно целое число мм больше 0 и не больше половины толщины плиты</system:String>
+    <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">У плиты не назначен защитный слой сверху или снизу</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamily">Выберите семейство каркаса</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamilyType">Выберите тип каркаса</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameParamsMissing">В семействе каркаса нет параметров: {0}</system:String>
+    <system:String x:Key="MainWindow.ErrorFramePlacement">Не удалось разместить экземпляр выбранного типа каркаса</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameWidth">Ширина каркаса: введите целое число мм больше 0</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupStep">Шаг хомутов: введите целое число мм больше 0</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupBendLength">Длина отгибов хомутов: введите целое число мм больше 0</system:String>
+    <system:String x:Key="MainWindow.ErrorLongRebarAnchorageLength">Выпуск продольных стержней: введите целое число мм, 0 или больше</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Расстановка каркасов</system:String>
+
+    <system:String x:Key="RevitUI.PickSlab">Выберите плиту</system:String>
+    <system:String x:Key="RevitUI.PickPylons">Выберите пилоны</system:String>
+    <system:String x:Key="RevitUI.CheckFrameTypeTransaction">Проверка типа каркаса</system:String>
+
+    <system:String x:Key="RebarClass.A500C">А500С</system:String>
+    <system:String x:Key="RebarClass.A240">А240</system:String>
+
+    <system:String x:Key="Report.Summary">Пилонов обработано: {0} из {1}. Каркасов создано: {2}.</system:String>
+    <system:String x:Key="Report.SkippedPylons">Пропущенные пилоны:</system:String>
+    <system:String x:Key="Report.PylonName">{0}, Id {1}</system:String>
+    <system:String x:Key="Report.ErrorPylonSize">не заданы длина или ширина пилона</system:String>
+    <system:String x:Key="Report.ErrorPylonHeight">не задана высота пилона</system:String>
+</ResourceDictionary>

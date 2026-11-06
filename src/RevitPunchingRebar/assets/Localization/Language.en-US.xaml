@@ -1,0 +1,73 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Punching shear reinforcement</system:String>
+
+    <system:String x:Key="MainWindow.GeneralSettings">General settings</system:String>
+    <system:String x:Key="MainWindow.PylonsFromModel">Pylons from model ({0} selected)</system:String>
+    <system:String x:Key="MainWindow.PylonsFromLink">Pylons from link ({0} selected)</system:String>
+    <system:String x:Key="MainWindow.SlabSelected">Slab (selected)</system:String>
+    <system:String x:Key="MainWindow.SlabNotSelected">Slab (not selected)</system:String>
+    <system:String x:Key="MainWindow.ButtonSelect">Select</system:String>
+
+    <system:String x:Key="MainWindow.SchemeTitle">Frame layout in plan</system:String>
+    <system:String x:Key="MainWindow.SchemeFrames">Frames, gap between them equals frame width</system:String>
+    <system:String x:Key="MainWindow.SchemeFirstRow">a₀ = h₀/3 — from pylon face to frames</system:String>
+    <system:String x:Key="MainWindow.SchemeZone">1.5·h₀ — punching shear zone boundary</system:String>
+    <system:String x:Key="MainWindow.SchemeWorkingHeight">h₀ — effective depth of the slab</system:String>
+
+    <system:String x:Key="MainWindow.SlabRebar">Slab reinforcement</system:String>
+    <system:String x:Key="MainWindow.RebarDiameter">Bar diameter, mm</system:String>
+    <system:String x:Key="MainWindow.RebarCover">Rebar cover</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromSlab">From slab</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromUser">Manual</system:String>
+    <system:String x:Key="MainWindow.RebarCoverTop">Top, mm</system:String>
+    <system:String x:Key="MainWindow.RebarCoverBottom">Bottom, mm</system:String>
+
+    <system:String x:Key="MainWindow.FrameRebar">Frame reinforcement</system:String>
+    <system:String x:Key="MainWindow.FrameGroup">Frame</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Family</system:String>
+    <system:String x:Key="MainWindow.FamilyType">Type</system:String>
+    <system:String x:Key="MainWindow.FrameWidth">Width, mm</system:String>
+    <system:String x:Key="MainWindow.StirrupsGroup">Stirrups</system:String>
+    <system:String x:Key="MainWindow.StirrupDiameter">Diameter, mm</system:String>
+    <system:String x:Key="MainWindow.StirrupRebarClass">Bar grade</system:String>
+    <system:String x:Key="MainWindow.StirrupStep">Spacing, mm</system:String>
+    <system:String x:Key="MainWindow.StirrupBendLength">Hook length, mm</system:String>
+    <system:String x:Key="MainWindow.LongRebarGroup">Longitudinal bars</system:String>
+    <system:String x:Key="MainWindow.LongRebarDiameter">Diameter, mm</system:String>
+    <system:String x:Key="MainWindow.LongRebarAnchorageLength">Extension beyond end stirrups, mm</system:String>
+
+    <system:String x:Key="MainWindow.ResetToDefault">Reset to default: {0}</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="MainWindow.ErrorSelectPylons">Select pylons</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectSlab">Select a slab</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverTop">Top rebar cover: enter a whole number of mm greater than 0 and not more than half the slab thickness</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverBottom">Bottom rebar cover: enter a whole number of mm greater than 0 and not more than half the slab thickness</system:String>
+    <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">The slab has no top or bottom rebar cover assigned</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamily">Select the frame family</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamilyType">Select the frame type</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameParamsMissing">The frame family lacks parameters: {0}</system:String>
+    <system:String x:Key="MainWindow.ErrorFramePlacement">Failed to place an instance of the selected frame type</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameWidth">Frame width: enter a whole number of mm greater than 0</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupStep">Stirrup spacing: enter a whole number of mm greater than 0</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupBendLength">Stirrup hook length: enter a whole number of mm greater than 0</system:String>
+    <system:String x:Key="MainWindow.ErrorLongRebarAnchorageLength">Longitudinal bar extension: enter a whole number of mm, 0 or more</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Placing reinforcement frames</system:String>
+
+    <system:String x:Key="RevitUI.PickSlab">Select a slab</system:String>
+    <system:String x:Key="RevitUI.PickPylons">Select pylons</system:String>
+    <system:String x:Key="RevitUI.CheckFrameTypeTransaction">Checking the frame type</system:String>
+
+    <system:String x:Key="RebarClass.A500C">A500C</system:String>
+    <system:String x:Key="RebarClass.A240">A240</system:String>
+
+    <system:String x:Key="Report.Summary">Pylons processed: {0} of {1}. Frames created: {2}.</system:String>
+    <system:String x:Key="Report.SkippedPylons">Skipped pylons:</system:String>
+    <system:String x:Key="Report.PylonName">{0}, Id {1}</system:String>
+    <system:String x:Key="Report.ErrorPylonSize">pylon length or width is not set</system:String>
+    <system:String x:Key="Report.ErrorPylonHeight">pylon height is not set</system:String>
+</ResourceDictionary>
