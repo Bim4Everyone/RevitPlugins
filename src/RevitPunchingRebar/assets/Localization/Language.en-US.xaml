@@ -23,7 +23,8 @@
     <system:String x:Key="MainWindow.FrameRebar">Frame reinforcement</system:String>
     <system:String x:Key="MainWindow.FamilyName">Family name</system:String>
     <system:String x:Key="MainWindow.FamilyType">Type name</system:String>
-    <system:String x:Key="MainWindow.RebarClass">Bar grade</system:String>
+    <system:String x:Key="MainWindow.StirrupDiameter">Stirrup diameter, mm</system:String>
+    <system:String x:Key="MainWindow.StirrupRebarClass">Stirrup bar grade</system:String>
     <system:String x:Key="MainWindow.StirrupStep">Stirrup spacing, mm</system:String>
     <system:String x:Key="MainWindow.FrameWidth">Frame width, mm</system:String>
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>

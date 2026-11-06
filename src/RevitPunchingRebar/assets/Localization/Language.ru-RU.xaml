@@ -23,7 +23,8 @@
     <system:String x:Key="MainWindow.FrameRebar">Арматура каркасов</system:String>
     <system:String x:Key="MainWindow.FamilyName">Имя семейства</system:String>
     <system:String x:Key="MainWindow.FamilyType">Имя типа</system:String>
-    <system:String x:Key="MainWindow.RebarClass">Класс стержней</system:String>
+    <system:String x:Key="MainWindow.StirrupDiameter">Диаметр хомутов, мм</system:String>
+    <system:String x:Key="MainWindow.StirrupRebarClass">Класс стержней хомутов</system:String>
     <system:String x:Key="MainWindow.StirrupStep">Шаг хомутов, мм</system:String>
     <system:String x:Key="MainWindow.FrameWidth">Ширина каркаса, мм</system:String>
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>

@@ -298,13 +298,13 @@
                             Grid.Column="0"
                             Grid.Row="2"
                             Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.RebarDiameter}"/>
+                            Text="{me:LocalizationSource MainWindow.StirrupDiameter}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"
                             Grid.Row="3"
                             Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.RebarClass}"/>
+                            Text="{me:LocalizationSource MainWindow.StirrupRebarClass}"/>
 
                         <ui:TextBlock
                             Grid.Column="0"

@@ -2,6 +2,10 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 
 namespace RevitPunchingRebar.Models.SelectionFilters;
+
+/// <summary>
+/// Фильтр выбора пилонов в связанных файлах.
+/// </summary>
 internal class PylonFromLinkFilter : ISelectionFilter {
     private readonly Document _hostDoc;
 
@@ -14,15 +18,10 @@ internal class PylonFromLinkFilter : ISelectionFilter {
     }
 
     public bool AllowReference(Reference reference, XYZ position) {
-        RevitLinkInstance link = _hostDoc.GetElement(reference.ElementId) as RevitLinkInstance;
-        Document linkedDoc = link.GetLinkDocument();
-        Element linkedElem = linkedDoc.GetElement(reference.LinkedElementId);
+        // У выгруженной связи документа нет - элементы из нее выбрать нельзя
+        Document linkedDoc = (_hostDoc.GetElement(reference.ElementId) as RevitLinkInstance)?.GetLinkDocument();
+        Element linkedElem = linkedDoc?.GetElement(reference.LinkedElementId);
 
-        if(linkedElem.get_Parameter(BuiltInParameter.ELEM_FAMILY_PARAM).AsValueString().ToLower().Contains("пилон") &&
-            linkedElem.get_Parameter(BuiltInParameter.ELEM_CATEGORY_PARAM_MT).AsValueString() == "Несущие колонны") {
-            return true;
-        } else {
-            return false;
-        }
+        return linkedElem != null && PylonFromModelFilter.IsPylon(linkedElem);
     }
 }
