@@ -34,16 +34,18 @@ internal class MainViewModel : BaseViewModel {
 
     private string _errorText;
 
-    private int _pylonsFromModelCount;
-    private int _pylonsFromLinkCount;
+    private string _pylonsFromModelLabel;
+    private string _pylonsFromLinkLabel;
+    private string _slabLabel;
+    private bool _isPylonsSelected;
     private int _selectedPylonsCount;
     private bool _isSlabSelected;
 
     private int _selectedSlabRebarDiameter;
     private bool _isRebarCoverFromSlab;
     private bool _isRebarCoverFromUser;
-    private int _rebarCoverTop;
-    private int _rebarCoverBottom;
+    private string _rebarCoverTop;
+    private string _rebarCoverBottom;
 
     private IList<string> _familyNames;
     private string _selectedFamilyName;
@@ -51,11 +53,11 @@ internal class MainViewModel : BaseViewModel {
     private string _selectedFamilyType;
     private int _selectedStirrupDiameter;
     private RebarClass _selectedRebarClass;
-    private int _stirrupStep;
-    private int _frameWidth;
+    private string _stirrupStep;
+    private string _frameWidth;
     private int _selectedLongRebarDiameter;
-    private int _longRebarAnchorageLength;
-    private int _stirrupBendLength;
+    private string _longRebarAnchorageLength;
+    private string _stirrupBendLength;
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -90,6 +92,9 @@ internal class MainViewModel : BaseViewModel {
         ];
 
         DefaultValueHints = CreateDefaultValueHints();
+
+        UpdatePylonsCount();
+        UpdateSlabLabel();
     }
 
     /// <summary>
@@ -161,19 +166,35 @@ internal class MainViewModel : BaseViewModel {
     public IReadOnlyList<RebarClassVM> RebarClasses { get; }
 
     /// <summary>
-    /// Количество пилонов, выбранных в текущем проекте.
+    /// Подпись строки выбора пилонов из текущего проекта с количеством выбранных.
     /// </summary>
-    public int PylonsFromModelCount {
-        get => _pylonsFromModelCount;
-        private set => RaiseAndSetIfChanged(ref _pylonsFromModelCount, value);
+    public string PylonsFromModelLabel {
+        get => _pylonsFromModelLabel;
+        private set => RaiseAndSetIfChanged(ref _pylonsFromModelLabel, value);
     }
 
     /// <summary>
-    /// Количество пилонов, выбранных в связанных файлах.
+    /// Подпись строки выбора пилонов из связей с количеством выбранных.
     /// </summary>
-    public int PylonsFromLinkCount {
-        get => _pylonsFromLinkCount;
-        private set => RaiseAndSetIfChanged(ref _pylonsFromLinkCount, value);
+    public string PylonsFromLinkLabel {
+        get => _pylonsFromLinkLabel;
+        private set => RaiseAndSetIfChanged(ref _pylonsFromLinkLabel, value);
+    }
+
+    /// <summary>
+    /// Подпись строки выбора плиты со статусом выбора.
+    /// </summary>
+    public string SlabLabel {
+        get => _slabLabel;
+        private set => RaiseAndSetIfChanged(ref _slabLabel, value);
+    }
+
+    /// <summary>
+    /// Выбран ли хотя бы один пилон (из модели или из связи).
+    /// </summary>
+    public bool IsPylonsSelected {
+        get => _isPylonsSelected;
+        private set => RaiseAndSetIfChanged(ref _isPylonsSelected, value);
     }
 
     /// <summary>
@@ -219,7 +240,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Защитный слой сверху, мм.
     /// </summary>
-    public int RebarCoverTop {
+    public string RebarCoverTop {
         get => _rebarCoverTop;
         set => RaiseAndSetIfChanged(ref _rebarCoverTop, value);
     }
@@ -227,7 +248,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Защитный слой снизу, мм.
     /// </summary>
-    public int RebarCoverBottom {
+    public string RebarCoverBottom {
         get => _rebarCoverBottom;
         set => RaiseAndSetIfChanged(ref _rebarCoverBottom, value);
     }
@@ -283,7 +304,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Шаг хомутов, мм.
     /// </summary>
-    public int StirrupStep {
+    public string StirrupStep {
         get => _stirrupStep;
         set => RaiseAndSetIfChanged(ref _stirrupStep, value);
     }
@@ -291,7 +312,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Ширина каркаса, мм.
     /// </summary>
-    public int FrameWidth {
+    public string FrameWidth {
         get => _frameWidth;
         set => RaiseAndSetIfChanged(ref _frameWidth, value);
     }
@@ -299,7 +320,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Длина отгибов хомутов, мм.
     /// </summary>
-    public int StirrupBendLength {
+    public string StirrupBendLength {
         get => _stirrupBendLength;
         set => RaiseAndSetIfChanged(ref _stirrupBendLength, value);
     }
@@ -315,7 +336,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Длина выпуска продольных стержней за крайние хомуты, мм.
     /// </summary>
-    public int LongRebarAnchorageLength {
+    public string LongRebarAnchorageLength {
         get => _longRebarAnchorageLength;
         set => RaiseAndSetIfChanged(ref _longRebarAnchorageLength, value);
     }
@@ -364,19 +385,12 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        double rebarCoverTop = IsRebarCoverFromSlab
-            ? _slab.RebarCoverTop.Value
-            : UnitUtilsHelper.FromMm(RebarCoverTop);
-        double rebarCoverBottom = IsRebarCoverFromSlab
-            ? _slab.RebarCoverBottom.Value
-            : UnitUtilsHelper.FromMm(RebarCoverBottom);
-
-        if(rebarCoverTop <= 0 || rebarCoverTop > _slab.Thickness * 0.5) {
+        if(!IsRebarCoverValid(RebarCoverTop, _slab.RebarCoverTop)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorRebarCoverTop");
             return false;
         }
 
-        if(rebarCoverBottom <= 0 || rebarCoverBottom > _slab.Thickness * 0.5) {
+        if(!IsRebarCoverValid(RebarCoverBottom, _slab.RebarCoverBottom)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorRebarCoverBottom");
             return false;
         }
@@ -396,28 +410,53 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        if(StirrupStep <= 0) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorStirrupStep");
-            return false;
-        }
-
-        if(FrameWidth <= 0) {
+        if(!TryParseMm(FrameWidth, out int frameWidth) || frameWidth <= 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorFrameWidth");
             return false;
         }
 
-        if(StirrupBendLength <= 0) {
+        if(!TryParseMm(StirrupStep, out int stirrupStep) || stirrupStep <= 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorStirrupStep");
+            return false;
+        }
+
+        if(!TryParseMm(StirrupBendLength, out int stirrupBendLength) || stirrupBendLength <= 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorStirrupBendLength");
             return false;
         }
 
-        if(LongRebarAnchorageLength < 0) {
+        if(!TryParseMm(LongRebarAnchorageLength, out int anchorageLength) || anchorageLength < 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorLongRebarAnchorageLength");
             return false;
         }
 
         ErrorText = null;
         return true;
+    }
+
+    /// <summary>
+    /// Проверяет защитный слой: в режиме «из плиты» — значение из плиты,
+    /// в режиме «вручную» — введенное целое число мм. Слой должен быть больше нуля
+    /// и не больше половины толщины плиты.
+    /// </summary>
+    private bool IsRebarCoverValid(string userValueMm, double? slabValue) {
+        double rebarCover;
+        if(IsRebarCoverFromSlab) {
+            rebarCover = slabValue.Value;
+        } else if(TryParseMm(userValueMm, out int rebarCoverMm)) {
+            rebarCover = UnitUtilsHelper.FromMm(rebarCoverMm);
+        } else {
+            return false;
+        }
+
+        return rebarCover > 0 && rebarCover <= _slab.Thickness * 0.5;
+    }
+
+    /// <summary>
+    /// Разбирает введенное пользователем целое число миллиметров.
+    /// </summary>
+    private static bool TryParseMm(string text, out int valueMm) {
+        return int.TryParse(text?.Trim(), out valueMm);
     }
 
     /// <summary>
@@ -449,6 +488,7 @@ internal class MainViewModel : BaseViewModel {
         SelectInRevit(window, () => {
             _slab = _revitRepository.GetSlab(_revitRepository.PickSlab());
             IsSlabSelected = true;
+            UpdateSlabLabel();
         });
     }
 
@@ -470,9 +510,18 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void UpdatePylonsCount() {
-        PylonsFromModelCount = _pylonsFromModel.Count;
-        PylonsFromLinkCount = _pylonsFromLink.Count;
-        SelectedPylonsCount = PylonsFromModelCount + PylonsFromLinkCount;
+        SelectedPylonsCount = _pylonsFromModel.Count + _pylonsFromLink.Count;
+        IsPylonsSelected = SelectedPylonsCount > 0;
+
+        PylonsFromModelLabel = string.Format(
+            _localizationService.GetLocalizedString("MainWindow.PylonsFromModel"), _pylonsFromModel.Count);
+        PylonsFromLinkLabel = string.Format(
+            _localizationService.GetLocalizedString("MainWindow.PylonsFromLink"), _pylonsFromLink.Count);
+    }
+
+    private void UpdateSlabLabel() {
+        SlabLabel = _localizationService.GetLocalizedString(
+            IsSlabSelected ? "MainWindow.SlabSelected" : "MainWindow.SlabNotSelected");
     }
 
     /// <summary>
@@ -540,16 +589,17 @@ internal class MainViewModel : BaseViewModel {
         SelectedSlabRebarDiameter = setting?.SlabRebarDiameter ?? DefaultSettings.SlabRebarDiameterMm;
         IsRebarCoverFromUser = setting?.IsRebarCoverFromUser ?? true;
         IsRebarCoverFromSlab = !IsRebarCoverFromUser;
-        RebarCoverTop = setting?.RebarCoverTop ?? DefaultSettings.RebarCoverTopMm;
-        RebarCoverBottom = setting?.RebarCoverBottom ?? DefaultSettings.RebarCoverBottomMm;
+        RebarCoverTop = (setting?.RebarCoverTop ?? DefaultSettings.RebarCoverTopMm).ToString();
+        RebarCoverBottom = (setting?.RebarCoverBottom ?? DefaultSettings.RebarCoverBottomMm).ToString();
 
         SelectedStirrupDiameter = setting?.StirrupDiameter ?? DefaultSettings.StirrupDiameterMm;
         SelectedRebarClass = setting?.StirrupRebarClass ?? DefaultSettings.StirrupRebarClass;
-        StirrupStep = setting?.StirrupStep ?? DefaultSettings.StirrupStepMm;
-        FrameWidth = setting?.FrameWidth ?? DefaultSettings.FrameWidthMm;
-        StirrupBendLength = setting?.StirrupBendLength ?? DefaultSettings.StirrupBendLengthMm;
+        StirrupStep = (setting?.StirrupStep ?? DefaultSettings.StirrupStepMm).ToString();
+        FrameWidth = (setting?.FrameWidth ?? DefaultSettings.FrameWidthMm).ToString();
+        StirrupBendLength = (setting?.StirrupBendLength ?? DefaultSettings.StirrupBendLengthMm).ToString();
         SelectedLongRebarDiameter = setting?.LongRebarDiameter ?? DefaultSettings.LongRebarDiameterMm;
-        LongRebarAnchorageLength = setting?.LongRebarAnchorageLength ?? DefaultSettings.LongRebarAnchorageLengthMm;
+        LongRebarAnchorageLength = (setting?.LongRebarAnchorageLength
+                                    ?? DefaultSettings.LongRebarAnchorageLengthMm).ToString();
     }
 
     /// <summary>
@@ -562,10 +612,10 @@ internal class MainViewModel : BaseViewModel {
                 SelectedSlabRebarDiameter = DefaultSettings.SlabRebarDiameterMm;
                 break;
             case nameof(RebarCoverTop):
-                RebarCoverTop = DefaultSettings.RebarCoverTopMm;
+                RebarCoverTop = DefaultSettings.RebarCoverTopMm.ToString();
                 break;
             case nameof(RebarCoverBottom):
-                RebarCoverBottom = DefaultSettings.RebarCoverBottomMm;
+                RebarCoverBottom = DefaultSettings.RebarCoverBottomMm.ToString();
                 break;
             case nameof(SelectedFamilyName):
                 ResetFrameFamily();
@@ -580,19 +630,19 @@ internal class MainViewModel : BaseViewModel {
                 SelectedRebarClass = DefaultSettings.StirrupRebarClass;
                 break;
             case nameof(StirrupStep):
-                StirrupStep = DefaultSettings.StirrupStepMm;
+                StirrupStep = DefaultSettings.StirrupStepMm.ToString();
                 break;
             case nameof(FrameWidth):
-                FrameWidth = DefaultSettings.FrameWidthMm;
+                FrameWidth = DefaultSettings.FrameWidthMm.ToString();
                 break;
             case nameof(StirrupBendLength):
-                StirrupBendLength = DefaultSettings.StirrupBendLengthMm;
+                StirrupBendLength = DefaultSettings.StirrupBendLengthMm.ToString();
                 break;
             case nameof(SelectedLongRebarDiameter):
                 SelectedLongRebarDiameter = DefaultSettings.LongRebarDiameterMm;
                 break;
             case nameof(LongRebarAnchorageLength):
-                LongRebarAnchorageLength = DefaultSettings.LongRebarAnchorageLengthMm;
+                LongRebarAnchorageLength = DefaultSettings.LongRebarAnchorageLengthMm.ToString();
                 break;
         }
     }
@@ -667,18 +717,23 @@ internal class MainViewModel : BaseViewModel {
         setting.IsRebarCoverFromUser = IsRebarCoverFromUser;
 
         // Сохраняются введенные вручную значения; в режиме "из плиты" слой берется из плиты при расстановке
-        setting.RebarCoverTop = RebarCoverTop;
-        setting.RebarCoverBottom = RebarCoverBottom;
+        if(TryParseMm(RebarCoverTop, out int rebarCoverTop)) {
+            setting.RebarCoverTop = rebarCoverTop;
+        }
+
+        if(TryParseMm(RebarCoverBottom, out int rebarCoverBottom)) {
+            setting.RebarCoverBottom = rebarCoverBottom;
+        }
 
         setting.FamilyName = SelectedFamilyName;
         setting.FamilyType = SelectedFamilyType;
         setting.StirrupDiameter = SelectedStirrupDiameter;
         setting.StirrupRebarClass = SelectedRebarClass;
-        setting.StirrupStep = StirrupStep;
-        setting.FrameWidth = FrameWidth;
-        setting.StirrupBendLength = StirrupBendLength;
+        setting.StirrupStep = int.Parse(StirrupStep.Trim());
+        setting.FrameWidth = int.Parse(FrameWidth.Trim());
+        setting.StirrupBendLength = int.Parse(StirrupBendLength.Trim());
         setting.LongRebarDiameter = SelectedLongRebarDiameter;
-        setting.LongRebarAnchorageLength = LongRebarAnchorageLength;
+        setting.LongRebarAnchorageLength = int.Parse(LongRebarAnchorageLength.Trim());
 
         _pluginConfig.SaveProjectConfig();
         return setting;

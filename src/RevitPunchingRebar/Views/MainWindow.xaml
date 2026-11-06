@@ -5,20 +5,23 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:vms="clr-namespace:RevitPunchingRebar.ViewModels"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
 
+    xmlns:vms="clr-namespace:RevitPunchingRebar.ViewModels"
+    xmlns:converters="clr-namespace:RevitPunchingRebar.Views.Converters"
+
     mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
     Title="{me:LocalizationSource MainWindow.Title}"
 
-    Height="600"
-    Width="800"
-
+    Height="770"
+    Width="1000"
     MinHeight="600"
-    MinWidth="800"
+    MinWidth="900"
 
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
@@ -29,36 +32,51 @@
     </i:Interaction.Triggers>
 
     <Window.Resources>
-        <Style TargetType="Border" x:Key="uiBorder">
-            <Setter Property="BorderBrush" Value="Gray" />
+        <converters:SelectedToAppearanceConverter x:Key="SelectedToAppearanceConverter" />
+
+        <!-- Карточка группы настроек (как CustomBorder в RevitPylonDocumentation) -->
+        <Style x:Key="CardBorder" TargetType="Border">
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="{DynamicResource CardControlBorderThemeThickness}" />
+        </Style>
+
+        <!-- Заголовок карточки -->
+        <Style x:Key="CardTitle" TargetType="ui:TextBlock">
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        </Style>
+
+        <!-- Подгруппа внутри карточки -->
+        <Style x:Key="SubCardBorder" TargetType="Border">
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="CornerRadius" Value="8" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="5" />
-            <Setter Property="Padding" Value="14 8 14 8" />
-            <Setter Property="Margin" Value="8 0 8 0" />
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorSecondaryBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
         </Style>
 
-        <Style TargetType="ui:TextBlock" x:Key="groupName">
-            <Setter Property="Margin" Value="8 8 0 8" />
+        <!-- Подзаголовок подгруппы -->
+        <Style x:Key="SubTitle" TargetType="ui:TextBlock">
+            <Setter Property="Margin" Value="5 5 5 0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
         </Style>
 
-        <Style TargetType="ui:TextBlock" x:Key="itemName">
-            <Setter Property="Height" Value="30" />
+        <!-- Подпись над полем ввода -->
+        <Style x:Key="FieldLabel" TargetType="ui:TextBlock">
+            <Setter Property="Margin" Value="5 5 5 0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
         </Style>
 
-        <!-- Количество выбранных элементов и статус выбора справа от кнопок "Выбрать" -->
-        <Style TargetType="TextBlock" x:Key="itemStatus">
-            <Setter Property="Margin" Value="10 0 0 0" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-
-        <!-- Кнопка сброса поля к значению по умолчанию -->
-        <Style TargetType="ui:Button" x:Key="resetButton">
-            <Setter Property="Width" Value="30" />
-            <Setter Property="Height" Value="30" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="Margin" Value="6 0 0 0" />
-            <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
-        </Style>
     </Window.Resources>
 
     <Grid>
@@ -72,481 +90,561 @@
             Grid.Row="0"
             Title="{me:LocalizationSource MainWindow.Title}" />
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <ScrollViewer
+            Grid.Row="1"
+            VerticalScrollBarVisibility="Auto">
+            <Grid Margin="7">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <StackPanel
-                Grid.Column="0"
-                Orientation="Vertical">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-                <ui:TextBlock
-                    Style="{StaticResource groupName}"
-                    Text="{me:LocalizationSource MainWindow.GeneralSettings}" />
-
-                <Border Style="{StaticResource uiBorder}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-
-                        </Grid.RowDefinitions>
-
+                <Border
+                    Margin="7"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Style="{StaticResource CardBorder}">
+                    <StackPanel>
                         <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="0"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.PylonsFromModel}" />
+                            Style="{StaticResource CardTitle}"
+                            Text="{me:LocalizationSource MainWindow.GeneralSettings}" />
 
-                        <ui:Button
-                            Grid.Column="1"
-                            Grid.Row="0"
-                            Width="120"
-                            Height="30"
-                            Content="{me:LocalizationSource MainWindow.ButtonSelect}"
-                            Command="{Binding SelectPylonsFromModelCommand}"
-                            CommandParameter="{Binding ElementName=mainWindow}" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock
-                            Grid.Column="2"
-                            Grid.Row="0"
-                            Style="{StaticResource itemStatus}"
-                            Text="{Binding PylonsFromModelCount}" />
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="1"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.PylonsFromLink}" />
+                            <ui:TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource FieldLabel}"
+                                Text="{Binding PylonsFromModelLabel}" />
 
-                        <ui:Button
-                            Grid.Column="1"
-                            Grid.Row="1"
-                            Width="120"
-                            Height="30"
-                            Content="{me:LocalizationSource MainWindow.ButtonSelect}"
-                            Command="{Binding SelectPylonsFromLinkCommand}"
-                            CommandParameter="{Binding ElementName=mainWindow}" />
+                            <ui:Button
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Margin="5"
+                                MinWidth="150"
+                                Appearance="{Binding IsPylonsSelected, Converter={StaticResource SelectedToAppearanceConverter}}"
+                                Content="{me:LocalizationSource MainWindow.ButtonSelect}"
+                                Command="{Binding SelectPylonsFromModelCommand}"
+                                CommandParameter="{Binding ElementName=mainWindow}" />
 
-                        <TextBlock
-                            Grid.Column="2"
-                            Grid.Row="1"
-                            Style="{StaticResource itemStatus}"
-                            Text="{Binding PylonsFromLinkCount}" />
+                            <ui:TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource FieldLabel}"
+                                Text="{Binding PylonsFromLinkLabel}" />
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="2"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.Slab}" />
+                            <ui:Button
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Margin="5"
+                                MinWidth="150"
+                                Appearance="{Binding IsPylonsSelected, Converter={StaticResource SelectedToAppearanceConverter}}"
+                                Content="{me:LocalizationSource MainWindow.ButtonSelect}"
+                                Command="{Binding SelectPylonsFromLinkCommand}"
+                                CommandParameter="{Binding ElementName=mainWindow}" />
 
-                        <ui:Button
-                            Grid.Column="1"
-                            Grid.Row="2"
-                            Width="120"
-                            Height="30"
-                            Content="{me:LocalizationSource MainWindow.ButtonSelect}"
-                            Command="{Binding SelectSlabCommand}"
-                            CommandParameter="{Binding ElementName=mainWindow}" />
+                            <ui:TextBlock
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource FieldLabel}"
+                                Text="{Binding SlabLabel}" />
 
-                        <TextBlock
-                            Grid.Column="2"
-                            Grid.Row="2">
-                            <TextBlock.Style>
-                                <Style
-                                    TargetType="TextBlock"
-                                    BasedOn="{StaticResource itemStatus}">
-                                    <Setter Property="Text" Value="{DynamicResource MainWindow.SlabNotSelected}" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsSlabSelected}" Value="True">
-                                            <Setter Property="Text" Value="{DynamicResource MainWindow.SlabSelected}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-
-                    </Grid>
+                            <ui:Button
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                Margin="5"
+                                MinWidth="150"
+                                Appearance="{Binding IsSlabSelected, Converter={StaticResource SelectedToAppearanceConverter}}"
+                                Content="{me:LocalizationSource MainWindow.ButtonSelect}"
+                                Command="{Binding SelectSlabCommand}"
+                                CommandParameter="{Binding ElementName=mainWindow}" />
+                        </Grid>
+                    </StackPanel>
                 </Border>
 
-                <ui:TextBlock
-                    Style="{StaticResource groupName}"
-                    Text="{me:LocalizationSource MainWindow.SlabRebar}" />
-
-                <Border Style="{StaticResource uiBorder}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-
-                        </Grid.RowDefinitions>
+                <Border
+                    Margin="7"
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Style="{StaticResource CardBorder}">
+                    <StackPanel>
+                        <ui:TextBlock
+                            Style="{StaticResource CardTitle}"
+                            Text="{me:LocalizationSource MainWindow.SlabRebar}" />
 
                         <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="0"
-                            Style="{StaticResource itemName}"
+                            Style="{StaticResource FieldLabel}"
                             Text="{me:LocalizationSource MainWindow.RebarDiameter}" />
 
-                        <ComboBox
-                            Grid.Column="1"
-                            Grid.Row="0"
-                            ItemsSource="{Binding RebarDiameters}"
-                            SelectedItem="{Binding SelectedSlabRebarDiameter}" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="0"
-                            Style="{StaticResource resetButton}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[SelectedSlabRebarDiameter]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="SelectedSlabRebarDiameter" />
+                            <ComboBox
+                                Grid.Column="0"
+                                Margin="5"
+                                ItemsSource="{Binding RebarDiameters}"
+                                SelectedItem="{Binding SelectedSlabRebarDiameter}" />
 
-                        <RadioButton
-                            Grid.Column="0"
-                            Grid.Row="1"
-                            Grid.ColumnSpan="3"
-                            GroupName="RebarCover"
-                            Content="{me:LocalizationSource MainWindow.RebarCoverFromSlab}"
-                            IsChecked="{Binding IsRebarCoverFromSlab}" />
-
-                        <RadioButton
-                            Grid.Column="0"
-                            Grid.Row="2"
-                            Grid.ColumnSpan="3"
-                            GroupName="RebarCover"
-                            Content="{me:LocalizationSource MainWindow.RebarCoverFromUser}"
-                            IsChecked="{Binding IsRebarCoverFromUser}" />
+                            <ui:Button
+                                Grid.Column="1"
+                                Margin="0 5 5 5"
+                                Padding="8"
+                                VerticalAlignment="Stretch"
+                                ToolTipService.ShowOnDisabled="True"
+                                Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                ToolTip="{Binding DefaultValueHints[SelectedSlabRebarDiameter]}"
+                                Command="{Binding ResetToDefaultCommand}"
+                                CommandParameter="SelectedSlabRebarDiameter" />
+                        </Grid>
 
                         <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="3"
-                            Style="{StaticResource itemName}"
-                            IsEnabled="{Binding IsRebarCoverFromUser}"
-                            Text="{me:LocalizationSource MainWindow.RebarCoverTop}" />
+                            Style="{StaticResource FieldLabel}"
+                            Text="{me:LocalizationSource MainWindow.RebarCover}" />
 
-                        <ui:TextBox
-                            Grid.Column="1"
-                            Grid.Row="3"
-                            IsEnabled="{Binding IsRebarCoverFromUser}"
-                            Text="{Binding RebarCoverTop}" />
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton
+                                Margin="5"
+                                GroupName="RebarCover"
+                                Content="{me:LocalizationSource MainWindow.RebarCoverFromSlab}"
+                                IsChecked="{Binding IsRebarCoverFromSlab}" />
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="3"
-                            Style="{StaticResource resetButton}"
-                            IsEnabled="{Binding IsRebarCoverFromUser}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[RebarCoverTop]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="RebarCoverTop" />
+                            <RadioButton
+                                Margin="5"
+                                GroupName="RebarCover"
+                                Content="{me:LocalizationSource MainWindow.RebarCoverFromUser}"
+                                IsChecked="{Binding IsRebarCoverFromUser}" />
+                        </StackPanel>
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="4"
-                            Style="{StaticResource itemName}"
-                            IsEnabled="{Binding IsRebarCoverFromUser}"
-                            Text="{me:LocalizationSource MainWindow.RebarCoverBottom}" />
+                        <UniformGrid Columns="2">
+                            <StackPanel>
+                                <ui:TextBlock
+                                    Style="{StaticResource FieldLabel}"
+                                    IsEnabled="{Binding IsRebarCoverFromUser}"
+                                    Text="{me:LocalizationSource MainWindow.RebarCoverTop}" />
 
-                        <ui:TextBox
-                            Grid.Column="1"
-                            Grid.Row="4"
-                            IsEnabled="{Binding IsRebarCoverFromUser}"
-                            Text="{Binding RebarCoverBottom}" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="4"
-                            Style="{StaticResource resetButton}"
-                            IsEnabled="{Binding IsRebarCoverFromUser}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[RebarCoverBottom]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="RebarCoverBottom" />
+                                    <ui:TextBox
+                                        Grid.Column="0"
+                                        Margin="5"
+                                        IsEnabled="{Binding IsRebarCoverFromUser}"
+                                        ClearButtonEnabled="False"
+                                        Text="{Binding RebarCoverTop, UpdateSourceTrigger=PropertyChanged}" />
 
-                    </Grid>
+                                    <ui:Button
+                                        Grid.Column="1"
+                                        Margin="0 5 5 5"
+                                        Padding="8"
+                                        VerticalAlignment="Stretch"
+                                        ToolTipService.ShowOnDisabled="True"
+                                        IsEnabled="{Binding IsRebarCoverFromUser}"
+                                        Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                        ToolTip="{Binding DefaultValueHints[RebarCoverTop]}"
+                                        Command="{Binding ResetToDefaultCommand}"
+                                        CommandParameter="RebarCoverTop" />
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel>
+                                <ui:TextBlock
+                                    Style="{StaticResource FieldLabel}"
+                                    IsEnabled="{Binding IsRebarCoverFromUser}"
+                                    Text="{me:LocalizationSource MainWindow.RebarCoverBottom}" />
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ui:TextBox
+                                        Grid.Column="0"
+                                        Margin="5"
+                                        IsEnabled="{Binding IsRebarCoverFromUser}"
+                                        ClearButtonEnabled="False"
+                                        Text="{Binding RebarCoverBottom, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <ui:Button
+                                        Grid.Column="1"
+                                        Margin="0 5 5 5"
+                                        Padding="8"
+                                        VerticalAlignment="Stretch"
+                                        ToolTipService.ShowOnDisabled="True"
+                                        IsEnabled="{Binding IsRebarCoverFromUser}"
+                                        Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                        ToolTip="{Binding DefaultValueHints[RebarCoverBottom]}"
+                                        Command="{Binding ResetToDefaultCommand}"
+                                        CommandParameter="RebarCoverBottom" />
+                                </Grid>
+                            </StackPanel>
+                        </UniformGrid>
+                    </StackPanel>
                 </Border>
-            </StackPanel>
 
-            <StackPanel
-                Grid.Column="1"
-                Orientation="Vertical">
-
-                <ui:TextBlock
-                    Style="{StaticResource groupName}"
-                    Text="{me:LocalizationSource MainWindow.FrameRebar}" />
-
-                <Border Style="{StaticResource uiBorder}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-                            <RowDefinition Height="35" />
-
-                        </Grid.RowDefinitions>
-
+                <Border
+                    Margin="7"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Style="{StaticResource CardBorder}">
+                    <StackPanel>
                         <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="0"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.FamilyName}" />
+                            Style="{StaticResource CardTitle}"
+                            Text="{me:LocalizationSource MainWindow.FrameRebar}" />
 
-                        <ComboBox
-                            Grid.Column="1"
-                            Grid.Row="0"
-                            ItemsSource="{Binding FamilyNames}"
-                            SelectedItem="{Binding SelectedFamilyName}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding LoadFamilyTypesCommand}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ComboBox>
+                        <UniformGrid Columns="3">
+                            <Border Style="{StaticResource SubCardBorder}">
+                                <StackPanel>
+                                    <ui:TextBlock
+                                        Style="{StaticResource SubTitle}"
+                                        Text="{me:LocalizationSource MainWindow.FrameGroup}" />
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="0"
-                            Style="{StaticResource resetButton}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[SelectedFamilyName]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="SelectedFamilyName" />
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.FamilyName}" />
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="1"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.FamilyType}" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                        <ComboBox
-                            Grid.Column="1"
-                            Grid.Row="1"
-                            ItemsSource="{Binding FamilyTypes}"
-                            SelectedItem="{Binding SelectedFamilyType}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding CheckFrameTypeCommand}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ComboBox>
+                                        <ComboBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            ItemsSource="{Binding FamilyNames}"
+                                            SelectedItem="{Binding SelectedFamilyName}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding LoadFamilyTypesCommand}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="1"
-                            Style="{StaticResource resetButton}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[SelectedFamilyType]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="SelectedFamilyType" />
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[SelectedFamilyName]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="SelectedFamilyName" />
+                                    </Grid>
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="2"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.StirrupDiameter}" />
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.FamilyType}" />
 
-                        <ComboBox
-                            Grid.Column="1"
-                            Grid.Row="2"
-                            ItemsSource="{Binding RebarDiameters}"
-                            SelectedItem="{Binding SelectedStirrupDiameter}" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="2"
-                            Style="{StaticResource resetButton}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[SelectedStirrupDiameter]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="SelectedStirrupDiameter" />
+                                        <ComboBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            ItemsSource="{Binding FamilyTypes}"
+                                            SelectedItem="{Binding SelectedFamilyType}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding CheckFrameTypeCommand}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="3"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.StirrupRebarClass}" />
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[SelectedFamilyType]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="SelectedFamilyType" />
+                                    </Grid>
 
-                        <ComboBox
-                            Grid.Column="1"
-                            Grid.Row="3"
-                            DisplayMemberPath="Name"
-                            SelectedValuePath="Value"
-                            ItemsSource="{Binding RebarClasses}"
-                            SelectedValue="{Binding SelectedRebarClass}" />
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.FrameWidth}" />
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="3"
-                            Style="{StaticResource resetButton}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[SelectedRebarClass]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="SelectedRebarClass" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="4"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.StirrupStep}" />
+                                        <ui:TextBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            ClearButtonEnabled="False"
+                                            Text="{Binding FrameWidth, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <ui:TextBox
-                            Grid.Column="1"
-                            Grid.Row="4"
-                            Text="{Binding StirrupStep}" />
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[FrameWidth]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="FrameWidth" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="4"
-                            Style="{StaticResource resetButton}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[StirrupStep]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="StirrupStep" />
+                            <Border Style="{StaticResource SubCardBorder}">
+                                <StackPanel>
+                                    <ui:TextBlock
+                                        Style="{StaticResource SubTitle}"
+                                        Text="{me:LocalizationSource MainWindow.StirrupsGroup}" />
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="5"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.FrameWidth}" />
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.StirrupDiameter}" />
 
-                        <ui:TextBox
-                            Grid.Column="1"
-                            Grid.Row="5"
-                            Text="{Binding FrameWidth}" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="5"
-                            Style="{StaticResource resetButton}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[FrameWidth]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="FrameWidth" />
+                                        <ComboBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            ItemsSource="{Binding RebarDiameters}"
+                                            SelectedItem="{Binding SelectedStirrupDiameter}" />
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="6"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.StirrupBendLength}" />
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[SelectedStirrupDiameter]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="SelectedStirrupDiameter" />
+                                    </Grid>
 
-                        <ui:TextBox
-                            Grid.Column="1"
-                            Grid.Row="6"
-                            Text="{Binding StirrupBendLength}" />
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.StirrupRebarClass}" />
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="6"
-                            Style="{StaticResource resetButton}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[StirrupBendLength]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="StirrupBendLength" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="7"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.LongRebarDiameter}" />
+                                        <ComboBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            DisplayMemberPath="Name"
+                                            SelectedValuePath="Value"
+                                            ItemsSource="{Binding RebarClasses}"
+                                            SelectedValue="{Binding SelectedRebarClass}" />
 
-                        <ComboBox
-                            Grid.Column="1"
-                            Grid.Row="7"
-                            ItemsSource="{Binding RebarDiameters}"
-                            SelectedItem="{Binding SelectedLongRebarDiameter}" />
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[SelectedRebarClass]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="SelectedRebarClass" />
+                                    </Grid>
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="7"
-                            Style="{StaticResource resetButton}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[SelectedLongRebarDiameter]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="SelectedLongRebarDiameter" />
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.StirrupStep}" />
 
-                        <ui:TextBlock
-                            Grid.Column="0"
-                            Grid.Row="8"
-                            Style="{StaticResource itemName}"
-                            Text="{me:LocalizationSource MainWindow.LongRebarAnchorageLength}" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                        <ui:TextBox
-                            Grid.Column="1"
-                            Grid.Row="8"
-                            Text="{Binding LongRebarAnchorageLength}" />
+                                        <ui:TextBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            ClearButtonEnabled="False"
+                                            Text="{Binding StirrupStep, UpdateSourceTrigger=PropertyChanged}" />
 
-                        <ui:Button
-                            Grid.Column="2"
-                            Grid.Row="8"
-                            Style="{StaticResource resetButton}"
-                            Content="{ui:SymbolIcon Symbol=ArrowCounterclockwise20}"
-                            ToolTip="{Binding DefaultValueHints[LongRebarAnchorageLength]}"
-                            Command="{Binding ResetToDefaultCommand}"
-                            CommandParameter="LongRebarAnchorageLength" />
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[StirrupStep]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="StirrupStep" />
+                                    </Grid>
 
-                    </Grid>
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.StirrupBendLength}" />
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <ui:TextBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            ClearButtonEnabled="False"
+                                            Text="{Binding StirrupBendLength, UpdateSourceTrigger=PropertyChanged}" />
+
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[StirrupBendLength]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="StirrupBendLength" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource SubCardBorder}">
+                                <StackPanel>
+                                    <ui:TextBlock
+                                        Style="{StaticResource SubTitle}"
+                                        Text="{me:LocalizationSource MainWindow.LongRebarGroup}" />
+
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.LongRebarDiameter}" />
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <ComboBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            ItemsSource="{Binding RebarDiameters}"
+                                            SelectedItem="{Binding SelectedLongRebarDiameter}" />
+
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[SelectedLongRebarDiameter]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="SelectedLongRebarDiameter" />
+                                    </Grid>
+
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.LongRebarAnchorageLength}" />
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <ui:TextBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            ClearButtonEnabled="False"
+                                            Text="{Binding LongRebarAnchorageLength, UpdateSourceTrigger=PropertyChanged}" />
+
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[LongRebarAnchorageLength]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="LongRebarAnchorageLength" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                    </StackPanel>
                 </Border>
-            </StackPanel>
-        </Grid>
+            </Grid>
+        </ScrollViewer>
 
-        <StackPanel
-            Grid.Row="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-            <ui:TextBlock
-                Margin="10"
+            <TextBlock
+                Grid.Column="0"
+                Margin="10 5 10 15"
                 Foreground="Orange"
                 VerticalAlignment="Center"
+                TextAlignment="Right"
+                TextWrapping="Wrap"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
-                Margin="10"
-                Width="80"
+                Grid.Column="1"
+                Margin="10 5 10 15"
+                MinWidth="150"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
-                Margin="10"
-                Width="80"
+                Grid.Column="2"
+                Margin="10 5 15 15"
+                MinWidth="150"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
-        </StackPanel>
+        </Grid>
     </Grid>
 </core:WpfUIPlatformWindow>
