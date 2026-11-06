@@ -44,6 +44,12 @@ public partial class MainWindow {
     }
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-        DialogResult = false;
+        // После скрытия окна на время выбора элементов в Revit DialogResult уже равен false,
+        // повторное присваивание того же значения окно не закрывает, поэтому закрываем явно.
+        if(DialogResult == false) {
+            Close();
+        } else {
+            DialogResult = false;
+        }
     }
 }

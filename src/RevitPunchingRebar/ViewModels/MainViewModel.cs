@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -33,58 +32,32 @@ internal class MainViewModel : BaseViewModel {
     public ICommand SelectPylonsFromLinkCommand { get; }
     public ICommand SelectSlabCommand { get; }
 
-    private string _selectedSlabId;
-    public string SelectedSlabId {
-        get { return _selectedSlabId; }
-        set {
-            _selectedSlabId = value;
-            SelectedSlabeChanged();
-        }
+    private List<ElementId> _pylonsFromModel = [];
+    private List<LinkedPylonReference> _pylonsFromLink = [];
+    private ElementId _slabId;
+
+    private int _pylonsFromModelCount;
+    public int PylonsFromModelCount {
+        get => _pylonsFromModelCount;
+        private set => RaiseAndSetIfChanged(ref _pylonsFromModelCount, value);
     }
 
-    private List<string> _selectedPylonsFromModel;
-    public List<string> SelectedPylonsFromModel {
-        get { return _selectedPylonsFromModel; }
-        set {
-            _selectedPylonsFromModel = value;
-
-            if(value.Count != 0) {
-                SelectedPylonsFromLink.Clear();
-                SelectedPylonsCount = _selectedPylonsFromModel.Count;
-            }
-        }
-    }
-
-    private Dictionary<string, string> _selectedPylonsFromLink;
-    public Dictionary<string, string> SelectedPylonsFromLink {
-        get { return _selectedPylonsFromLink; }
-        set {
-            _selectedPylonsFromLink = value;
-
-            if(value.Count != 0) {
-                SelectedPylonsFromModel.Clear();
-                SelectedPylonsCount = _selectedPylonsFromLink.Count;
-            }
-        }
+    private int _pylonsFromLinkCount;
+    public int PylonsFromLinkCount {
+        get => _pylonsFromLinkCount;
+        private set => RaiseAndSetIfChanged(ref _pylonsFromLinkCount, value);
     }
 
     private int _selectedPylonsCount;
     public int SelectedPylonsCount {
-        get { return _selectedPylonsCount; }
-        set {
-            _selectedPylonsCount = value;
-            OnPropertyChanged(nameof(SelectedPylonsCount));
-        }
+        get => _selectedPylonsCount;
+        private set => RaiseAndSetIfChanged(ref _selectedPylonsCount, value);
     }
 
-    private string _isSlabSelected;
-
+    private string _isSlabSelected = "Нет";
     public string IsSlabSelected {
-        get { return _isSlabSelected; }
-        set {
-            _isSlabSelected = value;
-            OnPropertyChanged(nameof(IsSlabSelected));
-        }
+        get => _isSlabSelected;
+        private set => RaiseAndSetIfChanged(ref _isSlabSelected, value);
     }
 
     //Арматура плиты
@@ -232,28 +205,44 @@ internal class MainViewModel : BaseViewModel {
         SelectSlabCommand = RelayCommand.Create<Window>(SelectSlab);
 
         FamilyNames = _revitRepository.GetFamilyNames();
-        SelectedPylonsFromLink = new Dictionary<string, string>();
     }
 
     /// <summary>
     /// Скрывает окно и дает выбрать пилоны в текущем проекте.
+    /// Выбор заменяет ранее выбранные пилоны из текущего проекта и не затрагивает пилоны из связей.
     /// </summary>
     private void SelectPylonsFromModel(Window window) {
-        SelectInRevit(window, () => SelectedPylonsFromModel = _revitRepository.PickPylonsFromModel());
+        SelectInRevit(window, () => {
+            _pylonsFromModel = _revitRepository.PickPylonsFromModel();
+            UpdatePylonsCount();
+        });
     }
 
     /// <summary>
     /// Скрывает окно и дает выбрать пилоны в связанных файлах.
+    /// Выбор заменяет ранее выбранные пилоны из связей и не затрагивает пилоны из текущего проекта.
     /// </summary>
     private void SelectPylonsFromLink(Window window) {
-        SelectInRevit(window, () => SelectedPylonsFromLink = _revitRepository.PickPylonsFromLink());
+        SelectInRevit(window, () => {
+            _pylonsFromLink = _revitRepository.PickPylonsFromLink();
+            UpdatePylonsCount();
+        });
     }
 
     /// <summary>
     /// Скрывает окно и дает выбрать плиту.
     /// </summary>
     private void SelectSlab(Window window) {
-        SelectInRevit(window, () => SelectedSlabId = _revitRepository.PickSlab());
+        SelectInRevit(window, () => {
+            _slabId = _revitRepository.PickSlab();
+            IsSlabSelected = "Да";
+        });
+    }
+
+    private void UpdatePylonsCount() {
+        PylonsFromModelCount = _pylonsFromModel.Count;
+        PylonsFromLinkCount = _pylonsFromLink.Count;
+        SelectedPylonsCount = PylonsFromModelCount + PylonsFromLinkCount;
     }
 
     /// <summary>
@@ -267,14 +256,6 @@ internal class MainViewModel : BaseViewModel {
             // Пользователь отменил выбор - оставляем предыдущий выбор
         } finally {
             _ = window.ShowDialog();
-        }
-    }
-
-    private void SelectedSlabeChanged() {
-        if(SelectedSlabId != null) {
-            IsSlabSelected = "Да";
-        } else {
-            IsSlabSelected = "Нет";
         }
     }
 
@@ -321,16 +302,13 @@ internal class MainViewModel : BaseViewModel {
     private void PlaceFrames(RevitSettings settings) {
         using Transaction transaction = _revitRepository.Document.StartTransaction("Расстановка каркасов");
 
-        List<IPylon> pylons = _revitRepository
-            .GetPylons<StructColumnPylon>(settings, e => new StructColumnPylon(e))
-            .Cast<IPylon>()
-            .ToList();
+        List<IPylon> pylons = _revitRepository.GetPylons(_pylonsFromModel, _pylonsFromLink);
 
         FrameParams frameParams = new FrameParams();
 
         frameParams.FrameFamilyName = settings.FamilyName;
         frameParams.FrameFamilyTypeName = settings.FamilyType;
-        frameParams.HostSlab = _revitRepository.GetSlab(settings.SlabId);
+        frameParams.HostSlab = _revitRepository.GetSlab(_slabId);
         frameParams.SlabThickness = frameParams.HostSlab.Thickness;
         frameParams.RebarCoverTop = UnitUtilsHelper.FromMm(settings.RebarCoverTop);
         frameParams.RebarCoverBottom = UnitUtilsHelper.FromMm(settings.RebarCoverBottom);
@@ -359,14 +337,14 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        if(SelectedSlabId == null) {
+        if(_slabId == null) {
             ErrorText = "Выберите плиту";
             return false;
         }
 
         double rebarCoverTopFt = UnitUtilsHelper.FromMm(RebarCoverTop);
         double rebarCoverBottomFt = UnitUtilsHelper.FromMm(RebarCoverBottom);
-        Slab slab = _revitRepository.GetSlab(SelectedSlabId);
+        Slab slab = _revitRepository.GetSlab(_slabId);
 
         if(rebarCoverTopFt <= 0 || rebarCoverTopFt > slab.Thickness * 0.5) {
             ErrorText = "Введите корректный верхний защитный слой";
@@ -412,9 +390,6 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
-        SelectedSlabId = setting?.SlabId ?? null;
-        SelectedPylonsFromModel = setting?.PylonsFromModel ?? [];
-        SelectedPylonsFromLink = setting?.PylonsFromLink ?? [];
 
         SelectedFamilyName = setting?.FamilyName ?? string.Empty;
         SelectedFamilyType = setting?.FamilyType ?? string.Empty;
@@ -439,14 +414,11 @@ internal class MainViewModel : BaseViewModel {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
-        setting.PylonsFromModel = SelectedPylonsFromModel;
-        setting.PylonsFromLink = SelectedPylonsFromLink;
-        setting.SlabId = SelectedSlabId;
         setting.SlabRebarDiameter = SelectedSlabRebarDiameter;
         setting.IsRebarCoverFromUser = IsRebarCoverFromUser;
 
         if(IsRebarCoverFromSlab) {
-            Slab slab = _revitRepository.GetSlab(SelectedSlabId);
+            Slab slab = _revitRepository.GetSlab(_slabId);
 
             setting.RebarCoverTop = Convert.ToInt32(UnitUtilsHelper.ToMm(slab.RebarCoverTop));
             setting.RebarCoverBottom = Convert.ToInt32(UnitUtilsHelper.ToMm(slab.RebarCoverBottom));

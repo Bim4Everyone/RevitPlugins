@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Serializers;
@@ -49,10 +47,6 @@ internal class RevitSettings : ProjectSettings {
     /// </summary>
     public override string ProjectName { get; set; }
 
-    public List<string> PylonsFromModel { get; set; }
-    public Dictionary<string, string> PylonsFromLink { get; set; }
-    
-    public string SlabId { get; set; }
     public int SlabRebarDiameter { get; set; }
     public bool IsRebarCoverFromUser { get; set; }
     public int RebarCoverTop { get; set; }

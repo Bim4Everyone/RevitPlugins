@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -52,80 +51,62 @@ internal class RevitRepository {
     /// <summary>
     /// Дает пользователю выбрать плиту.
     /// </summary>
-    /// <returns>UniqueId выбранной плиты.</returns>
-    public string PickSlab() {
+    /// <returns>Id выбранной плиты.</returns>
+    public ElementId PickSlab() {
         Reference reference = ActiveUIDocument.Selection.PickObject(
             ObjectType.Element, new SlabFilter(), "Выберите плиту");
 
-        return Document.GetElement(reference.ElementId).UniqueId;
+        return reference.ElementId;
     }
 
     /// <summary>
     /// Дает пользователю выбрать пилоны в текущем проекте.
     /// </summary>
-    /// <returns>UniqueId выбранных пилонов.</returns>
-    public List<string> PickPylonsFromModel() {
+    /// <returns>Id выбранных пилонов.</returns>
+    public List<ElementId> PickPylonsFromModel() {
         IList<Reference> references = ActiveUIDocument.Selection.PickObjects(
             ObjectType.Element, new PylonFromModelFilter(), "Выберите пилоны");
 
         return references
-            .Select(reference => Document.GetElement(reference).UniqueId)
+            .Select(reference => reference.ElementId)
             .ToList();
     }
 
     /// <summary>
     /// Дает пользователю выбрать пилоны в связанных файлах.
     /// </summary>
-    /// <returns>Словарь: UniqueId пилона в связанном файле - название связанного файла.</returns>
-    public Dictionary<string, string> PickPylonsFromLink() {
+    /// <returns>Ссылки на выбранные пилоны с указанием экземпляра связи.</returns>
+    public List<LinkedPylonReference> PickPylonsFromLink() {
         IList<Reference> references = ActiveUIDocument.Selection.PickObjects(
             ObjectType.LinkedElement, new PylonFromLinkFilter(Document), "Выберите пилоны");
 
-        Dictionary<string, string> selectedPylons = new Dictionary<string, string>();
-        foreach(Reference reference in references) {
-            RevitLinkInstance link = (RevitLinkInstance) Document.GetElement(reference.ElementId);
-            Document linkedDoc = link.GetLinkDocument();
-
-            selectedPylons.Add(linkedDoc.GetElement(reference.LinkedElementId).UniqueId, linkedDoc.Title);
-        }
-
-        return selectedPylons;
+        return references
+            .Select(reference => new LinkedPylonReference(reference.ElementId, reference.LinkedElementId))
+            .ToList();
     }
 
-    public Slab GetSlab(string slabUniqId) {
-        Element slabElement = Document.GetElement(slabUniqId);
+    public Slab GetSlab(ElementId slabId) {
+        Element slabElement = Document.GetElement(slabId);
 
         return new Slab(slabElement);
     }
 
-    public List<T> GetPylons<T>(RevitSettings settings, Func<Element, T> factory) where T : IPylon {
-        List<T> pylons = new List<T>();
+    /// <summary>
+    /// Возвращает пилоны, выбранные в текущем проекте и в связанных файлах.
+    /// </summary>
+    /// <param name="modelPylonIds">Id пилонов в текущем проекте.</param>
+    /// <param name="linkedPylons">Ссылки на пилоны в связанных файлах.</param>
+    public List<IPylon> GetPylons(
+        IEnumerable<ElementId> modelPylonIds, IEnumerable<LinkedPylonReference> linkedPylons) {
+        List<IPylon> pylons = modelPylonIds
+            .Select(id => (IPylon) new StructColumnPylon(Document.GetElement(id)))
+            .ToList();
 
-        if(settings.PylonsFromModel.Count != 0) {
-            List<string> ids = settings.PylonsFromModel;
+        foreach(LinkedPylonReference linkedPylon in linkedPylons) {
+            RevitLinkInstance linkInstance = (RevitLinkInstance) Document.GetElement(linkedPylon.LinkInstanceId);
+            Document linkedDoc = linkInstance.GetLinkDocument();
 
-            foreach(string uniqId in ids) {
-                Element element = Document.GetElement(uniqId);
-                pylons.Add(factory(element));
-            }
-        } else {
-            Dictionary<string, string> settingPylons = settings.PylonsFromLink;
-
-            foreach(var pylon in settingPylons) {
-                string uniqId = pylon.Key;
-                string linkedDocTitle = pylon.Value;
-
-                RevitLinkInstance linkInstance = new FilteredElementCollector(Document)
-                    .OfClass(typeof(RevitLinkInstance))
-                    .Cast<RevitLinkInstance>()
-                    .FirstOrDefault(link => {
-                        return link.GetLinkDocument().Title == linkedDocTitle;
-                    });
-
-                Document linkedDoc = linkInstance.GetLinkDocument();
-                Element element = linkedDoc.GetElement(uniqId);
-                pylons.Add(factory(element));
-            }
+            pylons.Add(new StructColumnPylon(linkedDoc.GetElement(linkedPylon.PylonId)));
         }
 
         return pylons;

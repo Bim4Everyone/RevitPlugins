@@ -145,8 +145,15 @@
 
                         <TextBlock
                             Grid.Column="1"
-                            Grid.Row="2"
-                            Text="{Binding SelectedPylonsCount}"/>
+                            Grid.Row="2">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} (из модели: {1}, из связи: {2})">
+                                    <Binding Path="SelectedPylonsCount" />
+                                    <Binding Path="PylonsFromModelCount" />
+                                    <Binding Path="PylonsFromLinkCount" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
 
                         <ui:Button
                             Grid.Column="1"
