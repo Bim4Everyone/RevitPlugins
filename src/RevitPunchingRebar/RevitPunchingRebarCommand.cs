@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Reflection;
+using System.Text;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -80,6 +81,37 @@ public class RevitPunchingRebarCommand : BasePluginCommand {
             CultureInfo.GetCultureInfo("ru-RU"));
 
         // Вызывает стандартное уведомление
-        Notification(kernel.Get<MainWindow>());
+        MainWindow window = kernel.Get<MainWindow>();
+        Notification(window);
+
+        ShowPlacementReport((MainViewModel) window.DataContext, kernel.Get<ILocalizationService>());
+    }
+
+    /// <summary>
+    /// Показывает итог расстановки: сколько пилонов обработано, сколько каркасов создано и какие пилоны пропущены.
+    /// </summary>
+    private void ShowPlacementReport(MainViewModel viewModel, ILocalizationService localizationService) {
+        PlacementResult result = viewModel.PlacementResult;
+        if(result == null) {
+            return;
+        }
+
+        StringBuilder report = new StringBuilder();
+        report.AppendFormat(
+            localizationService.GetLocalizedString("Report.Summary"),
+            result.ProcessedPylonsCount,
+            result.PylonsCount,
+            result.CreatedFramesCount);
+
+        if(result.SkippedPylons.Count > 0) {
+            report.AppendLine();
+            report.AppendLine();
+            report.AppendLine(localizationService.GetLocalizedString("Report.SkippedPylons"));
+            foreach(string skippedPylon in result.SkippedPylons) {
+                report.AppendLine(skippedPylon);
+            }
+        }
+
+        TaskDialog.Show(PluginName, report.ToString().TrimEnd());
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 
+using RevitPunchingRebar.Models;
 using RevitPunchingRebar.Models.Interfaces;
 
 namespace RevitPunchingRebar.Services;
@@ -11,7 +12,11 @@ internal interface IPunchingRebarPlacementService {
     /// <summary>
     /// Расставляет каркасы у каждого пилона.
     /// </summary>
+    /// <remarks>
+    /// Пилон, у которого расставить каркасы не удалось, пропускается, остальные обрабатываются.
+    /// </remarks>
     /// <param name="pylons">Пилоны, у которых нужно расставить каркасы.</param>
     /// <param name="frameParams">Параметры каркасов.</param>
-    void Run(IEnumerable<IPylon> pylons, IFrameParams frameParams);
+    /// <returns>Итог расстановки.</returns>
+    PlacementResult Run(IEnumerable<IPylon> pylons, IFrameParams frameParams);
 }

@@ -133,6 +133,11 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
+    /// Итог расстановки каркасов. null, если расстановка не выполнялась.
+    /// </summary>
+    public PlacementResult PlacementResult { get; private set; }
+
+    /// <summary>
     /// Доступные диаметры арматуры, мм.
     /// </summary>
     public List<int> RebarDiameters { get; } = [6, 8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40];
@@ -503,7 +508,7 @@ internal class MainViewModel : BaseViewModel {
 
         IFrameParams frameParams = new FrameParams(settings, _slab);
 
-        _placementService.Run(pylons, frameParams);
+        PlacementResult = _placementService.Run(pylons, frameParams);
 
         transaction.Commit();
     }

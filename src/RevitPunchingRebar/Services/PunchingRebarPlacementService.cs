@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitPunchingRebar.Models;
 using RevitPunchingRebar.Models.Interfaces;
@@ -27,16 +28,22 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     private const double _angleTolerance = 1e-6;
 
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
+
+    // Количество каркасов, созданных при текущей расстановке
+    private int _createdFramesCount;
 
     /// <summary>
     /// Создает сервис расстановки каркасов.
     /// </summary>
     /// <param name="revitRepository">Класс доступа к документу Revit.</param>
-    public PunchingRebarPlacementService(RevitRepository revitRepository) {
+    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
+    public PunchingRebarPlacementService(RevitRepository revitRepository, ILocalizationService localizationService) {
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
     }
 
-    public void Run(IEnumerable<IPylon> pylons, IFrameParams frameParams) {
+    public PlacementResult Run(IEnumerable<IPylon> pylons, IFrameParams frameParams) {
         FamilySymbol frameSymbol = _revitRepository.GetFrameSymbol(
             frameParams.FrameFamilyName, frameParams.FrameFamilyTypeName);
 
@@ -46,9 +53,63 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
             _revitRepository.Document.Regenerate();
         }
 
+        PlacementResult result = new PlacementResult();
+        _createdFramesCount = 0;
+
         foreach(IPylon pylon in pylons) {
-            CreateFrames(pylon, frameSymbol, frameParams);
+            result.PylonsCount++;
+
+            string skipReason = GetSkipReason(pylon, frameParams);
+            if(skipReason != null) {
+                result.SkippedPylons.Add(FormatSkippedPylon(pylon, skipReason));
+                continue;
+            }
+
+            // Каркасы каждого пилона создаются в своей подтранзакции:
+            // при ошибке откатывается только этот пилон
+            int createdFramesBefore = _createdFramesCount;
+            using SubTransaction subTransaction = new SubTransaction(_revitRepository.Document);
+            subTransaction.Start();
+            try {
+                CreateFrames(pylon, frameSymbol, frameParams);
+                subTransaction.Commit();
+                result.ProcessedPylonsCount++;
+            } catch(Exception ex) when(ex is Autodesk.Revit.Exceptions.ApplicationException
+                                         || ex is InvalidOperationException) {
+                subTransaction.RollBack();
+                _createdFramesCount = createdFramesBefore;
+                result.SkippedPylons.Add(FormatSkippedPylon(pylon, ex.Message));
+            }
         }
+
+        result.CreatedFramesCount = _createdFramesCount;
+        return result;
+    }
+
+    /// <summary>
+    /// Возвращает причину, по которой у пилона нельзя расставить каркасы, или null, если можно.
+    /// </summary>
+    private string GetSkipReason(IPylon pylon, IFrameParams frameParams) {
+        if(pylon.Length <= 0 || pylon.Width <= 0) {
+            return _localizationService.GetLocalizedString("Report.ErrorPylonSize");
+        }
+
+        bool isFloorSlab = frameParams.HostSlab.SlabInstance.Category.GetBuiltInCategory()
+                           != BuiltInCategory.OST_StructuralFoundation;
+        if(isFloorSlab && pylon.Height <= 0) {
+            return _localizationService.GetLocalizedString("Report.ErrorPylonHeight");
+        }
+
+        return null;
+    }
+
+    private string FormatSkippedPylon(IPylon pylon, string reason) {
+        string pylonName = string.Format(
+            _localizationService.GetLocalizedString("Report.PylonName"),
+            pylon.PylonInstance.Document.Title,
+            pylon.PylonInstance.Id);
+
+        return $"{pylonName}: {reason}";
     }
 
     private void CreateFrames(IPylon pylon, FamilySymbol frameSymbol, IFrameParams frameParams) {
@@ -65,6 +126,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         //Создаем каркас в первом направлении
         Frame frame1 = _revitRepository.CreateFrame(frameSymbol, frameParams, location);
+        _createdFramesCount++;
 
         //Делаем геометрические преобразования
         MoveFrameDown(frame1, frameParams);
@@ -79,6 +141,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         //Создаем каркас во втором направлении
         Frame frame2 = _revitRepository.CreateFrame(frameSymbol, frameParams, location);
+        _createdFramesCount++;
 
         MoveFrameDown(frame2, frameParams);
         RotateFrame(frame2, GetAlignAngle(frame2.FrameInstance.FacingOrientation, pylon.FacingOrientation) + Math.PI / 2);
@@ -258,6 +321,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
                 );
 
             ElementTransformUtils.CopyElement(frame.FrameInstance.Document, frame.FrameInstance.Id, endPoint - startPoint);
+            _createdFramesCount++;
 
             startPoint = endPoint;
         }
@@ -312,6 +376,8 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         Element element = frame.FrameInstance.Document.GetElement(mirrorElements.FirstOrDefault());
         Frame mirroredFrame = new Frame((FamilyInstance) element, frameParams);
+
+        _createdFramesCount++;
 
         return mirroredFrame;
     }

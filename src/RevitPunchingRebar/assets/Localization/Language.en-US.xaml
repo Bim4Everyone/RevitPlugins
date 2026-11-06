@@ -54,4 +54,10 @@
 
     <system:String x:Key="RebarClass.A500C">A500C</system:String>
     <system:String x:Key="RebarClass.A240">A240</system:String>
+
+    <system:String x:Key="Report.Summary">Pylons processed: {0} of {1}. Frames created: {2}.</system:String>
+    <system:String x:Key="Report.SkippedPylons">Skipped pylons:</system:String>
+    <system:String x:Key="Report.PylonName">{0}, Id {1}</system:String>
+    <system:String x:Key="Report.ErrorPylonSize">pylon length or width is not set</system:String>
+    <system:String x:Key="Report.ErrorPylonHeight">pylon height is not set</system:String>
 </ResourceDictionary>
