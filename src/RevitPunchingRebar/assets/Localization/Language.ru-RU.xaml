@@ -6,13 +6,9 @@
     <system:String x:Key="MainWindow.GeneralSettings">Общие настройки</system:String>
     <system:String x:Key="MainWindow.PylonsFromModel">Пилоны из модели</system:String>
     <system:String x:Key="MainWindow.PylonsFromLink">Пилоны из связи</system:String>
-    <system:String x:Key="MainWindow.SelectedPylons">Пилонов выбрано:</system:String>
-    <system:String x:Key="MainWindow.FromModel">из модели:</system:String>
-    <system:String x:Key="MainWindow.FromLink">из связи:</system:String>
     <system:String x:Key="MainWindow.Slab">Плита</system:String>
-    <system:String x:Key="MainWindow.SlabSelected">Плита выбрана:</system:String>
-    <system:String x:Key="MainWindow.Yes">Да</system:String>
-    <system:String x:Key="MainWindow.No">Нет</system:String>
+    <system:String x:Key="MainWindow.SlabSelected">выбрана</system:String>
+    <system:String x:Key="MainWindow.SlabNotSelected">не выбрана</system:String>
     <system:String x:Key="MainWindow.ButtonSelect">Выбрать</system:String>
     <system:String x:Key="MainWindow.SlabRebar">Арматура плиты</system:String>
     <system:String x:Key="MainWindow.RebarDiameter">Диаметр стержней, мм</system:String>
@@ -30,6 +26,7 @@
     <system:String x:Key="MainWindow.StirrupBendLength">Длина отгибов хомутов, мм</system:String>
     <system:String x:Key="MainWindow.LongRebarDiameter">Диаметр продольных стержней, мм</system:String>
     <system:String x:Key="MainWindow.LongRebarAnchorageLength">Выпуск продольных стержней, мм</system:String>
+    <system:String x:Key="MainWindow.ResetToDefault">Сбросить к значению по умолчанию: {0}</system:String>
     <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
 

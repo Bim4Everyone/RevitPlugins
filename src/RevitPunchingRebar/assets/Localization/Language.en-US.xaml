@@ -6,13 +6,9 @@
     <system:String x:Key="MainWindow.GeneralSettings">General settings</system:String>
     <system:String x:Key="MainWindow.PylonsFromModel">Pylons from model</system:String>
     <system:String x:Key="MainWindow.PylonsFromLink">Pylons from link</system:String>
-    <system:String x:Key="MainWindow.SelectedPylons">Pylons selected:</system:String>
-    <system:String x:Key="MainWindow.FromModel">from model:</system:String>
-    <system:String x:Key="MainWindow.FromLink">from link:</system:String>
     <system:String x:Key="MainWindow.Slab">Slab</system:String>
-    <system:String x:Key="MainWindow.SlabSelected">Slab selected:</system:String>
-    <system:String x:Key="MainWindow.Yes">Yes</system:String>
-    <system:String x:Key="MainWindow.No">No</system:String>
+    <system:String x:Key="MainWindow.SlabSelected">selected</system:String>
+    <system:String x:Key="MainWindow.SlabNotSelected">not selected</system:String>
     <system:String x:Key="MainWindow.ButtonSelect">Select</system:String>
     <system:String x:Key="MainWindow.SlabRebar">Slab reinforcement</system:String>
     <system:String x:Key="MainWindow.RebarDiameter">Bar diameter, mm</system:String>
@@ -30,6 +26,7 @@
     <system:String x:Key="MainWindow.StirrupBendLength">Stirrup hook length, mm</system:String>
     <system:String x:Key="MainWindow.LongRebarDiameter">Longitudinal bar diameter, mm</system:String>
     <system:String x:Key="MainWindow.LongRebarAnchorageLength">Longitudinal bar extension, mm</system:String>
+    <system:String x:Key="MainWindow.ResetToDefault">Reset to default: {0}</system:String>
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 

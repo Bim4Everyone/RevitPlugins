@@ -61,16 +61,6 @@ internal class Frame {
         _krGroupParam
     ];
 
-    /// <summary>
-    /// Семейство каркаса по умолчанию.
-    /// </summary>
-    public const string DefaultFamilyName = "IFC_Каркас_!КГор_№1";
-
-    /// <summary>
-    /// Тип каркаса по умолчанию.
-    /// </summary>
-    public const string DefaultFamilyTypeName = "Х_1501";
-
     internal Frame(FamilyInstance familyInstance, IFrameParams frameParams) {
         FrameInstance = familyInstance;
 

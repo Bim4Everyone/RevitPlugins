@@ -14,21 +14,6 @@ internal class FrameParams : IFrameParams {
     private const double _afterPylonDistanceDivider = 3;
 
     /// <summary>
-    /// Диаметр продольных стержней каркаса по умолчанию, мм.
-    /// </summary>
-    public const int DefaultLongRebarDiameterMm = 10;
-
-    /// <summary>
-    /// Длина выпуска продольных стержней за крайние хомуты по умолчанию, мм.
-    /// </summary>
-    public const int DefaultLongRebarAnchorageLengthMm = 50;
-
-    /// <summary>
-    /// Длина отгибов хомутов по умолчанию, мм.
-    /// </summary>
-    public const int DefaultStirrupBendLengthMm = 90;
-
-    /// <summary>
     /// Создает параметры каркасов по настройкам пользователя.
     /// </summary>
     /// <param name="settings">Настройки плагина для текущего проекта (размеры в мм).</param>
@@ -49,17 +34,17 @@ internal class FrameParams : IFrameParams {
             : hostSlab.RebarCoverBottom.Value;
         PlateRebarDiameter = UnitUtilsHelper.FromMm(settings.SlabRebarDiameter);
 
-        StirrupRebarClass = settings.StirrupRebarClass ?? RebarClass.A500C;
+        StirrupRebarClass = settings.StirrupRebarClass ?? DefaultSettings.StirrupRebarClass;
         StirrupRebarDiameter = UnitUtilsHelper.FromMm(settings.StirrupDiameter);
         StirrupStep = UnitUtilsHelper.FromMm(settings.StirrupStep);
         FrameWidth = UnitUtilsHelper.FromMm(settings.FrameWidth);
 
         LongRebarDiameter = UnitUtilsHelper.FromMm(
-            settings.LongRebarDiameter ?? DefaultLongRebarDiameterMm);
+            settings.LongRebarDiameter ?? DefaultSettings.LongRebarDiameterMm);
         LongRebarAnchorageLength = UnitUtilsHelper.FromMm(
-            settings.LongRebarAnchorageLength ?? DefaultLongRebarAnchorageLengthMm);
+            settings.LongRebarAnchorageLength ?? DefaultSettings.LongRebarAnchorageLengthMm);
         StirrupBendLength = UnitUtilsHelper.FromMm(
-            settings.StirrupBendLength ?? DefaultStirrupBendLengthMm);
+            settings.StirrupBendLength ?? DefaultSettings.StirrupBendLengthMm);
     }
 
     public string FrameFamilyName { get; }

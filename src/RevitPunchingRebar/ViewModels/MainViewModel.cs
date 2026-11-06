@@ -82,11 +82,14 @@ internal class MainViewModel : BaseViewModel {
         SelectSlabCommand = RelayCommand.Create<Window>(SelectSlab);
         LoadFamilyTypesCommand = RelayCommand.Create(LoadFamilyTypes);
         CheckFrameTypeCommand = RelayCommand.Create(CheckFrameType);
+        ResetToDefaultCommand = RelayCommand.Create<string>(ResetToDefault);
 
         RebarClasses = [
             new RebarClassVM(RebarClass.A500C, _localizationService.GetLocalizedString("RebarClass.A500C")),
             new RebarClassVM(RebarClass.A240, _localizationService.GetLocalizedString("RebarClass.A240"))
         ];
+
+        DefaultValueHints = CreateDefaultValueHints();
     }
 
     /// <summary>
@@ -123,6 +126,16 @@ internal class MainViewModel : BaseViewModel {
     /// Команда проверки выбранного типа каркаса.
     /// </summary>
     public ICommand CheckFrameTypeCommand { get; }
+
+    /// <summary>
+    /// Команда сброса поля к значению по умолчанию. Параметр — имя свойства ViewModel.
+    /// </summary>
+    public ICommand ResetToDefaultCommand { get; }
+
+    /// <summary>
+    /// Подсказки кнопок сброса со значением по умолчанию. Ключ — имя свойства ViewModel.
+    /// </summary>
+    public Dictionary<string, string> DefaultValueHints { get; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -519,24 +532,116 @@ internal class MainViewModel : BaseViewModel {
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
 
-        SelectedFamilyName = GetAvailableValue(FamilyNames, setting?.FamilyName, Frame.DefaultFamilyName);
+        SelectedFamilyName = GetAvailableValue(FamilyNames, setting?.FamilyName, DefaultSettings.FrameFamilyName);
         LoadFamilyTypes();
-        SelectedFamilyType = GetAvailableValue(FamilyTypes, setting?.FamilyType, Frame.DefaultFamilyTypeName);
+        SelectedFamilyType = GetAvailableValue(FamilyTypes, setting?.FamilyType, DefaultSettings.FrameFamilyTypeName);
         CheckFrameType();
 
-        SelectedSlabRebarDiameter = setting?.SlabRebarDiameter ?? 10;
+        SelectedSlabRebarDiameter = setting?.SlabRebarDiameter ?? DefaultSettings.SlabRebarDiameterMm;
         IsRebarCoverFromUser = setting?.IsRebarCoverFromUser ?? true;
         IsRebarCoverFromSlab = !IsRebarCoverFromUser;
-        RebarCoverTop = setting?.RebarCoverTop ?? 20;
-        RebarCoverBottom = setting?.RebarCoverBottom ?? 40;
+        RebarCoverTop = setting?.RebarCoverTop ?? DefaultSettings.RebarCoverTopMm;
+        RebarCoverBottom = setting?.RebarCoverBottom ?? DefaultSettings.RebarCoverBottomMm;
 
-        SelectedStirrupDiameter = setting?.StirrupDiameter ?? 10;
-        SelectedRebarClass = setting?.StirrupRebarClass ?? RebarClass.A500C;
-        StirrupStep = setting?.StirrupStep ?? 200;
-        FrameWidth = setting?.FrameWidth ?? 200;
-        StirrupBendLength = setting?.StirrupBendLength ?? FrameParams.DefaultStirrupBendLengthMm;
-        SelectedLongRebarDiameter = setting?.LongRebarDiameter ?? FrameParams.DefaultLongRebarDiameterMm;
-        LongRebarAnchorageLength = setting?.LongRebarAnchorageLength ?? FrameParams.DefaultLongRebarAnchorageLengthMm;
+        SelectedStirrupDiameter = setting?.StirrupDiameter ?? DefaultSettings.StirrupDiameterMm;
+        SelectedRebarClass = setting?.StirrupRebarClass ?? DefaultSettings.StirrupRebarClass;
+        StirrupStep = setting?.StirrupStep ?? DefaultSettings.StirrupStepMm;
+        FrameWidth = setting?.FrameWidth ?? DefaultSettings.FrameWidthMm;
+        StirrupBendLength = setting?.StirrupBendLength ?? DefaultSettings.StirrupBendLengthMm;
+        SelectedLongRebarDiameter = setting?.LongRebarDiameter ?? DefaultSettings.LongRebarDiameterMm;
+        LongRebarAnchorageLength = setting?.LongRebarAnchorageLength ?? DefaultSettings.LongRebarAnchorageLengthMm;
+    }
+
+    /// <summary>
+    /// Возвращает значение свойства ViewModel к значению по умолчанию.
+    /// </summary>
+    /// <param name="propertyName">Имя свойства.</param>
+    private void ResetToDefault(string propertyName) {
+        switch(propertyName) {
+            case nameof(SelectedSlabRebarDiameter):
+                SelectedSlabRebarDiameter = DefaultSettings.SlabRebarDiameterMm;
+                break;
+            case nameof(RebarCoverTop):
+                RebarCoverTop = DefaultSettings.RebarCoverTopMm;
+                break;
+            case nameof(RebarCoverBottom):
+                RebarCoverBottom = DefaultSettings.RebarCoverBottomMm;
+                break;
+            case nameof(SelectedFamilyName):
+                ResetFrameFamily();
+                break;
+            case nameof(SelectedFamilyType):
+                ResetFrameFamilyType();
+                break;
+            case nameof(SelectedStirrupDiameter):
+                SelectedStirrupDiameter = DefaultSettings.StirrupDiameterMm;
+                break;
+            case nameof(SelectedRebarClass):
+                SelectedRebarClass = DefaultSettings.StirrupRebarClass;
+                break;
+            case nameof(StirrupStep):
+                StirrupStep = DefaultSettings.StirrupStepMm;
+                break;
+            case nameof(FrameWidth):
+                FrameWidth = DefaultSettings.FrameWidthMm;
+                break;
+            case nameof(StirrupBendLength):
+                StirrupBendLength = DefaultSettings.StirrupBendLengthMm;
+                break;
+            case nameof(SelectedLongRebarDiameter):
+                SelectedLongRebarDiameter = DefaultSettings.LongRebarDiameterMm;
+                break;
+            case nameof(LongRebarAnchorageLength):
+                LongRebarAnchorageLength = DefaultSettings.LongRebarAnchorageLengthMm;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Выбирает семейство и тип каркаса по умолчанию, если семейство загружено в проект.
+    /// </summary>
+    private void ResetFrameFamily() {
+        if(!FamilyNames.Contains(DefaultSettings.FrameFamilyName)) {
+            return;
+        }
+
+        SelectedFamilyName = DefaultSettings.FrameFamilyName;
+        LoadFamilyTypes();
+        ResetFrameFamilyType();
+        CheckFrameType();
+    }
+
+    /// <summary>
+    /// Выбирает тип каркаса по умолчанию, если он есть у выбранного семейства.
+    /// </summary>
+    private void ResetFrameFamilyType() {
+        if(FamilyTypes != null && FamilyTypes.Contains(DefaultSettings.FrameFamilyTypeName)) {
+            SelectedFamilyType = DefaultSettings.FrameFamilyTypeName;
+        }
+    }
+
+    /// <summary>
+    /// Создает подсказки кнопок сброса: «Сбросить к значению по умолчанию: …».
+    /// </summary>
+    private Dictionary<string, string> CreateDefaultValueHints() {
+        string format = _localizationService.GetLocalizedString("MainWindow.ResetToDefault");
+        string defaultRebarClass = _localizationService.GetLocalizedString(
+            $"RebarClass.{DefaultSettings.StirrupRebarClass}");
+
+        return new Dictionary<string, string> {
+            [nameof(SelectedSlabRebarDiameter)] = string.Format(format, DefaultSettings.SlabRebarDiameterMm),
+            [nameof(RebarCoverTop)] = string.Format(format, DefaultSettings.RebarCoverTopMm),
+            [nameof(RebarCoverBottom)] = string.Format(format, DefaultSettings.RebarCoverBottomMm),
+            [nameof(SelectedFamilyName)] = string.Format(format, DefaultSettings.FrameFamilyName),
+            [nameof(SelectedFamilyType)] = string.Format(format, DefaultSettings.FrameFamilyTypeName),
+            [nameof(SelectedStirrupDiameter)] = string.Format(format, DefaultSettings.StirrupDiameterMm),
+            [nameof(SelectedRebarClass)] = string.Format(format, defaultRebarClass),
+            [nameof(StirrupStep)] = string.Format(format, DefaultSettings.StirrupStepMm),
+            [nameof(FrameWidth)] = string.Format(format, DefaultSettings.FrameWidthMm),
+            [nameof(StirrupBendLength)] = string.Format(format, DefaultSettings.StirrupBendLengthMm),
+            [nameof(SelectedLongRebarDiameter)] = string.Format(format, DefaultSettings.LongRebarDiameterMm),
+            [nameof(LongRebarAnchorageLength)] = string.Format(format, DefaultSettings.LongRebarAnchorageLengthMm)
+        };
     }
 
     /// <summary>
