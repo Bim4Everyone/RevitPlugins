@@ -5,8 +5,10 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 
 using RevitPunchingRebar.Models.Interfaces;
+using RevitPunchingRebar.Models.SelectionFilters;
 
 using Application = Autodesk.Revit.ApplicationServices.Application;
 
@@ -46,6 +48,49 @@ internal class RevitRepository {
     /// Класс доступа к документу Revit.
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
+
+    /// <summary>
+    /// Дает пользователю выбрать плиту.
+    /// </summary>
+    /// <returns>UniqueId выбранной плиты.</returns>
+    public string PickSlab() {
+        Reference reference = ActiveUIDocument.Selection.PickObject(
+            ObjectType.Element, new SlabFilter(), "Выберите плиту");
+
+        return Document.GetElement(reference.ElementId).UniqueId;
+    }
+
+    /// <summary>
+    /// Дает пользователю выбрать пилоны в текущем проекте.
+    /// </summary>
+    /// <returns>UniqueId выбранных пилонов.</returns>
+    public List<string> PickPylonsFromModel() {
+        IList<Reference> references = ActiveUIDocument.Selection.PickObjects(
+            ObjectType.Element, new PylonFromModelFilter(), "Выберите пилоны");
+
+        return references
+            .Select(reference => Document.GetElement(reference).UniqueId)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Дает пользователю выбрать пилоны в связанных файлах.
+    /// </summary>
+    /// <returns>Словарь: UniqueId пилона в связанном файле - название связанного файла.</returns>
+    public Dictionary<string, string> PickPylonsFromLink() {
+        IList<Reference> references = ActiveUIDocument.Selection.PickObjects(
+            ObjectType.LinkedElement, new PylonFromLinkFilter(Document), "Выберите пилоны");
+
+        Dictionary<string, string> selectedPylons = new Dictionary<string, string>();
+        foreach(Reference reference in references) {
+            RevitLinkInstance link = (RevitLinkInstance) Document.GetElement(reference.ElementId);
+            Document linkedDoc = link.GetLinkDocument();
+
+            selectedPylons.Add(linkedDoc.GetElement(reference.LinkedElementId).UniqueId, linkedDoc.Title);
+        }
+
+        return selectedPylons;
+    }
 
     public Slab GetSlab(string slabUniqId) {
         Element slabElement = Document.GetElement(slabUniqId);

@@ -1,5 +1,6 @@
 ﻿<core:WpfUIPlatformWindow
     x:Class="RevitPunchingRebar.Views.MainWindow"
+    x:Name="mainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -130,7 +131,8 @@
                             Content="Выбрать"
                             Width="150"
                             Height="30"
-                            Command="{Binding SelectPylonsFromModelCommand}"/>
+                            Command="{Binding SelectPylonsFromModelCommand}"
+                            CommandParameter="{Binding ElementName=mainWindow}"/>
 
                         <ui:Button
                             Grid.Column="1"
@@ -138,7 +140,8 @@
                             Content="Выбрать"
                             Width="150"
                             Height="30"
-                            Command="{Binding SelectPylonsFromLinkCommand}"/>
+                            Command="{Binding SelectPylonsFromLinkCommand}"
+                            CommandParameter="{Binding ElementName=mainWindow}"/>
 
                         <TextBlock
                             Grid.Column="1"
@@ -151,7 +154,8 @@
                             Content="Выбрать"
                             Width="150"
                             Height="30"
-                            Command="{Binding SelectSlabCommand}"/>
+                            Command="{Binding SelectSlabCommand}"
+                            CommandParameter="{Binding ElementName=mainWindow}"/>
 
                         <TextBlock
                             Grid.Column="1"
@@ -360,13 +364,15 @@
                 Width="80"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
+                Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
                 Margin="10"
                 Width="80"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
-                Command="{Binding CancelViewCommand}" />
+                IsCancel="True"
+                Click="ButtonCancel_Click" />
         </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>

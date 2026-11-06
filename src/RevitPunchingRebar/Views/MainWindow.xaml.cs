@@ -2,8 +2,6 @@ using System.Windows;
 
 using dosymep.SimpleServices;
 
-using RevitPunchingRebar.ViewModels;
-
 namespace RevitPunchingRebar.Views;
 
 /// <summary>
@@ -23,29 +21,6 @@ public partial class MainWindow {
             languageService, localizationService,
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
-
-        this.Loaded += MainWindow_Loaded;
-    }
-
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e) {
-        if(DataContext is MainViewModel vm) {
-            vm.RequestHideWindow += OnRequestHideWindow;
-            vm.RequestShowWindow += OnRequestShowWindow;
-            vm.RequestCloseWindow += OnRequestCloseWindow;
-        }
-    }
-
-    private void OnRequestCloseWindow() {
-        this.Close();
-    }
-
-    private void OnRequestHideWindow() {
-        this.Hide();
-    }
-
-    private void OnRequestShowWindow() {
-        this.Show();
-        this.Activate();
     }
 
     /// <summary>

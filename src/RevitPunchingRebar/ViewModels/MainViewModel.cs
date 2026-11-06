@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
-using Autodesk.Revit.UI;
+using Autodesk.Revit.DB;
 
+using dosymep.Revit;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitPunchingRebar.Models;
+using RevitPunchingRebar.Models.Interfaces;
 
 namespace RevitPunchingRebar.ViewModels;
 
@@ -17,26 +21,17 @@ namespace RevitPunchingRebar.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly IPunchingRebarPlacementService _placementService;
 
     private string _errorText;
-
-    public SelectHandler SelectHandler { get; set; }
-    public ExternalEvent SelectExternalEvent { get; set; }
-
-    public PlacementHandler PlacementHandler { get; set; }
-    public ExternalEvent PlacementExternalEvent { get; set; }
 
     public List<int> RebarDiameters { get; private set; } = [6, 8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40];
     public List<string> RebarClasses { get; private set; } = ["А500С", "А240"];
 
-    public event Action RequestHideWindow;
-    public event Action RequestShowWindow;
-    public event Action RequestCloseWindow;
-
     //Общие настройки
-    public ICommand SelectPylonsFromModelCommand => new RelayCommand(_ => StartSelection(SelectionMode.MultiFromModel));
-    public ICommand SelectPylonsFromLinkCommand => new RelayCommand(_ => StartSelection(SelectionMode.MultiFromLink));
-    public ICommand SelectSlabCommand => new RelayCommand(_ => StartSelection(SelectionMode.Single));
+    public ICommand SelectPylonsFromModelCommand { get; }
+    public ICommand SelectPylonsFromLinkCommand { get; }
+    public ICommand SelectSlabCommand { get; }
 
     private string _selectedSlabId;
     public string SelectedSlabId {
@@ -220,29 +215,59 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <param name="pluginConfig">Настройки плагина.</param>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>
+    /// <param name="placementService">Сервис расстановки каркасов.</param>
     public MainViewModel(
         PluginConfig pluginConfig,
-        RevitRepository revitRepository) {
+        RevitRepository revitRepository,
+        IPunchingRebarPlacementService placementService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _placementService = placementService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
-        CancelViewCommand = RelayCommand.Create(CancelView);
+
+        SelectPylonsFromModelCommand = RelayCommand.Create<Window>(SelectPylonsFromModel);
+        SelectPylonsFromLinkCommand = RelayCommand.Create<Window>(SelectPylonsFromLink);
+        SelectSlabCommand = RelayCommand.Create<Window>(SelectSlab);
 
         FamilyNames = _revitRepository.GetFamilyNames();
         SelectedPylonsFromLink = new Dictionary<string, string>();
     }
 
-    private void StartSelection(SelectionMode selectionMode) {
-        SelectHandler.SelectionMode = selectionMode;
-        RequestHideWindow?.Invoke();
-        SelectExternalEvent.Raise();
+    /// <summary>
+    /// Скрывает окно и дает выбрать пилоны в текущем проекте.
+    /// </summary>
+    private void SelectPylonsFromModel(Window window) {
+        SelectInRevit(window, () => SelectedPylonsFromModel = _revitRepository.PickPylonsFromModel());
     }
 
-    public void OnSelected() {
-        RequestShowWindow?.Invoke();
+    /// <summary>
+    /// Скрывает окно и дает выбрать пилоны в связанных файлах.
+    /// </summary>
+    private void SelectPylonsFromLink(Window window) {
+        SelectInRevit(window, () => SelectedPylonsFromLink = _revitRepository.PickPylonsFromLink());
+    }
+
+    /// <summary>
+    /// Скрывает окно и дает выбрать плиту.
+    /// </summary>
+    private void SelectSlab(Window window) {
+        SelectInRevit(window, () => SelectedSlabId = _revitRepository.PickSlab());
+    }
+
+    /// <summary>
+    /// Скрывает окно на время выбора элементов в Revit и показывает его снова после выбора или отмены.
+    /// </summary>
+    private void SelectInRevit(Window window, Action selectAction) {
+        window.Hide();
+        try {
+            selectAction();
+        } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
+            // Пользователь отменил выбор - оставляем предыдущий выбор
+        } finally {
+            _ = window.ShowDialog();
+        }
     }
 
     private void SelectedSlabeChanged() {
@@ -261,9 +286,7 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
-    /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
-    public ICommand CancelViewCommand { get; }
 
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
@@ -288,14 +311,38 @@ internal class MainViewModel : BaseViewModel {
     /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
     /// </remarks>
     private void AcceptView() {
-        SaveConfig();
-
-        RequestCloseWindow?.Invoke();
-        PlacementExternalEvent.Raise();
+        RevitSettings settings = SaveConfig();
+        PlaceFrames(settings);
     }
 
-    private void CancelView() {
-        RequestCloseWindow?.Invoke();
+    /// <summary>
+    /// Расставляет каркасы у выбранных пилонов по сохраненным настройкам.
+    /// </summary>
+    private void PlaceFrames(RevitSettings settings) {
+        using Transaction transaction = _revitRepository.Document.StartTransaction("Расстановка каркасов");
+
+        List<IPylon> pylons = _revitRepository
+            .GetPylons<StructColumnPylon>(settings, e => new StructColumnPylon(e))
+            .Cast<IPylon>()
+            .ToList();
+
+        FrameParams frameParams = new FrameParams();
+
+        frameParams.FrameFamilyName = settings.FamilyName;
+        frameParams.FrameFamilyTypeName = settings.FamilyType;
+        frameParams.HostSlab = _revitRepository.GetSlab(settings.SlabId);
+        frameParams.SlabThickness = frameParams.HostSlab.Thickness;
+        frameParams.RebarCoverTop = UnitUtilsHelper.FromMm(settings.RebarCoverTop);
+        frameParams.RebarCoverBottom = UnitUtilsHelper.FromMm(settings.RebarCoverBottom);
+        frameParams.PlateRebarDiameter = UnitUtilsHelper.FromMm(settings.SlabRebarDiameter);
+        frameParams.StirrupRebarClass = settings.RebarClass == "А500С" ? RebarClass.A500C : RebarClass.A240;
+        frameParams.StirrupRebarDiameter = UnitUtilsHelper.FromMm(settings.StirrupDiameter);
+        frameParams.StirrupStep = UnitUtilsHelper.FromMm(settings.StirrupStep);
+        frameParams.FrameWidth = UnitUtilsHelper.FromMm(settings.FrameWidth);
+
+        _placementService.Run(pylons, frameParams, _revitRepository);
+
+        transaction.Commit();
     }
 
     /// <summary>
@@ -387,7 +434,8 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Сохранение настроек плагина.
     /// </summary>
-    private void SaveConfig() {
+    /// <returns>Сохраненные настройки текущего проекта.</returns>
+    private RevitSettings SaveConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
@@ -414,6 +462,6 @@ internal class MainViewModel : BaseViewModel {
         setting.FrameWidth = FrameWidth;
 
         _pluginConfig.SaveProjectConfig();
-        PlacementHandler.Settings = setting;
+        return setting;
     }
 }
