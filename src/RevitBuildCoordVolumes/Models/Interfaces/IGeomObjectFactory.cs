@@ -5,7 +5,86 @@ using RevitBuildCoordVolumes.Models.Services;
 using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models.Interfaces;
+
 internal interface IGeomObjectFactory {
+    /// <summary>
+    /// Метод получения списка геометрических объектов по списку колонн.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится получение разъединенных геометрических объектов для построения DirectShape.
+    /// </remarks>
+    /// <param name="columnGroups">Колонны, построенные ColumnFactory.</param>   
+    /// <param name="polygons">Список всех полигонов зоны.</param>  
+    /// <param name="progressService">Прогресс сервис.</param>  
+    /// <returns>
+    /// Список геометрических элементов GeomObject.
+    /// </returns>
+    List<GeomObject> CreateIndividualColumnsGeomObjects(
+        IList<ColumnGroupObject> columnGroups,
+        IList<PolygonObject> polygons,
+        ProgressService progressService);
+    
+    /// <summary>
+    /// Метод получения списка геометрических объектов по списку колонн.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе производится получение объединенных геометрических объектов для построения DirectShape.
+    /// </remarks>
+    /// <param name="columnGroups">Колонны, построенные ColumnFactory.</param>   
+    /// <param name="polygons">Список всех полигонов зоны.</param> 
+    /// <param name="progressService">Прогресс сервис.</param>  
+    /// <returns>
+    /// Список геометрических элементов GeomObject.
+    /// </returns>
+    List<GeomObject> CreateUnitedContourGeomObjects(
+        IList<ColumnGroupObject> columnGroups,
+        IList<PolygonObject> polygons,
+        ProgressService progressService);
+
+    /// <summary>
+    /// Получение геометрии контура плиты между начальной и конечной отметками.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе создаются солиды на основе верхних контуров начальной и конечной плит
+    /// и выполняется их пересечение. Полученный результат используется для формирования
+    /// геометрического объекта с указанием этажа и объема.
+    /// Если исходные солиды или результат их пересечения отсутствуют, возвращается пустой список.
+    /// </remarks>
+    /// <param name="columnGroups">Список объектов колонн, содержащих информацию о начальной и конечной плитах.</param>   
+    /// <param name="polygons">Список всех полигонов зоны.</param>
+    /// <param name="spatialObject">Обрабатываемая зона</param>
+    /// <param name="settings">Настройки плагина</param>
+    /// <param name="progressService">Сервис отслеживания прогресса выполнения операции.</param>
+    /// <returns>
+    /// Список геометрических объектов с контуром плиты и его объемом.
+    /// </returns>
+    List<GeomObject> CreateSlabIntersectionGeomObjects(
+        BuildCoordVolumeSettings settings,
+        IList<ColumnGroupObject> columnGroups, 
+        IList<PolygonObject> polygons, 
+        SpatialObject spatialObject,
+        ProgressService progressService);
+    
+    /// <summary>
+    /// Получение геометрии контура плиты между начальной и конечной отметками.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе создаются солиды на основе верхних контуров плит.
+    /// Полученный результат используется для формирования
+    /// геометрического объекта с указанием этажа и объема.
+    /// Если исходные солиды отсутствуют, возвращается пустой список.
+    /// </remarks>
+    /// /// <param name="settings">Настройки плагина</param>
+    /// <param name="filteredSlabs">Список плит перекрытий, входящих в зону.</param>   
+    /// <param name="spatialObject">Обрабатываемая зона</param>
+    /// <returns>
+    /// Список геометрических объектов с контуром плиты и его объемом.
+    /// </returns>
+    List<GeomObject> CreateSlabExtrudeGeomObjects(
+        BuildCoordVolumeSettings settings,
+        IList<SlabElement> filteredSlabs,
+        SpatialObject spatialObject);
+    
     /// <summary>
     /// Метод получения списка геометрических объектов по исходной зоне.
     /// </summary>
@@ -18,40 +97,8 @@ internal interface IGeomObjectFactory {
     /// <returns>
     /// Список геометрических элементов GeomObject.
     /// </returns>
-    List<GeomObject> GetSimpleGeomObjects(
+    List<GeomObject> CreateSpatialExtrudeGeomObjects(
         BuildCoordVolumeSettings settings,
         SpatialObject spatialObject,
-        ProgressService progressService);
-    /// <summary>
-    /// Метод получения списка геометрических объектов по списку колонн.
-    /// </summary>
-    /// <remarks>
-    /// В данном методе производится получение объединенных геометрических объектов для построения DirectShape.
-    /// </remarks>
-    /// <param name="columns">Колонны, построенные ColumnFactory.</param>   
-    /// <param name="polygonObject">Список всех полигонов зоны.</param> 
-    /// <param name="progressService">Прогресс сервис.</param>  
-    /// <returns>
-    /// Список геометрических элементов GeomObject.
-    /// </returns>
-    List<GeomObject> GetUnitedGeomObjects(
-        List<ColumnObject> columns,
-        List<PolygonObject> polygonObject,
-        ProgressService progressService);
-    /// <summary>
-    /// Метод получения списка геометрических объектов по списку колонн.
-    /// </summary>
-    /// <remarks>
-    /// В данном методе производится получение разъединенных геометрических объектов для построения DirectShape.
-    /// </remarks>
-    /// <param name="columns">Колонны, построенные ColumnFactory.</param>   
-    /// <param name="polygonObject">Список всех полигонов зоны.</param>  
-    /// <param name="progressService">Прогресс сервис.</param>  
-    /// <returns>
-    /// Список геометрических элементов GeomObject.
-    /// </returns>
-    List<GeomObject> GetSeparatedGeomObjects(
-        List<ColumnObject> columns,
-        List<PolygonObject> polygonObject,
         ProgressService progressService);
 }

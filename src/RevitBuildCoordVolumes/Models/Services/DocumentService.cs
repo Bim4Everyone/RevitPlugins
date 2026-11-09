@@ -21,7 +21,7 @@ internal class DocumentService : IDocumentService {
         var foundDoc = _documentsByName
             .FirstOrDefault(dic => dic.Key.Equals(name))
             .Value.Item1;
-        return foundDoc ?? null;
+        return foundDoc;
     }
 
     public Transform GetTransformByName(string name) {
@@ -31,7 +31,7 @@ internal class DocumentService : IDocumentService {
         var foundTrans = _documentsByName
             .FirstOrDefault(dic => dic.Key.Equals(name))
             .Value.Item2;
-        return foundTrans ?? null;
+        return foundTrans;
     }
 
     public IEnumerable<Document> GetAllDocuments() {
@@ -46,22 +46,23 @@ internal class DocumentService : IDocumentService {
 
         foreach(var linkInst in GetLinkInstances(mainDocument)) {
             var doc = linkInst.GetLinkDocument();
-            var trans = linkInst.GetTransform();
+            var linkTransform = linkInst.GetTransform();
             if(doc != null && !_documentsByName.ContainsKey(doc.Title)) {
-                _documentsByName[doc.Title] = (doc, trans);
+                _documentsByName[doc.Title] = (doc, linkTransform);
             }
         }
     }
 
     // Метод получения всех RevitLinkInstance
-    private IEnumerable<RevitLinkInstance> GetLinkInstances(Document doc) {
+    private static IEnumerable<RevitLinkInstance> GetLinkInstances(Document doc) {
         var linkInstances = new FilteredElementCollector(doc)
             .OfCategory(BuiltInCategory.OST_RvtLinks)
             .OfClass(typeof(RevitLinkInstance))
-            .Cast<RevitLinkInstance>();
+            .Cast<RevitLinkInstance>()
+            .ToArray();
 
         return !linkInstances.Any()
-            ? Enumerable.Empty<RevitLinkInstance>()
+            ? []
             : linkInstances
         .Select(instance => new {
             Instance = instance,

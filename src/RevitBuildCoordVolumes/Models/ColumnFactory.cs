@@ -14,17 +14,21 @@ internal class ColumnFactory : IColumnFactory {
     // Длина линии для пресечения, примерно 100 этажей
     private const double _rayHeight = 1000;
 
-    public IEnumerable<IGrouping<string, ColumnObject>> GenerateColumnGroups(
-        List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService) {
-        var columns = GetColumns(polygons, slabs, progressService);
+    public IList<ColumnGroupObject> CreateColumnGroups(List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService) {
+        
+        var columns = CreateColumns(polygons, slabs, progressService);
 
         // Группируем по GUID плит - низ + верх      
         return columns
-            .GroupBy(col => col.StartSlabGuid.ToString() + "_" + col.FinishSlabGuid.ToString());
+            .GroupBy(col => col.StartSlab.Guid + "_" + col.FinishSlab.Guid)
+            .Select(group => new ColumnGroupObject {
+                ColumnObjects = group.ToList()
+            })
+            .ToList();
     }
 
     // Метод генерации колонн
-    private List<ColumnObject> GetColumns(
+    private static List<ColumnObject> CreateColumns(
         List<PolygonObject> polygons, List<SlabElement> slabs, ProgressService progressService) {
         if(polygons.Count == 0 || slabs.Count < 2) {
             return [];
@@ -39,7 +43,7 @@ internal class ColumnFactory : IColumnFactory {
         foreach(var polygon in polygons) {
             progressService?.CancellationToken.ThrowIfCancellationRequested();
             var center = polygon.Center;
-            var points = new List<SlabObject>(slabs.Count);
+            var slabObject = new List<SlabObject>(slabs.Count);
             var line = Line.CreateBound(center + XYZ.BasisZ * _rayHeight, center - XYZ.BasisZ * _rayHeight);
 
             processed++;
@@ -65,39 +69,36 @@ internal class ColumnFactory : IColumnFactory {
                 }
 
                 if(!double.IsNaN(z)) {
-                    points.Add(new SlabObject {
+                    slabObject.Add(new SlabObject {
                         Position = z,
-                        FloorName = slab.LevelName,
-                        SlabGuid = slab.Guid,
-                        IsSloped = slab.IsSloped
+                        SlabElement = slab
                     });
                 }
             }
 
-            if(points.Count < 2) {
+            if(slabObject.Count < 2) {
                 continue;
             }
 
-            points.Sort((a, b) => a.Position.CompareTo(b.Position));
+            slabObject.Sort((a, b) => a.Position.CompareTo(b.Position));
 
-            var start = points[0];
+            var startSlabObject = slabObject[0];
 
-            for(int i = 1; i < points.Count; i++) {
-                var end = points[i];
-                if(end.Position <= start.Position) {
+            for(int i = 1; i < slabObject.Count; i++) {
+                var endSlabObject = slabObject[i];
+                if(endSlabObject.Position <= startSlabObject.Position) {
                     continue;
                 }
 
                 columns.Add(new ColumnObject {
                     PolygonObject = polygon,
-                    FloorName = start.FloorName,
-                    StartPosition = start.Position,
-                    FinishPosition = end.Position,
-                    StartSlabGuid = start.SlabGuid,
-                    FinishSlabGuid = end.SlabGuid,
-                    IsSloped = start.IsSloped || end.IsSloped
+                    LevelName = startSlabObject.SlabElement.LevelName,
+                    StartPosition = startSlabObject.Position,
+                    FinishPosition = endSlabObject.Position,
+                    StartSlab = startSlabObject.SlabElement,
+                    FinishSlab = endSlabObject.SlabElement
                 });
-                start = end;
+                startSlabObject = endSlabObject;
             }
         }
         return columns;

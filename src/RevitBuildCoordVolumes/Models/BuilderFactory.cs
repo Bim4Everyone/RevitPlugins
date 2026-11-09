@@ -5,19 +5,9 @@ using RevitBuildCoordVolumes.Models.Settings;
 
 namespace RevitBuildCoordVolumes.Models;
 
-internal sealed class BuilderFactory {
-    private readonly RevitRepository _revitRepository;
-    private readonly BuildCoordVolumeServices _services;
-    private readonly BuildCoordVolumeSettings _settings;
-
-    public BuilderFactory(
-        RevitRepository revitRepository,
-        BuildCoordVolumeSettings settings,
-        BuildCoordVolumeServices services) {
-        _revitRepository = revitRepository;
-        _settings = settings;
-        _services = services;
-    }
+internal sealed class BuilderFactory(
+    BuildCoordVolumeSettings settings,
+    BuildCoordVolumeServices services) {
     /// <summary>
     /// Метод создания билдеров ICoordVolumeBuilder.
     /// </summary>
@@ -30,9 +20,7 @@ internal sealed class BuilderFactory {
     /// </returns>
     public ICoordVolumeBuilder Create(AlgorithmType algorithmType) {
         return algorithmType == AlgorithmType.SlabBasedAlgorithm
-            ? new SlabBasedCoordVolumeBuilder(_revitRepository, _services, _settings)
-            : algorithmType == AlgorithmType.ParamBasedAlgorithm
-            ? new ParamBasedCoordVolumeBuilder(_services, _settings)
-            : new ParamBasedCoordVolumeBuilder(_services, _settings);
+            ? new SlabBasedCoordVolumeBuilder(services, settings)
+            : new ParamBasedCoordVolumeBuilder(services, settings);
     }
 }

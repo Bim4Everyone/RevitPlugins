@@ -5,13 +5,28 @@ using Autodesk.Revit.DB;
 namespace RevitBuildCoordVolumes.Models.Utilites;
 internal static class GeometryUtility {
     /// <summary>
+    /// Создание трансформации для перемещения по оси Z.
+    /// </summary>
+    /// <remarks>
+    /// В данном методе создается трансформация переноса вдоль оси Z
+    /// на величину разницы между новой и исходной позициями.
+    /// </remarks>
+    /// <param name="oldPosition">Исходная позиция по оси Z.</param>
+    /// <param name="newPosition">Новая позиция по оси Z.</param>
+    /// <returns>
+    /// Трансформация переноса вдоль оси Z на величину смещения.
+    /// </returns>
+    public static Transform CreateZTranslation(double oldPosition, double newPosition) {
+        return Transform.CreateTranslation(new XYZ(0, 0, newPosition - oldPosition));
+    }
+    /// <summary>
     /// Метод проверки точки.
     /// </summary>
     /// <remarks>
     /// В данном методе производится проверка, находится ли точка внутри полигона точек.
     /// </remarks>
     /// <param name="point">Искомая точка.</param>
-    /// <param name="polygon">Список точек внутри которых ведется поиск (полигон точек).</param>
+    /// <param name="polygon">Список точек, внутри которых ведется поиск (полигон точек).</param>
     /// <returns>
     /// True - точка внутри, False - точки внутри нет.
     /// </returns>

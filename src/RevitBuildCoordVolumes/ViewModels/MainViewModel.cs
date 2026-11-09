@@ -45,7 +45,7 @@ internal class MainViewModel : BaseViewModel {
             ?? throw new ArgumentNullException(nameof(messageBoxService));
 
         ProgressDialogFactory = progressDialogFactory
-            ?? throw new System.ArgumentNullException(nameof(progressDialogFactory));
+            ?? throw new ArgumentNullException(nameof(progressDialogFactory));
 
         LoadViewCommand = RelayCommand.Create(LoadView);
         CheckAreaCommand = RelayCommand.Create(CheckArea, CanCheckArea);
@@ -131,7 +131,7 @@ internal class MainViewModel : BaseViewModel {
 
         UpdateVisibilitySettings();
 
-        SlabBasedSettingViewModel = new SlabBasedSettingViewModel(_systemPluginConfig, _revitRepository, _settings, _services);
+        SlabBasedSettingViewModel = new SlabBasedSettingViewModel(_systemPluginConfig, _settings, _services);
         SlabBasedSettingViewModel.PropertyChanged += OnSlabBasedSettingsChanged;
 
         UpdateRequiredCheckArea();
@@ -298,12 +298,12 @@ internal class MainViewModel : BaseViewModel {
         var documents = configSettings.Documents.Count == 0
             ? []
             : configSettings.Documents
-                .Select(_revitRepository.FindDocumentsByName)
+                .Select(_services.DocumentService.GetDocumentByName)
                 .Where(doc => doc != null)
                 .ToList();
 
         var typeSlabs = configSettings.TypeSlabs.Count == 0
-            ? _revitRepository.GetTypeSlabsByDocs(documents)
+            ? _services.SlabService.GetTypeSlabsByDocs(documents)
                 .Where(name => _systemPluginConfig.DefaultSlabTypeNames.Any(type => name.Contains(type)))
                 .ToList()
             : configSettings.TypeSlabs;
@@ -311,6 +311,7 @@ internal class MainViewModel : BaseViewModel {
         _settings = new BuildCoordVolumeSettings {
             AlgorithmType = configSettings.AlgorithmType,
             BuilderMode = configSettings.BuilderMode,
+            UnionVolumes = configSettings.UnionVolumes,
             TypeZones = configSettings.TypeZones,
             ParamMaps = configSettings.ParamMaps,
             Documents = documents,
@@ -326,14 +327,20 @@ internal class MainViewModel : BaseViewModel {
         var typeZones = CommonSettingViewModel.SelectedTypeZones.Select(typeZone => typeZone.Name).ToList();
         var paramMaps = CommonSettingViewModel.Params.Where(vm => vm.IsChecked).Select(vm => vm.ParamMap).ToList();
         var builderMode = SlabBasedSettingViewModel.SelectedBuilderMode.BuilderMode;
+        var slabExtrudeMode = SlabBasedSettingViewModel.SelectedSlabExtrudeMode.SlabExtrudeMode;
+        bool cutVolumes = SlabBasedSettingViewModel.SplitVolumes;
         var documents = SlabBasedSettingViewModel.FilteredDocuments.Where(vm => vm.IsChecked).Select(d => d.Document).ToList();
         var typeSlabs = SlabBasedSettingViewModel.FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToList();
         var levels = SlabBasedSettingViewModel.FilteredLevels.Where(vm => vm.IsChecked).Select(vm => vm.Level).ToList();
+        bool unionVolumes = SlabBasedSettingViewModel.UnionVolumes;
         double squareSide = Convert.ToDouble(SlabBasedSettingViewModel.SquareSideMm);
         double squareAngle = Convert.ToDouble(SlabBasedSettingViewModel.SquareAngleDeg);
 
         _settings.AlgorithmType = algorithmType;
         _settings.BuilderMode = builderMode;
+        _settings.SlabExtrudeMode = slabExtrudeMode;
+        _settings.SplitVolumes = cutVolumes;
+        _settings.UnionVolumes = unionVolumes;
         _settings.Documents = documents;
         _settings.TypeSlabs = typeSlabs;
         _settings.TypeZones = typeZones;
@@ -348,6 +355,7 @@ internal class MainViewModel : BaseViewModel {
         var configSettings = new ConfigSettings {
             AlgorithmType = _settings.AlgorithmType,
             BuilderMode = _settings.BuilderMode,
+            UnionVolumes = _settings.UnionVolumes,
             Documents = _settings.Documents.Select(doc => doc.GetUniqId()).ToList(),
             TypeZones = _settings.TypeZones,
             ParamMaps = _settings.ParamMaps,

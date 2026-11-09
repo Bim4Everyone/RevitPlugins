@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 
@@ -19,12 +20,15 @@ namespace RevitBuildCoordVolumes.ViewModels;
 
 internal class SlabBasedSettingViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
-    private readonly RevitRepository _revitRepository;
-    private readonly BuildCoordVolumeSettings _settings;
     private readonly BuildCoordVolumeServices _services;
+    private readonly BuildCoordVolumeSettings _settings;
     private readonly ILocalizationService _localizationService;
     private ObservableCollection<BuilderModeViewModel> _builderModes;
+    private ObservableCollection<SlabExtrudeModeViewModel> _slabExtrudeModes;
     private BuilderModeViewModel _selectedBuilderMode;
+    private bool _isSlabExtrudeMode;
+    private bool _isSlabIntersectMode;
+    private SlabExtrudeModeViewModel _selectedSlabExtrudeMode;
     private ObservableCollection<DocumentViewModel> _documents;
     private ObservableCollection<DocumentViewModel> _filteredDocuments;
     private string _searchTextDocs;
@@ -36,17 +40,19 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
     private string _searchTextLevels;
     private string _squareSideMm;
     private string _squareAngleDeg;
+    private bool _splitVolumes;
+    private bool _unionVolumes;
 
     public SlabBasedSettingViewModel(
         SystemPluginConfig systemPluginConfig,
-        RevitRepository revitRepository,
         BuildCoordVolumeSettings buildCoordVolumeSettings,
         BuildCoordVolumeServices buildCoordVolumeServices) {
         _systemPluginConfig = systemPluginConfig;
-        _revitRepository = revitRepository;
         _settings = buildCoordVolumeSettings;
         _services = buildCoordVolumeServices;
         _localizationService = _services.LocalizationService;
+        
+        PropertyChanged += OnPropertyChanged;
 
         LoadView();
 
@@ -56,6 +62,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         CheckAllLevelsCommand = RelayCommand.Create(CheckAllLevels);
         UncheckAllLevelsCommand = RelayCommand.Create(UncheckAllLevels);
     }
+
     public ICommand SearchDocsCommand { get; }
     public ICommand SearchSlabsCommand { get; }
     public ICommand SearchLevelsCommand { get; }
@@ -66,9 +73,33 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         get => _builderModes;
         set => RaiseAndSetIfChanged(ref _builderModes, value);
     }
+    public ObservableCollection<SlabExtrudeModeViewModel> SlabExtrudeModes {
+        get => _slabExtrudeModes;
+        set => RaiseAndSetIfChanged(ref _slabExtrudeModes, value);
+    }
     public BuilderModeViewModel SelectedBuilderMode {
         get => _selectedBuilderMode;
         set => RaiseAndSetIfChanged(ref _selectedBuilderMode, value);
+    }
+    public SlabExtrudeModeViewModel SelectedSlabExtrudeMode {
+        get => _selectedSlabExtrudeMode;
+        set => RaiseAndSetIfChanged(ref _selectedSlabExtrudeMode, value);
+    }
+    public bool IsSlabExtrudeMode {
+        get => _isSlabExtrudeMode;
+        set => RaiseAndSetIfChanged(ref _isSlabExtrudeMode, value);
+    }
+    public bool IsSlabIntersectMode {
+        get => _isSlabIntersectMode;
+        set => RaiseAndSetIfChanged(ref _isSlabIntersectMode, value);
+    }
+    public bool SplitVolumes {
+        get => _splitVolumes;
+        set => RaiseAndSetIfChanged(ref _splitVolumes, value);
+    }
+    public bool UnionVolumes {
+        get => _unionVolumes;
+        set => RaiseAndSetIfChanged(ref _unionVolumes, value);
     }
     public ObservableCollection<DocumentViewModel> Documents {
         get => _documents;
@@ -145,14 +176,14 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
     }
 
     // Метод получения коллекции LevelViewModel для UpLevels и BottomLevels
-    public IEnumerable<LevelViewModel> GetLevelViewModels() {
-        var typeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name);
-        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
+    private IEnumerable<LevelViewModel> GetLevelViewModels() {
+        string[] typeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToArray();
+        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document).ToArray();
 
-        if(!typeSlabs.Any() || !documents.Any()) {
+        if(typeSlabs.Length == 0 || documents.Length == 0) {
             return [];
         }
-        var slabs = _revitRepository.GetSlabsByTypesAndDocs(typeSlabs, documents);
+        var slabs = _services.SlabService.GetSlabsByTypesAndDocs(typeSlabs, documents);
         var levels = slabs
             .Select(slab => slab.Level)
             .GroupBy(lvl => lvl.Id)
@@ -167,8 +198,8 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
         FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
         // Подписка на события в SlabViewModel
-        foreach(var slabVM in FilteredSlabs) {
-            slabVM.PropertyChanged += OnSlabChanged;
+        foreach(var slabVm in FilteredSlabs) {
+            slabVm.PropertyChanged += OnSlabChanged;
         }
     }
 
@@ -183,18 +214,19 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
 
     // Метод подписанный на событие изменения SlabViewModel
     private void OnSlabChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not SlabViewModel vm) {
+        if(sender is not SlabViewModel) {
             return;
         }
-        if(e.PropertyName == nameof(vm.IsChecked)) {
-            UpdateLevels();
+        if(e.PropertyName != nameof(SlabViewModel.IsChecked)) {
+            return;
         }
+        UpdateLevels();
     }
 
     // Метод получения коллекции SlabViewModel для Slabs
     private IEnumerable<SlabViewModel> GetSlabViewModels() {
         var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
-        var allSlabs = _revitRepository.GetTypeSlabsByDocs(documents)?.ToList() ?? [];
+        var allSlabs = _services.SlabService.GetTypeSlabsByDocs(documents)?.ToList() ?? [];
         if(!allSlabs.Any()) {
             return [];
         }
@@ -208,7 +240,7 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
                 Name = slabType,
                 IsChecked = hasSaved
                     ? savedSlabs.Contains(slabType)
-                    : defaultNames.Any(def => slabType.Contains(def))
+                    : defaultNames.Any(slabType.Contains)
             })
             .OrderByDescending(vm => defaultNames.Any(def => vm.Name.Contains(def)))
             .ThenBy(vm => vm.Name);
@@ -223,27 +255,30 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
                 .IndexOf(SearchTextDocs, StringComparison.OrdinalIgnoreCase) >= 0));
     }
 
-    // Метод подписанный на событие изменения DocumentViewModel
+    // Метод, подписанный на событие изменения DocumentViewModel
     private void OnDocumentChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not DocumentViewModel vm) {
+        if(sender is not DocumentViewModel) {
             return;
         }
-        if(e.PropertyName == nameof(vm.IsChecked)) {
-            UpdateFilteredSlabs();
-            UpdateLevels();
+
+        if(e.PropertyName != nameof(DocumentViewModel.IsChecked)) {
+            return;
         }
+
+        UpdateFilteredSlabs();
+        UpdateLevels();
     }
 
     // Метод получения коллекции DocumentViewModel для Documents
     private IEnumerable<DocumentViewModel> GetDocumentViewModels() {
-        var allDocuments = _revitRepository.GetAllDocuments();
+        var allDocuments = _services.DocumentService.GetAllDocuments().ToArray();
         var savedDocuments = _settings.Documents;
         var savedDocumentsNames = savedDocuments.Count == 0
             ? []
             : savedDocuments
                 .Select(doc => doc.GetUniqId());
 
-        return !allDocuments.Any()
+        return allDocuments.Length == 0
             ? []
             : allDocuments
                 .Select(document => new DocumentViewModel(_localizationService, document) {
@@ -254,13 +289,31 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
 
     // Метод получения коллекции BuilderModeViewModel для BuilderModes
     private IEnumerable<BuilderModeViewModel> GetTypeBuilderModeViewModels() {
-        var currentBuilderMode = _settings.BuilderMode;
         var builderModes = Enum.GetValues(typeof(BuilderMode)).Cast<BuilderMode>();
         return builderModes
             .Select(builderMode => new BuilderModeViewModel {
                 Name = _localizationService.GetLocalizedString($"SlabBasedSettingViewModel.{builderMode}"),
                 BuilderMode = builderMode
             });
+    }
+    
+    // Метод получения коллекции SlabExtrudeModeViewModel для SlabExtrudeModes
+    private IEnumerable<SlabExtrudeModeViewModel> GetSlabExtrudeModeViewModels() {
+        var extrudeModes = Enum.GetValues(typeof(SlabExtrudeMode)).Cast<SlabExtrudeMode>();
+        return extrudeModes
+            .Select(extrudeMode => new SlabExtrudeModeViewModel {
+                Name = _localizationService.GetLocalizedString($"SlabBasedSettingViewModel.{extrudeMode}"),
+                SlabExtrudeMode = extrudeMode
+            });
+    }
+    
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        switch(e.PropertyName) {
+            case nameof(SelectedBuilderMode):
+                IsSlabExtrudeMode = SelectedBuilderMode.BuilderMode == BuilderMode.SlabExtrudeBuilder;
+                IsSlabIntersectMode = SelectedBuilderMode.BuilderMode == BuilderMode.SlabIntersectBuilder;
+                break;
+        }
     }
 
     // Метод загрузки окна
@@ -269,25 +322,33 @@ internal class SlabBasedSettingViewModel : BaseViewModel {
         SelectedBuilderMode = BuilderModes
             .OrderByDescending(mode => mode.BuilderMode == _settings.BuilderMode)
             .FirstOrDefault();
+        
+        SlabExtrudeModes = new ObservableCollection<SlabExtrudeModeViewModel>(GetSlabExtrudeModeViewModels());
+        SelectedSlabExtrudeMode = SlabExtrudeModes
+            .LastOrDefault();
+        
+        SplitVolumes = true;
+
+        UnionVolumes = _settings.UnionVolumes;
 
         Documents = new ObservableCollection<DocumentViewModel>(GetDocumentViewModels());
         FilteredDocuments = new ObservableCollection<DocumentViewModel>(Documents);
         // Подписка на события в DocumentViewModel
-        foreach(var documentVM in FilteredDocuments) {
-            documentVM.PropertyChanged += OnDocumentChanged;
+        foreach(var documentVm in FilteredDocuments) {
+            documentVm.PropertyChanged += OnDocumentChanged;
         }
 
         Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
         FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
         // Подписка на события в SlabViewModel
-        foreach(var slabVM in FilteredSlabs) {
-            slabVM.PropertyChanged += OnSlabChanged;
+        foreach(var slabVm in FilteredSlabs) {
+            slabVm.PropertyChanged += OnSlabChanged;
         }
 
         Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
         FilteredLevels = new ObservableCollection<LevelViewModel>(Levels);
 
-        SquareSideMm = Convert.ToString(_settings.SquareSideMm);
-        SquareAngleDeg = Convert.ToString(_settings.SquareAngleDeg);
+        SquareSideMm = Convert.ToString(_settings.SquareSideMm, CultureInfo.InvariantCulture);
+        SquareAngleDeg = Convert.ToString(_settings.SquareAngleDeg, CultureInfo.InvariantCulture);
     }
 }

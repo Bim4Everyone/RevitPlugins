@@ -17,7 +17,7 @@
     mc:Ignorable="d"       
     Width="900"
     MinWidth="900"
-    Height="950"       
+    Height="1050"       
     MinHeight="460"
     Title="{me:LocalizationSource MainWindow.Title}"
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
@@ -84,7 +84,7 @@
                 <GroupBox
                     Margin="0,0,0,10"
                     BorderThickness="0"
-                    Header="{me:LocalizationSource MainWindow.SlabBasedAlgorythmSettings}"
+                    Header="{me:LocalizationSource MainWindow.SlabBasedAlgorithmSettings}"
                     FontWeight="DemiBold"
                     Visibility="{Binding IsSlabBasedAlgorithm, Converter={StaticResource SlabSettingsVisible}}">
                     <edits:SlabBasedSettingEditControl

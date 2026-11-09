@@ -4,7 +4,7 @@
 
     <system:String x:Key="MainWindow.Title">Build CMR Volumes</system:String>
     <system:String x:Key="MainWindow.CommonSettings">General settings</system:String>
-    <system:String x:Key="MainWindow.SlabBasedAlgorythmSettings">Slab-Based algorithm settings</system:String>
+    <system:String x:Key="MainWindow.SlabBasedAlgorithmSettings">Slab-Based algorithm settings</system:String>
     <system:String x:Key="MainWindow.ButtonCheckArea">Check zones</system:String>
     <system:String x:Key="MainWindow.ButtonOk">Build</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
@@ -27,6 +27,18 @@
 
     <system:String x:Key="SlabBasedSettingEditControl.BuilderMode">Algorithm builder mode</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.BuilderModeDescription">Selecting the algorithm operating mode within a floor</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.SlabExtrudeMode">Extrusion Slab Settings</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SlabExtrudeModeDescription">Slab Contour Extrusion Mode</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.SplitVolumes">Mutual Volume Cutting</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SplitVolumesDescription">Cut volumes relative to each other</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.UnionVolumes">Final Volume Union</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.UnionVolumesDescription">Union volumes by the bottom slab elevation</system:String>
+    
+    <system:String x:Key="SlabBasedSettingEditControl.ToggleSwitchOnContent">Enabled</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.ToggleSwitchOffContent">Disabled</system:String>
 
     <system:String x:Key="SlabBasedSettingEditControl.SourceFiles">Source files</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SourceFilesDescription">Files containing floor slabs</system:String>
@@ -42,12 +54,12 @@
     <system:String x:Key="SlabBasedSettingEditControl.SearchTextLevels">Search by level name</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.NotCheckedAllLevels">Clear level selection</system:String>
 
-    <system:String x:Key="SlabBasedSettingEditControl.SquareSide">Square side length (mm)</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareSide">Cell side length (mm)</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SquareSideDescription">The zone is divided into a grid of squares with the specified side length</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SquareSideTooltip">Affects performance and accuracy. Smaller values reduce performance but increase accuracy</system:String>
 
-    <system:String x:Key="SlabBasedSettingEditControl.SquareAngle">Square rotation angle (degrees)</system:String>
-    <system:String x:Key="SlabBasedSettingEditControl.SquareAngleDescription">The square grid is rotated by the specified angle</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareAngle">Cell grid rotation angle (degrees)</system:String>
+    <system:String x:Key="SlabBasedSettingEditControl.SquareAngleDescription">The cell grid is rotated by the specified angle</system:String>
     <system:String x:Key="SlabBasedSettingEditControl.SquareAngleTooltip">Left rotation is positive, right rotation is negative</system:String>
 
     <system:String x:Key="CommonSettingViewModel.SlabBasedAlgorithm">Slab-Based (Automatic)</system:String>
@@ -60,8 +72,8 @@
     <system:String x:Key="CommonSettingViewModel.SectionParamDetailDescription">Used to determine the building section</system:String>
     <system:String x:Key="CommonSettingViewModel.FloorParamDescription">CMR floor parameter</system:String>
     <system:String x:Key="CommonSettingViewModel.FloorParamDetailDescription">Used to determine the building floor</system:String>
-    <system:String x:Key="CommonSettingViewModel.FloorDEParamDescription">Additional CMR floor parameter</system:String>
-    <system:String x:Key="CommonSettingViewModel.FloorDEParamDetailDescription">Used to determine the building floor</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorDeParamDescription">Additional CMR floor parameter</system:String>
+    <system:String x:Key="CommonSettingViewModel.FloorDeParamDetailDescription">Used to determine the building floor</system:String>
     <system:String x:Key="CommonSettingViewModel.ZoneParamDescription">CMR zone parameter</system:String>
     <system:String x:Key="CommonSettingViewModel.ZoneParamDetailDescription">Used to determine the CMR zone</system:String>
     <system:String x:Key="CommonSettingViewModel.BottomZoneParamDescription">CMR bottom parameter</system:String>
@@ -71,19 +83,24 @@
     <system:String x:Key="CommonSettingViewModel.VolumeParamDescription">CMR volume parameter</system:String>
     <system:String x:Key="CommonSettingViewModel.VolumeParamDetailDescription">Used to calculate volume</system:String>
 
-    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">United volume</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Separate volumes</system:String>
-    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Separate volumes using a square grid</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.AutomaticBuilder">Automatic Algorithm Selection</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ContourBuilder">Volume generation by extruding merged cell contours</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.ColumnBuilder">Volume generation by extruding cells between slabs</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.SlabIntersectBuilder">Volume generation by intersecting opposing slab extrusions</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.SlabExtrudeBuilder">Volume generation by simple slab contour extrusion</system:String>
+    
+    <system:String x:Key="SlabBasedSettingViewModel.TopSlabExtrude">Extrude top slab to down</system:String>
+    <system:String x:Key="SlabBasedSettingViewModel.BottomSlabExtrude">Extrude bottom slab to up</system:String>
 
     <system:String x:Key="MainViewModel.RequiredCheckArea">Zone check required</system:String>
     <system:String x:Key="MainViewModel.NoMainParam">Zone type parameter must be enabled</system:String>
     <system:String x:Key="MainViewModel.NoBottomZoneParam">Bottom CMR parameter is required for this algorithm</system:String>
     <system:String x:Key="MainViewModel.NoTopZoneParam">Top CMR parameter is required for this algorithm</system:String>
     <system:String x:Key="MainViewModel.NoVolumeParam">CMR volume parameter is required</system:String>
-    <system:String x:Key="MainViewModel.NoDocuments">No slab files selected</system:String>
+    <system:String x:Key="MainViewModel.NoDocuments">No slab files are selected</system:String>
     <system:String x:Key="MainViewModel.NoParams">No parameters selected</system:String>
-    <system:String x:Key="MainViewModel.NoSlabs">No floor slabs selected</system:String>
-    <system:String x:Key="MainViewModel.NoLevels">No slab levels selected</system:String>
+    <system:String x:Key="MainViewModel.NoSlabs">No floor slabs are selected</system:String>
+    <system:String x:Key="MainViewModel.NoLevels">No slab levels are selected</system:String>
     <system:String x:Key="MainViewModel.NoTypeZone">No zone type selected</system:String>
     <system:String x:Key="MainViewModel.ErrorParams">Some parameters are missing</system:String>
     <system:String x:Key="MainViewModel.SquareValueNoDouble">Input must be a number</system:String>
@@ -91,7 +108,7 @@
     <system:String x:Key="MainViewModel.SquareSideBig">Input must not exceed 1000 mm</system:String>
     <system:String x:Key="MainViewModel.SquareSideSmall">Input must not be less than 10 mm</system:String>
     <system:String x:Key="MainViewModel.MessageBoxTitle">Checking zones</system:String>
-    <system:String x:Key="MainViewModel.MessageBoxText">Zones checked. No issues found.</system:String>
+    <system:String x:Key="MainViewModel.MessageBoxText">Zones checked. No issues were found.</system:String>
 
     <system:String x:Key="ParamViewModel.WarningStartString">Missing parameters:</system:String>
     <system:String x:Key="DocumentViewModel.CurrentFile">Current file (open)</system:String>
@@ -121,10 +138,10 @@
     <system:String x:Key="WarningsViewModel.WrongFilledParam">Zones with incorrectly filled parameters</system:String>
     <system:String x:Key="WarningsViewModel.WrongFilledParamDescription">Bottom elevation is higher than or equal to top elevation</system:String>
 
-    <system:String x:Key="DivideSpatial.ProgressTitle">Divide zone {0}%</system:String>
-    <system:String x:Key="SlabNormalize.ProgressTitle">Processing slabs {0}%</system:String>
-    <system:String x:Key="BuildContour.ProgressTitle">Generate contours {0}%</system:String>
+    <system:String x:Key="DivideSpatial.ProgressTitle">Processing zone {0}%</system:String>
+    <system:String x:Key="BuildContour.ProgressTitle">Processing slabs {0}%</system:String>
     <system:String x:Key="BuildVolumes.ProgressTitle">Generate volumes {0}%</system:String>
     <system:String x:Key="UnionVolumes.ProgressTitle">Union volumes {0}%</system:String>
+    <system:String x:Key="ProcessingVolumes.ProgressTitle">Processing volumes {0}%</system:String>   
 
 </ResourceDictionary>
