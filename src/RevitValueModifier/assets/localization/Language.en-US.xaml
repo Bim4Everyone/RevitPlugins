@@ -4,6 +4,7 @@
 
     <system:String x:Key="MainWindow.Title">Change value</system:String>
     <system:String x:Key="MainWindow.ParamValueMask">Enter mask</system:String>
+    <system:String x:Key="MainWindow.NoElementsSelected">No elements are selected. Close the window, select elements in the model and run the plugin again</system:String>
     <system:String x:Key="MainWindow.ParamValueMaskEmpty">Value mask is empty</system:String>
 
     <system:String x:Key="MainWindow.SelectParamToRecord">Select an option to record</system:String>
@@ -17,6 +18,10 @@
 
     <system:String x:Key="MainWindow.SystemParameter">System parameter</system:String>
     <system:String x:Key="MainWindow.SharedParameter">Shared parameter</system:String>
+    <system:String x:Key="MainWindow.InstanceParameter">Instance</system:String>
+    <system:String x:Key="MainWindow.TypeParameter">Type</system:String>
+    <system:String x:Key="MainWindow.InstanceAndTypeParameter">Instance and type</system:String>
+    <system:String x:Key="MainWindow.FamilyParameter">Family parameter</system:String>
     <system:String x:Key="MainWindow.ProjectParameter">Project parameter</system:String>
 
     <system:String x:Key="MainWindow.True">True</system:String>
@@ -26,6 +31,11 @@
     <system:String x:Key="MainWindow.ParamByIdError">The parameter selected for recording was not found in the element with id:</system:String>
     <system:String x:Key="MainWindow.SettingValueError">Failed to write to element with id:</system:String>
     <system:String x:Key="MainWindow.ValueUnknown">Value unknown</system:String>
+    <system:String x:Key="MainWindow.ParamNotFound">The element does not have the selected parameter</system:String>
+    <system:String x:Key="MainWindow.ParamIsReadOnly">The parameter of the element is read-only</system:String>
+    <system:String x:Key="MainWindow.ValueSkipped">Skipped: the mask produced an empty value, the current parameter value will not change</system:String>
+    <system:String x:Key="MainWindow.ValueParseError">The value does not match the data type of the selected parameter</system:String>
+    <system:String x:Key="MainWindow.InvalidValuesCount">The value cannot be written for elements: {0}. See the tooltip on the value for the reason</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">Ok</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>

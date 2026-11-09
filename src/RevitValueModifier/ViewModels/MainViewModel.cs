@@ -6,8 +6,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-using Autodesk.Revit.DB;
-
 using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
@@ -22,6 +20,7 @@ internal class MainViewModel : BaseViewModel {
     private readonly ILocalizationService _localizationService;
 
     private DispatcherTimer _timerByChangedMask;
+    private ParamValueParser _paramValueParser;
 
     private string _errorText;
     private string _paramValueMask;
@@ -130,9 +129,10 @@ internal class MainViewModel : BaseViewModel {
             .Select(e => new RevitElementViewModel(e))
             .ToList();
 
-        List<ElementId> categoryIds = _revitRepository.GetCategoryIds(revitElements);
-        CommonParamsForRead = _revitRepository.GetParamsForRead(categoryIds);
-        CommonParamsForWrite = _revitRepository.GetParamsForWrite(CommonParamsForRead);
+        _paramValueParser = _revitRepository.CreateParamValueParser();
+
+        CommonParamsForRead = _revitRepository.GetParamsForRead(revitElements);
+        CommonParamsForWrite = _revitRepository.GetParamsForWrite(CommonParamsForRead, revitElements);
 
         LoadConfig();
         ParamUpdateCommand.Execute(null);
@@ -141,6 +141,8 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void AcceptView() {
+        // Пересчитываем значения на случай, если маска изменилась, а таймер обновления еще не сработал
+        UpdateParamValues();
         using(var transaction = _revitRepository.Document.StartTransaction("Изменение значений параметров")) {
             foreach(RevitElementViewModel revitElement in RevitElementVMs) {
                 revitElement.WriteParamValue(SelectedCommonParam);
@@ -151,6 +153,12 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private bool CanAcceptView() {
+        // Без выбранных элементов списки параметров пусты и записывать некуда
+        if(RevitElementVMs is null || RevitElementVMs.Count == 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.NoElementsSelected");
+            return false;
+        }
+
         if(string.IsNullOrEmpty(ParamValueMask)
             || ParamValueMask == _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask")) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ParamValueMaskEmpty");
@@ -159,6 +167,14 @@ internal class MainViewModel : BaseViewModel {
 
         if(SelectedCommonParam is null) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.SelectParamToRecord");
+            return false;
+        }
+
+        int invalidValuesCount = RevitElementVMs.Count(revitElement => !revitElement.IsParamValueValid);
+        if(invalidValuesCount > 0) {
+            ErrorText = string.Format(
+                _localizationService.GetLocalizedString("MainWindow.InvalidValuesCount"),
+                invalidValuesCount);
             return false;
         }
         ErrorText = null;
@@ -184,12 +200,18 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void UpdateParamValues() {
-        if(ParamValueMask == _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask")) {
+        if(RevitElementVMs is null
+            || _paramValueParser is null
+            || string.IsNullOrEmpty(ParamValueMask)
+            || ParamValueMask == _localizationService.GetLocalizedString("MainWindow.EnterParamValueMask")) {
             return;
         }
         foreach(RevitElementViewModel revitElement in RevitElementVMs) {
-            revitElement.SetParamValue(ParamValueMask);
+            revitElement.SetParamValue(ParamValueMask, SelectedCommonParam, _paramValueParser);
         }
+        // Значения пересчитываются по таймеру, без действий пользователя в окне,
+        // поэтому доступность кнопки "ОК" и текст ошибки нужно обновить явно
+        CommandManager.InvalidateRequerySuggested();
     }
 
     private void AddParamInMask() {

@@ -32,9 +32,9 @@
                 <ResourceDictionary
                     Source="CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <local:ParamTypeConverter 
-                x:Key="paramTypeConverter" 
-                LocalizationService="{Binding ElementName=window, Path=LocalizationService}"/>
+            <local:ParamDescriptionConverter
+                x:Key="paramDescriptionConverter"
+                LocalizationService="{Binding ElementName=window, Path=LocalizationService}" />
             
             <ui:TextBlock
                 x:Key="DataColumnRevitElementHeader"
@@ -91,16 +91,23 @@
                         StaysOpenOnEdit="True"
                         ItemsSource="{Binding Path=CommonParamsForWrite}"
                         SelectedItem="{Binding Path=SelectedCommonParam}">
+                        <!--От выбранного параметра зависит, как разбирается и проверяется значение,
+                            поэтому при смене параметра значения пересчитываются-->
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding Path=ParamUpdateCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <ui:TextBlock>
                                     <ui:TextBlock Text="{Binding Path=ParamName}"/>
-                                    <ui:TextBlock 
+                                    <!--Описание вида "(Общий параметр, Экземпляр, Текст)"-->
+                                    <ui:TextBlock
+                                        Margin="4 0 0 0"
                                         Foreground="DarkGray"
-                                        Text="{Binding
-                                            Path=ParamTypeName,
-                                            StringFormat=({0}),
-                                            Converter={StaticResource paramTypeConverter}}"/>
+                                        Text="{Binding Converter={StaticResource paramDescriptionConverter}}" />
                                 </ui:TextBlock>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
@@ -144,12 +151,11 @@
                             <DataTemplate>
                                 <ui:TextBlock>
                                     <ui:TextBlock Text="{Binding Path=ParamName}"/>
-                                    <ui:TextBlock 
+                                    <!--Описание вида "(Общий параметр, Экземпляр, Текст)"-->
+                                    <ui:TextBlock
+                                        Margin="4 0 0 0"
                                         Foreground="DarkGray"
-                                        Text="{Binding
-                                            Path=ParamTypeName,
-                                            StringFormat=({0}),
-                                            Converter={StaticResource paramTypeConverter}}"/>
+                                        Text="{Binding Converter={StaticResource paramDescriptionConverter}}" />
                                 </ui:TextBlock>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
@@ -236,36 +242,73 @@
                             Width="400"
                             Binding="{Binding ParamValue}"
                             Header="{StaticResource DataColumnElementParamValueHeader}"
-                            IsReadOnly="True" />
+                            IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <!--Значение, которое нельзя записать в выбранный параметр, выделяется оранжевым,
+                                    пропускаемый элемент - серым, пояснение показывается во всплывающей подсказке-->
+                                <Style
+                                    TargetType="TextBlock"
+                                    BasedOn="{x:Static DataGridTextColumn.DefaultElementStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger
+                                            Binding="{Binding IsParamValueSkipped}"
+                                            Value="True">
+                                            <Setter Property="Foreground" Value="Gray" />
+                                            <Setter Property="ToolTip" Value="{Binding ParamValueMessage}" />
+                                        </DataTrigger>
+                                        <DataTrigger
+                                            Binding="{Binding IsParamValueValid}"
+                                            Value="False">
+                                            <Setter Property="Foreground" Value="Orange" />
+                                            <Setter Property="ToolTip" Value="{Binding ParamValueMessage}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                     </DataGrid.Columns>
                 </ui:DataGrid>
             </Grid>
         </Border>
         
-        <StackPanel
-            Grid.Row="3"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
+        <!--Текст ошибки занимает оставшуюся ширину и переносится на новые строки,
+            если не помещается, высота строки с кнопками при этом увеличивается-->
+        <Grid
+            Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
             <ui:TextBlock
+                Grid.Column="0"
                 Margin="10"
-                Foreground="Orange"
+                HorizontalAlignment="Right"
                 VerticalAlignment="Center"
+                Foreground="Orange"
+                TextAlignment="Right"
+                TextWrapping="Wrap"
                 Text="{Binding ErrorText}" />
 
             <ui:Button
+                Grid.Column="1"
                 Margin="10"
                 Width="150"
+                VerticalAlignment="Center"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button
+                Grid.Column="2"
                 Margin="10"
                 Width="150"
+                VerticalAlignment="Center"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
-        </StackPanel>
+        </Grid>
     </Grid>
 </core:WpfUIPlatformWindow>
