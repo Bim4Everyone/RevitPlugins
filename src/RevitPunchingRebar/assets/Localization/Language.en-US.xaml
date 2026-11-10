@@ -53,6 +53,8 @@
     <system:String x:Key="MainWindow.ErrorFrameParamsMissing">The frame family lacks parameters: {0}</system:String>
     <system:String x:Key="MainWindow.ErrorFramePlacement">Failed to place an instance of the selected frame type</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidth">Frame width: enter a whole number of mm greater than 0</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameWidthTooSmall">Frame width must exceed the sum of the stirrup and longitudinal bar diameters</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameHeight">Frame height must be greater than 0 for the selected slab thickness, covers and bar diameters</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupStep">Stirrup spacing: enter a whole number of mm greater than 0</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupBendLength">Stirrup hook length: enter a whole number of mm greater than 0</system:String>
     <system:String x:Key="MainWindow.ErrorLongRebarAnchorageLength">Longitudinal bar extension: enter a whole number of mm, 0 or more</system:String>

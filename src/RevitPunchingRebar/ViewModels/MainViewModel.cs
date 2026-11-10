@@ -415,6 +415,11 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
+        if(frameWidth <= SelectedStirrupDiameter + SelectedLongRebarDiameter) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorFrameWidthTooSmall");
+            return false;
+        }
+
         if(!TryParseMm(StirrupStep, out int stirrupStep) || stirrupStep <= 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorStirrupStep");
             return false;
@@ -427,6 +432,16 @@ internal class MainViewModel : BaseViewModel {
 
         if(!TryParseMm(LongRebarAnchorageLength, out int anchorageLength) || anchorageLength < 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorLongRebarAnchorageLength");
+            return false;
+        }
+
+        // Используем те же настройки и расчет высоты, что и при расстановке,
+        // но не сохраняем конфигурацию во время проверки ввода.
+        RevitSettings settings = new RevitSettings();
+        UpdateSettings(settings);
+        IFrameParams frameParams = new FrameParams(settings, _slab);
+        if(frameParams.GetFrameHeight() <= 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorFrameHeight");
             return false;
         }
 
@@ -713,6 +728,16 @@ internal class MainViewModel : BaseViewModel {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document)
                                 ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
+        UpdateSettings(setting);
+        _pluginConfig.SaveProjectConfig();
+        return setting;
+    }
+
+    /// <summary>
+    /// Заполняет настройки текущими значениями окна без записи конфигурации.
+    /// </summary>
+    /// <param name="setting">Настройки для проверки или сохранения.</param>
+    private void UpdateSettings(RevitSettings setting) {
         setting.SlabRebarDiameter = SelectedSlabRebarDiameter;
         setting.IsRebarCoverFromUser = IsRebarCoverFromUser;
 
@@ -734,8 +759,5 @@ internal class MainViewModel : BaseViewModel {
         setting.StirrupBendLength = int.Parse(StirrupBendLength.Trim());
         setting.LongRebarDiameter = SelectedLongRebarDiameter;
         setting.LongRebarAnchorageLength = int.Parse(LongRebarAnchorageLength.Trim());
-
-        _pluginConfig.SaveProjectConfig();
-        return setting;
     }
 }

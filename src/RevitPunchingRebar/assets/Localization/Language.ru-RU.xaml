@@ -53,6 +53,8 @@
     <system:String x:Key="MainWindow.ErrorFrameParamsMissing">В семействе каркаса нет параметров: {0}</system:String>
     <system:String x:Key="MainWindow.ErrorFramePlacement">Не удалось разместить экземпляр выбранного типа каркаса</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidth">Ширина каркаса: введите целое число мм больше 0</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameWidthTooSmall">Ширина каркаса должна быть больше суммы диаметров хомута и продольного стержня</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameHeight">При выбранной толщине плиты, защитных слоях и диаметрах высота каркаса должна быть больше 0</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupStep">Шаг хомутов: введите целое число мм больше 0</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupBendLength">Длина отгибов хомутов: введите целое число мм больше 0</system:String>
     <system:String x:Key="MainWindow.ErrorLongRebarAnchorageLength">Выпуск продольных стержней: введите целое число мм, 0 или больше</system:String>

@@ -12,6 +12,8 @@ namespace RevitPunchingRebar.Models;
 internal class Frame {
     // Параметры семейства каркаса
     private const string _longRebarCodeParam = "обр_ПР_Код металлопроката";
+    private const string _longRebarDiameterTopParam = "мод_ПР_Диаметр_Верх";
+    private const string _longRebarDiameterBottomParam = "мод_ПР_Диаметр_Низ";
     private const string _stirrupCodeParam = "обр_Х_Код металлопроката";
     private const string _widthStepParam = "мод_ПР_Шаг по ширине";
     private const string _heightStepParam = "мод_ПР_Шаг по высоте";
@@ -46,6 +48,8 @@ internal class Frame {
     /// </summary>
     public static readonly IReadOnlyList<string> RequiredParamNames = [
         _longRebarCodeParam,
+        _longRebarDiameterTopParam,
+        _longRebarDiameterBottomParam,
         _stirrupCodeParam,
         _widthStepParam,
         _heightStepParam,
@@ -86,6 +90,9 @@ internal class Frame {
 
     private void SetParams(IFrameParams frameParams) {
         SetParam(_longRebarCodeParam, (int) _longRebarClass);
+        // В каркасе две пары продольных стержней; выбранный диаметр задается обеим парам.
+        SetParam(_longRebarDiameterTopParam, frameParams.LongRebarDiameter);
+        SetParam(_longRebarDiameterBottomParam, frameParams.LongRebarDiameter);
         SetParam(_stirrupCodeParam, (int) frameParams.StirrupRebarClass);
 
         SetParam(_widthStepParam,
