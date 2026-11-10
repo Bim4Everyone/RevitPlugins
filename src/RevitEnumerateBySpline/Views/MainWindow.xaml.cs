@@ -9,6 +9,11 @@ using Wpf.Ui.Abstractions;
 
 namespace RevitEnumerateBySpline.Views;
 
+internal enum MainWindowAction {
+    None,
+    SelectCurves
+}
+
 /// <summary>
 /// Класс главного окна плагина.
 /// </summary>
@@ -42,13 +47,22 @@ public partial class MainWindow {
     public override string PluginName => nameof(RevitEnumerateBySpline);
     
     public override string ProjectConfigName => nameof(MainWindow);
+
+    internal MainWindowAction DialogAction { get; private set; }
+
+    internal void RequestCurveSelection() {
+        DialogAction = MainWindowAction.SelectCurves;
+        DialogResult = false;
+    }
     
     
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+        DialogAction = MainWindowAction.None;
         DialogResult = true;
     }
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+        DialogAction = MainWindowAction.None;
         DialogResult = false;
     }
 }

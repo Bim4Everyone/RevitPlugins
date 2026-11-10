@@ -7,6 +7,7 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
 
@@ -137,7 +138,49 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        // Вызывает стандартное уведомление
-        Notification(kernel.Get<MainWindow>());
+        ShowMainWindowLoop(kernel);
+    }
+
+    private void ShowMainWindowLoop(IKernel kernel) {
+        var mainWindow = kernel.Get<MainWindow>();
+        var mainViewModel = mainWindow.DataContext as MainViewModel
+                            ?? kernel.Get<MainViewModel>();
+        var curveModelsViewModel = mainViewModel.CurveModelsViewModel;
+        var selectionService = kernel.Get<SelectionService>();
+        var revitRepository = kernel.Get<RevitRepository>();
+        var windowService = kernel.Get<WindowService>();
+
+        windowService.SetMainWindow(mainWindow);
+
+        while(true) {
+            bool? dialogResult = mainWindow.ShowDialog();
+
+            if(mainWindow.DialogAction == MainWindowAction.SelectCurves) {
+                string prompt = kernel.Get<ILocalizationService>()
+                    .GetLocalizedString("CurveModelsViewModel.SelectCurves.Promt");
+                var curves = selectionService.PickCurve(prompt, revitRepository.ActiveUiDocument);
+                curveModelsViewModel.AddCurves(curves);
+
+                mainWindow = CreateMainWindow(kernel, mainViewModel);
+                windowService.SetMainWindow(mainWindow);
+                continue;
+            }
+
+            Notification(dialogResult);
+            return;
+        }
+    }
+
+    private static MainWindow CreateMainWindow(IKernel kernel, MainViewModel mainViewModel) {
+        return new MainWindow(
+            kernel.Get<INavigationViewPageProvider>(),
+            kernel.Get<ILoggerService>(),
+            kernel.Get<ISerializationService>(),
+            kernel.Get<ILanguageService>(),
+            kernel.Get<ILocalizationService>(),
+            kernel.Get<IUIThemeService>(),
+            kernel.Get<IUIThemeUpdaterService>()) {
+            DataContext = mainViewModel
+        };
     }
 }

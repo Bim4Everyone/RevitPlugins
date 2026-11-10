@@ -8,7 +8,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -18,21 +17,12 @@ using RevitEnumerateBySpline.Models.Services;
 namespace RevitEnumerateBySpline.ViewModels;
 
 internal class CurveModelsViewModel : BaseViewModel {
-    private readonly ILocalizationService _localizationService;
-    private readonly SelectionService _selectionService;
-    private readonly RevitRepository _revitRepository;
     private readonly WindowService _windowService;
     private CurveModelViewModel? _selectedCurveModelViewModel;
     private ObservableCollection<CurveModelViewModel> _curveModelViewModels = [];
 
     public CurveModelsViewModel(
-        ILocalizationService localizationService, 
-        SelectionService selectionService, 
-        RevitRepository revitRepository, 
         WindowService windowService) {
-        _localizationService = localizationService;
-        _selectionService = selectionService;
-        _revitRepository = revitRepository;
         _windowService = windowService;
         
         SelectCurvesCommand = RelayCommand.Create(SelectCurves);
@@ -59,13 +49,10 @@ internal class CurveModelsViewModel : BaseViewModel {
     }
 
     private void SelectCurves() {
-        _windowService.HideMainWindow();
-        string prompt = _localizationService.GetLocalizedString("CurveModelsViewModel.SelectCurves.Promt");
-        var curves = _selectionService.PickCurve(prompt, _revitRepository.ActiveUiDocument);
-        if(curves.Count == 0) {
-            _windowService.ShowMainWindow();
-            return;
-        }
+        _windowService.RequestCurveSelection();
+    }
+
+    public void AddCurves(IEnumerable<CurveModel> curves) {
         foreach(var curve in curves) {
             if(curve is null || CurveModelViewModels.Any(x => x.CurveModel?.ElementId == curve.ElementId)) {
                 continue;   
@@ -75,7 +62,6 @@ internal class CurveModelsViewModel : BaseViewModel {
                 CurveModel = curve
             });
         }
-        _windowService.ShowMainWindow();
     }
     
     private void DeleteCurve() {
