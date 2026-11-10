@@ -9,6 +9,8 @@ using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 
+using OpenMcdf;
+
 namespace RevitPackageDocumentation.Models;
 
 /// <summary>
@@ -102,7 +104,7 @@ internal class FamilyLibraryService {
     /// </summary>
     private FamilyFileInfo ReadPartAtomFromFile(string familyPath) {
         try {
-            byte[] data = CompoundFileReader.ReadStream(familyPath, _partAtomStreamName);
+            byte[] data = ReadStream(familyPath, _partAtomStreamName);
             if(data is null || data.Length == 0) {
                 return null;
             }
@@ -112,6 +114,19 @@ internal class FamilyLibraryService {
         } catch(Exception) {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Читает поток файла семейства (.rfa хранится в формате OLE Compound File) с помощью OpenMcdf -
+    /// той же библиотеки, на которой построен платформенный dosymep.Revit.FileInfo.
+    /// Файл открывается только для чтения, Revit API не используется
+    /// </summary>
+    /// <returns>Содержимое потока или null, если такого потока в файле нет</returns>
+    private static byte[] ReadStream(string filePath, string streamName) {
+        using var file = new CompoundFile(filePath, CFSUpdateMode.ReadOnly, CFSConfiguration.Default);
+        return file.RootStorage.TryGetStream(streamName, out CFStream stream)
+            ? stream.GetData()
+            : null;
     }
 
     /// <summary>
