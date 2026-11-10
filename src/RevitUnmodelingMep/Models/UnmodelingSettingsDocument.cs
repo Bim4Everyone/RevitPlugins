@@ -18,6 +18,8 @@ internal class UnmodelingSettingsDocument {
 internal class UnmodelingSettingsOptions {
     public bool OnlyProjectInstances { get; set; } = true;
 
+    public bool IncludeSmr { get; set; } = true;
+
     [JsonExtensionData]
     public IDictionary<string, object> ExtensionData { get; set; }
 }

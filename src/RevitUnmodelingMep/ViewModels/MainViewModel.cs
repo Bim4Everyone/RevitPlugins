@@ -35,6 +35,12 @@ internal class MainViewModel : BaseViewModel {
     private ObservableCollection<ConsumableTypeItem> _consumableTypes;
     private ObservableCollection<CategoryAssignmentItem> _categoryAssignments;
     private bool _onlyPlacedInProject = true;
+    private bool _includeSmr = true;
+
+    public bool IncludeSmr {
+        get => _includeSmr;
+        set => RaiseAndSetIfChanged(ref _includeSmr, value);
+    }
     private int _lastConfigIndex;
     private readonly IReadOnlyList<CategoryOption> _categoryOptions;
     private bool _isViewLoaded;
@@ -451,7 +457,8 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private UnmodelingSettingsOptions BuildUnmodelingSettings() {
         return new UnmodelingSettingsOptions {
-            OnlyProjectInstances = OnlyPlacedInProject
+            OnlyProjectInstances = OnlyPlacedInProject,
+            IncludeSmr = IncludeSmr
         };
     }
 
@@ -461,6 +468,7 @@ internal class MainViewModel : BaseViewModel {
     private void ApplySettings(UnmodelingSettingsDocument settings) {
         if(settings?.UnmodelingSettings != null) {
             OnlyPlacedInProject = settings.UnmodelingSettings.OnlyProjectInstances;
+            IncludeSmr = settings.UnmodelingSettings.IncludeSmr;
         }
     }
 

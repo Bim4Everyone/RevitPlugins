@@ -14,14 +14,17 @@ namespace RevitUnmodelingMep.Models;
 
 internal class UnmodelingCalculator {
     private readonly DraftRowsBuilder _draftRowsBuilder;
+    private readonly VisSettingsStorage _settingsStorage;
     private readonly CalculationElementFactory _calculationElementFactory;
     private readonly FormulaEvaluator _formulaEvaluator;
     private readonly NoteGenerator _noteGenerator;
 
     public UnmodelingCalculator(
         Document doc,
+        VisSettingsStorage settingsStorage,
         ILocalizationService localizationService,
         IMessageBoxService messageBoxService) {
+        _settingsStorage = settingsStorage;
         var projectStockProvider = new ProjectStockProvider(doc);
         _calculationElementFactory = new CalculationElementFactory(doc, projectStockProvider);
         _draftRowsBuilder = new DraftRowsBuilder(doc, _calculationElementFactory, new PlaceholderReplacer());
@@ -30,14 +33,18 @@ internal class UnmodelingCalculator {
     }
 
     public List<NewRowElement> GetElementsToGenerate(ConsumableTypeItem config) {
-        Dictionary<string, List<NewRowElement>> rowsByKey = _draftRowsBuilder.Build(config);
+        Dictionary<string, List<NewRowElement>> rowsByKey = 
+            _draftRowsBuilder.Build(config, null, 
+            _settingsStorage.GetUnmodelingSettings()?.UnmodelingSettings?.IncludeSmr ?? true);
         return rowsByKey.Values
             .Select(rows => CreateFinalRow(rows, config))
             .ToList();
     }
 
     public List<NewRowElement> GetElementsToGenerate(ConsumableTypeItem config, UnmodelingCalcCache cache) {
-        Dictionary<string, List<NewRowElement>> rowsByKey = _draftRowsBuilder.Build(config, cache);
+        Dictionary<string, List<NewRowElement>> rowsByKey = 
+            _draftRowsBuilder.Build(config, cache, 
+                _settingsStorage.GetUnmodelingSettings()?.UnmodelingSettings?.IncludeSmr ?? true);
         return rowsByKey.Values
             .Select(rows => CreateFinalRow(rows, config))
             .ToList();

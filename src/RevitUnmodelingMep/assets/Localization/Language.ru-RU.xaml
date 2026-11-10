@@ -79,4 +79,5 @@
     <system:String x:Key="EditorChecker.SettigsIsBusy">Сведения о проекте сейчас редактирует пользователь: </system:String>
     <system:String x:Key="EditorChecker.SettigsIsOutDated">Элемент принадлежит вам, но файл устарел. Выполните синхронизацию с центральным файлом.</system:String>
 
+    <system:String x:Key="MainWindow.CheckboxIncludeSmr">Учитывать СМР в расчете</system:String>
 </ResourceDictionary>

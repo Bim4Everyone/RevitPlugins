@@ -32,7 +32,7 @@ internal sealed class DraftRowsBuilder {
 
     public Dictionary<string, List<NewRowElement>> Build(
         ConsumableTypeItem config,
-        UnmodelingCalcCache cache) {
+        UnmodelingCalcCache cache, bool includeSmr = true) {
         if(config == null) {
             throw new ArgumentNullException(nameof(config));
         }
@@ -63,6 +63,10 @@ internal sealed class DraftRowsBuilder {
                         element.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.BuildingWorksLevel, ""),
                         element.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.BuildingWorksLevelCurrency, 0));
                     localCache.SmrParamsById[elementId] = smrParams;
+                }
+
+                if(!includeSmr) {
+                    smrParams = (string.Empty, string.Empty, string.Empty, 0);
                 }
 
                 if(!localCache.CalcElementsById.TryGetValue(elementId, out CalculationElementBase calcElement)) {
@@ -112,7 +116,7 @@ internal sealed class DraftRowsBuilder {
 
     private (string System, string EconomicFunction) ResolveSystemAndFunction(
         Element element,
-        UnmodelingCalcCache cache) {
+        UnmodelingCalcCache cache, bool includeSmr = true) {
         if(cache != null && cache.SystemInfoById.TryGetValue(element.Id, out var cached)) {
             return cached;
         }
