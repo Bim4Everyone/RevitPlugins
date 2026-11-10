@@ -28,6 +28,12 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     /// </summary>
     private const BuiltInCategory _builtInCategory = BuiltInCategory.OST_GenericAnnotation;
 
+    // Отступ по вертикали, 100 мм, между рядом аннотаций и вышестоящим рядом (фрагменты, разрезы или рамка)
+    private readonly double _annotationRowOffset = UnitUtilsHelper.ConvertToInternalValue(100);
+
+    // Шаг по горизонтали, 120 мм, между левыми краями соседних аннотаций в ряду
+    private readonly double _annotationStep = UnitUtilsHelper.ConvertToInternalValue(120);
+
     private readonly FamilyLibraryService _familyLibraryService;
     private readonly IOpenFolderDialogService _openFolderDialogService;
 
@@ -74,6 +80,9 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         SelectTypeCommand = RelayCommand.Create(SelectType);
     }
 
+    /// <summary>
+    /// Команда выбора папки с семействами (доступна в режиме папки)
+    /// </summary>
     public ICommand SelectFolderCommand { get; }
 
     /// <summary>
@@ -114,6 +123,9 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         ? LocalizationService.GetLocalizedString("Validation.FamilyFolderIsEmpty")
         : FamilyFolderPath;
 
+    /// <summary>
+    /// Имена семейств из текущего источника
+    /// </summary>
     public List<string> FamilyNames {
         get => _familyNames;
         private set => RaiseAndSetIfChanged(ref _familyNames, value);
@@ -124,6 +136,9 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _selectedFamilyName, value);
     }
 
+    /// <summary>
+    /// Имена типоразмеров выбранного семейства
+    /// </summary>
     public List<string> TypeNames {
         get => _typeNames;
         private set => RaiseAndSetIfChanged(ref _typeNames, value);
@@ -163,7 +178,6 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     /// </summary>
     public string TypeNameForConfig => SelectedTypeName ?? _missingTypeName ?? string.Empty;
 
-
     /// <summary>
     /// Первичная инициализация из конфигурации: источник, папка, выбор семейства и типоразмера по именам
     /// </summary>
@@ -197,17 +211,7 @@ internal class TypicalAnnotationVM : SheetComponentVM {
             _selectedFamilyName = family;
 
             // Типоразмеры
-            TypeNames = family is null
-                ? []
-                : IsFromFolder ? GetFolderTypeNames(family) : GetProjectTypeNames(family);
-
-            string type = TypeNames.Contains(typeName)
-                ? typeName
-                : string.IsNullOrEmpty(typeName) && TypeNames.Contains(_selectedTypeName)
-                    ? _selectedTypeName
-                    : null;
-            _missingTypeName = type is null && !string.IsNullOrEmpty(typeName) ? typeName : null;
-            _selectedTypeName = type;
+            UpdateTypeNames(typeName);
         } finally {
             _isUpdating = false;
         }
@@ -216,6 +220,43 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         RaisePropertyChanged(nameof(SelectedFamilyName));
         RaisePropertyChanged(nameof(SelectedTypeName));
         UpdateSelectionError();
+    }
+
+    /// <summary>
+    /// Пересобирает только список типоразмеров выбранного семейства и выбирает типоразмер по имени.
+    /// Список семейств не меняется
+    /// </summary>
+    private void ResolveTypeSelection(string typeName) {
+        _isUpdating = true;
+        try {
+            UpdateTypeNames(typeName);
+        } finally {
+            _isUpdating = false;
+        }
+
+        // Синхронизируем UI с итоговым выбором
+        RaisePropertyChanged(nameof(SelectedTypeName));
+        UpdateSelectionError();
+    }
+
+    /// <summary>
+    /// Заполняет список типоразмеров выбранного семейства из текущего источника и выбирает типоразмер по имени.
+    /// Вызывается при установленном флаге обновления списков
+    /// </summary>
+    private void UpdateTypeNames(string typeName) {
+        TypeNames = _selectedFamilyName is null
+            ? []
+            : IsFromFolder ? GetFolderTypeNames(_selectedFamilyName) : GetProjectTypeNames(_selectedFamilyName);
+
+        // Если имя не задано, принимаем выбор, который сделал фильтр контрола,
+        // когда после фильтрации остался единственный вариант
+        string type = TypeNames.Contains(typeName)
+            ? typeName
+            : string.IsNullOrEmpty(typeName) && TypeNames.Contains(_selectedTypeName)
+                ? _selectedTypeName
+                : null;
+        _missingTypeName = type is null && !string.IsNullOrEmpty(typeName) ? typeName : null;
+        _selectedTypeName = type;
     }
 
     private List<string> GetProjectFamilyNames() {
@@ -337,14 +378,18 @@ internal class TypicalAnnotationVM : SheetComponentVM {
     }
 
     /// <summary>
-    /// Выбор семейства в списке. Типоразмер после смены семейства выбирается заново
+    /// Выбор семейства в списке. Типоразмер после смены семейства выбирается заново.
+    /// Список семейств при этом не пересобирается: выбор делается из уже заполненного списка
+    /// (замена списка во время его изменения контролом приводила бы к повторному обновлению контрола)
     /// </summary>
     private void SelectFamily() {
         // Списки пересобираются кодом - выбор в UI в этот момент не является выбором пользователя
         if(_isUpdating) {
             return;
         }
-        ResolveSelection(SelectedFamilyName, null);
+        // Семейство выбрано пользователем или выбор сброшен фильтром - ненайденное имя из конфигурации больше не актуально
+        _missingFamilyName = null;
+        ResolveTypeSelection(null);
     }
 
     /// <summary>
@@ -362,7 +407,10 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         return IsFromFolder;
     }
 
-
+    /// <summary>
+    /// Получает типоразмер (в режиме папки - с загрузкой семейства), размещает аннотацию и заполняет
+    /// дополнительные параметры
+    /// </summary>
     public override void Process(bool processDependent = false) {
         var annotationType = GetAnnotationType();
         // Если семейство/типоразмер получить не удалось - компонент пропускается
@@ -400,11 +448,92 @@ internal class TypicalAnnotationVM : SheetComponentVM {
         return annotationType;
     }
 
+    /// <summary>
+    /// Размещает аннотацию под рамкой листа слева направо: ряд аннотаций располагается ниже фрагментов,
+    /// если их нет - ниже разрезов, если нет и их - ниже рамки. Если такой типоразмер уже есть на листе,
+    /// аннотация повторно не размещается.
+    /// </summary>
+    /// <returns>Размещенный экземпляр или null, если аннотация не размещалась</returns>
     private FamilyInstance Place(FamilySymbol annotationType) {
-        var position = new XYZ(
-            UnitUtilsHelper.ConvertToInternalValue(-100),
-            UnitUtilsHelper.ConvertToInternalValue(250),
-            0);
-        return Repository.Document.Create.NewFamilyInstance(position, annotationType, Sheet.SheetInstance);
+        var sheetInstance = Sheet.SheetInstance;
+        if(sheetInstance is null || IsPlacedOnSheet(annotationType, sheetInstance)) {
+            return null;
+        }
+
+        // Без рамки ряд под рамкой не построить - аннотация размещается в фиксированной точке слева от листа
+        if(Repository.GetTitleBlock(sheetInstance) is not FamilyInstance titleBlock) {
+            var position = new XYZ(
+                UnitUtilsHelper.ConvertToInternalValue(-100),
+                UnitUtilsHelper.ConvertToInternalValue(250),
+                0);
+            return Repository.Document.Create.NewFamilyInstance(position, annotationType, sheetInstance);
+        }
+        var titleBlockBB = titleBlock.get_BoundingBox(sheetInstance);
+        double rowTopY = GetAnnotationRowTop(sheetInstance, titleBlockBB.Min.Y) - _annotationRowOffset;
+        double? lastAnnotationLeftX = GetLastAnnotationLeft(sheetInstance, titleBlockBB.Min.Y);
+        double rowLeftX = lastAnnotationLeftX.HasValue
+            ? lastAnnotationLeftX.Value + _annotationStep
+            : titleBlockBB.Min.X;
+
+        // Точка вставки семейства может не совпадать с углом аннотации, поэтому аннотация размещается в начале
+        // координат, а затем сдвигается так, чтобы левый верхний угол ее габарита оказался в нужной точке
+        var instance = Repository.Document.Create.NewFamilyInstance(XYZ.Zero, annotationType, sheetInstance);
+        Repository.Document.Regenerate();
+
+        var instanceBB = instance.get_BoundingBox(sheetInstance);
+        if(instanceBB != null) {
+            var translation = new XYZ(rowLeftX - instanceBB.Min.X, rowTopY - instanceBB.Max.Y, 0);
+            ElementTransformUtils.MoveElement(Repository.Document, instance.Id, translation);
+        }
+        return instance;
+    }
+
+    /// <summary>
+    /// Проверяет, есть ли на листе экземпляр указанного типоразмера
+    /// </summary>
+    private bool IsPlacedOnSheet(FamilySymbol annotationType, ViewSheet sheetInstance) {
+        return new FilteredElementCollector(Repository.Document, sheetInstance.Id)
+            .OfClass(typeof(FamilyInstance))
+            .OfType<FamilyInstance>()
+            .Any(instance => instance.Symbol.Id == annotationType.Id);
+    }
+
+    /// <summary>
+    /// Возвращает отметку, ниже которой располагается ряд аннотаций: низ самого нижнего фрагмента под рамкой,
+    /// если фрагментов нет - низ самого нижнего разреза под рамкой, если нет и их - низ рамки
+    /// </summary>
+    private double GetAnnotationRowTop(ViewSheet sheetInstance, double titleBlockMinY) {
+        var viewportsBelowTitleBlock = Repository.GetViewports(sheetInstance)
+            .Where(viewport => viewport.GetBoxCenter().Y < titleBlockMinY)
+            .Select(viewport => new {
+                View = Repository.Document.GetElement(viewport.ViewId) as View,
+                MinY = viewport.GetBoxOutline().MinimumPoint.Y
+            })
+            .Where(x => x.View != null)
+            .ToList();
+
+        var callouts = viewportsBelowTitleBlock.Where(x => x.View.IsCallout).ToList();
+        if(callouts.Count > 0) {
+            return callouts.Min(x => x.MinY);
+        }
+
+        var sections = viewportsBelowTitleBlock.Where(x => x.View is ViewSection && !x.View.IsCallout).ToList();
+        if(sections.Count > 0) {
+            return sections.Min(x => x.MinY);
+        }
+        return titleBlockMinY;
+    }
+
+    /// <summary>
+    /// Возвращает левую границу самой правой аннотации под рамкой листа или null, если аннотаций под рамкой нет
+    /// </summary>
+    private double? GetLastAnnotationLeft(ViewSheet sheetInstance, double titleBlockMinY) {
+        return new FilteredElementCollector(Repository.Document, sheetInstance.Id)
+            .OfCategory(_builtInCategory)
+            .WhereElementIsNotElementType()
+            .Select(element => element.get_BoundingBox(sheetInstance))
+            .Where(bb => bb != null && (bb.Min.Y + bb.Max.Y) / 2 < titleBlockMinY)
+            .Select(bb => (double?) bb.Min.X)
+            .Max();
     }
 }

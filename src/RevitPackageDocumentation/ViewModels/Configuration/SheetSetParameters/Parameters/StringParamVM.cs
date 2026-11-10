@@ -1,6 +1,10 @@
 using dosymep.SimpleServices;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+
+/// <summary>
+/// Текстовый параметр комплекта: значение подставляется в формулы вместо {Имя параметра}
+/// </summary>
 internal class StringParamVM : PluginParamVM {
     private string _stringValue;
 

@@ -43,10 +43,11 @@ internal class MainViewModel : BaseViewModel {
     private List<ComponentTypeItem> _componentTypes;
     private ComponentTypeItem _selectedComponentType;
 
+    private List<ViewFamilyType> _planViewFamilyTypes;
     private List<ViewFamilyType> _sectionViewFamilyTypes;
     private List<ViewPlan> _planViewTemplates;
+    private List<ViewPlan> _planViewsForDuplication;
     private List<ViewSection> _sectionViewTemplates;
-    private List<ViewFamilyType> _structuralPlanViewFamilyTypes;
     private List<ElementType> _viewportTypes;
     private List<ViewSchedule> _specsInPj;
     private List<TextNoteType> _textNoteTypes;
@@ -93,8 +94,19 @@ internal class MainViewModel : BaseViewModel {
         SelectElemForParamCommand = RelayCommand.Create<SelectElemParamVM>(SelectElemForParam);
     }
 
+    /// <summary>
+    /// Команда загрузки конфигурации комплекта из файла
+    /// </summary>
     public ICommand ImportCommand { get; }
+
+    /// <summary>
+    /// Команда сохранения конфигурации комплекта в файл
+    /// </summary>
     public ICommand ExportCommand { get; }
+
+    /// <summary>
+    /// Команда выбора элемента в модели для параметра комплекта "Выбор элемента"
+    /// </summary>
     public ICommand SelectElemForParamCommand { get; }
 
     /// <summary>
@@ -108,7 +120,6 @@ internal class MainViewModel : BaseViewModel {
     /// <remarks>В случаях, когда используется немодальное окно, требуется данную команду удалять.</remarks>
     public ICommand AcceptViewCommand { get; }
 
-
     public IOpenFileDialogService OpenFileDialogService { get; }
     public ISaveFileDialogService SaveFileDialogService { get; }
     public IMessageBoxService MessageBoxService { get; }
@@ -121,14 +132,20 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _errorText, value);
     }
 
+    /// <summary>
+    /// Загруженный комплект листов
+    /// </summary>
     public SheetSetVM CurrentSheetSet {
         get => _currentSheetSet;
         set => RaiseAndSetIfChanged(ref _currentSheetSet, value);
     }
 
+    /// <summary>
+    /// Списки элементов проекта для выпадающих списков модулей (собираются при открытии окна)
+    /// </summary>
     public List<ViewFamilyType> PlanViewFamilyTypes {
-        get => _structuralPlanViewFamilyTypes;
-        set => RaiseAndSetIfChanged(ref _structuralPlanViewFamilyTypes, value);
+        get => _planViewFamilyTypes;
+        set => RaiseAndSetIfChanged(ref _planViewFamilyTypes, value);
     }
 
     public List<ViewFamilyType> SectionViewFamilyTypes {
@@ -141,6 +158,14 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _planViewTemplates, value);
     }
 
+    /// <summary>
+    /// Виды в плане проекта, которые можно копировать с детализацией - исходные виды для дублирования
+    /// </summary>
+    public List<ViewPlan> PlanViewsForDuplication {
+        get => _planViewsForDuplication;
+        set => RaiseAndSetIfChanged(ref _planViewsForDuplication, value);
+    }
+
     public List<ViewSection> SectionViewTemplates {
         get => _sectionViewTemplates;
         set => RaiseAndSetIfChanged(ref _sectionViewTemplates, value);
@@ -151,6 +176,9 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _viewportTypes, value);
     }
 
+    /// <summary>
+    /// Спецификации проекта
+    /// </summary>
     public List<ViewSchedule> SpecsInPj {
         get => _specsInPj;
         set => RaiseAndSetIfChanged(ref _specsInPj, value);
@@ -171,11 +199,17 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _titleBlockFamilies, value);
     }
 
+    /// <summary>
+    /// Условия фильтров спецификаций
+    /// </summary>
     public IList<ScheduleTypeInfo> FilterTypes {
         get => _filterTypes;
         set => RaiseAndSetIfChanged(ref _filterTypes, value);
     }
 
+    /// <summary>
+    /// Типы модулей, которые можно добавить на лист (выпадающий список добавления)
+    /// </summary>
     public List<ComponentTypeItem> ComponentTypes {
         get => _componentTypes;
         set => RaiseAndSetIfChanged(ref _componentTypes, value);
@@ -186,6 +220,9 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedComponentType, value);
     }
 
+    /// <summary>
+    /// Типы параметров комплекта, которые можно добавить (выпадающий список добавления)
+    /// </summary>
     public List<ComponentTypeItem> SheetSetParamTypes {
         get => _sheetSetParamTypes;
         set => RaiseAndSetIfChanged(ref _sheetSetParamTypes, value);
@@ -196,7 +233,10 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedSheetSetParamType, value);
     }
 
-
+    /// <summary>
+    /// Загружает списки элементов проекта и последнюю использованную конфигурацию комплекта.
+    /// Если файл последней конфигурации не найден, предлагает выбрать файл
+    /// </summary>
     private void LoadView() {
         LoadConfig();
         GetSettingsForUI();
@@ -208,6 +248,9 @@ internal class MainViewModel : BaseViewModel {
         }
     }
 
+    /// <summary>
+    /// Заполняет списки типов модулей, типов параметров и элементов проекта для окна
+    /// </summary>
     private void GetSettingsForUI() {
         ComponentTypes = Assembly.GetExecutingAssembly()
             .GetTypes()
@@ -234,6 +277,7 @@ internal class MainViewModel : BaseViewModel {
         PlanViewFamilyTypes = _revitRepository.PlanViewTypes;
         SectionViewFamilyTypes = _revitRepository.SectionViewTypes;
         PlanViewTemplates = _revitRepository.PlanViewTemplates;
+        PlanViewsForDuplication = _revitRepository.PlanViewsForDuplication;
         SectionViewTemplates = _revitRepository.SectionViewTemplates;
         ViewportTypes = _revitRepository.ViewportTypes;
         SpecsInPj = _revitRepository.Specs;
@@ -297,10 +341,8 @@ internal class MainViewModel : BaseViewModel {
             MessageBoxService.Show(
                 _localizationService.GetLocalizedString("MainViewModel.ExportCanceled"),
                 _localizationService.GetLocalizedString("MainViewModel.Export"));
-            return;
         }
     }
-
 
     /// <summary>
     /// Загрузка настроек плагина.
@@ -322,16 +364,23 @@ internal class MainViewModel : BaseViewModel {
         _pluginConfig.SaveProjectConfig();
     }
 
-
     /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
+    /// Метод применения настроек главного окна. Только сохраняет конфигурацию: листы создаются
+    /// командой после закрытия окна (см. <see cref="ProcessSheets"/>)
     /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
     private void AcceptView() {
         SaveConfig();
+    }
 
+    /// <summary>
+    /// Создает отмеченные листы и их модули в одной транзакции.
+    /// </summary>
+    /// <remarks>
+    /// Вызывается командой после закрытия окна плагина и освобождения его COM-объектов,
+    /// а не из AcceptView: так загрузка и обновление семейств выполняются, когда объекты окна
+    /// уже освобождены. Подробнее - в RevitPackageDocumentationCommand.ReleaseClosedWindowComObjects
+    /// </remarks>
+    public void ProcessSheets() {
         using var transaction = _revitRepository.Document.StartTransaction(
             _localizationService.GetLocalizedString("MainWindow.Title"));
 
@@ -356,7 +405,7 @@ internal class MainViewModel : BaseViewModel {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorInSheets");
             return false;
         }
-        if(CurrentSheetSet?.SheetList?.Count() == 0) {
+        if(CurrentSheetSet?.SheetList?.Count == 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.SheetSetHasNotSheets");
             return false;
         }
@@ -365,26 +414,24 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        var viewNames = new HashSet<string>();
+        // Имя вида должно быть уникальным только среди видов одного типа: план, разрез и спецификация
+        // могут называться одинаково, поэтому имя сравнивается вместе с типом вида
+        var viewNames = new HashSet<(string ViewKind, string Name)>();
+        // Проверяются только компоненты листов, включенных в генерацию
         foreach(var sheetComponent in CurrentSheetSet?.SheetList
-            ?.SelectMany(s => s.SheetComponents)
+            ?.Where(s => s.IsModuleCheck)
+            .SelectMany(s => s.SheetComponents)
             .Where(c => c.IsModuleCheck)
             .ToList() ?? []) {
-            string name = sheetComponent switch {
-                ScheduleViewVM sv => sv.ViewName,
-                SectionViewVM sv => sv.ViewName,
-                CalloutViewVM sv => sv.ViewName,
-                PlanViewVM sv => sv.ViewName,
-                _ => string.Empty
-            };
+            foreach(var viewName in GetCreatedViewNames(sheetComponent)) {
+                if(string.IsNullOrEmpty(viewName.Name))
+                    continue;
 
-            if(string.IsNullOrEmpty(name))
-                continue;
-
-            if(!viewNames.Add(name)) {
-                ErrorText = $"{_localizationService.GetLocalizedString("MainWindow.ViewNameAlreadyHas")} - " +
-                            $"{sheetComponent.Sheet.ModuleName} - {name}";
-                return false;
+                if(!viewNames.Add(viewName)) {
+                    ErrorText = $"{_localizationService.GetLocalizedString("MainWindow.ViewNameAlreadyHas")} - " +
+                                $"{sheetComponent.Sheet.ModuleName} - {viewName.Name}";
+                    return false;
+                }
             }
         }
 
@@ -405,12 +452,53 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
+    /// Возвращает имена видов, которые создаст модуль, вместе с типом вида.
+    /// </summary>
+    /// <remarks>
+    /// Revit требует уникальности имени только среди видов одного типа. Тип определяется семейством вида
+    /// (план этажа, план потолка, разрез, узел и т.д.), спецификации - отдельный тип.
+    /// Фрагмент на плане этажа является планом этажа, поэтому его имя проверяется вместе с именами планов.
+    /// Для сечений и фрагментов проверяются фактические имена создаваемых видов: ИмяВида_1..N.
+    /// </remarks>
+    private static IEnumerable<(string ViewKind, string Name)> GetCreatedViewNames(SheetComponentVM component) {
+        switch(component) {
+            case ScheduleViewVM schedule:
+                yield return (nameof(ViewSchedule), schedule.ViewName);
+                break;
+            case PlanViewVM plan:
+                yield return (plan.GetPlanViewFamily()?.ToString(), plan.ViewName);
+                break;
+            case SectionViewVM section:
+                foreach(int number in GetViewNumbers(section.ViewCount)) {
+                    yield return (section.ViewFamilyType?.ViewFamily.ToString(), section.GetNumberedViewName(number));
+                }
+                break;
+            case CalloutViewVM callout:
+                foreach(int number in GetViewNumbers(callout.ViewCount)) {
+                    yield return (callout.ViewFamilyType?.ViewFamily.ToString(), callout.GetNumberedViewName(number));
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Возвращает порядковые номера видов 1..ViewCount. Если количество задано некорректно - пустой список
+    /// (об этом сообщает проверка модуля)
+    /// </summary>
+    private static IEnumerable<int> GetViewNumbers(string viewCount) {
+        return int.TryParse(viewCount, out int count) && count > 0
+            ? Enumerable.Range(1, count)
+            : Enumerable.Empty<int>();
+    }
+
+    /// <summary>
     /// Метод команды по выбору элемента для параметра конфигурации
     /// </summary>
     private void SelectElemForParam(SelectElemParamVM vm) {
         _revitElementPickerService.PickElement(onSelected: (element) => {
             vm.SelectedElem = element;
-            vm.ParamValueChangeCommand.Execute(null);
+            // Передаем сам параметр, чтобы обновились модули, зависящие от выбранного элемента (например, фрагменты)
+            vm.ParamValueChangeCommand.Execute(vm);
         });
     }
 }

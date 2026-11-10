@@ -1,10 +1,15 @@
 using Autodesk.Revit.DB;
 
 namespace RevitPackageDocumentation.Models;
-public class UnitUtilsHelper {
-    public static double ConvertFromInternalValue(double value) {
-        // Перевод из внутренних единиц Revit
 
+/// <summary>
+/// Перевод длин между миллиметрами и внутренними единицами Revit (футами)
+/// </summary>
+public static class UnitUtilsHelper {
+    /// <summary>
+    /// Переводит значение из внутренних единиц Revit в миллиметры
+    /// </summary>
+    public static double ConvertFromInternalValue(double value) {
 #if REVIT_2021_OR_GREATER
         var unitType = UnitTypeId.Millimeters;
 #else
@@ -13,10 +18,10 @@ public class UnitUtilsHelper {
         return UnitUtils.ConvertFromInternalUnits(value, unitType);
     }
 
-
+    /// <summary>
+    /// Переводит значение из миллиметров во внутренние единицы Revit
+    /// </summary>
     public static double ConvertToInternalValue(double value) {
-        // Перевод во внутренние единицы Revit
-
 #if REVIT_2021_OR_GREATER
         var unitType = UnitTypeId.Millimeters;
 #else

@@ -10,6 +10,9 @@ using pyRevitLabs.Json;
 
 namespace RevitPackageDocumentation.Models.ConfigSerializer;
 
+/// <summary>
+/// Чтение и запись файла конфигурации комплекта (.json)
+/// </summary>
 public class SheetSetConfig {
     private readonly ISheetSetSerializer _serializer;
     private readonly ILocalizationService _localizationService;
@@ -20,8 +23,9 @@ public class SheetSetConfig {
     }
 
     /// <summary>
-    /// Загрузить конфигурацию из файла.
+    /// Загрузить конфигурацию из файла. Если путь не задан или файла нет, возвращает пустую конфигурацию.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Файл не удалось прочитать или разобрать</exception>
     public SheetSetData Import(string path) {
         if(string.IsNullOrEmpty(path) || !File.Exists(path)) {
             return new SheetSetData();
@@ -42,6 +46,7 @@ public class SheetSetConfig {
     /// <summary>
     /// Сохранить конфигурацию в файл.
     /// </summary>
+    /// <exception cref="InvalidOperationException">Файл не удалось записать</exception>
     public void Export(SheetSetData data, string path) {
         if(string.IsNullOrEmpty(path))
             throw new ArgumentException(
@@ -60,7 +65,6 @@ public class SheetSetConfig {
     }
 }
 
-
 /// <summary>
 /// DTO комплекта листов
 /// </summary>
@@ -71,6 +75,9 @@ public class SheetSetData {
     public string ParamsComment { get; set; } = string.Empty;
 }
 
+/// <summary>
+/// Общие данные модулей: галочка генерации, имя, комментарий и дополнительные параметры
+/// </summary>
 public abstract class ParamContainerModuleData {
     public bool? IsModuleCheck { get; set; }
     public string ModuleName { get; set; }
@@ -79,23 +86,30 @@ public abstract class ParamContainerModuleData {
 }
 
 /// <summary>
-/// DTO комплекта листа
+/// DTO листа комплекта
 /// </summary>
 public class SheetData : ParamContainerModuleData {
     public string SheetNameFormula { get; set; }
+    public string SheetNumberFormula { get; set; }
     public string SheetSize { get; set; }
     public string SheetCoefficient { get; set; }
     public string TitleBlockFamilyName { get; set; }
+    public FiltrationComboBoxFilterListData TitleBlockFamilyFilterValues { get; set; }
     public string TitleBlockTypeName { get; set; }
+    public FiltrationComboBoxFilterListData TitleBlockTypeFilterValues { get; set; }
     public List<SheetComponentData> Views { get; set; } = [];
 }
 
+/// <summary>
+/// DTO модуля листа. Тип модуля записывается в JSON в свойство ComponentType
+/// и используется для выбора класса при чтении (см. <see cref="SheetComponentConverter"/>)
+/// </summary>
 public abstract class SheetComponentData : ParamContainerModuleData {
     public abstract string ComponentType { get; }
 }
 
 /// <summary>
-/// DTO модуля вида в плане несущих конструкций
+/// DTO модуля вида в плане
 /// </summary>
 public class PlanViewData : SheetComponentData {
     public override string ComponentType => "PlanView";
@@ -110,10 +124,13 @@ public class PlanViewData : SheetComponentData {
     public FiltrationComboBoxFilterListData ViewportTypeFilterValues { get; set; }
     public string ViewCount { get; set; }
     public string SelectedSelectElemParamName { get; set; }
+    public bool? IsDuplicate { get; set; }
+    public string ReferenceViewName { get; set; }
+    public FiltrationComboBoxFilterListData ReferenceViewFilterValues { get; set; }
 }
 
 /// <summary>
-/// DTO модуля фрагмента плана несущих конструкций
+/// DTO модуля фрагмента плана
 /// </summary>
 public class CalloutViewData : SheetComponentData {
     public override string ComponentType => "CalloutView";
@@ -130,9 +147,8 @@ public class CalloutViewData : SheetComponentData {
     public string SelectedSelectElemParamName { get; set; }
 }
 
-
 /// <summary>
-/// DTO модуля вида в сечения
+/// DTO модуля сечений
 /// </summary>
 public class SectionViewData : SheetComponentData {
     public override string ComponentType => "SectionView";
@@ -162,7 +178,6 @@ public class ScheduleViewData : SheetComponentData {
     public string ViewColumn { get; set; }
     public ScheduleFilterListData ScheduleFilterList { get; set; }
 }
-
 
 /// <summary>
 /// DTO модуля текста
@@ -250,14 +265,14 @@ public class CustomParameterData {
 }
 
 /// <summary>
-/// DTO списка фильтров для свойства
+/// DTO списка фильтров выпадающего списка
 /// </summary>
 public class FiltrationComboBoxFilterListData {
     public List<FiltrationComboBoxFilterData> ValueList { get; set; }
 }
 
 /// <summary>
-/// DTO дополнительного параметра
+/// DTO значения фильтра выпадающего списка
 /// </summary>
 public class FiltrationComboBoxFilterData {
     public string ValueFormula { get; set; }
@@ -268,9 +283,9 @@ public class FiltrationComboBoxFilterData {
     public bool? IsExcluding { get; set; }
 }
 
-
 /// <summary>
-/// DTO параметров
+/// DTO параметра комплекта. Тип параметра записывается в JSON в свойство PluginParamType
+/// и используется для выбора класса при чтении (см. <see cref="PluginParamConverter"/>)
 /// </summary>
 public abstract class PluginParamData {
     public abstract string PluginParamType { get; }
@@ -278,12 +293,18 @@ public abstract class PluginParamData {
     public string ParamComment { get; set; }
 }
 
+/// <summary>
+/// DTO текстового параметра комплекта
+/// </summary>
 public class StringParamData : PluginParamData {
     public override string PluginParamType => "StringParam";
 
     public string StringValue { get; set; }
 }
 
+/// <summary>
+/// DTO параметра комплекта "Выбор элемента". Выбранный элемент в конфигурации не сохраняется
+/// </summary>
 public class SelectElemParamData : PluginParamData {
     public override string PluginParamType => "SelectElem";
 }

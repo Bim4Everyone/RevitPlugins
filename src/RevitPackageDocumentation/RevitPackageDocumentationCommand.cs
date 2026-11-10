@@ -142,7 +142,47 @@ public class RevitPackageDocumentationCommand : BasePluginCommand {
             initialDirectory: Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
             multiSelect: false);
 
+        // Окно только собирает настройки. Листы создаются после закрытия окна:
+        // между закрытием окна и работой с документом нужно освободить COM-объекты окна
+        // (см. ReleaseClosedWindowComObjects)
+        var window = kernel.Get<MainWindow>();
+        bool? dialogResult = window.ShowDialog();
+        if(dialogResult == true && window.DataContext is MainViewModel mainViewModel) {
+            ReleaseClosedWindowComObjects();
+            mainViewModel.ProcessSheets();
+        }
+
         // Вызывает стандартное уведомление
-        Notification(kernel.Get<MainWindow>());
+        Notification(dialogResult);
+    }
+
+    /// <summary>
+    /// Освобождает COM-объекты закрытого окна плагина до начала работы с документом.
+    /// </summary>
+    /// <remarks>
+    /// Защита от зависания Revit 2024 при загрузке семейств предыдущих версий (например, 2022).
+    /// <para>
+    /// Поля ввода WPF создают в главном потоке Revit COM-объекты службы ввода текста Windows (TSF).
+    /// После закрытия окна их .NET-обертки становятся мусором, но сами объекты освобождаются финализатором,
+    /// который для этого обращается в главный поток (COM STA) и ждет его ответа.
+    /// </para>
+    /// <para>
+    /// После каждой внешней команды Revit сам вызывает GC.Collect и GC.WaitForPendingFinalizers,
+    /// и главный поток ждет финализатор. Если внутри команды семейство обновлялось до текущей версии
+    /// (Revit показывает служебные окна обновления), цикл ожидания главного потока может перестать
+    /// обрабатывать входящие вызовы COM. Тогда финализатор ждет главный поток, а главный поток - финализатор:
+    /// Revit зависает. Это подтверждено дампами процесса.
+    /// </para>
+    /// <para>
+    /// Поэтому объекты закрытого окна освобождаются здесь, до загрузки и обновления семейств, пока главный
+    /// поток еще обрабатывает вызовы COM. К сборке мусора Revit после команды освобождать в главном потоке
+    /// уже нечего. Метод должен вызываться после закрытия окна и до <see cref="MainViewModel.ProcessSheets"/>;
+    /// вызывать его после загрузки семейств нельзя - он сам может зависнуть по той же причине.
+    /// </para>
+    /// </remarks>
+    private static void ReleaseClosedWindowComObjects() {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
     }
 }

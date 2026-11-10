@@ -14,6 +14,12 @@ using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Validation;
 
+/// <summary>
+/// Базовая модель представления с проверкой свойств по атрибутам DataAnnotations (INotifyDataErrorInfo).
+/// Свойство проверяется при каждом изменении. Свойства с атрибутом ChildHasErrors дополнительно
+/// перепроверяются при изменении ошибок (и галочки генерации) дочерних объектов и состава коллекций.
+/// Тексты ошибок в атрибутах - ключи локализации
+/// </summary>
 internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
     private readonly ILocalizationService _localizationService;
 
@@ -42,11 +48,17 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
 
     public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
+    /// <summary>
+    /// Есть ли ошибки хотя бы в одном свойстве
+    /// </summary>
     public bool HasErrors {
         get => _hasErrors;
         set => RaiseAndSetIfChanged(ref _hasErrors, value);
     }
 
+    /// <summary>
+    /// Текст первой ошибки для отображения в подсказке. Пустая строка - ошибок нет
+    /// </summary>
     public string FirstError {
         get => _firstError;
         set => RaiseAndSetIfChanged(ref _firstError, value);
@@ -73,6 +85,9 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
         ValidateAllProperties();
     }
 
+    /// <summary>
+    /// Проверяет все свойства с атрибутами проверки
+    /// </summary>
     public void ValidateAllProperties() {
         foreach(var propertyName in _propertyCache.Keys) {
             ValidateProperty(propertyName);
@@ -118,7 +133,6 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
         return string.IsNullOrWhiteSpace(text) ? key : text;
     }
 
-
     private void RegisterTrackedProperty(PropertyInfo property) {
         var value = property.GetValue(this);
         _trackedValues[property.Name] = value;
@@ -160,14 +174,18 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
         }
 
         NotifyCollectionChangedEventHandler handler = (_, e) => {
-            if(e.NewItems != null) {
-                foreach(var item in e.NewItems) {
-                    SubscribeItem(propertyName, item);
+            // При перемещении элемент приходит и в NewItems, и в OldItems. Он остается в коллекции,
+            // поэтому подписка не меняется: иначе на элемент подписывались бы дважды, а запись о подписке терялась
+            if(e.Action != NotifyCollectionChangedAction.Move) {
+                if(e.NewItems != null) {
+                    foreach(var item in e.NewItems) {
+                        SubscribeItem(propertyName, item);
+                    }
                 }
-            }
-            if(e.OldItems != null) {
-                foreach(var item in e.OldItems) {
-                    UnsubscribeChild(item);
+                if(e.OldItems != null) {
+                    foreach(var item in e.OldItems) {
+                        UnsubscribeChild(item);
+                    }
                 }
             }
             ValidateProperty(propertyName);
@@ -188,7 +206,8 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
         INotifyPropertyChanged notify) {
 
         PropertyChangedEventHandler handler = (_, e) => {
-            if(e.PropertyName == nameof(HasErrors)) {
+            // Включение/исключение модуля из генерации также влияет на результат проверки (ChildHasErrors)
+            if(e.PropertyName == nameof(HasErrors) || e.PropertyName == nameof(ICheckableModule.IsModuleCheck)) {
                 ValidateProperty(propertyName);
             }
         };
@@ -217,7 +236,6 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
         }
     }
 
-
     protected override void RaisePropertyChanged(string propertyName) {
         base.RaisePropertyChanged(propertyName);
 
@@ -234,12 +252,9 @@ internal abstract class ValidatableVM : BaseViewModel, INotifyDataErrorInfo {
     }
 
     public IEnumerable GetErrors(string propertyName) {
-        try {
-            return _errors.TryGetValue(propertyName, out var errors)
-                ? errors
-                : Enumerable.Empty<string>();
-        } catch {
-            return Enumerable.Empty<string>();
-        }
+        // Ошибки уровня всего объекта (propertyName пустой) не используются
+        return !string.IsNullOrEmpty(propertyName) && _errors.TryGetValue(propertyName, out var errors)
+            ? errors
+            : Enumerable.Empty<string>();
     }
 }

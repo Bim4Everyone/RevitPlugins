@@ -424,10 +424,6 @@
     </Style>
 
     <Style
-        TargetType="{x:Type controls:FormulaTextBox}"
-        BasedOn="{StaticResource DefaultTextBoxStyle}" />
-
-    <Style
         x:Key="ButtonBySelectedSheet"
         TargetType="ui:Button"
         BasedOn="{StaticResource DefaultButtonStyle}">

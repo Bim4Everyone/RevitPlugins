@@ -15,6 +15,11 @@ using RevitPackageDocumentation.ViewModels.ScheduleFilters;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+
+/// <summary>
+/// Модуль спецификации: дублирует исходную спецификацию, заменяет ее фильтры фильтрами модуля
+/// и размещает на листе слева от рамки по столбцам
+/// </summary>
 internal class ScheduleViewVM : SheetComponentVM {
     private string _viewNameFormula = string.Empty;
     private string _viewName;
@@ -26,14 +31,16 @@ internal class ScheduleViewVM : SheetComponentVM {
 
     private FiltrationComboBoxFilterListVM _referenceSpecFilter;
 
-    // Смещение по горизонтали в футах, для размещаемых на листе спецификациях требуемое, чтобы они попали на лист
+    // Смещения задаются в мм и переводятся во внутренние единицы Revit
+
+    // Смещение по горизонтали влево от начала координат листа для первого столбца спецификаций
     private readonly double _specViewportRightOffset = UnitUtilsHelper.ConvertToInternalValue(0.77);
 
-    // Смещение по вертикали в футах, для размещаемых компонентов листа требуемое, чтобы они попали на лист
+    // Смещение по вертикали вниз от верха рамки для первой спецификации столбца
     private readonly double _specViewportTopOffset = UnitUtilsHelper.ConvertToInternalValue(12);
 
-    // Смещения по вертикали в футах, для размещаемых спецификаций
-    // требуемое, для их корректного взаимного размещения на листе (в случае наличия маленькой шапки спецификации)
+    // Смещение по вертикали для спецификаций одного столбца,
+    // требуемое для их корректного взаимного размещения на листе (в случае наличия маленькой шапки спецификации)
     private readonly double _scheduleTopOffsetSmall = UnitUtilsHelper.ConvertToInternalValue(2.117);
 
     public ScheduleViewVM(
@@ -48,7 +55,10 @@ internal class ScheduleViewVM : SheetComponentVM {
         SelectReferenceSpecCommand = RelayCommand.Create(SelectReferenceSpec);
     }
 
-    public ICommand SelectReferenceSpecCommand { get; set; }
+    /// <summary>
+    /// Команда выбора исходной спецификации: фильтры модуля заполняются фильтрами выбранной спецификации
+    /// </summary>
+    public ICommand SelectReferenceSpecCommand { get; }
 
     [Required(ErrorMessage = "Validation.ViewNameIsEmpty")]
     [RegularExpression(@"^[^\\\/:*?""<>|\[\];~]+$", ErrorMessage = "Validation.ViewNameIsNotCorrect")]
@@ -57,11 +67,17 @@ internal class ScheduleViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewNameFormula, value);
     }
 
+    /// <summary>
+    /// Имя итоговой спецификации, вычисленное по формуле
+    /// </summary>
     public string ViewName {
         get => _viewName;
         set => RaiseAndSetIfChanged(ref _viewName, value);
     }
 
+    /// <summary>
+    /// Исходная спецификация для дублирования
+    /// </summary>
     [Required(ErrorMessage = "Validation.ReferenceSpecIsNull")]
     public ViewSchedule ReferenceSpec {
         get => _referenceSpec;
@@ -73,6 +89,9 @@ internal class ScheduleViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _referenceSpecFilter, value);
     }
 
+    /// <summary>
+    /// Номер столбца размещения на листе: спецификации одного столбца размещаются друг под другом
+    /// </summary>
     [PositiveInteger(ErrorMessage = "Validation.ViewColumnIsNotCorrect")]
     public string ViewColumn {
         get => _viewColumn;
@@ -91,6 +110,9 @@ internal class ScheduleViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _scheduleFilterList, value);
     }
 
+    /// <summary>
+    /// Размещенная на листе спецификация
+    /// </summary>
     public ScheduleSheetInstance ViewportInstance {
         get => _viewportInstance;
         set => RaiseAndSetIfChanged(ref _viewportInstance, value);
@@ -100,14 +122,22 @@ internal class ScheduleViewVM : SheetComponentVM {
         ScheduleFilterList.SetSchedule(ReferenceSpec);
     }
 
+    /// <summary>
+    /// Находит или создает спецификацию, размещает ее на листе и заполняет дополнительные параметры
+    /// </summary>
     public override void Process(bool processDependent = false) {
         var view = Create();
         ViewportInstance = Place(view);
         SetCustomParams(view);
     }
 
+    /// <summary>
+    /// Возвращает существующую спецификацию с таким именем или дублирует исходную и заменяет ее фильтры.
+    /// Null, если спецификацию создать не удалось
+    /// </summary>
     public ViewSchedule Create() {
-        var view = Repository.GetSpecByName(ViewName);
+        // Поиск по текущему состоянию документа: находит и спецификации, созданные в этом запуске
+        var view = Repository.FindScheduleByName(ViewName);
         if(view != null) {
             return view;
         }
@@ -119,9 +149,10 @@ internal class ScheduleViewVM : SheetComponentVM {
         try {
             var scheduleId = ReferenceSpec.Duplicate(ViewDuplicateOption.Duplicate);
             view = Repository.Document.GetElement(scheduleId) as ViewSchedule;
-            if(view != null) {
-                view.Name = ViewName;
+            if(view is null) {
+                return null;
             }
+            view.Name = ViewName;
 
             var definition = view.Definition;
 
@@ -134,25 +165,28 @@ internal class ScheduleViewVM : SheetComponentVM {
         return view;
     }
 
-
+    /// <summary>
+    /// Размещает спецификацию слева от рамки: первая спецификация столбца - у верха рамки,
+    /// следующие спецификации столбца - под предыдущей, новый столбец - левее уже размещенных
+    /// </summary>
+    /// <returns>Размещенная спецификация (или уже имеющаяся на листе) либо null</returns>
     public ScheduleSheetInstance Place(ViewSchedule view) {
         var sheetInstance = Sheet.SheetInstance;
         if(sheetInstance is null || view is null) {
             return null;
         }
 
-        // Если видовой экран спецификации уже есть не листе, то не размещаем повторно
+        // Если видовой экран спецификации уже есть на листе, то не размещаем повторно
         if(Repository.GetScheduleSheetInstances(sheetInstance)
             .FirstOrDefault(s => s.ScheduleId == view.Id) is ScheduleSheetInstance scheduleSheetInstance) {
             return scheduleSheetInstance;
         }
 
         // Получение габаритов рамки листа
-        if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
+        if(Repository.GetTitleBlock(sheetInstance) is not FamilyInstance titleBlock) {
             return null;
         }
         var titleBlockBB = titleBlock.get_BoundingBox(sheetInstance);
-        double titleBlockWidth = titleBlockBB.Max.X - titleBlockBB.Min.X;
         double titleBlockHeight = titleBlockBB.Max.Y - titleBlockBB.Min.Y;
 
         // Изначально размещаем в Zero
@@ -218,10 +252,13 @@ internal class ScheduleViewVM : SheetComponentVM {
 
     private void ApplyFilters(ScheduleDefinition definition) {
         foreach(var rule in ScheduleFilterList.ScheduleFilterRules) {
-            var filter = CreateFilter(definition, rule);
-            if(filter != null) {
-                definition.AddFilter(filter);
-            }
+            // Ошибочное правило пропускаем, чтобы остальные фильтры все равно применились
+            try {
+                var filter = CreateFilter(definition, rule);
+                if(filter != null) {
+                    definition.AddFilter(filter);
+                }
+            } catch(System.Exception) { }
         }
     }
 
@@ -234,38 +271,33 @@ internal class ScheduleViewVM : SheetComponentVM {
             return CreateHasFilter(definition, rule);
         }
 
-        // Пытаемся создать фильтр, где поле является параметром рабочего набора
-        var worksetFilter = CreateWorksetFilter(definition, rule);
-
-        if(worksetFilter is null) {
-            // Создаем фильтр для обычного поля
-            return CreateStandardFilter(definition, rule);
-        } else {
-            return worksetFilter;
+        if(Repository.IsWorksetField(definition, rule.SelectedSpecField.Field.FieldId)) {
+            // Создаем фильтр для поля "Рабочий набор"
+            return CreateWorksetFilter(rule);
         }
+
+        // Создаем фильтр для обычного поля
+        return CreateStandardFilter(definition, rule);
     }
 
-    private ScheduleFilter CreateWorksetFilter(ScheduleDefinition definition, ScheduleFilterRuleVM rule) {
-        var paramId = definition.GetField(rule.SelectedSpecField.Field.FieldId).ParameterId;
+    /// <summary>
+    /// Создает фильтр по рабочему набору. Для условий "равно" и "не равно" Revit сравнивает id набора,
+    /// поэтому ищется набор с точно таким именем; если его нет, фильтр не создается.
+    /// Остальные условия (содержит, начинается с и т.д.) Revit сравнивает с именем набора как со строкой,
+    /// поэтому значение передается как есть
+    /// </summary>
+    private ScheduleFilter CreateWorksetFilter(ScheduleFilterRuleVM rule) {
+        var fieldId = rule.SelectedSpecField.Field.FieldId;
+        var filterType = rule.SelectedFilterType.FilterType;
 
-        if(!AreIdsEqual(paramId, Repository.WorksetParamId)) {
-            return null;
+        if(filterType is ScheduleFilterType.Equal or ScheduleFilterType.NotEqual) {
+            var workset = Repository.FindWorksetByName(rule.FilterValue);
+            return workset is null
+                ? null
+                : new ScheduleFilter(fieldId, filterType, workset.Id.IntegerValue);
         }
 
-        // Получаем первый рабочий набор, который содержит нужную строку в имени
-        var workset = new FilteredWorksetCollector(Repository.Document)
-            .OfKind(WorksetKind.UserWorkset)
-            .OrderBy(w => w.Name)
-            .FirstOrDefault(w => w.Name.Contains(rule.FilterValue));
-
-        if(workset is null) {
-            return null;
-        }
-
-        return new ScheduleFilter(
-            rule.SelectedSpecField.Field.FieldId,
-            rule.SelectedFilterType.FilterType,
-            workset.Id.IntegerValue);
+        return new ScheduleFilter(fieldId, filterType, rule.FilterValue ?? string.Empty);
     }
 
     private ScheduleFilter CreateStandardFilter(ScheduleDefinition definition, ScheduleFilterRuleVM rule) {
@@ -297,13 +329,5 @@ internal class ScheduleViewVM : SheetComponentVM {
             return new ScheduleFilter(fieldId, filterType);
         }
         return null;
-    }
-
-    private bool AreIdsEqual(ElementId id1, ElementId id2) {
-#if REVIT_2024_OR_GREATER
-    return id1.Value == id2.Value;
-#else
-        return id1.IntegerValue == id2.IntegerValue;
-#endif
     }
 }

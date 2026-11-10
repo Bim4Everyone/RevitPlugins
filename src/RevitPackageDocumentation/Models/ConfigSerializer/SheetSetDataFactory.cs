@@ -13,6 +13,10 @@ using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 
 namespace RevitPackageDocumentation.Models.ConfigSerializer;
 
+/// <summary>
+/// Фабрика DTO конфигурации: из моделей представления (для сохранения) и пустых DTO по типу (для добавления модуля
+/// или параметра в окне)
+/// </summary>
 internal interface ISheetSetDataFactory {
     SheetSetData CreateSheetSetData();
     SheetSetData CreateSheetSetData(SheetSetVM vm);
@@ -50,29 +54,22 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
         if(vm == null)
             return new SheetData();
 
-        return new SheetData {
-            IsModuleCheck = vm.IsModuleCheck,
-            ModuleName = vm.ModuleName,
-            ModuleComment = vm.ModuleComment,
-            CustomParamsList = GetCustomParametersList(vm),
-
+        return WithModuleData(new SheetData {
             SheetNameFormula = vm.SheetNameFormula,
+            SheetNumberFormula = vm.SheetNumberFormula,
             SheetSize = vm.SheetSize,
             SheetCoefficient = vm.SheetCoefficient,
             TitleBlockFamilyName = vm.TitleBlockFamily?.Name,
+            TitleBlockFamilyFilterValues = GetFiltrationComboBoxFilterList(vm.TitleBlockFamilyFilter),
             TitleBlockTypeName = vm.TitleBlockType?.Name,
+            TitleBlockTypeFilterValues = GetFiltrationComboBoxFilterList(vm.TitleBlockTypeFilter),
             Views = vm.SheetComponents?.Select(CreateComponentData).ToList(),
-        };
+        }, vm);
     }
 
     public SheetComponentData CreateComponentData(SheetComponentVM sheetComponentVM) {
         return sheetComponentVM switch {
-            PlanViewVM vm => new PlanViewData {
-                IsModuleCheck = vm.IsModuleCheck,
-                ModuleName = vm.ModuleName,
-                ModuleComment = vm.ModuleComment,
-                CustomParamsList = GetCustomParametersList(vm),
-
+            PlanViewVM vm => WithModuleData(new PlanViewData {
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
                 ViewFamilyTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewFamilyTypeFilter),
@@ -83,14 +80,12 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,
                 SelectedSelectElemParamName = vm.SelectedSelectElemParam?.ParamName,
-            },
+                IsDuplicate = vm.IsDuplicate,
+                ReferenceViewName = vm.ReferenceView?.Name,
+                ReferenceViewFilterValues = GetFiltrationComboBoxFilterList(vm.ReferenceViewFilter),
+            }, vm),
 
-            CalloutViewVM vm => new CalloutViewData {
-                IsModuleCheck = vm.IsModuleCheck,
-                ModuleName = vm.ModuleName,
-                ModuleComment = vm.ModuleComment,
-                CustomParamsList = GetCustomParametersList(vm),
-
+            CalloutViewVM vm => WithModuleData(new CalloutViewData {
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
                 ViewFamilyTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewFamilyTypeFilter),
@@ -101,14 +96,9 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,
                 SelectedSelectElemParamName = vm.SelectedSelectElemParam?.ParamName,
-            },
+            }, vm),
 
-            SectionViewVM vm => new SectionViewData {
-                IsModuleCheck = vm.IsModuleCheck,
-                ModuleName = vm.ModuleName,
-                ModuleComment = vm.ModuleComment,
-                CustomParamsList = GetCustomParametersList(vm),
-
+            SectionViewVM vm => WithModuleData(new SectionViewData {
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewFamilyTypeName = vm.ViewFamilyType?.Name,
                 ViewFamilyTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewFamilyTypeFilter),
@@ -119,59 +109,39 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
                 ViewCount = vm.ViewCount,
                 SelectedSelectElemParamName = vm.SelectedSelectElemParam?.ParamName,
-            },
+            }, vm),
 
-            ScheduleViewVM vm => new ScheduleViewData {
-                IsModuleCheck = vm.IsModuleCheck,
-                ModuleName = vm.ModuleName,
-                ModuleComment = vm.ModuleComment,
-                CustomParamsList = GetCustomParametersList(vm),
-
+            ScheduleViewVM vm => WithModuleData(new ScheduleViewData {
                 ReferenceViewName = vm.ReferenceSpec?.Name,
                 ReferenceViewFilterValues = GetFiltrationComboBoxFilterList(vm.ReferenceSpecFilter),
                 ViewNameFormula = vm.ViewNameFormula,
                 ViewColumn = vm.ViewColumn,
                 ViewCount = vm.ViewCount,
                 ScheduleFilterList = GetScheduleFilterList(vm),
-            },
+            }, vm),
 
-            TextNoteVM vm => new TextNoteData {
-                IsModuleCheck = vm.IsModuleCheck,
-                ModuleName = vm.ModuleName,
-                ModuleComment = vm.ModuleComment,
-                CustomParamsList = GetCustomParametersList(vm),
-
+            TextNoteVM vm => WithModuleData(new TextNoteData {
                 TextFormula = vm.TextFormula,
                 TextNoteTypeName = vm.TextNoteType?.Name,
                 TextNoteTypeFilterValues = GetFiltrationComboBoxFilterList(vm.TextNoteTypeFilter),
                 TextWidth = vm.TextWidth,
-            },
+            }, vm),
 
-            TypicalAnnotationVM vm => new TypicalAnnotationData {
-                IsModuleCheck = vm.IsModuleCheck,
-                ModuleName = vm.ModuleName,
-                ModuleComment = vm.ModuleComment,
-                CustomParamsList = GetCustomParametersList(vm),
-
+            TypicalAnnotationVM vm => WithModuleData(new TypicalAnnotationData {
                 IsFromFolder = vm.IsFromFolder,
                 FamilyFolderPath = vm.FamilyFolderPath ?? string.Empty,
                 FamilyName = vm.FamilyNameForConfig,
                 TypeName = vm.TypeNameForConfig,
                 FamilyNameFilterValues = GetFiltrationComboBoxFilterList(vm.FamilyNameFilter),
                 TypeNameFilterValues = GetFiltrationComboBoxFilterList(vm.TypeNameFilter),
-            },
+            }, vm),
 
-            LegendViewVM vm => new LegendViewData {
-                IsModuleCheck = vm.IsModuleCheck,
-                ModuleName = vm.ModuleName,
-                ModuleComment = vm.ModuleComment,
-                CustomParamsList = GetCustomParametersList(vm),
-
+            LegendViewVM vm => WithModuleData(new LegendViewData {
                 ViewName = vm.LegendView?.Name,
                 ViewFilterValues = GetFiltrationComboBoxFilterList(vm.LegendViewFilter),
                 ViewportTypeName = vm.ViewportType?.Name,
                 ViewportTypeFilterValues = GetFiltrationComboBoxFilterList(vm.ViewportTypeFilter),
-            },
+            }, vm),
 
             _ => throw new NotSupportedException(
                 $"{_localizationService.GetLocalizedString("MainViewModel.Type")} '{sheetComponentVM?.GetType().Name}' " +
@@ -179,7 +149,18 @@ internal class SheetSetDataFactory : ISheetSetDataFactory {
         };
     }
 
-    private CustomParametersListData GetCustomParametersList(BaseParamContainerVM vm) => new() {
+    /// <summary>
+    /// Заполняет общие данные модуля: галочку генерации, имя, комментарий и дополнительные параметры
+    /// </summary>
+    private static T WithModuleData<T>(T data, ModuleVM vm) where T : ParamContainerModuleData {
+        data.IsModuleCheck = vm.IsModuleCheck;
+        data.ModuleName = vm.ModuleName;
+        data.ModuleComment = vm.ModuleComment;
+        data.CustomParamsList = GetCustomParametersList(vm);
+        return data;
+    }
+
+    private static CustomParametersListData GetCustomParametersList(BaseParamContainerVM vm) => new() {
         Params = vm.CustomParamsList.Params
             .Select(r => new CustomParameterData() {
                 ParamName = r.ParamName ?? string.Empty,

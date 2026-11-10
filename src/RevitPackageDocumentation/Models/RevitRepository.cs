@@ -17,34 +17,33 @@ namespace RevitPackageDocumentation.Models;
 /// Класс доступа к документу и приложению Revit.
 /// </summary>
 /// <remarks>
-/// В случае если данный класс разрастается, рекомендуется его разделить на несколько.
+/// Списки элементов для выпадающих списков окна собираются один раз при создании репозитория.
+/// Поиск элементов при генерации (Find*, GetFamilySymbols) выполняется по текущему состоянию документа,
+/// поэтому учитывает элементы, созданные или загруженные в этом запуске.
 /// </remarks>
 internal class RevitRepository {
-    private readonly IMessageBoxService _messageBoxService;
     private readonly ILocalizationService _localizationService;
 
     /// <summary>
     /// Создает экземпляр репозитория.
     /// </summary>
     /// <param name="uiApplication">Класс доступа к интерфейсу Revit.</param>
+    /// <param name="localizationService">Сервис локализации (названия условий фильтров спецификаций).</param>
     public RevitRepository(
         UIApplication uiApplication,
-        IMessageBoxService messageBoxService,
         ILocalizationService localizationService) {
         UIApplication = uiApplication;
-        _messageBoxService = messageBoxService;
         _localizationService = localizationService;
 
         PlanViewTypes = GetFloorPlanViewTypes();
         SectionViewTypes = GetSectionViewTypes();
         PlanViewTemplates = GetPlanViewTemplates();
+        PlanViewsForDuplication = GetPlanViewsForDuplication();
         SectionViewTemplates = GetSectionViewTemplates();
         ViewportTypes = GetViewportTypes();
         TextNoteTypes = GetTextNoteTypes();
         LegendsInProject = GetLegendsInProject();
         TitleBlockFamilies = GetTitleBlockFamilies();
-        Sheets = GetSheets();
-        Views = GetViews();
         Specs = GetSpecs();
         FilterTypes = GetFilterTypes();
         WorksetParamId = new ElementId(BuiltInParameter.ELEM_PARTITION_PARAM);
@@ -54,7 +53,6 @@ internal class RevitRepository {
     /// Класс доступа к интерфейсу Revit.
     /// </summary>
     public UIApplication UIApplication { get; }
-
 
     /// <summary>
     /// Класс доступа к интерфейсу документа Revit.
@@ -71,21 +69,65 @@ internal class RevitRepository {
     /// </summary>
     public Document Document => ActiveUIDocument.Document;
 
-
+    /// <summary>
+    /// Типоразмеры видов в плане этажа
+    /// </summary>
     public List<ViewFamilyType> PlanViewTypes { get; }
-    public List<ViewFamilyType> SectionViewTypes { get; }
-    public List<ViewPlan> PlanViewTemplates { get; }
-    public List<ViewSection> SectionViewTemplates { get; }
-    public List<ElementType> ViewportTypes { get; }
-    public List<TextNoteType> TextNoteTypes { get; }
-    public List<View> LegendsInProject { get; }
-    public List<Family> TitleBlockFamilies { get; }
-    public List<ViewSheet> Sheets { get; }
-    public List<View> Views { get; }
-    public List<ViewSchedule> Specs { get; }
-    public List<ScheduleTypeInfo> FilterTypes { get; }
-    public ElementId WorksetParamId { get; }
 
+    /// <summary>
+    /// Типоразмеры разрезов
+    /// </summary>
+    public List<ViewFamilyType> SectionViewTypes { get; }
+
+    /// <summary>
+    /// Шаблоны видов в плане
+    /// </summary>
+    public List<ViewPlan> PlanViewTemplates { get; }
+
+    /// <summary>
+    /// Виды в плане, которые можно дублировать с детализацией
+    /// </summary>
+    public List<ViewPlan> PlanViewsForDuplication { get; }
+
+    /// <summary>
+    /// Шаблоны разрезов
+    /// </summary>
+    public List<ViewSection> SectionViewTemplates { get; }
+
+    /// <summary>
+    /// Типоразмеры видовых экранов
+    /// </summary>
+    public List<ElementType> ViewportTypes { get; }
+
+    /// <summary>
+    /// Типоразмеры текста
+    /// </summary>
+    public List<TextNoteType> TextNoteTypes { get; }
+
+    /// <summary>
+    /// Легенды проекта
+    /// </summary>
+    public List<View> LegendsInProject { get; }
+
+    /// <summary>
+    /// Семейства рамок листа
+    /// </summary>
+    public List<Family> TitleBlockFamilies { get; }
+
+    /// <summary>
+    /// Спецификации проекта
+    /// </summary>
+    public List<ViewSchedule> Specs { get; }
+
+    /// <summary>
+    /// Условия фильтров спецификаций, доступные в окне, с локализованными названиями
+    /// </summary>
+    public List<ScheduleTypeInfo> FilterTypes { get; }
+
+    /// <summary>
+    /// Id встроенного параметра "Рабочий набор"
+    /// </summary>
+    public ElementId WorksetParamId { get; }
 
     /// <summary>
     /// Возвращает список типоразмеров видов в плане в проекте
@@ -97,11 +139,15 @@ internal class RevitRepository {
         .OrderBy(a => a.Name)
         .ToList();
 
-    private List<ViewFamilyType> GetStructuralPlanViewTypes() => new FilteredElementCollector(Document)
-        .OfClass(typeof(ViewFamilyType))
-        .OfType<ViewFamilyType>()
-        .Where(a => ViewFamily.StructuralPlan == a.ViewFamily)
-        .OrderBy(a => a.Name)
+    /// <summary>
+    /// Возвращает список видов в плане проекта (кроме шаблонов), которые можно копировать с детализацией
+    /// </summary>
+    private List<ViewPlan> GetPlanViewsForDuplication() => new FilteredElementCollector(Document)
+        .OfClass(typeof(ViewPlan))
+        .WhereElementIsNotElementType()
+        .OfType<ViewPlan>()
+        .Where(v => !v.IsTemplate && v.CanViewBeDuplicated(ViewDuplicateOption.WithDetailing))
+        .OrderBy(v => v.Name)
         .ToList();
 
     /// <summary>
@@ -114,11 +160,10 @@ internal class RevitRepository {
         .OrderBy(a => a.Name)
         .ToList();
 
-
     /// <summary>
     /// Возвращает список всех шаблонов планов в проекте
     /// </summary>
-    public List<ViewPlan> GetPlanViewTemplates() => new FilteredElementCollector(Document)
+    private List<ViewPlan> GetPlanViewTemplates() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewPlan))
         .WhereElementIsNotElementType()
         .OfType<ViewPlan>()
@@ -126,11 +171,10 @@ internal class RevitRepository {
         .OrderBy(a => a.Name)
         .ToList();
 
-
     /// <summary>
     /// Возвращает список всех шаблонов сечений в проекте
     /// </summary>
-    public List<ViewSection> GetSectionViewTemplates() => new FilteredElementCollector(Document)
+    private List<ViewSection> GetSectionViewTemplates() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewSection))
         .WhereElementIsNotElementType()
         .OfType<ViewSection>()
@@ -141,14 +185,21 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает список всех типов видовых экранов в проекте
     /// </summary>
-    public List<ElementType> GetViewportTypes() {
-        var defaultElementType = Document.GetElement(
-            Document.GetDefaultElementTypeId(ElementTypeGroup.ViewportType)) as ElementType;
+    /// <remarks>
+    /// Типы видовых экранов берутся как типы, на которые можно заменить тип по умолчанию (GetSimilarTypes),
+    /// без перебора всех типоразмеров проекта
+    /// </remarks>
+    private List<ElementType> GetViewportTypes() {
+        if(Document.GetElement(Document.GetDefaultElementTypeId(ElementTypeGroup.ViewportType))
+           is not ElementType defaultElementType) {
+            return [];
+        }
 
-        return new FilteredElementCollector(Document)
-            .OfClass(typeof(ElementType))
-            .OfType<ElementType>()
-            .Where(q => q.FamilyName == defaultElementType.FamilyName)
+        return defaultElementType.GetSimilarTypes()
+            .Append(defaultElementType.Id)
+            .Distinct()
+            .Select(id => Document.GetElement(id) as ElementType)
+            .Where(type => type != null && type.FamilyName == defaultElementType.FamilyName)
             .OrderBy(a => a.Name)
             .ToList();
     }
@@ -156,7 +207,7 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает список всех типов текста в проекте
     /// </summary>
-    public List<TextNoteType> GetTextNoteTypes() => new FilteredElementCollector(Document)
+    private List<TextNoteType> GetTextNoteTypes() => new FilteredElementCollector(Document)
         .OfClass(typeof(TextNoteType))
         .OfType<TextNoteType>()
         .OrderBy(a => a.Name)
@@ -181,7 +232,6 @@ internal class RevitRepository {
         GetFamilySymbols(builtInCategory)
             .FirstOrDefault(s => s.FamilyName.Equals(familyName) && s.Name.Equals(typeName));
 
-
     /// <summary>
     /// Возвращает локализованное имя категории в текущей версии Revit
     /// </summary>
@@ -199,7 +249,7 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает список всех легенд, присутствующих в проекте
     /// </summary>
-    public List<View> GetLegendsInProject() => new FilteredElementCollector(Document)
+    private List<View> GetLegendsInProject() => new FilteredElementCollector(Document)
         .OfClass(typeof(View))
         .OfType<View>()
         .Where(view => view.ViewType == ViewType.Legend)
@@ -209,32 +259,26 @@ internal class RevitRepository {
     /// <summary>
     /// Возвращает список семейств рамок листа
     /// </summary>
-    public List<Family> GetTitleBlockFamilies() => new FilteredElementCollector(Document)
+    private List<Family> GetTitleBlockFamilies() => new FilteredElementCollector(Document)
         .OfClass(typeof(Family))
         .OfType<Family>()
         .Where(f => f.FamilyCategory.GetBuiltInCategory() == BuiltInCategory.OST_TitleBlocks)
         .OrderBy(a => a.Name)
         .ToList();
 
-    public List<ViewSheet> GetSheets() => new FilteredElementCollector(Document)
-        .OfClass(typeof(ViewSheet))
-        .OfType<ViewSheet>()
-        .OrderBy(a => a.Name)
-        .ToList();
-
-    public List<View> GetViews() => new FilteredElementCollector(Document)
-        .OfClass(typeof(View))
-        .OfType<View>()
-        .OrderBy(a => a.Name)
-        .ToList();
-
-    public List<ViewSchedule> GetSpecs() => new FilteredElementCollector(Document)
+    /// <summary>
+    /// Возвращает список спецификаций проекта
+    /// </summary>
+    private List<ViewSchedule> GetSpecs() => new FilteredElementCollector(Document)
         .OfClass(typeof(ViewSchedule))
         .OfType<ViewSchedule>()
         .OrderBy(a => a.Name)
         .ToList();
 
-    public List<ScheduleTypeInfo> GetFilterTypes() => Enum.GetValues(typeof(ScheduleFilterType))
+    /// <summary>
+    /// Возвращает условия фильтров спецификаций, кроме служебных и связанных с глобальными параметрами
+    /// </summary>
+    private List<ScheduleTypeInfo> GetFilterTypes() => Enum.GetValues(typeof(ScheduleFilterType))
             .Cast<ScheduleFilterType>()
             .Where(s => s != ScheduleFilterType.Invalid)
             .Where(s => s != ScheduleFilterType.HasParameter)
@@ -244,35 +288,174 @@ internal class RevitRepository {
                 new ScheduleTypeInfo(s, _localizationService.GetLocalizedString($"ScheduleFilterType.{s}") ?? s.ToString()))
             .ToList();
 
-    public ViewSheet GetSheetByName(string sheetName) {
-        return Sheets
-            .FirstOrDefault(o => o.Name.Equals(sheetName));
+    /// <summary>
+    /// Ищет в документе лист для доукомплектования. Если номер задан, лист должен совпадать и по имени, и по номеру,
+    /// иначе ищется только по имени. Поиск выполняется по текущему состоянию документа,
+    /// поэтому находит и листы, созданные в этом запуске
+    /// </summary>
+    /// <returns>Найденный лист или null</returns>
+    public ViewSheet FindSheet(string sheetName, string sheetNumber) {
+        bool checkNumber = !string.IsNullOrWhiteSpace(sheetNumber);
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewSheet))
+            .OfType<ViewSheet>()
+            .FirstOrDefault(s => s.Name.Equals(sheetName)
+                && (!checkNumber || s.SheetNumber.Equals(sheetNumber)));
     }
 
-    public View GetViewByName(string viewName) {
-        return Views
-            .FirstOrDefault(o => o.Name.Equals(viewName));
+    /// <summary>
+    /// Проверяет, является ли поле спецификации параметром "Рабочий набор"
+    /// </summary>
+    public bool IsWorksetField(ScheduleDefinition definition, ScheduleFieldId fieldId) {
+        var paramId = definition.GetField(fieldId).ParameterId;
+#if REVIT_2024_OR_GREATER
+        return paramId.Value == WorksetParamId.Value;
+#else
+        return paramId.IntegerValue == WorksetParamId.IntegerValue;
+#endif
     }
 
+    /// <summary>
+    /// Ищет пользовательский рабочий набор с точно таким именем
+    /// </summary>
+    /// <returns>Найденный рабочий набор или null</returns>
+    public Workset FindWorksetByName(string worksetName) {
+        if(string.IsNullOrEmpty(worksetName)) {
+            return null;
+        }
+        return new FilteredWorksetCollector(Document)
+            .OfKind(WorksetKind.UserWorkset)
+            .FirstOrDefault(w => w.Name.Equals(worksetName));
+    }
+
+    /// <summary>
+    /// Возвращает имя рабочего набора по его id
+    /// </summary>
+    /// <returns>Имя рабочего набора или null, если набор не найден</returns>
+    public string GetWorksetName(int worksetId) {
+        return new FilteredWorksetCollector(Document)
+            .OfKind(WorksetKind.UserWorkset)
+            .FirstOrDefault(w => w.Id.IntegerValue == worksetId)
+            ?.Name;
+    }
+
+    /// <summary>
+    /// Ищет в документе вид указанного класса с указанным именем (кроме шаблонов, листов и спецификаций).
+    /// Поиск выполняется по текущему состоянию документа, поэтому находит и виды, созданные в этом запуске
+    /// </summary>
+    /// <param name="viewName">Имя вида</param>
+    /// <param name="viewFamily">
+    /// Семейство вида. Revit допускает одинаковые имена у видов разных типов (например, у плана и разреза),
+    /// поэтому, если семейство задано, ищется вид только этого семейства
+    /// </param>
+    /// <returns>Найденный вид или null</returns>
+    public T FindViewByName<T>(string viewName, ViewFamily? viewFamily = null) where T : View {
+        if(string.IsNullOrEmpty(viewName)) {
+            return null;
+        }
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(T))
+            .OfType<T>()
+            .FirstOrDefault(v => !v.IsTemplate
+                && v is not ViewSheet
+                && v is not ViewSchedule
+                && v.Name.Equals(viewName)
+                && (viewFamily is null || GetViewFamily(v) == viewFamily));
+    }
+
+    /// <summary>
+    /// Ищет в документе план на указанном уровне, на котором можно создать фрагмент указанного типоразмера:
+    /// не шаблон, не фрагмент, не зависимый вид. По правилам Revit фрагмент создается на плане этажа, плане
+    /// несущих конструкций или плане потолка; типоразмер семейства «Узел» допустим на любом из них, кроме плана
+    /// потолка, остальные - только на виде своего семейства. Если подходящих видов несколько, возвращается первый по имени
+    /// </summary>
+    /// <returns>Найденный план или null</returns>
+    public ViewPlan FindPlanViewOnLevel(ElementId levelId, ViewFamilyType calloutType) {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewPlan))
+            .OfType<ViewPlan>()
+            .Where(v => !v.IsTemplate
+                && !v.IsCallout
+                && v.GetPrimaryViewId() == ElementId.InvalidElementId
+                && v.GenLevel != null
+                && v.GenLevel.Id == levelId)
+            .Where(v => IsCalloutAllowed(v, calloutType))
+            .OrderBy(v => v.Name)
+            .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Возвращает семейство вида (по его типоразмеру) или null
+    /// </summary>
+    public ViewFamily? GetViewFamily(View view) {
+        return view is null ? null : (Document.GetElement(view.GetTypeId()) as ViewFamilyType)?.ViewFamily;
+    }
+
+    private bool IsCalloutAllowed(ViewPlan parentView, ViewFamilyType calloutType) {
+        return IsCalloutAllowed(GetViewFamily(parentView), calloutType);
+    }
+
+    /// <summary>
+    /// Проверяет, можно ли создать на виде указанного семейства фрагмент указанного типоразмера
+    /// (правила ViewSection.CreateCallout)
+    /// </summary>
+    public bool IsCalloutAllowed(ViewFamily? parentFamily, ViewFamilyType calloutType) {
+        if(parentFamily is not (ViewFamily.FloorPlan or ViewFamily.StructuralPlan or ViewFamily.CeilingPlan)) {
+            return false;
+        }
+        if(calloutType is null) {
+            return true;
+        }
+        return calloutType.ViewFamily == ViewFamily.Detail
+            ? parentFamily != ViewFamily.CeilingPlan
+            : parentFamily == calloutType.ViewFamily;
+    }
+
+    /// <summary>
+    /// Возвращает спецификацию по имени из списка, собранного при запуске
+    /// </summary>
     internal ViewSchedule GetSpecByName(string viewName) {
         return Specs
             .FirstOrDefault(o => o.Name.Equals(viewName));
     }
 
+    /// <summary>
+    /// Ищет в документе спецификацию (не шаблон) с указанным именем. Поиск выполняется по текущему состоянию
+    /// документа, поэтому находит и спецификации, созданные в этом запуске
+    /// </summary>
+    /// <returns>Найденная спецификация или null</returns>
+    public ViewSchedule FindScheduleByName(string viewName) {
+        if(string.IsNullOrEmpty(viewName)) {
+            return null;
+        }
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(ViewSchedule))
+            .OfType<ViewSchedule>()
+            .FirstOrDefault(v => !v.IsTemplate && v.Name.Equals(viewName));
+    }
 
-    public FamilyInstance GetTitleBlocks(ViewSheet viewSheet) {
+    /// <summary>
+    /// Возвращает рамку листа (первый экземпляр категории "Основные надписи" на листе) или null
+    /// </summary>
+    public FamilyInstance GetTitleBlock(ViewSheet viewSheet) {
         return new FilteredElementCollector(Document, viewSheet.Id)
             .OfCategory(BuiltInCategory.OST_TitleBlocks)
             .WhereElementIsNotElementType()
             .FirstOrDefault() as FamilyInstance;
     }
 
+    /// <summary>
+    /// Возвращает видовые экраны листа
+    /// </summary>
     public List<Viewport> GetViewports(ViewSheet viewSheet) {
         return viewSheet.GetAllViewports()
             .Select(id => Document.GetElement(id) as Viewport)
             .ToList();
     }
 
+    /// <summary>
+    /// Возвращает спецификации, размещенные на листе
+    /// </summary>
     public List<ScheduleSheetInstance> GetScheduleSheetInstances(ViewSheet viewSheet) {
         return new FilteredElementCollector(Document, viewSheet.Id)
             .OfClass(typeof(ScheduleSheetInstance))
@@ -281,6 +464,9 @@ internal class RevitRepository {
             .ToList();
     }
 
+    /// <summary>
+    /// Возвращает текстовые примечания листа
+    /// </summary>
     public List<TextNote> GetTextNotes(ViewSheet viewSheet) {
         return new FilteredElementCollector(Document, viewSheet.Id)
             .OfClass(typeof(TextNote))

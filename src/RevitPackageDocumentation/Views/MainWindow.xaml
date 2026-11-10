@@ -11,6 +11,7 @@
     xmlns:local="clr-namespace:RevitPackageDocumentation.Views"
     xmlns:controls="clr-namespace:RevitPackageDocumentation.Views.Controls"
     xmlns:extensions="clr-namespace:RevitPackageDocumentation.Views.Extensions"
+    xmlns:converters="clr-namespace:RevitPackageDocumentation.Views.Converters"
     
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
@@ -34,9 +35,26 @@
                 <ResourceDictionary
                     Source="CustomDataTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:SingleItemCollectionConverter
+                x:Key="SingleItemCollectionConverter" />
             <SolidColorBrush
                 x:Key="ListBoxItemSelectedBackgroundThemeBrush"
                 Color="#80007ACC" />
+
+            <!--Перемещение листа в списке. Одно меню на все строки, поэтому контекст данных берется
+                из строки, на которой меню открыто (PlacementTarget)-->
+            <ContextMenu
+                x:Key="SheetContextMenu"
+                DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                <MenuItem
+                    Header="{extensions:Localized MainWindow.MoveUp}"
+                    Icon="{ui:SymbolIcon ArrowUp24}"
+                    Command="{Binding MoveUpCommand}" />
+                <MenuItem
+                    Header="{extensions:Localized MainWindow.MoveDown}"
+                    Icon="{ui:SymbolIcon ArrowDown24}"
+                    Command="{Binding MoveDownCommand}" />
+            </ContextMenu>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -138,16 +156,74 @@
                     <ListBox
                         Grid.Row="0"
                         ItemsSource="{Binding CurrentSheetSet.SheetList}"
-                        SelectedItem="{Binding CurrentSheetSet.SelectedSheet}" />
+                        SelectedItem="{Binding CurrentSheetSet.SelectedSheet}">
+                        <!--Меню перемещения на всей строке листа, кроме полей ввода и кнопок-->
+                        <ListBox.ItemContainerStyle>
+                            <Style
+                                TargetType="ListBoxItem"
+                                BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                <Setter
+                                    Property="ContextMenu"
+                                    Value="{StaticResource SheetContextMenu}" />
+                                <EventSetter
+                                    Event="ContextMenuOpening"
+                                    Handler="SheetListItem_ContextMenuOpening" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
 
-                    <ui:Button
-                        Grid.Row="1"
-                        Margin="5"
-                        Padding="7"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Right"
-                        Content="{me:LocalizationSource MainWindow.AddSheet}"
-                        Command="{Binding CurrentSheetSet.AddSheetCommand}" />
+                    <Grid
+                        Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--Массовая расстановка галочек листов-->
+                        <StackPanel
+                            Grid.Column="0"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Left">
+                            <ui:Button
+                                Margin="5"
+                                Height="35"
+                                Width="35"
+                                Padding="0"
+                                VerticalAlignment="Center"
+                                Icon="{ui:SymbolIcon CheckboxChecked24}"
+                                ToolTip="{me:LocalizationSource MainWindow.SelectAllSheets}"
+                                Command="{Binding CurrentSheetSet.SelectAllSheetsCommand}" />
+
+                            <ui:Button
+                                Margin="5"
+                                Height="35"
+                                Width="35"
+                                Padding="0"
+                                VerticalAlignment="Center"
+                                Icon="{ui:SymbolIcon CheckboxUnchecked24}"
+                                ToolTip="{me:LocalizationSource MainWindow.DeselectAllSheets}"
+                                Command="{Binding CurrentSheetSet.DeselectAllSheetsCommand}" />
+
+                            <ui:Button
+                                Margin="5"
+                                Height="35"
+                                Width="35"
+                                Padding="0"
+                                VerticalAlignment="Center"
+                                Icon="{ui:SymbolIcon Wand24}"
+                                ToolTip="{me:LocalizationSource MainWindow.SelectSheetsWithoutErrors}"
+                                Command="{Binding CurrentSheetSet.SelectSheetsWithoutErrorsCommand}" />
+                        </StackPanel>
+
+                        <ui:Button
+                            Grid.Column="1"
+                            Margin="5"
+                            Padding="7"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Content="{me:LocalizationSource MainWindow.AddSheet}"
+                            Command="{Binding CurrentSheetSet.AddSheetCommand}" />
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>
@@ -274,29 +350,9 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
-                    <ui:TextBlock
-                        Grid.Column="0"
-                        Grid.Row="0"
-                        Margin="5 13"
-                        VerticalAlignment="Top"
-                        Text="{me:LocalizationSource MainWindow.SheetName}" />
-
-                    <controls:FormulaTextBoxControl
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Grid.ColumnSpan="3"
-                        Margin="5"
-                        PropFormula="{Binding 
-                            Path=CurrentSheetSet.SelectedSheet.SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
-                            ValidatesOnNotifyDataErrors=True}"
-                        PropResult="{Binding Path=CurrentSheetSet.SelectedSheet.SheetName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        UpdateCommand="{Binding CurrentSheetSet.SelectedSheet.PropUpdateByFormulaCommand}"
-                        TextBoxStyle="{StaticResource ErrorControlTextBoxStyle}"/>
 
                     <!--<ui:TextBlock
                         Grid.Column="3"
@@ -309,153 +365,209 @@
                     <Expander
                         Grid.Column="0"
                         Grid.ColumnSpan="4"
-                        Grid.Row="1"
+                        Grid.Row="0"
                         Margin="5"
                         Header="{me:LocalizationSource MainWindow.SheetSettings}">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <UniformGrid
-                                Rows="0"
-                                Grid.IsSharedSizeScope="True"
-                                extensions:UniformGridExtensions.AutoColumns="True"
-                                extensions:UniformGridExtensions.ColumnThresholds="1000,700">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <ui:TextBlock
-                                        Grid.Column="0"
-                                        Margin="10 5 5 5"
-                                        VerticalAlignment="Center"
-                                        Text="{me:LocalizationSource MainWindow.TitleBlockFamily}" />
-
-                                    <ComboBox
-                                        Grid.Column="1"
-                                        Margin="5"
-                                        Style="{StaticResource ErrorComboBoxStyle}"
-                                        ItemsSource="{Binding Path=TitleBlockFamilies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        DisplayMemberPath="Name"
-                                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger
-                                                EventName="DropDownClosed">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding CurrentSheetSet.SelectedSheet.SelectTitleBlockFamilyCommand}" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </ComboBox>
-                                </Grid>
-
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <ui:TextBlock
-                                        Grid.Column="0"
-                                        Margin="10 5 5 5"
-                                        VerticalAlignment="Center"
-                                        Text="{me:LocalizationSource MainWindow.TitleBlockType}" />
-
-                                    <ComboBox
-                                        Grid.Column="1"
-                                        Margin="5"
-                                        Style="{StaticResource ErrorComboBoxStyle}"
-                                        ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockTypes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        DisplayMemberPath="Name"
-                                        SelectedItem="{Binding Path=CurrentSheetSet.SelectedSheet.TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        IsSynchronizedWithCurrentItem="False" />
-                                </Grid>
-
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <ui:TextBlock
-                                        Grid.Column="0"
-                                        Margin="10 5 5 5"
-                                        VerticalAlignment="Center"
-                                        Text="{me:LocalizationSource MainWindow.SheetSize}" />
-
-                                    <ui:TextBlock
-                                        Grid.Column="1"
-                                        Margin="5"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Right"
-                                        Text="A" />
-
-                                    <ui:TextBox
-                                        Grid.Column="2"
-                                        Margin="5"
-                                        MinWidth="50"
-                                        Style="{StaticResource ErrorTextBoxStyle}"
-                                        Text="{Binding 
-                                            Path=CurrentSheetSet.SelectedSheet.SheetSize, UpdateSourceTrigger=PropertyChanged, 
-                                            Mode=TwoWay, ValidatesOnNotifyDataErrors=True}" />
-
-                                    <ui:TextBlock
-                                        Grid.Column="3"
-                                        Margin="5"
-                                        VerticalAlignment="Center"
-                                        Text="x" />
-
-                                    <ui:TextBox
-                                        Grid.Column="4"
-                                        Margin="5"
-                                        MinWidth="50"
-                                        Style="{StaticResource ErrorTextBoxStyle}"
-                                        Text="{Binding 
-                                            Path=CurrentSheetSet.SelectedSheet.SheetCoefficient, UpdateSourceTrigger=PropertyChanged, 
-                                            Mode=TwoWay, ValidatesOnNotifyDataErrors=True}" />
-                                </Grid>
-                            </UniformGrid>
-
-                            <Border
-                                Grid.Row="1"
-                                Margin="5"
-                                Style="{StaticResource CustomBorder}">
-                                <Grid>
+                        <!--Шаблон пересоздается при смене листа, чтобы привязки не переключались по одной: иначе списки рамки
+                            могут записать сброшенный выбор в лист, с которого ушли-->
+                        <ItemsControl
+                            ItemsSource="{Binding CurrentSheetSet.SelectedSheet, Converter={StaticResource SingleItemCollectionConverter}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                <!--Общая область ширины подписей, чтобы подпись имени листа выровнялась с подписями ниже-->
+                                <Grid
+                                    Grid.IsSharedSizeScope="True">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <ui:TextBlock
+                                    <!--Имя и номер листа: в широком окне в одну строку, в узком - номер под именем-->
+                                    <UniformGrid
                                         Grid.Row="0"
-                                        Margin="5 0"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Left"
-                                        Text="{me:LocalizationSource MainWindow.CustomParams}" />
+                                        Rows="0"
+                                        extensions:UniformGridExtensions.AutoColumns="True"
+                                        extensions:UniformGridExtensions.ColumnThresholds="700">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
 
-                                    <ui:Button
-                                        Grid.Row="0"
-                                        HorizontalAlignment="Right"
-                                        Content="+"
-                                        Style="{StaticResource ButtonBySelectedSheet}"
-                                        Command="{Binding Path=CurrentSheetSet.SelectedSheet.CustomParamsList.AddCustomParameterCommand}" />
+                                            <ui:TextBlock
+                                                Grid.Column="0"
+                                                Margin="10 13 5 5"
+                                                VerticalAlignment="Top"
+                                                Text="{extensions:Localized MainWindow.SheetName}" />
 
-                                    <ItemsControl
+                                            <controls:FormulaTextBoxControl
+                                                Grid.Column="1"
+                                                Margin="5"
+                                                PropFormula="{Binding 
+                                                    Path=SheetNameFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay,
+                                                    ValidatesOnNotifyDataErrors=True}"
+                                                PropResult="{Binding Path=SheetName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                UpdateCommand="{Binding PropUpdateByFormulaCommand}"
+                                                TextBoxStyle="{StaticResource ErrorControlTextBoxStyle}"/>
+                                        </Grid>
+
+                                        <!--Номер листа необязателен: если не задан, номер назначает Revit-->
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <ui:TextBlock
+                                                Grid.Column="0"
+                                                Margin="10 13 5 5"
+                                                VerticalAlignment="Top"
+                                                Text="{extensions:Localized MainWindow.SheetNumber}" />
+
+                                            <controls:FormulaTextBoxControl
+                                                Grid.Column="1"
+                                                Margin="5"
+                                                PropFormula="{Binding 
+                                                    Path=SheetNumberFormula, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                PropResult="{Binding Path=SheetNumber, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                UpdateCommand="{Binding PropUpdateByFormulaCommand}"
+                                                TextBoxStyle="{StaticResource ErrorControlTextBoxStyle}"/>
+                                        </Grid>
+                                    </UniformGrid>
+
+                                    <UniformGrid
                                         Grid.Row="1"
-                                        HorizontalContentAlignment="Stretch"
-                                        Validation.ErrorTemplate="{x:Null}"
-                                        ItemsSource="{Binding 
-                                            Path=CurrentSheetSet.SelectedSheet.CustomParamsList.Params, 
-                                            UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                        Rows="0"
+                                        extensions:UniformGridExtensions.AutoColumns="True"
+                                        extensions:UniformGridExtensions.ColumnThresholds="1000,700">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <ui:TextBlock
+                                                Grid.Column="0"
+                                                Margin="10 5 5 5"
+                                                VerticalAlignment="Center"
+                                                Text="{extensions:Localized MainWindow.TitleBlockFamily}" />
+
+                                            <controls:FiltrationComboBoxControl
+                                                Grid.Column="1"
+                                                Margin="5"
+                                                ComboBoxSource="{Binding DataContext.TitleBlockFamilies, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                ComboBoxSelected="{Binding Path=TitleBlockFamily, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                FilterList="{Binding Path=TitleBlockFamilyFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                ComboBoxSelectionChangedCommand="{Binding SelectTitleBlockFamilyCommand}"
+                                                ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
+                                        </Grid>
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <ui:TextBlock
+                                                Grid.Column="0"
+                                                Margin="10 5 5 5"
+                                                VerticalAlignment="Center"
+                                                Text="{extensions:Localized MainWindow.TitleBlockType}" />
+
+                                            <controls:FiltrationComboBoxControl
+                                                Grid.Column="1"
+                                                Margin="5"
+                                                ComboBoxSource="{Binding Path=TitleBlockTypes}"
+                                                ComboBoxSelected="{Binding Path=TitleBlockType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                FilterList="{Binding Path=TitleBlockTypeFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                ComboBoxStyle="{StaticResource ErrorControlComboBoxStyle}" />
+                                        </Grid>
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="LabelColumn"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <ui:TextBlock
+                                                Grid.Column="0"
+                                                Margin="10 5 5 5"
+                                                VerticalAlignment="Center"
+                                                Text="{extensions:Localized MainWindow.SheetSize}" />
+
+                                            <ui:TextBlock
+                                                Grid.Column="1"
+                                                Margin="5"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Right"
+                                                Text="A" />
+
+                                            <ui:TextBox
+                                                Grid.Column="2"
+                                                Margin="5"
+                                                MinWidth="50"
+                                                Style="{StaticResource ErrorTextBoxStyle}"
+                                                Text="{Binding 
+                                                    Path=SheetSize, UpdateSourceTrigger=PropertyChanged, 
+                                                    Mode=TwoWay, ValidatesOnNotifyDataErrors=True}" />
+
+                                            <ui:TextBlock
+                                                Grid.Column="3"
+                                                Margin="5"
+                                                VerticalAlignment="Center"
+                                                Text="x" />
+
+                                            <ui:TextBox
+                                                Grid.Column="4"
+                                                Margin="5"
+                                                MinWidth="50"
+                                                Style="{StaticResource ErrorTextBoxStyle}"
+                                                Text="{Binding 
+                                                    Path=SheetCoefficient, UpdateSourceTrigger=PropertyChanged, 
+                                                    Mode=TwoWay, ValidatesOnNotifyDataErrors=True}" />
+                                        </Grid>
+                                    </UniformGrid>
+
+                                    <Border
+                                        Grid.Row="2"
+                                        Margin="5"
+                                        Style="{StaticResource CustomBorder}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+
+                                            <ui:TextBlock
+                                                Grid.Row="0"
+                                                Margin="5 0"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Left"
+                                                Text="{extensions:Localized MainWindow.CustomParams}" />
+
+                                            <ui:Button
+                                                Grid.Row="0"
+                                                HorizontalAlignment="Right"
+                                                Content="+"
+                                                Command="{Binding Path=CustomParamsList.AddCustomParameterCommand}" />
+
+                                            <ItemsControl
+                                                Grid.Row="1"
+                                                HorizontalContentAlignment="Stretch"
+                                                Validation.ErrorTemplate="{x:Null}"
+                                                ItemsSource="{Binding 
+                                                    Path=CustomParamsList.Params, 
+                                                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                        </Grid>
+                                    </Border>
                                 </Grid>
-                            </Border>
-                        </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Expander>
 
                     <!--<ui:TextBlock
@@ -477,7 +589,7 @@
                     <ui:TextBox
                         Grid.Column="0"
                         Grid.ColumnSpan="4"
-                        Grid.Row="2"
+                        Grid.Row="1"
                         Foreground="Orange"
                         Margin="5"
                         VerticalAlignment="Center"
@@ -516,6 +628,43 @@
                             HorizontalContentAlignment="Stretch"
                             ItemsSource="{Binding Path=CurrentSheetSet.SelectedSheet.SheetComponents, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </ScrollViewer>
+
+                    <!--Массовая расстановка галочек модулей выбранного листа-->
+                    <StackPanel
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Left">
+                        <ui:Button
+                            Margin="5"
+                            Height="35"
+                            Width="35"
+                            Padding="0"
+                            VerticalAlignment="Center"
+                            Icon="{ui:SymbolIcon CheckboxChecked24}"
+                            ToolTip="{me:LocalizationSource MainWindow.SelectAllComponents}"
+                            Command="{Binding CurrentSheetSet.SelectedSheet.SelectAllComponentsCommand}" />
+
+                        <ui:Button
+                            Margin="5"
+                            Height="35"
+                            Width="35"
+                            Padding="0"
+                            VerticalAlignment="Center"
+                            Icon="{ui:SymbolIcon CheckboxUnchecked24}"
+                            ToolTip="{me:LocalizationSource MainWindow.DeselectAllComponents}"
+                            Command="{Binding CurrentSheetSet.SelectedSheet.DeselectAllComponentsCommand}" />
+
+                        <ui:Button
+                            Margin="5"
+                            Height="35"
+                            Width="35"
+                            Padding="0"
+                            VerticalAlignment="Center"
+                            Icon="{ui:SymbolIcon Wand24}"
+                            ToolTip="{me:LocalizationSource MainWindow.SelectComponentsWithoutErrors}"
+                            Command="{Binding CurrentSheetSet.SelectedSheet.SelectComponentsWithoutErrorsCommand}" />
+                    </StackPanel>
 
                     <ComboBox
                         x:Name="ComponentTypesComboBox"

@@ -1,8 +1,11 @@
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
+
+using RevitPackageDocumentation.Views.Extensions;
 
 namespace RevitPackageDocumentation.Views;
 
@@ -51,6 +54,17 @@ public partial class MainWindow {
         Close();
     }
 
+    /// <summary>
+    /// Меню перемещения листа открывается только на свободном месте строки, а не на поле имени и кнопках
+    /// </summary>
+    private void SheetListItem_ContextMenuOpening(object sender, ContextMenuEventArgs e) {
+        if(ContextMenuHelper.IsOverInputControl(e.OriginalSource, (DependencyObject) sender)) {
+            e.Handled = true;
+        }
+    }
+
+    // Выпадающие списки добавления модуля и параметра работают как меню: открываются по нажатию в любом месте,
+    // а после выбора (выбор обрабатывает команда) сбрасываются, чтобы тот же пункт можно было выбрать снова
 
     private void SheetSetParamTypesComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
         if(!SheetSetParamTypesComboBox.IsDropDownOpen) {

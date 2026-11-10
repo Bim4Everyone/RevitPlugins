@@ -7,6 +7,10 @@ using RevitPackageDocumentation.Models;
 using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
 
 namespace RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
+
+/// <summary>
+/// Значение фильтра выпадающего списка, вычисляемое по формуле
+/// </summary>
 internal class FiltrationComboBoxFilterVM : BaseViewModel {
     private string _valueFormula = string.Empty;
     private string _value = string.Empty;
@@ -46,12 +50,16 @@ internal class FiltrationComboBoxFilterVM : BaseViewModel {
     }
 
     /// <summary>
-    /// В случае изменения имени параметра конфигурации нужно обновить свойства дополнительного параметра
+    /// В случае изменения имени параметра конфигурации нужно пересчитать значение фильтра
     /// </summary>
     public void UpdateDueParamNameChange() {
         StrParamSetService.SetAll(this, FilterList.SheetSetParams);
     }
 
+    /// <summary>
+    /// В случае изменения значения параметра конфигурации нужно пересчитать значение фильтра,
+    /// если оно на него ссылается
+    /// </summary>
     public void UpdateDueParamValueChange(StringParamVM stringParam) {
         StrParamSetService.SetAll(this, FilterList.SheetSetParams, stringParam);
     }

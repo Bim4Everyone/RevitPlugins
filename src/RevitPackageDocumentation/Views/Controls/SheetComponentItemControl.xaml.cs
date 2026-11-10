@@ -2,6 +2,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
+using RevitPackageDocumentation.Views.Extensions;
+
 namespace RevitPackageDocumentation.Views.Controls;
 /// <summary>
 /// Логика взаимодействия для SheetComponentItemControl.xaml
@@ -42,5 +44,15 @@ public partial class SheetComponentItemControl : UserControl {
 
     public SheetComponentItemControl() {
         InitializeComponent();
+    }
+
+    /// <summary>
+    /// Меню перемещения модуля открывается только на свободном месте карточки,
+    /// а не на полях ввода, списках и кнопках
+    /// </summary>
+    private void OnContextMenuOpening(object sender, ContextMenuEventArgs e) {
+        if(ContextMenuHelper.IsOverInputControl(e.OriginalSource, this)) {
+            e.Handled = true;
+        }
     }
 }

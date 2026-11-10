@@ -12,6 +12,11 @@ using RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
 using RevitPackageDocumentation.ViewModels.Validation.Attributes;
 
 namespace RevitPackageDocumentation.ViewModels.Configuration.Sheet.SheetComponents;
+
+/// <summary>
+/// Модуль фрагментов плана: создает указанное количество фрагментов возле элемента привязки на плане его уровня
+/// и размещает их в ряд под рамкой листа
+/// </summary>
 internal class CalloutViewVM : SheetComponentVM {
     // При разработке документации пользователям необходимо иметь возможность задать одинаковый Номер вида
     // для нескольких компонентов одного листа (значение задается одинаковое, но за счет разного типа вида в заголовке
@@ -19,7 +24,9 @@ internal class CalloutViewVM : SheetComponentVM {
     // По умолчанию в Revit это не допускается, поэтому пользователи используют регламентированные стандартами невидимые
     // символы для различных типов видов. Для отличия Номера вида у фрагментов регламентирован невидимый символ
     // указанный ниже (в Юникоде это Left-to-Right Embedding (LRE))
-    private readonly string _uniqueViewportNumberKey = "‪";
+    private const string _uniqueViewportNumberKey = "\u202A";
+
+    // Размеры задаются в мм и переводятся во внутренние единицы Revit
 
     // Ширина фрагмента
     private readonly double _calloutWidth = UnitUtilsHelper.ConvertToInternalValue(4000);
@@ -39,8 +46,11 @@ internal class CalloutViewVM : SheetComponentVM {
     private ElementType _viewportType;
     private ViewPlan _viewTemplate;
     private string _viewCount;
-    private string _viewportNumber;
     private SelectElemParamVM _selectedSelectElemParam;
+    private string _parentPlanError = string.Empty;
+
+    // Значение параметра «Показать на» (SECTION_SHOW_IN_ONE_VIEW_ONLY): 0 - пересекающиеся виды, 1 - только родительский вид
+    private const int _showInIntersectingViews = 0;
 
     private FiltrationComboBoxFilterListVM _viewFamilyTypeFilter;
     private FiltrationComboBoxFilterListVM _viewportTypeFilter;
@@ -112,11 +122,6 @@ internal class CalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _viewCount, value);
     }
 
-    public string ViewportNumber {
-        get => _viewportNumber;
-        set => RaiseAndSetIfChanged(ref _viewportNumber, value);
-    }
-
     [Required(ErrorMessage = "Validation.SelectedSelectElemParamIsNull")]
     [ChildHasErrors(ErrorMessage = "Validation.SelectElemParamSelectedElemIsNull")]
     public SelectElemParamVM SelectedSelectElemParam {
@@ -124,30 +129,77 @@ internal class CalloutViewVM : SheetComponentVM {
         set => RaiseAndSetIfChanged(ref _selectedSelectElemParam, value);
     }
 
-
-    public override bool CanCreateComponent() {
-        if(HasErrors) {
-            return false;
-        }
-
-        int index = Sheet.SheetComponents.IndexOf(this);
-        PlanViewVM parentView = null;
-        for(int i = index; i >= 0; i--) {
-            parentView = Sheet.SheetComponents[i] as PlanViewVM;
-
-            if(parentView != null && parentView.IsModuleCheck == true) {
-                break;
-            }
-        }
-        if(parentView is null) {
-            FirstError = LocalizationService.GetLocalizedString("Validation.HasNotPlanView");
-            return false;
-        }
-
-        FirstError = string.Empty;
-        return true;
+    /// <summary>
+    /// Текст ошибки отсутствия родительского плана. Пустая строка - ошибки нет
+    /// </summary>
+    [ErrorTextIsEmpty]
+    public string ParentPlanError {
+        get => _parentPlanError;
+        private set => RaiseAndSetIfChanged(ref _parentPlanError, value);
     }
 
+    /// <summary>
+    /// Пересчитывает ошибку отсутствия родительского вида: плана на уровне элемента привязки, который уже есть
+    /// в проекте или будет создан модулем плана выше на листе. Вызывается листом при изменении состава модулей,
+    /// элемента привязки и типоразмера фрагмента, а также при изменениях модулей плана
+    /// </summary>
+    public void UpdateParentPlan() {
+        // Пока элемент привязки не выбран, родительский вид искать не по чему - об этом сообщает своя ошибка
+        bool isElemSelected = SelectedSelectElemParam?.SelectedElem != null;
+        bool hasParentView = FindParentPlanView() != null || HasPlanModuleAboveOnLevel();
+        ParentPlanError = isElemSelected && !hasParentView
+            ? LocalizationService.GetLocalizedString("Validation.PlanViewOnLevelNotFound")
+            : string.Empty;
+    }
+
+    /// <summary>
+    /// Проверяет, создаст ли в этом запуске план на уровне элемента привязки модуль плана, стоящий на листе выше
+    /// фрагмента (отмеченный и без ошибок). Такой план к моменту создания фрагмента уже будет в проекте
+    /// </summary>
+    private bool HasPlanModuleAboveOnLevel() {
+        var levelId = GetElemLevelId();
+        var components = Sheet?.SheetComponents;
+        if(levelId is null || components is null) {
+            return false;
+        }
+        int index = components.IndexOf(this);
+        for(int i = index - 1; i >= 0; i--) {
+            if(components[i] is PlanViewVM plan
+                && plan.IsModuleCheck
+                && !plan.HasErrors
+                && plan.GetPlanLevelId() is ElementId planLevelId
+                && planLevelId == levelId
+                && Repository.IsCalloutAllowed(plan.GetPlanViewFamily(), ViewFamilyType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Возвращает уровень элемента привязки или null, если элемент не выбран или у него нет уровня
+    /// </summary>
+    private ElementId GetElemLevelId() {
+        var levelId = SelectedSelectElemParam?.SelectedElem?.LevelId;
+        return levelId is null || levelId == ElementId.InvalidElementId ? null : levelId;
+    }
+
+    /// <summary>
+    /// Возвращает план проекта на уровне элемента привязки, на котором можно создать фрагмент, или null
+    /// </summary>
+    private ViewPlan FindParentPlanView() {
+        var levelId = GetElemLevelId();
+        return levelId is null ? null : Repository.FindPlanViewOnLevel(levelId, ViewFamilyType);
+    }
+
+    public override bool CanCreateComponent() {
+        // Отсутствие родительского вида также является ошибкой модуля (ParentPlanError)
+        return !HasErrors;
+    }
+
+    /// <summary>
+    /// Создает (или находит) ViewCount фрагментов с именами ИмяВида_1..N и размещает их на листе
+    /// </summary>
     public override void Process(bool processDependent = false) {
         int.TryParse(ViewCount, out int viewCountAsInt);
 
@@ -158,27 +210,23 @@ internal class CalloutViewVM : SheetComponentVM {
         }
     }
 
+    /// <summary>
+    /// Возвращает существующий вид ИмяВида_number или создает фрагмент на плане уровня элемента привязки,
+    /// со сдвигом вдоль оси X на number - 1 шагов.
+    /// Null, если родительский план не найден или фрагмент создать не удалось
+    /// </summary>
     public View Create(int number) {
-        string viewName = $"{ViewName}_{number}";
-        var view = Repository.GetViewByName(viewName);
+        string viewName = GetNumberedViewName(number);
+        // Ищется вид того же семейства, что и типоразмер фрагмента: с таким же именем может быть, например, разрез
+        var view = Repository.FindViewByName<View>(viewName, ViewFamilyType?.ViewFamily);
 
         if(view != null) {
             return view;
         }
 
         try {
-            int index = Sheet.SheetComponents.IndexOf(this);
-            PlanViewVM parentView = default;
-
-            for(int i = index; i >= 0; i--) {
-                parentView = Sheet.SheetComponents[i] as PlanViewVM;
-
-                if(parentView != null) {
-                    break;
-                }
-            }
-
-            if(parentView is null || parentView.ViewInstance is null) {
+            var parentView = FindParentPlanView();
+            if(parentView is null) {
                 return null;
             }
 
@@ -191,11 +239,19 @@ internal class CalloutViewVM : SheetComponentVM {
 
             view = ViewSection.CreateCallout(
                 Repository.Document,
-                parentView.ViewInstance.Id,
+                parentView.Id,
                 ViewFamilyType.Id,
                 calloutStart,
                 calloutEnd);
             view.Name = viewName;
+
+            // Родительский вид выбирается любой подходящий по уровню, поэтому фрагмент показывается на всех
+            // пересекающихся видах, а где именно его видно - настраивается видимостью/фильтрами
+            var showInParam = view.get_Parameter(BuiltInParameter.SECTION_SHOW_IN_ONE_VIEW_ONLY);
+            if(showInParam is { IsReadOnly: false }) {
+                showInParam.Set(_showInIntersectingViews);
+            }
+
             view.ViewTemplateId = ViewTemplate.Id;
 
             // Необходимо для перезагрузки габаритов видов перед их размещением, т.к. при назначении 
@@ -210,6 +266,16 @@ internal class CalloutViewVM : SheetComponentVM {
         return view;
     }
 
+    /// <summary>
+    /// Имя вида с порядковым номером: ИмяВида_number
+    /// </summary>
+    public string GetNumberedViewName(int number) => $"{ViewName}_{number}";
+
+    /// <summary>
+    /// Размещает фрагмент под рамкой листа правее последнего размещенного фрагмента.
+    /// Номер видового экрана помечается невидимым символом фрагментов
+    /// </summary>
+    /// <returns>Созданный видовой экран или null, если вид разместить нельзя</returns>
     public Viewport Place(View view, int number) {
         var sheetInstance = Sheet.SheetInstance;
         if(sheetInstance != null
@@ -217,13 +283,10 @@ internal class CalloutViewVM : SheetComponentVM {
             && Viewport.CanAddViewToSheet(Repository.Document, sheetInstance.Id, view.Id)) {
 
             // Получение габаритов рамки листа
-            if(Repository.GetTitleBlocks(sheetInstance) is not FamilyInstance titleBlock) {
+            if(Repository.GetTitleBlock(sheetInstance) is not FamilyInstance titleBlock) {
                 return null;
             }
             var boundingBoxXYZ = titleBlock.get_BoundingBox(sheetInstance);
-            double titleBlockWidth = boundingBoxXYZ.Max.X - boundingBoxXYZ.Min.X;
-            double titleBlockHeight = boundingBoxXYZ.Max.Y - boundingBoxXYZ.Min.Y;
-
             double titleBlockMinX = boundingBoxXYZ.Min.X;
             double titleBlockMinY = boundingBoxXYZ.Min.Y;
 
