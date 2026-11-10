@@ -68,6 +68,10 @@
     <system:String x:Key="MainViewModel.NoCurves">Не выбраны линии</system:String>
     
     <system:String x:Key="SelectionService.CancelledSelectionElements">Ошибка</system:String>
+
+    <system:String x:Key="ParamService.NoValue">Нет значения</system:String>
+    <system:String x:Key="ParamService.Yes">Да</system:String>
+    <system:String x:Key="ParamService.No">Нет</system:String>
     
     <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
     <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>

@@ -10,4 +10,8 @@
 
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="ParamService.NoValue">No value</system:String>
+    <system:String x:Key="ParamService.Yes">Yes</system:String>
+    <system:String x:Key="ParamService.No">No</system:String>
 </ResourceDictionary>

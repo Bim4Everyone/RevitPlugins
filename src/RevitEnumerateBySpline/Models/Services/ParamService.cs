@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -6,6 +7,8 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SystemParams;
+using dosymep.Revit;
+using dosymep.SimpleServices;
 
 namespace RevitEnumerateBySpline.Models.Services;
 
@@ -13,16 +16,19 @@ internal class ParamService {
     private readonly RevitRepository _revitRepository;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly IRevitParamFactory _revitParamFactory;
+    private readonly ILocalizationService _localizationService;
     private readonly ICollection<ElementId> _allParamElementIds;
 
     public ParamService(
         RevitRepository revitRepository,
         SystemPluginConfig systemPluginConfig,
-        IRevitParamFactory revitParamFactory) {
+        IRevitParamFactory revitParamFactory,
+        ILocalizationService localizationService) {
 
         _revitRepository = revitRepository;
         _systemPluginConfig = systemPluginConfig;
         _revitParamFactory = revitParamFactory;
+        _localizationService = localizationService;
 
         _allParamElementIds = GetAllParamElementIds();
 
@@ -35,7 +41,134 @@ internal class ParamService {
     public RevitParam? DefaultSpatialFilterParam { get; }
     
     public string GetParamValue(SpatialModel spatialModel, RevitParam? filterParam) {
-        return spatialModel.SpatialElement.GetParamValueOrDefault<string>(filterParam, "Нет значения");
+        if(spatialModel.SpatialElement is not { } spatialElement || filterParam is null) {
+            return GetNoValueText();
+        }
+
+        if(IsLevelParameter(filterParam)) {
+            return GetLevelValue(spatialModel, spatialElement);
+        }
+
+        if(!spatialElement.IsExistsParam(filterParam)) {
+            return GetNoValueText();
+        }
+
+        TryGetParam(filterParam, spatialElement, out var parameter);
+        
+        if(parameter is null || !parameter.HasValue) {
+            return GetNoValueText();
+        }
+
+        return parameter.StorageType switch {
+            StorageType.String => spatialElement.GetParamValueOrDefault(filterParam.Name, GetNoValueText()),
+            StorageType.Double => GetDoubleValue(spatialElement, filterParam, parameter),
+            StorageType.Integer => GetIntegerValue(spatialElement, filterParam, parameter),
+            StorageType.ElementId => GetElementIdValue(spatialElement, filterParam),
+            _ => GetNoValueText()
+        };
+    }
+    
+    // Метод получения параметра по RevitParam и Element
+    private static bool TryGetParam(RevitParam revitParam, Element element, out Parameter? param) {
+        try {
+            param = revitParam.GetParam(element);
+            return param != null;
+        } catch {
+            param = null;
+            return false;
+        }
+    }
+
+    private static bool IsLevelParameter(RevitParam revitParam) {
+        return revitParam is SystemParam systemParam
+               && (systemParam.SystemParamId == BuiltInParameter.ROOM_LEVEL_ID
+                   || systemParam.SystemParamId == BuiltInParameter.LEVEL_PARAM);
+    }
+
+    private string GetLevelValue(SpatialModel spatialModel, SpatialElement spatialElement) {
+        return spatialElement.Document.GetElement(spatialElement.LevelId)?.Name
+               ?? spatialModel.LevelName
+               ?? GetNoValueText();
+    }
+
+    private string GetDoubleValue(SpatialElement spatialElement, RevitParam revitParam, Parameter parameter) {
+        double value = spatialElement.GetParamValueOrDefault(revitParam.Name, double.NaN);
+
+        if(double.IsNaN(value)) {
+            return GetNoValueText();
+        }
+        
+        try {
+            string formattedValue = UnitFormatUtils.Format(
+                spatialElement.Document.GetUnits(),
+                parameter.Definition.GetDataType(),
+                value,
+                false);
+
+            if (!string.IsNullOrWhiteSpace(formattedValue)) {
+                return formattedValue;
+            }
+        }
+        catch (Autodesk.Revit.Exceptions.ArgumentException) {
+            // Formatting is not supported for this specification.
+        }
+
+        return value.ToString(CultureInfo.CurrentCulture);
+    }
+
+    
+    private string GetIntegerValue(SpatialElement spatialElement, RevitParam revitParam, Parameter parameter) {
+        int? value = spatialElement.GetParamValueOrDefault<int?>(revitParam.Name);
+
+        if (value is null) {
+            return GetNoValueText();
+        }
+
+        if (parameter.Definition.GetDataType() == SpecTypeId.Boolean.YesNo) {
+            string key = value == 0
+                ? "ParamService.No"
+                : "ParamService.Yes";
+
+            return _localizationService.GetLocalizedString(key);
+        }
+
+        try {
+            string formattedValue = UnitFormatUtils.Format(
+                spatialElement.Document.GetUnits(),
+                parameter.Definition.GetDataType(),
+                value.Value,
+                false);
+
+            if (!string.IsNullOrWhiteSpace(formattedValue))
+                return formattedValue;
+        }
+        catch (Autodesk.Revit.Exceptions.ArgumentException) {
+            // Formatting is not supported for this specification.
+        }
+
+        return value.Value.ToString(CultureInfo.CurrentCulture);
+    }
+
+
+    private string GetElementIdValue(SpatialElement spatialElement, RevitParam revitParam) {
+        var elementId = spatialElement.GetParamValueOrDefault(revitParam.Name, ElementId.InvalidElementId);
+        if(elementId == ElementId.InvalidElementId || elementId.ToString() == "-1") {
+            return GetNoValueText();
+        }
+
+        string? elementName = spatialElement.Document.GetElement(elementId)?.Name;
+        
+        if(elementName is  null) {
+            return GetNoValueText();
+        }
+        
+        return !string.IsNullOrWhiteSpace(elementName) 
+            ? elementName 
+            : elementId.ToString();
+    }
+
+    private string GetNoValueText() {
+        return _localizationService.GetLocalizedString("ParamService.NoValue");
     }
 
     private ICollection<ElementId> GetAllParamElementIds() {
@@ -69,6 +202,4 @@ internal class ParamService {
         }
         return parameters;
     }
-
-    
 }
