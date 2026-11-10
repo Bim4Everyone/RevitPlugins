@@ -59,7 +59,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         foreach(IPylon pylon in pylons) {
             result.PylonsCount++;
 
-            string skipReason = GetSkipReason(pylon, frameParams);
+            string skipReason = GetSkipReason(pylon);
             if(skipReason != null) {
                 result.SkippedPylons.Add(FormatSkippedPylon(pylon, skipReason));
                 continue;
@@ -89,15 +89,9 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     /// <summary>
     /// Возвращает причину, по которой у пилона нельзя расставить каркасы, или null, если можно.
     /// </summary>
-    private string GetSkipReason(IPylon pylon, IFrameParams frameParams) {
+    private string GetSkipReason(IPylon pylon) {
         if(pylon.Length <= 0 || pylon.Width <= 0) {
             return _localizationService.GetLocalizedString("Report.ErrorPylonSize");
-        }
-
-        bool isFloorSlab = frameParams.HostSlab.SlabInstance.Category.GetBuiltInCategory()
-                           != BuiltInCategory.OST_StructuralFoundation;
-        if(isFloorSlab && pylon.Height <= 0) {
-            return _localizationService.GetLocalizedString("Report.ErrorPylonHeight");
         }
 
         return null;
@@ -113,16 +107,11 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     }
 
     private void CreateFrames(IPylon pylon, FamilySymbol frameSymbol, IFrameParams frameParams) {
-        XYZ location = new XYZ();
+        XYZ pylonLocation = pylon.GetLocation();
 
-        if(frameParams.HostSlab.SlabInstance.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralFoundation) {
-            location = pylon.GetLocation();
-        } else {
-            location = new XYZ(
-                pylon.GetLocation().X,
-                pylon.GetLocation().Y,
-                pylon.GetLocation().Z + pylon.Height);
-        }
+        // Плановое положение определяется пилоном, а отметка — выбранной плитой.
+        // Для нижней и верхней плиты используется ее фактический верх, независимо от высоты пилона.
+        XYZ location = new XYZ(pylonLocation.X, pylonLocation.Y, frameParams.HostSlab.TopElevation.Value);
 
         //Создаем каркас в первом направлении
         Frame frame1 = _revitRepository.CreateFrame(frameSymbol, frameParams, location);

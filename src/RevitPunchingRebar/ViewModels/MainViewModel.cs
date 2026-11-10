@@ -380,6 +380,11 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
+        if(!_slab.TopElevation.HasValue) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSlabTopFace");
+            return false;
+        }
+
         if(IsRebarCoverFromSlab && !_slab.HasRebarCover) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSlabRebarCoverMissing");
             return false;

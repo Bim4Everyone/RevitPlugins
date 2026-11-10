@@ -45,6 +45,7 @@
 
     <system:String x:Key="MainWindow.ErrorSelectPylons">Select pylons</system:String>
     <system:String x:Key="MainWindow.ErrorSelectSlab">Select a slab</system:String>
+    <system:String x:Key="MainWindow.ErrorSlabTopFace">Select a slab with a horizontal top at a single elevation: sloped and stepped slabs are not supported yet</system:String>
     <system:String x:Key="MainWindow.ErrorRebarCoverTop">Top rebar cover: enter a whole number of mm greater than 0 and not more than half the slab thickness</system:String>
     <system:String x:Key="MainWindow.ErrorRebarCoverBottom">Bottom rebar cover: enter a whole number of mm greater than 0 and not more than half the slab thickness</system:String>
     <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">The slab has no top or bottom rebar cover assigned</system:String>

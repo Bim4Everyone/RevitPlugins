@@ -45,6 +45,7 @@
 
     <system:String x:Key="MainWindow.ErrorSelectPylons">Выберите пилоны</system:String>
     <system:String x:Key="MainWindow.ErrorSelectSlab">Выберите плиту</system:String>
+    <system:String x:Key="MainWindow.ErrorSlabTopFace">Выберите плиту с горизонтальным верхом на одной отметке: наклонные и разноуровневые плиты пока не поддерживаются</system:String>
     <system:String x:Key="MainWindow.ErrorRebarCoverTop">Защитный слой сверху: нужно целое число мм больше 0 и не больше половины толщины плиты</system:String>
     <system:String x:Key="MainWindow.ErrorRebarCoverBottom">Защитный слой снизу: нужно целое число мм больше 0 и не больше половины толщины плиты</system:String>
     <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">У плиты не назначен защитный слой сверху или снизу</system:String>
