@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 using Autodesk.Revit.DB;
 
 namespace RevitEnumerateBySpline.Models.Services;
@@ -10,7 +14,7 @@ internal sealed class SplineSpatialIntersectionService {
         UnitUtils.ConvertToInternalUnits(10, UnitTypeId.Millimeters);
 
     public IReadOnlyList<SpatialSegmentIntersection> FindIntersections(
-        IEnumerable<SpatialModel?> spatialModels,
+        List<SpatialModel?> spatialModels,
         IReadOnlyList<SplineSegment> segments) {
 
         var intersections = new List<SpatialSegmentIntersection>();

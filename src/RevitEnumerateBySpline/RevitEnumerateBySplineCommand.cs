@@ -20,6 +20,7 @@ using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Services;
 using RevitEnumerateBySpline.Providers;
 using RevitEnumerateBySpline.ViewModels;
+using RevitEnumerateBySpline.ViewModels.Warnings;
 using RevitEnumerateBySpline.Views;
 
 using Wpf.Ui.Abstractions;
@@ -84,6 +85,10 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         kernel.Bind<IEnumerateBySpline>()
             .To<EnumerateBySpline>()
             .InSingletonScope();
+
+        kernel.Bind<SpatialElementCheckService>()
+            .ToSelf()
+            .InSingletonScope();
         
         // Настройка доступа к RangeViewModel
         kernel.Bind<RangeViewModel>()
@@ -139,6 +144,7 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
 
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
+        kernel.BindOtherWindow<WarningsViewModel, WarningsWindow>();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -176,6 +182,11 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
                 mainWindow = CreateMainWindow(kernel, mainViewModel);
                 windowService.SetMainWindow(mainWindow);
                 continue;
+            }
+
+            if(mainWindow.DialogAction == MainWindowAction.ShowWarnings) {
+                windowService.ShowWarnings();
+                return;
             }
 
             if(dialogResult == false) {

@@ -18,6 +18,17 @@
     <system:String x:Key="MainViewModel.SearchKeyRequired">Enter the keyword used to find parking spaces</system:String>
     <system:String x:Key="MainViewModel.DependentSearchParamRequired">Select the main parking space parameter</system:String>
 
+    <system:String x:Key="WarningsViewModel.Redundant">Redundant rooms</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Rooms in the same enclosed area</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Unenclosed or unplaced rooms</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Rooms without boundaries or without a location on a plan</system:String>
+    <system:String x:Key="WarningWindow.Title">Enumerate by spline — warnings</system:String>
+    <system:String x:Key="WarningWindow.ShowHeader">Select</system:String>
+    <system:String x:Key="WarningWindow.ElementIdHeader">Room ID</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Room name</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Room level</system:String>
+    <system:String x:Key="RevitRepository.NoLevel">— No level —</system:String>
+
     <system:String x:Key="ParamService.NoValue">No value</system:String>
     <system:String x:Key="ParamService.Yes">Yes</system:String>
     <system:String x:Key="ParamService.No">No</system:String>

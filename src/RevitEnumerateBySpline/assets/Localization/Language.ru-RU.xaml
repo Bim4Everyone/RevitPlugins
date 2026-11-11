@@ -72,6 +72,17 @@
     <system:String x:Key="MainViewModel.DependentParamRequired">Выберите параметр для поиска машино-места</system:String>
     <system:String x:Key="MainViewModel.SearchKeyRequired">Введите ключевое слово для поиска машино-мест</system:String>
     <system:String x:Key="MainViewModel.DependentSearchParamRequired">Выберите параметр основного машино-места</system:String>
+
+    <system:String x:Key="WarningsViewModel.Redundant">Избыточные помещения</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Помещения, расположенные в одной ограждённой области</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Неограждённые или неразмещённые помещения</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Помещения без границ или без размещения на плане</system:String>
+    <system:String x:Key="WarningWindow.Title">Нумератор по линии — предупреждения</system:String>
+    <system:String x:Key="WarningWindow.ShowHeader">Выделить</system:String>
+    <system:String x:Key="WarningWindow.ElementIdHeader">ИД помещения</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Имя помещения</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Уровень помещения</system:String>
+    <system:String x:Key="RevitRepository.NoLevel">— Нет уровня —</system:String>
     
     <system:String x:Key="SelectionService.CancelledSelectionElements">Ошибка</system:String>
 

@@ -23,6 +23,8 @@ internal class MainViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private readonly ParamService _paramService;
     private readonly IEnumerateBySpline _enumerateBySpline;
+    private readonly SpatialElementCheckService _spatialElementCheckService;
+    private readonly WindowService _windowService;
     private readonly string _saveProperty = string.Empty;
 
     private ConfigSettings? _configSettings;
@@ -44,6 +46,8 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="parkingSpaceParamSettingsViewModel"></param>
     /// <param name="paramService"></param>
     /// <param name="enumerateBySpline"></param>
+    /// <param name="spatialElementCheckService"></param>
+    /// <param name="windowService"></param>
     public MainViewModel(
         PluginConfig pluginConfig,
         SystemPluginConfig systemPluginConfig,
@@ -55,7 +59,9 @@ internal class MainViewModel : BaseViewModel {
         CommonParamSettingsViewModel commonParamSettingsViewModel,
         ParkingSpaceParamSettingsViewModel parkingSpaceParamSettingsViewModel,
         ParamService paramService,
-        IEnumerateBySpline enumerateBySpline) {
+        IEnumerateBySpline enumerateBySpline,
+        SpatialElementCheckService spatialElementCheckService,
+        WindowService windowService) {
 
         _pluginConfig = pluginConfig;
         _systemPluginConfig = systemPluginConfig;
@@ -68,6 +74,8 @@ internal class MainViewModel : BaseViewModel {
         ParkingSpaceParamSettingsViewModel = parkingSpaceParamSettingsViewModel;
         _paramService = paramService;
         _enumerateBySpline = enumerateBySpline;
+        _spatialElementCheckService = spatialElementCheckService;
+        _windowService = windowService;
         RangeViewModel = rangeViewModel;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -130,6 +138,12 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void AcceptView() {
         var settings = BuildSettings();
+        var warnings = _spatialElementCheckService.CheckSpatialElements(settings.SpatialModels ?? []);
+        if(warnings.Count != 0) {
+            _windowService.RequestWarnings(warnings);
+            return;
+        }
+
         _enumerateBySpline.Enumerate(settings);
         SaveConfig();
     }

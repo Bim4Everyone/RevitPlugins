@@ -12,7 +12,8 @@ namespace RevitEnumerateBySpline.Views;
 
 internal enum MainWindowAction {
     None,
-    SelectCurves
+    SelectCurves,
+    ShowWarnings
 }
 
 /// <summary>
@@ -54,6 +55,10 @@ public partial class MainWindow {
     internal void RequestCurveSelection() {
         DialogAction = MainWindowAction.SelectCurves;
         DialogResult = false;
+    }
+
+    internal void RequestWarnings() {
+        DialogAction = MainWindowAction.ShowWarnings;
     }
     
     

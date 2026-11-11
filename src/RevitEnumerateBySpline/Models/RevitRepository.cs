@@ -73,6 +73,10 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
     public bool HasRoomsOnCurrentView() {
         return ActiveViewSpatialModels.Any();
     }
+
+    public void SetSelected(ElementId elementId) {
+        ActiveUiDocument.SetSelectedElements([elementId]);
+    }
     
     /// <summary>
     /// Метод получения всех помещений 
@@ -102,11 +106,11 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
     // Получение уровня помещения
     private string GetLevelName(SpatialElement? spatialElement) {
         if(spatialElement is null) {
-            localizationService.GetLocalizedString("RevitRepository.NoLevel");
+            return localizationService.GetLocalizedString("RevitRepository.NoLevel");
         }
-        var levelId = spatialElement?.LevelId;
+        var levelId = spatialElement.LevelId;
         if(levelId == ElementId.InvalidElementId) {
-            localizationService.GetLocalizedString("RevitRepository.NoLevel");
+            return localizationService.GetLocalizedString("RevitRepository.NoLevel");
         }
         return Document.GetElement(levelId)?.Name
                ?? localizationService.GetLocalizedString("RevitRepository.NoLevel");
