@@ -43,7 +43,7 @@ internal class RangeViewModel(
         SelectedRange = ResolveDefaultRange() ?? Range.FirstOrDefault();
     }
 
-    // Метод получения коллекции ElementsProviderViewModel для RangeElements
+    // Создаёт варианты диапазона.
     private IEnumerable<ElementsProviderViewModel> GetElementsProviderViewModels() {
         var providers = Enum.GetValues(typeof(ElementsProviderType)).Cast<ElementsProviderType>();
         return providers
@@ -53,7 +53,7 @@ internal class RangeViewModel(
             });
     }
     
-    // Метод получения ElementsProviderViewModel по умолчанию
+    // Выбирает исходный диапазон.
     private ElementsProviderViewModel? ResolveDefaultRange() {
         return revitRepository.HasSelectedRooms()
             ? Range?.FirstOrDefault(x => x.ElementsProvider?.Type == ElementsProviderType.SelectedElementsProvider)

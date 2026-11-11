@@ -8,11 +8,11 @@ namespace RevitEnumerateBySpline.Models.Interfaces;
 
 internal interface IElementsProvider {
     /// <summary>
-    /// Тип провайдера элементов
+    /// Тип источника помещений.
     /// </summary>        
     ElementsProviderType Type { get; }
     /// <summary>
-    /// Метод получения элементов модели по стадиям
+    /// Возвращает помещения выбранного диапазона.
     /// </summary>
     List<SpatialModel> GetSpatialElements();
 }

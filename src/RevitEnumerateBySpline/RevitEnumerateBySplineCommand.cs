@@ -70,24 +70,24 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
             .InSingletonScope();
         
         // Настройка доступа к классу параметров
-        kernel.Bind<ParamService>()
-            .ToSelf()
+        kernel.Bind<IParamService>()
+            .To<ParamService>()
             .InSingletonScope();
 
-        kernel.Bind<SplineDividerService>()
-            .ToSelf()
+        kernel.Bind<ISplineDividerService>()
+            .To<SplineDividerService>()
             .InSingletonScope();
 
-        kernel.Bind<SplineSpatialIntersectionService>()
-            .ToSelf()
+        kernel.Bind<ISplineSpatialIntersectionService>()
+            .To<SplineSpatialIntersectionService>()
             .InSingletonScope();
 
         kernel.Bind<IEnumerateBySpline>()
             .To<EnumerateBySpline>()
             .InSingletonScope();
 
-        kernel.Bind<SpatialElementCheckService>()
-            .ToSelf()
+        kernel.Bind<ISpatialElementCheckService>()
+            .To<SpatialElementCheckService>()
             .InSingletonScope();
         
         // Настройка доступа к RangeViewModel
@@ -125,8 +125,8 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
             .InSingletonScope();
         
         // Настройка доступа к классу параметров
-        kernel.Bind<WindowService>()
-            .ToSelf()
+        kernel.Bind<IWindowService>()
+            .To<WindowService>()
             .InSingletonScope();
         
         // Настройка доступа к классу мессенджера
@@ -135,8 +135,8 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
             .InSingletonScope();
         
         // Настройка доступа к RevitPickService
-        kernel.Bind<SelectionService>()
-            .ToSelf()
+        kernel.Bind<ISelectionService>()
+            .To<SelectionService>()
             .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
@@ -159,14 +159,15 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         ShowMainWindowLoop(kernel);
     }
 
+    // Управляет циклом главного окна.
     private void ShowMainWindowLoop(IKernel kernel) {
         var mainWindow = kernel.Get<MainWindow>();
         var mainViewModel = mainWindow.DataContext as MainViewModel
                             ?? kernel.Get<MainViewModel>();
         var curveModelsViewModel = mainViewModel.CurveModelsViewModel;
-        var selectionService = kernel.Get<SelectionService>();
+        var selectionService = kernel.Get<ISelectionService>();
         var revitRepository = kernel.Get<RevitRepository>();
-        var windowService = kernel.Get<WindowService>();
+        var windowService = kernel.Get<IWindowService>();
 
         windowService.SetMainWindow(mainWindow);
 
@@ -201,6 +202,7 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         }
     }
 
+    // Создаёт окно с текущей моделью.
     private static MainWindow CreateMainWindow(IKernel kernel, MainViewModel mainViewModel) {
         return new MainWindow(
             kernel.Get<INavigationViewPageProvider>(),

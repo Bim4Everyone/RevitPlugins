@@ -8,13 +8,14 @@ using Autodesk.Revit.DB;
 using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
+using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Services;
 using RevitEnumerateBySpline.Models.Settings;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
 internal class CommonParamSettingsViewModel : BaseViewModel {
-    private readonly ParamService _paramService;
+    private readonly IParamService _paramService;
     private readonly RevitRepository _revitRepository;
     private ObservableCollection<ParamViewModel>? _numberParams;
     private ParamViewModel? _selectedNumberParam;
@@ -23,7 +24,7 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
     private string? _suffix;
 
     public CommonParamSettingsViewModel(
-        ParamService paramService,
+        IParamService paramService,
         RevitRepository revitRepository) {
         _paramService = paramService;
         _revitRepository = revitRepository;
@@ -65,6 +66,7 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _suffix, value);
     }
 
+    /// <summary>Загружает параметры нумерации в форму.</summary>
     public void LoadView(ConfigSettings? settings) {
         NumberParams = new ObservableCollection<ParamViewModel>(GetNumberParamViewModels());
         SelectedNumberParam = NumberParams
@@ -76,6 +78,7 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
         Suffix = settings?.Suffix;
     } 
     
+    // Получает доступные параметры номера.
     private IEnumerable<ParamViewModel> GetNumberParamViewModels() {
         var spatialElements = _revitRepository.AllSpatialModels;
 

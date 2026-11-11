@@ -11,9 +11,11 @@ using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
+using RevitEnumerateBySpline.Models.Interfaces;
+
 namespace RevitEnumerateBySpline.Models.Services;
 
-internal class ParamService {
+internal class ParamService : IParamService {
     private readonly RevitRepository _revitRepository;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly IRevitParamFactory _revitParamFactory;
@@ -86,18 +88,21 @@ internal class ParamService {
         }
     }
 
+    // Определяет параметр уровня.
     private static bool IsLevelParameter(RevitParam revitParam) {
         return revitParam is SystemParam systemParam
                && (systemParam.SystemParamId == BuiltInParameter.ROOM_LEVEL_ID
                    || systemParam.SystemParamId == BuiltInParameter.LEVEL_PARAM);
     }
 
+    // Возвращает имя уровня помещения.
     private string GetLevelValue(SpatialModel spatialModel, SpatialElement spatialElement) {
         return spatialElement.Document.GetElement(spatialElement.LevelId)?.Name
                ?? spatialModel.LevelName
                ?? GetNoValueText();
     }
 
+    // Форматирует числовой параметр.
     private string GetDoubleValue(SpatialElement spatialElement, RevitParam revitParam, Parameter parameter) {
         double value = spatialElement.GetParamValueOrDefault(revitParam.Name, double.NaN);
 
@@ -124,6 +129,7 @@ internal class ParamService {
     }
 
     
+    // Форматирует целочисленный параметр.
     private string GetIntegerValue(SpatialElement spatialElement, RevitParam revitParam, Parameter parameter) {
         int? value = spatialElement.GetParamValueOrDefault<int?>(revitParam.Name);
 
@@ -157,6 +163,7 @@ internal class ParamService {
     }
 
 
+    // Возвращает значение параметра-ссылки.
     private string GetElementIdValue(SpatialElement spatialElement, RevitParam revitParam) {
         var elementId = spatialElement.GetParamValueOrDefault(revitParam.Name, ElementId.InvalidElementId);
         if(elementId == ElementId.InvalidElementId || elementId.ToString() == "-1") {
@@ -174,10 +181,12 @@ internal class ParamService {
             : elementId.ToString();
     }
 
+    // Возвращает текст отсутствующего значения.
     private string GetNoValueText() {
         return _localizationService.GetLocalizedString("ParamService.NoValue");
     }
 
+    // Собирает идентификаторы параметров помещений.
     private ICollection<ElementId> GetAllParamElementIds() {
         var categoryId = new ElementId(BuiltInCategory.OST_Rooms);
 
@@ -185,18 +194,21 @@ internal class ParamService {
             .GetFilterableParametersInCommon(_revitRepository.Document, [categoryId]);
     }
 
+    // Находит параметр имени по умолчанию.
     private RevitParam? GetDefaultNameParam() {
         return AllSpatialRevitParams
             .OfType<SystemParam>()
             .FirstOrDefault(x => x.SystemParamId == _systemPluginConfig.SystemRoomNameParamId);
     }
     
+    // Находит параметр номера по умолчанию.
     private RevitParam? GetDefaultNumberParam() {
         return AllSpatialRevitParams
             .OfType<SystemParam>()
             .FirstOrDefault(x => x.SystemParamId == _systemPluginConfig.SystemRoomNumberParamId);
     }
 
+    // Создаёт список доступных параметров Revit.
     private List<RevitParam> GetAllRevitParams() {
         if(_allParamElementIds.Count == 0) {
             return [];

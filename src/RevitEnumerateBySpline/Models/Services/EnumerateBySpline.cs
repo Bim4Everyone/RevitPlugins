@@ -10,8 +10,8 @@ namespace RevitEnumerateBySpline.Models.Services;
 /// Управляет подготовкой упорядоченных помещений для нумерации по линиям.
 /// </summary>
 internal sealed class EnumerateBySpline(
-    SplineDividerService splineDividerService,
-    SplineSpatialIntersectionService intersectionService) : IEnumerateBySpline {
+    ISplineDividerService splineDividerService,
+    ISplineSpatialIntersectionService intersectionService) : IEnumerateBySpline {
 
     public IReadOnlyList<SpatialSegmentIntersection> OrderedIntersections { get; private set; } = [];
 

@@ -15,6 +15,7 @@ internal class ExternalRevitHandler : IExternalEventHandler {
         _externalEvent = ExternalEvent.Create(this);
     }
 
+    /// <summary>Ставит действие в очередь внешнего события Revit.</summary>
     public void Raise(Action<UIApplication> action) {
         if(action == null) {
             throw new ArgumentNullException(nameof(action));
@@ -26,6 +27,7 @@ internal class ExternalRevitHandler : IExternalEventHandler {
         _externalEvent.Raise();
     }
 
+    /// <summary>Выполняет действие через внешнее событие и возвращает задачу.</summary>
     public Task RaiseAsync(Action<UIApplication> action) {
         if(action == null) {
             throw new ArgumentNullException(nameof(action));
@@ -46,6 +48,7 @@ internal class ExternalRevitHandler : IExternalEventHandler {
         return tcs.Task;
     }
 
+    /// <summary>Выполняет функцию через внешнее событие и возвращает результат.</summary>
     public Task<T> RaiseAsync<T>(Func<UIApplication, T> func) {
         if(func == null) {
             throw new ArgumentNullException(nameof(func));

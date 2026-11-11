@@ -26,6 +26,7 @@ internal sealed class WarningsViewModel {
     public int WarningQuantity { get; private set; }
     public IReadOnlyList<WarningGroupViewModel> WarningViewModels { get; private set; } = [];
 
+    /// <summary>Группирует предупреждения для отображения.</summary>
     public void LoadView(IReadOnlyCollection<WarningElement> warnings) {
         WarningQuantity = warnings.Count;
         WarningViewModels = warnings
@@ -39,6 +40,7 @@ internal sealed class WarningsViewModel {
             .ToList();
     }
 
+    // Выделяет помещение в Revit.
     private void ShowElement(ElementId elementId) {
         _revitRepository.SetSelected(elementId);
     }

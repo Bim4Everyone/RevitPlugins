@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using Ninject;
 using Ninject.Syntax;
 
+using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Warnings;
 using RevitEnumerateBySpline.ViewModels.Warnings;
 using RevitEnumerateBySpline.Views;
 
 namespace RevitEnumerateBySpline.Models.Services;
 
-internal class WindowService(IResolutionRoot resolutionRoot) {
+internal class WindowService(IResolutionRoot resolutionRoot) : IWindowService {
     private MainWindow? _mainWindow;
     private IReadOnlyCollection<WarningElement> _pendingWarnings = [];
 

@@ -15,7 +15,7 @@ using RevitEnumerateBySpline.Models.Services;
 namespace RevitEnumerateBySpline.ViewModels;
 
 internal class SpatialModelsViewModel : BaseViewModel {
-    private readonly ParamService _paramService;
+    private readonly IParamService _paramService;
     private readonly SystemPluginConfig _systemPluginConfig;
     private ObservableCollection<ParamViewModel>? _filterParameterViewModels;
     private ParamViewModel? _selectedFilterParameterViewModel;
@@ -24,7 +24,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
     private ObservableCollection<SpatialModelViewModel>? _filteredSpatialModelViewModels;
     private bool _isNotSelected = true;
 
-    public SpatialModelsViewModel(ParamService paramService, SystemPluginConfig systemPluginConfig, IMessenger messenger) {
+    public SpatialModelsViewModel(IParamService paramService, SystemPluginConfig systemPluginConfig, IMessenger messenger) {
         _paramService = paramService;
         _systemPluginConfig = systemPluginConfig;
 
@@ -75,14 +75,14 @@ internal class SpatialModelsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _isNotSelected, value);
     }
 
-    // Метод сброса фильтра на значение по умолчанию
+    // Сбрасывает фильтр.
     private void ResetFilter() {
         SelectedFilterParameterViewModel = FilterParameterViewModels?
             .FirstOrDefault(param => param?.RevitParam?.Id == _paramService.DefaultSpatialNameParam?.Id) 
             ?? FilterParameterViewModels?.FirstOrDefault();
     }
     
-    // Метод команды на выделение всех помещений
+    // Выбирает все помещения.
     private void SelectAll() {
         if(FilteredSpatialModelViewModels == null) {
             return;
@@ -92,7 +92,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
         }
     }
 
-    // Метод команды на снятие выделения всех помещений
+    // Снимает выбор помещений.
     private void ClearSelections() {
         if(FilteredSpatialModelViewModels == null) {
             return;
@@ -102,7 +102,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
         }
     }
     
-    // Метод для реализации поиска в списке помещений
+    // Фильтрует список помещений.
     private void ApplySearch() {
         if(SpatialModelViewModels != null) {
             FilteredSpatialModelViewModels = string.IsNullOrEmpty(SearchText)
@@ -112,7 +112,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
                         .IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0) ?? []);
         }
     }
-    // Метод создания FilterParameterViewModels
+    // Загружает параметры фильтра.
     private void LoadFilterParameterViewModels() {
         FilterParameterViewModels = new ObservableCollection<ParamViewModel>(GetFilterParamViewModels());
         SelectedFilterParameterViewModel = FilterParameterViewModels
@@ -120,7 +120,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
             ?? FilterParameterViewModels.FirstOrDefault();
     }
     
-    // Метод получения коллекции ParamViewModel для FilterParameterViewModels
+    // Создаёт параметры фильтра.
     private IEnumerable<ParamViewModel> GetFilterParamViewModels() {
         return _paramService.AllSpatialRevitParams
             .Select(param => new ParamViewModel {
@@ -129,20 +129,20 @@ internal class SpatialModelsViewModel : BaseViewModel {
             });
     }
         
-    // Метод, подписанный на сообщение смены диапазона помещений
+    // Обрабатывает смену диапазона.
     private void OnRangeChanged(RangeChangedMessage message) {
         var provider = message.Provider;
         LoadSpatialModelViewModels(provider);
         UpdateSpatialViewModelNames();
     }
     
-    // Метод создания SpatialModelViewModels из помещений
+    // Загружает помещения диапазона.
     private void LoadSpatialModelViewModels(IElementsProvider? elementsProvider) {
         SpatialModelViewModels = new ObservableCollection<SpatialModelViewModel>(GetSpatialModelViewModels(elementsProvider));
         FilteredSpatialModelViewModels = new ObservableCollection<SpatialModelViewModel>(SpatialModelViewModels);
     } 
     
-    // Метод получения коллекции SpatialModelViewModel для SpatialModelViewModels
+    // Создаёт модели помещений.
     private IEnumerable<SpatialModelViewModel> GetSpatialModelViewModels(IElementsProvider? elementsProvider) {
         var spatialModels = elementsProvider?.GetSpatialElements();
         if(spatialModels?.Count == 0) {
@@ -156,7 +156,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
         }) ?? [];
     }
     
-    // Метод, подписанный на изменение параметра фильтрации
+    // Обрабатывает смену фильтра.
     private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
         if(e.PropertyName != nameof(SelectedFilterParameterViewModel)) {
             return;
@@ -164,7 +164,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
         UpdateSpatialViewModelNames();
     }
     
-    // Метод обновления значений помещений
+    // Обновляет подписи помещений.
     private void UpdateSpatialViewModelNames() {
         if(SpatialModelViewModels == null) {
             return;

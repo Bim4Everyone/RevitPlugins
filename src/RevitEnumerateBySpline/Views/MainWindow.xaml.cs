@@ -52,16 +52,19 @@ public partial class MainWindow {
 
     internal MainWindowAction DialogAction { get; private set; }
 
+    /// <summary>Закрывает окно для выбора линий в Revit.</summary>
     internal void RequestCurveSelection() {
         DialogAction = MainWindowAction.SelectCurves;
         DialogResult = false;
     }
 
+    /// <summary>Помечает окно для показа предупреждений.</summary>
     internal void RequestWarnings() {
         DialogAction = MainWindowAction.ShowWarnings;
     }
     
     
+    // Закрывает окно после выполнения команды.
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogAction = MainWindowAction.None;
 
@@ -72,6 +75,7 @@ public partial class MainWindow {
             new Action(() => DialogResult = true));
     }
 
+    // Отменяет работу окна.
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
         DialogAction = MainWindowAction.None;
         DialogResult = false;

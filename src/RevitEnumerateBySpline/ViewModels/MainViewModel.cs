@@ -21,10 +21,10 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
-    private readonly ParamService _paramService;
+    private readonly IParamService _paramService;
     private readonly IEnumerateBySpline _enumerateBySpline;
-    private readonly SpatialElementCheckService _spatialElementCheckService;
-    private readonly WindowService _windowService;
+    private readonly ISpatialElementCheckService _spatialElementCheckService;
+    private readonly IWindowService _windowService;
     private readonly string _saveProperty = string.Empty;
 
     private ConfigSettings? _configSettings;
@@ -58,10 +58,10 @@ internal class MainViewModel : BaseViewModel {
         CurveModelsViewModel curveModelsViewModel,
         CommonParamSettingsViewModel commonParamSettingsViewModel,
         ParkingSpaceParamSettingsViewModel parkingSpaceParamSettingsViewModel,
-        ParamService paramService,
+        IParamService paramService,
         IEnumerateBySpline enumerateBySpline,
-        SpatialElementCheckService spatialElementCheckService,
-        WindowService windowService) {
+        ISpatialElementCheckService spatialElementCheckService,
+        IWindowService windowService) {
 
         _pluginConfig = pluginConfig;
         _systemPluginConfig = systemPluginConfig;
@@ -116,9 +116,7 @@ internal class MainViewModel : BaseViewModel {
     public CommonParamSettingsViewModel CommonParamSettingsViewModel { get; set; }
     public ParkingSpaceParamSettingsViewModel ParkingSpaceParamSettingsViewModel { get; set; }
 
-    /// <summary>
-    /// Метод загрузки главного окна.
-    /// </summary>
+    // Загружает данные главного окна.
     private void LoadView() {
         // Окно пересоздаётся после выбора линий, но ViewModel остаётся той же.
         // Повторная загрузка сбрасывает выбранный диапазон, помещения и параметры.
@@ -133,9 +131,7 @@ internal class MainViewModel : BaseViewModel {
         _isViewInitialized = true;
     }
 
-    /// <summary>
-    /// Метод применения настроек главного окна. (выполнение плагина)
-    /// </summary>
+    // Проверяет помещения и запускает нумерацию.
     private void AcceptView() {
         var settings = BuildSettings();
         var warnings = _spatialElementCheckService.CheckSpatialElements(settings.SpatialModels ?? []);
@@ -148,10 +144,7 @@ internal class MainViewModel : BaseViewModel {
         SaveConfig();
     }
 
-    /// <summary>
-    /// Метод проверки возможности выполнения команды применения настроек.
-    /// </summary>
-    /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
+    // Проверяет готовность настроек к запуску.
     private bool CanAcceptView() {
         if(RangeViewModel.SelectedRange?.ElementsProvider is null) {
             return SetValidationError("MainViewModel.RangeRequired", hasCommonSettingsErrors: true);
@@ -203,6 +196,7 @@ internal class MainViewModel : BaseViewModel {
         return true;
     }
 
+    // Показывает ошибку настройки.
     private bool SetValidationError(string errorKey, bool hasCommonSettingsErrors) {
         ErrorText = _localizationService.GetLocalizedString(errorKey);
         HasCommonSettingsErrors = hasCommonSettingsErrors;
@@ -210,16 +204,14 @@ internal class MainViewModel : BaseViewModel {
         return false;
     }
 
-    /// <summary>
-    /// Загрузка настроек плагина.
-    /// </summary>
+    // Загружает настройки проекта.
     private void LoadConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
         _configSettings = setting?.ConfigSettings ?? new ConfigSettings();
         ApplyDefaultsConfig();
     }
 
-    // Метод применения дефолтных значений настроек.
+    // Применяет настройки по умолчанию.
     private void ApplyDefaultsConfig() {
         _configSettings?.NumberParam ??= _paramService.DefaultSpatialNumberParam;
         _configSettings?.StartNumber ??= _systemPluginConfig.DefaultStartNumber;
@@ -230,9 +222,7 @@ internal class MainViewModel : BaseViewModel {
         _configSettings?.DependentSearchParam ??= _paramService.DefaultDependentSearchParam;
     }
 
-    /// <summary>
-    /// Сохранение основных настроек плагина.
-    /// </summary>
+    // Собирает настройки нумерации.
     private EnumerateBySplineSettings BuildSettings() {
         _enumerateBySplineSettings = new EnumerateBySplineSettings {
             ConfigSettings = new ConfigSettings {
@@ -255,9 +245,7 @@ internal class MainViewModel : BaseViewModel {
         return _enumerateBySplineSettings;
     }
 
-    /// <summary>
-    /// Сохранение сохраняемых настроек плагина.
-    /// </summary>
+    // Сохраняет настройки проекта.
     private void SaveConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                       ?? _pluginConfig.AddSettings(_revitRepository.Document);

@@ -4,12 +4,14 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitEnumerateBySpline.Models.Interfaces;
+
 namespace RevitEnumerateBySpline.Models.Services;
 
 /// <summary>
 /// Находит первое пересечение каждого помещения с последовательностью сегментов.
 /// </summary>
-internal sealed class SplineSpatialIntersectionService {
+internal sealed class SplineSpatialIntersectionService : ISplineSpatialIntersectionService {
     private static readonly double _boundingBoxTolerance =
         UnitUtils.ConvertToInternalUnits(10, UnitTypeId.Millimeters);
 
@@ -52,6 +54,7 @@ internal sealed class SplineSpatialIntersectionService {
         return intersections;
     }
 
+    // Отсекает сегменты вне габаритов помещения.
     private static bool IsOutsideBoundingBox(Line segment, BoundingBoxXYZ boundingBox) {
         XYZ start = segment.GetEndPoint(0);
         XYZ end = segment.GetEndPoint(1);
@@ -62,6 +65,7 @@ internal sealed class SplineSpatialIntersectionService {
             || Math.Min(start.Y, end.Y) > boundingBox.Max.Y + _boundingBoxTolerance;
     }
 
+    // Проверяет пересечение двух кривых.
     private static bool Intersects(Curve boundaryCurve, Curve segmentCurve) {
         var result = boundaryCurve.Intersect(segmentCurve);
         return result is SetComparisonResult.Overlap

@@ -5,11 +5,12 @@ using Autodesk.Revit.DB.Architecture;
 using dosymep.Revit;
 
 using RevitEnumerateBySpline.Models.Enums;
+using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Warnings;
 
 namespace RevitEnumerateBySpline.Models.Services;
 
-internal sealed class SpatialElementCheckService {
+internal sealed class SpatialElementCheckService : ISpatialElementCheckService {
     public IReadOnlyList<WarningElement> CheckSpatialElements(IEnumerable<SpatialModel?> spatialModels) {
         var warnings = new List<WarningElement>();
 

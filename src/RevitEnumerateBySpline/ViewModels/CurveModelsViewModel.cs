@@ -12,17 +12,18 @@ using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
+using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Services;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
 internal class CurveModelsViewModel : BaseViewModel {
-    private readonly WindowService _windowService;
+    private readonly IWindowService _windowService;
     private CurveModelViewModel? _selectedCurveModelViewModel;
     private ObservableCollection<CurveModelViewModel> _curveModelViewModels = [];
 
     public CurveModelsViewModel(
-        WindowService windowService) {
+        IWindowService windowService) {
         _windowService = windowService;
         
         SelectCurvesCommand = RelayCommand.Create(SelectCurves);
@@ -48,10 +49,12 @@ internal class CurveModelsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _curveModelViewModels, value);
     }
 
+    // Запрашивает выбор линий.
     private void SelectCurves() {
         _windowService.RequestCurveSelection();
     }
 
+    /// <summary>Добавляет выбранные линии без повторов.</summary>
     public void AddCurves(IEnumerable<CurveModel> curves) {
         foreach(var curve in curves) {
             if(curve is null || CurveModelViewModels.Any(x => x.CurveModel?.ElementId == curve.ElementId)) {
@@ -64,6 +67,7 @@ internal class CurveModelsViewModel : BaseViewModel {
         }
     }
     
+    // Удаляет выбранную линию.
     private void DeleteCurve() {
         if(SelectedCurveModelViewModel is null) {
             return;
@@ -78,6 +82,7 @@ internal class CurveModelsViewModel : BaseViewModel {
             : CurveModelViewModels[Math.Min(index, CurveModelViewModels.Count - 1)];
     }
 
+    // Сдвигает линию вниз.
     private void MoveDownCurve() {
         if(SelectedCurveModelViewModel is null) {
             return;
@@ -89,6 +94,7 @@ internal class CurveModelsViewModel : BaseViewModel {
         CurveModelViewModels.Move(index, index + 1);
     }
 
+    // Сдвигает линию вверх.
     private void MoveUpCurve() {
         if(SelectedCurveModelViewModel is null) {
             return;
@@ -100,6 +106,7 @@ internal class CurveModelsViewModel : BaseViewModel {
         CurveModelViewModels.Move(index, index - 1);
     }
 
+    // Удаляет все линии.
     private void DeleteAllCurves() {
         CurveModelViewModels.Clear();
         SelectedCurveModelViewModel = null;

@@ -6,6 +6,7 @@ using System.Linq;
 using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models.Services;
+using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Settings;
 
 namespace RevitEnumerateBySpline.ViewModels;
@@ -17,9 +18,9 @@ internal class ParkingSpaceParamSettingsViewModel : BaseViewModel {
     private ObservableCollection<ParamViewModel>? _dependentSearchParams;
     private ParamViewModel? _selectedDependentSearchParam;
     private string? _searchKey;
-    private readonly ParamService _paramService;
+    private readonly IParamService _paramService;
 
-    public ParkingSpaceParamSettingsViewModel(ParamService paramService) {
+    public ParkingSpaceParamSettingsViewModel(IParamService paramService) {
         _paramService = paramService;
     }
 
@@ -48,6 +49,7 @@ internal class ParkingSpaceParamSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _searchKey, value);
     }
 
+    /// <summary>Загружает параметры машино-мест в форму.</summary>
     public void LoadView(ConfigSettings? settings) {
         DependentParams = new ObservableCollection<ParamViewModel>(GetParamViewModels());
         SelectedDependentParam = DependentParams
@@ -62,7 +64,7 @@ internal class ParkingSpaceParamSettingsViewModel : BaseViewModel {
             ?? DependentSearchParams.FirstOrDefault();
     } 
     
-    // Метод получения коллекции ParamViewModel для DependentParams, DependentSearchParams
+    // Получает параметры помещений.
     private IEnumerable<ParamViewModel> GetParamViewModels() {
         return _paramService.AllSpatialRevitParams
             .Select(param => new ParamViewModel {

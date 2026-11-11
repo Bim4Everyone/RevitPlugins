@@ -3,12 +3,14 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using RevitEnumerateBySpline.Models.Interfaces;
+
 namespace RevitEnumerateBySpline.Models.Services;
 
 /// <summary>
 /// Разбивает линии на отрезки в порядке, заданном в интерфейсе.
 /// </summary>
-internal sealed class SplineDividerService {
+internal sealed class SplineDividerService : ISplineDividerService {
     private static readonly double _maxSegmentLength =
         UnitUtils.ConvertToInternalUnits(10, UnitTypeId.Millimeters);
 

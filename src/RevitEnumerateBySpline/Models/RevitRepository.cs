@@ -74,13 +74,12 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
         return ActiveViewSpatialModels.Any();
     }
 
+    /// <summary>Выделяет помещение в активном документе.</summary>
     public void SetSelected(ElementId elementId) {
         ActiveUiDocument.SetSelectedElements([elementId]);
     }
     
-    /// <summary>
-    /// Метод получения всех помещений 
-    /// </summary>
+    // Получает все помещения документа.
     private List<SpatialElement> GetAllSpatialElements() {
         return new FilteredElementCollector(Document)
             .OfCategory(BuiltInCategory.OST_Rooms)
@@ -89,13 +88,13 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
             .ToList();
     }
     
-    // Метод получения всех выделенных элементов модели
+    // Получает выделенные элементы.
     private IEnumerable<Element> GetSelectedElements() {
         return ActiveUiDocument.GetSelectedElements()
             .Where(element => element is Room);
     }
     
-    // Создания объекта SpatialModel
+    // Создаёт модель помещения.
     private SpatialModel CreateSpatialModel(SpatialElement spatialElement) {
         return new SpatialModel {
             SpatialElement = spatialElement,
@@ -103,7 +102,7 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
         };
     }
     
-    // Получение уровня помещения
+    // Получает уровень помещения.
     private string GetLevelName(SpatialElement? spatialElement) {
         if(spatialElement is null) {
             return localizationService.GetLocalizedString("RevitRepository.NoLevel");

@@ -5,9 +5,11 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
+using RevitEnumerateBySpline.Models.Interfaces;
+
 namespace RevitEnumerateBySpline.Models.Services;
 
-internal class SelectionService {
+internal class SelectionService : ISelectionService {
     
     /// <summary>
     /// Выбор элемента с фильтром ModelCurve и DetailCurve
