@@ -15,6 +15,8 @@ internal sealed class CalculationElementDuctIns : CalculationElementBase {
 
     public bool? IsRound { get; set; }
 
+    public bool IsVertical { get; set; }
+
     public double ProjectStock { get; set; }
 
     public double? Length_mm {

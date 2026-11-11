@@ -49,10 +49,39 @@ internal sealed class CalculationElementFactory {
         throw new InvalidOperationException($"GetGeometricDescription unexpected element type: (Id {element?.Id})");
     }
 
+    private bool GetIsVertical(MEPCurve curve) {
+        List<XYZ> points = curve.ConnectorManager.Connectors
+            .Cast<Connector>()
+            .Where(connector => connector.Owner.Id == curve.Id)
+            .Select(connector => connector.Origin)
+            .Take(2)
+            .ToList();
+        if(points.Count < 2) {
+            return false;
+        }
+
+        double deltaX = Math.Round(points[1].X, 3) - Math.Round(points[0].X, 3);
+        double deltaY = Math.Round(points[1].Y, 3) - Math.Round(points[0].Y, 3);
+        double deltaZ = Math.Round(points[1].Z, 3) - Math.Round(points[0].Z, 3);
+        const double epsilon = 0.01;
+
+        if(Math.Abs(deltaX) < epsilon && Math.Abs(deltaY) < epsilon) {
+            return true;
+        }
+
+        if(curve.Category.IsId(BuiltInCategory.OST_PipeCurves)) {
+            double slope = curve.GetParamValueOrDefault<double>(BuiltInParameter.RBS_PIPE_SLOPE);
+            return slope > 0.06;
+        }
+
+        return Math.Abs(deltaZ) > epsilon;
+    }
+
     private CalculationElementBase CreateDuct(MEPCurve duct) {
         DuctType ductType = (DuctType) duct.GetElementType();
         CalculationElementDuct calculationElement = new CalculationElementDuct(duct) {
-            ProjectStock = _projectStockProvider.Get(BuiltInCategory.OST_DuctCurves)
+            ProjectStock = _projectStockProvider.Get(BuiltInCategory.OST_DuctCurves),
+            IsVertical = GetIsVertical(duct)
         };
 
         calculationElement.SystemSharedName =
@@ -104,7 +133,8 @@ internal sealed class CalculationElementFactory {
 
     private CalculationElementBase CreatePipe(Pipe pipe) {
         CalculationElementPipe calculationElement = new CalculationElementPipe(pipe) {
-            ProjectStock = _projectStockProvider.Get(BuiltInCategory.OST_PipeCurves)
+            ProjectStock = _projectStockProvider.Get(BuiltInCategory.OST_PipeCurves),
+            IsVertical = GetIsVertical(pipe)
         };
 
         calculationElement.SystemSharedName =
@@ -151,6 +181,7 @@ internal sealed class CalculationElementFactory {
         };
 
         Pipe pipe = (Pipe) _doc.GetElement(pipeIns.HostElementId);
+        calculationElement.IsVertical = GetIsVertical(pipe);
         calculationElement.SystemSharedName =
             pipeIns.GetParamValueOrDefault<string>(SharedParamsConfig.Instance.VISSystemName, "");
         calculationElement.SystemTypeName = pipe?.MEPSystem?.GetElementType()?.Name ?? string.Empty;
@@ -326,7 +357,8 @@ internal sealed class CalculationElementFactory {
         if(duct == null) {
             return calculationElement;
         }
-        
+
+        calculationElement.IsVertical = GetIsVertical(duct);
         calculationElement.SystemTypeName = duct.MEPSystem?.GetElementType()?.Name ?? string.Empty;
         
         DuctType ductType = (DuctType) duct.GetElementType();
