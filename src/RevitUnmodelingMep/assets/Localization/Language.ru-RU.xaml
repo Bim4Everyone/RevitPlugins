@@ -80,4 +80,5 @@
     <system:String x:Key="EditorChecker.SettigsIsOutDated">Элемент принадлежит вам, но файл устарел. Выполните синхронизацию с центральным файлом.</system:String>
 
     <system:String x:Key="MainWindow.CheckboxIncludeSmr">Учитывать СМР в расчете</system:String>
+    <system:String x:Key="MainWindow.CalculateCode">Вычислять артикул по формуле</system:String>
 </ResourceDictionary>

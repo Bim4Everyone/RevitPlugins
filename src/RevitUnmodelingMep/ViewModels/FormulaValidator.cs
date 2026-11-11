@@ -61,6 +61,12 @@ internal static class FormulaValidator {
         }
 
         foreach(ConsumableTypeItem item in consumableTypes ?? Enumerable.Empty<ConsumableTypeItem>()) {
+            if(item.CalculateCode && !IsFormulaAllowed(item, item.Code, resolveCategoryId, out string invalidCodeToken)) {
+                string message = localizationService?.GetLocalizedString("FormulaValidator.VariableError");
+                errorText = AppendDetail(AppendDetail(message, GetName(item)), invalidCodeToken ?? item.Code);
+                return false;
+            }
+
             if(!IsFormulaAllowed(item, item.Formula, resolveCategoryId, out string invalidToken)) {
                 string name = GetName(item);
                 string message = localizationService?.GetLocalizedString("FormulaValidator.VariableError");

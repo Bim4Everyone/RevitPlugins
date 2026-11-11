@@ -375,6 +375,10 @@
                                                                 Text="{DynamicResource MainWindow.Code}" />
                                                             <ui:TextBox
                                                                 Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <CheckBox
+                                                                Margin="0 6 0 0"
+                                                                Content="{DynamicResource MainWindow.CalculateCode}"
+                                                                IsChecked="{Binding CalculateCode, Mode=TwoWay}" />
 
                                                             <TextBlock
                                                                 Style="{StaticResource FieldLabel}"

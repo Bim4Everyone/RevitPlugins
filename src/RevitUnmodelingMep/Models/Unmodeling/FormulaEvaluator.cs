@@ -32,6 +32,15 @@ internal sealed class FormulaEvaluator {
         }
     }
 
+    public string EvaluateText(string formula, CalculationElementBase calcElement) {
+        try {
+            return Convert.ToString(GetEvaluator(calcElement).Evaluate(formula), CultureInfo.InvariantCulture);
+        } catch(Exception) {
+            BuildDebugLog(calcElement, formula);
+            throw;
+        }
+    }
+
     private double EvaluateInternal(string formula, CalculationElementBase calcElement) {
         var evaluator = GetEvaluator(calcElement);
         object result = evaluator.Evaluate(formula);

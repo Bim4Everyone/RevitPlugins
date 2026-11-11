@@ -238,6 +238,7 @@ internal sealed class ConsumableTemplateManager {
                || !StringEquals(current.ValueFormula, templateConfig.ValueFormula)
                || !StringEquals(current.NoteValue, templateConfig.NoteValue)
                || !StringEquals(current.NoteFormat, templateConfig.NoteFormat)
+               || current.CalculateCode != templateConfig.CalculateCode
                || current.RoundUpTotal != templateConfig.RoundUpTotal
                || current.RoundUpNoteTotal != templateConfig.RoundUpNoteTotal;
     }
@@ -261,6 +262,7 @@ internal sealed class ConsumableTemplateManager {
         item.Grouping = template.Group;
         item.Mark = template.Mark;
         item.Code = template.Code;
+        item.CalculateCode = template.CalculateCode;
         item.Unit = template.Unit;
         item.Maker = template.Creator;
         item.Formula = template.ValueFormula;

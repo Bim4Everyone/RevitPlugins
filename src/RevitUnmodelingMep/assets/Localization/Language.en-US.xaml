@@ -77,5 +77,6 @@
     <system:String x:Key="EditorChecker.SettigsIsBusy">Project information is editing by user: </system:String>
     <system:String x:Key="EditorChecker.SettigsIsOutDated">You own the items, but your file is out of date. Please sync.</system:String>
     <system:String x:Key="MainWindow.CheckboxIncludeSmr">Include construction works in calculation</system:String>
+    <system:String x:Key="MainWindow.CalculateCode">Calculate code using a formula</system:String>
 </ResourceDictionary>
 

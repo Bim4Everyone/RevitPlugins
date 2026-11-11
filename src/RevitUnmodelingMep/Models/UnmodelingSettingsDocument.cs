@@ -49,6 +49,8 @@ internal class UnmodelingConfigItem {
 
     public List<int> AssignedElementIds { get; set; } = new();
 
+    public bool CalculateCode { get; set; }
+
     public bool RoundUpTotal { get; set; }
 
     public bool RoundUpNoteTotal { get; set; }

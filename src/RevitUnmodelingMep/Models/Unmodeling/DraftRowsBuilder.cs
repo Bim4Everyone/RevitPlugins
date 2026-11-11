@@ -17,10 +17,12 @@ namespace RevitUnmodelingMep.Models.Unmodeling;
 
 internal sealed class DraftRowsBuilder {
     private readonly Document _doc;
+    private readonly FormulaEvaluator _formulaEvaluator;
     private readonly CalculationElementFactory _calculationElementFactory;
     private readonly PlaceholderReplacer _placeholderReplacer;
 
-    public DraftRowsBuilder(Document doc, CalculationElementFactory calculationElementFactory, PlaceholderReplacer placeholderReplacer) {
+    public DraftRowsBuilder(Document doc, CalculationElementFactory calculationElementFactory, PlaceholderReplacer placeholderReplacer, FormulaEvaluator formulaEvaluator) {
+        _formulaEvaluator = formulaEvaluator;
         _doc = doc;
         _calculationElementFactory = calculationElementFactory;
         _placeholderReplacer = placeholderReplacer;
@@ -76,7 +78,7 @@ internal sealed class DraftRowsBuilder {
 
                 string name = _placeholderReplacer.Replace(config.Name, calcElement);
                 string mark = config.Mark;
-                string code = config.Code;
+                string code = config.CalculateCode ? _formulaEvaluator.EvaluateText(config.Code, calcElement) : config.Code;
                 string maker = config.Maker;
                 string unit = config.Unit;
 

@@ -27,7 +27,10 @@ internal class UnmodelingCalculator {
         _settingsStorage = settingsStorage;
         var projectStockProvider = new ProjectStockProvider(doc);
         _calculationElementFactory = new CalculationElementFactory(doc, projectStockProvider);
-        _draftRowsBuilder = new DraftRowsBuilder(doc, _calculationElementFactory, new PlaceholderReplacer());
+        _draftRowsBuilder = new DraftRowsBuilder(doc, 
+            _calculationElementFactory, 
+            new PlaceholderReplacer(), 
+            new FormulaEvaluator(localizationService, messageBoxService));
         _formulaEvaluator = new FormulaEvaluator(localizationService, messageBoxService);
         _noteGenerator = new NoteGenerator();
     }

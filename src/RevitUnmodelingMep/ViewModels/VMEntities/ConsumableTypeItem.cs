@@ -20,6 +20,7 @@ internal class ConsumableTypeItem : BaseViewModel {
     private string _formula;
     private string _noteValue;
     private string _note;
+    private bool _calculateCode;
     private bool _roundUpTotal;
     private bool _roundUpNoteTotal;
     private bool _isTemplateDifferenceVisible;
@@ -89,6 +90,11 @@ internal class ConsumableTypeItem : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _note, value);
     }
 
+    public bool CalculateCode {
+        get => _calculateCode;
+        set => RaiseAndSetIfChanged(ref _calculateCode, value);
+    }
+
     public bool RoundUpTotal {
         get => _roundUpTotal;
         set => RaiseAndSetIfChanged(ref _roundUpTotal, value);
@@ -132,6 +138,7 @@ internal class ConsumableTypeItem : BaseViewModel {
             Formula = config.ValueFormula,
             NoteValue = config.NoteValue,
             Note = config.NoteFormat,
+            CalculateCode = config.CalculateCode,
             RoundUpTotal = config.RoundUpTotal,
             RoundUpNoteTotal = config.RoundUpNoteTotal,
             AssignedElementIds = config.AssignedElementIds != null
@@ -158,6 +165,7 @@ internal class ConsumableTypeItem : BaseViewModel {
             ValueFormula = Formula ?? string.Empty,
             NoteValue = NoteValue ?? string.Empty,
             NoteFormat = Note ?? string.Empty,
+            CalculateCode = CalculateCode,
             RoundUpTotal = RoundUpTotal,
             RoundUpNoteTotal = RoundUpNoteTotal,
             AssignedElementIds = AssignedElementIds != null
