@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using Autodesk.Revit.DB;
 
 namespace RevitEnumerateBySpline.Models.Services;
@@ -9,15 +5,14 @@ namespace RevitEnumerateBySpline.Models.Services;
 /// <summary>
 /// Находит первое пересечение каждого помещения с последовательностью сегментов.
 /// </summary>
-internal sealed class SplineSpatialIntersectionService(SplineDividerService splineDividerService) {
+internal sealed class SplineSpatialIntersectionService {
     private static readonly double _boundingBoxTolerance =
         UnitUtils.ConvertToInternalUnits(10, UnitTypeId.Millimeters);
 
     public IReadOnlyList<SpatialSegmentIntersection> FindIntersections(
         IEnumerable<SpatialModel?> spatialModels,
-        IEnumerable<CurveModel?> curveModels) {
+        IReadOnlyList<SplineSegment> segments) {
 
-        var segments = splineDividerService.Divide(curveModels);
         var intersections = new List<SpatialSegmentIntersection>();
 
         foreach(var spatialModel in spatialModels) {
@@ -50,8 +45,7 @@ internal sealed class SplineSpatialIntersectionService(SplineDividerService spli
             }
         }
 
-        // OrderBy сохраняет исходный порядок помещений при совпадении индекса сегмента.
-        return intersections.OrderBy(intersection => intersection.SplineSegment.Index).ToList();
+        return intersections;
     }
 
     private static bool IsOutsideBoundingBox(Line segment, BoundingBoxXYZ boundingBox) {

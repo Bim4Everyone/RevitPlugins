@@ -72,6 +72,18 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         kernel.Bind<ParamService>()
             .ToSelf()
             .InSingletonScope();
+
+        kernel.Bind<SplineDividerService>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<SplineSpatialIntersectionService>()
+            .ToSelf()
+            .InSingletonScope();
+
+        kernel.Bind<IEnumerateBySpline>()
+            .To<EnumerateBySpline>()
+            .InSingletonScope();
         
         // Настройка доступа к RangeViewModel
         kernel.Bind<RangeViewModel>()

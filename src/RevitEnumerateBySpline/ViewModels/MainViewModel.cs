@@ -7,6 +7,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Enums;
+using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Services;
 using RevitEnumerateBySpline.Models.Settings;
 
@@ -21,10 +22,11 @@ internal class MainViewModel : BaseViewModel {
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly ParamService _paramService;
+    private readonly IEnumerateBySpline _enumerateBySpline;
     private readonly string _saveProperty = string.Empty;
 
     private ConfigSettings? _configSettings;
-    private EnumerateBySplineSettings? _enumeratorBySplineSettings;
+    private EnumerateBySplineSettings? _enumerateBySplineSettings;
     private bool _isViewInitialized;
     
 
@@ -41,6 +43,7 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="commonParamSettingsViewModel"></param>
     /// <param name="parkingSpaceParamSettingsViewModel"></param>
     /// <param name="paramService"></param>
+    /// <param name="enumerateBySpline"></param>
     public MainViewModel(
         PluginConfig pluginConfig,
         SystemPluginConfig systemPluginConfig,
@@ -51,7 +54,8 @@ internal class MainViewModel : BaseViewModel {
         CurveModelsViewModel curveModelsViewModel,
         CommonParamSettingsViewModel commonParamSettingsViewModel,
         ParkingSpaceParamSettingsViewModel parkingSpaceParamSettingsViewModel,
-        ParamService paramService) {
+        ParamService paramService,
+        IEnumerateBySpline enumerateBySpline) {
 
         _pluginConfig = pluginConfig;
         _systemPluginConfig = systemPluginConfig;
@@ -63,6 +67,7 @@ internal class MainViewModel : BaseViewModel {
         CommonParamSettingsViewModel = commonParamSettingsViewModel;
         ParkingSpaceParamSettingsViewModel = parkingSpaceParamSettingsViewModel;
         _paramService = paramService;
+        _enumerateBySpline = enumerateBySpline;
         RangeViewModel = rangeViewModel;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -124,7 +129,8 @@ internal class MainViewModel : BaseViewModel {
     /// Метод применения настроек главного окна. (выполнение плагина)
     /// </summary>
     private void AcceptView() {
-        BuildSettings();
+        var settings = BuildSettings();
+        _enumerateBySpline.Enumerate(settings);
         SaveConfig();
     }
 
@@ -213,8 +219,8 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Сохранение основных настроек плагина.
     /// </summary>
-    private void BuildSettings() {
-        _enumeratorBySplineSettings = new EnumerateBySplineSettings {
+    private EnumerateBySplineSettings BuildSettings() {
+        _enumerateBySplineSettings = new EnumerateBySplineSettings {
             ConfigSettings = new ConfigSettings {
                 NumberParam = CommonParamSettingsViewModel.SelectedNumberParam?.RevitParam,
                 StartNumber = CommonParamSettingsViewModel.StartNumber,
@@ -232,6 +238,7 @@ internal class MainViewModel : BaseViewModel {
                 .Select(x => x.CurveModel)
                 .ToList()
         };
+        return _enumerateBySplineSettings;
     }
 
     /// <summary>
@@ -240,7 +247,7 @@ internal class MainViewModel : BaseViewModel {
     private void SaveConfig() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                       ?? _pluginConfig.AddSettings(_revitRepository.Document);
-        setting.ConfigSettings = _enumeratorBySplineSettings?.ConfigSettings;
+        setting.ConfigSettings = _enumerateBySplineSettings?.ConfigSettings;
         _pluginConfig.SaveProjectConfig();
     }
 
