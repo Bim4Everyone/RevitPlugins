@@ -25,6 +25,7 @@ internal class MainViewModel : BaseViewModel {
 
     private ConfigSettings? _configSettings;
     private EnumerateBySplineSettings? _enumeratorBySplineSettings;
+    private bool _isViewInitialized;
     
 
     /// <summary>
@@ -83,6 +84,11 @@ internal class MainViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref field, value);
     }
 
+    public bool HasParamSettingsErrors {
+        get;
+        set => RaiseAndSetIfChanged(ref field, value);
+    }
+
     /// <summary>
     /// Текст ошибки, который отображается при неверном вводе пользователя.
     /// </summary>
@@ -101,10 +107,17 @@ internal class MainViewModel : BaseViewModel {
     /// Метод загрузки главного окна.
     /// </summary>
     private void LoadView() {
+        // Окно пересоздаётся после выбора линий, но ViewModel остаётся той же.
+        // Повторная загрузка сбрасывает выбранный диапазон, помещения и параметры.
+        if(_isViewInitialized) {
+            return;
+        }
+
         LoadConfig();
         RangeViewModel.LoadView();
         CommonParamSettingsViewModel.LoadView(_configSettings);
         ParkingSpaceParamSettingsViewModel.LoadView(_configSettings);
+        _isViewInitialized = true;
     }
 
     /// <summary>
@@ -120,32 +133,61 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <returns>В случае когда true - команда может выполниться, в случае false - нет.</returns>
     private bool CanAcceptView() {
+        if(RangeViewModel.SelectedRange?.ElementsProvider is null) {
+            return SetValidationError("MainViewModel.RangeRequired", hasCommonSettingsErrors: true);
+        }
+
         switch(RangeViewModel.SelectedRange?.ElementsProvider?.Type) {
             case ElementsProviderType.SelectedElementsProvider
                 when !_revitRepository.HasSelectedRooms():
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NotSelected");
-                HasCommonSettingsErrors = true;
-                return false;
+                return SetValidationError("MainViewModel.NotSelected", hasCommonSettingsErrors: true);
             case ElementsProviderType.CurrentViewProvider
                 when !_revitRepository.HasRoomsOnCurrentView():
-                ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoRoomsOnView");
-                HasCommonSettingsErrors = true;
-                return false;
+                return SetValidationError("MainViewModel.NoRoomsOnView", hasCommonSettingsErrors: true);
         }
+
         if(SpatialModelsViewModel.FilteredSpatialModelViewModels?
                .Any(x => x.IsChecked) != true) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoSelection");
-            HasCommonSettingsErrors = true;
-            return false;
+            return SetValidationError("MainViewModel.NoSelection", hasCommonSettingsErrors: true);
         }
+
         if(CurveModelsViewModel.CurveModelViewModels.Count == 0) {
-            ErrorText = _localizationService.GetLocalizedString("MainViewModel.NoCurves");
-            HasCommonSettingsErrors = true;
-            return false;
+            return SetValidationError("MainViewModel.NoCurves", hasCommonSettingsErrors: true);
         }
+
+        if(CommonParamSettingsViewModel.SelectedNumberParam?.RevitParam is null) {
+            return SetValidationError("MainViewModel.NumberParamRequired", hasCommonSettingsErrors: false);
+        }
+
+        if(CommonParamSettingsViewModel.StartNumber is not double startNumber
+           || double.IsNaN(startNumber)
+           || double.IsInfinity(startNumber)) {
+            return SetValidationError("MainViewModel.StartNumberInvalid", hasCommonSettingsErrors: false);
+        }
+
+        if(ParkingSpaceParamSettingsViewModel.SelectedDependentParam?.RevitParam is null) {
+            return SetValidationError("MainViewModel.DependentParamRequired", hasCommonSettingsErrors: false);
+        }
+
+        if(string.IsNullOrWhiteSpace(ParkingSpaceParamSettingsViewModel.SearchKey)) {
+            return SetValidationError("MainViewModel.SearchKeyRequired", hasCommonSettingsErrors: false);
+        }
+
+        if(ParkingSpaceParamSettingsViewModel.SelectedDependentSearchParam?.RevitParam is null) {
+            return SetValidationError("MainViewModel.DependentSearchParamRequired", hasCommonSettingsErrors: false);
+        }
+
         ErrorText = null;
         HasCommonSettingsErrors = false;
+        HasParamSettingsErrors = false;
         return true;
+    }
+
+    private bool SetValidationError(string errorKey, bool hasCommonSettingsErrors) {
+        ErrorText = _localizationService.GetLocalizedString(errorKey);
+        HasCommonSettingsErrors = hasCommonSettingsErrors;
+        HasParamSettingsErrors = !hasCommonSettingsErrors;
+        return false;
     }
 
     /// <summary>

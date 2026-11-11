@@ -11,6 +11,13 @@
     <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 
+    <system:String x:Key="MainViewModel.RangeRequired">Select a room processing range</system:String>
+    <system:String x:Key="MainViewModel.NumberParamRequired">Select a numbering parameter</system:String>
+    <system:String x:Key="MainViewModel.StartNumberInvalid">The start number must be numeric</system:String>
+    <system:String x:Key="MainViewModel.DependentParamRequired">Select the parameter used to find parking spaces</system:String>
+    <system:String x:Key="MainViewModel.SearchKeyRequired">Enter the keyword used to find parking spaces</system:String>
+    <system:String x:Key="MainViewModel.DependentSearchParamRequired">Select the main parking space parameter</system:String>
+
     <system:String x:Key="ParamService.NoValue">No value</system:String>
     <system:String x:Key="ParamService.Yes">Yes</system:String>
     <system:String x:Key="ParamService.No">No</system:String>

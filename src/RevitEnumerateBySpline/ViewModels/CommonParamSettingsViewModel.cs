@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -17,7 +18,7 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
     private ObservableCollection<ParamViewModel>? _numberParams;
     private ParamViewModel? _selectedNumberParam;
-    private double? _startNumber;
+    private string? _startNumberText;
     private string? _prefix;
     private string? _suffix;
 
@@ -38,10 +39,21 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedNumberParam, value);
     }
     
-    public double? StartNumber {
-        get => _startNumber;
-        set => RaiseAndSetIfChanged(ref _startNumber, value);
+    public string? StartNumberText {
+        get => _startNumberText;
+        set => RaiseAndSetIfChanged(ref _startNumberText, value);
     }
+
+    public double? StartNumber =>
+        double.TryParse(
+            StartNumberText,
+            NumberStyles.Float | NumberStyles.AllowThousands,
+            CultureInfo.CurrentCulture,
+            out double value)
+        && !double.IsNaN(value)
+        && !double.IsInfinity(value)
+            ? value
+            : null;
     
     public string? Prefix {
         get => _prefix;
@@ -59,7 +71,7 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
             .FirstOrDefault(param => param?.RevitParam?.Name == settings?.NumberParam?.Name)
             ?? NumberParams.FirstOrDefault();
         
-        StartNumber = settings?.StartNumber;
+        StartNumberText = settings?.StartNumber?.ToString(CultureInfo.CurrentCulture);
         Prefix = settings?.Prefix;
         Suffix = settings?.Suffix;
     } 

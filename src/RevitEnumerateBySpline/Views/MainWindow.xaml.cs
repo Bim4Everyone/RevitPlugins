@@ -1,3 +1,4 @@
+using System;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -58,7 +59,12 @@ public partial class MainWindow {
     
     private void ButtonOk_Click(object sender, RoutedEventArgs e) {
         DialogAction = MainWindowAction.None;
-        DialogResult = true;
+
+        // ButtonBase raises Click before executing its bound Command. Defer closing
+        // until AcceptViewCommand has saved the settings and built the run context.
+        Dispatcher.BeginInvoke(
+            DispatcherPriority.Normal,
+            new Action(() => DialogResult = true));
     }
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {

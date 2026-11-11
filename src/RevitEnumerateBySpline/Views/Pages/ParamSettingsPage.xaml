@@ -46,7 +46,7 @@
                                 HeaderEditControlBorderVisible="False">
                                 <controls:LabeledControl.HeaderEditControl>
                                     <ui:TextBox
-                                        Text="{Binding CommonParamSettingsViewModel.StartNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        Text="{Binding CommonParamSettingsViewModel.StartNumberText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </controls:LabeledControl.HeaderEditControl>
                             </controls:LabeledControl>
                             

@@ -166,6 +166,13 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
                 continue;
             }
 
+            if(dialogResult == false) {
+                GetPlatformService<INotificationService>()
+                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
+                    .ShowAsync();
+                return;
+            }
+
             Notification(dialogResult);
             return;
         }
