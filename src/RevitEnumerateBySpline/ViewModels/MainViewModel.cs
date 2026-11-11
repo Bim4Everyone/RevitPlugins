@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Windows.Input;
 
 using dosymep.SimpleServices;
@@ -6,6 +7,7 @@ using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Enums;
+using RevitEnumerateBySpline.Models.Services;
 using RevitEnumerateBySpline.Models.Settings;
 
 namespace RevitEnumerateBySpline.ViewModels;
@@ -18,11 +20,12 @@ internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly ParamService _paramService;
     private readonly string _saveProperty = string.Empty;
-    private bool _isViewLoaded;
 
     private ConfigSettings? _configSettings;
     private EnumerateBySplineSettings? _enumeratorBySplineSettings;
+    
 
     /// <summary>
     /// Создает экземпляр основной ViewModel главного окна.
@@ -36,6 +39,7 @@ internal class MainViewModel : BaseViewModel {
     /// <param name="curveModelsViewModel"></param>
     /// <param name="commonParamSettingsViewModel"></param>
     /// <param name="parkingSpaceParamSettingsViewModel"></param>
+    /// <param name="paramService"></param>
     public MainViewModel(
         PluginConfig pluginConfig,
         SystemPluginConfig systemPluginConfig,
@@ -45,7 +49,8 @@ internal class MainViewModel : BaseViewModel {
         SpatialModelsViewModel spatialModelsViewModel,
         CurveModelsViewModel curveModelsViewModel,
         CommonParamSettingsViewModel commonParamSettingsViewModel,
-        ParkingSpaceParamSettingsViewModel parkingSpaceParamSettingsViewModel) {
+        ParkingSpaceParamSettingsViewModel parkingSpaceParamSettingsViewModel,
+        ParamService paramService) {
 
         _pluginConfig = pluginConfig;
         _systemPluginConfig = systemPluginConfig;
@@ -56,6 +61,7 @@ internal class MainViewModel : BaseViewModel {
         CurveModelsViewModel = curveModelsViewModel;
         CommonParamSettingsViewModel = commonParamSettingsViewModel;
         ParkingSpaceParamSettingsViewModel = parkingSpaceParamSettingsViewModel;
+        _paramService = paramService;
         RangeViewModel = rangeViewModel;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
@@ -95,13 +101,10 @@ internal class MainViewModel : BaseViewModel {
     /// Метод загрузки главного окна.
     /// </summary>
     private void LoadView() {
-        if(_isViewLoaded) {
-            return;
-        }
-
         LoadConfig();
         RangeViewModel.LoadView();
-        _isViewLoaded = true;
+        CommonParamSettingsViewModel.LoadView(_configSettings);
+        ParkingSpaceParamSettingsViewModel.LoadView(_configSettings);
     }
 
     /// <summary>
@@ -110,11 +113,6 @@ internal class MainViewModel : BaseViewModel {
     private void AcceptView() {
         BuildSettings();
         SaveConfig();
-
-        CommonParamSettingsViewModel.Prefix = _enumeratorBySplineSettings?.ConfigSettings?.Prefix;
-        CommonParamSettingsViewModel.Suffix = _enumeratorBySplineSettings?.ConfigSettings?.Suffix;
-        CommonParamSettingsViewModel.StartNumber = _enumeratorBySplineSettings?.ConfigSettings?.StartNumber;
-        ParkingSpaceParamSettingsViewModel.SearchKey = _enumeratorBySplineSettings?.ConfigSettings?.SearchKey;
     }
 
     /// <summary>
@@ -161,12 +159,13 @@ internal class MainViewModel : BaseViewModel {
 
     // Метод применения дефолтных значений настроек.
     private void ApplyDefaultsConfig() {
+        _configSettings?.NumberParam ??= _paramService.DefaultSpatialNumberParam;
         _configSettings?.StartNumber ??= _systemPluginConfig.DefaultStartNumber;
         _configSettings?.Prefix ??= _systemPluginConfig.DefaultPrefix;
         _configSettings?.Suffix ??= _systemPluginConfig.DefaultSuffix;
+        _configSettings?.DependentParam ??= _paramService.DefaultDependentParam;
         _configSettings?.SearchKey ??= _systemPluginConfig.DefaultSearchKey;
-        _configSettings?.DependentParam ??= _systemPluginConfig.DefaultDependentParam;
-        _configSettings?.DependentSearchParam ??= _systemPluginConfig.DefaultDependentSearchParam;
+        _configSettings?.DependentSearchParam ??= _paramService.DefaultDependentSearchParam;
     }
 
     /// <summary>
@@ -175,11 +174,12 @@ internal class MainViewModel : BaseViewModel {
     private void BuildSettings() {
         _enumeratorBySplineSettings = new EnumerateBySplineSettings {
             ConfigSettings = new ConfigSettings {
+                NumberParam = CommonParamSettingsViewModel.SelectedNumberParam?.RevitParam,
                 StartNumber = CommonParamSettingsViewModel.StartNumber,
                 Prefix = CommonParamSettingsViewModel.Prefix,
                 Suffix = CommonParamSettingsViewModel.Suffix,
-                SearchKey = ParkingSpaceParamSettingsViewModel.SearchKey,
                 DependentParam = ParkingSpaceParamSettingsViewModel.SelectedDependentParam?.RevitParam,
+                SearchKey = ParkingSpaceParamSettingsViewModel.SearchKey,
                 DependentSearchParam = ParkingSpaceParamSettingsViewModel.SelectedDependentSearchParam?.RevitParam
             },
             SpatialModels = SpatialModelsViewModel.FilteredSpatialModelViewModels?

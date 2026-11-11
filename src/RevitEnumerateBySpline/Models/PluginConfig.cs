@@ -72,11 +72,11 @@ internal class RevitSettings : ProjectSettings {
 internal class SystemPluginConfig {
     // Системный параметр имени помещений по умолчанию
     public BuiltInParameter SystemRoomNameParamId => BuiltInParameter.ROOM_NAME;
+    // Системный параметр номера помещений по умолчанию
+    public BuiltInParameter SystemRoomNumberParamId => BuiltInParameter.ROOM_NUMBER;
     public double DefaultStartNumber => 1;
     public string DefaultPrefix => string.Empty;
     public string DefaultSuffix => string.Empty;
     public string DefaultSearchKey => "зависимое";
-    public RevitParam DefaultDependentParam => SharedParamsConfig.Instance.RoomArea;
-    public RevitParam DefaultDependentSearchParam => SharedParamsConfig.Instance.RoomArea;
     
 }

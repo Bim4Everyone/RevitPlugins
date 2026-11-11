@@ -1,6 +1,12 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 using dosymep.WPF.ViewModels;
+
+using RevitEnumerateBySpline.Models.Services;
+using RevitEnumerateBySpline.Models.Settings;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
@@ -11,9 +17,10 @@ internal class ParkingSpaceParamSettingsViewModel : BaseViewModel {
     private ObservableCollection<ParamViewModel>? _dependentSearchParams;
     private ParamViewModel? _selectedDependentSearchParam;
     private string? _searchKey;
-    
-    public ParkingSpaceParamSettingsViewModel() {
-        LoadView();
+    private readonly ParamService _paramService;
+
+    public ParkingSpaceParamSettingsViewModel(ParamService paramService) {
+        _paramService = paramService;
     }
 
     public ObservableCollection<ParamViewModel>? DependentParams {
@@ -41,8 +48,26 @@ internal class ParkingSpaceParamSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _searchKey, value);
     }
 
-    private void LoadView() {
-       
+    public void LoadView(ConfigSettings? settings) {
+        DependentParams = new ObservableCollection<ParamViewModel>(GetParamViewModels());
+        SelectedDependentParam = DependentParams
+            .FirstOrDefault(param => param?.RevitParam?.Name == settings?.DependentParam?.Name)
+            ?? DependentParams.FirstOrDefault();
+        
+        SearchKey = settings?.SearchKey;
+        
+        DependentSearchParams = new ObservableCollection<ParamViewModel>(GetParamViewModels());
+        SelectedDependentSearchParam = DependentSearchParams
+            .FirstOrDefault(param => param?.RevitParam?.Name == settings?.DependentSearchParam?.Name) 
+            ?? DependentSearchParams.FirstOrDefault();
     } 
     
+    // Метод получения коллекции ParamViewModel для DependentParams, DependentSearchParams
+    private IEnumerable<ParamViewModel> GetParamViewModels() {
+        return _paramService.AllSpatialRevitParams
+            .Select(param => new ParamViewModel {
+                Name = param.Name,
+                RevitParam = param
+            });
+    }
 }

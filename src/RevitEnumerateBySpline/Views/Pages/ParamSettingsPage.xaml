@@ -33,8 +33,8 @@
                                 HeaderEditControlBorderVisible="False">
                                 <controls:LabeledControl.HeaderEditControl>
                                     <ComboBox
-                                        ItemsSource="{Binding FilterParameterVeiwModels}"
-                                        SelectedValue="{Binding SelectedFilterParameterVeiwModel}"
+                                        ItemsSource="{Binding CommonParamSettingsViewModel.NumberParams}"
+                                        SelectedValue="{Binding CommonParamSettingsViewModel.SelectedNumberParam}"
                                         DisplayMemberPath="Name" />
                                 </controls:LabeledControl.HeaderEditControl>
                             </controls:LabeledControl>
@@ -46,7 +46,7 @@
                                 HeaderEditControlBorderVisible="False">
                                 <controls:LabeledControl.HeaderEditControl>
                                     <ui:TextBox
-                                        Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        Text="{Binding CommonParamSettingsViewModel.StartNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </controls:LabeledControl.HeaderEditControl>
                             </controls:LabeledControl>
                             
@@ -56,7 +56,7 @@
                                 Description="{me:LocalizationSource CommonSettingsPage.PrefixDescription}"
                                 HeaderEditControlBorderVisible="False">
                                 <ui:TextBox
-                                    Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    Text="{Binding CommonParamSettingsViewModel.Prefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             </controls:LabeledControl>
                             
                             <controls:LabeledControl
@@ -65,7 +65,7 @@
                                 Description="{me:LocalizationSource CommonSettingsPage.SuffixDescription}"
                                 HeaderEditControlBorderVisible="False">
                                 <ui:TextBox
-                                    Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    Text="{Binding CommonParamSettingsViewModel.Suffix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             </controls:LabeledControl>
                             
                         </StackPanel>
@@ -86,8 +86,8 @@
                                 Description="{me:LocalizationSource CommonSettingsPage.SearchDependentParkParameterDescription}"
                                 HeaderEditControlBorderVisible="False">
                                 <ComboBox
-                                    ItemsSource="{Binding FilterParameterVeiwModels}"
-                                    SelectedValue="{Binding SelectedFilterParameterVeiwModel}"
+                                    ItemsSource="{Binding ParkingSpaceParamSettingsViewModel.DependentParams}"
+                                    SelectedValue="{Binding ParkingSpaceParamSettingsViewModel.SelectedDependentParam}"
                                     DisplayMemberPath="Name" />
                             </controls:LabeledControl>
                             
@@ -97,7 +97,7 @@
                                 Description="{me:LocalizationSource CommonSettingsPage.KeyDescription}"
                                 HeaderEditControlBorderVisible="False">
                                 <ui:TextBox
-                                    Text="{Binding SectionHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    Text="{Binding ParkingSpaceParamSettingsViewModel.SearchKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             </controls:LabeledControl>
                             
                             <controls:LabeledControl
@@ -106,8 +106,8 @@
                                 Description="{me:LocalizationSource CommonSettingsPage.MainParkParameterDescription}"
                                 HeaderEditControlBorderVisible="False">
                                 <ComboBox
-                                    ItemsSource="{Binding FilterParameterVeiwModels}"
-                                    SelectedValue="{Binding SelectedFilterParameterVeiwModel}"
+                                    ItemsSource="{Binding ParkingSpaceParamSettingsViewModel.DependentSearchParams}"
+                                    SelectedValue="{Binding ParkingSpaceParamSettingsViewModel.SelectedDependentSearchParam}"
                                     DisplayMemberPath="Name" />
                             </controls:LabeledControl>
                         </StackPanel>

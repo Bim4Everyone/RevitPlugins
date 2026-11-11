@@ -78,7 +78,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
     // Метод сброса фильтра на значение по умолчанию
     private void ResetFilter() {
         SelectedFilterParameterViewModel = FilterParameterViewModels?
-            .FirstOrDefault(param => param?.RevitParam?.Id == _paramService.DefaultSpatialFilterParam?.Id) 
+            .FirstOrDefault(param => param?.RevitParam?.Id == _paramService.DefaultSpatialNameParam?.Id) 
             ?? FilterParameterViewModels?.FirstOrDefault();
     }
     
@@ -116,7 +116,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
     private void LoadFilterParameterViewModels() {
         FilterParameterViewModels = new ObservableCollection<ParamViewModel>(GetFilterParamViewModels());
         SelectedFilterParameterViewModel = FilterParameterViewModels
-            .FirstOrDefault(param => param?.RevitParam?.Id == _paramService.DefaultSpatialFilterParam?.Id)
+            .FirstOrDefault(param => param?.RevitParam?.Id == _paramService.DefaultSpatialNameParam?.Id)
             ?? FilterParameterViewModels.FirstOrDefault();
     }
     

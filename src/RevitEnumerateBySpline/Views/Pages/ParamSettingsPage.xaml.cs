@@ -12,7 +12,7 @@ internal partial class ParamSettingsPage {
             languageService, localizationService,
             uiThemeService, themeUpdaterService) {
         InitializeComponent();
-        DataContext = viewModel.RangeViewModel;
+        DataContext = viewModel;
     }
 }
 

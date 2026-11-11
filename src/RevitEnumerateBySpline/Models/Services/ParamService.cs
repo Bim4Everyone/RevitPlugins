@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
@@ -34,11 +35,17 @@ internal class ParamService {
 
         AllSpatialRevitParams = GetAllRevitParams().AsReadOnly();
 
-        DefaultSpatialFilterParam = GetDefaultFilterParam();
+        DefaultSpatialNameParam = GetDefaultNameParam();
+        DefaultSpatialNumberParam = GetDefaultNumberParam();
+        DefaultDependentParam = GetDefaultNameParam();
+        DefaultDependentSearchParam = SharedParamsConfig.Instance.RoomArea;
     }
 
     public IReadOnlyList<RevitParam> AllSpatialRevitParams { get; }
-    public RevitParam? DefaultSpatialFilterParam { get; }
+    public RevitParam? DefaultSpatialNameParam { get; }
+    public RevitParam? DefaultSpatialNumberParam { get; }
+    public RevitParam? DefaultDependentParam { get; }
+    public RevitParam? DefaultDependentSearchParam { get; }
     
     public string GetParamValue(SpatialModel spatialModel, RevitParam? filterParam) {
         if(spatialModel.SpatialElement is not { } spatialElement || filterParam is null) {
@@ -69,7 +76,7 @@ internal class ParamService {
     }
     
     // Метод получения параметра по RevitParam и Element
-    private static bool TryGetParam(RevitParam revitParam, Element element, out Parameter? param) {
+    public bool TryGetParam(RevitParam revitParam, Element? element, out Parameter? param) {
         try {
             param = revitParam.GetParam(element);
             return param != null;
@@ -178,10 +185,16 @@ internal class ParamService {
             .GetFilterableParametersInCommon(_revitRepository.Document, [categoryId]);
     }
 
-    private RevitParam? GetDefaultFilterParam() {
+    private RevitParam? GetDefaultNameParam() {
         return AllSpatialRevitParams
             .OfType<SystemParam>()
             .FirstOrDefault(x => x.SystemParamId == _systemPluginConfig.SystemRoomNameParamId);
+    }
+    
+    private RevitParam? GetDefaultNumberParam() {
+        return AllSpatialRevitParams
+            .OfType<SystemParam>()
+            .FirstOrDefault(x => x.SystemParamId == _systemPluginConfig.SystemRoomNumberParamId);
     }
 
     private List<RevitParam> GetAllRevitParams() {
