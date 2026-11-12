@@ -8,7 +8,6 @@ using dosymep.WPF.ViewModels;
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Enums;
 using RevitEnumerateBySpline.Models.Interfaces;
-using RevitEnumerateBySpline.Models.Services;
 using RevitEnumerateBySpline.Models.Settings;
 
 namespace RevitEnumerateBySpline.ViewModels;
@@ -36,18 +35,18 @@ internal class MainViewModel : BaseViewModel {
     /// Создает экземпляр основной ViewModel главного окна.
     /// </summary>
     /// <param name="pluginConfig">Настройки плагина.</param>
-    /// <param name="systemPluginConfig"></param>
+    /// <param name="systemPluginConfig">Системные настройки по умолчанию.</param>
     /// <param name="revitRepository">Класс доступа к интерфейсу Revit.</param>
-    /// <param name="localizationService">Интерфейс доступа к сервису локализации.</param>/
-    /// <param name="rangeViewModel"></param>
-    /// <param name="spatialModelsViewModel"></param>
-    /// <param name="curveModelsViewModel"></param>
-    /// <param name="commonParamSettingsViewModel"></param>
-    /// <param name="parkingSpaceParamSettingsViewModel"></param>
-    /// <param name="paramService"></param>
-    /// <param name="enumerateBySpline"></param>
-    /// <param name="spatialElementCheckService"></param>
-    /// <param name="windowService"></param>
+    /// <param name="localizationService">Сервис локализации.</param>
+    /// <param name="rangeViewModel">Модель выбора диапазона помещений.</param>
+    /// <param name="spatialModelsViewModel">Модель списка помещений.</param>
+    /// <param name="curveModelsViewModel">Модель списка кривых.</param>
+    /// <param name="commonParamSettingsViewModel">Общие настройки нумерации.</param>
+    /// <param name="parkingSpaceParamSettingsViewModel">Настройки зависимых помещений.</param>
+    /// <param name="paramService">Сервис параметров помещений.</param>
+    /// <param name="enumerateBySpline">Сервис нумерации по сплайну.</param>
+    /// <param name="spatialElementCheckService">Сервис проверки помещений.</param>
+    /// <param name="windowService">Сервис управления окнами.</param>
     public MainViewModel(
         PluginConfig pluginConfig,
         SystemPluginConfig systemPluginConfig,
@@ -217,9 +216,9 @@ internal class MainViewModel : BaseViewModel {
         _configSettings?.StartNumber ??= _systemPluginConfig.DefaultStartNumber;
         _configSettings?.Prefix ??= _systemPluginConfig.DefaultPrefix;
         _configSettings?.Suffix ??= _systemPluginConfig.DefaultSuffix;
-        _configSettings?.DependentParam ??= _paramService.DefaultDependentParam;
-        _configSettings?.SearchKey ??= _systemPluginConfig.DefaultSearchKey;
         _configSettings?.DependentSearchParam ??= _paramService.DefaultDependentSearchParam;
+        _configSettings?.SearchKey ??= _systemPluginConfig.DefaultSearchKey;
+        _configSettings?.DependentParam ??= _paramService.DefaultDependentParam;
     }
 
     // Собирает настройки нумерации.

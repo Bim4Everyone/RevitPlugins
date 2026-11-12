@@ -11,6 +11,7 @@ using dosymep.SimpleServices;
 
 namespace RevitEnumerateBySpline.Models;
 
+/// <summary>Предоставляет доступ к помещениям и документу Revit.</summary>
 internal class RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
     
     private List<SpatialModel>? _allSpatialModels;
@@ -19,7 +20,6 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
     
     public UIApplication UiApplication { get; } = uiApplication;
     public UIDocument ActiveUiDocument => UiApplication.ActiveUIDocument;
-    public Application Application => UiApplication.Application;
     public Document Document => ActiveUiDocument.Document;
     public List<SpatialModel> AllSpatialModels => _allSpatialModels ??= GetAllSpatialModels();
     public List<SpatialModel> ActiveViewSpatialModels => _activeViewSpatialModels ??= GetActiveViewSpatialModels();
@@ -28,6 +28,7 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
     /// <summary>
     /// Метод получения всех помещений SpatialModel
     /// </summary>
+    /// <returns>Помещения документа.</returns>
     public List<SpatialModel> GetAllSpatialModels() {
         return GetAllSpatialElements()
             .Select(CreateSpatialModel)
@@ -37,6 +38,7 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
     /// <summary>
     /// Метод получения всех помещений SpatialModel на активном виде
     /// </summary>
+    /// <returns>Помещения активного вида.</returns>
     public List<SpatialModel> GetActiveViewSpatialModels() {
         return new FilteredElementCollector(Document, Document.ActiveView.Id)
             .OfCategory(BuiltInCategory.OST_Rooms)
@@ -49,6 +51,7 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
     /// <summary>
     /// Метод получения всех выделенных помещений SpatialModel
     /// </summary>
+    /// <returns>Выделенные помещения.</returns>
     public List<SpatialModel> GetSelectedSpatialModels() {
         var selected = GetSelectedElements().ToArray();
         if(selected.Length == 0) {
@@ -63,6 +66,7 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
     /// <summary>
     /// Метод проверки, есть ли выделенные помещения
     /// </summary>
+    /// <returns>Истина, если помещения выделены.</returns>
     public bool HasSelectedRooms() {
         return SelectedSpatialModels.Any();
     }
@@ -70,11 +74,13 @@ internal class RevitRepository(UIApplication uiApplication, ILocalizationService
     /// <summary>
     /// Метод проверки, есть ли помещения на активном виде
     /// </summary>
+    /// <returns>Истина, если на активном виде есть помещения.</returns>
     public bool HasRoomsOnCurrentView() {
         return ActiveViewSpatialModels.Any();
     }
 
     /// <summary>Выделяет помещение в активном документе.</summary>
+    /// <param name="elementId">Идентификатор выделяемого помещения.</param>
     public void SetSelected(ElementId elementId) {
         ActiveUiDocument.SetSelectedElements([elementId]);
     }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
@@ -9,11 +9,11 @@ using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Interfaces;
-using RevitEnumerateBySpline.Models.Services;
 using RevitEnumerateBySpline.Models.Settings;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
+/// <summary>Настройки параметра номера помещения.</summary>
 internal class CommonParamSettingsViewModel : BaseViewModel {
     private readonly IParamService _paramService;
     private readonly RevitRepository _revitRepository;
@@ -23,6 +23,7 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
     private string? _prefix;
     private string? _suffix;
 
+    /// <summary>Создаёт модель параметров номера помещения.</summary>
     public CommonParamSettingsViewModel(
         IParamService paramService,
         RevitRepository revitRepository) {
@@ -67,6 +68,7 @@ internal class CommonParamSettingsViewModel : BaseViewModel {
     }
 
     /// <summary>Загружает параметры нумерации в форму.</summary>
+    /// <param name="settings">Сохранённые настройки проекта.</param>
     public void LoadView(ConfigSettings? settings) {
         NumberParams = new ObservableCollection<ParamViewModel>(GetNumberParamViewModels());
         SelectedNumberParam = NumberParams

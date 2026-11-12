@@ -2,19 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Settings;
 
 namespace RevitEnumerateBySpline.Models.Services;
 
 /// <summary>Записывает номера помещений и номер основного машиноместа у зависимых.</summary>
-internal sealed class ParamSetter(RevitRepository revitRepository) {
-    public void SetParams(IReadOnlyList<SpatialSegmentIntersection> intersections, ConfigSettings settings) {
+internal sealed class ParamSetter(RevitRepository revitRepository) : IParamSetter {
+    public void SetParams(IReadOnlyList<SpatialPointIntersection> intersections, ConfigSettings settings) {
         if(intersections is null) {
             throw new ArgumentNullException(nameof(intersections));
         }
@@ -38,16 +38,18 @@ internal sealed class ParamSetter(RevitRepository revitRepository) {
                 continue;
             }
 
+            bool isDependent = previousNumber is not null
+                && settings.DependentSearchParam is { } searchParam
+                && settings.DependentParam is not null
+                && !string.IsNullOrWhiteSpace(searchKey)
+                && searchParam.GetParam(room)?.AsString()?.IndexOf(
+                    searchKey, StringComparison.OrdinalIgnoreCase) >= 0;
+
             string currentNumber = prefix + number.ToString(CultureInfo.CurrentCulture) + suffix;
             room.SetParamValue(numberParam, currentNumber);
 
-            if(previousNumber is not null
-               && settings.DependentSearchParam is { } searchParam
-               && settings.DependentParam is { } dependentParam
-               && !string.IsNullOrWhiteSpace(searchKey)
-               && searchParam.GetParam(room)?.AsString()?.IndexOf(
-                   searchKey, StringComparison.OrdinalIgnoreCase) >= 0) {
-                room.SetParamValue(dependentParam, previousNumber);
+            if(isDependent) {
+                room.SetParamValue(settings.DependentParam!, previousNumber!);
             }
 
             previousNumber = currentNumber;

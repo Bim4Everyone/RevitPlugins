@@ -6,6 +6,7 @@ using Wpf.Ui.Controls;
 
 namespace RevitEnumerateBySpline.Views.Controls;
 
+/// <summary>Группа редактирования дополнительных настроек.</summary>
 [DefaultProperty(nameof(EditControl))]
 [ContentProperty(nameof(EditControl))]
 public partial class CustomGroupEditControl {
@@ -46,6 +47,7 @@ public partial class CustomGroupEditControl {
         nameof(SwitchOffContent), typeof(string), typeof(CustomGroupEditControl), new PropertyMetadata(default(string)));
 
 
+    /// <summary>Создаёт группу редактирования.</summary>
     public CustomGroupEditControl() {
         InitializeComponent();
     }

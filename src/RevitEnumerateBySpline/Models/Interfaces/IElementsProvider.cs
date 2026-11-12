@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 
-using Autodesk.Revit.DB;
-
 using RevitEnumerateBySpline.Models.Enums;
 
 namespace RevitEnumerateBySpline.Models.Interfaces;
 
+/// <summary>Предоставляет помещения выбранного диапазона.</summary>
 internal interface IElementsProvider {
     /// <summary>
     /// Тип источника помещений.

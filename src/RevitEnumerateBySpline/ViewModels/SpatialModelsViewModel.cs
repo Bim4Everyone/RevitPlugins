@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,10 +10,10 @@ using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Interfaces;
-using RevitEnumerateBySpline.Models.Services;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
+/// <summary>Управляет списком и фильтрацией помещений.</summary>
 internal class SpatialModelsViewModel : BaseViewModel {
     private readonly IParamService _paramService;
     private readonly SystemPluginConfig _systemPluginConfig;
@@ -24,6 +24,7 @@ internal class SpatialModelsViewModel : BaseViewModel {
     private ObservableCollection<SpatialModelViewModel>? _filteredSpatialModelViewModels;
     private bool _isNotSelected = true;
 
+    /// <summary>Создаёт модель списка помещений.</summary>
     public SpatialModelsViewModel(IParamService paramService, SystemPluginConfig systemPluginConfig, IMessenger messenger) {
         _paramService = paramService;
         _systemPluginConfig = systemPluginConfig;

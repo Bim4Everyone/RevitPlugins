@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Markup;
 
@@ -6,6 +6,7 @@ using Wpf.Ui.Controls;
 
 namespace RevitEnumerateBySpline.Views.Controls;
 
+/// <summary>Поле настройки с заголовком и описанием.</summary>
 [DefaultProperty(nameof(HeaderEditControl))]
 [ContentProperty(nameof(HeaderEditControl))]
 public partial class LabeledControl {
@@ -30,6 +31,7 @@ public partial class LabeledControl {
     public static readonly DependencyProperty HeaderEditControlBorderVisibleProperty = DependencyProperty.Register(
         nameof(HeaderEditControlBorderVisible), typeof(bool), typeof(LabeledControl), new PropertyMetadata(true));
 
+    /// <summary>Создаёт поле настройки.</summary>
     public LabeledControl() {
         InitializeComponent();
     }

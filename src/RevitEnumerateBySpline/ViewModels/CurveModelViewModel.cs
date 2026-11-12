@@ -1,9 +1,10 @@
-﻿using dosymep.WPF.ViewModels;
+using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
+/// <summary>Представление выбранной кривой.</summary>
 internal class CurveModelViewModel : BaseViewModel {
     private string _name = string.Empty;
 

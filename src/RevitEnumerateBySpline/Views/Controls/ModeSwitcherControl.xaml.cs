@@ -1,9 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace RevitEnumerateBySpline.Views.Controls;
 
+/// <summary>Переключатель режимов выбора.</summary>
 public partial class ModeSwitcherControl : UserControl {
     /// <summary>
     /// Источник данных.
@@ -37,6 +38,7 @@ public partial class ModeSwitcherControl : UserControl {
             typeof(ModeSwitcherControl),
             new PropertyMetadata("Name"));
 
+    /// <summary>Создаёт переключатель режимов.</summary>
     public ModeSwitcherControl() {
         InitializeComponent();
     }

@@ -86,8 +86,8 @@
                                 Description="{me:LocalizationSource CommonSettingsPage.SearchDependentParkParameterDescription}"
                                 HeaderEditControlBorderVisible="False">
                                 <ComboBox
-                                    ItemsSource="{Binding ParkingSpaceParamSettingsViewModel.DependentParams}"
-                                    SelectedValue="{Binding ParkingSpaceParamSettingsViewModel.SelectedDependentParam}"
+                                    ItemsSource="{Binding ParkingSpaceParamSettingsViewModel.DependentSearchParams}"
+                                    SelectedValue="{Binding ParkingSpaceParamSettingsViewModel.SelectedDependentSearchParam}"
                                     DisplayMemberPath="Name" />
                             </controls:LabeledControl>
                             
@@ -106,8 +106,8 @@
                                 Description="{me:LocalizationSource CommonSettingsPage.MainParkParameterDescription}"
                                 HeaderEditControlBorderVisible="False">
                                 <ComboBox
-                                    ItemsSource="{Binding ParkingSpaceParamSettingsViewModel.DependentSearchParams}"
-                                    SelectedValue="{Binding ParkingSpaceParamSettingsViewModel.SelectedDependentSearchParam}"
+                                    ItemsSource="{Binding ParkingSpaceParamSettingsViewModel.DependentParams}"
+                                    SelectedValue="{Binding ParkingSpaceParamSettingsViewModel.SelectedDependentParam}"
                                     DisplayMemberPath="Name" />
                             </controls:LabeledControl>
                         </StackPanel>

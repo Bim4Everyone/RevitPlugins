@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
-using Autodesk.Revit.DB;
 
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Interfaces;
-using RevitEnumerateBySpline.Models.Services;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
+/// <summary>Управляет списком кривых в порядке нумерации.</summary>
 internal class CurveModelsViewModel : BaseViewModel {
     private readonly IWindowService _windowService;
     private CurveModelViewModel? _selectedCurveModelViewModel;
     private ObservableCollection<CurveModelViewModel> _curveModelViewModels = [];
 
+    /// <summary>Создаёт модель списка выбранных кривых.</summary>
     public CurveModelsViewModel(
         IWindowService windowService) {
         _windowService = windowService;
@@ -55,8 +53,10 @@ internal class CurveModelsViewModel : BaseViewModel {
     }
 
     /// <summary>Добавляет выбранные линии без повторов.</summary>
+    /// <param name="curves">Линии в порядке, полученном от Revit.</param>
     public void AddCurves(IEnumerable<CurveModel> curves) {
-        foreach(var curve in curves) {
+        // Revit возвращает выбор в обратном порядке: первая выбранная линия должна быть наверху.
+        foreach(var curve in curves.Reverse()) {
             if(curve is null || CurveModelViewModels.Any(x => x.CurveModel?.ElementId == curve.ElementId)) {
                 continue;   
             }

@@ -1,52 +1,63 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 
 using RevitEnumerateBySpline.Models.Interfaces;
 
 namespace RevitEnumerateBySpline.Models.Services;
 
 /// <summary>
-/// Находит первое пересечение каждого помещения с последовательностью сегментов.
+/// Находит первую точку линии внутри Solid каждого выбранного помещения.
 /// </summary>
 internal sealed class SplineSpatialIntersectionService : ISplineSpatialIntersectionService {
-    private static readonly double _boundingBoxTolerance =
-        UnitUtils.ConvertToInternalUnits(10, UnitTypeId.Millimeters);
+    private static readonly double _probeLength =
+        UnitUtils.ConvertToInternalUnits(100, UnitTypeId.Millimeters);
 
-    public IReadOnlyList<SpatialSegmentIntersection> FindIntersections(
+    public IReadOnlyList<SpatialPointIntersection> FindIntersections(
         List<SpatialModel?> spatialModels,
-        IReadOnlyList<SplineSegment> segments) {
+        IReadOnlyList<SplinePoint> points) {
 
-        var intersections = new List<SpatialSegmentIntersection>();
+        var intersections = new List<SpatialPointIntersection>();
+        if(points.Count == 0) {
+            return intersections;
+        }
+
+        var firstRoom = spatialModels.Find(model => model?.SpatialElement is Room)?.SpatialElement;
+        if(firstRoom is null) {
+            return intersections;
+        }
+
+        using var calculator = new SpatialElementGeometryCalculator(firstRoom.Document);
+        using var options = new SolidCurveIntersectionOptions();
 
         foreach(var spatialModel in spatialModels) {
-            if(spatialModel?.SpatialElement is not { } spatialElement) {
+            if(spatialModel?.SpatialElement is not Room room
+               || !SpatialElementGeometryCalculator.CanCalculateGeometry(room)) {
                 continue;
             }
 
-            var boundaryLoops = spatialElement.GetBoundarySegments(new SpatialElementBoundaryOptions());
-            if(boundaryLoops is null) {
+            Solid solid = calculator.CalculateSpatialElementGeometry(room).GetGeometry();
+            if(solid.Volume <= 0) {
                 continue;
             }
 
-            var boundaryCurves = boundaryLoops
-                .SelectMany(loop => loop)
-                .Select(boundarySegment => boundarySegment.GetCurve())
-                .ToList();
-            var boundingBox = spatialElement.get_BoundingBox(null);
+            BoundingBoxXYZ box = solid.GetBoundingBox();
+            XYZ center = box.Transform.OfPoint((box.Min + box.Max).Multiply(0.5));
+            BoundingBoxXYZ? roomBox = room.get_BoundingBox(null);
 
-            foreach(var segment in segments) {
-                if(boundingBox is not null && IsOutsideBoundingBox(segment.Curve, boundingBox)) {
+            foreach(var point in points) {
+                if(roomBox is not null && IsOutsideBoundingBox(point.Position, roomBox)) {
                     continue;
                 }
 
-                if(!boundaryCurves.Any(boundaryCurve => Intersects(boundaryCurve, segment.Curve))) {
+                Line probe = CreateProbe(point.Position, center.Z);
+                using SolidCurveIntersection intersection = solid.IntersectWithCurve(probe, options);
+                if(intersection.SegmentCount == 0) {
                     continue;
                 }
 
-                intersections.Add(new SpatialSegmentIntersection(spatialModel, segment));
+                intersections.Add(new SpatialPointIntersection(spatialModel, point));
                 break;
             }
         }
@@ -54,23 +65,17 @@ internal sealed class SplineSpatialIntersectionService : ISplineSpatialIntersect
         return intersections;
     }
 
-    // Отсекает сегменты вне габаритов помещения.
-    private static bool IsOutsideBoundingBox(Line segment, BoundingBoxXYZ boundingBox) {
-        XYZ start = segment.GetEndPoint(0);
-        XYZ end = segment.GetEndPoint(1);
-
-        return Math.Max(start.X, end.X) < boundingBox.Min.X - _boundingBoxTolerance
-            || Math.Min(start.X, end.X) > boundingBox.Max.X + _boundingBoxTolerance
-            || Math.Max(start.Y, end.Y) < boundingBox.Min.Y - _boundingBoxTolerance
-            || Math.Min(start.Y, end.Y) > boundingBox.Max.Y + _boundingBoxTolerance;
+    // Проверяет, лежит ли точка вне габаритов помещения в плане.
+    private static bool IsOutsideBoundingBox(XYZ point, BoundingBoxXYZ box) {
+        return point.X < box.Min.X || point.X > box.Max.X
+            || point.Y < box.Min.Y || point.Y > box.Max.Y;
     }
 
-    // Проверяет пересечение двух кривых.
-    private static bool Intersects(Curve boundaryCurve, Curve segmentCurve) {
-        var result = boundaryCurve.Intersect(segmentCurve);
-        return result is SetComparisonResult.Overlap
-            or SetComparisonResult.Subset
-            or SetComparisonResult.Superset
-            or SetComparisonResult.Equal;
+    // Создаёт короткую вертикальную линию на средней высоте помещения.
+    private static Line CreateProbe(XYZ point, double centerZ) {
+        double halfLength = _probeLength / 2;
+        return Line.CreateBound(
+            new XYZ(point.X, point.Y, centerZ - halfLength),
+            new XYZ(point.X, point.Y, centerZ + halfLength));
     }
 }

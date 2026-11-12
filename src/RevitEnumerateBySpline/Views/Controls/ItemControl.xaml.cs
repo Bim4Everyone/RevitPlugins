@@ -1,7 +1,8 @@
-﻿using System.Windows;
+using System.Windows;
 
 namespace RevitEnumerateBySpline.Views.Controls;
 
+/// <summary>Элемент списка с возможностью выбора.</summary>
 public partial class ItemControl {
 
     public static readonly DependencyProperty SlabNameProperty = DependencyProperty.Register(
@@ -14,6 +15,7 @@ public partial class ItemControl {
         nameof(CheckBoxVisible), typeof(bool), typeof(ItemControl), new PropertyMetadata(true));
 
 
+    /// <summary>Создаёт элемент списка.</summary>
     public ItemControl() {
         InitializeComponent();
     }

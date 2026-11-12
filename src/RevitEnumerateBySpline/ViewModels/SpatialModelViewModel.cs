@@ -1,9 +1,10 @@
-﻿using dosymep.WPF.ViewModels;
+using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
+/// <summary>Представление помещения в списке.</summary>
 internal class SpatialModelViewModel : BaseViewModel {
     private string _name = string.Empty;
     private bool _isChecked;

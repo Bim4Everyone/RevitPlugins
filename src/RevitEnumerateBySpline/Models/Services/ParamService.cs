@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SystemParams;
 using dosymep.Revit;
@@ -38,8 +39,8 @@ internal class ParamService : IParamService {
 
         DefaultSpatialNameParam = GetDefaultNameParam();
         DefaultSpatialNumberParam = GetDefaultNumberParam();
-        DefaultDependentParam = GetDefaultNameParam();
         DefaultDependentSearchParam = GetDefaultNameParam();
+        DefaultDependentParam = SharedParamsConfig.Instance.RoomArea;
     }
 
     public IReadOnlyList<RevitParam> AllSpatialRevitParams { get; }

@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 
 using Ninject;
 using Ninject.Syntax;
 
 using Wpf.Ui.Abstractions;
 
-namespace RevitEnumerateBySpline.Providers;
+namespace RevitEnumerateBySpline.Models.Providers;
 
 internal sealed class NavigationViewPageProvider(IResolutionRoot resolutionRoot) : INavigationViewPageProvider {
     public object GetPage(Type pageType) {

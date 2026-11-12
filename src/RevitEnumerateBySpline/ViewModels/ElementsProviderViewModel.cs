@@ -1,9 +1,10 @@
-﻿using dosymep.WPF.ViewModels;
+using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models.Interfaces;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
+/// <summary>Представление источника помещений.</summary>
 internal class ElementsProviderViewModel : BaseViewModel{
     private string _name = string.Empty;
 

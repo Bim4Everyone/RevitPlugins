@@ -18,7 +18,7 @@ internal class SelectionService : ISelectionService {
         try {
             var refs = uiDoc.Selection.PickObjects(
                 ObjectType.Element,
-                new CurveSelectionFilter(uiDoc.Document),
+                new CurveSelectionFilter(),
                 prompt);
 
             return refs

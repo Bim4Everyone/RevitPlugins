@@ -8,56 +8,46 @@ using RevitEnumerateBySpline.Models.Interfaces;
 namespace RevitEnumerateBySpline.Models.Services;
 
 /// <summary>
-/// Разбивает линии на отрезки в порядке, заданном в интерфейсе.
+/// Разбивает линии на точки в порядке, заданном в интерфейсе.
 /// </summary>
 internal sealed class SplineDividerService : ISplineDividerService {
     private static readonly double _maxSegmentLength =
         UnitUtils.ConvertToInternalUnits(10, UnitTypeId.Millimeters);
 
-    public IReadOnlyList<SplineSegment> Divide(IEnumerable<CurveModel?> curveModels) {
-        var segments = new List<SplineSegment>();
-        int curveIndex = 0;
+    public IReadOnlyList<SplinePoint> Divide(IEnumerable<CurveModel?> curveModels) {
+        var points = new List<SplinePoint>();
 
         foreach(var curveModel in curveModels) {
             if(curveModel?.CurveElement?.GeometryCurve is not { } curve) {
-                curveIndex++;
                 continue;
             }
 
-            var points = curve.Tessellate();
-            if(points.Count < 2) {
-                curveIndex++;
+            var tessellatedPoints = curve.Tessellate();
+            if(tessellatedPoints.Count < 2) {
                 continue;
             }
 
-            double shortCurveTolerance = curveModel.CurveElement.Document.Application.ShortCurveTolerance;
-            int segmentIndex = 0;
-            XYZ startPoint = points[0];
+            XYZ startPoint = tessellatedPoints[0];
+            points.Add(new SplinePoint(startPoint, points.Count));
 
-            for(int pointIndex = 1; pointIndex < points.Count; pointIndex++) {
-                XYZ endPoint = points[pointIndex];
+            for(int pointIndex = 1; pointIndex < tessellatedPoints.Count; pointIndex++) {
+                XYZ endPoint = tessellatedPoints[pointIndex];
                 double edgeLength = startPoint.DistanceTo(endPoint);
-                if(edgeLength <= shortCurveTolerance) {
+                if(edgeLength == 0) {
                     continue;
                 }
 
                 int partCount = (int) Math.Ceiling(edgeLength / _maxSegmentLength);
-                XYZ partStart = startPoint;
 
                 for(int partIndex = 1; partIndex <= partCount; partIndex++) {
-                    XYZ partEnd = startPoint + (endPoint - startPoint).Multiply((double) partIndex / partCount);
-                    var segmentCurve = Line.CreateBound(partStart, partEnd);
-                    segments.Add(new SplineSegment(curveModel, segmentCurve, curveIndex, segmentIndex, segments.Count));
-                    segmentIndex++;
-                    partStart = partEnd;
+                    XYZ position = startPoint + (endPoint - startPoint).Multiply((double) partIndex / partCount);
+                    points.Add(new SplinePoint(position, points.Count));
                 }
 
                 startPoint = endPoint;
             }
-
-            curveIndex++;
         }
 
-        return segments;
+        return points;
     }
 }

@@ -2,7 +2,6 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Bim4Everyone.SharedParams;
 
 using pyRevitLabs.Json;
 
@@ -30,10 +29,8 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
     /// <summary>
     /// Метод создания конфигурации плагина.
     /// </summary>
-    /// <returns>
-	/// <param name="configSerializer">Сериализатор конфигурации.</param>
-    /// Возвращает прочитанную конфигурацию плагина, либо созданный конфиг по умолчанию.
-    /// </returns>
+    /// <param name="configSerializer">Сериализатор конфигурации.</param>
+    /// <returns>Прочитанная или новая конфигурация плагина.</returns>
     public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
             .SetSerializer(configSerializer)
@@ -69,6 +66,7 @@ internal class RevitSettings : ProjectSettings {
     public ConfigSettings? ConfigSettings { get; set; }
 }
 
+/// <summary>Системные значения по умолчанию для плагина.</summary>
 internal class SystemPluginConfig {
     // Системный параметр имени помещений по умолчанию
     public BuiltInParameter SystemRoomNameParamId => BuiltInParameter.ROOM_NAME;

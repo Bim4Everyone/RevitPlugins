@@ -69,9 +69,9 @@
     <system:String x:Key="MainViewModel.RangeRequired">Выберите диапазон обработки помещений</system:String>
     <system:String x:Key="MainViewModel.NumberParamRequired">Выберите параметр нумерации</system:String>
     <system:String x:Key="MainViewModel.StartNumberInvalid">Стартовый номер должен быть числом</system:String>
-    <system:String x:Key="MainViewModel.DependentParamRequired">Выберите параметр для поиска машино-места</system:String>
+    <system:String x:Key="MainViewModel.DependentParamRequired">Выберите параметр основного машино-места</system:String>
     <system:String x:Key="MainViewModel.SearchKeyRequired">Введите ключевое слово для поиска машино-мест</system:String>
-    <system:String x:Key="MainViewModel.DependentSearchParamRequired">Выберите параметр основного машино-места</system:String>
+    <system:String x:Key="MainViewModel.DependentSearchParamRequired">Выберите параметр для поиска машино-места</system:String>
 
     <system:String x:Key="WarningsViewModel.Redundant">Избыточные помещения</system:String>
     <system:String x:Key="WarningsViewModel.RedundantDescription">Помещения, расположенные в одной ограждённой области</system:String>

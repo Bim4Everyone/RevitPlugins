@@ -17,8 +17,8 @@ using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Factories;
 using RevitEnumerateBySpline.Models.Handlers;
 using RevitEnumerateBySpline.Models.Interfaces;
+using RevitEnumerateBySpline.Models.Providers;
 using RevitEnumerateBySpline.Models.Services;
-using RevitEnumerateBySpline.Providers;
 using RevitEnumerateBySpline.ViewModels;
 using RevitEnumerateBySpline.ViewModels.Warnings;
 using RevitEnumerateBySpline.Views;
@@ -86,8 +86,8 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
             .To<EnumerateBySpline>()
             .InSingletonScope();
 
-        kernel.Bind<ParamSetter>()
-            .ToSelf()
+        kernel.Bind<IParamSetter>()
+            .To<ParamSetter>()
             .InSingletonScope();
 
         kernel.Bind<ISpatialElementCheckService>()

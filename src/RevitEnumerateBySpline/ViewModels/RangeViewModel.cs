@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -13,6 +13,7 @@ using RevitEnumerateBySpline.Models.Interfaces;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
+/// <summary>Управляет выбором диапазона помещений.</summary>
 internal class RangeViewModel(
     ILocalizationService localizationService,
     IMessenger messenger,

@@ -3,6 +3,7 @@ using dosymep.WPF.ViewModels;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
+/// <summary>Представление параметра Revit.</summary>
 internal class ParamViewModel : BaseViewModel {
     private string _name = string.Empty;
 

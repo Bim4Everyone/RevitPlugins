@@ -1,7 +1,8 @@
-﻿using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone;
 
 namespace RevitEnumerateBySpline.Models.Settings;
 
+/// <summary>Настройки нумерации и зависимых помещений.</summary>
 public class ConfigSettings {
     public RevitParam? NumberParam { get; set; }
     public double? StartNumber { get; set; }

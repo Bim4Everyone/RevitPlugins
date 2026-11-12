@@ -2,7 +2,9 @@ using dosymep.SimpleServices;
 
 namespace RevitEnumerateBySpline.Views;
 
+/// <summary>Окно предупреждений о помещениях.</summary>
 public partial class WarningsWindow {
+    /// <summary>Создаёт окно предупреждений.</summary>
     public WarningsWindow(
         ILoggerService loggerService,
         ISerializationService serializationService,

@@ -3,13 +3,8 @@ using Autodesk.Revit.UI.Selection;
 
 namespace RevitEnumerateBySpline.Models;
 
+/// <summary>Разрешает выбирать линии модели и линии детализации.</summary>
 internal class CurveSelectionFilter : ISelectionFilter {
-    private readonly Document _doc;
-
-    public CurveSelectionFilter(Document doc) {
-        _doc = doc;
-    }
-
     public bool AllowElement(Element elem) {
         return elem is ModelCurve or DetailCurve;
     }

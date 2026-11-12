@@ -12,10 +12,12 @@ using RevitEnumerateBySpline.Models.Warnings;
 
 namespace RevitEnumerateBySpline.ViewModels.Warnings;
 
+/// <summary>Управляет окном предупреждений.</summary>
 internal sealed class WarningsViewModel {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
 
+    /// <summary>Создаёт модель окна предупреждений.</summary>
     public WarningsViewModel(ILocalizationService localizationService, RevitRepository revitRepository) {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
@@ -27,6 +29,7 @@ internal sealed class WarningsViewModel {
     public IReadOnlyList<WarningGroupViewModel> WarningViewModels { get; private set; } = [];
 
     /// <summary>Группирует предупреждения для отображения.</summary>
+    /// <param name="warnings">Предупреждения о помещениях.</param>
     public void LoadView(IReadOnlyCollection<WarningElement> warnings) {
         WarningQuantity = warnings.Count;
         WarningViewModels = warnings
