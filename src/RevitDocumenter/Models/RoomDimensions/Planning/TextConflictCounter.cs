@@ -146,7 +146,8 @@ internal static class TextConflictCounter {
         Func<IReadOnlyList<Point2D>, bool> fitsRoom,
         IReadOnlyList<Segment2D> contour,
         PlanningOptions options,
-        List<string> log) {
+        List<string> log,
+        ISet<VirtualDimension> movable = null) {
         dimensions.ThrowIfNull();
         fitsRoom.ThrowIfNull();
         contour.ThrowIfNull();
@@ -155,8 +156,21 @@ internal static class TextConflictCounter {
 
         // Первый проход: тексты по порядку, сдвинутые учитываются дальше
         var targets = new List<TextTarget>();
-        foreach(var dimension in dimensions) {
+        foreach(var dimension in dimensions.Where(d => movable is null || movable.Contains(d))) {
             for(int i = 0; i + 1 < dimension.Anchors.Count; i++) {
+                // При переносе цепочки сохраняем удачные места соседей. Переставляем лишь текст,
+                // которому действительно помешала новая линия или ее вспомогательные линии.
+                if(movable != null) {
+                    dimension.TextOffsets.TryGetValue(i, out var currentOffset);
+                    var current = GetTextBox(
+                        dimension, i, dimension.LinePosition, currentOffset, -GetTouchTolerance(options), options);
+                    if(current is null || ((currentOffset != null
+                        || current.Width <= current.Value + options.CoordinateTolerance)
+                       && FindCandidateConflict(current, dimensions, fitsRoom, options) is null)) {
+                        continue;
+                    }
+                    dimension.TextOffsets.Remove(i);
+                }
                 string reason = FindPlacementReason(dimension, i, dimensions, options);
                 if(reason is null) {
                     continue;
@@ -210,6 +224,69 @@ internal static class TextConflictCounter {
                         + (target.Crosses ? ", выноска пересекает линию размера" : ""));
             }
         }
+    }
+
+    /// <summary>
+    /// Остаточные проблемы текущей раскладки и цена сдвигов. Используется только при локальном переносе
+    /// цепочки: сначала устраняем проблемы, затем предпочитаем короткие сдвиги и выноски (D75).
+    /// </summary>
+    internal static (int Problems, double Cost) GetLayoutScore(
+        List<VirtualDimension> dimensions,
+        Func<IReadOnlyList<Point2D>, bool> fitsRoom,
+        PlanningOptions options) {
+        int problems = 0;
+        double cost = 0;
+        foreach(var dimension in dimensions) {
+            foreach(var text in GetTextBoxes(dimension, dimension.LinePosition, options, -GetTouchTolerance(options))) {
+                bool wider = text.Offset is null && text.Width > text.Value + options.CoordinateTolerance;
+                if(wider || FindCandidateConflict(text, dimensions, fitsRoom, options) != null) {
+                    problems++;
+                }
+                if(text.Offset != null) {
+                    cost += Math.Abs(text.Offset.Along) + Math.Abs(text.Offset.Across);
+                    if(text.Leader != null) {
+                        cost += options.TextSize * _leaderPenaltyRatio
+                                + _leaderLengthWeight * (text.Leader[1] - text.Leader[0]).Length;
+                    }
+                }
+            }
+        }
+        return (problems, cost);
+    }
+
+    /// <summary>
+    /// Цепочки с оставшимся неразмещенным текстом. Успешные помещения новый этап не затрагивает.
+    /// </summary>
+    internal static List<VirtualDimension> GetUnplacedChains(
+        List<VirtualDimension> dimensions,
+        Func<IReadOnlyList<Point2D>, bool> fitsRoom,
+        PlanningOptions options) {
+        return dimensions.Where(d => d.Kind == "Chain" && GetTextBoxes(
+                d, d.LinePosition, options, -GetTouchTolerance(options)).Any(t =>
+                (t.Offset is null && t.Width > t.Value + options.CoordinateTolerance)
+                || FindCandidateConflict(t, dimensions, fitsRoom, options) != null))
+            .ToList();
+    }
+
+    /// <summary>
+    /// Тексты в полосе переноса цепочки. Остальные сдвиги фиксированы во всех пробных раскладках.
+    /// </summary>
+    internal static HashSet<VirtualDimension> GetAffectedDimensions(
+        VirtualDimension chain,
+        double position,
+        List<VirtualDimension> dimensions,
+        PlanningOptions options) {
+        var points = GetDimensionLine(chain, chain.LinePosition).Concat(GetDimensionLine(chain, position)).ToList();
+        double margin = 2 * options.TextSize;
+        double minX = points.Min(p => p.X) - margin;
+        double maxX = points.Max(p => p.X) + margin;
+        double minY = points.Min(p => p.Y) - margin;
+        double maxY = points.Max(p => p.Y) + margin;
+        bool Overlaps(IReadOnlyList<Point2D> polygon) => polygon.Min(p => p.X) <= maxX
+            && polygon.Max(p => p.X) >= minX && polygon.Min(p => p.Y) <= maxY && polygon.Max(p => p.Y) >= minY;
+        return new HashSet<VirtualDimension>(dimensions.Where(d => d == chain
+            || GetTextBoxes(d, d.LinePosition, options)
+                .Any(t => Overlaps(t.Corners) || (t.Leader != null && Overlaps(t.Leader)))));
     }
 
     /// <summary>

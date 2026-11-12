@@ -69,6 +69,9 @@ internal class ContourDimensionPlanner {
 
         // Модель текста (D62): тексты с конфликтами сдвигаются (D68), оставшиеся конфликты - в журнал
         TextConflictCounter.Place(dimensions, shape.ContainsShape, shape.Segments, options, log);
+        ChainLayoutRefiner.Refine(
+            dimensions, shape.ContainsShape, shape.Segments,
+            (chain, position) => IsLocalChainPositionValid(shape, chain, position, dimensions, options), options, log);
         TextConflictCounter.Count(dimensions, options, log);
         return dimensions;
     }
@@ -377,6 +380,29 @@ internal class ContourDimensionPlanner {
             result.Add(overall);
         }
         return result;
+    }
+
+    /// <summary>
+    /// Допустимое положение при локальном переносе: линия и ее отступ внутри помещения,
+    /// шаг яруса и порядок относительно параллельных линий сохранены.
+    /// </summary>
+    private static bool IsLocalChainPositionValid(
+        RoomShape shape,
+        VirtualDimension chain,
+        double position,
+        List<VirtualDimension> dimensions,
+        PlanningOptions options) {
+        // В локальной раскладке тексты проверяются в фактическом положении после Place, а не в полосе
+        // их стандартного положения. Отступ самой линии от контура и шаг яруса сохраняются.
+        double tolerance = options.CoordinateTolerance;
+        if(!shape.Contains(chain, position)
+           || !shape.ContainsBand(
+               chain, position - options.Offset + tolerance, position + options.Offset - tolerance)) {
+            return false;
+        }
+        return dimensions.Where(d => d != chain && IsSameDirection(d, chain) && Overlaps(d, chain, options))
+            .All(d => Math.Abs(d.LinePosition - position) >= options.TierStep - tolerance
+                      && (d.LinePosition - position) * (d.LinePosition - chain.LinePosition) > 0);
     }
 
     /// <summary>
