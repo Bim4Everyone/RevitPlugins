@@ -11,7 +11,8 @@ namespace RevitEnumerateBySpline.Models.Services;
 /// </summary>
 internal sealed class EnumerateBySpline(
     ISplineDividerService splineDividerService,
-    ISplineSpatialIntersectionService intersectionService) : IEnumerateBySpline {
+    ISplineSpatialIntersectionService intersectionService,
+    ParamSetter paramSetter) : IEnumerateBySpline {
 
     public IReadOnlyList<SpatialSegmentIntersection> OrderedIntersections { get; private set; } = [];
 
@@ -22,6 +23,7 @@ internal sealed class EnumerateBySpline(
             .FindIntersections(settings.SpatialModels ?? [], segments)
             .OrderBy(intersection => intersection.SplineSegment.Index)
             .ToList();
-        // Здесь позже будет вызван ParamSetterService для OrderedIntersections.
+        paramSetter.SetParams(OrderedIntersections, settings.ConfigSettings
+            ?? throw new System.ArgumentException("Не заданы настройки нумерации.", nameof(settings)));
     }
 }

@@ -86,6 +86,10 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
             .To<EnumerateBySpline>()
             .InSingletonScope();
 
+        kernel.Bind<ParamSetter>()
+            .ToSelf()
+            .InSingletonScope();
+
         kernel.Bind<ISpatialElementCheckService>()
             .To<SpatialElementCheckService>()
             .InSingletonScope();
