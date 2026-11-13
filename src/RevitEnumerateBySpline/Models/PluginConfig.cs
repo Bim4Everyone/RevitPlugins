@@ -2,6 +2,7 @@ using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SharedParams;
 
 using pyRevitLabs.Json;
 
@@ -68,10 +69,14 @@ internal class RevitSettings : ProjectSettings {
 
 /// <summary>Системные значения по умолчанию для плагина.</summary>
 internal class SystemPluginConfig {
+    // Максимальная длина сегмента при разбиении линий, мм.
+    public double MaxSegmentLengthMm => 10;
     // Системный параметр имени помещений по умолчанию
     public BuiltInParameter SystemRoomNameParamId => BuiltInParameter.ROOM_NAME;
     // Системный параметр номера помещений по умолчанию
     public BuiltInParameter SystemRoomNumberParamId => BuiltInParameter.ROOM_NUMBER;
+    // Параметр основного машино-места по умолчанию.
+    public RevitParam DefaultDependentParam => SharedParamsConfig.Instance.RoomArea;
     public double DefaultStartNumber => 1;
     public string DefaultPrefix => string.Empty;
     public string DefaultSuffix => string.Empty;

@@ -10,9 +10,9 @@ namespace RevitEnumerateBySpline.Models.Services;
 /// <summary>
 /// Разбивает линии на точки в порядке, заданном в интерфейсе.
 /// </summary>
-internal sealed class SplineDividerService : ISplineDividerService {
-    private static readonly double _maxSegmentLength =
-        UnitUtils.ConvertToInternalUnits(10, UnitTypeId.Millimeters);
+internal sealed class SplineDividerService(SystemPluginConfig systemPluginConfig) : ISplineDividerService {
+    private readonly double _maxSegmentLength =
+        UnitUtils.ConvertToInternalUnits(systemPluginConfig.MaxSegmentLengthMm, UnitTypeId.Millimeters);
 
     public IReadOnlyList<SplinePoint> Divide(IEnumerable<CurveModel?> curveModels) {
         var points = new List<SplinePoint>();
@@ -27,11 +27,11 @@ internal sealed class SplineDividerService : ISplineDividerService {
                 continue;
             }
 
-            XYZ startPoint = tessellatedPoints[0];
+            var startPoint = tessellatedPoints[0];
             points.Add(new SplinePoint(startPoint, points.Count));
 
             for(int pointIndex = 1; pointIndex < tessellatedPoints.Count; pointIndex++) {
-                XYZ endPoint = tessellatedPoints[pointIndex];
+                var endPoint = tessellatedPoints[pointIndex];
                 double edgeLength = startPoint.DistanceTo(endPoint);
                 if(edgeLength == 0) {
                     continue;
@@ -40,7 +40,7 @@ internal sealed class SplineDividerService : ISplineDividerService {
                 int partCount = (int) Math.Ceiling(edgeLength / _maxSegmentLength);
 
                 for(int partIndex = 1; partIndex <= partCount; partIndex++) {
-                    XYZ position = startPoint + (endPoint - startPoint).Multiply((double) partIndex / partCount);
+                    var position = startPoint + (endPoint - startPoint).Multiply((double) partIndex / partCount);
                     points.Add(new SplinePoint(position, points.Count));
                 }
 
