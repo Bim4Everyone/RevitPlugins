@@ -93,5 +93,7 @@
     <system:String x:Key="MainWindow.ButtonOk">Number</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
     <system:String x:Key="ParamSetter.TransactionName">Number rooms along a line</system:String>
+    <system:String x:Key="Common.ParamErrorMessageBody">Error loading parameters</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Plug-in configuration error</system:String>
 </ResourceDictionary>
 

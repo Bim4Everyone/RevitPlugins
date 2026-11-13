@@ -1,5 +1,7 @@
+using System;
 using System.Globalization;
 using System.Reflection;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -153,6 +155,24 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         kernel.UseWpfLocalization(
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+
+        // Загружаем общий параметр до создания ParamService и списка параметров помещений.
+        bool isParamChecked = new CheckProjectParams(
+                kernel.Get<SystemPluginConfig>(),
+                uiApplication.Application,
+                uiApplication.ActiveUIDocument.Document)
+            .CopyProjectParams()
+            .GetIsChecked();
+
+        if(!isParamChecked) {
+            var localizationService = kernel.Get<ILocalizationService>();
+            kernel.Get<IMessageBoxService>().Show(
+                localizationService.GetLocalizedString("Common.ParamErrorMessageBody"),
+                localizationService.GetLocalizedString("Common.ConfigErrorMessageTitle"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Exclamation);
+            throw new OperationCanceledException();
+        }
 
         // Сначала создаём окно и его DataContext, затем запускаем цикл диалогов.
         _ = kernel.Get<MainWindow>();
