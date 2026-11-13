@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -76,7 +75,7 @@ internal class Frame {
 
     public XYZ GetLocation() {
         XYZ location = ((LocationPoint) FrameInstance.Location).Point;
-        double halfWidthStep = 0.5 * GetParam<double>(FrameInstance, _widthStepParam);
+        double halfWidthStep = 0.5 * FrameInstance.GetParamValue<double>(_widthStepParam);
 
         XYZ currentLocation = new XYZ
                     (
@@ -89,75 +88,38 @@ internal class Frame {
     }
 
     private void SetParams(IFrameParams frameParams) {
-        SetParam(_longRebarCodeParam, (int) _longRebarClass);
+        FrameInstance.SetParamValue(_longRebarCodeParam, (int) _longRebarClass);
         // В каркасе две пары продольных стержней; выбранный диаметр задается обеим парам.
-        SetParam(_longRebarDiameterTopParam, frameParams.LongRebarDiameter);
-        SetParam(_longRebarDiameterBottomParam, frameParams.LongRebarDiameter);
-        SetParam(_stirrupCodeParam, (int) frameParams.StirrupRebarClass);
+        FrameInstance.SetParamValue(_longRebarDiameterTopParam, frameParams.LongRebarDiameter);
+        FrameInstance.SetParamValue(_longRebarDiameterBottomParam, frameParams.LongRebarDiameter);
+        FrameInstance.SetParamValue(_stirrupCodeParam, (int) frameParams.StirrupRebarClass);
 
-        SetParam(_widthStepParam,
-                 frameParams.FrameWidth - frameParams.StirrupRebarDiameter - frameParams.LongRebarDiameter);
-        SetParam(_heightStepParam, frameParams.GetFrameHeight());
+        FrameInstance.SetParamValue(
+            _widthStepParam,
+            frameParams.FrameWidth - frameParams.StirrupRebarDiameter - frameParams.LongRebarDiameter);
+        FrameInstance.SetParamValue(_heightStepParam, frameParams.GetFrameHeight());
 
-        SetParam(_anchorageTop1Param, frameParams.LongRebarAnchorageLength);
-        SetParam(_anchorageTop2Param, frameParams.LongRebarAnchorageLength);
-        SetParam(_anchorageBottom1Param, frameParams.LongRebarAnchorageLength);
-        SetParam(_anchorageBottom2Param, frameParams.LongRebarAnchorageLength);
+        FrameInstance.SetParamValue(_anchorageTop1Param, frameParams.LongRebarAnchorageLength);
+        FrameInstance.SetParamValue(_anchorageTop2Param, frameParams.LongRebarAnchorageLength);
+        FrameInstance.SetParamValue(_anchorageBottom1Param, frameParams.LongRebarAnchorageLength);
+        FrameInstance.SetParamValue(_anchorageBottom2Param, frameParams.LongRebarAnchorageLength);
 
-        SetParam(_stirrupChangeBindingParam, _stirrupChangeBindingValue);
+        FrameInstance.SetParamValue(_stirrupChangeBindingParam, _stirrupChangeBindingValue);
 
-        SetParam(_stirrupDiameterParam, frameParams.StirrupRebarDiameter);
-        SetParam(_stirrupBendLengthParam, frameParams.StirrupBendLength);
-        SetParam(_stirrupStepParam, frameParams.StirrupStep);
-        SetParam(_stirrupCountParam, frameParams.GetFrameLength() / frameParams.StirrupStep + 1);
+        FrameInstance.SetParamValue(_stirrupDiameterParam, frameParams.StirrupRebarDiameter);
+        FrameInstance.SetParamValue(_stirrupBendLengthParam, frameParams.StirrupBendLength);
+        FrameInstance.SetParamValue(_stirrupStepParam, frameParams.StirrupStep);
+        FrameInstance.SetParamValue(
+            _stirrupCountParam,
+            frameParams.GetFrameLength() / frameParams.StirrupStep + 1);
 
         if(frameParams.HostSlab.SlabInstance.InAnyCategory(BuiltInCategory.OST_StructuralFoundation)) {
-            SetParam(_krGroupParam, _foundationSlabKrGroup);
+            FrameInstance.SetParamValue(_krGroupParam, _foundationSlabKrGroup);
         } else {
-            SetParam(_krGroupParam, _floorSlabKrGroup);
+            FrameInstance.SetParamValue(_krGroupParam, _floorSlabKrGroup);
         }
 
         CopyParametersFromSlab(frameParams.HostSlab.SlabInstance);
-    }
-
-    private void SetParam(string paramName, string paramValue) {
-        Parameter param = FrameInstance.LookupParameter(paramName);
-
-        if(param == null) {
-            throw new InvalidOperationException($"Параметр {paramName} не существует");
-        }
-
-        param.Set(paramValue);
-    }
-
-    private void SetParam(string paramName, int paramValue) {
-        Parameter param = FrameInstance.LookupParameter(paramName);
-
-        if(param == null) {
-            throw new InvalidOperationException($"Параметр {paramName} не существует");
-        }
-
-        param.Set(paramValue);
-    }
-
-    private void SetParam(string paramName, double paramValue) {
-        Parameter param = FrameInstance.LookupParameter(paramName);
-
-        if(param == null) {
-            throw new InvalidOperationException($"Параметр {paramName} не существует");
-        }
-
-        param.Set(paramValue);
-    }
-
-    private T GetParam<T>(Element hostElement, string paramName) {
-        Parameter param = hostElement.LookupParameter(paramName);
-
-        if(param == null) {
-            throw new InvalidOperationException($"Параметр {paramName} не существует");
-        }
-
-        return (T) param.AsObject();
     }
 
     /// <summary>
