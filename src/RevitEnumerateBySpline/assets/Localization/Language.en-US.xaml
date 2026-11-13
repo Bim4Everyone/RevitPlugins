@@ -1,35 +1,96 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
-
-    <!-- Пример перевода на американский английский язык (google translate) -->
-
-    <system:String x:Key="MainWindow.Title">Sample command</system:String>
-    <system:String x:Key="MainWindow.Hello">Hello Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Enter a value for the property to save.</system:String>
-
-    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
-    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
-
-    <system:String x:Key="MainViewModel.RangeRequired">Select a room processing range</system:String>
+    
+    <system:String x:Key="MainWindow.Title">Spline Enumerator</system:String>
+    <system:String x:Key="MainWindow.Settings">Plugin Settings</system:String>
+    <system:String x:Key="MainWindow.CommonSettings">General Settings</system:String>
+    <system:String x:Key="MainWindow.ParamSettings">Parameter Settings</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.RangeElements">Room Processing Scope</system:String>
+    <system:String x:Key="CommonSettingsPage.RangeElementsDescription">Select which rooms to process</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.FilterElements">Filter Rooms by Parameter</system:String>
+    <system:String x:Key="CommonSettingsPage.FilterElementsDescription">Select a parameter and filter by its value</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.LineSet">Lines / Splines for Numbering</system:String>
+    <system:String x:Key="CommonSettingsPage.LineSetDescription">Select lines or splines for numbering</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.ResetFilter">Default</system:String>
+    <system:String x:Key="CommonSettingsPage.DeleteAllLines">Delete All</system:String>
+    <system:String x:Key="CommonSettingsPage.SelectLines">Select Lines in Model</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParameters">Numbering Settings</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParametersDescription">Settings that affect the displayed number</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParkParameter">Numbering Settings Parking Spaces</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParkParameterDescription">Select parameters for numbering dependent parking spaces</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParameter">Numbering Parameter</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParameterDescription">Parameter where the value will be stored</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.StartNumber">Starting Number</system:String>
+    <system:String x:Key="CommonSettingsPage.StartNumberDescription">Number to start numbering from</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Prefix">Prefix</system:String>
+    <system:String x:Key="CommonSettingsPage.PrefixDescription">Text before the number</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Suffix">Suffix</system:String>
+    <system:String x:Key="CommonSettingsPage.SuffixDescription">Text after the number</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.SearchDependentParkParameter">Search for Marker in Parameter</system:String>
+    <system:String x:Key="CommonSettingsPage.SearchDependentParkParameterDescription">Parameter value to search for the keyword</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Key">Keyword</system:String>
+    <system:String x:Key="CommonSettingsPage.KeyDescription">Parameter value to search for the keyword</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.MainParkParameter">Main Parking Space Parameter</system:String>
+    <system:String x:Key="CommonSettingsPage.MainParkParameterDescription">Parameter where the main parking space will be stored</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.SelectAll">Select All</system:String>
+    <system:String x:Key="CommonSettingsPage.ClearSelections">Clear Selection</system:String>
+    <system:String x:Key="CommonSettingsPage.SearchText">Search by Value</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.MoveUpCurveCommand">Move Up</system:String>
+    <system:String x:Key="CommonSettingsPage.MoveDownCurveCommand">Move Down</system:String>
+    <system:String x:Key="CommonSettingsPage.DeleteCurveCommand">Delete Selected</system:String>
+    
+    <system:String x:Key="RangeViewModel.AllElementsProvider">All Elements</system:String>
+    <system:String x:Key="RangeViewModel.SelectedElementsProvider">Selected Elements</system:String>
+    <system:String x:Key="RangeViewModel.CurrentViewProvider">Visible in View</system:String>
+    
+    <system:String x:Key="CurveModelsViewModel.SelectCurves.Prompt">Select lines in the model and click DONE</system:String>
+    
+    
+    <system:String x:Key="MainViewModel.NotSelected">No rooms are selected in the model</system:String>
+    <system:String x:Key="MainViewModel.NoRoomsOnView">No rooms are on view</system:String>
+    <system:String x:Key="MainViewModel.NoSelection">No rooms selected</system:String>
+    <system:String x:Key="MainViewModel.NoCurves">No lines selected</system:String>
+    <system:String x:Key="MainViewModel.RangeRequired">Select a room processing scope</system:String>
     <system:String x:Key="MainViewModel.NumberParamRequired">Select a numbering parameter</system:String>
-    <system:String x:Key="MainViewModel.StartNumberInvalid">The start number must be numeric</system:String>
-    <system:String x:Key="MainViewModel.DependentParamRequired">Select the parameter for the main parking space</system:String>
-    <system:String x:Key="MainViewModel.SearchKeyRequired">Enter the keyword used to find parking spaces</system:String>
-    <system:String x:Key="MainViewModel.DependentSearchParamRequired">Select the parameter used to find parking spaces</system:String>
+    <system:String x:Key="MainViewModel.StartNumberInvalid">Starting Number must be a number</system:String>
+    <system:String x:Key="MainViewModel.DependentParamRequired">Select the main parking space parameter</system:String>
+    <system:String x:Key="MainViewModel.SearchKeyRequired">Enter a keyword to search for parking spaces</system:String>
+    <system:String x:Key="MainViewModel.DependentSearchParamRequired">Select a parameter to search for parking spaces</system:String>
 
-    <system:String x:Key="WarningsViewModel.Redundant">Redundant rooms</system:String>
-    <system:String x:Key="WarningsViewModel.RedundantDescription">Rooms in the same enclosed area</system:String>
-    <system:String x:Key="WarningsViewModel.NotEnclosed">Unenclosed or unplaced rooms</system:String>
-    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Rooms without boundaries or without a location on a plan</system:String>
-    <system:String x:Key="WarningWindow.Title">Enumerate by spline — warnings</system:String>
-    <system:String x:Key="WarningWindow.ShowHeader">Select</system:String>
+    <system:String x:Key="WarningsViewModel.Redundant">Duplicate Rooms</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Rooms located in the same enclosed area</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Unenclosed or Unplaced Rooms</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Rooms without boundaries or without a location on the plan</system:String>
+    <system:String x:Key="WarningWindow.Title">Spline Enumerator — Warnings</system:String>
+    <system:String x:Key="WarningWindow.ShowHeader">Highlight</system:String>
     <system:String x:Key="WarningWindow.ElementIdHeader">Room ID</system:String>
-    <system:String x:Key="WarningWindow.NameHeader">Room name</system:String>
-    <system:String x:Key="WarningWindow.LevelNameHeader">Room level</system:String>
-    <system:String x:Key="RevitRepository.NoLevel">— No level —</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Room Name</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Room Level</system:String>
+    <system:String x:Key="RevitRepository.NoLevel">— No Level —</system:String>
+    
+    <system:String x:Key="SelectionService.CancelledSelectionElements">Error</system:String>
 
-    <system:String x:Key="ParamService.NoValue">No value</system:String>
+    <system:String x:Key="ParamService.NoValue">No Value</system:String>
     <system:String x:Key="ParamService.Yes">Yes</system:String>
     <system:String x:Key="ParamService.No">No</system:String>
+    
+    <system:String x:Key="MainWindow.ButtonOk">Number</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
 </ResourceDictionary>
+

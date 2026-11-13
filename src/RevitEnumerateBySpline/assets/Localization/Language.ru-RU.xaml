@@ -61,7 +61,6 @@
     
     <system:String x:Key="CurveModelsViewModel.SelectCurves.Prompt">Выберите линии в модели и нажмите ГОТОВО</system:String>
     
-    
     <system:String x:Key="MainViewModel.NotSelected">Не выделены помещения в модели</system:String>
     <system:String x:Key="MainViewModel.NoRoomsOnView">Нет помещений на активном виде</system:String>
     <system:String x:Key="MainViewModel.NoSelection">Не выбраны помещения</system:String>
@@ -75,7 +74,7 @@
 
     <system:String x:Key="WarningsViewModel.Redundant">Избыточные помещения</system:String>
     <system:String x:Key="WarningsViewModel.RedundantDescription">Помещения, расположенные в одной ограждённой области</system:String>
-    <system:String x:Key="WarningsViewModel.NotEnclosed">Неограждённые или неразмещённые помещения</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Не окруженные или не размещённые помещения</system:String>
     <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Помещения без границ или без размещения на плане</system:String>
     <system:String x:Key="WarningWindow.Title">Нумератор по линии — предупреждения</system:String>
     <system:String x:Key="WarningWindow.ShowHeader">Выделить</system:String>
@@ -89,9 +88,6 @@
     <system:String x:Key="ParamService.NoValue">Нет значения</system:String>
     <system:String x:Key="ParamService.Yes">Да</system:String>
     <system:String x:Key="ParamService.No">Нет</system:String>
-    
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
 
     <system:String x:Key="MainWindow.ButtonOk">Нумеровать</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
