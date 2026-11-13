@@ -1,0 +1,123 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Поперечное армирование</system:String>
+
+    <system:String x:Key="MainWindow.GeneralSettings">Общие настройки</system:String>
+    <system:String x:Key="MainWindow.PylonsFromModel">Пилоны из модели (выбрано {0})</system:String>
+    <system:String x:Key="MainWindow.PylonsFromLink">Пилоны из связи (выбрано {0})</system:String>
+    <system:String x:Key="MainWindow.SlabSelected">Плита (выбрана)</system:String>
+    <system:String x:Key="MainWindow.SlabNotSelected">Плита (не выбрана)</system:String>
+    <system:String x:Key="MainWindow.ButtonSelect">Выбрать</system:String>
+
+    <system:String x:Key="MainWindow.SchemeTitle">Схема раскладки каркасов в плане</system:String>
+    <system:String x:Key="MainWindow.SchemeFrames">Каркасы, зазор между ними — ширина каркаса</system:String>
+    <system:String x:Key="MainWindow.SchemeFirstRow">a₀ = h₀/3 — от грани пилона до каркасов</system:String>
+    <system:String x:Key="MainWindow.SchemeZone">1,5·h₀ — граница зоны продавливания</system:String>
+    <system:String x:Key="MainWindow.SchemeWorkingHeight">h₀ — рабочая высота сечения плиты</system:String>
+
+    <system:String x:Key="MainWindow.SlabRebar">Арматура плиты</system:String>
+    <system:String x:Key="MainWindow.RebarDiameter">Диаметр стержней, мм</system:String>
+    <system:String x:Key="MainWindow.RebarCover">Защитный слой</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromSlab">Из плиты</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromUser">Вручную</system:String>
+    <system:String x:Key="MainWindow.RebarCoverTop">Сверху, мм</system:String>
+    <system:String x:Key="MainWindow.RebarCoverBottom">Снизу, мм</system:String>
+
+    <system:String x:Key="MainWindow.FrameRebar">Арматура каркасов</system:String>
+    <system:String x:Key="MainWindow.FrameGroup">Каркас</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Семейство</system:String>
+    <system:String x:Key="MainWindow.FamilyType">Тип</system:String>
+    <system:String x:Key="MainWindow.FrameWidth">Ширина, мм</system:String>
+    <system:String x:Key="MainWindow.StirrupsGroup">Хомуты</system:String>
+    <system:String x:Key="MainWindow.StirrupDiameter">Диаметр, мм</system:String>
+    <system:String x:Key="MainWindow.StirrupRebarClass">Класс стержней</system:String>
+    <system:String x:Key="MainWindow.StirrupStep">Шаг, мм</system:String>
+    <system:String x:Key="MainWindow.StirrupBendLength">Длина отгибов, мм</system:String>
+    <system:String x:Key="MainWindow.LongRebarGroup">Продольные стержни</system:String>
+    <system:String x:Key="MainWindow.LongRebarDiameter">Диаметр, мм</system:String>
+    <system:String x:Key="MainWindow.LongRebarAnchorageLength">Выпуск за крайние хомуты, мм</system:String>
+
+    <system:String x:Key="MainWindow.ResetToDefault">Сбросить к значению по умолчанию: {0}</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String x:Key="MainWindow.ErrorSelectPylons">Выберите пилоны</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectSlab">Выберите плиту</system:String>
+    <system:String x:Key="MainWindow.ErrorSlabTopFace">Выберите плиту с горизонтальным верхом на одной отметке: наклонные и разноуровневые плиты пока не поддерживаются</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverTop">Защитный слой сверху: нужно целое число мм больше 0 и не больше половины толщины плиты</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverBottom">Защитный слой снизу: нужно целое число мм больше 0 и не больше половины толщины плиты</system:String>
+    <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">У плиты не назначен защитный слой сверху или снизу</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamily">Выберите семейство каркаса</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamilyType">Выберите тип каркаса</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameWidth">Ширина каркаса: введите целое число мм больше 0</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameWidthTooSmall">Ширина каркаса должна быть больше суммы диаметров хомута и продольного стержня</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameHeight">При выбранной толщине плиты, защитных слоях и диаметрах высота каркаса должна быть больше 0</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupStep">Шаг хомутов: введите целое число мм больше 0</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupBendLength">Длина отгибов хомутов: введите целое число мм больше 0</system:String>
+    <system:String x:Key="MainWindow.ErrorLongRebarAnchorageLength">Выпуск продольных стержней: введите целое число мм, 0 или больше</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Расстановка каркасов</system:String>
+
+    <system:String x:Key="RevitUI.PickSlab">Выберите плиту</system:String>
+    <system:String x:Key="RevitUI.PickPylons">Выберите пилоны</system:String>
+
+    <system:String x:Key="RebarClass.A500C">А500С</system:String>
+    <system:String x:Key="RebarClass.A240">А240</system:String>
+
+    <system:String x:Key="Report.Summary">Пилонов обработано: {0} из {1}. Каркасов создано: {2}.</system:String>
+    <system:String x:Key="Report.SkippedPylons">Пропущенные пилоны:</system:String>
+    <system:String x:Key="Report.PylonName">{0}, Id {1}</system:String>
+    <system:String x:Key="Report.ErrorPylonSize">не заданы длина или ширина пилона</system:String>
+
+    <system:String x:Key="Parameters.Title">Настройки параметров</system:String>
+    <system:String x:Key="Parameters.Intro">Введите имена параметров. Для копирования из плиты используется одно имя: оно должно быть одинаковым у плиты и каркаса. Настройки сохраняются по OK основного экрана.</system:String>
+    <system:String x:Key="Parameters.Default">По умолчанию: {0}</system:String>
+    <system:String x:Key="Parameters.Reset">Сбросить</system:String>
+    <system:String x:Key="Parameters.ResetAll">Сбросить все</system:String>
+    <system:String x:Key="Parameters.LongRebarCode.Title">Класс продольных стержней</system:String>
+    <system:String x:Key="Parameters.LongRebarCode.Description">Запись кода класса продольной арматуры. Сейчас A500C соответствует коду 501.</system:String>
+    <system:String x:Key="Parameters.LongRebarDiameterTop.Title">Диаметр верхних продольных стержней</system:String>
+    <system:String x:Key="Parameters.LongRebarDiameterTop.Description">Диаметр двух верхних продольных стержней; берётся выбранный пользователем диаметр.</system:String>
+    <system:String x:Key="Parameters.LongRebarDiameterBottom.Title">Диаметр нижних продольных стержней</system:String>
+    <system:String x:Key="Parameters.LongRebarDiameterBottom.Description">Диаметр двух нижних продольных стержней; берётся тот же выбранный диаметр.</system:String>
+    <system:String x:Key="Parameters.StirrupCode.Title">Класс хомутов</system:String>
+    <system:String x:Key="Parameters.StirrupCode.Description">Код выбранного класса хомутов: A240 — 240, A500C — 501. Иные соглашения о кодах требуют отдельного решения.</system:String>
+    <system:String x:Key="Parameters.WidthStep.Title">Шаг продольных стержней по ширине</system:String>
+    <system:String x:Key="Parameters.WidthStep.Description">Ширина каркаса за вычетом диаметров хомута и продольного стержня. Также используется для определения положения каркаса.</system:String>
+    <system:String x:Key="Parameters.HeightStep.Title">Шаг продольных стержней по высоте</system:String>
+    <system:String x:Key="Parameters.HeightStep.Description">Расстояние по высоте, рассчитанное по толщине плиты, защитным слоям и диаметрам арматуры.</system:String>
+    <system:String x:Key="Parameters.AnchorageTop1.Title">Анкеровка верхнего стержня, конец 1</system:String>
+    <system:String x:Key="Parameters.AnchorageTop1.Description">Длина первой анкеровки верхних продольных стержней.</system:String>
+    <system:String x:Key="Parameters.AnchorageTop2.Title">Анкеровка верхнего стержня, конец 2</system:String>
+    <system:String x:Key="Parameters.AnchorageTop2.Description">Длина второй анкеровки верхних продольных стержней.</system:String>
+    <system:String x:Key="Parameters.AnchorageBottom1.Title">Анкеровка нижнего стержня, конец 1</system:String>
+    <system:String x:Key="Parameters.AnchorageBottom1.Description">Длина первой анкеровки нижних продольных стержней.</system:String>
+    <system:String x:Key="Parameters.AnchorageBottom2.Title">Анкеровка нижнего стержня, конец 2</system:String>
+    <system:String x:Key="Parameters.AnchorageBottom2.Description">Длина второй анкеровки нижних продольных стержней.</system:String>
+    <system:String x:Key="Parameters.StirrupChangeBinding.Title">Изменение привязки хомутов</system:String>
+    <system:String x:Key="Parameters.StirrupChangeBinding.Description">Управляющий переключатель семейства. Плагин записывает 1. Точный смысл переключателя должен соответствовать исходному семейству.</system:String>
+    <system:String x:Key="Parameters.StirrupDiameter.Title">Диаметр хомутов</system:String>
+    <system:String x:Key="Parameters.StirrupDiameter.Description">Диаметр поперечной арматуры, выбранный в основном окне.</system:String>
+    <system:String x:Key="Parameters.StirrupBendLength.Title">Длина отгибов хомутов</system:String>
+    <system:String x:Key="Parameters.StirrupBendLength.Description">Длина отгибов хомутов, заданная пользователем.</system:String>
+    <system:String x:Key="Parameters.StirrupStep.Title">Шаг хомутов</system:String>
+    <system:String x:Key="Parameters.StirrupStep.Description">Расстояние между хомутами вдоль каркаса.</system:String>
+    <system:String x:Key="Parameters.StirrupCount.Title">Количество хомутов</system:String>
+    <system:String x:Key="Parameters.StirrupCount.Description">Длина каркаса / шаг хомутов + 1. Требуется параметр «Число» с хранением Double.</system:String>
+    <system:String x:Key="Parameters.KrGroup.Title">Группа КР каркаса</system:String>
+    <system:String x:Key="Parameters.KrGroup.Description">Запись группы ФП_Каркасы_Продавливание для фундамента либо ПП_Каркасы_Продавливание для перекрытия.</system:String>
+    <system:String x:Key="Parameters.ProjectSection.Title">Раздел проекта</system:String>
+    <system:String x:Key="Parameters.ProjectSection.Description">Копируется из выбранной плиты в одноимённый параметр каркаса.</system:String>
+    <system:String x:Key="Parameters.ConsumptionMark.Title">Марка ведомости расхода</system:String>
+    <system:String x:Key="Parameters.ConsumptionMark.Description">Копируется из плиты в каркас для принадлежности к ведомости расхода арматуры.</system:String>
+    <system:String x:Key="Parameters.OrgLevel.Title">Организационный уровень</system:String>
+    <system:String x:Key="Parameters.OrgLevel.Description">Копируется из плиты в каркас для принятой в проекте классификации.</system:String>
+    <system:String x:Key="Parameters.Group.Longitudinal">Продольные стержни</system:String>
+    <system:String x:Key="Parameters.Group.Stirrups">Хомуты</system:String>
+    <system:String x:Key="Parameters.Group.Geometry">Габариты и привязка</system:String>
+    <system:String x:Key="Parameters.Group.Data">Данные плиты и каркаса</system:String>
+    <system:String x:Key="Parameters.Apply">Применить</system:String>
+    <system:String x:Key="Report.ParameterError">Параметр «{0}», имя «{1}»: {2}</system:String>
+    <system:String x:Key="Report.CopyParameterMissing">Параметр с указанным именем не найден в плите или каркасе.</system:String>
+</ResourceDictionary>
