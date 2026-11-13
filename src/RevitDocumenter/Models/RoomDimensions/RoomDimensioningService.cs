@@ -8,7 +8,8 @@ using Autodesk.Revit.DB;
 using dosymep.SimpleServices;
 
 using RevitDocumenter.Models.RoomDimensions.Contours;
-using RevitDocumenter.Models.RoomDimensions.Debug;
+using RevitDocumenter.Models.RoomDimensions.Diagnostics;
+using RevitDocumenter.Models.RoomDimensions.Geometry;
 using RevitDocumenter.Models.RoomDimensions.Layout;
 using RevitDocumenter.Models.RoomDimensions.Planning;
 using RevitDocumenter.Models.RoomDimensions.Settings;
@@ -76,6 +77,11 @@ internal class RoomDimensioningService {
             transaction.Start();
 
             result.DeletedDimensionCount = _revitRepository.DeleteDimensionsOfTypes(pluginTypeNames);
+            result.DoorObstacles = new DoorObstacleCollector(
+                _revitRepository.Document, _revitRepository.ActiveView).Collect();
+            if(settings.Debug.Enabled) {
+                CollectViewDiagnostics(result);
+            }
 
             foreach(var room in _revitRepository.GetRoomsOnActiveView()) {
                 var roomType = RoomTypeMatcher.Match(room, settings);
@@ -93,10 +99,11 @@ internal class RoomDimensioningService {
 
                 _referenceResolver.Resolve(contour);
                 if(dimensionTypes.TryGetValue(roomType.DimensionTypeName, out var dimensionType)) {
+                    double textSize = DimensionTextHelper.GetTextSize(dimensionType, scale);
                     var options = new PlanningOptions {
                         Offset = offset,
                         TextAllowance = DimensionTextHelper.GetTextAllowance(dimensionType, scale),
-                        TextSize = DimensionTextHelper.GetTextSize(dimensionType, scale),
+                        TextSize = textSize,
                         TextGap = DimensionTextHelper.GetTextGap(dimensionType, scale),
                         TextWidthScale = DimensionTextHelper.GetTextWidthScale(dimensionType),
                         // Плоскости и значения сравниваются с допуском типа помещения, но не точнее 0.5 мм
@@ -108,8 +115,15 @@ internal class RoomDimensioningService {
                         OverallMinSegments = roomType.OverallDimMinSegments,
                         DuplicateMaxDistance = UnitUtilsHelper.ConvertToInternalValue(
                             Math.Max(0, roomType.DuplicateMaxDistanceMm)),
-                        PylonDuplicatesAcrossPylons = roomType.PylonDuplicatesAcrossPylons
+                        PylonDuplicatesAcrossPylons = roomType.PylonDuplicatesAcrossPylons,
+                        DoorLeaves = GetNearbyDoorObstacles(
+                            contour, result.DoorObstacles.Leaves, l => l.Corners, textSize),
+                        DoorOpeningArcs = GetNearbyDoorObstacles(
+                            contour, result.DoorObstacles.OpeningArcs, a => a.Points, textSize)
                     };
+                    roomResult.PlanningOptions = options;
+                    roomResult.PlanningLog.Add($"Дверные полотна для текста: {options.DoorLeaves.Count}; "
+                                              + $"дуг открывания: {options.DoorOpeningArcs.Count}");
                     roomResult.Dimensions = _planner.Plan(contour, options, roomResult.PlanningLog);
                     foreach(var dimension in roomResult.Dimensions) {
                         _dimensionBuilder.Create(dimension, dimensionType);
@@ -130,6 +144,33 @@ internal class RoomDimensioningService {
             WriteDump(folder, baseName, settingsPath, result);
         }
         return result;
+    }
+
+    private static List<T> GetNearbyDoorObstacles<T>(
+        RoomContour contour, List<T> obstacles, Func<T, IReadOnlyList<Point2D>> getPoints, double margin) {
+        var points = contour.Loops.SelectMany(l => l.Lines)
+            .SelectMany(l => new[] { l.Segment.Start, l.Segment.End }).ToList();
+        if(points.Count == 0) {
+            return [];
+        }
+        // Полотно может выходить из соседнего помещения в это: отбираем по перекрытию областей.
+        double minX = points.Min(p => p.X) - margin;
+        double maxX = points.Max(p => p.X) + margin;
+        double minY = points.Min(p => p.Y) - margin;
+        double maxY = points.Max(p => p.Y) + margin;
+        return obstacles.Where(o => getPoints(o).Min(p => p.X) <= maxX && getPoints(o).Max(p => p.X) >= minX
+                                    && getPoints(o).Min(p => p.Y) <= maxY && getPoints(o).Max(p => p.Y) >= minY)
+            .ToList();
+    }
+
+    private void CollectViewDiagnostics(RoomDimensioningResult result) {
+        try {
+            // Снимок до создания новых размеров и цветной отладки, чтобы не записывать их как препятствия.
+            result.ViewDiagnostics = new ViewObstacleCollector(
+                _revitRepository.Document, _revitRepository.ActiveView, result.DoorObstacles.Geometry).Collect();
+        } catch(Exception ex) {
+            result.ViewDiagnosticsError = $"{ex.GetType().Name}: {ex.Message}";
+        }
     }
 
     private void DrawContours(RoomDimensioningResult result) {

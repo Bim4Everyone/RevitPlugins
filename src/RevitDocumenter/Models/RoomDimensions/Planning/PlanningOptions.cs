@@ -1,9 +1,28 @@
+using System.Collections.Generic;
+
+using RevitDocumenter.Models.RoomDimensions.Geometry;
+
 namespace RevitDocumenter.Models.RoomDimensions.Planning;
 
 /// <summary>
 /// Параметры планирования размеров для одного помещения. Все значения в футах модели.
 /// </summary>
 internal class PlanningOptions {
+    /// <summary>
+    /// Открытые дверные полотна поблизости от помещения (D77). Дуги открывания сюда не входят.
+    /// </summary>
+    public IReadOnlyList<DoorLeafObstacle> DoorLeaves { get; set; } = [];
+
+    /// <summary>
+    /// Кривые дуг открывания поблизости от помещения (D79), без заполнения сектора.
+    /// </summary>
+    public IReadOnlyList<DoorOpeningArcObstacle> DoorOpeningArcs { get; set; } = [];
+
+    /// <summary>
+    /// Защитный запас вокруг модели текста только для дверей (D79), не калибровка шрифта Revit.
+    /// </summary>
+    public double DoorTextClearance => TextSize * 0.5;
+
     /// <summary>
     /// Отступ размерной линии от контура.
     /// </summary>

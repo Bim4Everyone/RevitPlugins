@@ -18,7 +18,7 @@ using RevitDocumenter.Models.Dimensions.DimensionServices;
 using RevitDocumenter.Models.Mapping.ViewServices;
 using RevitDocumenter.Models.RoomDimensions;
 using RevitDocumenter.Models.RoomDimensions.Contours;
-using RevitDocumenter.Models.RoomDimensions.Debug;
+using RevitDocumenter.Models.RoomDimensions.Diagnostics;
 using RevitDocumenter.Models.RoomDimensions.Planning;
 using RevitDocumenter.Models.RoomDimensions.Settings;
 using RevitDocumenter.ViewModels;

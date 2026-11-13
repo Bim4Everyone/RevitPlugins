@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using RevitDocumenter.Models.RoomDimensions.Contours;
+using RevitDocumenter.Models.RoomDimensions.Diagnostics;
 using RevitDocumenter.Models.RoomDimensions.Planning;
 
 namespace RevitDocumenter.Models.RoomDimensions;
@@ -30,6 +31,18 @@ internal class RoomDimensioningResult {
     public string DumpPath { get; set; }
     public string DumpError { get; set; }
 
+    /// <summary>
+    /// Диагностика потенциальных препятствий активного вида (D76), не влияет на раскладку.
+    /// </summary>
+    public object ViewDiagnostics { get; set; }
+
+    public string ViewDiagnosticsError { get; set; }
+
+    /// <summary>
+    /// Дверные полотна для планировщика (D77), собираются и без режима отладки.
+    /// </summary>
+    public DoorObstacleResult DoorObstacles { get; set; } = new();
+
     public int RoomErrorCount => Rooms.Count(r => r.Contour.Error != null);
     public int LineCount => Rooms.Sum(r => r.Contour.Loops.Sum(l => l.Lines.Count()));
     public int LinesWithoutReferenceCount => Rooms.Sum(r => r.Contour.Loops.Sum(l => l.Lines.Count(x => x.Reference is null)));
@@ -55,4 +68,6 @@ internal class RoomRunResult {
     /// Журнал планирования размеров.
     /// </summary>
     public List<string> PlanningLog { get; } = [];
+
+    public PlanningOptions PlanningOptions { get; set; }
 }

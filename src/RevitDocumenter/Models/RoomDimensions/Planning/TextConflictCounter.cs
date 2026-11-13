@@ -23,6 +23,8 @@ internal static class TextConflictCounter {
     public const string TextLine = "текст/размерная линия";
     public const string TextWitness = "текст/вспомогательная линия";
     public const string WiderThanSegment = "текст шире сегмента";
+    public const string TextDoor = "текст/дверное полотно";
+    public const string TextDoorArc = "текст/дуга открывания";
 
     public const string ShiftAlong = "вдоль сегмента";
     public const string ShiftOtherSide = "на другую сторону линии";
@@ -79,6 +81,12 @@ internal static class TextConflictCounter {
         }
 
         foreach(var text in texts) {
+            string doorConflict = FindDoorConflict(text, options);
+            if(doorConflict != null) {
+                text.Dimension.TextIssues.Add(doorConflict.StartsWith(TextDoorArc, StringComparison.Ordinal)
+                    ? TextDoorArc : TextDoor);
+                log.Add($"Конфликт {doorConflict}: {Describe(text)}");
+            }
             foreach(var other in dimensions.Where(d => d != text.Dimension)) {
                 if(Intersects(text.Corners, GetDimensionLine(other, other.LinePosition))) {
                     text.Dimension.TextIssues.Add(TextLine);
@@ -325,7 +333,14 @@ internal static class TextConflictCounter {
         TextOffset best = null;
         double bestCost = double.MaxValue;
         bool bestCrosses = false;
+        // D78: обход двери не должен переводить подпись через собственную размерную линию.
+        // Revit может добавить выноску и пересечь ей текст. Сначала ищем место вдоль той же стороны;
+        // если его нет, оставшаяся проблема передается локальному переносу цепочки (D75).
+        bool keepTextSide = FindDoorConflict(text, options) != null;
         foreach(var (offset, kindCost) in GetTextOffsets(text, wider, first, last, step, options)) {
+            if(keepTextSide && Math.Abs(offset.Across) > _axisTolerance) {
+                continue;
+            }
             var candidate = GetTextBox(dimension, segment, dimension.LinePosition, offset, step, options);
             if(FindCandidateConflict(candidate, dimensions, fitsRoom, options) != null
                || !ExtensionFitsRoom(text, offset, fitsRoom)) {
@@ -520,6 +535,15 @@ internal static class TextConflictCounter {
         foreach(var segment in contour) {
             Add([segment.Start, segment.End]);
         }
+        foreach(var door in options.DoorLeaves) {
+            Add(door.Corners);
+        }
+        foreach(var arc in options.DoorOpeningArcs) {
+            double distance = DistanceToDoorArc(text.Corners, arc, clearance);
+            if(distance < clearance) {
+                penalty += _nearnessWeight * (clearance - distance);
+            }
+        }
         return penalty;
     }
 
@@ -570,6 +594,10 @@ internal static class TextConflictCounter {
         IEnumerable<VirtualDimension> dimensions,
         bool includeOwn,
         PlanningOptions options) {
+        string doorConflict = FindDoorConflict(text, options);
+        if(doorConflict != null) {
+            return doorConflict;
+        }
         foreach(var other in dimensions) {
             bool own = other == text.Dimension;
             if(own && !includeOwn) {
@@ -596,6 +624,35 @@ internal static class TextConflictCounter {
             }
         }
         return null;
+    }
+
+    private static string FindDoorConflict(TextBox text, PlanningOptions options) {
+        double clearance = options.DoorTextClearance;
+        var door = options.DoorLeaves.FirstOrDefault(d => Distance(text.Corners, d.Corners) <= clearance);
+        if(door != null) {
+            return $"{TextDoor} {door.DoorId} (с учетом запаса)";
+        }
+        var arc = options.DoorOpeningArcs
+            .FirstOrDefault(a => DistanceToDoorArc(text.Corners, a, clearance) <= clearance);
+        return arc is null ? null : $"{TextDoorArc} {arc.DoorId} (с учетом запаса)";
+    }
+
+    private static double DistanceToDoorArc(
+        IReadOnlyList<Point2D> corners, DoorOpeningArcObstacle arc, double limit) {
+        // Отсев далеких дуг: затем считаем расстояние до самой ломаной, не до ее области или хорды.
+        double dx = Math.Max(0, Math.Max(arc.Min.X - corners.Max(p => p.X), corners.Min(p => p.X) - arc.Max.X));
+        double dy = Math.Max(0, Math.Max(arc.Min.Y - corners.Max(p => p.Y), corners.Min(p => p.Y) - arc.Max.Y));
+        if(dx * dx + dy * dy > limit * limit) {
+            return double.MaxValue;
+        }
+        double result = double.MaxValue;
+        foreach(var segment in arc.Segments) {
+            result = Math.Min(result, Distance(corners, new[] { segment.Start, segment.End }));
+            if(result <= _axisTolerance) {
+                break;
+            }
+        }
+        return result;
     }
 
     private static IEnumerable<TextBox> GetTextBoxes(
