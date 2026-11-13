@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 
 using RevitEnumerateBySpline.Models.Interfaces;
@@ -13,17 +12,14 @@ internal sealed class EnumerateBySpline(
     ISplineDividerService splineDividerService,
     ISplineSpatialIntersectionService intersectionService,
     IParamSetter paramSetter) : IEnumerateBySpline {
-    private IReadOnlyList<SpatialPointIntersection> OrderedIntersections { get; set; } = [];
-
     public void Enumerate(EnumerateBySplineSettings settings) {
-        OrderedIntersections = [];
         var points = splineDividerService.Divide(settings.CurveModels ?? []);
-        OrderedIntersections = intersectionService
+        var orderedIntersections = intersectionService
             .FindIntersections(settings.SpatialModels ?? [], points)
             .OrderBy(intersection => intersection.SplinePoint.Index)
             .ToList();
         if(settings.ConfigSettings != null) {
-            paramSetter.SetParams(OrderedIntersections, settings.ConfigSettings);
+            paramSetter.SetParams(orderedIntersections, settings.ConfigSettings);
         }
     }
 }
