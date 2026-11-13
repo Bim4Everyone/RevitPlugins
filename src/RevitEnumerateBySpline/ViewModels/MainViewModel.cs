@@ -135,11 +135,12 @@ internal class MainViewModel : BaseViewModel {
         var settings = BuildSettings();
         SaveConfig();
         
-        // var warnings = _spatialElementCheckService.CheckSpatialElements(settings.SpatialModels ?? []);
-        // if(warnings.Count != 0) {
-        //     _windowService.RequestWarnings(warnings);
-        //     return;
-        // }
+        var warnings = _spatialElementCheckService.CheckSpatialElements(settings.SpatialModels ?? []);
+        if(warnings.Count != 0) {
+            _windowService.CloseMainWindow();
+            _windowService.ShowWarningWindow(warnings);
+            return;
+        }
 
         _enumerateBySpline.Enumerate(settings);
         
