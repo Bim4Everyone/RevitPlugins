@@ -57,6 +57,14 @@ internal class ParamService : IParamService {
             return GetLevelValue(spatialModel, spatialElement);
         }
 
+        if(filterParam is SystemParam { SystemParamId: BuiltInParameter.ROOM_PHASE }
+            or SystemParam { SystemParamId: BuiltInParameter.ROOM_PHASE_ID }) {
+            var phaseId = spatialElement.get_Parameter(BuiltInParameter.ROOM_PHASE_ID)?.AsElementId();
+            return phaseId is null || phaseId == ElementId.InvalidElementId
+                ? GetNoValueText()
+                : spatialElement.Document.GetElement(phaseId)?.Name ?? GetNoValueText();
+        }
+
         if(!spatialElement.IsExistsParam(filterParam)) {
             return GetNoValueText();
         }
@@ -189,8 +197,14 @@ internal class ParamService : IParamService {
     private ICollection<ElementId> GetAllParamElementIds() {
         var categoryId = new ElementId(BuiltInCategory.OST_Rooms);
 
-        return ParameterFilterUtilities
+        var parameterIds = ParameterFilterUtilities
             .GetFilterableParametersInCommon(_revitRepository.Document, [categoryId]);
+        var phaseParameterId = new ElementId(BuiltInParameter.ROOM_PHASE);
+        if(!parameterIds.Contains(phaseParameterId)) {
+            parameterIds.Add(phaseParameterId);
+        }
+
+        return parameterIds;
     }
 
     // Находит параметр имени по умолчанию.
