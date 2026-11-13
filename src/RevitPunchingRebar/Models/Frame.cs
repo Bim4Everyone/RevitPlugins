@@ -1,36 +1,18 @@
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitPunchingRebar.Models.Interfaces;
 
 namespace RevitPunchingRebar.Models;
 internal class Frame {
-    // Параметры семейства каркаса
-    private const string _longRebarCodeParam = "обр_ПР_Код металлопроката";
-    private const string _longRebarDiameterTopParam = "мод_ПР_Диаметр_Верх";
-    private const string _longRebarDiameterBottomParam = "мод_ПР_Диаметр_Низ";
-    private const string _stirrupCodeParam = "обр_Х_Код металлопроката";
-    private const string _widthStepParam = "мод_ПР_Шаг по ширине";
-    private const string _heightStepParam = "мод_ПР_Шаг по высоте";
-    private const string _anchorageTop1Param = "мод_ПР_Анкеровка_Верх_1";
-    private const string _anchorageTop2Param = "мод_ПР_Анкеровка_Верх_2";
-    private const string _anchorageBottom1Param = "мод_ПР_Анкеровка_Низ_1";
-    private const string _anchorageBottom2Param = "мод_ПР_Анкеровка_Низ_2";
-    private const string _stirrupChangeBindingParam = "мод_Х_Изменить привязку";
-    private const string _stirrupDiameterParam = "мод_Х_Диаметр";
-    private const string _stirrupBendLengthParam = "мод_Х_Длина отгибов";
-    private const string _stirrupStepParam = "мод_Х_Шаг";
-    private const string _stirrupCountParam = "мод_Х_Количество";
-
-    // Параметры, общие для каркаса и плиты
-    private const string _krGroupParam = "обр_ФОП_Группа КР";
-    private const string _projectSectionParam = "обр_ФОП_Раздел проекта";
-    private const string _consumptionMarkParam = "обр_ФОП_Марка ведомости расхода";
-    private const string _orgLevelParam = "обр_ФОП_Орг. уровень";
+    private readonly FrameParameterSettings _parameterSettings;
+    private readonly ILocalizationService _localizationService;
 
     // Значения группы КР для каркасов в фундаментной плите и в плите перекрытия
     private const string _foundationSlabKrGroup = "ФП_Каркасы_Продавливание";
@@ -42,30 +24,11 @@ internal class Frame {
     // Класс продольных стержней каркаса
     private const RebarClass _longRebarClass = RebarClass.A500C;
 
-    /// <summary>
-    /// Параметры, которые обязательно должны быть у экземпляра семейства каркаса.
-    /// </summary>
-    public static readonly IReadOnlyList<string> RequiredParamNames = [
-        _longRebarCodeParam,
-        _longRebarDiameterTopParam,
-        _longRebarDiameterBottomParam,
-        _stirrupCodeParam,
-        _widthStepParam,
-        _heightStepParam,
-        _anchorageTop1Param,
-        _anchorageTop2Param,
-        _anchorageBottom1Param,
-        _anchorageBottom2Param,
-        _stirrupChangeBindingParam,
-        _stirrupDiameterParam,
-        _stirrupBendLengthParam,
-        _stirrupStepParam,
-        _stirrupCountParam,
-        _krGroupParam
-    ];
-
-    public Frame(FamilyInstance familyInstance, IFrameParams frameParams) {
+    public Frame(FamilyInstance familyInstance, IFrameParams frameParams,
+        ILocalizationService localizationService) {
         FrameInstance = familyInstance;
+        _localizationService = localizationService;
+        _parameterSettings = frameParams.ParameterSettings;
 
         //Заполняем необходимые параметры каркаса
         SetParams(frameParams);
@@ -76,7 +39,8 @@ internal class Frame {
     public XYZ GetLocation() {
         XYZ location = ((LocationPoint) FrameInstance.Location).Point;
         XYZ direction = FrameInstance.FacingOrientation;
-        double halfWidthStep = 0.5 * FrameInstance.GetParamValue<double>(_widthStepParam);
+        string widthParamName = _parameterSettings.GetName(FrameParameterRole.WidthStep);
+        double halfWidthStep = 0.5 * FrameInstance.GetParamValue<double>(widthParamName);
 
         return new XYZ(
             location.X + direction.X * halfWidthStep,
@@ -85,35 +49,49 @@ internal class Frame {
     }
 
     private void SetParams(IFrameParams frameParams) {
-        FrameInstance.SetParamValue(_longRebarCodeParam, (int) _longRebarClass);
+        ApplyParameter(FrameParameterRole.LongRebarCode, name =>
+            FrameInstance.SetParamValue(name, (int) _longRebarClass));
         // В каркасе две пары продольных стержней; выбранный диаметр задается обеим парам.
-        FrameInstance.SetParamValue(_longRebarDiameterTopParam, frameParams.LongRebarDiameter);
-        FrameInstance.SetParamValue(_longRebarDiameterBottomParam, frameParams.LongRebarDiameter);
-        FrameInstance.SetParamValue(_stirrupCodeParam, (int) frameParams.StirrupRebarClass);
+        ApplyParameter(FrameParameterRole.LongRebarDiameterTop, name =>
+            FrameInstance.SetParamValue(name, frameParams.LongRebarDiameter));
+        ApplyParameter(FrameParameterRole.LongRebarDiameterBottom, name =>
+            FrameInstance.SetParamValue(name, frameParams.LongRebarDiameter));
+        ApplyParameter(FrameParameterRole.StirrupCode, name =>
+            FrameInstance.SetParamValue(name, (int) frameParams.StirrupRebarClass));
 
-        FrameInstance.SetParamValue(
-            _widthStepParam,
-            frameParams.FrameWidth - frameParams.StirrupRebarDiameter - frameParams.LongRebarDiameter);
-        FrameInstance.SetParamValue(_heightStepParam, frameParams.GetFrameHeight());
+        ApplyParameter(FrameParameterRole.WidthStep, name =>
+            FrameInstance.SetParamValue(
+                name, frameParams.FrameWidth - frameParams.StirrupRebarDiameter - frameParams.LongRebarDiameter));
+        ApplyParameter(FrameParameterRole.HeightStep, name =>
+            FrameInstance.SetParamValue(name, frameParams.GetFrameHeight()));
 
-        FrameInstance.SetParamValue(_anchorageTop1Param, frameParams.LongRebarAnchorageLength);
-        FrameInstance.SetParamValue(_anchorageTop2Param, frameParams.LongRebarAnchorageLength);
-        FrameInstance.SetParamValue(_anchorageBottom1Param, frameParams.LongRebarAnchorageLength);
-        FrameInstance.SetParamValue(_anchorageBottom2Param, frameParams.LongRebarAnchorageLength);
+        ApplyParameter(FrameParameterRole.AnchorageTop1, name =>
+            FrameInstance.SetParamValue(name, frameParams.LongRebarAnchorageLength));
+        ApplyParameter(FrameParameterRole.AnchorageTop2, name =>
+            FrameInstance.SetParamValue(name, frameParams.LongRebarAnchorageLength));
+        ApplyParameter(FrameParameterRole.AnchorageBottom1, name =>
+            FrameInstance.SetParamValue(name, frameParams.LongRebarAnchorageLength));
+        ApplyParameter(FrameParameterRole.AnchorageBottom2, name =>
+            FrameInstance.SetParamValue(name, frameParams.LongRebarAnchorageLength));
 
-        FrameInstance.SetParamValue(_stirrupChangeBindingParam, _stirrupChangeBindingValue);
+        ApplyParameter(FrameParameterRole.StirrupChangeBinding, name =>
+            FrameInstance.SetParamValue(name, _stirrupChangeBindingValue));
 
-        FrameInstance.SetParamValue(_stirrupDiameterParam, frameParams.StirrupRebarDiameter);
-        FrameInstance.SetParamValue(_stirrupBendLengthParam, frameParams.StirrupBendLength);
-        FrameInstance.SetParamValue(_stirrupStepParam, frameParams.StirrupStep);
-        FrameInstance.SetParamValue(
-            _stirrupCountParam,
-            frameParams.GetFrameLength() / frameParams.StirrupStep + 1);
+        ApplyParameter(FrameParameterRole.StirrupDiameter, name =>
+            FrameInstance.SetParamValue(name, frameParams.StirrupRebarDiameter));
+        ApplyParameter(FrameParameterRole.StirrupBendLength, name =>
+            FrameInstance.SetParamValue(name, frameParams.StirrupBendLength));
+        ApplyParameter(FrameParameterRole.StirrupStep, name =>
+            FrameInstance.SetParamValue(name, frameParams.StirrupStep));
+        ApplyParameter(FrameParameterRole.StirrupCount, name =>
+            FrameInstance.SetParamValue(name, frameParams.GetFrameLength() / frameParams.StirrupStep + 1));
 
         if(frameParams.HostSlab.SlabInstance.InAnyCategory(BuiltInCategory.OST_StructuralFoundation)) {
-            FrameInstance.SetParamValue(_krGroupParam, _foundationSlabKrGroup);
+            ApplyParameter(FrameParameterRole.KrGroup, name =>
+                FrameInstance.SetParamValue(name, _foundationSlabKrGroup));
         } else {
-            FrameInstance.SetParamValue(_krGroupParam, _floorSlabKrGroup);
+            ApplyParameter(FrameParameterRole.KrGroup, name =>
+                FrameInstance.SetParamValue(name, _floorSlabKrGroup));
         }
 
         CopyParametersFromSlab(frameParams.HostSlab.SlabInstance);
@@ -123,38 +101,61 @@ internal class Frame {
     /// Копирует параметры из опалубки.
     /// </summary>
     /// <remarks>
-    /// Каждый параметр копируется независимо: если параметра нет у плиты или у каркаса,
-    /// он пропускается, а остальные копируются.
+    /// Координаты СМР копируются при наличии. Ошибка пользовательского назначения
+    /// передается в итоговый отчет вместе с именем и назначением параметра.
     /// </remarks>
     /// <param name="hostElement">Плита, в которой расставляются каркасы.</param>
     private void CopyParametersFromSlab(Element hostElement) {
         string[] paramNames = [
             SharedParamsConfig.Instance.BuildingWorksBlock.Name,
             SharedParamsConfig.Instance.BuildingWorksSection.Name,
-            SharedParamsConfig.Instance.BuildingWorksLevel.Name,
-            _projectSectionParam,
-            _consumptionMarkParam,
-            _orgLevelParam
+            SharedParamsConfig.Instance.BuildingWorksLevel.Name
         ];
 
         foreach(string paramName in paramNames) {
-            CopyParam(hostElement, paramName);
+            CopyParam(hostElement, paramName, false);
+        }
+
+        foreach(FrameParameterDefinition definition in FrameParameterCatalog.Definitions) {
+            if(definition.IsCopy) {
+                ApplyParameter(definition.Role, name => CopyParam(hostElement, name, true));
+            }
         }
     }
 
-    private void CopyParam(Element sourceElement, string paramName) {
-        Parameter sourceParam = sourceElement.LookupParameter(paramName);
-        Parameter targetParam = FrameInstance.LookupParameter(paramName);
+    private void CopyParam(Element sourceElement, string paramName, bool required) {
+        bool hasSource = sourceElement.IsExistsParam(paramName);
+        bool hasTarget = FrameInstance.IsExistsParam(paramName);
+        if(!hasSource || !hasTarget) {
+            if(required) {
+                throw new InvalidOperationException(
+                    _localizationService.GetLocalizedString("Report.CopyParameterMissing"));
+            }
 
-        if(sourceParam == null
-           || targetParam == null
-           || targetParam.IsReadOnly
-           || !sourceParam.HasValue
-           || sourceParam.StorageType != targetParam.StorageType
-           || sourceParam.StorageType == StorageType.None) {
             return;
         }
 
-        targetParam.Set(sourceParam);
+        Parameter sourceParam = sourceElement.GetParam(paramName);
+        Parameter targetParam = FrameInstance.GetParam(paramName);
+        if(!required && (targetParam.IsReadOnly || sourceParam.StorageType != targetParam.StorageType)) {
+            return;
+        }
+
+        if(sourceParam.HasValue) {
+            targetParam.Set(sourceParam);
+        }
+    }
+
+    /// <summary>Добавляет назначение и имя к ошибке фактической записи или копирования параметра.</summary>
+    private void ApplyParameter(FrameParameterRole role, Action<string> action) {
+        string name = _parameterSettings.GetName(role);
+        try {
+            action(name);
+        } catch(Exception ex) when(ex is Autodesk.Revit.Exceptions.ApplicationException
+                                     || ex is ArgumentException || ex is InvalidOperationException) {
+            string title = _localizationService.GetLocalizedString($"Parameters.{role}.Title");
+            throw new InvalidOperationException(string.Format(
+                _localizationService.GetLocalizedString("Report.ParameterError"), title, name, ex.Message), ex);
+        }
     }
 }

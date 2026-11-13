@@ -1,0 +1,64 @@
+<UserControl
+    x:Class="RevitPunchingRebar.Views.ParameterSettingsView"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+>
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Text="{me:LocalizationSource Parameters.Intro}" TextWrapping="Wrap" Margin="0 0 0 12" />
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding ParameterGroups}">
+                <ItemsControl.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="SemiBold"
+                                    Margin="0 12 0 8" />
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ItemsControl.GroupStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="12" Margin="0 0 8 10" CornerRadius="8" BorderThickness="1"
+                            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="15" />
+                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0 4" />
+                                <TextBlock Text="{Binding DefaultHint}" TextWrapping="Wrap" Opacity="0.7" />
+                                <Grid Margin="0 8 0 0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBox Margin="0 0 8 0"
+                                        Text="{Binding ParameterName, UpdateSourceTrigger=PropertyChanged}" />
+                                    <ui:Button Grid.Column="1" VerticalAlignment="Center"
+                                        Content="{Binding ResetLabel}" Command="{Binding ResetCommand}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <ui:Button Content="{me:LocalizationSource Parameters.ResetAll}" Command="{Binding ResetCommand}"
+                Margin="0 0 8 0" />
+            <ui:Button Content="{me:LocalizationSource Parameters.Apply}" Appearance="Primary"
+                Command="{Binding DataContext.ApplyParameterSettingsCommand,
+                    RelativeSource={RelativeSource AncestorType=Window}}"
+                Margin="0 0 8 0" />
+            <ui:Button Content="{me:LocalizationSource MainWindow.ButtonCancel}"
+                Command="{Binding DataContext.CancelParameterSettingsCommand,
+                    RelativeSource={RelativeSource AncestorType=Window}}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

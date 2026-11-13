@@ -1,5 +1,7 @@
 namespace RevitPunchingRebar.Models.Interfaces;
 internal interface IFrameParams {
+    FrameParameterSettings ParameterSettings { get; }
+
     string FrameFamilyName { get; }
     string FrameFamilyTypeName { get; }
 

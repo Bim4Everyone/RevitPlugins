@@ -19,6 +19,7 @@ internal class FrameParams : IFrameParams {
     /// <param name="settings">Настройки плагина для текущего проекта (размеры в мм).</param>
     /// <param name="hostSlab">Плита, в которой расставляются каркасы.</param>
     public FrameParams(RevitSettings settings, Slab hostSlab) {
+        ParameterSettings = FrameParameterSettings.CopyWithDefaults(settings.ParameterSettings);
         FrameFamilyName = settings.FamilyName;
         FrameFamilyTypeName = settings.FamilyType;
 
@@ -46,6 +47,8 @@ internal class FrameParams : IFrameParams {
         StirrupBendLength = UnitUtilsHelper.FromMm(
             settings.StirrupBendLength ?? DefaultSettings.StirrupBendLengthMm);
     }
+
+    public FrameParameterSettings ParameterSettings { get; }
 
     public string FrameFamilyName { get; }
     public string FrameFamilyTypeName { get; }

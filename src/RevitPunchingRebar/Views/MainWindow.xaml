@@ -1,4 +1,4 @@
-﻿<core:WpfUIPlatformWindow
+<core:WpfUIPlatformWindow
     x:Class="RevitPunchingRebar.Views.MainWindow"
     x:Name="mainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -11,6 +11,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
 
+    xmlns:views="clr-namespace:RevitPunchingRebar.Views"
     xmlns:vms="clr-namespace:RevitPunchingRebar.ViewModels"
     xmlns:converters="clr-namespace:RevitPunchingRebar.Views.Converters"
 
@@ -32,6 +33,10 @@
     </i:Interaction.Triggers>
 
     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SettingsToggleSwitch.xaml" />
+            </ResourceDictionary.MergedDictionaries>
         <converters:SelectedToAppearanceConverter x:Key="SelectedToAppearanceConverter" />
 
         <!-- Карточка группы настроек (как CustomBorder в RevitPylonDocumentation) -->
@@ -108,6 +113,7 @@
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
         </Style>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
@@ -119,9 +125,22 @@
 
         <ui:TitleBar
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}" />
+            Title="{me:LocalizationSource MainWindow.Title}">
+            <ui:TitleBar.TrailingContent>
+                <ui:ToggleSwitch
+                    IsChecked="{Binding IsParameterSettingsOpen, Mode=OneWay}"
+                    Margin="8,5"
+                    VerticalAlignment="Top"
+                    ToolTip="{me:LocalizationSource Parameters.Title}"
+                    OnContent="{ui:SymbolIcon Settings48, Filled=True, FontSize=20}"
+                    OffContent="{ui:SymbolIcon Settings48, Filled=False, FontSize=20}"
+                    Style="{StaticResource CustomToggleSwitchStyle}"
+                    Command="{Binding ParameterSettingsCommand}" />
+            </ui:TitleBar.TrailingContent>
+        </ui:TitleBar>
 
         <ScrollViewer
+            Visibility="{Binding MainContentVisibility}"
             Grid.Row="1"
             VerticalScrollBarVisibility="Auto">
             <Grid Margin="7">
@@ -519,11 +538,6 @@
                                             Margin="5"
                                             ItemsSource="{Binding FamilyTypes}"
                                             SelectedItem="{Binding SelectedFamilyType}">
-                                            <i:Interaction.Triggers>
-                                                <i:EventTrigger EventName="SelectionChanged">
-                                                    <i:InvokeCommandAction Command="{Binding CheckFrameTypeCommand}" />
-                                                </i:EventTrigger>
-                                            </i:Interaction.Triggers>
                                         </ComboBox>
 
                                         <ui:Button
@@ -759,7 +773,11 @@
             </Grid>
         </ScrollViewer>
 
-        <Grid Grid.Row="2">
+        <views:ParameterSettingsView Grid.Row="1"
+            DataContext="{Binding ParameterEditor}"
+            Visibility="{Binding DataContext.ParameterSettingsVisibility, ElementName=mainWindow}" />
+
+        <Grid Grid.Row="2" Visibility="{Binding MainContentVisibility}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />

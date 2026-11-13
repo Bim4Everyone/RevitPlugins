@@ -136,38 +136,11 @@ internal class RevitRepository {
             .FirstOrDefault(symbol => symbol.FamilyName == familyName && symbol.Name == typeName);
     }
 
-    /// <summary>
-    /// Проверяет, каких параметров не хватает экземпляру типа каркаса.
-    /// </summary>
-    /// <remarks>
-    /// Создает пробный экземпляр во временной транзакции и откатывает ее, поэтому учитываются
-    /// и параметры семейства, и параметры проекта, назначенные категории семейства.
-    /// </remarks>
-    /// <param name="symbol">Тип каркаса.</param>
-    /// <param name="paramNames">Имена обязательных параметров.</param>
-    /// <returns>Имена отсутствующих параметров.</returns>
-    public List<string> GetMissingFrameParams(FamilySymbol symbol, IEnumerable<string> paramNames) {
-        string transactionName = _localizationService.GetLocalizedString("RevitUI.CheckFrameTypeTransaction");
-        using Transaction transaction = Document.StartTransaction(transactionName);
-
-        if(!symbol.IsActive) {
-            symbol.Activate();
-        }
-
-        FamilyInstance instance = Document.Create.NewFamilyInstance(XYZ.Zero, symbol, StructuralType.NonStructural);
-        List<string> missingParams = paramNames
-            .Where(paramName => !instance.IsExistsParam(paramName))
-            .ToList();
-
-        transaction.RollBack();
-        return missingParams;
-    }
-
     public Frame CreateFrame(FamilySymbol frameSymbol, IFrameParams frameParams, XYZ location) {
         FamilyInstance frameInstance = Document.Create.NewFamilyInstance(
             location, frameSymbol, StructuralType.NonStructural);
 
-        Frame frame = new Frame(frameInstance, frameParams);
+        Frame frame = new Frame(frameInstance, frameParams, _localizationService);
 
         return frame;
     }

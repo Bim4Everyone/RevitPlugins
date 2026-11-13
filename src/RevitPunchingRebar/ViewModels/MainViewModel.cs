@@ -14,7 +14,7 @@ using RevitPunchingRebar.Models;
 using RevitPunchingRebar.Models.Interfaces;
 using RevitPunchingRebar.Services;
 
-using Frame = RevitPunchingRebar.Models.Frame;
+using Visibility = System.Windows.Visibility;
 
 namespace RevitPunchingRebar.ViewModels;
 
@@ -22,6 +22,10 @@ namespace RevitPunchingRebar.ViewModels;
 /// Основная ViewModel главного окна плагина.
 /// </summary>
 internal class MainViewModel : BaseViewModel {
+    private bool _isInitialized;
+    private bool _isParameterSettingsOpen;
+    private ParameterSettingsViewModel _parameterEditor;
+    private FrameParameterSettings _parameterSettings = FrameParameterSettings.CopyWithDefaults(null);
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly IPunchingRebarPlacementService _placementService;
@@ -30,7 +34,6 @@ internal class MainViewModel : BaseViewModel {
     private List<ElementId> _pylonsFromModel = [];
     private List<LinkedPylonReference> _pylonsFromLink = [];
     private Slab _slab;
-    private string _frameTypeError;
 
     private string _errorText;
 
@@ -77,13 +80,15 @@ internal class MainViewModel : BaseViewModel {
         _localizationService = localizationService;
 
         LoadViewCommand = RelayCommand.Create(LoadView);
+        ParameterSettingsCommand = RelayCommand.Create(ToggleParameterSettings);
+        ApplyParameterSettingsCommand = RelayCommand.Create(ApplyParameterSettings);
+        CancelParameterSettingsCommand = RelayCommand.Create(CancelParameterSettings);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
         SelectPylonsFromModelCommand = RelayCommand.Create<Window>(SelectPylonsFromModel);
         SelectPylonsFromLinkCommand = RelayCommand.Create<Window>(SelectPylonsFromLink);
         SelectSlabCommand = RelayCommand.Create<Window>(SelectSlab);
         LoadFamilyTypesCommand = RelayCommand.Create(LoadFamilyTypes);
-        CheckFrameTypeCommand = RelayCommand.Create(CheckFrameType);
         ResetToDefaultCommand = RelayCommand.Create<string>(ResetToDefault);
 
         RebarClasses = [
@@ -106,6 +111,22 @@ internal class MainViewModel : BaseViewModel {
     /// Команда применения настроек главного окна. (запуск плагина)
     /// </summary>
     public ICommand AcceptViewCommand { get; }
+    public ICommand ParameterSettingsCommand { get; }
+    public ICommand ApplyParameterSettingsCommand { get; }
+    public ICommand CancelParameterSettingsCommand { get; }
+
+    public ParameterSettingsViewModel ParameterEditor {
+        get => _parameterEditor;
+        private set => RaiseAndSetIfChanged(ref _parameterEditor, value);
+    }
+
+    public bool IsParameterSettingsOpen {
+        get => _isParameterSettingsOpen;
+        private set => RaiseAndSetIfChanged(ref _isParameterSettingsOpen, value);
+    }
+
+    public Visibility MainContentVisibility => IsParameterSettingsOpen ? Visibility.Collapsed : Visibility.Visible;
+    public Visibility ParameterSettingsVisibility => IsParameterSettingsOpen ? Visibility.Visible : Visibility.Collapsed;
 
     /// <summary>
     /// Команда выбора пилонов в текущем проекте.
@@ -130,7 +151,6 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Команда проверки выбранного типа каркаса.
     /// </summary>
-    public ICommand CheckFrameTypeCommand { get; }
 
     /// <summary>
     /// Команда сброса поля к значению по умолчанию. Параметр — имя свойства ViewModel.
@@ -346,6 +366,11 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
+        if(_isInitialized) {
+            return;
+        }
+
+        _isInitialized = true;
         FamilyNames = _revitRepository.GetFamilyNames();
         LoadConfig();
     }
@@ -407,11 +432,6 @@ internal class MainViewModel : BaseViewModel {
 
         if(string.IsNullOrEmpty(SelectedFamilyType)) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorSelectFamilyType");
-            return false;
-        }
-
-        if(_frameTypeError != null) {
-            ErrorText = _frameTypeError;
             return false;
         }
 
@@ -551,32 +571,32 @@ internal class MainViewModel : BaseViewModel {
         FamilyTypes = _revitRepository.GetFamilyTypes(SelectedFamilyName);
     }
 
-    /// <summary>
-    /// Проверяет, что у выбранного типа каркаса есть все параметры, которые заполняет плагин.
-    /// </summary>
-    private void CheckFrameType() {
-        _frameTypeError = null;
-        if(string.IsNullOrEmpty(SelectedFamilyName) || string.IsNullOrEmpty(SelectedFamilyType)) {
+    private void ToggleParameterSettings() {
+        if(IsParameterSettingsOpen) {
+            CancelParameterSettings();
             return;
         }
 
-        FamilySymbol symbol = _revitRepository.GetFrameSymbol(SelectedFamilyName, SelectedFamilyType);
-        if(symbol == null) {
-            _frameTypeError = _localizationService.GetLocalizedString("MainWindow.ErrorSelectFamilyType");
-            return;
-        }
+        SetParameterEditor(new ParameterSettingsViewModel(
+            FrameParameterSettings.CopyWithDefaults(_parameterSettings), _localizationService));
+    }
 
-        try {
-            List<string> missingParams = _revitRepository.GetMissingFrameParams(symbol, Frame.RequiredParamNames);
-            if(missingParams.Count > 0) {
-                _frameTypeError = string.Format(
-                    _localizationService.GetLocalizedString("MainWindow.ErrorFrameParamsMissing"),
-                    string.Join(", ", missingParams));
-            }
-        } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-            // Экземпляр выбранного типа не удалось разместить без основы
-            _frameTypeError = _localizationService.GetLocalizedString("MainWindow.ErrorFramePlacement");
+    private void ApplyParameterSettings() {
+        if(ParameterEditor != null) {
+            _parameterSettings = ParameterEditor.GetSettings();
+            SetParameterEditor(null);
         }
+    }
+
+    private void CancelParameterSettings() {
+        SetParameterEditor(null);
+    }
+
+    private void SetParameterEditor(ParameterSettingsViewModel editor) {
+        ParameterEditor = editor;
+        IsParameterSettingsOpen = editor != null;
+        OnPropertyChanged(nameof(MainContentVisibility));
+        OnPropertyChanged(nameof(ParameterSettingsVisibility));
     }
 
     /// <summary>
@@ -600,11 +620,11 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void LoadConfig() {
         RevitSettings setting = _pluginConfig.GetSettings(_revitRepository.Document);
+        _parameterSettings = FrameParameterSettings.CopyWithDefaults(setting?.ParameterSettings);
 
         SelectedFamilyName = GetAvailableValue(FamilyNames, setting?.FamilyName, DefaultSettings.FrameFamilyName);
         LoadFamilyTypes();
         SelectedFamilyType = GetAvailableValue(FamilyTypes, setting?.FamilyType, DefaultSettings.FrameFamilyTypeName);
-        CheckFrameType();
 
         SelectedSlabRebarDiameter = setting?.SlabRebarDiameter ?? DefaultSettings.SlabRebarDiameterMm;
         IsRebarCoverFromUser = setting?.IsRebarCoverFromUser ?? true;
@@ -678,7 +698,6 @@ internal class MainViewModel : BaseViewModel {
         SelectedFamilyName = DefaultSettings.FrameFamilyName;
         LoadFamilyTypes();
         ResetFrameFamilyType();
-        CheckFrameType();
     }
 
     /// <summary>
@@ -743,6 +762,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     /// <param name="setting">Настройки для проверки или сохранения.</param>
     private void UpdateSettings(RevitSettings setting) {
+        setting.ParameterSettings = FrameParameterSettings.CopyWithDefaults(_parameterSettings);
         setting.SlabRebarDiameter = SelectedSlabRebarDiameter;
         setting.IsRebarCoverFromUser = IsRebarCoverFromUser;
 

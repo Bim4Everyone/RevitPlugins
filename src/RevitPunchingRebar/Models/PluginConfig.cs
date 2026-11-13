@@ -47,6 +47,8 @@ internal class RevitSettings : ProjectSettings {
     /// </summary>
     public override string ProjectName { get; set; }
 
+    public FrameParameterSettings ParameterSettings { get; set; }
+
     public int SlabRebarDiameter { get; set; }
     public bool IsRebarCoverFromUser { get; set; }
     public int RebarCoverTop { get; set; }

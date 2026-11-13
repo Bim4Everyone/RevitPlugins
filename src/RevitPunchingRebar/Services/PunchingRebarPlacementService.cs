@@ -334,7 +334,7 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
             true);
 
         Element element = frame.FrameInstance.Document.GetElement(mirrorElements.FirstOrDefault());
-        Frame mirroredFrame = new Frame((FamilyInstance) element, frameParams);
+        Frame mirroredFrame = new Frame((FamilyInstance) element, frameParams, _localizationService);
 
         _createdFramesCount++;
 
