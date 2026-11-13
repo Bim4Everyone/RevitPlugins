@@ -75,16 +75,13 @@ internal class Frame {
 
     public XYZ GetLocation() {
         XYZ location = ((LocationPoint) FrameInstance.Location).Point;
+        XYZ direction = FrameInstance.FacingOrientation;
         double halfWidthStep = 0.5 * FrameInstance.GetParamValue<double>(_widthStepParam);
 
-        XYZ currentLocation = new XYZ
-                    (
-                        location.X + FrameInstance.FacingOrientation.X * halfWidthStep,
-                        location.Y + FrameInstance.FacingOrientation.Y * halfWidthStep,
-                        location.Z
-                    );
-
-        return currentLocation;
+        return new XYZ(
+            location.X + direction.X * halfWidthStep,
+            location.Y + direction.Y * halfWidthStep,
+            location.Z);
     }
 
     private void SetParams(IFrameParams frameParams) {

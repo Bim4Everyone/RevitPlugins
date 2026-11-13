@@ -132,7 +132,9 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         _createdFramesCount++;
 
         MoveFrameDown(frame2, frameParams);
-        RotateFrame(frame2, GetAlignAngle(frame2.FrameInstance.FacingOrientation, pylon.FacingOrientation) + Math.PI / 2);
+        double secondFrameAngle = GetAlignAngle(frame2.FrameInstance.FacingOrientation, pylon.FacingOrientation)
+            + Math.PI / 2;
+        RotateFrame(frame2, secondFrameAngle);
         MoveFrameCrossColumn(pylon, frame2, frameParams);
         MoveFrameAlongColumn(pylon, frame2, frameParams);
 
@@ -155,17 +157,12 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     private void MoveFrameDown(Frame frame, IFrameParams frameParams) {
         XYZ startPoint = frame.GetLocation();
         double bendFactor = GetStirrupBendFactor(frameParams.StirrupRebarClass);
+        double stirrupOffset = frameParams.StirrupRebarDiameter
+            + 0.5 * bendFactor * frameParams.StirrupRebarDiameter;
+        double verticalOffset = stirrupOffset - 0.5 * frameParams.LongRebarDiameter
+            - frameParams.RebarCoverTop - frameParams.PlateRebarDiameter;
 
-        XYZ endPoint = new XYZ
-            (
-                startPoint.X,
-                startPoint.Y,
-                startPoint.Z + (frameParams.StirrupRebarDiameter + 0.5 * bendFactor * frameParams.StirrupRebarDiameter) -
-                                0.5 * frameParams.LongRebarDiameter -
-                                frameParams.RebarCoverTop -
-                                frameParams.PlateRebarDiameter
-            );
-
+        XYZ endPoint = new XYZ(startPoint.X, startPoint.Y, startPoint.Z + verticalOffset);
         frame.FrameInstance.Location.Move(endPoint - startPoint);
     }
 
@@ -212,30 +209,25 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     /// </summary>
     private void MoveFrameCrossColumn(IPylon pylon, Frame frame, IFrameParams frameParams) {
         XYZ startPoint = frame.GetLocation();
-        XYZ endPoint = new XYZ();
-
+        XYZ pylonLocation = pylon.GetLocation();
+        XYZ direction = pylon.FacingOrientation;
         double angle = GetAngleBetweenInstances(pylon, frame);
+        double offset;
 
         if(angle == _crossAngle) {
             int frameCount = GetFramesCount(pylon, frame, frameParams);
-
-            endPoint = new XYZ
-                    (
-                        pylon.GetLocation().X - pylon.FacingOrientation.Y * ((frameCount * (2 * frameParams.FrameWidth) - frameParams.FrameWidth) / 2 - 0.5 * frameParams.FrameWidth),
-                        pylon.GetLocation().Y + pylon.FacingOrientation.X * ((frameCount * (2 * frameParams.FrameWidth) - frameParams.FrameWidth) / 2 - 0.5 * frameParams.FrameWidth),
-                        startPoint.Z
-                    );
+            double frameWidth = frameParams.FrameWidth;
+            offset = (frameCount * (2 * frameWidth) - frameWidth) / 2 - 0.5 * frameWidth;
         } else {
             double afterPylonDistance = frameParams.GetAfterPylonDistance();
             double frameLength = frameParams.GetFrameLength();
-
-            endPoint = new XYZ
-                (
-                    pylon.GetLocation().X - pylon.FacingOrientation.Y * (frameLength / 2 + pylon.Width / 2 + afterPylonDistance),
-                    pylon.GetLocation().Y + pylon.FacingOrientation.X * (frameLength / 2 + pylon.Width / 2 + afterPylonDistance),
-                    startPoint.Z
-                );
+            offset = frameLength / 2 + pylon.Width / 2 + afterPylonDistance;
         }
+
+        XYZ endPoint = new XYZ(
+            pylonLocation.X - direction.Y * offset,
+            pylonLocation.Y + direction.X * offset,
+            startPoint.Z);
 
         frame.FrameInstance.Location.Move(endPoint - startPoint);
     }
@@ -245,29 +237,24 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     /// </summary>
     private void MoveFrameAlongColumn(IPylon pylon, Frame frame, IFrameParams frameParams) {
         XYZ startPoint = frame.GetLocation();
-        XYZ endPoint = new XYZ();
-
+        XYZ direction = pylon.FacingOrientation;
         double angle = GetAngleBetweenInstances(pylon, frame);
         int frameCount = GetFramesCount(pylon, frame, frameParams);
+        double offset;
 
         if(angle == _crossAngle) {
             double frameLength = frameParams.GetFrameLength();
             double afterPylonDistance = frameParams.GetAfterPylonDistance();
-
-            endPoint = new XYZ
-                    (
-                        startPoint.X + pylon.FacingOrientation.X * (0.5 * frameLength + 0.5 * pylon.Length + afterPylonDistance),
-                        startPoint.Y + pylon.FacingOrientation.Y * (0.5 * frameLength + 0.5 * pylon.Length + afterPylonDistance),
-                        startPoint.Z
-                    );
+            offset = 0.5 * frameLength + 0.5 * pylon.Length + afterPylonDistance;
         } else {
-            endPoint = new XYZ
-                    (
-                        startPoint.X + pylon.FacingOrientation.X * 0.5 * (frameCount * (2 * frameParams.FrameWidth) - 2 * frameParams.FrameWidth),
-                        startPoint.Y + pylon.FacingOrientation.Y * 0.5 * (frameCount * (2 * frameParams.FrameWidth) - 2 * frameParams.FrameWidth),
-                        startPoint.Z
-                    );
+            double frameWidth = frameParams.FrameWidth;
+            offset = 0.5 * (frameCount * (2 * frameWidth) - 2 * frameWidth);
         }
+
+        XYZ endPoint = new XYZ(
+            startPoint.X + direction.X * offset,
+            startPoint.Y + direction.Y * offset,
+            startPoint.Z);
 
         frame.FrameInstance.Location.Move(endPoint - startPoint);
     }
@@ -308,7 +295,8 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
                     startPoint.Z
                 );
 
-            ElementTransformUtils.CopyElement(frame.FrameInstance.Document, frame.FrameInstance.Id, endPoint - startPoint);
+            ElementTransformUtils.CopyElement(
+                frame.FrameInstance.Document, frame.FrameInstance.Id, endPoint - startPoint);
             _createdFramesCount++;
 
             startPoint = endPoint;
@@ -316,45 +304,28 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     }
 
     private Frame MirrorFrame(IPylon pylon, Frame frame, IFrameParams frameParams) {
-        Plane plane = null;
+        XYZ pylonLocation = pylon.GetLocation();
+        XYZ direction = pylon.FacingOrientation;
         double angle = GetAngleBetweenInstances(pylon, frame);
+        XYZ planeDirectionPoint;
 
         if(angle == _crossAngle) {
-            plane = Plane.CreateByThreePoints
-                    (
-                        pylon.GetLocation(),
-                        new XYZ
-                        (
-                            pylon.GetLocation().X - _planePointOffset * pylon.FacingOrientation.Y,
-                            pylon.GetLocation().Y + _planePointOffset * pylon.FacingOrientation.X,
-                            pylon.GetLocation().Z
-                        ),
-
-                        new XYZ
-                        (
-                            pylon.GetLocation().X,
-                            pylon.GetLocation().Y,
-                            pylon.GetLocation().Z + _planePointOffset
-                        )
-                    );
+            planeDirectionPoint = new XYZ(
+                pylonLocation.X - _planePointOffset * direction.Y,
+                pylonLocation.Y + _planePointOffset * direction.X,
+                pylonLocation.Z);
         } else {
-            plane = Plane.CreateByThreePoints
-                (
-                    pylon.GetLocation(),
-                    new XYZ
-                        (
-                            pylon.GetLocation().X + _planePointOffset * pylon.FacingOrientation.X,
-                            pylon.GetLocation().Y + _planePointOffset * pylon.FacingOrientation.Y,
-                            pylon.GetLocation().Z
-                        ),
-                    new XYZ
-                        (
-                            pylon.GetLocation().X,
-                            pylon.GetLocation().Y,
-                            pylon.GetLocation().Z + _planePointOffset
-                        )
-                );
+            planeDirectionPoint = new XYZ(
+                pylonLocation.X + _planePointOffset * direction.X,
+                pylonLocation.Y + _planePointOffset * direction.Y,
+                pylonLocation.Z);
         }
+
+        XYZ planeVerticalPoint = new XYZ(
+            pylonLocation.X,
+            pylonLocation.Y,
+            pylonLocation.Z + _planePointOffset);
+        Plane plane = Plane.CreateByThreePoints(pylonLocation, planeDirectionPoint, planeVerticalPoint);
 
         IList<ElementId> mirrorElements = ElementTransformUtils.MirrorElements(
             frame.FrameInstance.Document,
