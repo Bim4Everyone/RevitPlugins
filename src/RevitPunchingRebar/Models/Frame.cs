@@ -111,7 +111,7 @@ internal class Frame {
         SetParam(_stirrupStepParam, frameParams.StirrupStep);
         SetParam(_stirrupCountParam, frameParams.GetFrameLength() / frameParams.StirrupStep + 1);
 
-        if(frameParams.HostSlab.SlabInstance.Category.GetBuiltInCategory() == BuiltInCategory.OST_StructuralFoundation) {
+        if(frameParams.HostSlab.SlabInstance.InAnyCategory(BuiltInCategory.OST_StructuralFoundation)) {
             SetParam(_krGroupParam, _foundationSlabKrGroup);
         } else {
             SetParam(_krGroupParam, _floorSlabKrGroup);

@@ -14,10 +14,10 @@ internal class SlabFilter : ISelectionFilter {
     /// в категории «Фундамент несущей конструкции» плитой не являются.
     /// </remarks>
     public bool AllowElement(Element elem) {
-        BuiltInCategory? category = elem.Category?.GetBuiltInCategory();
-
         return elem is Floor
-               && (category == BuiltInCategory.OST_Floors || category == BuiltInCategory.OST_StructuralFoundation);
+               && elem.InAnyCategory(
+                   BuiltInCategory.OST_Floors,
+                   BuiltInCategory.OST_StructuralFoundation);
     }
 
     public bool AllowReference(Reference reference, XYZ position) {

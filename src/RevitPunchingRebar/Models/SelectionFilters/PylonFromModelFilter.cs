@@ -30,7 +30,7 @@ internal class PylonFromModelFilter : ISelectionFilter {
     /// </remarks>
     public static bool IsPylon(Element element) {
         return element is FamilyInstance familyInstance
-               && familyInstance.Category?.GetBuiltInCategory() == BuiltInCategory.OST_StructuralColumns
+               && familyInstance.InAnyCategory(BuiltInCategory.OST_StructuralColumns)
                && familyInstance.Symbol.FamilyName.IndexOf(
                    _pylonFamilyNamePart, StringComparison.OrdinalIgnoreCase) >= 0;
     }
