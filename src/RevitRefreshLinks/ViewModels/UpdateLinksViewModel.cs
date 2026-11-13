@@ -30,12 +30,16 @@ internal class UpdateLinksViewModel : BaseViewModel {
         ILocalizationService localizationService,
         ITwoSourceLinksProvider linksProvider,
         ILinksLoader linksLoader,
+        IMessageBoxService messageBoxService,
+        IOpenFolderDialogService openFolderDialog,
         IProgressDialogFactory progressFactory) {
 
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _linksProvider = linksProvider ?? throw new ArgumentNullException(nameof(linksProvider));
         _linksLoader = linksLoader ?? throw new ArgumentNullException(nameof(linksLoader));
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        OpenFolderDialogService = openFolderDialog ?? throw new ArgumentNullException(nameof(openFolderDialog));
         ProgressDialogFactory = progressFactory ?? throw new ArgumentNullException(nameof(progressFactory));
         LinksToUpdate = [];
         SourceLocalLinks = [];
@@ -52,6 +56,8 @@ internal class UpdateLinksViewModel : BaseViewModel {
 
 
     public IProgressDialogFactory ProgressDialogFactory { get; }
+    public IMessageBoxService MessageBoxService { get; }
+    public IOpenFolderDialogService OpenFolderDialogService { get; }
 
     public ICommand LoadViewCommand { get; }
 
@@ -120,8 +126,8 @@ internal class UpdateLinksViewModel : BaseViewModel {
             string msg = string.Join("\n\n",
                 errors.GroupBy(e => e.Error)
                 .Select(e => $"{e.Key}:\n{string.Join("\n", e.Select(i => i.Link.Name))}"));
-            GetPlatformService<IMessageBoxService>()
-                .Show(msg,
+            MessageBoxService.Show(
+                msg,
                 _localizationService.GetLocalizedString("MessageBox.Title.ErrorUpdateLink"),
                 System.Windows.MessageBoxButton.OK,
                 System.Windows.MessageBoxImage.Warning);

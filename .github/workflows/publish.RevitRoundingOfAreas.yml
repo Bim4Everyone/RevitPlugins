@@ -1,0 +1,18 @@
+name: publish RevitRoundingOfAreas
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [ closed, synchronize, review_requested ]
+    branches: [ main, master ]
+    paths:
+      - '**RevitRoundingOfAreas**.cs'
+      - '**RevitRoundingOfAreas**.xaml'
+      - '**RevitRoundingOfAreas**.csproj'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-plugin.yml
+    with:
+      plugin-name: "RevitRoundingOfAreas"
+    secrets: inherit

@@ -7,7 +7,8 @@ using Autodesk.Revit.DB;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.Models;
-internal class MepLinkElementsProvider : IMepLinkElementsProvider {
+
+internal class MepLinkElementsProvider : LinkElementsProvider, IMepLinkElementsProvider {
     private readonly ICollection<ElementId> _mepElements;
     private readonly ICollection<ElementId> _openingTasks;
 
@@ -17,20 +18,16 @@ internal class MepLinkElementsProvider : IMepLinkElementsProvider {
     /// </summary>
     /// <param name="linkDocument">Связанный файл с элементами ВИС</param>
     /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    public MepLinkElementsProvider(RevitLinkInstance linkDocument) {
+    public MepLinkElementsProvider(RevitLinkInstance linkDocument)
+        : base(linkDocument) {
         if(linkDocument is null) {
             throw new ArgumentNullException(nameof(linkDocument));
         }
 
-        Document = linkDocument.GetLinkDocument();
-        DocumentTransform = linkDocument.GetTransform();
         _mepElements = GetMepElementIds(Document);
         _openingTasks = GetOpeningsTaskIds(Document);
     }
 
-    public Document Document { get; }
-
-    public Transform DocumentTransform { get; }
 
     public ICollection<ElementId> GetMepElementIds() {
         return _mepElements;

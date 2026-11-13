@@ -6,26 +6,32 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.WPF.Extensions;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// <summary>
 /// Модель представления окна для работы с конкретным входящим заданием на отверстие от инженера в файле архитектора или конструктора
 /// </summary>
-internal class OpeningMepTaskIncomingViewModel : BaseViewModel, IOpeningTaskIncomingForKrViewModel, IEquatable<OpeningMepTaskIncomingViewModel> {
+internal class OpeningMepTaskIncomingViewModel : BaseViewModel,
+    IOpeningTaskIncomingToKrViewModel,
+    IOpeningMepTaskIncomingToArViewModel,
+    IEquatable<OpeningMepTaskIncomingViewModel> {
     /// <summary>
     /// Экземпляр семейства задания на отверстие
     /// </summary>
     private readonly OpeningMepTaskIncoming _openingTask;
 
-
-    public OpeningMepTaskIncomingViewModel(OpeningMepTaskIncoming incomingOpeningTask) {
+    public OpeningMepTaskIncomingViewModel(
+        OpeningMepTaskIncoming incomingOpeningTask,
+        ILocalizationService localization) {
         if(incomingOpeningTask is null) {
             throw new ArgumentNullException(nameof(incomingOpeningTask));
         }
@@ -44,92 +50,48 @@ internal class OpeningMepTaskIncomingViewModel : BaseViewModel, IOpeningTaskInco
         Thickness = _openingTask.DisplayThickness;
         FamilyShortName = _openingTask.FamilyShortName;
         Host = _openingTask.Host is null ? new OpeningKrHost() : new OpeningKrHost(_openingTask.Host);
-        Status = _openingTask.Status.GetDescription();
+        Status = localization.GetLocalizedString($"{nameof(OpeningTaskIncomingStatus)}.{_openingTask.Status}");
         Comment = _openingTask.Comment;
         Username = _openingTask.Username;
     }
 
+    public ElementId OpeningId { get; }
 
-    /// <summary>
-    /// Id экземпляра семейства задания на отверстие
-    /// </summary>
-    public ElementId OpeningId { get; } = ElementId.InvalidElementId;
+    public string FileName { get; }
 
-    /// <summary>
-    /// Название связанного файла-источника задания на отверстие
-    /// </summary>
-    public string FileName { get; } = string.Empty;
+    public string Date { get; }
 
-    /// <summary>
-    /// Дата создания отверстия
-    /// </summary>
-    public string Date { get; } = string.Empty;
+    public string MepSystem { get; }
 
-    /// <summary>
-    /// Название инженерной системы, для элемента которой создано задание на отверстие
-    /// </summary>
-    public string MepSystem { get; } = string.Empty;
+    public string Description { get; }
 
-    /// <summary>
-    /// Описание задания на отверстие
-    /// </summary>
-    public string Description { get; } = string.Empty;
+    public string CenterOffset { get; }
 
-    /// <summary>
-    /// Отметка центра задания на отверстие
-    /// </summary>
-    public string CenterOffset { get; } = string.Empty;
+    public string BottomOffset { get; }
 
-    /// <summary>
-    /// Отметка низа задания на отверстие
-    /// </summary>
-    public string BottomOffset { get; } = string.Empty;
+    public string Diameter { get; }
 
-    /// <summary>
-    /// Диаметр
-    /// </summary>
-    public string Diameter { get; } = string.Empty;
+    public string Width { get; }
 
-    /// <summary>
-    /// Ширина
-    /// </summary>
-    public string Width { get; } = string.Empty;
+    public string Height { get; }
 
-    /// <summary>
-    /// Высота
-    /// </summary>
-    public string Height { get; } = string.Empty;
+    public string Thickness { get; }
 
-    /// <summary>
-    /// Толщина
-    /// </summary>
-    public string Thickness { get; } = string.Empty;
+    public string Status { get; }
 
-    /// <summary>
-    /// Статус задания на отверстие
-    /// </summary>
-    public string Status { get; } = string.Empty;
+    public string FamilyShortName { get; }
 
-    /// <summary>
-    /// Расположение отверстия - в перекрытии/в стене
-    /// </summary>
-    public string FamilyShortName { get; } = string.Empty;
+    public string Comment { get; }
 
-    /// <summary>
-    /// Комментарий экземпляра семейства задания на отверстие
-    /// </summary>
-    public string Comment { get; } = string.Empty;
+    public string Username { get; }
 
-    /// <summary>
-    /// Имя пользователя, создавшего задание на отверстие
-    /// </summary>
-    public string Username { get; } = string.Empty;
+    IOpeningHost IOpeningMepTaskIncomingToArViewModel.Host => Host;
 
     public IOpeningKrHost Host { get; }
 
     public override bool Equals(object obj) {
         return (obj != null)
-            && (obj is OpeningMepTaskIncomingViewModel vmOther)
+               && (obj is OpeningMepTaskIncomingViewModel vmOther)
             && Equals(vmOther);
     }
 
@@ -151,7 +113,7 @@ internal class OpeningMepTaskIncomingViewModel : BaseViewModel, IOpeningTaskInco
     }
 
     /// <summary>
-    /// Возвращает коллекцию элементов, в которой находится входящее задание на отверстие, которое надо выделить на виде
+    /// Возвращает коллекцию элементов, в которой находится входящее задание на отверстие для выделения на виде
     /// </summary>
     public ICollection<ElementModel> GetElementsToSelect() {
         return new ElementModel[] {

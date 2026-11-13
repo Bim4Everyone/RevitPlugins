@@ -22,7 +22,7 @@ internal class RectangleMepWallPlacerInitializer : IMepCurvePlacerInitializer {
             AngleFinder = new WallAngleFinder(clash.Element2, clash.Element2Transform),
             Type = revitRepository.GetOpeningTaskType(OpeningType.WallRectangle),
         };
-        if(clash.Element1.IsPerpendicular(clash.Element2)) {
+        if(clash.Element1.IsPerpendicular(clash.Element2, clash.Element2Transform)) {
             var pointFinder = new WallPointFinder(clash, categoryOption.ElevationRounding, new HeightValueGetter(clash.Element1, categoryOption));
             placer.PointFinder = pointFinder;
             placer.ParameterGetter = new PerpendicularRectangleCurveWallParamGetter(clash, categoryOption, pointFinder, levelFinder);

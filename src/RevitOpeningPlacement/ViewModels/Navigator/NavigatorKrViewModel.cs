@@ -1,0 +1,330 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Input;
+
+using Autodesk.Revit.DB;
+
+using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
+using dosymep.WPF.ViewModels;
+
+using Ninject;
+using Ninject.Syntax;
+
+using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.Services;
+
+namespace RevitOpeningPlacement.ViewModels.Navigator;
+
+/// <summary>
+/// Модель представления окна для просмотра входящих заданий на отверстия от архитектора в файле конструктора
+/// </summary>
+internal class NavigatorKrViewModel : BaseViewModel {
+    private readonly RevitRepository _revitRepository;
+    private readonly OpeningRealsKrConfig _config;
+    private readonly ILocalizationService _localization;
+    private readonly IResolutionRoot _resolutionRoot;
+
+    public NavigatorKrViewModel(
+        RevitRepository revitRepository,
+        OpeningRealsKrConfig config,
+        IMessageBoxService messageBoxService,
+        IProgressDialogFactory progressDialogFactory,
+        IResolutionRoot resolutionRoot,
+        ILocalizationService localization) {
+        MessageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
+        ProgressDialogFactory = progressDialogFactory ?? throw new ArgumentNullException(nameof(progressDialogFactory));
+        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
+        _config = config ?? throw new ArgumentNullException(nameof(config));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        _resolutionRoot = resolutionRoot ?? throw new ArgumentNullException(nameof(resolutionRoot));
+        OpeningsTasksIncoming = [];
+        OpeningsReal = [];
+
+        LoadViewCommand
+            = RelayCommand.Create(LoadView);
+        SelectCommand
+            = RelayCommand.Create<ISelectorAndHighlighter>(SelectElement, CanSelect);
+        RenewCommand
+            = RelayCommand.Create(Renew);
+        PlaceRealOpeningBySingleTaskCommand
+            = RelayCommand.Create(PlaceRealOpeningBySingleTask);
+        PlaceOneRealOpeningByManyTasksCommand
+            = RelayCommand.Create(PlaceOneRealOpeningByManyTasks);
+        PlaceManyRealOpeningsByManyTasksCommand
+            = RelayCommand.Create(PlaceManyRealOpeningsByManyTasks);
+        PlaceManyRealOpeningsByManyTasksInManyHostsCommand
+            = RelayCommand.Create(PlaceManyRealOpeningsByManyTasksInManyHosts);
+    }
+
+    public IMessageBoxService MessageBoxService { get; }
+    public IProgressDialogFactory ProgressDialogFactory { get; }
+
+    // Входящие задания на отверстия из АР/ВИС
+    public ObservableCollection<IOpeningTaskIncomingToKrViewModel> OpeningsTasksIncoming { get; }
+
+    // Чистовые отверстия из активного документа КР
+    public ObservableCollection<IOpeningRealKrViewModel> OpeningsReal { get; }
+
+    public bool ShowOpeningsReal => OpeningsReal.Count > 0;
+
+    public ICommand LoadViewCommand { get; }
+
+    public ICommand SelectCommand { get; }
+
+    public ICommand RenewCommand { get; }
+
+    public ICommand PlaceRealOpeningBySingleTaskCommand { get; }
+
+    public ICommand PlaceOneRealOpeningByManyTasksCommand { get; }
+
+    public ICommand PlaceManyRealOpeningsByManyTasksCommand { get; }
+
+    public ICommand PlaceManyRealOpeningsByManyTasksInManyHostsCommand { get; }
+
+    private void SelectElement(ISelectorAndHighlighter p) {
+        _revitRepository.SelectAndShowElement(p, MessageBoxService);
+    }
+
+    private bool CanSelect(ISelectorAndHighlighter p) {
+        return p != null;
+    }
+
+    private void Renew() {
+        void action() {
+            var cmd = new GetOpeningTasksCmd();
+            cmd.ExecuteCommand(_revitRepository.UIApplication);
+        }
+
+        _revitRepository.DoAction(action);
+    }
+
+    private void PlaceRealOpeningBySingleTask() {
+        void action() {
+            var cmd = new PlaceOneOpeningRealByOneTaskCmd();
+            cmd.ExecuteCommand(_revitRepository.UIApplication);
+        }
+
+        _revitRepository.DoAction(action);
+    }
+
+    private void PlaceOneRealOpeningByManyTasks() {
+        void action() {
+            var cmd = new PlaceOneOpeningRealByManyTasksCmd();
+            cmd.ExecuteCommand(_revitRepository.UIApplication);
+        }
+
+        _revitRepository.DoAction(action);
+    }
+
+    private void PlaceManyRealOpeningsByManyTasks() {
+        void action() {
+            var cmd = new PlaceManyOpeningRealsByManyTasksInOneHostCmd();
+            cmd.ExecuteCommand(_revitRepository.UIApplication);
+        }
+
+        _revitRepository.DoAction(action);
+    }
+
+    private void PlaceManyRealOpeningsByManyTasksInManyHosts() {
+        void action() {
+            var cmd = new PlaceManyOpeningRealsByManyTasksInManyHostsCmd();
+            cmd.ExecuteCommand(_revitRepository.UIApplication);
+        }
+
+        _revitRepository.DoAction(action);
+    }
+
+    private void LoadView() {
+        var mode = _config.PlacementType;
+        switch(mode) {
+            case OpeningRealKrPlacementType.PlaceByMep:
+                LoadIncomingMepTasks();
+                break;
+            case OpeningRealKrPlacementType.PlaceByAr:
+                LoadIncomingArTasks();
+                break;
+            default:
+                throw new InvalidOperationException($"Режим обработки заданий для КР: '{mode}' не поддерживается.");
+        }
+    }
+
+    private void LoadIncomingArTasks() {
+        var incomingTasksViewModels = GetOpeningsArIncomingTasksViewModels(
+                _revitRepository.GetOpeningsArTasksIncoming(),
+                _revitRepository.GetVentBlocksArTasksIncoming())
+            .ToList();
+        incomingTasksViewModels.AddRange(GetUniqueArIncomingTasks());
+        LoadOpeningsTasksIncoming(incomingTasksViewModels);
+
+        LoadOpeningsReal();
+    }
+
+    private void LoadIncomingMepTasks() {
+        var incomingTasksViewModels = GetOpeningsMepIncomingTasksViewModels(
+                _revitRepository.GetOpeningsMepTasksIncoming())
+            .ToList<IOpeningTaskIncomingToKrViewModel>();
+        incomingTasksViewModels.AddRange(GetUniqueMepIncomingTasks());
+        LoadOpeningsTasksIncoming(incomingTasksViewModels);
+
+        LoadOpeningsReal();
+    }
+
+    private void LoadOpeningsTasksIncoming(ICollection<IOpeningTaskIncomingToKrViewModel> incomingTasks) {
+        OpeningsTasksIncoming.Clear();
+        foreach(var incomingTask in incomingTasks) {
+            OpeningsTasksIncoming.Add(incomingTask);
+        }
+    }
+
+    private void LoadOpeningsReal() {
+        var openingsRealViewModels = GetOpeningsRealKrViewModels(_revitRepository.GetRealOpeningsKr())
+            .ToList<IOpeningRealKrViewModel>();
+        openingsRealViewModels.AddRange(GetUniqueKrOpenings());
+
+        OpeningsReal.Clear();
+        foreach(var openingReal in openingsRealViewModels) {
+            OpeningsReal.Add(openingReal);
+        }
+
+        OnPropertyChanged(nameof(ShowOpeningsReal));
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию уникальных чистовых отверстий КР из активного файла
+    /// </summary>
+    private ICollection<IOpeningRealKrViewModel> GetUniqueKrOpenings() {
+        return _revitRepository.GetFamilyInstances(
+                RevitRepository.KrUniqueFamilyName,
+                BuiltInCategory.OST_GenericModel)
+            .Select(o => new OpeningRealKrUniqueViewModel(o, _localization.GetLocalizedString("AllOpeningStatus.Unique")))
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию уникальных входящих заданий на отверстия от ВИС
+    /// </summary>
+    private ICollection<IOpeningTaskIncomingToKrViewModel> GetUniqueMepIncomingTasks() {
+        return _revitRepository.GetFamilyInstancesFromLinks(
+                RevitRepository.MepUniqueFamilyName,
+                BuiltInCategory.OST_GenericModel)
+            .Select(i => new OpeningMepTaskIncomingUniqueViewModel(
+                i.Instance,
+                i.Transform,
+                _localization.GetLocalizedString("AllOpeningStatus.Unique")))
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию уникальных входящих заданий на отверстия от АР
+    /// </summary>
+    private ICollection<IOpeningTaskIncomingToKrViewModel> GetUniqueArIncomingTasks() {
+        return _revitRepository.GetFamilyInstancesFromLinks(
+                RevitRepository.ArUniqueFamilyName,
+                BuiltInCategory.OST_Windows)
+            .Select(i => new OpeningArTaskIncomingUniqueViewModel(
+                i.Instance,
+                i.Transform,
+                _localization.GetLocalizedString("AllOpeningStatus.Unique")))
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию моделей представления для входящих заданий на отверстия из АР
+    /// </summary>
+    /// <param name="incomingTasks">Чистовые отверстия АР из связей</param>
+    /// <param name="ventBlocks">Вентблоки из связей АР</param>
+    private ICollection<IOpeningTaskIncomingToKrViewModel> GetOpeningsArIncomingTasksViewModels(
+        ICollection<OpeningArTaskIncoming> incomingTasks,
+        ICollection<VentBlockAr> ventBlocks) {
+        using var pb = ProgressDialogFactory.CreateDialog();
+        pb.StepValue = 100;
+        pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.TaskAnalysis");
+        var progress = pb.CreateProgress();
+        pb.MaxValue = incomingTasks.Count + ventBlocks.Count;
+        var ct = pb.CreateCancellationToken();
+        pb.Show();
+
+        int i = 0;
+        var incomingTasksViewModels = new HashSet<IOpeningTaskIncomingToKrViewModel>();
+        var infoUpdater = _resolutionRoot.Get<IOpeningInfoUpdater<IOpeningTaskIncoming>>();
+        foreach(var incomingTask in incomingTasks) {
+            ct.ThrowIfCancellationRequested();
+            progress.Report(i);
+            infoUpdater.UpdateInfo(incomingTask);
+            incomingTasksViewModels.Add(new OpeningArTaskIncomingViewModel(incomingTask, _localization));
+            i++;
+        }
+
+        foreach(var ventBlock in ventBlocks) {
+            ct.ThrowIfCancellationRequested();
+            progress.Report(i);
+            infoUpdater.UpdateInfo(ventBlock);
+            incomingTasksViewModels.Add(new VentBlockArIncomingViewModel(ventBlock, _localization));
+            i++;
+        }
+
+        return incomingTasksViewModels;
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию моделей представления для входящих заданий на отверстия из ВИС
+    /// </summary>
+    /// <param name="incomingTasks">Входящие задания на отверстия из связей</param>
+    private ICollection<OpeningMepTaskIncomingViewModel> GetOpeningsMepIncomingTasksViewModels(
+        ICollection<OpeningMepTaskIncoming> incomingTasks) {
+        using var pb = ProgressDialogFactory.CreateDialog();
+        pb.StepValue = 100;
+        pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.TaskAnalysis");
+        var progress = pb.CreateProgress();
+        pb.MaxValue = incomingTasks.Count;
+        var ct = pb.CreateCancellationToken();
+        pb.Show();
+
+        int i = 0;
+        var incomingTasksViewModels = new HashSet<OpeningMepTaskIncomingViewModel>();
+        var infoUpdater = _resolutionRoot.Get<IOpeningInfoUpdater<IOpeningTaskIncoming>>();
+        foreach(var incomingTask in incomingTasks) {
+            ct.ThrowIfCancellationRequested();
+            progress.Report(i);
+            infoUpdater.UpdateInfo(incomingTask);
+            incomingTasksViewModels.Add(new OpeningMepTaskIncomingViewModel(incomingTask, _localization));
+            i++;
+        }
+
+        return incomingTasksViewModels;
+    }
+
+    /// <summary>
+    /// Возвращает коллекцию моделей представления чистовых отверстий, размещенных в активном документе КР
+    /// </summary>
+    /// <param name="openingsReal">Чистовые отверстия, размещенные в активном документе КР</param>
+    private ICollection<OpeningRealKrViewModel> GetOpeningsRealKrViewModels(
+        ICollection<OpeningRealKr> openingsReal) {
+        using var pb = ProgressDialogFactory.CreateDialog();
+        pb.StepValue = 50;
+        pb.DisplayTitleFormat = _localization.GetLocalizedString("Progress.OpeningAnalysis");
+        var progress = pb.CreateProgress();
+        pb.MaxValue = openingsReal.Count;
+        var ct = pb.CreateCancellationToken();
+        pb.Show();
+
+        int i = 0;
+        var openingsRealViewModels = new HashSet<OpeningRealKrViewModel>();
+        var infoUpdater = _resolutionRoot.Get<IOpeningInfoUpdater<OpeningRealKr>>();
+        foreach(var openingReal in openingsReal) {
+            ct.ThrowIfCancellationRequested();
+            progress.Report(i);
+            infoUpdater.UpdateInfo(openingReal);
+            openingsRealViewModels.Add(new OpeningRealKrViewModel(openingReal, _localization));
+            i++;
+        }
+
+        return openingsRealViewModels;
+    }
+}

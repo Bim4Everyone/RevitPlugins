@@ -64,6 +64,7 @@ internal class RevitRepository {
             if(!Directory.Exists(path)) {
                 path = LocalProfilePath;
             }
+
             return path;
         }
     }
@@ -94,7 +95,7 @@ internal class RevitRepository {
 
     public UIApplication UiApplication { get; }
 
-    public List<DocInfo> DocInfos { get; set; }
+    public List<DocInfo> DocInfos { get; private set; }
 
     public View3D GetClashView() {
         var view = new FilteredElementCollector(Doc)
@@ -185,7 +186,7 @@ internal class RevitRepository {
         return new FilteredElementCollector(Doc)
             .OfClass(typeof(RevitLinkInstance))
             .Cast<RevitLinkInstance>()
-            .Where(item => item.GetLinkDocument() != null)
+            .Where(IsRvtLink)
             .ToList();
     }
 
@@ -564,6 +565,27 @@ internal class RevitRepository {
             return providers;
         }
         return new[] { providers.First() };
+    }
+
+    private bool IsRvtLink(RevitLinkInstance link) {
+        if(link is null) {
+            return false;
+        }
+
+        if(!link.HasElementType()) {
+            return false;
+        }
+
+        var type = (RevitLinkType) Doc.GetElement(link.GetTypeId());
+        var extRef = type.GetExternalFileReference();
+        if(extRef == null) {
+            return false;
+        }
+
+        var doc = link.GetLinkDocument();
+        return doc != null
+               && extRef.ExternalFileReferenceType == ExternalFileReferenceType.RevitLink
+               && type.Name.EndsWith(".rvt", StringComparison.CurrentCultureIgnoreCase);
     }
 
     /// <summary>

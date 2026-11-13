@@ -4,12 +4,16 @@
         <OutputType>Library</OutputType>
         <NoWarn>1701;1702;MSB3246;MSB3277</NoWarn>
         <TargetFramework>net48</TargetFramework>
+
+        <!-- Версия языка по умолчанию для всех плагинов.
+             Общие исходники src/dosymep содержат директиву "#nullable disable",
+             которая недоступна в C# 7.3 (версия net48 по умолчанию) у старых плагинов. -->
+        <LangVersion>latest</LangVersion>
         
         <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
         <IncludePackageReferencesDuringMarkupCompilation>false</IncludePackageReferencesDuringMarkupCompilation>
         
         <UseWPF>true</UseWPF>
-        <UseWindowsForms>true</UseWindowsForms>
         <RevitVersion Condition="'$(RevitVersion)' == ''">2024</RevitVersion>
         
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -53,10 +57,7 @@
         <Compile Include="..\dosymep\ConvertibleExtention.cs" Link="dosymep\ConvertibleExtention.cs"/>
         <Compile Include="..\dosymep\BasePluginCommand.cs" Link="dosymep\BasePluginCommand.cs"/>
         <Compile Include="..\dosymep\EnumConverter.cs" Link="dosymep\Converters\EnumConverter.cs"/>
-        <Compile Include="..\dosymep\IndexConverter.cs" Link="dosymep\Converters\IndexConverter.cs"/>
         <Compile Include="..\dosymep\InverseBooleanConverter.cs" Link="dosymep\Converters\InverseBooleanConverter.cs"/>
-        <Compile Include="..\dosymep\ElementIdConverter.cs" Link="dosymep\Converters\ElementIdConverter.cs"/>
-        <Compile Include="..\dosymep\EnumToItemsSource.cs" Link="dosymep\MarkupExtensions\EnumToItemsSource.cs"/>
         <Compile Include="..\dosymep\PlatformWindow.cs" Link="dosymep\PlatformWindow.cs"/>
         <Compile Include="..\dosymep\ICommand.cs" Link="dosymep\BaseCommands\ICommand.cs"/>
         <Compile Include="..\dosymep\IAsyncCommand.cs" Link="dosymep\BaseCommands\IAsyncCommand.cs"/>

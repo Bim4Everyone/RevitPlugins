@@ -15,11 +15,8 @@
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
 
-    Height="900" 
-    Width="1000"
-    
-    MinHeight="900"
-    MinWidth="1000"
+    Height="750" Width="1000"    
+    MinHeight="750" MinWidth="1000"
     
     d:DataContext="{d:DesignInstance vms:RoomsViewModel, IsDesignTimeCreatable=False}">
 
@@ -55,7 +52,7 @@
         <ui:TitleBar
             VerticalAlignment="Center"
             Grid.Row="0"
-            Title="{me:LocalizationSource MainWindow.Title}"/>
+            Title="{me:LocalizationSource RoomsWindow.Title}"/>
         
         <Border
             Grid.Row="1"
@@ -71,8 +68,20 @@
             Grid.Row="2"
             Margin="14,4"
             Style="{StaticResource CustomBorder}">
-            <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                
                 <CheckBox
+                    Grid.Row="0"
+                    Grid.Column="0"
                     Margin="0,4"
                     IsChecked="{Binding RevitViewModel.IsFillLevel}">
                     <TextBlock>
@@ -82,23 +91,30 @@
                 </CheckBox>
 
                 <CheckBox
+                    Grid.Row="0"
+                    Grid.Column="1"
                     Margin="0,4"
                     Content="{me:LocalizationSource RoomsWindow.CalculateContourArea}"
                     IsChecked="{Binding RevitViewModel.IsSpotCalcArea}" />
 
                 <CheckBox
+                    Grid.Row="1"
+                    Grid.Column="1"
                     Margin="0,4"
                     Content="{me:LocalizationSource RoomsWindow.CountRooms}"
                     IsChecked="{Binding RevitViewModel.IsCountRooms}" />
 
                 <CheckBox
+                    Grid.Row="1"
+                    Grid.Column="0"
                     x:Name="_checkArea"
                     Margin="0,4"
                     Content="{me:LocalizationSource RoomsWindow.CheckChanges}"
                     IsChecked="{Binding RevitViewModel.IsCheckRoomsChanges}" />
 
                 <StackPanel
-                    Grid.Row="6"
+                    Grid.Row="2"
+                    Grid.Column="0"
                     Margin="0,4"
                     Orientation="Horizontal"
                     Visibility="{Binding ElementName=_checkArea,Path=IsChecked, Converter={StaticResource BoolToVis}}">
@@ -114,7 +130,7 @@
                         VerticalAlignment="Center"
                         Text="%" />
                 </StackPanel>
-            </StackPanel>
+            </Grid>
         </Border>
 
         <Border
@@ -190,7 +206,7 @@
                     </DataGridCheckBoxColumn>
                     <DataGridTextColumn
                         Binding="{Binding Path=Name}"
-                        Width="500"
+                        Width="400"
                         IsReadOnly="True">
                         <DataGridTextColumn.Header>
                             <TextBlock
@@ -199,7 +215,7 @@
                     </DataGridTextColumn>
                     <DataGridTextColumn
                         Binding="{Binding Path=LevelNames}"
-                        Width="300"
+                        Width="250"
                         IsReadOnly="True">
                         <DataGridTextColumn.Header>
                             <TextBlock
@@ -230,7 +246,8 @@
 
             <ui:Button
                 Content="{me:LocalizationSource RoomsWindow.ButtonCalculateAreas}"
-                Margin="4,0" 
+                Margin="4,0"
+                Appearance="Info"
                 Click="ButtonOK_Click"
                 Command="{Binding RevitViewModel.CalculateAreasCommand}" />
 
@@ -238,6 +255,7 @@
                 Content="{me:LocalizationSource RoomsWindow.ButtonCalculateRooms}"
                 Margin="4,0" 
                 IsDefault="True"
+                Appearance="Info"
                 Click="ButtonOK_Click" 
                 Command="{Binding RevitViewModel.CalculateCommand}" />
 

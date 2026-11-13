@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml.Linq;
@@ -11,10 +12,13 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
 
+using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     public class MaskReplacer {
+        private static readonly Regex _maskParameterRegex = new Regex(@"\{(?<paramName>[^{}]+)\}");
+
         // должно работать только с шаблонизированными семействами, так что оставляем только ADSK_Параметры, объявляем их тут же
         private readonly string _length = "ДЛИНА";
         private readonly string _adskLength = "ADSK_Размер_Длина";
@@ -39,10 +43,45 @@ namespace RevitMechanicalSpecification.Service {
         /// <param name="paramName"></param>
         /// <returns></returns>
         private string GetStringValue(Element element, Element elemType, string paramName) {
-            double value = element.GetTypeOrInstanceParamDoubleValue(elemType, paramName);
-            value = UnitConverter.DoubleToMilimeters(value);
 
-            return UnitConverter.DoubleToString(value);
+            Parameter parameter = element.GetTypeOrInstanceParam(elemType, paramName);
+            if(parameter == null) {
+                return null;
+            }
+
+            if(parameter.StorageType == StorageType.String) {
+                return element.GetTypeOrInstanceParamStringValue(elemType, paramName);
+            }
+
+            if(parameter.StorageType == StorageType.Double) {
+                double value = UnitConverter.DoubleToProjectUnits(parameter.AsDouble(), parameter);
+                return UnitConverter.DoubleToString(value);
+            }
+
+            string valueString = parameter.AsValueString();
+            return valueString?.Trim() ?? string.Empty;
+        }
+
+        private string ReplaceCustomMaskParameters(Element element, Element elemType, string mask) {
+            return _maskParameterRegex.Replace(mask, match => {
+                string paramName = match.Groups["paramName"].Value.Trim();
+                if(string.IsNullOrWhiteSpace(paramName)) {
+                    return match.Value;
+                }
+                
+                Parameter parameter = element.GetTypeOrInstanceParam(elemType, paramName);
+                if(parameter == null) {
+                    return match.Value;
+                }
+
+                string value = GetStringValue(element, elemType, paramName);
+
+                if(value == null) {
+                    return string.Empty;
+                }
+
+                return value;
+            });
         }
 
         /// <summary>
@@ -56,16 +95,18 @@ namespace RevitMechanicalSpecification.Service {
             Element elemType = element.GetElementType();
 
             if(!elemType.IsExistsParam(maskName) && !element.IsExistsParam(maskName)) {
-                return string.Empty;
+                return null;
             }
 
-            string mask = element.GetSharedParamValueOrDefault<string>(maskName) ?? elemType.GetSharedParamValueOrDefault<string>(maskName, "ЗАПОЛНИТЕ МАСКУ");
+            string mask = element.GetSharedParamValueOrDefault<string>(maskName) 
+                ?? elemType.GetSharedParamValueOrDefault<string>(maskName, "ЗАПОЛНИТЕ МАСКУ");
 
-            string width = GetStringValue(element, elemType, _adskWidth);
-            string height = GetStringValue(element, elemType, _adskHeight);
-            string lenght = GetStringValue(element, elemType, _adskLength);
+            string defaultSizeValue = UnitConverter.DoubleToString(0);
+            string width = GetStringValue(element, elemType, _adskWidth) ?? defaultSizeValue;
+            string height = GetStringValue(element, elemType, _adskHeight) ?? defaultSizeValue;
+            string lenght = GetStringValue(element, elemType, _adskLength) ?? defaultSizeValue;
 
-            string diameter = GetStringValue(element, elemType, _adskDiameter);
+            string diameter = GetStringValue(element, elemType, _adskDiameter) ?? defaultSizeValue;
 
             if(mask.Contains(_height)) {
                 mask = mask.Replace(_height, height);
@@ -79,6 +120,8 @@ namespace RevitMechanicalSpecification.Service {
             if(mask.Contains(_diameter)) {
                 mask = mask.Replace(_diameter, diameter);
             }
+
+            mask = ReplaceCustomMaskParameters(element, elemType, mask);
 
             // Здесь нужно обновить значение ADSK_Наименование-Марка для шаблонных семейств с масками
             Parameter toParam = element.GetParam(toParamName);
@@ -99,7 +142,7 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        public string ReplaceMarkMask(Element element) {
+        private string ReplaceMarkMask(Element element) {
             return ReplaceMask(element, _specConfiguration.MaskMarkName, "ADSK_Марка");
         }
 
@@ -108,21 +151,28 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        public string ReplaceNameMask(Element element) {
+        private string ReplaceNameMask(Element element) {
             return ReplaceMask(element, _specConfiguration.MaskNameName, "ADSK_Наименование");
         }
 
         /// <summary>
-        /// Вызывает замену обоих целевых параметров масками. Возвращает бул, 
-        /// чтоб в общей обработке понять была ли замена
+        /// Вызов замены параметра ADSK_Наименование краткое
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        public bool ExecuteReplacment(Element element) {
-            string markMask = ReplaceMarkMask(element);
-            string nameMask = ReplaceNameMask(element);
+        private string ReplaceShortNameMask(Element element) {
+            return ReplaceMask(element, _specConfiguration.MaskShortNameName, "ADSK_Наименование краткое");
+        }
 
-            return !string.IsNullOrEmpty(markMask) & !string.IsNullOrEmpty(nameMask);
+        /// <summary>
+        /// Вызывает замену целевых параметров масками и сохраняет рассчитанные имя и марку.
+        /// </summary>
+        /// <param name="specificationElement"></param>
+        public void ExecuteReplacment(SpecificationElement specificationElement) {
+            Element element = specificationElement.Element;
+            specificationElement.ReplacedMark = ReplaceMarkMask(element);
+            specificationElement.ReplacedName = ReplaceNameMask(element);
+            ReplaceShortNameMask(element);
         }
     }
 }

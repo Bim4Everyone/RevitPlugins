@@ -5,7 +5,6 @@ using Autodesk.Revit.DB;
 
 using RevitPylonDocumentation.Models.PluginOptions;
 using RevitPylonDocumentation.Models.Services;
-using RevitPylonDocumentation.ViewModels;
 
 namespace RevitPylonDocumentation.Models.PylonSheetNView.ViewDimensionServices.ViewRebarDimensionServices;
 internal class TransViewRebarHorizDimensionService {
@@ -39,27 +38,27 @@ internal class TransViewRebarHorizDimensionService {
             var formDimensionLineOffset = 0.5;
 
             if(onTopOfRebar && !_sheetInfo.RebarInfo.AllRebarAreL) {
-                var edgeBottomSideRefArray = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
+                var edgeBottomSideRefArray = _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,
                                                                                     ["низ", "торец", "край"]);
                 if(_sheetInfo.RebarInfo.HasLRebar) {
                     var rebarFinder = _sheetInfo.RebarFinder;
                     var view = _viewOfPylon.ViewElement;
-                    if(rebarFinder.DirectionHasLRebar(view, _sheetInfo.ProjectSection, DirectionType.Top) 
+                    if(rebarFinder.DirectionHasLRebar(view, _sheetInfo.ProjectSection, DirectionType.Top)
                         && _sheetInfo.RebarInfo.SecondLRebarParamValue) {
-                        edgeBottomSideRefArray = 
-                            _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
-                                                                   ["1", "верх", "торец", "край"], 
+                        edgeBottomSideRefArray =
+                            _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,
+                                                                   ["1", "верх", "торец", "край"],
                                                                    oldRefArray: edgeBottomSideRefArray);
                     } else {
-                        edgeBottomSideRefArray = 
-                            _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
-                                                                   ["2", "верх", "торец", "край"], 
+                        edgeBottomSideRefArray =
+                            _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,
+                                                                   ["2", "верх", "торец", "край"],
                                                                    oldRefArray: edgeBottomSideRefArray);
                     }
                 } else {
-                    edgeBottomSideRefArray = 
-                        _dimensionBaseService.GetDimensionRefs(skeletonParentRebar, 
-                                                               ["верх", "торец", "край"], 
+                    edgeBottomSideRefArray =
+                        _dimensionBaseService.GetDimensionRefs(skeletonParentRebar,
+                                                               ["верх", "торец", "край"],
                                                                oldRefArray: edgeBottomSideRefArray);
                 }
 
@@ -69,7 +68,8 @@ internal class TransViewRebarHorizDimensionService {
             }
 
             var rebarSideOffset = new DimensionLineOffsetOption(pylon, DirectionType.Right, formDimensionLineOffset);
-            _dimCreationService.CreateDimension(skeletonParentRebar, rebarSideOffset, ["низ", "торец", "край"]);
+            _dimCreationService.CreateDimension(skeletonParentRebar, rebarSideOffset, ["низ", "торец", "край"],
+                                                needEqualityFormula: _settings.AnnotationSettings.DimensionGrouping);
         } catch(Exception) { }
     }
 }

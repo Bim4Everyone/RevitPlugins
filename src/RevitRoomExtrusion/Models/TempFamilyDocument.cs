@@ -15,7 +15,7 @@ internal class TempFamilyDocument {
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly FamilyLoadOptions _familyLoadOptions;
-    private readonly string _familyTemplatePath;
+
     private readonly string _familyPath;
     private readonly string _tempDirectory = Path.GetTempPath();
     private readonly string _familyName;
@@ -33,17 +33,14 @@ internal class TempFamilyDocument {
         _familyLoadOptions = familyLoadOptions;
         _familyName = familyName;
         _location = location;
-
-        _familyTemplatePath = _localizationService.GetLocalizedString(
-            "FamilyDocument.TemplateFamilyName", _revitRepository.Application.FamilyTemplatePath);
         _familyPath = _localizationService.GetLocalizedString(
             "FamilyDocument.FamilyName", _tempDirectory, _familyName, _location, _extension);
     }
 
     //Метод загрузки в проект и получения типоразмера семейства
-    public FamilySymbol GetFamilySymbol(List<RoomElement> roomList, double amount, bool joinExtrusionChecked) {
+    public FamilySymbol GetFamilySymbol(List<RoomElement> roomList, double amount, bool joinExtrusionChecked, string familyTemplatePath) {
         try {
-            CreateFile(roomList, amount, joinExtrusionChecked);
+            CreateFile(roomList, amount, joinExtrusionChecked, familyTemplatePath);
             FamilySymbol familySymbol = null;
             bool loadSuccess = _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out var family);
             familySymbol = _revitRepository.GetFamilySymbol(family);
@@ -64,10 +61,10 @@ internal class TempFamilyDocument {
     }
 
     //Метод создания файла
-    private void CreateFile(List<RoomElement> roomList, double amount, bool joinExtrusionChecked) {
+    private void CreateFile(List<RoomElement> roomList, double amount, bool joinExtrusionChecked, string familyTemplatePath) {
         Document document = null;
         try {
-            document = _revitRepository.Application.NewFamilyDocument(_familyTemplatePath);
+            document = _revitRepository.Application.NewFamilyDocument(familyTemplatePath);
             string transactionName = _localizationService.GetLocalizedString("FamilyDocument.TransactionName");
             using(var t = document.StartTransaction(transactionName)) {
                 CreateExtrusions(document, roomList, amount, joinExtrusionChecked);

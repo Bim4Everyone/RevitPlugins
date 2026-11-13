@@ -10,8 +10,8 @@
         <Border
             SnapsToDevicePixels="True"
             CornerRadius="3"
-            Padding="5,3"
-            Margin="3"
+            Padding="5,1"
+            Margin="1"
             Background="Honeydew">
 
             <TextBlock
@@ -31,8 +31,8 @@
         <Border
             SnapsToDevicePixels="True"
             CornerRadius="3"
-            Padding="5,3"
-            Margin="3"
+            Padding="5,1"
+            Margin="1"
             Background="MistyRose">
 
             <TextBlock
@@ -51,8 +51,8 @@
         <Border
             SnapsToDevicePixels="True"
             CornerRadius="3"
-            Padding="5,3"
-            Margin="3"
+            Padding="5,1"
+            Margin="1"
             Background="LightYellow">
 
             <TextBlock
@@ -71,8 +71,8 @@
         <Border
             SnapsToDevicePixels="True"
             CornerRadius="3"
-            Padding="5,3"
-            Margin="3"
+            Padding="5,1"
+            Margin="1"
             Background="LightYellow">
 
             <TextBlock

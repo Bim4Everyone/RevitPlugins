@@ -1,0 +1,523 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="VM.NeedSaveSettings">Save the settings</system:String>
+
+    <system:String x:Key="MainWindow.MustBeInteger">Enter an integer</system:String>
+
+    
+    <!-- Pylon Analysis Error Messages -->
+    <system:String x:Key="VM.TypicalPylonFilterParamNotFound">Typical pylon filter parameter not found</system:String>
+    <system:String x:Key="VM.ProjectSectionParamNotFound">Project section parameter not found in Walls or Structural Columns</system:String>
+    <system:String x:Key="VM.HostMarkParamNotFound">Host mark parameter not found in Walls or Structural Columns</system:String>
+    <system:String x:Key="VM.DuplicatePylonMarksFound">Pylons with duplicate marks found</system:String>
+
+    <!-- ViewModel Error Messages -->
+    <system:String x:Key="VM.SelectPylon">Select a pylon</system:String>
+    <system:String x:Key="VM.SelectProjectSection">Select a set of documentation</system:String>
+    <system:String x:Key="VM.SheetTypeNotSelected">The sheet frame size is not selected</system:String>
+    <system:String x:Key="VM.ViewTypeNotSelected">View type size not selected</system:String>
+    <system:String x:Key="VM.MainViewsTemplateNotSelected">Main views template not selected</system:String>
+    <system:String x:Key="VM.MainRebarViewsTemplateNotSelected">Main rebar views template not selected</system:String>
+    <system:String x:Key="VM.TransverseViewsTemplateNotSelected">Transverse views template not selected</system:String>
+    <system:String x:Key="VM.TransverseRebarViewsTemplateNotSelected">Transverse rebar views template not selected</system:String>
+    <system:String x:Key="VM.LegendNotSelected">Notes legend not selected</system:String>
+    <system:String x:Key="VM.ViewTypeSizeNotSelected">View type size not selected</system:String>
+    <system:String x:Key="VM.DimensionTypeNotSelected">Dimension type size not selected</system:String>
+    <system:String x:Key="VM.SpotDimensionTypeNotSelected">Spot dimension type size not selected</system:String>
+    <system:String x:Key="VM.SkeletonTagTypeNotSelected">Skeleton tag type size not set</system:String>
+    <system:String x:Key="VM.RebarTagWithSerifTypeNotSelected">Rebar tag with serif type size not set</system:String>
+    <system:String x:Key="VM.RebarTagWithoutSerifTypeNotSelected">Rebar tag without serif type size not set</system:String>
+    <system:String x:Key="VM.RebarTagWithCommentTypeNotSelected">Rebar tag with comment type size not set</system:String>
+    <system:String x:Key="VM.UniversalTagTypeNotSelected">Universal tag type size not set</system:String>
+    <system:String x:Key="VM.BreakLineTypeNotSelected">Break line type size not set</system:String>
+    <system:String x:Key="VM.ConcretingJointTypeNotSelected">Concreting joint type size not set</system:String>
+    <system:String x:Key="VM.WriteName">Enter the name</system:String>
+
+    <!-- Schedule Settings Validation Error Messages -->
+    <system:String x:Key="VM.SkeletonScheduleNameInvalid">The name of the skeletons schedule is incorrect.</system:String>
+    <system:String x:Key="VM.SkeletonByElemsScheduleNameInvalid">The name of the element-wise skeletons schedule is incorrect</system:String>
+    <system:String x:Key="VM.MaterialScheduleNameInvalid">The name of the material schedule is incorrect.</system:String>
+    <system:String x:Key="VM.SystemPartsScheduleNameInvalid">The system parts schedule name is incorrect.</system:String>
+    <system:String x:Key="VM.IfcPartsScheduleNameInvalid">The IFC parts schedule name is incorrect</system:String>
+    
+    <!-- Dispatcher Settings Validation Error Messages -->
+    <system:String x:Key="VM.DispatcherGroupingFirstParamInvalid">Dispatcher grouping 1 parameter name is incorrect</system:String>
+    <system:String x:Key="VM.DispatcherGroupingSecondParamInvalid">Dispatcher grouping 2 parameter name is incorrect</system:String>
+
+    <!-- Annotation Settings Validation Error Messages -->
+    <system:String x:Key="VM.LegendOffsetsNotSet">Legend offsets on sheet are not set</system:String>
+    <system:String x:Key="VM.SheetSizeParamInvalid">Sheet frame format parameter name is incorrect</system:String>
+    <system:String x:Key="VM.SheetCoefficientParamInvalid">Sheet frame format multiplier parameter name is incorrect</system:String>
+    <system:String x:Key="VM.PylonLengthParamInvalid">Pylon section length parameter name is incorrect</system:String>
+    <system:String x:Key="VM.PylonWidthParamInvalid">Pylon section width parameter name is incorrect</system:String>
+
+    <!-- View Sections Settings Validation Error Messages -->
+    <system:String x:Key="VM.MainViewXOffsetInvalid">Main view X offset value is incorrect</system:String>
+    <system:String x:Key="VM.MainViewYTopOffsetInvalid">Main view top Y offset value is incorrect</system:String>
+    <system:String x:Key="VM.MainViewYBottomOffsetInvalid">Main view bottom Y offset value is incorrect</system:String>
+
+    <system:String x:Key="VM.SideViewXOffsetInvalid">Side view X offset value is incorrect</system:String>
+    <system:String x:Key="VM.SideViewYTopOffsetInvalid">Side view top Y offset value is incorrect</system:String>
+    <system:String x:Key="VM.SideViewYBottomOffsetInvalid">Side view bottom Y offset value is incorrect</system:String>
+
+    <system:String x:Key="VM.TransverseViewXOffsetInvalid">Transverse view X offset value is incorrect</system:String>
+    <system:String x:Key="VM.TransverseViewYOffsetInvalid">Transverse view Y offset value is incorrect</system:String>
+
+    <system:String x:Key="VM.TransverseViewDepthInvalid">The transverse view depth value is incorrect</system:String>
+    <system:String x:Key="VM.TransverseRebarViewDepthInvalid">The transverse reinforcement view depth value is incorrect</system:String>
+    
+    <system:String x:Key="VM.FirstTransverseViewElevationInvalid">First transverse view elevation value is incorrect</system:String>
+    <system:String x:Key="VM.SecondTransverseViewElevationInvalid">Second transverse view elevation value is incorrect</system:String>
+    <system:String x:Key="VM.ThirdTransverseViewElevationInvalid">Third transverse view elevation value is incorrect</system:String>
+    
+    <!-- View Sections Settings Validation Error Messages -->
+    <system:String x:Key="VM.CustomSheetSizeValueInvalid">The custom sheet frame format value is incorrect</system:String>
+    <system:String x:Key="VM.CustomSheetCoefficientValueInvalid">The custom sheet frame format factor value is incorrect</system:String>
+    
+    <!-- MainWindow -->
+    <system:String x:Key="MainWindow.Title">Pylon Documentation Automation</system:String>
+    <system:String x:Key="MainWindow.Settings">Settings</system:String>
+
+    <system:String x:Key="MainWindow.PluginRun">Plugin Run</system:String>
+    <system:String x:Key="MainWindow.SheetComponentsMenu">Settings. Sheet Components</system:String>
+    <system:String x:Key="MainWindow.ProjectParametersMenu">Settings. Project parameters</system:String>
+    
+    <system:String x:Key="MainWindow.VerticalViews">Vertical views</system:String>
+    <system:String x:Key="MainWindow.TransverseViews">Transverse views</system:String>
+    <system:String x:Key="MainWindow.Schedules">Schedules</system:String>
+    <system:String x:Key="MainWindow.ScheduleFilters">Schedules. Filtration</system:String>
+
+    <system:String x:Key="MainWindow.LegendsAndAnnotations">Legends and Annotations</system:String>
+    <system:String x:Key="MainWindow.PylonParameters">Pylon parameters</system:String>
+    <system:String x:Key="MainWindow.AnnotationParameters">Annotation parameters</system:String>
+    <system:String x:Key="MainWindow.DispatcherParameters">Dispatcher parameters</system:String>
+    <system:String x:Key="MainWindow.SheetParameters">Sheet parameters</system:String>
+
+    <system:String x:Key="MainWindow.BimTipTitle">BIM Tip</system:String>
+    <system:String x:Key="MainWindow.BimTip1">1. Make sure that the required pylons have the parameter 'Filtration 1' filled with 'per 1 piece'</system:String>
+    <system:String x:Key="MainWindow.BimTip2">2. Make sure you have loaded the latest versions of formwork and reinforcement families from the library</system:String>
+
+    <system:String x:Key="MainWindow.VerticalViewsSettings">A tab with settings for vertical views 
+        - views of formwork and reinforcement that look at the pylon from the side</system:String>
+    <system:String x:Key="MainWindow.TransverseViewsSettings">A tab with settings for transverse views 
+        - views of formwork and reinforcement that cut the pylon crosswise and look from top to bottom</system:String>
+    <system:String x:Key="MainWindow.SchedulesSettings">A tab with specification settings 
+        - tables with data on the pylon and its reinforcement</system:String>
+    <system:String x:Key="MainWindow.ScheduleFiltersSettings">Specification filter settings tab
+        - rules for changing filters after copying specifications</system:String>
+    <system:String x:Key="MainWindow.LegendsAndAnnotationsSettings">A tab with settings for other views, for example, 
+        here you can set up the legend of the note and the rules for its placement on the view</system:String>
+    <system:String x:Key="MainWindow.PylonParametersSettings">A tab with pylon parameter settings 
+        - parameters that relate to the pylon formwork model, such as its length and section width</system:String>
+    <system:String x:Key="MainWindow.AnnotationParametersSettings">Annotation settings tab
+        - parameters and types that will be used when creating annotations</system:String>
+    <system:String x:Key="MainWindow.DispatcherParametersSettings">A tab with dispatcher parameter settings 
+        - parameters that determine the grouping in the project manager</system:String>
+    <system:String x:Key="MainWindow.SheetParametersSettings">A tab with sheet parameters settings 
+        - parameters that determine the characteristics of the sheet, such as its format</system:String>
+    
+    <!-- GeneralPage -->
+    <system:String x:Key="GeneralPage.PylonSelection">Pylon Selection</system:String>
+    <system:String x:Key="GeneralPage.DocumentationSet">Documentation Set:</system:String>
+    <system:String x:Key="GeneralPage.SelectPylon">Select Pylon</system:String>
+    <system:String x:Key="GeneralPage.SelectPylonMarks">Select pylon marks for processing:</system:String>
+    <system:String x:Key="GeneralPage.SearchPlaceholder">Search...</system:String>
+
+    <system:String x:Key="GeneralPage.SheetElements">Sheet Elements</system:String>
+
+    <system:String x:Key="GeneralPage.FormworkViews">Formwork Views</system:String>
+    <system:String x:Key="GeneralPage.Main">Main</system:String>
+    <system:String x:Key="GeneralPage.Side">Side</system:String>
+    <system:String x:Key="GeneralPage.Transverse1">Transverse 1</system:String>
+    <system:String x:Key="GeneralPage.Transverse2">Transverse 2</system:String>
+    <system:String x:Key="GeneralPage.Transverse3">Transverse 3</system:String>
+
+    <system:String x:Key="GeneralPage.RebarViews">Rebar Views</system:String>
+
+    <system:String x:Key="GeneralPage.ScheduleViews">Schedule Views</system:String>
+    <system:String x:Key="GeneralPage.Skeleton">Skeleton</system:String>
+    <system:String x:Key="GeneralPage.SkeletonElements">Skeleton Elements</system:String>
+    <system:String x:Key="GeneralPage.Materials">Materials</system:String>
+    <system:String x:Key="GeneralPage.SystemParts">System Parts</system:String>
+    <system:String x:Key="GeneralPage.IfcParts">IFC Parts</system:String>
+
+    <system:String x:Key="GeneralPage.OtherViews">Other Views</system:String>
+    <system:String x:Key="GeneralPage.NotesLegend">Notes Legend</system:String>
+
+    <system:String x:Key="GeneralPage.Sheet">Sheet</system:String>
+    <system:String x:Key="GeneralPage.SheetParameters">Sheet Parameters</system:String>
+    <system:String x:Key="GeneralPage.SelectTitleBlockType">Select title block type:</system:String>
+    <system:String x:Key="GeneralPage.SelectTitleBlockTypeTooltip">Select title block type</system:String>
+
+    <system:String x:Key="GeneralPage.FormworkViewTemplates">Formwork View Templates</system:String>
+    <system:String x:Key="GeneralPage.FormworkViewTemplatesTooltip">Formwork View Templates</system:String>
+    <system:String x:Key="GeneralPage.RebarViewTemplates">Rebar View Templates</system:String>
+    <system:String x:Key="GeneralPage.RebarViewTemplatesTooltip">Rebar View Templates</system:String>
+    <system:String x:Key="GeneralPage.VerticalViews">Vertical Views</system:String>
+    <system:String x:Key="GeneralPage.TransverseViews">Transverse Views</system:String>
+
+    <system:String x:Key="GeneralPage.Run">Run</system:String>
+    <system:String x:Key="GeneralPage.Cancel">Cancel</system:String>
+    <system:String x:Key="GeneralPage.Show">Show</system:String>
+
+    <!-- VerticalViewSettingsPage -->
+    <system:String x:Key="VerticalView.FormworkMainView">Formwork Main View</system:String>
+    <system:String x:Key="VerticalView.PylonMainViewNameMask">Pylon main view name mask:</system:String>
+    <system:String x:Key="VerticalView.PylonMainViewNameMaskTooltip">Pylon main view name mask</system:String>
+    <system:String x:Key="VerticalView.PylonSideViewNameMask">Pylon side view name mask:</system:String>
+    <system:String x:Key="VerticalView.PylonSideViewNameMaskTooltip">Pylon side view name mask</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideViewTemplate">Select template for main and side views:</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideViewTemplateTooltip">Select template for main and side views</system:String>
+
+    <system:String x:Key="VerticalView.RebarMainView">Rebar Main View</system:String>
+    <system:String x:Key="VerticalView.PylonMainRebarViewNameMask">Pylon main rebar view name mask:</system:String>
+    <system:String x:Key="VerticalView.PylonMainRebarViewNameMaskTooltip">Pylon main rebar view name mask</system:String>
+    <system:String x:Key="VerticalView.PylonSideRebarViewNameMask">Pylon side rebar view name mask:</system:String>
+    <system:String x:Key="VerticalView.PylonSideRebarViewNameMaskTooltip">Pylon side rebar view name mask</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideRebarViewTemplate">Select template for main and side rebar views:</system:String>
+    <system:String x:Key="VerticalView.SelectMainAndSideRebarViewTemplateTooltip">Select template for main and side rebar views</system:String>
+
+    <system:String x:Key="VerticalView.MainViewOffsets">Main View Offsets</system:String>
+    <system:String x:Key="VerticalView.MainViewXOffset">Main view X offset</system:String>
+    <system:String x:Key="VerticalView.MainViewXOffsetTooltip">Main view X offset</system:String>
+    <system:String x:Key="VerticalView.MainViewYTopOffset">Main view top Y offset</system:String>
+    <system:String x:Key="VerticalView.MainViewYTopOffsetTooltip">Main view top Y offset</system:String>
+    <system:String x:Key="VerticalView.MainViewYBottomOffset">Main view bottom Y offset</system:String>
+    <system:String x:Key="VerticalView.MainViewYBottomOffsetTooltip">Main view bottom Y offset</system:String>
+
+    <system:String x:Key="VerticalView.SideViewOffsets">Side View Offsets</system:String>
+    <system:String x:Key="VerticalView.SideViewXOffset">Side view X offset</system:String>
+    <system:String x:Key="VerticalView.SideViewXOffsetTooltip">Side view X offset</system:String>
+    <system:String x:Key="VerticalView.SideViewYTopOffset">Side view top Y offset</system:String>
+    <system:String x:Key="VerticalView.SideViewYTopOffsetTooltip">Side view top Y offset</system:String>
+    <system:String x:Key="VerticalView.SideViewYBottomOffset">Side view bottom Y offset</system:String>
+    <system:String x:Key="VerticalView.SideViewYBottomOffsetTooltip">Side view bottom Y offset</system:String>
+
+    <system:String x:Key="VerticalView.ViewTypeSize">View Type Size</system:String>
+    <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViews">Select view type size for main and side views:</system:String>
+    <system:String x:Key="VerticalView.SelectViewTypeSizeForMainAndSideViewsTooltip">Select view type size for main and side views</system:String>
+
+    <!-- TransverseViewSettingsPage -->
+    <system:String x:Key="TransverseView.FormworkTransverseView">Transverse Formwork View</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewNameMask">First transverse view name mask:</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewNameMaskTooltip">First transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewNameMask">Second transverse view name mask:</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewNameMaskTooltip">Second transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewNameMask">Third transverse view name mask:</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewNameMaskTooltip">Third transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.SelectTransverseViewTemplate">Select transverse view template:</system:String>
+    <system:String x:Key="TransverseView.SelectTransverseViewTemplateTooltip">Select transverse view template</system:String>
+    <system:String x:Key="TransverseView.TransverseViewDepth">Transverse view depth</system:String>
+    <system:String x:Key="TransverseView.TransverseViewDepthTooltip">Transverse view depth</system:String>
+
+    <system:String x:Key="TransverseView.RebarTransverseView">Transverse Rebar View</system:String>
+    <system:String x:Key="TransverseView.FirstRebarTransverseViewNameMask">First transverse rebar view name mask:</system:String>
+    <system:String x:Key="TransverseView.FirstRebarTransverseViewNameMaskTooltip">First transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.SecondRebarTransverseViewNameMask">Second transverse rebar view name mask:</system:String>
+    <system:String x:Key="TransverseView.SecondRebarTransverseViewNameMaskTooltip">Second transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.ThirdRebarTransverseViewNameMask">Third transverse rebar view name mask:</system:String>
+    <system:String x:Key="TransverseView.ThirdRebarTransverseViewNameMaskTooltip">Third transverse view name mask</system:String>
+    <system:String x:Key="TransverseView.SelectRebarTransverseViewTemplate">Select transverse rebar view template:</system:String>
+    <system:String x:Key="TransverseView.SelectRebarTransverseViewTemplateTooltip">Select transverse rebar view template</system:String>
+    <system:String x:Key="TransverseView.RebarTransverseViewDepth">Transverse rebar view depth</system:String>
+    <system:String x:Key="TransverseView.RebarTransverseViewDepthTooltip">Transverse view depth</system:String>
+
+    <system:String x:Key="TransverseView.TransverseViewBottomOffsets">Transverse view offsets</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewBottomOffset">Bottom offset to first transverse view</system:String>
+    <system:String x:Key="TransverseView.FirstTransverseViewBottomOffsetTooltip">Bottom offset to first transverse view</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewTopOffset">Top offset to second transverse view</system:String>
+    <system:String x:Key="TransverseView.SecondTransverseViewTopOffsetTooltip">Top offset to second transverse view</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewTopOffset">Top offset to third transverse view</system:String>
+    <system:String x:Key="TransverseView.ThirdTransverseViewTopOffsetTooltip">Top offset to third transverse view</system:String>
+
+    <system:String x:Key="TransverseView.TransverseViewXOffset">Transverse view X offset from pylon</system:String>
+    <system:String x:Key="TransverseView.TransverseViewXOffsetTooltip">Transverse view X offset from pylon</system:String>
+    <system:String x:Key="TransverseView.TransverseViewYOffset">Transverse view Y offset from pylon</system:String>
+    <system:String x:Key="TransverseView.TransverseViewYOffsetTooltip">Transverse view X offset from pylon</system:String>
+
+    <system:String x:Key="TransverseView.SelectViewTypeSizeForTransverseViews">Select view type size for transverse views:</system:String>
+    <system:String x:Key="TransverseView.SelectViewTypeSizeForTransverseViewsTooltip">Select view type size for transverse views</system:String>
+    
+    <!-- LegendViewsPage -->
+    <system:String x:Key="LegendView.NotesLegend">Notes Legend</system:String>
+    <system:String x:Key="LegendView.SelectNotesLegend">Select notes legend:</system:String>
+    <system:String x:Key="LegendView.SelectNotesLegendTooltip">Select notes legend</system:String>
+    <system:String x:Key="LegendView.XOffsetFromBottomRightCorner">X offset from bottom right corner of frame:</system:String>
+    <system:String x:Key="LegendView.XOffsetFromBottomRightCornerTooltip">X offset from bottom right corner of frame</system:String>
+    <system:String x:Key="LegendView.YOffsetFromBottomRightCorner">Y offset from bottom right corner of frame:</system:String>
+    <system:String x:Key="LegendView.YOffsetFromBottomRightCornerTooltip">Y offset from bottom right corner of frame</system:String>
+
+    <!-- DispatcherParamsPage -->
+    <system:String x:Key="DispatcherParams.DispatcherRelatedParameters">The settings for the project manager you are working in</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameter">Parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameterTooltip">Parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameter">Parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameterTooltip">Parameter for dispatcher grouping 2</system:String>
+
+    <!-- AnnotationParamsPage -->
+    <system:String x:Key="AnnotationParams.AnnotationRelatedParameters">Annotation settings for the project you are working on</system:String>
+    <system:String x:Key="AnnotationParams.DimensionGrouping">Dimensions grouping is needed</system:String>
+    <system:String x:Key="AnnotationParams.DimensionGroupingTooltip">If the checkbox is checked, then the "Equality Formula" value will be set in the "Equality Display" parameter in the dimensions created.</system:String>
+
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSize">Select dimension type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSizeTooltip">Select dimension type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSize">Select spot dimension type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSizeTooltip">Select spot dimension type size</system:String>
+
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSize">Select rebar product mark type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSizeTooltip">Select rebar product mark type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSize">Select rebar mark with serif type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSizeTooltip">Select rebar mark with serif type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSize">Select rebar mark with step type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSizeTooltip">Select rebar mark with step type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSize">Select rebar mark with comment type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSizeTooltip">Select rebar mark with comment type size</system:String>
+
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSize">Select universal mark with text type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSizeTooltip">Select universal mark with text type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSize">Select break line type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSizeTooltip">Select break line type size</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSize">Select concreting joint type size:</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSizeTooltip">Select concreting joint type size</system:String>
+
+    <!-- PylonParamsPage -->
+    <system:String x:Key="PylonParams.FormworkElementParameters">Parameters belonging to the pylon formwork element</system:String>
+
+    <system:String x:Key="PylonParams.PylonMarkParameter">Pylon mark parameter:</system:String>
+    <system:String x:Key="PylonParams.PylonMarkParameterTooltip">Pylon mark parameter</system:String>
+    <system:String x:Key="PylonParams.PylonDocumentationSetParameter">Pylon documentation set parameter:</system:String>
+    <system:String x:Key="PylonParams.PylonDocumentationSetParameterTooltip">Pylon documentation set parameter</system:String>
+
+    <system:String x:Key="PylonParams.TypicalPylonFilterParameter">Typical pylon filter parameter and its value:</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterParameterTooltip">Typical pylon filter parameter and its value</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterValue">Typical pylon filter parameter value</system:String>
+    <system:String x:Key="PylonParams.TypicalPylonFilterValueTooltip">Typical pylon filter parameter value</system:String>
+
+    <system:String x:Key="PylonParams.PylonSectionLengthParameter">Pylon section length parameter:</system:String>
+    <system:String x:Key="PylonParams.PylonSectionLengthParameterTooltip">Pylon section length parameter</system:String>
+    <system:String x:Key="PylonParams.PylonSectionWidthParameter">Pylon section width parameter:</system:String>
+    <system:String x:Key="PylonParams.PylonSectionWidthParameterTooltip">Pylon section width parameter</system:String>
+
+    <!-- SchedulesPage -->
+    <system:String x:Key="Schedules.SkeletonSpecification">Skeleton Specification</system:String>
+    <system:String x:Key="Schedules.SkeletonSpecNameMask">Skeleton specification name mask:</system:String>
+    <system:String x:Key="Schedules.SkeletonSpecNameMaskTooltip">Skeleton specification name mask</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonSpecSearchName">Reference skeleton specification search name:</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonSpecSearchNameTooltip">Reference skeleton specification search name</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpec">To parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecTooltip">To parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpec">To parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecTooltip">To parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="Schedules.SystemPartsSchedule">System Parts Schedule</system:String>
+    <system:String x:Key="Schedules.SystemPartsScheduleNameMask">System parts schedule name mask:</system:String>
+    <system:String x:Key="Schedules.SystemPartsScheduleNameMaskTooltip">System parts schedule name mask</system:String>
+    <system:String x:Key="Schedules.ReferenceSystemPartsScheduleSearchName">Reference system parts schedule search name:</system:String>
+    <system:String x:Key="Schedules.ReferenceSystemPartsScheduleSearchNameTooltip">Reference system parts schedule search name</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSchedule">To parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForScheduleTooltip">To parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSchedule">To parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForScheduleTooltip">To parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="Schedules.SkeletonElementsSpecification">Skeleton Elements Specification</system:String>
+    <system:String x:Key="Schedules.SkeletonElementsSpecNameMask">Skeleton elements specification name mask:</system:String>
+    <system:String x:Key="Schedules.SkeletonElementsSpecNameMaskTooltip">Skeleton elements specification name mask</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonElementsSpecSearchName">Reference skeleton elements specification search name:</system:String>
+    <system:String x:Key="Schedules.ReferenceSkeletonElementsSpecSearchNameTooltip">Reference skeleton elements specification search name</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecElements">To parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForSpecElementsTooltip">To parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecElements">To parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForSpecElementsTooltip">To parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="Schedules.IfcPartsSchedule">IFC Parts Schedule</system:String>
+    <system:String x:Key="Schedules.IfcPartsScheduleNameMask">IFC parts schedule name mask:</system:String>
+    <system:String x:Key="Schedules.IfcPartsScheduleNameMaskTooltip">IFC parts schedule name mask</system:String>
+    <system:String x:Key="Schedules.ReferenceIfcPartsScheduleSearchName">Reference IFC parts schedule search name:</system:String>
+    <system:String x:Key="Schedules.ReferenceIfcPartsScheduleSearchNameTooltip">Reference IFC parts schedule search name</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForIfcSchedule">To parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForIfcScheduleTooltip">To parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForIfcSchedule">To parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForIfcScheduleTooltip">To parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="Schedules.MaterialsSpecification">Materials Specification</system:String>
+    <system:String x:Key="Schedules.MaterialsSpecNameMask">Materials specification name mask:</system:String>
+    <system:String x:Key="Schedules.MaterialsSpecNameMaskTooltip">Materials specification name mask</system:String>
+    <system:String x:Key="Schedules.ReferenceMaterialsSpecSearchName">Reference materials specification search name:</system:String>
+    <system:String x:Key="Schedules.ReferenceMaterialsSpecSearchNameTooltip">Reference materials specification search name</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForMaterials">To parameter for dispatcher grouping 1:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingFirstParameterForMaterialsTooltip">To parameter for dispatcher grouping 1</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForMaterials">To parameter for dispatcher grouping 2:</system:String>
+    <system:String x:Key="Schedules.DispatcherGroupingSecondParameterForMaterialsTooltip">To parameter for dispatcher grouping 2</system:String>
+
+    <system:String x:Key="Schedules.ScheduleFilterParametersList">Schedule filter parameters list</system:String>
+
+    <system:String x:Key="Schedules.Add">Add</system:String>
+    <system:String x:Key="Schedules.Delete">Delete</system:String>
+
+    <!-- SheetParamsPage -->
+    <system:String x:Key="SheetParams.SheetCreationRules">Rules for creating new sheets in the project</system:String>
+
+    <system:String x:Key="SheetParams.PylonSheetNameMask">Pylon sheet name mask:</system:String>
+    <system:String x:Key="SheetParams.PylonSheetNameMaskTooltip">Pylon sheet name mask</system:String>
+
+    <system:String x:Key="SheetParams.SheetSizeParameter">Parameter for sheet frame format:</system:String>
+    <system:String x:Key="SheetParams.SheetSizeParameterTooltip">Parameter for sheet frame format</system:String>
+    <system:String x:Key="SheetParams.SheetCoefficientParameter">Parameter for sheet frame format multiplier:</system:String>
+    <system:String x:Key="SheetParams.SheetCoefficientParameterTooltip">Parameter for sheet frame format multiplier</system:String>
+
+    <system:String x:Key="SheetParams.SetCustomTitleBlock">Set a custom title block size:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetSizeParameterValue">Custom value for sheet frame format parameter:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetSizeParameterValueTooltip">Custom value for sheet frame format parameter</system:String>
+    <system:String x:Key="SheetParams.CustomSheetCoefficientParameterValue">Custom value for sheet frame format multiplier parameter:</system:String>
+    <system:String x:Key="SheetParams.CustomSheetCoefficientParameterValueTooltip">Custom value for sheet frame format multiplier parameter</system:String>
+
+    <!-- GeneralPage ToolTips -->
+    <system:String x:Key="GeneralPage.DocumentationSetToolTip">Select the documentation set with whose pylons you want to work. If you want to work with a specific pylon, click the "Select Pylon" button on the right.&#10;Then select the required pylon marks in the list below, and in the list on the right, select the views/schedules you want to create/place. Then click "OK".&#10;If nothing is displayed in the list or there is an error in orange text at the bottom of the window, edit the "Settings" in the upper right corner.</system:String>
+    <system:String x:Key="GeneralPage.SelectPylonToolTip">To select a specific pylon manually:&#10;1) click this button;&#10;2) the plugin window will close and you will be given the opportunity to select an element - click on the desired pylon;&#10;3) the plugin window will open again and you can continue with the settings.</system:String>
+    <system:String x:Key="GeneralPage.SearchPylonsToolTip">Enter text to search in the list below</system:String>
+    <system:String x:Key="GeneralPage.SelectAllPylonsToolTip">Click to select all pylon marks visible in the list below</system:String>
+    <system:String x:Key="GeneralPage.UnselectAllPylonsToolTip">Click to deselect all pylon marks visible in the list below</system:String>
+    <system:String x:Key="GeneralPage.SelectAllViewsToolTip">Click to move all switches to the right for all views/schedules below</system:String>
+    <system:String x:Key="GeneralPage.UnselectAllViewsToolTip">Click to move all switches to the left for all views/schedules below</system:String>
+    <system:String x:Key="GeneralPage.FormworkMainViewToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the main view of the pylon (vertical view looking at the larger side of the pylon)</system:String>
+    <system:String x:Key="GeneralPage.FormworkSideViewToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the side view of the pylon (vertical view looking at the smaller side of the pylon)</system:String>
+    <system:String x:Key="GeneralPage.FormworkTransverse1ToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons a cross-section at 1/4 of the pylon height</system:String>
+    <system:String x:Key="GeneralPage.FormworkTransverse2ToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons a cross-section at 1/2 of the pylon height</system:String>
+    <system:String x:Key="GeneralPage.FormworkTransverse3ToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons a cross-section at 5/4 of the pylon height</system:String>
+    <system:String x:Key="GeneralPage.RebarMainViewToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the main view of the reinforcement cage</system:String>
+    <system:String x:Key="GeneralPage.RebarSideViewToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the side view of the reinforcement cage</system:String>
+    <system:String x:Key="GeneralPage.RebarTransverse1ToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the first cross-section of the reinforcement cage</system:String>
+    <system:String x:Key="GeneralPage.RebarTransverse2ToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the second cross-section of the reinforcement cage</system:String>
+    <system:String x:Key="GeneralPage.RebarTransverse3ToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the third cross-section of the reinforcement cage</system:String>
+    <system:String x:Key="GeneralPage.SkeletonScheduleToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the general reinforcement cage schedule</system:String>
+    <system:String x:Key="GeneralPage.SkeletonElementsScheduleToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the element-by-element reinforcement cage schedule</system:String>
+    <system:String x:Key="GeneralPage.MaterialsScheduleToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the materials schedule</system:String>
+    <system:String x:Key="GeneralPage.SystemPartsScheduleToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the system reinforcement parts schedule</system:String>
+    <system:String x:Key="GeneralPage.IfcPartsScheduleToolTip">Move the switch to the right if you want the plugin to create and place on sheets for selected pylons the IFC reinforcement parts schedule</system:String>
+    <system:String x:Key="GeneralPage.NotesLegendToolTip">Move the switch to the right if you want the plugin to place the notes legend on sheets for selected pylons</system:String>
+
+    <!-- Transverse View Settings Page ToolTips -->
+    <system:String x:Key="TransverseViewSettingsPage.FormworkTransverseViewToolTip">Rules for creating transverse sections for pylons in the project</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstTransverseViewNameMaskToolTip">Prefix and suffix of the first transverse pylon view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the first transverse pylon view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.1-1&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.1-1&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondTransverseViewNameMaskToolTip">Prefix and suffix of the second transverse pylon view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the second transverse pylon view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.2-2&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.2-2&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdTransverseViewNameMaskToolTip">Prefix and suffix of the third transverse pylon view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the third transverse pylon view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.3-3&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.3-3&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectTransverseViewTemplateToolTip">View template to be applied to transverse views when creating them.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewDepthToolTip">Projection depth of the transverse section</system:String>
+
+    <system:String x:Key="TransverseViewSettingsPage.RebarTransverseViewToolTip">Rules for creating transverse rebar sections for pylons in the project</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstRebarTransverseViewNameMaskToolTip">Prefix and suffix of the first transverse pylon rebar view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the first transverse pylon rebar view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.1-1&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.1-1&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondRebarTransverseViewNameMaskToolTip">Prefix and suffix of the second transverse pylon rebar view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the second transverse pylon rebar view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.2-2&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.2-2&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdRebarTransverseViewNameMaskToolTip">Prefix and suffix of the third transverse pylon rebar view name, i.e., what should go in the view name before and after the pylon mark.&#10;For example, in the name of the third transverse pylon rebar view:&#10;&quot;Pylon 12.30.25-12?20-P1_Sec.3-3&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Sec.3-3&quot; is the suffix.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectRebarTransverseViewTemplateToolTip">View template to be applied to transverse rebar views when creating them.</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.RebarTransverseViewDepthToolTip">Projection depth of the transverse rebar section</system:String>
+
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewBottomOffsetsToolTip">Position of transverse sections relative to pylon height</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.FirstTransverseViewBottomOffsetToolTip">The position of the transverse section relative to the pylon is set using an offset from the bottom of the pylon in mm</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SecondTransverseViewTopOffsetToolTip">The position of the transverse section relative to the pylon is set using an offset from the top of the pylon in mm</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.ThirdTransverseViewTopOffsetToolTip">The position of the transverse section relative to the pylon is set using an offset from the top of the pylon in mm</system:String>
+
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewPylonOffsetsToolTip">Offsets of transverse views from pylon boundaries on the sheet</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewXOffsetToolTip">Specify the offset from the pylon to the right and left for transverse views</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.TransverseViewYOffsetToolTip">Specify the offset from the pylon to the top and bottom for transverse views</system:String>
+
+    <system:String x:Key="TransverseViewSettingsPage.ViewTypeSizeToolTip">View type sizes for transverse sections</system:String>
+    <system:String x:Key="TransverseViewSettingsPage.SelectViewTypeSizeForTransverseViewsToolTip">View type size to be applied to transverse views when creating them.</system:String>
+
+    <!-- LegendViewsPage ToolTips -->
+    <system:String x:Key="LegendViewsPage.NotesLegendToolTip">Rules according to which note legends for pylons will be placed on sheets</system:String>
+    <system:String x:Key="LegendViewsPage.SelectNotesLegendToolTip">Select from the list a legend containing pylon sheet notes that need to be placed on the sheet.</system:String>
+    <system:String x:Key="LegendViewsPage.XOffsetFromBottomRightCornerToolTip">Specify the transverse offset (X-axis) from the bottom right corner of the sheet frame to the center of the note legend viewport</system:String>
+    <system:String x:Key="LegendViewsPage.YOffsetFromBottomRightCornerToolTip">Specify the vertical offset (Y-axis) from the bottom right corner of the sheet frame to the center of the note legend viewport</system:String>
+    
+    <!-- DispatcherParamsPage ToolTips -->
+    <system:String x:Key="DispatcherParams.DispatcherRelatedParametersToolTip">Settings specific to the project manager you are working in</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingFirstParameterToolTip">Name of the parameter used in the project for dispatcher grouping at the first level</system:String>
+    <system:String x:Key="DispatcherParams.DispatcherGroupingSecondParameterToolTip">Name of the parameter used in the project for dispatcher grouping at the second level</system:String>
+    
+    <!-- AnnotationParamsPage ToolTips -->
+    <system:String x:Key="AnnotationParams.AnnotationRelatedParametersToolTip">The settings and annotation types for the project you are working on</system:String>
+    <system:String x:Key="AnnotationParams.SelectDimensionTypeSizeToolTip">Select dimension type for placing dimensions on views</system:String>
+    <system:String x:Key="AnnotationParams.SelectSpotDimensionTypeSizeToolTip">Select spot dimension type for placing elevation marks</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarProductMarkTypeSizeToolTip">Select rebar product mark type for marking reinforcement cages</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithSerifTypeSizeToolTip">Select rebar mark with serif type for marking individual bars</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithStepTypeSizeToolTip">Select rebar mark with step type for marking bars with step indication</system:String>
+    <system:String x:Key="AnnotationParams.SelectRebarMarkWithCommentTypeSizeToolTip">Select rebar mark with comment type for marking with additional comments</system:String>
+    <system:String x:Key="AnnotationParams.SelectUniversalMarkWithTextTypeSizeToolTip">Select universal mark with text type for other designations</system:String>
+    <system:String x:Key="AnnotationParams.SelectBreakLineTypeSizeToolTip">Select break line type for indicating breaks on views</system:String>
+    <system:String x:Key="AnnotationParams.SelectConcretingJointTypeSizeToolTip">Select concreting joint type for indicating concreting joints</system:String>
+
+    <!-- PylonParamsPage ToolTips -->
+    <system:String x:Key="PylonParamsPage.FormworkElementParametersToolTip">Parameters belonging to the pylon formwork element</system:String>
+    <system:String x:Key="PylonParamsPage.PylonMarkParameterToolTip">Name of the parameter where the pylon mark value is specified for the pylon</system:String>
+    <system:String x:Key="PylonParamsPage.PylonDocumentationSetParameterToolTip">Name of the parameter where the documentation set is specified for the pylon</system:String>
+    <system:String x:Key="PylonParamsPage.TypicalPylonFilterParameterToolTip">Name of the parameter where the distinguishing feature of typical pylons is specified for the pylon</system:String>
+    <system:String x:Key="PylonParamsPage.TypicalPylonFilterValueToolTip">Value of the parameter where the distinguishing feature of typical pylons is specified for the pylon</system:String>
+    <system:String x:Key="PylonParamsPage.PylonSectionLengthParameterToolTip">Name of the parameter where the section length is specified at the type level for the pylon</system:String>
+    <system:String x:Key="PylonParamsPage.PylonSectionWidthParameterToolTip">Name of the parameter where the section width is specified at the type level for the pylon</system:String>
+
+    <!-- Schedules Page ToolTips -->
+    <system:String x:Key="SchedulesPage.SkeletonSpecificationToolTip">Rules for creating skeleton schedules for pylons</system:String>
+    <system:String x:Key="SchedulesPage.SkeletonSpecNameMaskToolTip">Prefix and suffix of the pylon skeleton schedule name, i.e., what should go in the schedule name before and after the pylon mark.&#10;For example, in the pylon skeleton schedule name:&#10;&quot;Pylon 12.30.25-12?20-P1_VD_IFC&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_VD_IFC&quot; is the suffix.</system:String>
+    <system:String x:Key="SchedulesPage.ReferenceSkeletonSpecSearchNameToolTip">Name of the reference skeleton schedule that will be copied to obtain the pylon skeleton schedule.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingFirstParameterForSpecToolTip">Value that will be used to fill the dispatcher grouping parameter at the first level in the skeleton schedule.&#10;Depending on what value is specified here, the following options are possible:&#10;1) If you specify the name of a parameter that the pylon has, the plugin will take the value of this parameter from the pylon and write it to the dispatcher grouping parameter at the first level in the skeleton schedule.&#10;Example: if you write the value &quot;Mark&quot;, the plugin will check the list of pylon parameters and understand that the parameter named &quot;Mark&quot; exists in the pylon. Then it will read the value from the &quot;Mark&quot; parameter of the pylon and write it to the dispatcher grouping parameter at the first level in the skeleton schedule.&#10;2) If a parameter with the specified value is not found in the pylon, then this value will simply be written to the dispatcher grouping parameter at the first level in the skeleton schedule.&#10;Example: if you write the value &quot;VD&quot;, the plugin will check the list of pylon parameters and understand that there is no parameter named &quot;VD&quot; in the pylon. Then it will simply write &quot;VD&quot; to the dispatcher grouping parameter at the first level in the skeleton schedule.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingSecondParameterForSpecToolTip">Value that will be used to fill the dispatcher grouping parameter at the second level in the skeleton schedule.&#10;Depending on what value is specified here, the following options are possible:&#10;1) If you specify the name of a parameter that the pylon has, the plugin will take the value of this parameter from the pylon and write it to the dispatcher grouping parameter at the second level in the skeleton schedule.&#10;Example: if you write the value &quot;Mark&quot;, the plugin will check the list of pylon parameters and understand that the parameter named &quot;Mark&quot; exists in the pylon. Then it will read the value from the &quot;Mark&quot; parameter of the pylon and write it to the dispatcher grouping parameter at the second level in the skeleton schedule.&#10;2) If a parameter with the specified value is not found in the pylon, then this value will simply be written to the dispatcher grouping parameter at the second level in the skeleton schedule.&#10;Example: if you write the value &quot;VD&quot;, the plugin will check the list of pylon parameters and understand that there is no parameter named &quot;VD&quot; in the pylon. Then it will simply write &quot;VD&quot; to the dispatcher grouping parameter at the second level in the skeleton schedule.</system:String>
+
+    <system:String x:Key="SchedulesPage.SystemPartsScheduleToolTip">Rules for creating system parts schedules for pylons</system:String>
+    <system:String x:Key="SchedulesPage.SystemPartsScheduleNameMaskToolTip">Prefix and suffix of the pylon system parts schedule name, i.e., what should go in the schedule name before and after the pylon mark.&#10;For example, in the pylon system parts schedule name:&#10;&quot;Pylon 12.30.25-12?20-P1_VD_SYS&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_VD_SYS&quot; is the suffix.</system:String>
+    <system:String x:Key="SchedulesPage.ReferenceSystemPartsScheduleSearchNameToolTip">Name of the reference system parts schedule that will be copied to obtain the pylon system parts schedule.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingFirstParameterForScheduleToolTip">Value that will be used to fill the dispatcher grouping parameter at the first level in the system parts schedule.&#10;Depending on what value is specified here, the following options are possible:&#10;1) If you specify the name of a parameter that the pylon has, the plugin will take the value of this parameter from the pylon and write it to the dispatcher grouping parameter at the first level in the system parts schedule.&#10;Example: if you write the value &quot;Mark&quot;, the plugin will check the list of pylon parameters and understand that the parameter named &quot;Mark&quot; exists in the pylon. Then it will read the value from the &quot;Mark&quot; parameter of the pylon and write it to the dispatcher grouping parameter at the first level in the system parts schedule.&#10;2) If a parameter with the specified value is not found in the pylon, then this value will simply be written to the dispatcher grouping parameter at the first level in the system parts schedule.&#10;Example: if you write the value &quot;VD&quot;, the plugin will check the list of pylon parameters and understand that there is no parameter named &quot;VD&quot; in the pylon. Then it will simply write &quot;VD&quot; to the dispatcher grouping parameter at the first level in the system parts schedule.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingSecondParameterForScheduleToolTip">Value that will be used to fill the dispatcher grouping parameter at the second level in the system parts schedule.&#10;Depending on what value is specified here, the following options are possible:&#10;1) If you specify the name of a parameter that the pylon has, the plugin will take the value of this parameter from the pylon and write it to the dispatcher grouping parameter at the second level in the system parts schedule.&#10;Example: if you write the value &quot;Mark&quot;, the plugin will check the list of pylon parameters and understand that the parameter named &quot;Mark&quot; exists in the pylon. Then it will read the value from the &quot;Mark&quot; parameter of the pylon and write it to the dispatcher grouping parameter at the second level in the system parts schedule.&#10;2) If a parameter with the specified value is not found in the pylon, then this value will simply be written to the dispatcher grouping parameter at the second level in the system parts schedule.&#10;Example: if you write the value &quot;VD&quot;, the plugin will check the list of pylon parameters and understand that there is no parameter named &quot;VD&quot; in the pylon. Then it will simply write &quot;VD&quot; to the dispatcher grouping parameter at the second level in the system parts schedule.</system:String>
+
+    <system:String x:Key="SchedulesPage.SkeletonElementsSpecificationToolTip">Rules for creating skeleton elements schedules for pylons</system:String>
+    <system:String x:Key="SchedulesPage.SkeletonElementsSpecNameMaskToolTip">Prefix and suffix of the pylon skeleton elements schedule name, i.e., what should go in the schedule name before and after the pylon mark.&#10;For example, in the pylon skeleton elements schedule name:&#10;&quot;Pylon 12.30.25-12?20-P1_VD_IFC&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_VD_IFC&quot; is the suffix.</system:String>
+    <system:String x:Key="SchedulesPage.ReferenceSkeletonElementsSpecSearchNameToolTip">Name of the reference skeleton elements schedule that will be copied to obtain the pylon skeleton elements schedule.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingFirstParameterForSpecElementsToolTip">Value that will be used to fill the dispatcher grouping parameter at the first level in the skeleton elements schedule.&#10;Depending on what value is specified here, the following options are possible:&#10;1) If you specify the name of a parameter that the pylon has, the plugin will take the value of this parameter from the pylon and write it to the dispatcher grouping parameter at the first level in the skeleton elements schedule.&#10;Example: if you write the value &quot;Mark&quot;, the plugin will check the list of pylon parameters and understand that the parameter named &quot;Mark&quot; exists in the pylon. Then it will read the value from the &quot;Mark&quot; parameter of the pylon and write it to the dispatcher grouping parameter at the first level in the skeleton elements schedule.&#10;2) If a parameter with the specified value is not found in the pylon, then this value will simply be written to the dispatcher grouping parameter at the first level in the skeleton elements schedule.&#10;Example: if you write the value &quot;VD&quot;, the plugin will check the list of pylon parameters and understand that there is no parameter named &quot;VD&quot; in the pylon. Then it will simply write &quot;VD&quot; to the dispatcher grouping parameter at the first level in the skeleton elements schedule.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingSecondParameterForSpecElementsToolTip">Value that will be used to fill the dispatcher grouping parameter at the second level in the skeleton elements schedule.&#10;Depending on what value is specified here, the following options are possible:&#10;1) If you specify the name of a parameter that the pylon has, the plugin will take the value of this parameter from the pylon and write it to the dispatcher grouping parameter at the second level in the skeleton elements schedule.&#10;Example: if you write the value &quot;Mark&quot;, the plugin will check the list of pylon parameters and understand that the parameter named &quot;Mark&quot; exists in the pylon. Then it will read the value from the &quot;Mark&quot; parameter of the pylon and write it to the dispatcher grouping parameter at the second level in the skeleton elements schedule.&#10;2) If a parameter with the specified value is not found in the pylon, then this value will simply be written to the dispatcher grouping parameter at the second level in the skeleton elements schedule.&#10;Example: if you write the value &quot;VD&quot;, the plugin will check the list of pylon parameters and understand that there is no parameter named &quot;VD&quot; in the pylon. Then it will simply write &quot;VD&quot; to the dispatcher grouping parameter at the second level in the skeleton elements schedule.</system:String>
+
+    <system:String x:Key="SchedulesPage.IfcPartsScheduleToolTip">Rules for creating IFC parts schedules for pylons</system:String>
+    <system:String x:Key="SchedulesPage.IfcPartsScheduleNameMaskToolTip">Prefix and suffix of the pylon IFC parts schedule name, i.e., what should go in the schedule name before and after the pylon mark.&#10;For example, in the pylon IFC parts schedule name:&#10;&quot;Pylon 12.30.25-12?20-P1_VD_IFC&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_VD_IFC&quot; is the suffix.</system:String>
+    <system:String x:Key="SchedulesPage.ReferenceIfcPartsScheduleSearchNameToolTip">Name of the reference IFC parts schedule that will be copied to obtain the pylon IFC parts schedule.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingFirstParameterForIfcScheduleToolTip">Value that will be used to fill the dispatcher grouping parameter at the first level in the IFC parts schedule.&#10;Depending on what value is specified here, the following options are possible:&#10;1) If you specify the name of a parameter that the pylon has, the plugin will take the value of this parameter from the pylon and write it to the dispatcher grouping parameter at the first level in the IFC parts schedule.&#10;Example: if you write the value &quot;Mark&quot;, the plugin will check the list of pylon parameters and understand that the parameter named &quot;Mark&quot; exists in the pylon. Then it will read the value from the &quot;Mark&quot; parameter of the pylon and write it to the dispatcher grouping parameter at the first level in the IFC parts schedule.&#10;2) If a parameter with the specified value is not found in the pylon, then this value will simply be written to the dispatcher grouping parameter at the first level in the IFC parts schedule.&#10;Example: if you write the value &quot;VD&quot;, the plugin will check the list of pylon parameters and understand that there is no parameter named &quot;VD&quot; in the pylon. Then it will simply write &quot;VD&quot; to the dispatcher grouping parameter at the first level in the IFC parts schedule.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingSecondParameterForIfcScheduleToolTip">Value that will be used to fill the dispatcher grouping parameter at the second level in the IFC parts schedule.&#10;Depending on what value is specified here, the following options are possible:&#10;1) If you specify the name of a parameter that the pylon has, the plugin will take the value of this parameter from the pylon and write it to the dispatcher grouping parameter at the second level in the IFC parts schedule.&#10;Example: if you write the value &quot;Mark&quot;, the plugin will check the list of pylon parameters and understand that the parameter named &quot;Mark&quot; exists in the pylon. Then it will read the value from the &quot;Mark&quot; parameter of the pylon and write it to the dispatcher grouping parameter at the second level in the IFC parts schedule.&#10;2) If a parameter with the specified value is not found in the pylon, then this value will simply be written to the dispatcher grouping parameter at the second level in the IFC parts schedule.&#10;Example: if you write the value &quot;VD&quot;, the plugin will check the list of pylon parameters and understand that there is no parameter named &quot;VD&quot; in the pylon. Then it will simply write &quot;VD&quot; to the dispatcher grouping parameter at the second level in the IFC parts schedule.</system:String>
+
+    <system:String x:Key="SchedulesPage.MaterialsSpecificationToolTip">Rules for creating materials schedules for pylons</system:String>
+    <system:String x:Key="SchedulesPage.MaterialsSpecNameMaskToolTip">Prefix and suffix of the pylon materials schedule name, i.e., what should go in the schedule name before and after the pylon mark.&#10;For example, in the pylon materials schedule name:&#10;&quot;Pylon 12.30.25-12?20-P1_SM&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_SM&quot; is the suffix.</system:String>
+    <system:String x:Key="SchedulesPage.ReferenceMaterialsSpecSearchNameToolTip">Name of the reference materials schedule that will be copied to obtain the pylon materials schedule.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingFirstParameterForMaterialsToolTip">Value that will be used to fill the dispatcher grouping parameter at the first level in the materials schedule.&#10;Depending on what value is specified here, the following options are possible:&#10;1) If you specify the name of a parameter that the pylon has, the plugin will take the value of this parameter from the pylon and write it to the dispatcher grouping parameter at the first level in the materials schedule.&#10;Example: if you write the value &quot;Mark&quot;, the plugin will check the list of pylon parameters and understand that the parameter named &quot;Mark&quot; exists in the pylon. Then it will read the value from the &quot;Mark&quot; parameter of the pylon and write it to the dispatcher grouping parameter at the first level in the materials schedule.&#10;2) If a parameter with the specified value is not found in the pylon, then this value will simply be written to the dispatcher grouping parameter at the first level in the materials schedule.&#10;Example: if you write the value &quot;SM&quot;, the plugin will check the list of pylon parameters and understand that there is no parameter named &quot;SM&quot; in the pylon. Then it will simply write &quot;SM&quot; to the dispatcher grouping parameter at the first level in the materials schedule.</system:String>
+    <system:String x:Key="SchedulesPage.DispatcherGroupingSecondParameterForMaterialsToolTip">Value that will be used to fill the dispatcher grouping parameter at the second level in the materials schedule.&#10;Depending on what value is specified here, the following options are possible:&#10;1) If you specify the name of a parameter that the pylon has, the plugin will take the value of this parameter from the pylon and write it to the dispatcher grouping parameter at the second level in the materials schedule.&#10;Example: if you write the value &quot;Mark&quot;, the plugin will check the list of pylon parameters and understand that the parameter named &quot;Mark&quot; exists in the pylon. Then it will read the value from the &quot;Mark&quot; parameter of the pylon and write it to the dispatcher grouping parameter at the second level in the materials schedule.&#10;2) If a parameter with the specified value is not found in the pylon, then this value will simply be written to the dispatcher grouping parameter at the second level in the materials schedule.&#10;Example: if you write the value &quot;SM&quot;, the plugin will check the list of pylon parameters and understand that there is no parameter named &quot;SM&quot; in the pylon. Then it will simply write &quot;SM&quot; to the dispatcher grouping parameter at the second level in the materials schedule.</system:String>
+
+    <system:String x:Key="SchedulesPage.ScheduleFilterParametersListToolTip">Rules for forming filters in schedules and lists</system:String>
+    <system:String x:Key="SchedulesPage.ParamNameInScheduleToolTip">Parameter name in the schedule filter</system:String>
+    <system:String x:Key="SchedulesPage.ParamNameInHostToolTip">Parameter name in the pylon or filter value</system:String>
+    <system:String x:Key="SchedulesPage.AddButtonToolTip">Adds a new row in the list above</system:String>
+    <system:String x:Key="SchedulesPage.DeleteButtonToolTip">Deletes the rows marked with checkboxes from the list above</system:String>
+
+    <!-- SheetParamsPage ToolTips -->
+    <system:String x:Key="SheetParams.SheetCreationRulesToolTip">Rules by which new sheets will be created in the project</system:String>
+    <system:String x:Key="SheetParams.PylonSheetNameMaskToolTip">Sheet name prefix and suffix, i.e., what should come in the sheet name before and after the pylon mark.&#10;For example, in the sheet name:&#10;"Pylon 12.30.25-12?20-P1_RC",&#10;where "12.30.25-12?20-P1" is the pylon mark,&#10;"Pylon " is the prefix,&#10;"_RC" is the suffix.</system:String>
+    <system:String x:Key="SheetParams.SelectTitleBlockTypeToolTip">Title block type that will be placed on new sheets</system:String>
+    <system:String x:Key="SheetParams.SheetSizeParameterToolTip">Name of the sheet title block parameter that sets the sheet format value.&#10;For example, if you need to set the sheet format to "A3", you would write "3" in this parameter.&#10;In this field, you need to specify the name of this parameter.</system:String>
+    <system:String x:Key="SheetParams.SheetCoefficientParameterToolTip">Name of the sheet title block parameter that sets the sheet format multiplier value.&#10;For example, if you need to set the sheet format to "A2x3", you would write "3" in this parameter to indicate that the "A2" format is multiplied by 3.&#10;In this field, you need to specify the name of this parameter.</system:String>
+
+    <!-- VerticalViewSettingsPage ToolTips -->
+    <system:String x:Key="VerticalViewSettingsPage.FormworkMainViewToolTip">Rules for creating vertical sections for pylons in the project</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.PylonMainViewNameMaskToolTip">Prefix and suffix of the main pylon view name, i.e., what should come in the view name before and after the pylon mark indication.&#10;For example, in the main pylon view name:&#10;&quot;Pylon 12.30.25-12?20-P1_Concrete&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Concrete&quot; is the suffix.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.PylonSideViewNameMaskToolTip">Prefix and suffix of the side pylon view name, i.e., what should come in the view name before and after the pylon mark indication.&#10;For example, in the side pylon view name:&#10;&quot;Pylon 12.30.25-12?20-P1_Concrete&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Concrete&quot; is the suffix.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SelectMainAndSideViewTemplateToolTip">View template to be applied to the main and side views when creating them.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.RebarMainViewToolTip">Rules for creating vertical reinforcement sections for pylons in the project</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.PylonMainRebarViewNameMaskToolTip">Prefix and suffix of the main pylon reinforcement view name, i.e., what should come in the view name before and after the pylon mark indication.&#10;For example, in the main pylon reinforcement view name:&#10;&quot;Pylon 12.30.25-12?20-P1_Concrete&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Concrete&quot; is the suffix.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.PylonSideRebarViewNameMaskToolTip">Prefix and suffix of the side pylon reinforcement view name, i.e., what should come in the view name before and after the pylon mark indication.&#10;For example, in the side pylon reinforcement view name:&#10;&quot;Pylon 12.30.25-12?20-P1_Concrete&quot;,&#10;where &quot;12.30.25-12?20-P1&quot; is the pylon mark,&#10;&quot;Pylon &quot; is the prefix,&#10;&quot;_Concrete&quot; is the suffix.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SelectMainAndSideRebarViewTemplateToolTip">View template to be applied to the main and side reinforcement views when creating them.</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.MainViewOffsetsToolTip">Offsets of the main vertical view from the pylon boundaries on the sheet</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.MainViewXOffsetToolTip">Specify the offset from the pylon to the right and left for the main view</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.MainViewYTopOffsetToolTip">Specify the offset from the pylon at the top for the main view</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.MainViewYBottomOffsetToolTip">Specify the offset from the pylon at the bottom for the main view</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SideViewOffsetsToolTip">Offsets of the side vertical view from the pylon boundaries on the sheet</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SideViewXOffsetToolTip">Specify the offset from the pylon to the right and left for the side view</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SideViewYTopOffsetToolTip">Specify the offset from the pylon at the top for the side view</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SideViewYBottomOffsetToolTip">Specify the offset from the pylon at the bottom for the side view</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.ViewTypeSizeToolTip">View types for vertical sections</system:String>
+    <system:String x:Key="VerticalViewSettingsPage.SelectViewTypeSizeForMainAndSideViewsToolTip">View type to be applied to the main and side views when creating them.</system:String>
+</ResourceDictionary>

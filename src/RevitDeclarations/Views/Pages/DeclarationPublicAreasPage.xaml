@@ -1,0 +1,186 @@
+﻿<core:WpfUIPlatformPage
+    x:Class="RevitDeclarations.Views.DeclarationPublicAreasPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    
+    ScrollViewer.CanContentScroll="False"
+    
+    x:ClassModifier="internal">
+
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+
+    <ScrollViewer>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border
+                Grid.Row="0"
+                Margin="14,14,14,4"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="Auto" MinHeight="44"/>
+                        <RowDefinition Height="43"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="230"/>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ui:TextBlock 
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        Style="{StaticResource HeaderName}"
+                        Text="{me:LocalizationSource DeclarationPage.ExportFormat}" />
+
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource DeclarationPage.FileName}" />
+                    <ui:TextBox
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        Height="35"
+                        Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock
+                        Grid.Row="2"  
+                        Grid.Column="0"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource DeclarationPage.ExportFolder}" />
+                    <TextBox
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        TextWrapping="Wrap"
+                        IsEnabled="False"
+                        Text="{Binding FilePath}" />
+                    <ui:Button
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Margin="4,0,0,0"
+                        Appearance="Info"
+                        Height="35"
+                        Content="{me:LocalizationSource DeclarationPage.SelectFolder}"
+                        Command="{Binding SelectFolderCommand}" />
+
+                    <TextBlock
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource DeclarationPage.FileFormat}" />
+                    <ComboBox
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        ItemsSource="{Binding ExportFormats}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding SelectedFormat}"/>
+                </Grid>
+            </Border>
+
+            <Border
+                Grid.Row="1"
+                Margin="14,0,14,4"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="230" />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock 
+                        Grid.Row="0"
+                        Grid.ColumnSpan="2"
+                        Style="{StaticResource HeaderName}"
+                        Text="{me:LocalizationSource DeclarationPage.Accuracy}" />
+
+                    <TextBlock 
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource DeclarationPage.Phase}" />
+                    <ComboBox
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        ItemsSource="{Binding Phases}"
+                        DisplayMemberPath="Name"
+                        SelectedItem="{Binding SelectedPhase}"/>
+
+                    <TextBlock 
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource DeclarationPage.Accuracy}" />
+                    <TextBox
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        Height="35"
+                        PreviewTextInput="IndentValidation"
+                        PreviewKeyDown="TextBox_PreviewKeyDown"
+                        Text="{Binding Accuracy}" />
+                </Grid>
+            </Border>
+                    
+            <Border
+                Grid.Row="2"
+                Margin="14,0,14,14"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock 
+                        Grid.Row="0"
+                        Style="{StaticResource HeaderName}"
+                        Text="{me:LocalizationSource DeclarationPage.Projects}" />
+                    <Border
+                        Grid.Row="1"
+                        Style="{StaticResource CustomBorder}">
+                        <ListBox                    
+                            ItemsSource="{Binding RevitDocuments}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox 
+                                        Content="{Binding Name}" 
+                                        IsChecked="{Binding IsChecked}"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox> 
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</core:WpfUIPlatformPage>

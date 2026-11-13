@@ -3,11 +3,13 @@ using System.Globalization;
 using System.Reflection;
 
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
@@ -15,6 +17,7 @@ using dosymep.WpfUI.Core.Ninject;
 using Ninject;
 
 using RevitCorrectNamingCheck.Models;
+using RevitCorrectNamingCheck.Services;
 using RevitCorrectNamingCheck.ViewModels;
 using RevitCorrectNamingCheck.Views;
 
@@ -51,10 +54,9 @@ public class RevitCorrectNamingCheckCommand : BasePluginCommand {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
-
-        // Настройка конфигурации плагина
-        kernel.Bind<PluginConfig>()
-            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
+        kernel.Bind<LinkedFileEnricher>()
+            .ToSelf()
+            .InSingletonScope();
 
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
@@ -76,8 +78,7 @@ public class RevitCorrectNamingCheckCommand : BasePluginCommand {
         var localizationService = kernel.Get<ILocalizationService>();
         ValidateLinkedFiles(revitRepository, localizationService);
 
-        var window = kernel.Get<MainWindow>();
-        window.Show();
+        Notification(kernel.Get<MainWindow>());
     }
 
     private void ValidateLinkedFiles(RevitRepository revitRepository, ILocalizationService localizationService) {

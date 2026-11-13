@@ -14,6 +14,7 @@ internal class PublicAreasTableInfo : ITableInfo {
         SummerRoomsStart = 0;
         OtherRoomsStart = 0;
         UtpStart = 0;
+        ExtraApartPropsStart = 0;
         RowsTotalNumber = RoomGroups.Count;
 
         AreaTypeColumnsIndexes = new int[] { 4 };
@@ -29,6 +30,7 @@ internal class PublicAreasTableInfo : ITableInfo {
     public int SummerRoomsStart { get; }
     public int OtherRoomsStart { get; }
     public int UtpStart { get; }
+    public int ExtraApartPropsStart { get; }
     public int[] NumericColumnsIndexes { get; }
     public int[] AreaTypeColumnsIndexes { get; }
     public int[] LengthTypeColumnsIndexes { get; }

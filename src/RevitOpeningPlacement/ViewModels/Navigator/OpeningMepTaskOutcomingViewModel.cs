@@ -5,26 +5,32 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
-using dosymep.WPF.Extensions;
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models.Clashes;
 
+using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.OpeningModels.Enums;
 
 namespace RevitOpeningPlacement.ViewModels.Navigator;
 /// <summary>
 /// Модель представления окна для работы с конкретным исходящим заданием на отверстие в активном файле инженера
 /// </summary>
-internal class OpeningMepTaskOutcomingViewModel : BaseViewModel, ISelectorAndHighlighter, IEquatable<OpeningMepTaskOutcomingViewModel> {
+internal class OpeningMepTaskOutcomingViewModel : BaseViewModel,
+    IEquatable<OpeningMepTaskOutcomingViewModel>,
+    IOpeningMepTaskOutcomingViewModel {
+
     /// <summary>
     /// Входящее задание на отверстие
     /// </summary>
     private readonly OpeningMepTaskOutcoming _openingTask;
 
-
-    public OpeningMepTaskOutcomingViewModel(OpeningMepTaskOutcoming incomingOpeningTask) {
+    public OpeningMepTaskOutcomingViewModel(
+        OpeningMepTaskOutcoming incomingOpeningTask,
+        ILocalizationService localization) {
         if(incomingOpeningTask is null) {
             throw new ArgumentNullException(nameof(incomingOpeningTask));
         }
@@ -39,65 +45,37 @@ internal class OpeningMepTaskOutcomingViewModel : BaseViewModel, ISelectorAndHig
         Comment = _openingTask.Comment;
         Username = _openingTask.Username;
 
-        Status = _openingTask.Status.GetDescription();
+        Status = localization.GetLocalizedString($"{nameof(OpeningTaskOutcomingStatus)}.{_openingTask.Status}");
     }
 
+    public string OpeningId { get; }
 
-    /// <summary>
-    /// Id экземпляра семейства задания на отверстие
-    /// </summary>
-    public string OpeningId { get; } = string.Empty;
+    public string Date { get; }
 
-    /// <summary>
-    /// Дата создания отверстия
-    /// </summary>
-    public string Date { get; } = string.Empty;
+    public string MepSystem { get; }
 
-    /// <summary>
-    /// Название инженерной системы, для элемента которой создан экземпляр семейства задания на отверстие
-    /// </summary>
-    public string MepSystem { get; } = string.Empty;
+    public string Description { get; }
 
-    /// <summary>
-    /// Описание задания на отверстие
-    /// </summary>
-    public string Description { get; } = string.Empty;
+    public string CenterOffset { get; }
 
-    /// <summary>
-    /// Отметка центра задания на отверстие
-    /// </summary>
-    public string CenterOffset { get; } = string.Empty;
+    public string BottomOffset { get; }
 
-    /// <summary>
-    /// Отметка низа задания на отверстие
-    /// </summary>
-    public string BottomOffset { get; } = string.Empty;
+    public string Status { get; }
 
-    /// <summary>
-    /// Статус задания на отверстие
-    /// </summary>
-    public string Status { get; } = string.Empty;
+    public string Comment { get; }
 
-    /// <summary>
-    /// Комментарий
-    /// </summary>
-    public string Comment { get; } = string.Empty;
-
-    /// <summary>
-    /// Имя пользователя, создавшего задание на отверстие
-    /// </summary>
-    public string Username { get; } = string.Empty;
+    public string Username { get; }
 
     public override bool Equals(object obj) {
         return (obj != null)
             && (obj is OpeningMepTaskOutcomingViewModel otherVM)
             && Equals(otherVM);
     }
-
+    
     public override int GetHashCode() {
         return (int) _openingTask.Id.GetIdValue();
     }
-
+    
     public bool Equals(OpeningMepTaskOutcomingViewModel other) {
         return (other != null)
             && (_openingTask.Id == other._openingTask.Id);
@@ -111,7 +89,7 @@ internal class OpeningMepTaskOutcomingViewModel : BaseViewModel, ISelectorAndHig
     }
 
     /// <summary>
-    /// Возвращает коллекцию элементов, в которой находится исходящее задание на отверстие, которое надо выделить на виде
+    /// Возвращает коллекцию элементов, в которой находится исходящее задание на отверстие для выделения на виде
     /// </summary>
     public ICollection<ElementModel> GetElementsToSelect() {
         return new ElementModel[] {

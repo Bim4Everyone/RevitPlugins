@@ -1,8 +1,11 @@
 using System.Globalization;
 using System.Reflection;
+using System.Windows.Controls;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
+
+using Bim4Everyone.RevitFiltration.Ninject;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
@@ -18,6 +21,11 @@ using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.ViewModels.OpeningConfig;
 using RevitOpeningPlacement.Views.Settings;
+using RevitOpeningPlacement.Views.Settings.Ar;
+
+using RevitOpeningPlacement.Services;
+
+using Wpf.Ui.Abstractions;
 
 namespace RevitOpeningPlacement;
 /// <summary>
@@ -40,6 +48,11 @@ internal class SetOpeningRealsArPlacementConfigCmd : BasePluginCommand {
         kernel.Bind<RevitRepository>()
             .ToSelf()
             .InSingletonScope();
+        kernel.Bind<IFamilyGeometryProvider>()
+            .To<FamilyGeometryProvider>()
+            .InSingletonScope();
+
+        kernel.UseLogicalFilterFactory();
         kernel.Bind<RevitClashDetective.Models.RevitRepository>()
             .ToSelf()
             .InSingletonScope();
@@ -52,13 +65,31 @@ internal class SetOpeningRealsArPlacementConfigCmd : BasePluginCommand {
         kernel.Bind<OpeningRealsArConfig>()
             .ToMethod(c =>
                     OpeningRealsArConfig.GetOpeningConfig(uiApplication.ActiveUIDocument.Document)
-                );
-        kernel.BindMainWindow<OpeningRealsArConfigViewModel, OpeningRealsArSettingsView>();
+                )
+            .InSingletonScope();
+        kernel.Bind<INavigationViewPageProvider>()
+            .To<NavigationViewPageProvider>()
+            .InSingletonScope();
+        kernel.Bind<ArPlacementSettingsViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ArNavigatorSettingsViewModel>()
+            .ToSelf()
+            .InSingletonScope();
+        kernel.Bind<ArPlacementSettingsPage>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Page.DataContext), c => c.Kernel.Get<ArPlacementSettingsViewModel>());
+        kernel.Bind<ArNavigatorSettingsPage>()
+            .ToSelf()
+            .InSingletonScope()
+            .WithPropertyValue(nameof(Page.DataContext), c => c.Kernel.Get<ArNavigatorSettingsViewModel>());
+        kernel.BindMainWindow<ArSettingsViewModel, ArSettingsWindow>();
         kernel.UseWpfUIThemeUpdater();
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        Notification(kernel.Get<OpeningRealsArSettingsView>());
+        Notification(kernel.Get<ArSettingsWindow>());
     }
 }

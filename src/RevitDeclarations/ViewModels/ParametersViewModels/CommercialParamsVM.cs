@@ -15,6 +15,7 @@ internal class CommercialParamsVM : ParametersViewModel {
     private Parameter _selectedRoomsHeightParam;
     private Parameter _selectedParkingSpaceClass;
     private Parameter _selectedParkingInfo;
+    private Parameter _selectedPositionType;
 
     public CommercialParamsVM(RevitRepository revitRepository, MainViewModel mainViewModel)
         : base(revitRepository, mainViewModel) {
@@ -45,6 +46,10 @@ internal class CommercialParamsVM : ParametersViewModel {
         get => _selectedParkingInfo;
         set => RaiseAndSetIfChanged(ref _selectedParkingInfo, value);
     }
+    public Parameter SelectedPositionType {
+        get => _selectedPositionType;
+        set => RaiseAndSetIfChanged(ref _selectedPositionType, value);
+    }
 
     public override List<Parameter> AllSelectedParameters {
         get {
@@ -66,6 +71,7 @@ internal class CommercialParamsVM : ParametersViewModel {
                 SelectedRoomsHeightParam,
                 SelectedParkingSpaceClass,
                 SelectedParkingInfo,
+                SelectedPositionType,
 
                 SelectedRoomNameParam,
                 SelectedRoomAreaParam
@@ -79,11 +85,12 @@ internal class CommercialParamsVM : ParametersViewModel {
         }
     }
 
-
     public override void SetLastParamConfig(object obj) {
         var config = CommercialConfig.GetPluginConfig();
         var configSettings = config.GetSettings(_revitRepository.Document);
-        SetParametersFromConfig(configSettings);
+        if(configSettings != null) {
+            SetParametersFromConfig(configSettings);
+        }
     }
 
     public override void SetCompanyParamConfig(object obj) {
@@ -125,6 +132,8 @@ internal class CommercialParamsVM : ParametersViewModel {
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.ParkingSpaceClass);
         SelectedParkingInfo = TextParameters
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.ParkingInfo);
+        SelectedPositionType = TextParameters
+            .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.PositionType);
         ProjectName = commercialConfigSettings.ProjectNameID;
 
         SelectedRoomNumberParam = TextParameters
@@ -138,5 +147,6 @@ internal class CommercialParamsVM : ParametersViewModel {
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.GroupNameParam);
 
         AddPrefixToNumber = commercialConfigSettings.AddPrefixToNumber;
+        AddHyphenToPrefix = commercialConfigSettings.AddHyphenToPrefix;
     }
 }

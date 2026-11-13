@@ -6,6 +6,7 @@ using RevitClashDetective.Models.Interfaces;
 
 namespace RevitClashDetective.Models.ClashDetection;
 internal class ClashDetector {
+    public const string DefaultNamePrefix = "Конфликт";
     private readonly RevitRepository _revitRepository;
     private readonly IEnumerable<IProvider> _mainDocProviders;
     private readonly IEnumerable<IProvider> _otherProviders;
@@ -27,7 +28,7 @@ internal class ClashDetector {
 
         clashes = clashes.Distinct().ToList();
         for(int i = 0; i < clashes.Count; i++) {
-            clashes[i].Name = $"Конфликт{i + 1}";
+            clashes[i].Name = $"{DefaultNamePrefix}{i + 1}";
         }
 
         return clashes;

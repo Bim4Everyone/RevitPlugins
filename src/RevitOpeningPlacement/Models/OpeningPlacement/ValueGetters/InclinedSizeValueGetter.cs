@@ -6,6 +6,7 @@ using RevitClashDetective.Models.Value;
 using RevitOpeningPlacement.Models.Configs;
 using RevitOpeningPlacement.Models.Exceptions;
 using RevitOpeningPlacement.Models.Interfaces;
+using RevitOpeningPlacement.Services;
 using RevitOpeningPlacement.Models.OpeningPlacement.ParameterGetters;
 
 namespace RevitOpeningPlacement.Models.OpeningPlacement.ValueGetters;
@@ -16,11 +17,6 @@ internal class InclinedSizeValueGetter : RoundValueGetter, IValueGetter<DoublePa
     private readonly IDirectionsGetter _directionsGetter;
     private readonly MepCategory _mepCategory;
 
-    /// <summary>
-    /// Минимальное значение габарита задания на отверстие в футах (5 мм)
-    /// </summary>
-    private const double _minGeometryFeetSize = 0.015;
-
     public InclinedSizeValueGetter(
         MepCurveClash<Wall> clash,
         IValueGetter<DoubleParamValue> sizeValueGetter,
@@ -30,7 +26,7 @@ internal class InclinedSizeValueGetter : RoundValueGetter, IValueGetter<DoublePa
 
         _clash = clash;
         _sizeValueGetter = sizeValueGetter;
-        _plane = plane;
+        _plane = plane; // плоскость стены
         _directionsGetter = directionsGetter;
         _mepCategory = mepCategory;
     }
@@ -39,15 +35,15 @@ internal class InclinedSizeValueGetter : RoundValueGetter, IValueGetter<DoublePa
         double size = GetSize();
         double roundSize = RoundFeetToMillimeters(size, _mepCategory.Rounding);
         //проверка на недопустимо малые габариты
-        return roundSize < _minGeometryFeetSize
+        return roundSize < ConstantsProvider.OpeningTaskSizeMinValueFeet
             ? throw new SizeTooSmallException("Заданный габарит отверстия слишком мал")
             : new DoubleParamValue(roundSize);
     }
 
     private double GetSize() {
         //получение длины размера, спроецированного на плоскость
-        double size = _sizeValueGetter.GetValue().TValue / 2;
+        double offset = _sizeValueGetter.GetValue().TValue / 2;
         var directions = _directionsGetter.GetDirectionsOnPlane(_plane);
-        return new SizeGetter(_clash, _plane).GetSizeFromProjection(directions, size);
+        return new SizeGetter(_clash, _plane).GetSizeFromProjection(directions, offset);
     }
 }

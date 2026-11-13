@@ -8,6 +8,8 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Revit;
@@ -68,6 +70,9 @@ internal class PlaceAllSleevesCommand : BasePluginCommand {
             .ToMethod(c => SleevePlacementSettingsConfig.GetPluginConfig(
                 new RevitClashConfigSerializer(
                     new RevitClashesSerializationBinder(), uiApplication.ActiveUIDocument.Document)));
+
+        kernel.UseLogicalFilterFactory();
+        kernel.UseFilterContextParser();
 
         BindServices(kernel);
         BindWindows(kernel);

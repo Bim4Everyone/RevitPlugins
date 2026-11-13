@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
 
+using RevitDeclarations.Comparators;
+
 namespace RevitDeclarations.Models;
 internal class PublicArea : RoomGroup {
     private readonly PublicAreasSettings _settings;
 
     public PublicArea(IEnumerable<RoomElement> rooms,
                       DeclarationSettings settings,
-                      RoomParamProvider paramProvider)
-        : base(rooms, settings, paramProvider) {
+                      RoomParamProvider paramProvider, 
+                      RevitLogicalStringComparer logicalStrComparer)
+        : base(rooms, settings, paramProvider, logicalStrComparer) {
         _settings = (PublicAreasSettings) settings;
 
         RoomPosition = _paramProvider.GetRoomsPosition(this);
@@ -19,7 +22,7 @@ internal class PublicArea : RoomGroup {
     }
 
     public string DeclarationNumber =>
-        _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber);
+        _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber, _settings.AddHyphenToPrefix);
 
     public override string Department => _paramProvider.GetDepartment(_firstRoom, "МОП");
     public override double AreaMain => _isOneRoomGroup ? _firstRoom.Area : base.AreaMain;

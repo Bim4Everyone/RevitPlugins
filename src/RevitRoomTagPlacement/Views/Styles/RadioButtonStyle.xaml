@@ -13,23 +13,22 @@
             <Setter.Value>
                 <ControlTemplate 
                     TargetType="{x:Type RadioButton}">                    
-                    <BulletDecorator 
-                        Background="Gray">
-                        
+                    <BulletDecorator>                        
                         <BulletDecorator.Bullet>
                             <Grid 
                                 Width="30" 
                                 Height="30">
-                                <Rectangle
+                                <Border
                                     x:Name="Border"
-                                    StrokeThickness="1"
-                                    Stroke="White"
-                                    Fill="LightGray"/>
-                                <Rectangle
+                                    BorderThickness="1"
+                                    Background="{DynamicResource CardBorderBrush}"
+                                    CornerRadius="4" />
+                                <Border
                                     x:Name="CheckMark"
-                                    Fill="DarkGray"
-                                    Visibility="Collapsed"
-                                    Margin="2"/>
+                                    Background="#03a9f4"
+                                    Margin="2"
+                                    CornerRadius="3"
+                                    Visibility="Collapsed" />
                             </Grid>
                         </BulletDecorator.Bullet>
                         

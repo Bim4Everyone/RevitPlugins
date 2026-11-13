@@ -165,18 +165,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <Style
-        x:Key="CustomDataGridHeaderStyle"
-        TargetType="DataGridColumnHeader">
-        <Setter
-            Property="HorizontalContentAlignment"
-            Value="Center" />
-        <Setter
-            Property="Background"
-            Value="White" />
-        <Setter
-            Property="FontWeight"
-            Value="Bold" />
-    </Style>
 </ResourceDictionary>

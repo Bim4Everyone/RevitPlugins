@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectParams;
 using dosymep.Revit;
 
 using pyRevitLabs.Json;
@@ -56,14 +57,28 @@ internal class RoomElement {
         return RevitRoom.GetParamValueOrDefault<string>(parameter.Definition.Name);
     }
 
+    /// <summary>
+    /// Возвращает значение параметра длины в квадратных метрах.
+    /// </summary>
     public double GetAreaParamValue(Parameter parameter, int accuracy) {
         double value = RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
         return ParamConverter.ConvertArea(value, accuracy);
     }
 
+    /// <summary>
+    /// Возвращает значение параметра длины в метрах.
+    /// </summary>
     public double GetLengthParamValue(Parameter parameter, int accuracy) {
         double value = RevitRoom.GetParamValueOrDefault<double>(parameter.Definition.Name);
         return ParamConverter.ConvertLength(value, accuracy);
+    }
+
+    /// <summary>
+    /// Возвращает значение параметра длины в миллиметрах.
+    /// </summary>
+    public double GetLengthParamValueMm(RevitParam parameter, int accuracy) {
+        double value = RevitRoom.GetParamValueOrDefault<double>(parameter);
+        return ParamConverter.ConvertLengthMm(value, accuracy);
     }
 
     public double GetIntAndCurrencyParamValue(Parameter parameter) {
@@ -72,10 +87,18 @@ internal class RoomElement {
             : RevitRoom.GetParamValueOrDefault<int>(parameter.Definition.Name);
     }
 
-    public IReadOnlyList<ElementId> GetBoundaries() {
-        return RevitRoom.GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
-            .SelectMany(item => item)
-            .Select(item => item.ElementId)
+    public IReadOnlyList<BoundarySegment> GetBoundaries() {
+        return RevitRoom
+            .GetBoundarySegments(SpatialElementExtensions.DefaultBoundaryOptions)
+            .SelectMany(x => x)
             .ToList();
+    }
+
+    public string GetNameForSummerRoomWithGlazing() {
+        if(RevitRoom.GetParamValueOrDefault<int>(ProjectParamsConfig.Instance.RoomNoGlazing) == 1) {
+            return $"{Name} (без остекления)";
+        }
+
+        return Name;
     }
 }

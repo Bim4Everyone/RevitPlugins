@@ -1,0 +1,33 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="RebarDimensioningWindow.Title">Размеры зон дополнительного армирования</system:String>
+
+    <system:String x:Key="RebarDimensioningWindow.ViewNotViewPlan">Активный вид должен быть планом</system:String>
+    
+    <system:String x:Key="RebarDimensioningWindow.FamilyNamePart">Часть имени семейства зоны армирования:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.ReferenceNames">Имена опорных плоскостей:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.VerticalReferences">Вертикальные опорные плоскости:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.HorizontalReferences">Горизонтальные опорные плоскости:</system:String>
+    
+    <system:String x:Key="RebarDimensioningWindow.Name">Имя</system:String>
+    <system:String x:Key="RebarDimensioningWindow.Add">Добавить</system:String>
+    <system:String x:Key="RebarDimensioningWindow.Remove">Удалить</system:String>
+    
+    <system:String x:Key="RebarDimensioningWindow.DimensionType">Типоразмер размера:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.MinValueDimension">Минимальный размер для размещения:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.MinValueDimensionIncorrect">Минимальный размер для размещения некорректен</system:String>
+
+    <system:String x:Key="RebarDimensioningWindow.ViewHasNotGrids">На виде нет осей</system:String>
+    <system:String x:Key="RebarDimensioningWindow.WriteFamilyNamePart">Не указана часть имени семейства</system:String>
+    <system:String x:Key="RebarDimensioningWindow.DimensionTypeIsNotSelected">Не выбран типоразмер размера</system:String>
+    <system:String x:Key="RebarDimensioningWindow.WriteReferenceNames">Не указаны имена опорных плоскостей</system:String>
+    
+    <system:String x:Key="RebarDimensioningWindow.PlaceDimensions">Методика позиционирования размеров:</system:String>
+    <system:String x:Key="RebarDimensioningWindow.PlaceDimensionsAccurately">Позиционировать размеры точно</system:String>
+    <system:String x:Key="RebarDimensioningWindow.CreateMarkedImage">Создать изображение карты свободных зон</system:String>
+
+    <system:String x:Key="RebarDimensioningWindow.ButtonOk">ОК</system:String>
+    <system:String x:Key="RebarDimensioningWindow.ButtonCancel">Отмена</system:String>
+</ResourceDictionary>

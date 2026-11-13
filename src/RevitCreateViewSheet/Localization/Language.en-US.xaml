@@ -146,7 +146,7 @@ Existing sheet numbers may change.</system:String>
     <system:String
         x:Key="Errors.CannotCreateAnnotationOnNotCreatedSheet">Cannot create an annotation on a sheet that has not yet been created.</system:String>
     <system:String
-        x:Key="Errors.CannotUpdateNotCreatetViewPort">Cannot update haven't created viewport yet.</system:String>
+        x:Key="Errors.CannotUpdateNotCreatedViewPort">Cannot update haven't created viewport yet.</system:String>
     <system:String
         x:Key="Errors.CannotUpdateNotCreatetSheet">Cannot update haven't created sheet yet.</system:String>
     <system:String

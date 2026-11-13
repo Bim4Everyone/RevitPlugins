@@ -63,18 +63,42 @@ internal class LinksLoader : ILinksLoader {
 
         var errors = new List<(ILink Link, string Error)>();
         int i = 0;
+        List<RevitLinkType> reloadedLinkTypes = [];
         foreach(var item in links) {
             ct.ThrowIfCancellationRequested();
             bool success = _revitRepository.ReloadLink(
                 item.LocalLink,
                 item.SourceLink.FullPath,
                 out string error);
-            if(!success) {
+            if(success) {
+                reloadedLinkTypes.Add(item.LocalLink);
+            } else {
                 errors.Add((item.SourceLink, error));
             }
             progress?.Report(++i);
         }
+
+        // закрепление связей после обновления, т.к. ревит запрещает обновлять связи при запущенной транзакции
+        PinLinkInstances(reloadedLinkTypes);
+
         return errors;
+    }
+
+    private void PinLinkInstances(ICollection<RevitLinkType> linkTypes) {
+        using var transaction = _revitRepository.Document.StartTransaction(
+            _localizationService.GetLocalizedString("LinkLoader.Transaction.PinLinks"));
+        foreach(var link in linkTypes) {
+            var instances = new FilteredElementCollector(_revitRepository.Document)
+                .OfClass(typeof(RevitLinkInstance))
+                .OfType<RevitLinkInstance>()
+                .Where(r => r.GetTypeId() == link.Id)
+                .ToArray();
+            foreach(var instance in instances) {
+                instance.Pinned = true;
+            }
+        }
+
+        transaction.Commit();
     }
 
     private bool LinkExists(

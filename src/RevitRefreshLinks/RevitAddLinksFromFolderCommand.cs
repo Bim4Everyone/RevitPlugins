@@ -47,13 +47,18 @@ public class RevitAddLinksFromFolderCommand : BasePluginCommand {
             .ToMethod(c => AddLinksFromFolderConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()))
             .InTransientScope();
 
+        kernel.UseWpfWindowsTheme();
         kernel.UseWpfUIThemeUpdater();
+        kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
+        kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
+        kernel.UseWpfUIMessageBox<AddLocalLinksViewModel>();
+        kernel.UseWpfUIProgressDialog<AddLocalLinksViewModel>();
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
         var localizationService = kernel.Get<ILocalizationService>();
-        kernel.UseXtraOpenFileDialog<FolderLinksProvider>(
+        kernel.UseWpfOpenFileDialog<FolderLinksProvider>(
             title: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Title"),
             filter: localizationService.GetLocalizedString("SelectLinksFromFolderDialog.Filter"),
             initialDirectory: GetInitialFolder(kernel),

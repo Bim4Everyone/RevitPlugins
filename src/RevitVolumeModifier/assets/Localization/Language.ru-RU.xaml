@@ -1,0 +1,62 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Модифицировать объемные элементы</system:String>
+
+    <system:String x:Key="ParamViewModel.NoParam">Параметра не существует в проекте</system:String>
+
+    <system:String x:Key="MainWindow.Params">Конфигурация параметров</system:String>
+    <system:String x:Key="MainWindow.ParamsDescription">Параметры СМР, используемые плагином</system:String>
+    <system:String x:Key="MainWindow.ParamWarningTooltip">В некоторых параметрах есть ошибки</system:String>
+    <system:String x:Key="MainWindow.SaveConfig">Сохранить конфигурацию параметров</system:String>
+
+    <system:String x:Key="MainWindow.JoinPanel">Объединение элементов</system:String>
+    <system:String x:Key="MainWindow.JoinPanelDescription">Выделенные элементы будут объединены</system:String>
+    <system:String x:Key="MainWindow.JoinCommand">Объединить</system:String>
+
+    <system:String x:Key="MainWindow.DividePanel">Разделение элементов</system:String>
+    <system:String x:Key="MainWindow.DividePanelDescription">Выделенные элементы будут разделены</system:String>
+    <system:String x:Key="MainWindow.DivideBySelectHorizontalPointCommand">Разделить по горизонтальной точке</system:String>
+    <system:String x:Key="MainWindow.DivideBySelectVerticalPointCommand">Разделить по вертикальной точке</system:String>
+    <system:String x:Key="MainWindow.DivideBySelectFacesCommand">Разделить по граням</system:String>
+
+    <system:String x:Key="MainWindow.CutPanel">Вырезание элементов</system:String>
+    <system:String x:Key="MainWindow.CutPanelDescription">Выделенные элементы будут вырезаны</system:String>
+    <system:String x:Key="MainWindow.CutCommand">Выбрать вырезаемые элементы</system:String>
+
+    <system:String x:Key="MainViewModel.DescriptionParamDescription">Параметр описания СМР</system:String>
+    <system:String x:Key="MainViewModel.DescriptionParamDetailDescription">Тип - Текст</system:String>
+    <system:String x:Key="MainViewModel.BlockParamDescription">Параметр блока СМР</system:String>
+    <system:String x:Key="MainViewModel.BlockParamDetailDescription">Тип - Текст</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDescription">Параметр секции СМР</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDetailDescription">Тип - Текст</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDescription">Параметр этажа СМР</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDetailDescription">Тип - Текст</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDescription">Доп. параметр этажа СМР</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDetailDescription">Тип - Денежная единица</system:String>
+    <system:String x:Key="MainViewModel.ZoneParamDescription">Параметр зоны СМР</system:String>
+    <system:String x:Key="MainViewModel.ZoneParamDetailDescription">Тип - Текст</system:String>
+    <system:String x:Key="MainViewModel.VolumeParamDescription">Параметр объёма СМР</system:String>
+    <system:String x:Key="MainViewModel.VolumeParamDetailDescription">Тип - Объем</system:String>
+
+    <system:String x:Key="MainViewModel.FailedCommand">Операция выполнена с предупреждениями</system:String>
+    <system:String x:Key="MainViewModel.SuccessCommand">Операция выполнена успешно</system:String>
+
+    <system:String x:Key="MainViewModel.NoSelection">Не выделены элементы</system:String>
+    <system:String x:Key="MainViewModel.DocumentChangedWarning">Откройте исходный документ</system:String>
+    <system:String x:Key="MainViewModel.HasParamWarning">В файле отсутствуют необходимые параметры</system:String>
+    <system:String x:Key="MainViewModel.SaveConfigNecessary">Необходимо сохранить конфигурацию параметров</system:String>
+    <system:String x:Key="MainViewModel.PickPointOnElementPromt">Выберите точку на объемном элементе</system:String>    
+    <system:String x:Key="MainViewModel.PickFacesPromt">Выберите плоскости (грани) и нажмите "Готово"</system:String>
+    <system:String x:Key="MainViewModel.CutPromt">Выберите элементы, которые нужно вырезать и нажмите "Готово"</system:String>
+
+    <system:String x:Key="RevitRepository.NoParamValue">Нет значения</system:String>
+
+    <system:String x:Key="RevitRepository.TransactionNameJoin">Объединение объемов СМР</system:String>
+    <system:String x:Key="RevitRepository.TransactionNameDivide">Разделение объемов СМР</system:String>
+    <system:String x:Key="RevitRepository.TransactionNameCut">Вырезание объемов СМР</system:String>
+    <system:String x:Key="RevitPickService.CancelledSelectionPoint">Выбор точек отменен</system:String>      
+    <system:String x:Key="RevitPickService.CancelledSelectionFaces">Выбор граней отменен</system:String>      
+    <system:String x:Key="RevitPickService.CancelledSelectionElements">Выбор элементов вырезания отменен</system:String>      
+</ResourceDictionary>

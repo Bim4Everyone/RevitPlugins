@@ -34,10 +34,4 @@ internal class ProvidersFactory {
             _ => new PositionProviderCenter(revitRepository)
         };
     }
-    /// <summary>
-    /// Метод получения провайдера сферы
-    /// </summary>
-    public ISphereProvider GetSphereProvider(RevitRepository revitRepository) {
-        return new SphereProvider(revitRepository);
-    }
 }

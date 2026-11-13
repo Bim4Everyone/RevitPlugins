@@ -13,6 +13,7 @@
     xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     xmlns:mvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+    xmlns:common="clr-namespace:dosymep.Xpf.Core.SimpleServices;assembly=dosymep.Xpf.Core"
     x:Name="_this"
     mc:Ignorable="d"
     Title="NavigatorMepToKrIncomingView"
@@ -22,7 +23,7 @@
     Width="1000"
     MinHeight="150"
     MinWidth="150"
-    d:DataContext="{d:DesignInstance {x:Type vm:ConstructureNavigatorForIncomingTasksViewModel}, IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance {x:Type vm:NavigatorKrViewModel}, IsDesignTimeCreatable=False}"
     WindowStartupLocation="Manual"
     Left="50"
     Top="50">
@@ -30,6 +31,10 @@
         <dxmvvm:EventToCommand
             EventName="Loaded"
             Command="{Binding LoadViewCommand}" />
+        <common:AttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+        <common:AttachServiceBehavior
+            AttachableService="{Binding ProgressDialogFactory}" />
     </dxmvvm:Interaction.Behaviors>
 
     <base:ThemedPlatformWindow.Resources>
@@ -165,11 +170,9 @@
                     <dxg:GridControl
                         x:Name="_dgIncomingTasks"
                         Grid.Row="0"
-                        ItemsSource="{Binding OpeningsTasksIncomingViewSource.View}"
+                        ItemsSource="{Binding OpeningsTasksIncoming}"
                         BorderThickness="0"
                         SelectionMode="Row"
-                        CurrentItem="RevitOpeningPlacement.Models.Interfaces.IOpeningTaskIncomingForKrViewModel"
-                        SelectedItem="{Binding SelectedOpeningTaskIncoming}"
                         MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem
@@ -182,7 +185,6 @@
                                 ShowDataNavigator="True"
                                 ShowSearchPanelMode="Always"
                                 IndicatorWidth="0"
-                                FocusedRowHandleChanged="viewTasks_FocusedRowHandleChanged"
                                 NavigationStyle="Cell"
                                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                                 VirtualizingPanel.VirtualizationMode="Recycling"
@@ -321,12 +323,10 @@
                     ShowCloseButton="False">
                     <dxg:GridControl
                         x:Name="_dgOpeningsReal"
-                        ItemsSource="{Binding OpeningsRealViewSource.View}"
+                        ItemsSource="{Binding OpeningsReal}"
                         DefaultSorting="Diameter"
                         BorderThickness="0"
                         SelectionMode="Row"
-                        CurrentItem="RevitOpeningPlacement.ViewModels.Navigator.OpeningRealKrViewModel"
-                        SelectedItem="{Binding SelectedOpeningReal}"
                         MaxHeight="2000">
                         <dxg:GridControl.GroupSummary>
                             <dxg:GridSummaryItem
@@ -339,7 +339,6 @@
                                 ShowDataNavigator="True"
                                 ShowSearchPanelMode="Always"
                                 IndicatorWidth="0"
-                                FocusedRowHandleChanged="viewOpenings_FocusedRowHandleChanged"
                                 NavigationStyle="Cell"
                                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                                 VirtualizingPanel.VirtualizationMode="Recycling"

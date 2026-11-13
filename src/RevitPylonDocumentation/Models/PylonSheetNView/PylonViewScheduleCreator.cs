@@ -9,23 +9,23 @@ using RevitPylonDocumentation.Models.UserSettings;
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonViewScheduleCreator {
     internal PylonViewScheduleCreator(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
-        ProjectSettings = settings.ProjectSettings;
+        DispatcherSettings = settings.DispatcherSettings;
         SchedulesSettings = settings.SchedulesSettings;
-        RefSettings = settings.ReferenceScheduleSettings;
+        ScheduleFiltersSettings = settings.ScheduleFiltersSettings;
         Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
-    internal UserProjectSettings ProjectSettings { get; set; }
+    internal UserDispatcherSettings DispatcherSettings { get; set; }
     internal UserSchedulesSettings SchedulesSettings { get; set; }
-    internal UserReferenceScheduleSettings RefSettings { get; set; }
+    internal UserScheduleFiltersSettings ScheduleFiltersSettings { get; set; }
     internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
 
     public bool TryCreateSkeletonSchedule() {
-        if(RefSettings.ReferenceSkeletonSchedule is null 
-            || !RefSettings.ReferenceSkeletonSchedule
+        if(SchedulesSettings.SelectedSkeletonSchedule is null
+            || !SchedulesSettings.SelectedSkeletonSchedule
                     .CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
             return false;
         }
@@ -33,7 +33,7 @@ public class PylonViewScheduleCreator {
         ElementId scheduleId = null;
         ViewSchedule viewSchedule;
         try {
-            scheduleId = RefSettings.ReferenceSkeletonSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            scheduleId = SchedulesSettings.SelectedSkeletonSchedule.Duplicate(ViewDuplicateOption.Duplicate);
             viewSchedule = Doc.GetElement(scheduleId) as ViewSchedule;
             if(viewSchedule != null) {
                 viewSchedule.Name =
@@ -44,11 +44,11 @@ public class PylonViewScheduleCreator {
                 // Задаем сортировку
                 SetScheduleDispatcherParameter(
                     viewSchedule,
-                    ProjectSettings.DispatcherGroupingFirst,
+                    DispatcherSettings.DispatcherGroupingFirst,
                     SchedulesSettings.SkeletonScheduleDisp1);
                 SetScheduleDispatcherParameter(
                     viewSchedule,
-                    ProjectSettings.DispatcherGroupingSecond,
+                    DispatcherSettings.DispatcherGroupingSecond,
                     SchedulesSettings.SkeletonScheduleDisp2);
 
                 // Задаем фильтры спецификации
@@ -67,15 +67,15 @@ public class PylonViewScheduleCreator {
 
 
     public bool TryCreateSkeletonByElemsSchedule() {
-        if(RefSettings.ReferenceSkeletonByElemsSchedule is null
-            || !RefSettings.ReferenceSkeletonByElemsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+        if(SchedulesSettings.SelectedSkeletonByElemsSchedule is null
+            || !SchedulesSettings.SelectedSkeletonByElemsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
             return false;
         }
 
         ElementId scheduleId = null;
         ViewSchedule viewSchedule;
         try {
-            scheduleId = RefSettings.ReferenceSkeletonByElemsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            scheduleId = SchedulesSettings.SelectedSkeletonByElemsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
             viewSchedule = Doc.GetElement(scheduleId) as ViewSchedule;
             if(viewSchedule != null) {
                 viewSchedule.Name =
@@ -86,11 +86,11 @@ public class PylonViewScheduleCreator {
                 // Задаем сортировку
                 SetScheduleDispatcherParameter(
                     viewSchedule,
-                    ProjectSettings.DispatcherGroupingFirst,
+                    DispatcherSettings.DispatcherGroupingFirst,
                     SchedulesSettings.SkeletonByElemsScheduleDisp1);
                 SetScheduleDispatcherParameter(
                     viewSchedule,
-                    ProjectSettings.DispatcherGroupingSecond,
+                    DispatcherSettings.DispatcherGroupingSecond,
                     SchedulesSettings.SkeletonByElemsScheduleDisp2);
 
                 // Задаем фильтры спецификации
@@ -109,28 +109,28 @@ public class PylonViewScheduleCreator {
 
 
     public bool TryCreateMaterialSchedule() {
-        if(RefSettings.ReferenceMaterialSchedule is null 
-            || !RefSettings.ReferenceMaterialSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { 
-            return false; 
+        if(SchedulesSettings.SelectedMaterialSchedule is null
+            || !SchedulesSettings.SelectedMaterialSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+            return false;
         }
 
         ElementId scheduleId = null;
         ViewSchedule viewSchedule;
         try {
-            scheduleId = RefSettings.ReferenceMaterialSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            scheduleId = SchedulesSettings.SelectedMaterialSchedule.Duplicate(ViewDuplicateOption.Duplicate);
             viewSchedule = Doc.GetElement(scheduleId) as ViewSchedule;
             if(viewSchedule is null) { return false; }
 
-            viewSchedule.Name = SchedulesSettings.MaterialSchedulePrefix 
-                                + SheetInfo.PylonKeyName 
+            viewSchedule.Name = SchedulesSettings.MaterialSchedulePrefix
+                                + SheetInfo.PylonKeyName
                                 + SchedulesSettings.MaterialScheduleSuffix;
 
             // Задаем сортировку
-            SetScheduleDispatcherParameter(viewSchedule, 
-                                           ProjectSettings.DispatcherGroupingFirst, 
+            SetScheduleDispatcherParameter(viewSchedule,
+                                           DispatcherSettings.DispatcherGroupingFirst,
                                            SchedulesSettings.MaterialScheduleDisp1);
-            SetScheduleDispatcherParameter(viewSchedule, 
-                                           ProjectSettings.DispatcherGroupingSecond, 
+            SetScheduleDispatcherParameter(viewSchedule,
+                                           DispatcherSettings.DispatcherGroupingSecond,
                                            SchedulesSettings.MaterialScheduleDisp2);
 
             // Задаем фильтры спецификации
@@ -148,28 +148,28 @@ public class PylonViewScheduleCreator {
 
 
     public bool TryCreateSystemPartsSchedule() {
-        if(RefSettings.ReferenceSystemPartsSchedule is null 
-            || !RefSettings.ReferenceSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { 
-            return false; 
+        if(SchedulesSettings.SelectedSystemPartsSchedule is null
+            || !SchedulesSettings.SelectedSystemPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+            return false;
         }
 
         ElementId scheduleId = null;
         ViewSchedule viewSchedule;
         try {
-            scheduleId = RefSettings.ReferenceSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            scheduleId = SchedulesSettings.SelectedSystemPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
             viewSchedule = Doc.GetElement(scheduleId) as ViewSchedule;
             if(viewSchedule is null) { return false; }
 
-            viewSchedule.Name = SchedulesSettings.SystemPartsSchedulePrefix 
-                                + SheetInfo.PylonKeyName 
+            viewSchedule.Name = SchedulesSettings.SystemPartsSchedulePrefix
+                                + SheetInfo.PylonKeyName
                                 + SchedulesSettings.SystemPartsScheduleSuffix;
 
             // Задаем сортировку
-            SetScheduleDispatcherParameter(viewSchedule, 
-                                           ProjectSettings.DispatcherGroupingFirst, 
+            SetScheduleDispatcherParameter(viewSchedule,
+                                           DispatcherSettings.DispatcherGroupingFirst,
                                            SchedulesSettings.SystemPartsScheduleDisp1);
-            SetScheduleDispatcherParameter(viewSchedule, 
-                                           ProjectSettings.DispatcherGroupingSecond, 
+            SetScheduleDispatcherParameter(viewSchedule,
+                                           DispatcherSettings.DispatcherGroupingSecond,
                                            SchedulesSettings.SystemPartsScheduleDisp2);
 
             // Задаем фильтры спецификации
@@ -187,28 +187,28 @@ public class PylonViewScheduleCreator {
 
 
     public bool TryCreateIfcPartsSchedule() {
-        if(RefSettings.ReferenceIfcPartsSchedule is null 
-            || !RefSettings.ReferenceIfcPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) { 
-            return false; 
+        if(SchedulesSettings.SelectedIfcPartsSchedule is null
+            || !SchedulesSettings.SelectedIfcPartsSchedule.CanViewBeDuplicated(ViewDuplicateOption.Duplicate)) {
+            return false;
         }
 
         ElementId scheduleId = null;
         ViewSchedule viewSchedule;
         try {
-            scheduleId = RefSettings.ReferenceIfcPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
+            scheduleId = SchedulesSettings.SelectedIfcPartsSchedule.Duplicate(ViewDuplicateOption.Duplicate);
             viewSchedule = Doc.GetElement(scheduleId) as ViewSchedule;
             if(viewSchedule is null) { return false; }
 
-            viewSchedule.Name = SchedulesSettings.IfcPartsSchedulePrefix 
-                                + SheetInfo.PylonKeyName 
+            viewSchedule.Name = SchedulesSettings.IfcPartsSchedulePrefix
+                                + SheetInfo.PylonKeyName
                                 + SchedulesSettings.IfcPartsScheduleSuffix;
 
             // Задаем сортировку
-            SetScheduleDispatcherParameter(viewSchedule, 
-                                           ProjectSettings.DispatcherGroupingFirst, 
+            SetScheduleDispatcherParameter(viewSchedule,
+                                           DispatcherSettings.DispatcherGroupingFirst,
                                            SchedulesSettings.IfcPartsScheduleDisp1);
-            SetScheduleDispatcherParameter(viewSchedule, 
-                                           ProjectSettings.DispatcherGroupingSecond, 
+            SetScheduleDispatcherParameter(viewSchedule,
+                                           DispatcherSettings.DispatcherGroupingSecond,
                                            SchedulesSettings.IfcPartsScheduleDisp2);
 
             // Задаем фильтры спецификации
@@ -228,12 +228,12 @@ public class PylonViewScheduleCreator {
     /// <summary>
     /// Задает у спецификации значение параметру диспетчера
     /// </summary>
-    public void SetScheduleDispatcherParameter(ViewSchedule viewSchedule, string dispGroupingParam, 
+    public void SetScheduleDispatcherParameter(ViewSchedule viewSchedule, string dispGroupingParam,
                                                string hostDispGroupingParam) {
         var scheduleGroupingParameter = viewSchedule.LookupParameter(dispGroupingParam);
         var hostGroupingParameterValue = SheetInfo.HostElems[0].LookupParameter(hostDispGroupingParam);
 
-            string groupingParameterValue = string.Empty;
+        string groupingParameterValue = string.Empty;
 
         // Если такого параметра нет, значит просто записываем то, что записал пользователь
         if(hostGroupingParameterValue is null) {
@@ -262,7 +262,7 @@ public class PylonViewScheduleCreator {
             ScheduleField scheduleFieldFromFilter = scheduleDefinition.GetField(currentFilter.FieldId);
 
             // Определяем есть ли параметр фильтра в списке нужных
-            ScheduleFilterParamHelper filterParam = SchedulesSettings.ParamsForScheduleFilters
+            ScheduleFilterParamHelper filterParam = ScheduleFiltersSettings.ParamsForScheduleFilters
                 .FirstOrDefault(item => item.ParamNameInSchedule.Equals(scheduleFieldFromFilter.GetName()));
 
             // Если его нет в списке нужных - удаляем

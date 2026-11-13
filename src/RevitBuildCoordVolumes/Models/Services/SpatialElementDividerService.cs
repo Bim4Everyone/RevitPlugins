@@ -1,0 +1,125 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Autodesk.Revit.DB;
+
+using RevitBuildCoordVolumes.Models.Enums;
+using RevitBuildCoordVolumes.Models.Geometry;
+using RevitBuildCoordVolumes.Models.Interfaces;
+using RevitBuildCoordVolumes.Models.Settings;
+using RevitBuildCoordVolumes.Models.Utilites;
+
+namespace RevitBuildCoordVolumes.Models.Services;
+
+internal class SpatialElementDividerService : ISpatialElementDividerService {
+    private readonly IContourService _contourService;
+
+    public SpatialElementDividerService(IContourService contourService) {
+        _contourService = contourService;
+    }
+
+    public List<PolygonObject> DivideSpatialElement(
+    SpatialElement spatialElement,
+    BuildCoordVolumeSettings settings,
+    ProgressService progressService) {
+        double angleDeg = UnitUtils.ConvertToInternalUnits(settings.SquareAngleDeg, UnitTypeId.Degrees);
+        double side = UnitUtils.ConvertToInternalUnits(settings.SquareSideMm, UnitTypeId.Millimeters);
+        var contour = _contourService.GetOuterContour(spatialElement);
+        if(contour.Count == 0) {
+            return [];
+        }
+
+        var contourDots = contour
+            .Select(curve => curve.GetEndPoint(0))
+            .ToList();
+
+        // Центр контура
+        var origin = new XYZ(
+            contourDots.Average(p => p.X),
+            contourDots.Average(p => p.Y),
+            0);
+
+        // Повернутые оси
+        var ux = new XYZ(Math.Cos(angleDeg), Math.Sin(angleDeg), 0);
+        var uy = new XYZ(-Math.Sin(angleDeg), Math.Cos(angleDeg), 0);
+
+        // Габариты в локальной системе координат
+        var localXs = contourDots
+            .Select(p => (p - origin).DotProduct(ux))
+            .ToList();
+
+        var localYs = contourDots
+            .Select(p => (p - origin).DotProduct(uy))
+            .ToList();
+
+        double minLocalX = localXs.Min();
+        double maxLocalX = localXs.Max();
+
+        double minLocalY = localYs.Min();
+        double maxLocalY = localYs.Max();
+
+        // нужен запас минимум в диагональ квадрата,
+        // иначе при повороте угловые квадраты не попадут в диапазон
+        double extra = side * Math.Sqrt(2);
+
+        int nx = (int) Math.Ceiling(
+            (Math.Max(Math.Abs(minLocalX), Math.Abs(maxLocalX)) + extra)
+            / side);
+
+        int ny = (int) Math.Ceiling(
+            (Math.Max(Math.Abs(minLocalY), Math.Abs(maxLocalY)) + extra)
+            / side);
+
+        progressService?.BeginStage(ProgressType.DivideSpatial);
+        int total = (2 * nx + 1) * (2 * ny + 1);
+        int processed = 0;
+        int reported = 0;
+        var polygons = new List<PolygonObject>();
+        for(int ix = -nx; ix <= nx; ix++) {
+            for(int iy = -ny; iy <= ny; iy++) {
+                progressService?.CancellationToken.ThrowIfCancellationRequested();
+
+                var basePoint =
+                    origin
+                    + ux * (ix * side)
+                    + uy * (iy * side);
+
+                var p1 = basePoint;
+                var p2 = basePoint + ux * side;
+                var p3 = basePoint + ux * side + uy * side;
+                var p4 = basePoint + uy * side;
+
+                // Проверяем все углы
+                if(!GeometryUtility.IsPointInsidePolygon(p1, contourDots)
+                    || !GeometryUtility.IsPointInsidePolygon(p2, contourDots)
+                    || !GeometryUtility.IsPointInsidePolygon(p3, contourDots)
+                    || !GeometryUtility.IsPointInsidePolygon(p4, contourDots)) {
+                    continue;
+                }
+
+                var center = (p1 + p3) / 2;
+
+                polygons.Add(new PolygonObject {
+                    Center = center,
+                    Sides = [
+                        Line.CreateBound(p1, p2),
+                        Line.CreateBound(p2, p3),
+                        Line.CreateBound(p3, p4),
+                        Line.CreateBound(p4, p1)
+                    ]
+                });
+                processed++;
+                int current = processed * 100 / total;
+                if(current > 100) {
+                    current = 100;
+                }
+                if(current > reported) {
+                    reported = current;
+                    progressService?.ProgressCount?.Report(reported);
+                }
+            }
+        }
+        return polygons;
+    }
+}

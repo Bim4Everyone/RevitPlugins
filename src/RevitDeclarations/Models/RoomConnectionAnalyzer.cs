@@ -3,22 +3,14 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using RevitDeclarations.Models.Rooms;
+using RevitDeclarations.Models.Rooms.Separators;
+
 namespace RevitDeclarations.Models;
-internal class RoomConnectionAnalyzer {
-    private readonly ApartmentsProject _project;
-    private readonly PrioritiesConfig _priorities;
-
-    // Мастер-спальни 
-    private IEnumerable<ElementId> _masterBedrooms = [];
-    // Санузлы, относящиеся к мастер спальням
-    private IEnumerable<ElementId> _masterBathrooms = [];
-    // Гардеробные с дверью (разделителем) в жилую комнату. Для УТП Гардеробная
-    private IEnumerable<ElementId> _pantriesWithBedroom = [];
-
-    public RoomConnectionAnalyzer(ApartmentsProject project, PrioritiesConfig priorities) {
-        _project = project;
-        _priorities = priorities;
-    }
+internal class RoomConnectionAnalyzer(ApartmentsProject project, PrioritiesConfig priorities) {
+    private HashSet<ElementId> _masterBedrooms = [];
+    private HashSet<ElementId> _masterBathrooms = [];
+    private HashSet<ElementId> _pantriesWithBedroom = [];
 
     public bool CheckIsMasterBathroom(ElementId roomId) {
         return _masterBathrooms.Contains(roomId);
@@ -33,89 +25,176 @@ internal class RoomConnectionAnalyzer {
     }
 
     public void FindConnections() {
-        IEnumerable<RoomSeparator> doorSeparators = _project
-            .GetDoors()
-            .Select(x => new FamInstanceRoomSeparator(_project, x));
+        // Построение всех разделителей:
+        // 1. Двери: помещение с одной стороны двери + помещение с другой стороны двери.
+        // 2. Room Separation Lines: помещения, границы которых проходят по одной линии разделения и реально пересекаются.
+        
+        var separators = BuildSeparators();
 
-        IEnumerable<RoomSeparator> curveSeparators = _project
-            .GetCurveSeparators()
-            .Select(x => new CurveRoomSeparator(_project, x));
+        // Жилые помещения, соединенные с санузлами
+        var bedroomBathroom = GetRoomsBySeparators(
+            separators,
+            priorities.LivingRoom,
+            priorities.Bathroom);
 
-        var separators = doorSeparators
-            .Concat(curveSeparators)
-            .Where(x => x.CheckIsValid());
+        var bedroomsWithBathroom = bedroomBathroom[priorities.LivingRoom];
 
-        // Словарь с жилыми комнатами, соединенными с СУ и этими СУ
-        var bedroomBathroom = GetRoomsBySeparators(separators, _priorities.LivingRoom, _priorities.Bathroom);
-        // Жилые комнаты, соединенные с санузлами
-        var bedroomsWithBathroom = bedroomBathroom[_priorities.LivingRoom];
+        // Жилые помещения, соединенные с гардеробными
+        var pantryBedroom = GetRoomsBySeparators(
+            separators,
+            priorities.Pantry,
+            priorities.LivingRoom);
 
-        var pantryBedroom = GetRoomsBySeparators(separators, _priorities.Pantry, _priorities.LivingRoom);
-        var pantryBathroom = GetRoomsBySeparators(separators, _priorities.Pantry, _priorities.Bathroom);
-        // Гардеробные, соединенные с жилыми комнатами (не учитываются для УТП Гардеробная)
-        _pantriesWithBedroom = pantryBedroom[_priorities.Pantry];
         // Гардеробные, соединенные с санузлами
-        var pantriesWithBathroom = pantryBathroom[_priorities.Pantry];
+        var pantryBathroom = GetRoomsBySeparators(
+            separators,
+            priorities.Pantry,
+            priorities.Bathroom);
 
-        // Мастер-гардеробные (имеющие дверь в санузел) для определения мастер-спален
-        var masterPantries = _pantriesWithBedroom.Intersect(pantriesWithBathroom).ToList();
+        _pantriesWithBedroom = pantryBedroom[priorities.Pantry].ToHashSet();
+        
+        var pantriesWithBathroom = pantryBathroom[priorities.Pantry].ToHashSet();
 
-        var bedroomPantry = GetRoomsBySeparators(separators, _priorities.LivingRoom, masterPantries);
-        // Жилые комнаты, соединенные с мастер-гардеробными
-        var bedroomsWithPantryAndBathroom = bedroomPantry[_priorities.LivingRoom];
+        // Master pantry - гардеробные, соединенные с жилым помещением с санузлом
+        var masterPantries = _pantriesWithBedroom
+            .Intersect(pantriesWithBathroom)
+            .ToHashSet();
+        
+        // Жилые помещения, соединенные с гардеробными (master pantry)
+        var bedroomPantry = GetRoomsBySeparators(
+            separators, priorities.LivingRoom, masterPantries);
 
-        // Итоговый список мастер-спален
+        var bedroomsWithPantryAndBathroom = bedroomPantry[priorities.LivingRoom];
+        
+        // Master bedroom - жилые помещения, соединенные с гардеробными (master pantry), или жилые помещения, соединенные с санузлом
         _masterBedrooms = bedroomsWithBathroom
             .Concat(bedroomsWithPantryAndBathroom)
-            .ToList();
+            .ToHashSet();
+        
+        // Санузлы, соединенные с жилыми помещениями
+        var bathroomsWithBedroom = bedroomBathroom[priorities.Bathroom];
 
-        var bathroomsWithBedroom = bedroomBathroom[_priorities.Bathroom];
-        var bathroomPantry = GetRoomsBySeparators(separators, _priorities.Bathroom, masterPantries);
-        // Санузлы, соединенные с мастер-гардеробными
-        var bathroomsWithMasterPantry = bathroomPantry[_priorities.Bathroom];
+        // Санузлы, соединенные с жилыми помещениями
+        var bathroomPantry = GetRoomsBySeparators(
+            separators,
+            priorities.Bathroom,
+            masterPantries);
 
-        // Санузлы, относящиеся к мастер-спальням для определение УТП Две ванны
+        var bathroomsWithMasterPantry = bathroomPantry[priorities.Bathroom];
+        
+        // Master bathroom - санузлы, соединенные с гардеробными (master pantry), или санузлы, соединенные с жилым помещением
         _masterBathrooms = bathroomsWithBedroom
             .Concat(bathroomsWithMasterPantry)
-            .ToList();
+            .ToHashSet();
     }
 
-    private Dictionary<RoomPriority, List<ElementId>> GetRoomsBySeparators(IEnumerable<RoomSeparator> separators,
-                                                                           RoomPriority priority1,
-                                                                           RoomPriority priority2) {
-        var roomByNames = new Dictionary<RoomPriority, List<ElementId>>() {
-            [priority1] = [],
-            [priority2] = []
-        };
+    private List<RoomSeparator> BuildSeparators() {
+        // 1. Двери: помещение с одной стороны двери + помещение с другой стороны двери.
+        var doorSeparators = project
+            .GetDoors()
+            .Select(x => new FamInstanceRoomSeparator(project, x))
+            .Where(x => x.CheckIsValid())
+            .Cast<RoomSeparator>()
+            .ToList();
 
-        foreach(var separator in separators) {
-            var room1 = separator.GetRoom(priority1);
-            var room2 = separator.GetRoom(priority2);
-            if(room1 != null && room2 != null) {
-                roomByNames[priority1].Add(room1.Id);
-                roomByNames[priority2].Add(room2.Id);
+        // 2. Room Separation Lines: помещения, границы которых проходят по одной линии разделения и реально пересекаются.
+        var curveSeparators = BuildCurveSeparators();
+
+        doorSeparators.AddRange(curveSeparators);
+        
+        return doorSeparators;
+    }
+
+    private List<RoomSeparator> BuildCurveSeparators() {
+        var curves = project
+            .GetCurveSeparators()
+            .ToList();
+
+        if (curves.Count == 0) {
+            return [];
+        }
+        
+        var boundaryCache = BuildBoundaryCache(curves);
+
+        var result = new List<RoomSeparator>(curves.Count);
+
+        foreach (var curve in curves) {
+            var separator = new CurveRoomSeparator(curve, boundaryCache);
+            
+            if (separator.CheckIsValid()) {
+                result.Add(separator);
             }
         }
 
-        return roomByNames;
+        return result;
     }
 
-    private Dictionary<RoomPriority, List<ElementId>> GetRoomsBySeparators(IEnumerable<RoomSeparator> separators,
-                                                                           RoomPriority priority,
-                                                                           List<ElementId> rooms) {
-        var roomByNames = new Dictionary<RoomPriority, List<ElementId>>() {
+    private RoomBoundaryCache BuildBoundaryCache(IReadOnlyList<CurveElement> curves) {
+        var curveIds = curves
+            .Select(x => x.Id)
+            .ToHashSet();
+
+        var cache = new RoomBoundaryCache();
+        
+        foreach (var room in project.Rooms) {
+            var boundaries = room.GetBoundaries();
+
+            foreach (var boundary in boundaries) {
+                if (!curveIds.Contains(boundary.ElementId)) {
+                    continue;
+                }
+                
+                cache.Add(boundary.ElementId, room.RevitRoom, boundary);
+            }
+        }
+
+        return cache;
+    }
+
+    private static Dictionary<RoomPriority, List<ElementId>> GetRoomsBySeparators(
+        IReadOnlyList<RoomSeparator> separators,
+        RoomPriority priority1,
+        RoomPriority priority2) {
+        
+        var result = new Dictionary<RoomPriority, List<ElementId>> { [priority1] = [], [priority2] = [] };
+
+        foreach (var separator in separators) {
+            var room1 = separator.GetRoom(priority1);
+            var room2 = separator.GetRoom(priority2);
+
+            if (room1 == null || room2 == null) {
+                continue;
+            }
+
+            result[priority1].Add(room1.Id);
+            result[priority2].Add(room2.Id);
+        }
+
+        return result;
+    }
+
+    private static Dictionary<RoomPriority, List<ElementId>> GetRoomsBySeparators(
+        IReadOnlyList<RoomSeparator> separators, RoomPriority priority, HashSet<ElementId> rooms) {
+        
+        var result = new Dictionary<RoomPriority, List<ElementId>> {
             [priority] = []
         };
 
-        foreach(var separator in separators) {
-            if(separator.Rooms.Where(x => rooms.Contains(x.Id)).Any()) {
-                var room = separator.GetRoom(priority);
-                if(room != null) {
-                    roomByNames[priority].Add(room.Id);
-                }
+        foreach (var separator in separators) {
+            bool containsRoom = separator.Rooms
+                .Any(x => rooms.Contains(x.Id));
+
+            if (!containsRoom) {
+                continue;
+            }
+           
+            var room = separator.GetRoom(priority);
+
+            if (room != null) {
+                result[priority].Add(room.Id);
             }
         }
 
-        return roomByNames;
+        return result;
     }
 }

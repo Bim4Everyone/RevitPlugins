@@ -41,7 +41,7 @@ internal sealed class PrintOptionsViewModel : BaseViewModel {
         
         FilePath = printOptions.FilePath;
         PrinterName = PrinterNames
-                          .FirstOrDefault(item => printOptions.PrinterName.Equals(item))
+                          .FirstOrDefault(item => item.Equals(printOptions.PrinterName))
                       ?? PrinterNames.FirstOrDefault();
 
         Zoom = printOptions.Zoom;

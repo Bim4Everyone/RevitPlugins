@@ -34,7 +34,9 @@ namespace RevitMechanicalSpecification {
         }
 
         protected override void Execute(UIApplication uiApplication) {
-            new RevitRepository(uiApplication).SelectedFullRefresh();
+            using(IKernel kernel = RevitMechanicalSpecificationKernel.Create(uiApplication)) {
+                kernel.Get<RevitRepository>().SelectedFullRefresh();
+            }
         }
     }
 }

@@ -42,7 +42,8 @@ internal class RevitRepository {
             }
             var linkType = Document.GetElement(linkLoadResult.ElementId);
             linkType.SetParamValue(BuiltInParameter.WALL_ATTR_ROOM_BOUNDING, 1);
-            RevitLinkInstance.Create(Document, linkLoadResult.ElementId, ImportPlacement.Shared);
+            var instance = RevitLinkInstance.Create(Document, linkLoadResult.ElementId, ImportPlacement.Shared);
+            instance.Pinned = true;
             return true;
         } catch(Autodesk.Revit.Exceptions.InvalidOperationException) {
             error = _localizationService.GetLocalizedString("LinkLoader.Error.Coordinates");

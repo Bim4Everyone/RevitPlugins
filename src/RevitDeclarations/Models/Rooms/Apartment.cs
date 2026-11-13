@@ -4,6 +4,8 @@ using System.Linq;
 
 using pyRevitLabs.Json;
 
+using RevitDeclarations.Comparators;
+
 namespace RevitDeclarations.Models;
 internal class Apartment : RoomGroup {
     // Словарь для группировки помещений, входящих в исходные приоритеты
@@ -20,8 +22,9 @@ internal class Apartment : RoomGroup {
 
     public Apartment(IEnumerable<RoomElement> rooms,
                      DeclarationSettings settings,
-                     RoomParamProvider paramProvider)
-        : base(rooms, settings, paramProvider) {
+                     RoomParamProvider paramProvider, 
+                     RevitLogicalStringComparer logicalStrComparer)
+        : base(rooms, settings, paramProvider, logicalStrComparer) {
         _settings = (ApartmentsSettings) settings;
         _mainRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
         _nonConfigRooms = new Dictionary<string, List<RoomElement>>(_strComparer);
@@ -76,6 +79,14 @@ internal class Apartment : RoomGroup {
     public string UtpLaundry { get; private set; }
     [JsonIgnore]
     public string UtpExtraBalconyArea { get; private set; }
+    [JsonIgnore]
+    public string UtpBalconyWithGlazing { get; private set; }
+    [JsonIgnore]
+    public string UtpBalconyWithoutGlazing { get; private set; }
+    [JsonIgnore]
+    public string ExtraPropSummerRoomsList { get; private set; }
+    [JsonIgnore]
+    public string ExtraPropSummerRoomsFloorDiff { get; private set; }
 
     // Рассчитывает площади квартир на основе актуальных системных площадей помещений
     public void CalculateRevitAreas() {
@@ -179,5 +190,13 @@ internal class Apartment : RoomGroup {
 
         UtpPantry = calculator.CalculatePantry(this);
         UtpLaundry = calculator.CalculateLaundry(this);
+
+        UtpBalconyWithGlazing = calculator.CalculateBalconyWithGlazing(this);
+        UtpBalconyWithoutGlazing = calculator.CalculateBalconyWithoutGlazing(this);
+    }
+
+    public void CalculateExtraApartProps(ExtraApartPropsCalculator calculator) {
+        ExtraPropSummerRoomsList = calculator.CalculateSummerRoomsList(this);
+        ExtraPropSummerRoomsFloorDiff = calculator.CalculateSummerRoomsFloorDiff(this);
     }
 }

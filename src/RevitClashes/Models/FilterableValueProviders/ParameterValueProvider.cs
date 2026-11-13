@@ -70,11 +70,15 @@ internal class ParameterValueProvider : IFilterableValueProvider, IEquatable<Par
     }
 
     public ParamValue GetElementParamValue(Element item) {
+        if(item is null) {
+            return null;
+        }
+
         if(item.IsExistsParam(RevitParam)) {
             return ParamValue.GetParamValue(RevitParam, item);
         } else {
             var typeId = item.GetTypeId();
-            if(typeId != null) {
+            if(typeId.IsNotNull()) {
                 var type = item.Document.GetElement(typeId);
                 if(type.IsExistsParam(RevitParam)) {
                     return ParamValue.GetParamValue(RevitParam, type);

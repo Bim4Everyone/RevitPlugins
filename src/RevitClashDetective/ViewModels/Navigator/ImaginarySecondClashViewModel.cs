@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Dynamic;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitClashDetective.Models;
@@ -19,10 +23,20 @@ internal class ImaginarySecondClashViewModel
     : BaseViewModel, IClashViewModel, IEquatable<ImaginarySecondClashViewModel> {
     private readonly RevitRepository _revitRepository;
     private readonly ElementViewModel _secondElement;
+    private bool _visited;
 
-    public ImaginarySecondClashViewModel(RevitRepository revitRepository, ElementViewModel secondElement) {
+    public ImaginarySecondClashViewModel(
+        RevitRepository revitRepository,
+        ElementViewModel secondElement,
+        ILocalizationService localizationService) {
+        if(localizationService == null) {
+            throw new ArgumentNullException(nameof(localizationService));
+        }
+
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
         _secondElement = secondElement ?? throw new ArgumentNullException(nameof(secondElement));
+        ClashStatusName = localizationService.GetLocalizedString(
+            $"{nameof(RevitClashDetective.Models.Clashes.ClashStatus)}.{ClashStatus}");
         SecondElementVolume = secondElement.ElementVolume;
 
         SecondId = _secondElement.Element.Id;
@@ -33,10 +47,32 @@ internal class ImaginarySecondClashViewModel
         SecondLevel = _secondElement.Element.Level;
         FirstElementParams = new ExpandoObject();
         SecondElementParams = new ExpandoObject();
+
+        AddCommentCommand = RelayCommand.Create(() => { }, () => false);
+        RemoveCommentCommand = RelayCommand.Create(() => { }, () => false);
     }
+
+    public ICommand AddCommentCommand { get; }
+    public ICommand RemoveCommentCommand { get; }
+
+    public ClashCommentViewModel SelectedComment {
+        get => null;
+        set { return; }
+    }
+
+    public bool CanEditComments {
+        get => false;
+        set { return; }
+    }
+
+    public string CommentsTitle => ClashName;
+
+    public ObservableCollection<ClashCommentViewModel> Comments { get; } = [];
 
 
     public ClashStatus ClashStatus { get => ClashStatus.Imaginary; set { return; } }
+
+    public string ClashStatusName { get; }
 
     public string ClashName { get => string.Empty; set { return; } }
 
@@ -79,6 +115,11 @@ internal class ImaginarySecondClashViewModel
     public double SecondElementVolume { get; }
 
     public bool ClashDataIsValid => true;
+
+    public bool Visited {
+        get => _visited;
+        set => RaiseAndSetIfChanged(ref _visited, value);
+    }
 
 
     public ElementModel GetFirstElement() {

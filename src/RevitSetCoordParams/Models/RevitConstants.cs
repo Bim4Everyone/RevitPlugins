@@ -11,6 +11,8 @@ namespace RevitSetCoordParams.Models;
 internal static class RevitConstants {
     // Начальный диаметр сферы в миллиметрах
     public static double StartDiameterSearchSphereMm = 30;
+    // Длина линии для пересечения
+    public static double IntersectCurveLengthMm = 30;
     // Средне-статистическое максимальное расстояние от удаленных элементов в моделях
     public const double MaxDiameterSearchSphereMm = 2000;
     // Наиболее оптимальный шаг увеличения поисковой сферы
@@ -19,21 +21,15 @@ internal static class RevitConstants {
     public const bool Search = true;
     // Самое распространенное значения для записи координат
     public const string TypeModel = "Координаты СМР";
-    // Ключевое слово, для фильтрации объемных элементов
-    public const string TypeModelPartName = "СМР";
     // Имя рабочего набора, элементы которого не будут обработаны
     public const string WorksetExcludeName = "99_Немоделируемые элементы";
     // Ключевая строка, по которому ищется координационный файл
     public const string CoordFilePartName = "KOORD";
-    // Параметр, значения которого используется дли идентификации объемных элементов
-    public static RevitParam SourceVolumeParam = SharedParamsConfig.Instance.Description;
-    // Категория объемных элементов
-    public static BuiltInCategory SourceVolumeCategory = BuiltInCategory.OST_GenericModel;
 
-
-    // Утвержденные категории, которые используются в проектах разных дисциплин
-    private static readonly List<BuiltInCategory> _allCategories = [
+    // Утвержденные категории верхнего уровня
+    private static readonly ICollection<BuiltInCategory> _allCategories = [
         BuiltInCategory.OST_CableTray,
+        BuiltInCategory.OST_CableTrayFitting,
         BuiltInCategory.OST_Casework,
         BuiltInCategory.OST_Ceilings,
         BuiltInCategory.OST_Curtain_Systems,
@@ -41,15 +37,21 @@ internal static class RevitConstants {
         BuiltInCategory.OST_CurtainWallPanels,
         BuiltInCategory.OST_CommunicationDevices,
         BuiltInCategory.OST_Conduit,
-        BuiltInCategory.OST_CurtainWallPanels,
         BuiltInCategory.OST_Doors,
         BuiltInCategory.OST_DuctCurves,
         BuiltInCategory.OST_DuctFitting,
         BuiltInCategory.OST_DuctAccessory,
         BuiltInCategory.OST_DuctInsulations,
+        BuiltInCategory.OST_DuctFittingInsulation,
+        BuiltInCategory.OST_DuctCurvesInsulation,
+        BuiltInCategory.OST_FlexPipeCurves,
+        BuiltInCategory.OST_FlexPipeCurvesInsulation,
+        BuiltInCategory.OST_FlexDuctCurves,
+        BuiltInCategory.OST_FlexDuctCurvesInsulation,
         BuiltInCategory.OST_DuctTerminal,
         BuiltInCategory.OST_ElectricalEquipment,
         BuiltInCategory.OST_ElectricalFixtures,
+        BuiltInCategory.OST_FireAlarmDevices,
         BuiltInCategory.OST_Floors,
         BuiltInCategory.OST_Furniture,
         BuiltInCategory.OST_FurnitureSystems,
@@ -63,6 +65,9 @@ internal static class RevitConstants {
         BuiltInCategory.OST_PipeFitting,
         BuiltInCategory.OST_PipeAccessory,
         BuiltInCategory.OST_PipeInsulations,
+        BuiltInCategory.OST_PipeFittingInsulation,
+        BuiltInCategory.OST_PipeCurvesInsulation,
+        BuiltInCategory.OST_FlexPipeCurvesInsulation,
         BuiltInCategory.OST_Parking,
         BuiltInCategory.OST_Planting,
         BuiltInCategory.OST_PlumbingFixtures,
@@ -82,46 +87,102 @@ internal static class RevitConstants {
         BuiltInCategory.OST_Walls,
         BuiltInCategory.OST_Windows];
 
-    // Утвержденные карты параметров, которые используются в проектах разных дисциплин
-    private static readonly List<ParamMap> _allParamMaps = [
-        new ParamMap {
-            Type = ParamType.BlockParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksBlock,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksBlock
-        },
-        new ParamMap {
-            Type = ParamType.SectionParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksSection,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksSection
-        },
-        new ParamMap {
-            Type = ParamType.FloorParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksLevel,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksLevel
-        },
-        new ParamMap {
-            Type = ParamType.FloorDEParam,
-            SourceParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency,
-            TargetParam = SharedParamsConfig.Instance.BuildingWorksLevelCurrency
-        },
-        new ParamMap {
-            Type = ParamType.BlockingParam,
-            SourceParam = null,
-            TargetParam = SharedParamsConfig.Instance.FixBuildingWorks
-        },
-    ];
+    // Параметр, значения которого используется дли идентификации объемных элементов
+    public static RevitParam SourceVolumeParam => SharedParamsConfig.Instance?.BuildingWorksDescription;
+
+    // Категория объемных элементов
+    public static BuiltInCategory SourceVolumeCategory => BuiltInCategory.OST_GenericModel;
 
     /// <summary>
-    /// Метод получения карты параметров
-    /// </summary>
-    public static List<ParamMap> GetDefaultParamMaps() {
-        return _allParamMaps;
+    /// Метод получения параметра ФОП_Блок СМР
+    /// </summary>  
+    public static ParamMap GetBlockParamMap() {
+        var instance = SharedParamsConfig.Instance;
+        return new ParamMap {
+            Type = ParamType.BlockParam,
+            SourceParam = instance?.BuildingWorksBlock,
+            TargetParam = instance?.BuildingWorksBlock
+        };
     }
 
     /// <summary>
-    /// Метод получения категорий
+    /// Метод получения параметра ФОП_Секция СМР
+    /// </summary>  
+    public static ParamMap GetSectionParamMap() {
+        var instance = SharedParamsConfig.Instance;
+        return new ParamMap {
+            Type = ParamType.SectionParam,
+            SourceParam = instance?.BuildingWorksSection,
+            TargetParam = instance?.BuildingWorksSection
+        };
+    }
+
+    /// <summary>
+    /// Метод получения параметра ФОП_Этаж СМР
+    /// </summary>  
+    public static ParamMap GetFloorParamMap() {
+        var instance = SharedParamsConfig.Instance;
+        return new ParamMap {
+            Type = ParamType.FloorParam,
+            SourceParam = instance?.BuildingWorksLevel,
+            TargetParam = instance?.BuildingWorksLevel
+        };
+    }
+
+    /// <summary>
+    /// Метод получения параметра ФОП_Этаж СМР_ДЕ
+    /// </summary>  
+    public static ParamMap GetFloorDEParamMap() {
+        var instance = SharedParamsConfig.Instance;
+        return new ParamMap {
+            Type = ParamType.FloorDEParam,
+            SourceParam = instance?.BuildingWorksLevelCurrency,
+            TargetParam = instance?.BuildingWorksLevelCurrency
+        };
+    }
+
+    /// <summary>
+    /// Метод получения параметра ФОП_Зона СМР
+    /// </summary>  
+    public static ParamMap GetZoneParamMap() {
+        var instance = SharedParamsConfig.Instance;
+        return new ParamMap {
+            Type = ParamType.ZoneParam,
+            SourceParam = instance?.BuildingWorksZone,
+            TargetParam = instance?.BuildingWorksZone
+        };
+    }
+
+    /// <summary>
+    /// Метод получения параметра ФОП_Фиксация координаты СМР
+    /// </summary>  
+    public static ParamMap GetBlockingParamMap() {
+        var instance = SharedParamsConfig.Instance;
+        return new ParamMap {
+            Type = ParamType.BlockingParam,
+            SourceParam = null,
+            TargetParam = instance?.FixBuildingWorks
+        };
+    }
+
+    /// <summary>
+    /// Метод получения списка всех параметров
     /// </summary>
-    public static List<BuiltInCategory> GetDefaultBuiltInCategories() {
+    public static List<ParamMap> GetDefaultParamMaps() {
+        return [
+            GetBlockParamMap(),
+            GetSectionParamMap(),
+            GetFloorParamMap(),
+            GetFloorDEParamMap(),
+            GetZoneParamMap(),
+            GetBlockingParamMap()
+        ];
+    }
+
+    /// <summary>
+    /// Метод получения всех категорий
+    /// </summary>
+    public static ICollection<BuiltInCategory> GetDefaultBuiltInCategories() {
         return _allCategories;
     }
 }

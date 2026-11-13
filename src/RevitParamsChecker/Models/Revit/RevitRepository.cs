@@ -1,0 +1,144 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+
+using Bim4Everyone.RevitFiltration;
+using Bim4Everyone.RevitFiltration.Controls;
+using Bim4Everyone.RevitFiltration.Extensions.Materials;
+
+using RevitParamsChecker.Models.Filtration;
+
+namespace RevitParamsChecker.Models.Revit;
+
+internal class RevitRepository {
+    private readonly IFilterContextParser _filterParser;
+    private readonly ILogicalFilterFactory _filterFactory;
+    private DocumentModel[] _documentsCache;
+    private readonly Bim4Everyone.RevitFiltration.Options _filterBuildOptions = new() { Tolerance = 0.001 };
+    private readonly MaterialOptions _materialsBuildOptions = new() { Tolerance = 0.001 };
+
+    public RevitRepository(
+        UIApplication uiApplication,
+        IFilterContextParser filterParser,
+        ILogicalFilterFactory filterFactory) {
+        _filterParser = filterParser ?? throw new ArgumentNullException(nameof(filterParser));
+        _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
+        UIApplication = uiApplication ?? throw new ArgumentNullException(nameof(uiApplication));
+    }
+
+    public UIApplication UIApplication { get; }
+
+    public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
+
+    public Application Application => UIApplication.Application;
+
+    public Document Document => ActiveUIDocument.Document;
+
+    /// <summary>
+    /// Возвращает коллекцию документов, имеющих отношение к активному документу.
+    /// </summary>
+    /// <returns>Активный документ и все загруженные связи, по одному экземпляру связи каждого типоразмера связи, если они продублированы.</returns>
+    public DocumentModel[] GetDocuments() {
+        return _documentsCache ??= [
+            new DocumentModel(Document), ..GetRevitLinkInstances().Select(l => new DocumentModel(l))
+        ];
+    }
+
+    /// <summary>
+    /// Возвращает документ по имени без учета регистра
+    /// </summary>
+    /// <param name="name">Название документа</param>
+    public DocumentModel GetDocument(string name) {
+        return GetDocuments()
+            .FirstOrDefault(d => d.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+    }
+
+    public ICollection<ElementModel> GetElements(DocumentModel doc, Filter filter) {
+        bool success = _filterParser.TryParse(filter.FilterContext, out var context);
+        if(!success) {
+            throw new InvalidOperationException(filter.Name);
+        }
+
+        var paramsFilter = context!.GetFilter().Build(doc.Document, _filterBuildOptions);
+        var categoriesFilter = new ElementMulticategoryFilter(context.SelectedCategories);
+        var materialsFilter = GetMaterialsFilter(doc.Document, filter.MaterialsFilterContext);
+        return new FilteredElementCollector(doc.Document)
+            .WhereElementIsNotElementType()
+            .WherePasses(categoriesFilter)
+            .WherePasses(paramsFilter)
+            .PassesFilter(materialsFilter)
+            .Select(e => new ElementModel(
+                e,
+                doc.IsLink ? new Reference(e).CreateLinkReference(doc.Link) : new Reference(e)))
+            .ToArray();
+    }
+
+    public ICollection<Material> GetElementMaterials(Element element) {
+        if(element is null) {
+            throw new ArgumentNullException(nameof(element));
+        }
+
+        var doc = element.Document;
+        var ids = new HashSet<ElementId>();
+        foreach(var id in element.GetMaterialIds(false)) {
+            ids.Add(id);
+        }
+
+        foreach(var id in element.GetMaterialIds(true)) {
+            ids.Add(id);
+        }
+
+        List<Material> materials = [];
+        foreach(var id in ids) {
+            if(doc.GetElement(id) is Material m) {
+                materials.Add(m);
+            }
+        }
+
+        return materials;
+    }
+
+    public void SelectElements(ICollection<ElementModel> elements) {
+#if REVIT_2023_OR_GREATER
+        ActiveUIDocument.Selection.SetReferences(elements.Select(e => e.Reference).ToArray());
+#else
+        ActiveUIDocument.Selection.SetElementIds(
+            elements.Where(e =>
+                    e.Element.Document.Title.Equals(Document.Title, StringComparison.CurrentCultureIgnoreCase))
+                .Select(e => e.Element.Id)
+                .ToArray());
+#endif
+    }
+
+    /// <summary>
+    /// Создает фильтр элементов по параметрам их материалов.
+    /// </summary>
+    /// <param name="doc">Документ, в котором отбираются материалы.</param>
+    /// <param name="serializedContext">Сериализованный контекст фильтра по материалам.</param>
+    /// <returns>
+    /// Фильтр по материалам. Если контекст не задан либо его не удалось прочитать,
+    /// возвращается фильтр без правил, пропускающий все элементы.
+    /// </returns>
+    private MaterialsFilter GetMaterialsFilter(Document doc, string serializedContext) {
+        if(!string.IsNullOrWhiteSpace(serializedContext)
+           && _filterParser.TryParse(serializedContext, out var context)) {
+            return context!.GetFilter().BuildMaterialsFilter(doc, _materialsBuildOptions);
+        }
+
+        return _filterFactory.CreateAndFilter().BuildMaterialsFilter(doc, _materialsBuildOptions);
+    }
+
+    private ICollection<RevitLinkInstance> GetRevitLinkInstances() {
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(RevitLinkInstance))
+            .OfType<RevitLinkInstance>()
+            .Where(item => item.GetLinkDocument() != null)
+            .GroupBy(l => l.GetLinkDocument().Title)
+            .Select(g => g.First())
+            .ToArray();
+    }
+}

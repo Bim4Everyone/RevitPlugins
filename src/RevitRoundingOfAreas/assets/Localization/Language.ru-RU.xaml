@@ -1,0 +1,50 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Рассчитать площади (соц. объекты)</system:String>
+    <system:String x:Key="MainWindow.RangeElements">Диапазон обработки элементов модели</system:String>
+    <system:String x:Key="MainWindow.RangeElementsDescription">Выбор варианта обработки элементов модели</system:String>
+
+    <system:String x:Key="MainWindow.Phase">Стадия помещений</system:String>
+    <system:String x:Key="MainWindow.PhaseDescription">Выбор стадии для обрабатываемых помещений</system:String>
+
+    <system:String x:Key="MainWindow.SourceParam">Параметр для чтения</system:String>
+    <system:String x:Key="MainWindow.SourceParamDescription">Параметр, с которого будет считываться площадь</system:String>
+
+    <system:String x:Key="MainWindow.TargetParam">Параметр для записи</system:String>
+    <system:String x:Key="MainWindow.TargetParamDescription">Параметр, в который будет записываться площадь</system:String>
+
+    <system:String x:Key="MainWindow.Accuracy">Количество знаков после запятой</system:String>
+    <system:String x:Key="MainWindow.AccuracyDescription">До которого будет происходить округление</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">Рассчитать</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+
+    <system:String x:Key="MainViewModel.AllElementsProvider">Все элементы</system:String>
+    <system:String x:Key="MainViewModel.SelectedElementsProvider">Выделенные</system:String>
+    <system:String x:Key="MainViewModel.CurrentViewProvider">Видимые на виде</system:String>
+    
+    <system:String x:Key="MainViewModel.TransactionName">Расчёт площадей (соц. объекты)</system:String>
+
+    <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+
+    <system:String x:Key="WarningsViewModel.Redundant">Избыточные зоны</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Зоны, находящиеся в одной окруженной области</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Не окруженные зоны / Не размещенные зоны</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Зоны, не имеющие границ или не размещенные на плане</system:String>
+
+    <system:String x:Key="MainViewModel.NoSelection">Не выделены помещения</system:String>
+    <system:String x:Key="MainViewModel.NoRoomsOnView">Нет помещений на виде</system:String>
+
+    <system:String x:Key="RevitRepository.NoLevel"> - Нет уровня - </system:String>
+
+    <system:String x:Key="WarningWindow.Title">Рассчитать площади (соц. объекты) - предупреждения</system:String>
+    
+    <system:String x:Key="WarningWindow.ShowHeader">Выделить</system:String>
+    <system:String x:Key="WarningWindow.ElementIdHeader">ИД помещения</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Имя помещения</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Уровень помещения</system:String>
+    
+</ResourceDictionary>

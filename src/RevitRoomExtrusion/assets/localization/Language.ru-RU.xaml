@@ -5,7 +5,7 @@
     <system:String x:Key="FamilyDocument.TransactionName">Категория, выдавливание, материал</system:String>
     <system:String x:Key="FamilyDocument.MaterialName">стекло</system:String>
     <system:String x:Key="FamilyDocument.FamilyName">{0}Држ_Проверка_{1}_Отм.{2}{3}</system:String>
-    <system:String x:Key="FamilyDocument.TemplateFamilyName">{0}\Метрическая система, типовая модель.rft</system:String>
+    <system:String x:Key="FamilyDocument.TemplateFamilyName">Метрическая система, типовая модель.rft</system:String>
 
     <system:String x:Key="InstanceManager.TransactionName">Выдавливание помещений</system:String>   
 
@@ -44,5 +44,7 @@
     <system:String x:Key="MainWindow.NameError">Имя содержит недопустимые символы</system:String>
     <system:String x:Key="Command.MessegeBody">Пожалуйста, выберите помещения</system:String>
     <system:String x:Key="Command.MessegeTitle">Ошибка выбора</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+    <system:String x:Key="Common.ConfigErrorNoFamily">Отсутствует шаблон семейства:  {0}  по пути:  {1}</system:String>
 
 </ResourceDictionary>

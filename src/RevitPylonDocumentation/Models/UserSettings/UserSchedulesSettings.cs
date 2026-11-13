@@ -1,17 +1,17 @@
-using System.Collections.ObjectModel;
+using Autodesk.Revit.DB;
 
 namespace RevitPylonDocumentation.Models.UserSettings;
 internal class UserSchedulesSettings {
+    public string SkeletonSchedulePrefix { get; set; }
+    public string SkeletonScheduleSuffix { get; set; }
+    public string SkeletonByElemsSchedulePrefix { get; set; }
+    public string SkeletonByElemsScheduleSuffix { get; set; }
     public string MaterialSchedulePrefix { get; set; }
     public string MaterialScheduleSuffix { get; set; }
     public string SystemPartsSchedulePrefix { get; set; }
     public string SystemPartsScheduleSuffix { get; set; }
     public string IfcPartsSchedulePrefix { get; set; }
     public string IfcPartsScheduleSuffix { get; set; }
-    public string SkeletonSchedulePrefix { get; set; }
-    public string SkeletonScheduleSuffix { get; set; }
-    public string SkeletonByElemsSchedulePrefix { get; set; }
-    public string SkeletonByElemsScheduleSuffix { get; set; }
     public string SkeletonScheduleName { get; set; }
     public string SkeletonByElemsScheduleName { get; set; }
     public string MaterialScheduleName { get; set; }
@@ -27,5 +27,29 @@ internal class UserSchedulesSettings {
     public string IfcPartsScheduleDisp2 { get; set; }
     public string SkeletonScheduleDisp2 { get; set; }
     public string SkeletonByElemsScheduleDisp2 { get; set; }
-    public ObservableCollection<ScheduleFilterParamHelper> ParamsForScheduleFilters { get; set; } = [];
+
+    /// <summary>
+    /// Эталонная спецификация арматуры
+    /// </summary>
+    public ViewSchedule SelectedSkeletonSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная спецификация арматуры
+    /// </summary>
+    public ViewSchedule SelectedSkeletonByElemsSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная спецификация материалов
+    /// </summary>
+    public ViewSchedule SelectedMaterialSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная ведомость деталей для системной арматуры
+    /// </summary>
+    public ViewSchedule SelectedSystemPartsSchedule { get; set; }
+
+    /// <summary>
+    /// Эталонная ведомость деталей для IFC арматуры
+    /// </summary>
+    public ViewSchedule SelectedIfcPartsSchedule { get; set; }
 }

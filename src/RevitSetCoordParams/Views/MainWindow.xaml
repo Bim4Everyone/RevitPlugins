@@ -14,19 +14,15 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
     xmlns:wpfbehaviors="clr-namespace:dosymep.WpfCore.Behaviors;assembly=dosymep.WpfCore"
-   
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    
-    Height="710"
+    Height="810"
     Width="900"
-    
-    MinHeight="710"
+    MinHeight="810"
     MinWidth="900"
-   
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
-    <i:Interaction.Behaviors>        
+    <i:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding ProgressDialogFactory}" />
     </i:Interaction.Behaviors>
@@ -36,45 +32,50 @@
             x:Key="CategoryWarningIconVisible"
             TrueValue="Visible"
             FalseValue="Collapsed" />
-        
+
         <converters:BoolToVisibilityConverter
             x:Key="ParamWarningIconVisible"
             TrueValue="Visible"
             FalseValue="Collapsed" />
-        
+
         <Style
             TargetType="ToolTip">
             <Setter
                 Property="MaxWidth"
-                Value="500" />            
-        </Style>        
+                Value="500" />
+        </Style>
     </Window.Resources>
 
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
+        <i:EventTrigger
+            EventName="Loaded">
+            <i:InvokeCommandAction
+                Command="{Binding LoadViewCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <ui:TitleBar
             Grid.Row="0"
             Icon="{ui:SymbolIcon clipboardTaskListLtr24, FontSize=20}"
-            Title="{me:LocalizationSource MainWindow.Title}" 
+            Title="{me:LocalizationSource MainWindow.Title}"
             FontSize="14"
-            FontWeight="DemiBold"/>        
+            FontWeight="DemiBold"/>
 
         <ScrollViewer
             Grid.Row="1"
             VerticalScrollBarVisibility="Auto"
             HorizontalScrollBarVisibility="Disabled">
-            
+
             <StackPanel
                 Margin="10">
 
@@ -100,25 +101,93 @@
                         DisplayMemberPath="FileName"/>
                 </edits:CustomEditControl>
 
-                <edits:CustomEditControl
+                <edits:CustomGroupEditControl
                     Icon="{ui:SymbolIcon grid24}"
                     Header="{me:LocalizationSource MainWindow.TypeModels}"
-                    Description="{me:LocalizationSource MainWindow.TypeModelsDescription}">
+                    Description="{me:LocalizationSource MainWindow.TypeModelsDescription}"
+                    ExtraIconVisible="False">
+                    <edits:CustomGroupEditControl.EditControl>
+                        <StackPanel>
+                            <Border
+                                Margin="5"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                Background="{DynamicResource CardBackground}"
+                                BorderBrush="{DynamicResource CardBorderBrush}"
+                                CornerRadius="{DynamicResource ControlCornerRadius}"
+                                BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                                    <RadioButton
+                                        Margin="20,0,0,0"
+                                        GroupName="Choise"
+                                        Content="{me:LocalizationSource MainWindow.CheckedAllTypeModels}"
+                                        IsChecked="{Binding IsCheckedAllTypeModels, Mode=TwoWay}"
+                                        Command="{Binding CheckAllTypeModelsCommand}" />
+                                    <RadioButton
+                                        Margin="20,0,0,0"
+                                        GroupName="Choise"
+                                        Content="{me:LocalizationSource MainWindow.NotCheckedAllTypeModels}"
+                                        Command="{Binding UncheckAllTypeModelsCommand}" />
+                                </StackPanel>
+                            </Border>
+                            <ui:AutoSuggestBox
+                                Margin="5,0,5,20"
+                                Icon="{ui:SymbolIcon Search24}"
+                                Text="{Binding SearchTextTypeModels, Mode=TwoWay}"
+                                PlaceholderText="{me:LocalizationSource MainWindow.SearchTextTypeModels}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger
+                                        EventName="TextChanged">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding SearchTypeModelsCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </ui:AutoSuggestBox>
+                            <ItemsControl
+                                ItemsSource="{Binding FilteredTypeModels}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate
+                                        DataType="{x:Type vms:TypeModelViewModel}">
+                                        <edits:ItemControl
+                                            ItemName="{Binding Name}"
+                                            IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                            HasWarning="False" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
 
-                    <ComboBox
-                        ItemsSource="{Binding TypeModels}"
-                        SelectedValue="{Binding SelectedTypeModel}"
-                        DisplayMemberPath="Name" />
-                </edits:CustomEditControl>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid
+                                            Columns="3" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </StackPanel>
+                    </edits:CustomGroupEditControl.EditControl>
+                </edits:CustomGroupEditControl>
 
                 <edits:CustomEditControl
                     Icon="{ui:SymbolIcon fullScreenMinimize24}"
                     Header="{me:LocalizationSource MainWindow.Positions}"
                     Description="{me:LocalizationSource MainWindow.PositionsDescription}">
-                    
+
                     <ComboBox
                         ItemsSource="{Binding Positions}"
                         SelectedValue="{Binding SelectedPosition}"
+                        DisplayMemberPath="Name" />
+                </edits:CustomEditControl>
+
+                <edits:CustomEditControl
+                    Icon="{ui:SymbolIcon shortpick24}"
+                    Header="{me:LocalizationSource MainWindow.DependentProcessViewModels}"
+                    Description="{me:LocalizationSource MainWindow.DependentProcessViewModelsDescription}">
+
+                    <ComboBox
+                        ItemsSource="{Binding DependentProcessViewModels}"
+                        SelectedValue="{Binding SelectedDependentProcessViewModel}"
                         DisplayMemberPath="Name" />
                 </edits:CustomEditControl>
 
@@ -153,7 +222,7 @@
                                         WarningDescription="{Binding Warnings}"/>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
-                            
+
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel />
@@ -161,16 +230,15 @@
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>
                     </edits:CustomGroupEditControl.EditControl>
-
                 </edits:CustomGroupEditControl>
 
                 <edits:CustomGroupEditControl
-                    Icon="{ui:SymbolIcon form24}"                     
+                    Icon="{ui:SymbolIcon form24}"
                     Header="{me:LocalizationSource MainWindow.Categories}"
                     Description="{me:LocalizationSource MainWindow.CategoriesDescription}"
-                    ExtraIconVisible="True">                    
+                    ExtraIconVisible="True">
                     <edits:CustomGroupEditControl.ExtraIcon>
-                        <ui:SymbolIcon                            
+                        <ui:SymbolIcon
                             Symbol="Warning24"
                             Foreground="OrangeRed"
                             FontSize="24"
@@ -195,24 +263,24 @@
                                     <RadioButton
                                         Margin="20,0,0,0"
                                         GroupName="Choise"
-                                        Content="{me:LocalizationSource MainWindow.CheckedAllCats}"                                        
+                                        Content="{me:LocalizationSource MainWindow.CheckedAllCats}"
                                         IsChecked="{Binding IsCheckedAllCats, Mode=TwoWay}"
                                         Command="{Binding CheckAllCatsCommand}" />
                                     <RadioButton
                                         Margin="20,0,0,0"
                                         GroupName="Choise"
-                                        Content="{me:LocalizationSource MainWindow.NotCheckedAllCats}"                                        
+                                        Content="{me:LocalizationSource MainWindow.NotCheckedAllCats}"
                                         Command="{Binding UncheckAllCatsCommand}" />
                                 </StackPanel>
                             </Border>
-                            
+
                             <ItemsControl
                                 ItemsSource="{Binding Categories}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate
                                         DataType="{x:Type vms:CategoryViewModel}">
-                                        <edits:CategoryControl
-                                            CategoryName="{Binding CategoryName}"
+                                        <edits:ItemControl
+                                            ItemName="{Binding CategoryName}"
                                             IsChecked="{Binding IsChecked, Mode=TwoWay}"
                                             HasWarning="{Binding HasWarning, Mode=TwoWay}"
                                             WarningDescription="{Binding Warnings}" />
@@ -226,21 +294,21 @@
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
-                        </StackPanel>                        
-                    </edits:CustomGroupEditControl.EditControl> 
+                        </StackPanel>
+                    </edits:CustomGroupEditControl.EditControl>
                 </edits:CustomGroupEditControl>
-                
-                <edits:CustomGroupEditControl                    
+
+                <edits:CustomGroupEditControl
                     Icon="{ui:SymbolIcon search24}"
                     Header="{me:LocalizationSource MainWindow.Search}"
-                    Description="{me:LocalizationSource MainWindow.SearchDescription}"                    
+                    Description="{me:LocalizationSource MainWindow.SearchDescription}"
                     ToggleSwitchVisible="True"
                     IsChecked="{Binding Search, Mode=TwoWay}"
                     SwitchOnContent="{me:LocalizationSource MainWindow.SearchToggleSwitchOn}"
                     SwitchOffContent="{me:LocalizationSource MainWindow.SearchToggleSwitchOff}">
 
                     <StackPanel>
-                        
+
                         <edits:CustomEditControl
                             Icon="{ui:SymbolIcon addCircle24}"
                             Header="{me:LocalizationSource MainWindow.MaxDiameterSearchSphere}"
@@ -259,11 +327,11 @@
                             <ui:TextBox
                                 Text="{Binding StepDiameterSearchSphereMm, UpdateSourceTrigger=PropertyChanged}"
                                 ToolTip="{me:LocalizationSource MainWindow.StepSearchSphereTooltip}" />
-                        </edits:CustomEditControl>                        
-                    </StackPanel>                    
-                </edits:CustomGroupEditControl>                
-            </StackPanel>            
-        </ScrollViewer>        
+                        </edits:CustomEditControl>
+                    </StackPanel>
+                </edits:CustomGroupEditControl>
+            </StackPanel>
+        </ScrollViewer>
 
         <StackPanel
             Grid.Row="2"
@@ -290,7 +358,7 @@
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
-            
-        </StackPanel>        
-    </Grid>    
+
+        </StackPanel>
+    </Grid>
 </core:WpfUIPlatformWindow>

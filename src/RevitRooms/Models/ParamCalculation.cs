@@ -20,7 +20,14 @@ internal abstract class ParamCalculation<T> {
 #if REVIT_2020_OR_LESS
 
     protected static double ConvertValueToSquareMeters(double? value, int accuracy) {
-        return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, DisplayUnitType.DUT_SQUARE_METERS), accuracy, MidpointRounding.AwayFromZero) : 0;
+double step = Math.Pow(10, -accuracy); // Зависимость от знаков после запятой
+        double eps  = step / 1000.0; // Погрешность
+        return value.HasValue 
+            ? Math.Round(
+                UnitUtils.ConvertFromInternalUnits(value.Value, DisplayUnitType.DUT_SQUARE_METERS) + eps,
+                accuracy, 
+                MidpointRounding.AwayFromZero) 
+            : 0;
     }
 
     protected static double ConvertValueToInternalUnits(double value) {
@@ -30,7 +37,14 @@ internal abstract class ParamCalculation<T> {
 #else
 
     protected double ConvertValueToSquareMeters(double? value, int accuracy) {
-        return value.HasValue ? Math.Round(UnitUtils.ConvertFromInternalUnits(value.Value, UnitTypeId.SquareMeters), accuracy, MidpointRounding.AwayFromZero) : 0;
+        double step = Math.Pow(10, -accuracy); // Зависимость от знаков после запятой
+        double eps  = step / 1000.0; // Погрешность
+        return value.HasValue 
+            ? Math.Round(
+                UnitUtils.ConvertFromInternalUnits(value.Value, UnitTypeId.SquareMeters) + eps, 
+                accuracy, 
+                MidpointRounding.AwayFromZero) 
+            : 0;
     }
 
     protected double ConvertValueToInternalUnits(double value) {

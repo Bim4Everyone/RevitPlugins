@@ -1,0 +1,18 @@
+name: publish RevitBuildCoordVolumes
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [ closed, synchronize, review_requested ]
+    branches: [ main, master ]
+    paths:
+      - '**RevitBuildCoordVolumes**.cs'
+      - '**RevitBuildCoordVolumes**.xaml'
+      - '**RevitBuildCoordVolumes**.csproj'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-plugin.yml
+    with:
+      plugin-name: "RevitBuildCoordVolumes"
+    secrets: inherit

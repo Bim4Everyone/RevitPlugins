@@ -8,6 +8,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI.Selection;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
@@ -18,27 +19,35 @@ namespace RevitRemoveRoomTags.ViewModels;
 internal class MainViewModel : BaseViewModel {
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
+    private readonly ILocalizationService _localizationService;
 
+    private MainWindow _userWindow;
     private ObservableCollection<View> _selectedViews = [];
-    private ObservableCollection<RoomTagTaskHelper> _roomTagTasks = [new RoomTagTaskHelper()];
-    private RoomTagTaskHelper _selectedRoomTagTask;
+    private ObservableCollection<RoomTagTaskVM> _roomTagTasks = [];
+    private RoomTagTaskVM _selectedRoomTagTask;
     private bool _needOpenSelectedViews = false;
 
     private string _errorText;
     private string _errorTextFromGUI;
 
 
-    public MainViewModel(PluginConfig pluginConfig, RevitRepository revitRepository) {
+    public MainViewModel(
+        PluginConfig pluginConfig,
+        RevitRepository revitRepository,
+        ILocalizationService localizationService) {
         _pluginConfig = pluginConfig;
         _revitRepository = revitRepository;
+        _localizationService = localizationService;
 
-        LoadViewCommand = RelayCommand.Create(LoadView);
+        RoomTagTasks.Add(new RoomTagTaskVM(_localizationService));
+
+        LoadViewCommand = RelayCommand.Create<MainWindow>(LoadView);
         AcceptViewCommand = RelayCommand.Create(AcceptView, CanAcceptView);
 
         AddTaskCommand = RelayCommand.Create(AddTask);
         DeleteTaskCommand = RelayCommand.Create(DeleteTask, CanDeleteTask);
 
-        SelectRoomTagsCommand = new RelayCommand(SelectRoomTags);
+        SelectRoomTagsCommand = new RelayCommand<RoomTagTaskVM>(SelectRoomTags);
     }
 
     public ICommand LoadViewCommand { get; }
@@ -49,17 +58,22 @@ internal class MainViewModel : BaseViewModel {
     public ICommand SelectRoomTagsCommand { get; }
 
 
+    public MainWindow UserWindow {
+        get => _userWindow;
+        set => RaiseAndSetIfChanged(ref _userWindow, value);
+    }
+
     public ObservableCollection<View> SelectedViews {
         get => _selectedViews;
         set => RaiseAndSetIfChanged(ref _selectedViews, value);
     }
 
-    public ObservableCollection<RoomTagTaskHelper> RoomTagTasks {
+    public ObservableCollection<RoomTagTaskVM> RoomTagTasks {
         get => _roomTagTasks;
         set => RaiseAndSetIfChanged(ref _roomTagTasks, value);
     }
 
-    public RoomTagTaskHelper SelectedRoomTagTask {
+    public RoomTagTaskVM SelectedRoomTagTask {
         get => _selectedRoomTagTask;
         set => RaiseAndSetIfChanged(ref _selectedRoomTagTask, value);
     }
@@ -84,8 +98,8 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Метод, отрабатывающий при загрузке окна
     /// </summary>
-    private void LoadView() {
-
+    private void LoadView(MainWindow window) {
+        UserWindow = window;
         LoadConfig();
         GetSelectedViews();
     }
@@ -105,19 +119,19 @@ internal class MainViewModel : BaseViewModel {
     private bool CanAcceptView() {
 
         if(SelectedViews.Count == 0) {
-            ErrorText = "Не выбрано ни одного вида";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoViews");
             return false;
         }
 
         if(RoomTagTasks.Count == 0) {
-            ErrorText = "Не создано ни одной задачи";
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoTasks");
             return false;
         }
 
         foreach(var roomTagTask in RoomTagTasks) {
 
             if(roomTagTask.RoomTags.Count == 0) {
-                ErrorText = "Не во всех задачах выбраны марки помещений";
+                ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorNoTagsInTasks");
                 return false;
             }
         }
@@ -170,7 +184,9 @@ internal class MainViewModel : BaseViewModel {
     /// Метод команды по выбору марок помещений для конкретной задачи RoomTagTaskHelper, которая передается через CommandParameter
     /// </summary>
     private void SelectRoomTags(object obj) {
-        if(obj is RoomTagTaskHelper task) {
+        UserWindow.Hide();
+
+        if(obj is RoomTagTaskVM task) {
             task.RoomTags.Clear();
 
             ISelectionFilter selectFilter = new RoomTagSelectionFilter();
@@ -186,11 +202,7 @@ internal class MainViewModel : BaseViewModel {
             }
         }
 
-        // Переоткрываем окно плагина
-        var mainWindow = new MainWindow {
-            DataContext = this
-        };
-        _ = mainWindow.ShowDialog();
+        UserWindow.ShowDialog();
     }
 
 
@@ -226,7 +238,7 @@ internal class MainViewModel : BaseViewModel {
         HashSet<ElementId> tagsForDel = [];
 
         // Перебираем задачи, созданные пользователем
-        foreach(RoomTagTaskHelper roomTagTask in RoomTagTasks) {
+        foreach(RoomTagTaskVM roomTagTask in RoomTagTasks) {
 
             // Получаем значения смещения, если пользователь задал перемещение марок, а не удаление
             double xOffset;
@@ -295,7 +307,7 @@ internal class MainViewModel : BaseViewModel {
     /// </summary>
     private void AddTask() {
 
-        RoomTagTasks.Add(new RoomTagTaskHelper());
+        RoomTagTasks.Add(new RoomTagTaskVM(_localizationService));
     }
 
     /// <summary>

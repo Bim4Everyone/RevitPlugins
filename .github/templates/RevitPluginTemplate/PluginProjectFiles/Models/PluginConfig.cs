@@ -1,6 +1,5 @@
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
@@ -15,13 +14,13 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
     /// Системное свойство конфигурации. (Не трогать)
     /// </summary>
     [JsonIgnore]
-    public override string ProjectConfigPath { get; set; }
+    public override string? ProjectConfigPath { get; set; }
 
     /// <summary>
     /// Системное свойство конфигурации. (Не трогать)
     /// </summary>
     [JsonIgnore]
-    public override IConfigSerializer Serializer { get; set; }
+    public override IConfigSerializer? Serializer { get; set; }
 
     /// <summary>
     /// Метод создания конфигурации плагина.
@@ -57,10 +56,10 @@ internal class RevitSettings : ProjectSettings {
     /// <summary>
     /// Наименование проекта. Системное свойство. (Не трогать)
     /// </summary>
-    public override string ProjectName { get; set; }
+    public override string ProjectName { get; set; } = string.Empty;
     
     /// <summary>
     /// Сохраняемое свойство для примера, нужно его заменить своими настройками.
     /// </summary>
-    public string SaveProperty { get; set; }
+    public string SaveProperty { get; set; } = string.Empty;
 }

@@ -10,59 +10,78 @@ using dosymep.SimpleServices;
 namespace RevitListOfSchedules.Models;
 internal class TempFamilyDocument {
     private const string _extension = ".rfa";
-    private const int _diameterArc = 5; // Диаметр окружности для семейства. Выбрано 5 чтобы его было видно на виде.
+    private const int _diameterArc = 5; // Диаметр окружности для семейства. Выбрано 5, чтобы его было видно на виде.
     private readonly ILocalizationService _localizationService;
     private readonly RevitRepository _revitRepository;
     private readonly FamilyLoadOptions _familyLoadOptions;
-    private readonly string _familyTemplatePath;
-    private readonly string _familyPath;
     private readonly string _tempDirectory = Path.GetTempPath();
 
     public TempFamilyDocument(
         ILocalizationService localizationService,
         RevitRepository revitRepository,
-        FamilyLoadOptions familyLoadOptions,
-        string albumName) {
+        FamilyLoadOptions familyLoadOptions) {
         _localizationService = localizationService;
         _revitRepository = revitRepository;
         _familyLoadOptions = familyLoadOptions;
-
-        string familyTemplatePath = _revitRepository.Application.FamilyTemplatePath;
-
-        _familyTemplatePath = _localizationService.GetLocalizedString(
-            "TempFamilyDocument.TemplateFamilyName", familyTemplatePath);
-        _familyPath = _localizationService.GetLocalizedString(
-            "TempFamilyDocument.FamilyName", _tempDirectory, albumName, _extension);
     }
 
-    public FamilySymbol GetFamilySymbol() {
+    public FamilySymbol GetFamilySymbol(string familyTemplatePath, string albumName)
+    {
+        string familyPath = _localizationService.GetLocalizedString(
+            "TempFamilyDocument.FamilyName", _tempDirectory, albumName, _extension);
         try {
-            CreateFile();
-            FamilySymbol familySymbol = null;
-            bool loadSuccess = _revitRepository.Document.LoadFamily(_familyPath, _familyLoadOptions, out var family);
-            familySymbol = _revitRepository.GetFamilySymbol(family);
+            CreateFile(familyTemplatePath, familyPath);
+            
+            bool success = LoadFamily(familyPath, out var family);
 
-            if(!loadSuccess || family == null) {
-                DeleteFile();
-                return null;
-            }
-            if(familySymbol != null) {
-                if(!familySymbol.IsActive) {
-                    familySymbol.Activate();
+            if (!success) {
+                string famName = Path.GetFileNameWithoutExtension(familyPath);
+
+                var existingFamily = new FilteredElementCollector(_revitRepository.Document)
+                    .OfClass(typeof(Family))
+                    .Cast<Family>()
+                    .FirstOrDefault(f => f.Name.Equals(famName, StringComparison.OrdinalIgnoreCase));
+
+                if (existingFamily != null) {
+                    _revitRepository.Document.Delete(existingFamily.Id);
+                    success = LoadFamily(familyPath, out family);
                 }
             }
-            DeleteFile();
-            return familySymbol;
 
-        } finally {
-            DeleteFile();
+            if (!success)
+                throw new InvalidOperationException();
+
+            var familySymbol = _revitRepository.GetFamilySymbol(family);
+
+            if (familySymbol == null)
+                throw new InvalidOperationException();
+
+            if (!familySymbol.IsActive)
+                familySymbol.Activate();
+
+            return familySymbol;
+        }
+        catch (Exception ex) {
+            throw new InvalidOperationException(
+                _localizationService.GetLocalizedString("TempFamilyDocument.ExceptionFamily", albumName), ex);
+        }
+        finally {
+            try {
+                DeleteFile(familyPath);
+            } catch {
+                // Не важное
+            }
         }
     }
+    
+    private bool LoadFamily(string familyPath, out Family family) {
+        return _revitRepository.Document.LoadFamily(familyPath, _familyLoadOptions, out family);
+    }
 
-    private void CreateFile() {
+    private void CreateFile(string familyTemplatePath, string familyPath) {
         Document document = null;
         try {
-            document = _revitRepository.Application.NewFamilyDocument(_familyTemplatePath);
+            document = _revitRepository.Application.NewFamilyDocument(familyTemplatePath);
             string transactionName = _localizationService.GetLocalizedString("TempFamilyDocument.TransactionName");
             using(var t = document.StartTransaction(transactionName)) {
                 CreateCircle(document);
@@ -71,7 +90,7 @@ internal class TempFamilyDocument {
             var opt = new SaveAsOptions {
                 OverwriteExistingFile = true
             };
-            document.SaveAs(_familyPath, opt);
+            document.SaveAs(familyPath, opt);
 
         } finally {
             document?.Close(false);
@@ -90,12 +109,13 @@ internal class TempFamilyDocument {
         familyCreator.NewDetailCurve(viewPlan, circle);
     }
 
-    private void DeleteFile() {
+    private void DeleteFile(string familyPath) {
         try {
-            if(File.Exists(_familyPath)) {
-                File.Delete(_familyPath);
+            if(File.Exists(familyPath)) {
+                File.Delete(familyPath);
             }
-        } catch(UnauthorizedAccessException) {
+        } catch {
+            // Не важное
         }
     }
 }

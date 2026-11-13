@@ -5,7 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:RevitOpeningPlacement.ViewModels.OpeningConfig"
-    xmlns:m="clr-namespace:RevitClashDetective.Models.Value"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
@@ -105,13 +104,6 @@
                 Property="AllowFloat"
                 Value="False" />
         </Style>
-        <DataTemplate
-            DataType="{x:Type m:ParamValue}">
-            <dxe:TextEdit
-                IsReadOnly="True"
-                EditMode="InplaceActive"
-                EditValue="{Binding DisplayValue}" />
-        </DataTemplate>
     </base:ThemedPlatformWindow.Resources>
     <Grid
         Margin="10">
@@ -134,7 +126,7 @@
         </dxe:CheckEdit>
 
         <dxdo:LayoutPanel
-            Caption="{Binding ElementsSearchSet.Filter.Name}"
+            Caption="{Binding ElementsSearchSet.Name}"
             Grid.Row="1">
             <dxdo:LayoutPanel.ControlBoxContent>
                 <dx:SimpleButton

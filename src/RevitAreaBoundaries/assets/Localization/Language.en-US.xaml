@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Area Boundaries</system:String>
+
+    <system:String x:Key="MainWindow.Settings">Plugin Settings</system:String>
+    <system:String x:Key="MainWindow.CommonSettings">General Settings</system:String>
+    <system:String x:Key="MainWindow.ViewPlanSelections">Select Area Plans</system:String>
+    <system:String x:Key="MainWindow.TypeElementSelections">Select Element Types</system:String>
+
+    <system:String x:Key="ViewPlanSelectionPage.GroupParameters">Grouping Parameter</system:String>
+    <system:String x:Key="ViewPlanSelectionPage.GroupParametersDescription">Parameter used to group views</system:String>
+
+    <system:String x:Key="CommonSettingsPage.AlgorithmType">Algorithm Type</system:String>
+    <system:String x:Key="CommonSettingsPage.AlgorithmTypeDescription">Select the boundary detection algorithm</system:String>
+
+    <system:String x:Key="CommonSettingsPage.SectionHeight">Height Above Level, mm</system:String>
+    <system:String x:Key="CommonSettingsPage.SectionHeightDescription">Building section height above the plan level in millimeters</system:String>
+    <system:String x:Key="CommonSettingsPage.SectionHeightTooltip">Enter the value in millimeters without decimal places</system:String>
+
+    <system:String x:Key="ViewPlanSelectionViewModel.NoViews">No area plans found in the project</system:String>
+    <system:String x:Key="ViewPlanSelectionViewModel.NoBrowserParameter">The view grouping parameter is not configured in the project</system:String>
+
+    <system:String x:Key="CommonSettingViewModel.OuterBoundary">Outer Boundary</system:String>
+
+    <system:String x:Key="CustomGroupEditControl.SelectCommandText">Select All</system:String>
+    <system:String x:Key="CustomGroupEditControl.UnSelectCommandText">Clear Selection</system:String>
+
+    <system:String x:Key="MainViewModel.ErrorNoViewPlans">No area plans found in the project</system:String>
+    <system:String x:Key="MainViewModel.ErrorNoSelectionViewPlans">No area plans are selected</system:String>
+
+    <system:String x:Key="MainViewModel.ErrorNoElementTypes">No element types are found in the project</system:String>
+    <system:String x:Key="MainViewModel.ErrorNoSelectionElementTypes">No element types are selected</system:String>
+
+    <system:String x:Key="MainViewModel.SectionHeightNoDouble">The input value must be a number</system:String>
+    <system:String x:Key="MainViewModel.SectionHeightNegate">The input value must be a positive number</system:String>
+
+    <system:String x:Key="MainViewModel.TransactionName">Create Area Boundaries</system:String>
+    
+    <system:String x:Key="BoundaryProcessor.AreaPlanName">Plan {0}/{1}: </system:String>
+    <system:String x:Key="ProgressTitle.SectionProcessing">Section elements {0}%</system:String>
+    <system:String x:Key="ProgressTitle.BoundaryProcessing">Boundary detection {0}%</system:String>
+    <system:String x:Key="ProgressTitle.DrawProcessing">Drawing boundaries {0}%</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">Create</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    
+</ResourceDictionary>

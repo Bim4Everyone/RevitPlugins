@@ -4,11 +4,13 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using Bim4Everyone.RevitFiltration.Controls;
+
 using RevitClashDetective.Models.ClashDetection;
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.FilterModel;
 
 using RevitSleeves.Models;
+using RevitSleeves.Models.Filtration;
 using RevitSleeves.Services.Core;
 
 namespace RevitSleeves.Services.Placing.Intersections;
@@ -16,11 +18,13 @@ internal abstract class MepStructureCollisionFinder {
     protected readonly RevitRepository _revitRepository;
     protected readonly IMepElementsProvider _mepElementsProvider;
     protected readonly IStructureLinksProvider _structureLinksProvider;
+    protected readonly IFilterContextParser _filterContextParser;
 
     protected MepStructureCollisionFinder(
         RevitRepository revitRepository,
         IMepElementsProvider mepElementsProvider,
-        IStructureLinksProvider structureLinksProvider) {
+        IStructureLinksProvider structureLinksProvider,
+        IFilterContextParser filterContextParser) {
 
         _revitRepository = revitRepository
             ?? throw new ArgumentNullException(nameof(revitRepository));
@@ -28,6 +32,8 @@ internal abstract class MepStructureCollisionFinder {
             ?? throw new ArgumentNullException(nameof(mepElementsProvider));
         _structureLinksProvider = structureLinksProvider
             ?? throw new ArgumentNullException(nameof(structureLinksProvider));
+        _filterContextParser = filterContextParser
+                               ?? throw new ArgumentNullException(nameof(filterContextParser));
     }
 
 
@@ -35,58 +41,56 @@ internal abstract class MepStructureCollisionFinder {
     /// Находит коллизии между элементами ВИС из активного файла и конструкциями из связей
     /// </summary>
     /// <param name="mepCategory">Категория элементов ВИС</param>
-    /// <param name="mepFilterSet">Фильтр элементов ВИС</param>
+    /// <param name="mepFilterContext">Сериализованный контекст фильтра элементов ВИС</param>
     /// <param name="structureCategory">Категория элементов конструкций</param>
-    /// <param name="structureFilterSet">Фильтр конструкций</param>
+    /// <param name="structureFilterContext">Сериализованный контекст фильтра конструкций</param>
     /// <returns>Коллизии между элементами ВИС из активного файла и конструкциями из связей</returns>
     protected ICollection<ClashModel> FindStructureClashes<TStructure>(
         BuiltInCategory mepCategory,
-        Set mepFilterSet,
+        string mepFilterContext,
         BuiltInCategory structureCategory,
-        Set structureFilterSet) where TStructure : Element {
-
-        var mepProvider = GetMepFilterProvider(mepCategory, mepFilterSet);
+        string structureFilterContext) where TStructure : Element {
+        var mepProvider = GetMepFilterProvider(mepCategory, mepFilterContext);
         var structureLinks = _structureLinksProvider.GetLinks();
         if(structureLinks.Count == 0) {
             return Array.Empty<ClashModel>();
         }
         var structureProviders = GetStructureFilterProviders<TStructure>(
-            structureLinks, structureCategory, structureFilterSet);
+            structureLinks,
+            structureCategory,
+            structureFilterContext);
         return [.. new ClashDetector(_revitRepository.GetClashRevitRepository(), [mepProvider], structureProviders)
             .FindClashes()];
     }
 
-    protected FilterProvider GetMepFilterProvider(BuiltInCategory mepCategory, Set mepFilterSet) {
-        var clashRepo = _revitRepository.GetClashRevitRepository();
-
-        var pipeFilter = new Filter(clashRepo) {
-            CategoryIds = [new ElementId(mepCategory)],
-            Name = mepCategory.ToString(),
-            Set = mepFilterSet
-        };
-        return new FilterProvider(_revitRepository.Document,
-            pipeFilter,
+    protected FilterableElementsProvider GetMepFilterProvider(BuiltInCategory mepCategory, string mepFilterContext) {
+        var filterContext = ParseFilterContext(mepFilterContext, mepCategory);
+        return new FilterableElementsProvider(
+            _revitRepository.Document,
+            filterContext,
             Transform.Identity,
             [.. _mepElementsProvider.GetMepElementIds(mepCategory)]);
     }
 
-    protected ICollection<FilterProvider> GetStructureFilterProviders<T>(
+    protected ICollection<FilterableElementsProvider> GetStructureFilterProviders<T>(
         ICollection<RevitLinkInstance> structureLinks,
         BuiltInCategory structureCategory,
-        Set structureFilterSet) where T : Element {
-
-        var clashRepo = _revitRepository.GetClashRevitRepository();
-
-        var structureFilter = new Filter(clashRepo) {
-            CategoryIds = [new ElementId(structureCategory)],
-            Name = structureCategory.ToString(),
-            Set = structureFilterSet
-        };
-        return [.. structureLinks.Select(link => new FilterProvider(
+        string structureFilterContext) where T : Element {
+        var filterContext = ParseFilterContext(structureFilterContext, structureCategory);
+        return [
+            .. structureLinks.Select(link => new FilterableElementsProvider(
             link.GetLinkDocument(),
-            structureFilter,
+            filterContext,
             link.GetTransform(),
             // дополнительный фильтр по классу, т.к. в плагине обрабатываются только системные семейства
             [.. _revitRepository.GetLinkedElementIds<T>(link)]))];
+    }
+
+    protected ILogicalFilterContext ParseFilterContext(string filterContext, BuiltInCategory category) {
+        if(_filterContextParser.TryParse(filterContext, out var context)) {
+            return context;
+        }
+
+        throw new InvalidOperationException($"Не удалось прочитать фильтр категории {category}");
     }
 }

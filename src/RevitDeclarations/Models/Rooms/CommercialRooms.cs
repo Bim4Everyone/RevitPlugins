@@ -2,14 +2,17 @@ using System.Collections.Generic;
 
 using pyRevitLabs.Json;
 
+using RevitDeclarations.Comparators;
+
 namespace RevitDeclarations.Models;
 internal class CommercialRooms : RoomGroup {
     private readonly CommercialSettings _settings;
 
     public CommercialRooms(IEnumerable<RoomElement> rooms,
                                        DeclarationSettings settings,
-                                       RoomParamProvider paramProvider)
-        : base(rooms, settings, paramProvider) {
+                                       RoomParamProvider paramProvider, 
+                                       RevitLogicalStringComparer logicalStrComparer)
+        : base(rooms, settings, paramProvider, logicalStrComparer) {
         _settings = (CommercialSettings) settings;
     }
 
@@ -21,12 +24,12 @@ internal class CommercialRooms : RoomGroup {
     public double RoomsHeight => _firstRoom.GetLengthParamValue(_settings.RoomsHeightParam, _accuracyForLength);
 
     [JsonProperty("type")]
-    public override string Department => _paramProvider.GetDepartment(_firstRoom, "Нежилые помещения");
     public string ParkingSpaceClass => _firstRoom.GetTextParamValue(_settings.ParkingSpaceClass);
     public string ParkingInfo => _firstRoom.GetTextParamValue(_settings.ParkingInfo);
+    public string PositionType => _firstRoom.GetTextParamValue(_settings.PositionType);
 
     public string DeclarationNumber =>
-        _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber);
+        _paramProvider.GetTwoParamsWithHyphen(_firstRoom, _settings.AddPrefixToNumber, _settings.AddHyphenToPrefix);
 
     public override double AreaMain => _isOneRoomGroup ? _firstRoom.Area : base.AreaMain;
 

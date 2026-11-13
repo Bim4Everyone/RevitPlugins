@@ -5,7 +5,7 @@
     <system:String x:Key="FamilyDocument.TransactionName">Category, extrusion, material</system:String>    
     <system:String x:Key="FamilyDocument.MaterialName">glass</system:String>
     <system:String x:Key="FamilyDocument.FamilyName">{0}Road_Check_{1}_Elev.{2}{3}</system:String>
-    <system:String x:Key="FamilyDocument.TemplateFamilyName">{0}\English\Metric Generic Model.rft</system:String>
+    <system:String x:Key="FamilyDocument.TemplateFamilyName">English\Metric Generic Model.rft</system:String>
 
     <system:String x:Key="InstanceManager.TransactionName">Room extrusion</system:String>
 
@@ -43,6 +43,8 @@
     <system:String x:Key="MainWindow.HeightErrorBig">Height cannot exceed 100 meters</system:String>
     <system:String x:Key="MainWindow.NameError">The name contains invalid characters</system:String>
     <system:String x:Key="Command.MessegeBody">Please, select rooms</system:String>
-    <system:String x:Key="Command.MessegeTitle">Error selection</system:String>  
+    <system:String x:Key="Command.MessegeTitle">Error selection</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Error config settings</system:String>
+    <system:String x:Key="Common.ConfigErrorNoFamily">Missing family template:  {0}  path:  {1}</system:String>
 
 </ResourceDictionary>

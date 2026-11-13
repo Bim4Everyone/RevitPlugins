@@ -47,16 +47,16 @@ internal class WarningsViewModel : BaseViewModel {
 
     // Метод выделения элемента
     private void ShowElement(ElementId elementId) {
-        _revitRepository.SetSelected(elementId);
+        _revitRepository.SetSelected([elementId]);
     }
 
     // Метод формирования списка WarningGroupViewModel
     private IEnumerable<WarningGroupViewModel> GetWarningGroupViewModels() {
         var regularGroups = WarningElementsCollection
-            .Where(w => w is not WarningNotFoundParamElement)
+            .Where(w => w is not WarningNotFoundParamElement and not WarningOccupiedElement)
             .GroupBy(w => w.WarningType)
             .Select(group => {
-                var vm = new WarningGroupViewModel {
+                var vm = new WarningGroupViewModel(_revitRepository) {
                     Caption = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}"),
                     Description = _localizationService.GetLocalizedString($"WarningsViewModel.{group.Key}Description"),
                     WarningElements = group.ToList(),
@@ -76,7 +76,7 @@ internal class WarningsViewModel : BaseViewModel {
             })
             .GroupBy(g => g.ParamNames)
             .Select(g => {
-                var vm = new WarningGroupViewModel {
+                var vm = new WarningGroupViewModel(_revitRepository) {
                     Caption = $"{_localizationService.GetLocalizedString("WarningsViewModel.NotFoundParam")}: {g.Key}",
                     Description = _localizationService.GetLocalizedString("WarningsViewModel.NotFoundParamDescription"),
                     WarningElements = g.SelectMany(x => x.WarningElements).ToList(),
@@ -86,6 +86,22 @@ internal class WarningsViewModel : BaseViewModel {
                 vm.LoadView();
                 return vm;
             });
-        return regularGroups.Concat(notFoundGroups);
+
+        var occupiedGroups = WarningElementsCollection
+            .OfType<WarningOccupiedElement>()
+            .GroupBy(w => w.WarningType)
+            .Select(group => {
+                var vm = new WarningGroupViewModel(_revitRepository) {
+                    Caption = $"{_localizationService.GetLocalizedString("WarningsViewModel.OccupiedElement")}: {group.First().User}",
+                    Description = _localizationService.GetLocalizedString("WarningsViewModel.OccupiedElementDescription"),
+                    WarningElements = group.ToList(),
+                    WarningQuantity = $"({group.Count()})",
+                    ShowElementCommand = ShowElementCommand
+                };
+                vm.LoadView();
+                return vm;
+            });
+
+        return regularGroups.Concat(notFoundGroups).Concat(occupiedGroups);
     }
 }

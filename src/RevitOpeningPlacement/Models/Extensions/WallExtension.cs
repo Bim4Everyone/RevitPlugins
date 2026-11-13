@@ -8,6 +8,10 @@ internal static class WallExtension {
         return (Line) ((LocationCurve) wall.Location).Curve;
     }
 
+    public static Line GetLine(this Wall wall, Transform wallTransform) {
+        return (Line) ((LocationCurve) wall.Location).Curve.CreateTransformed(wallTransform);
+    }
+
     public static Line GetСentralLine(this Wall wall) {
         var centralPoint = GetCentralPoint(wall);
 

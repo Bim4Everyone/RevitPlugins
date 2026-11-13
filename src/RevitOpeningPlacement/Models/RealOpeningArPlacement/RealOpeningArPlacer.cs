@@ -2,11 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Revit;
 using dosymep.SimpleServices;
+
+using Ninject;
+using Ninject.Syntax;
 
 using RevitClashDetective.Models.Extensions;
 
@@ -16,15 +20,19 @@ using RevitOpeningPlacement.Models.Extensions;
 using RevitOpeningPlacement.Models.Interfaces;
 using RevitOpeningPlacement.Models.RealOpeningArPlacement.Providers;
 using RevitOpeningPlacement.OpeningModels;
+using RevitOpeningPlacement.Services;
 
 namespace RevitOpeningPlacement.Models.RealOpeningArPlacement;
 /// <summary>
 /// Класс для размещения чистовых отверстий АР в активном документе в местах расположений заданий на отверстия из связанных файлов ВИС
 /// </summary>
 internal class RealOpeningArPlacer {
+    private readonly IResolutionRoot _root;
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localization;
     private readonly OpeningRealsArConfig _config;
+    private readonly IMessageBoxService _msgBox;
+    private readonly ISolidProviderUtils _solidUtils;
 
     public const string RealOpeningArDiameter = "ФОП_РАЗМ_Диаметр";
     public const string RealOpeningArWidth = "ФОП_РАЗМ_Ширина проёма";
@@ -44,48 +52,55 @@ internal class RealOpeningArPlacer {
     /// <summary>
     /// Конструктор класса для размещения чистовых отверстий АР в активном документе в местах расположений заданий на отверстия из связанных файлов ВИС
     /// </summary>
-    /// <param name="revitRepository">Репозиторий активного АР документа ревита, в котором будет происходить размещение чистовых отверстий</param>
-    /// <exception cref="ArgumentNullException">Исключение, если обязательный параметр null</exception>
-    public RealOpeningArPlacer(RevitRepository revitRepository, ILocalizationService localization) {
-        _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
-        _config = OpeningRealsArConfig.GetOpeningConfig(_revitRepository.Doc);
+    public RealOpeningArPlacer(IResolutionRoot root) {
+        _root = root ?? throw new ArgumentNullException(nameof(root));
+        _revitRepository = _root.Get<RevitRepository>();
+        _localization = _root.Get<ILocalizationService>();
+        _msgBox = _root.Get<IMessageBoxService>();
+        _config = _root.Get<OpeningRealsArConfig>();
+        _solidUtils = _root.Get<ISolidProviderUtils>();
     }
 
 
     /// <summary>
     /// Размещение чистового отверстия по одному заданию на отверстие из связи в одном хосте
     /// </summary>
-#pragma warning disable 0618
     public void PlaceSingleOpeningByOneTask() {
         var host = _revitRepository.PickHostForRealOpening();
-        var openingTask = _revitRepository.PickSingleOpeningMepTaskIncoming();
+        var openingTask = _revitRepository.PickSingleOpeningMepTaskIncoming(_msgBox);
 
         using var transaction = _revitRepository.GetTransaction(
             _localization.GetLocalizedString("Transaction.PlaceSingleOpening"));
         try {
-            if(openingTask.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())) {
+            if(_solidUtils.IntersectsSolid(openingTask, host.GetSolid(), host.GetBoundingBox())) {
                 PlaceByOneTask(host, openingTask);
             } else {
-                _revitRepository.ShowErrorMessage(
-                    _localization.GetLocalizedString("Errors.TaskNotIntersectConstruction"));
+                _msgBox.Show(
+                    _localization.GetLocalizedString("Errors.TaskNotIntersectConstruction"),
+                    _localization.GetLocalizedString("OpeningTasks"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 throw new OperationCanceledException();
             }
         } catch(OpeningNotPlacedException e) {
-            _revitRepository.ShowErrorMessage(e.Message);
+            _msgBox.Show(
+                e.Message,
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
         transaction.Commit();
     }
-#pragma warning restore 0618
 
     /// <summary>
     /// Размещение объединенного чистового отверстия по одному или нескольким заданиям на отверстия из связи(ей) в одном хосте
     /// </summary>
-#pragma warning disable 0618
     public void PlaceUnitedOpeningByManyTasks() {
         var host = _revitRepository.PickHostForRealOpening();
-        var openingTasks = _revitRepository.PickManyOpeningMepTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+        var openingTasks = _revitRepository.PickManyOpeningMepTasksIncoming()
+            .Where(opening => _solidUtils.IntersectsSolid(opening, host.GetSolid(), host.GetBoundingBox()))
+            .ToHashSet();
 
         try {
             if(openingTasks.Count > 0) {
@@ -95,24 +110,31 @@ internal class RealOpeningArPlacer {
 
                 transaction.Commit();
             } else {
-                _revitRepository.ShowErrorMessage(
-                    _localization.GetLocalizedString("Errors.TasksNotIntersectConstruction"));
+                _msgBox.Show(
+                    _localization.GetLocalizedString("Errors.TasksNotIntersectConstruction"),
+                    _localization.GetLocalizedString("OpeningTasks"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 throw new OperationCanceledException();
             }
         } catch(OpeningNotPlacedException e) {
-            _revitRepository.ShowErrorMessage(e.Message);
+            _msgBox.Show(
+                e.Message,
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
             throw new OperationCanceledException();
         }
     }
-#pragma warning restore 0618
 
     /// <summary>
     /// Размещение нескольких одиночных чистовых отверстий по нескольким заданиям на отверстия из связи(ей) без их объединения в одном хосте
     /// </summary>
-#pragma warning disable 0618
     public void PlaceSingleOpeningsInOneHost() {
         var host = _revitRepository.PickHostForRealOpening();
-        var openingTasks = _revitRepository.PickManyOpeningMepTasksIncoming().Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+        var openingTasks = _revitRepository.PickManyOpeningMepTasksIncoming()
+            .Where(opening => _solidUtils.IntersectsSolid(opening, host.GetSolid(), host.GetBoundingBox()))
+            .ToHashSet();
 
         string error = string.Empty;
         using(var transaction = _revitRepository.GetTransaction(
@@ -131,15 +153,17 @@ internal class RealOpeningArPlacer {
             transaction.Commit();
         }
         if(!string.IsNullOrWhiteSpace(error)) {
-            _revitRepository.ShowErrorMessage(error);
+            _msgBox.Show(
+                error,
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
     }
-#pragma warning restore 0618
 
     /// <summary>
     /// Размещение нескольких одиночных чистовых отверстий в выбранных хостах по всем заданиям на отверстия из связи(ей), которые пересекаются с этими хостами
     /// </summary>
-#pragma warning disable 0618
     public void PlaceSingleOpeningsInManyHosts() {
         var hosts = _revitRepository.PickHostsForRealOpenings();
         var allOpeningTasks = _revitRepository.GetOpeningsMepTasksIncoming();
@@ -147,7 +171,7 @@ internal class RealOpeningArPlacer {
         var sb = new StringBuilder();
         using(var transaction = _revitRepository.GetTransaction(
             _localization.GetLocalizedString("Transaction.PlaceSingleOpeningsInManyHosts"))) {
-            using(var progressBar = _revitRepository.GetProgressDialogService()) {
+            using(var progressBar = _root.Get<IProgressDialogService>()) {
                 progressBar.StepValue = 1;
                 progressBar.DisplayTitleFormat = _localization.GetLocalizedString("Progress.ProcessConstructions");
                 var progress = progressBar.CreateProgress();
@@ -159,7 +183,9 @@ internal class RealOpeningArPlacer {
                 foreach(var host in hosts) {
                     ct.ThrowIfCancellationRequested();
 
-                    ICollection<OpeningMepTaskIncoming> openingTasks = allOpeningTasks.Where(opening => opening.IntersectsSolid(host.GetSolid(), host.GetBoundingBox())).ToHashSet();
+                    ICollection<OpeningMepTaskIncoming> openingTasks = allOpeningTasks.Where(opening =>
+                            _solidUtils.IntersectsSolid(opening, host.GetSolid(), host.GetBoundingBox()))
+                        .ToHashSet();
                     if(openingTasks.Count == 0) {
                         sb.AppendLine(_localization.GetLocalizedString("Errors.StructureNotIntersectTask", host.Id));
                     }
@@ -184,10 +210,13 @@ internal class RealOpeningArPlacer {
             transaction.Commit();
         }
         if(sb.Length > 0) {
-            _revitRepository.ShowErrorMessage(sb.ToString());
+            _msgBox.Show(
+                sb.ToString(),
+                _localization.GetLocalizedString("OpeningTasks"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
     }
-#pragma warning restore 0618
 
 
     /// <summary>

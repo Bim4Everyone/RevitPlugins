@@ -4,6 +4,8 @@ using System.Reflection;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 
+using Bim4Everyone.RevitFiltration.Ninject;
+
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.WpfCore.Ninject;
@@ -55,17 +57,16 @@ public class SleevesSettingsCommand : BasePluginCommand {
         kernel.Bind<IView3DProvider>()
             .To<SleeveView3dProvider>()
             .InSingletonScope();
-        kernel.Bind<ActiveDocFilterViewModel>()
+        kernel.Bind<FilterViewModel>()
             .ToSelf()
-            .InTransientScope()
-            .OnActivation(s => s.Initialize());
-        kernel.Bind<StructureLinksFilterViewModel>()
-            .ToSelf()
-            .InTransientScope()
-            .OnActivation(s => s.Initialize());
+            .InTransientScope();
         kernel.Bind<FilterWindow>()
             .ToSelf()
             .InTransientScope();
+
+        kernel.UseLogicalFilterFactory();
+        kernel.UseLogicalFilterProviderFactory();
+        kernel.UseFilterContextParser();
 
 
         kernel.Bind<SleevePlacementSettingsConfig>()

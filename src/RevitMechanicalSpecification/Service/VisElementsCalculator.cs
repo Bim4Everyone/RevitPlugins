@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -17,6 +18,7 @@ using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     internal class VisElementsCalculator {
+        private readonly CultureInfo _ruCulture = CultureInfo.GetCultureInfo("ru-RU");
 
         private readonly SpecConfiguration _specConfiguration;
 
@@ -47,10 +49,12 @@ namespace RevitMechanicalSpecification.Service {
         /// <returns></returns>
         public string GetDuctFittingMark(Element element) {
             List<Connector> connectors = GetConnectors(element);
-            Element duct = GetDuctFromFitting(connectors);
+            Element duct = GetDuctFromConnectorList(connectors);
+            
             if(duct is null) {
-                return "!Не учитывать";
+                return String.Empty;
             }
+            
             return duct.GetTypeOrInstanceParamStringValue(duct.GetElementType(), _specConfiguration.OriginalParamNameMark);
         }
 
@@ -59,21 +63,23 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
-        public string GetDuctFittingName(Element element) {
+        public string GetDuctFittingName(Element element, string nameAddon) {
             string thikness = GetDuctFittingThikness(element);
-            if(thikness is null) {
-                return "!Не учитывать";
-            }
-
-            if(!_specConfiguration.IsSpecifyDuctFittings) {
-                return "Металл для фасонных деталей воздуховодов с толщиной стенки " + thikness + " мм";
-            }
-
             string startName = "Не удалось определить тип фитинга";
             FamilyInstance instanse = element as FamilyInstance;
             MechanicalFitting fitting = instanse.MEPModel as MechanicalFitting;
 
+            if(!_specConfiguration.IsSpecifyDuctFittings) {
+                return "Металл для фасонных деталей воздуховодов с толщиной стенки " + thikness + " мм";
+            }
+            
             switch(fitting.PartType) {
+                case PartType.MultiPort:
+                    Element elementType = element.GetElementType();
+                    startName = element.GetTypeOrInstanceParamStringValue(
+                        elementType, 
+                        _specConfiguration.OriginalParamNameName);
+                    return startName;
                 case PartType.Transition:
                     startName = "Переход между сечениями воздуховода";
                     break;
@@ -114,7 +120,110 @@ namespace RevitMechanicalSpecification.Service {
             if(notTransition && notTee) {
                 size = size.Split('-').First();
             }
-            return startName + " " + size + ", с толщиной стенки " + thikness + " мм";
+            
+            string optionalLength = GetTransitionLength(element);
+            optionalLength = string.IsNullOrEmpty(optionalLength)
+                ? string.Empty
+                : $", L={optionalLength} мм";
+            string fullName = $"{startName} {size}{optionalLength}";
+            
+            if(string.IsNullOrEmpty(nameAddon) && thikness is null) {
+                return $"{fullName}, УКАЖИТЕ ТОЛЩИНУ ЧЕРЕЗ \"ФОП_ВИС_Дополнение к имени\"";
+            }
+
+            if(thikness is null) {
+                return $"{fullName},";
+            }
+
+            return $"{fullName}, с толщиной стенки {thikness} мм";
+        }
+
+        /// <summary>
+        /// Получение имени фитинга кабельного лотка
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string GetCableTrayFittingName(Element element, string name) {
+            FamilyInstance instance = element as FamilyInstance;
+            List<Connector> connectors = instance?.MEPModel?.ConnectorManager?.Connectors?
+                .Cast<Connector>().ToList() ?? new List<Connector>();
+            string size = GetCableTrayFittingSize(element, connectors);
+            if(string.IsNullOrEmpty(size)) {
+                return name;
+            }
+
+            Connector angleConnector = connectors.FirstOrDefault(item => item.Angle > 0);
+            double angle = angleConnector == null ? 0 : UnitConverter.DoubleToDegree(angleConnector.Angle);
+            if(angle > 0) {
+                if(angle <= 15) {
+                    angle = 15;
+                } else if(angle <= 30) {
+                    angle = 30;
+                } else if(angle <= 45) {
+                    angle = 45;
+                } else if(angle <= 60) {
+                    angle = 60;
+                } else if(angle <= 75) {
+                    angle = 75;
+                } else if(angle <= 90) {
+                    angle = 90;
+                }
+            }
+            string angleName = angle > 0 ? $" {UnitConverter.DoubleToString(angle)}°" : string.Empty;
+
+            return $"{name} {size}{angleName}";
+        }
+
+        private string GetCableTrayFittingSize(Element element, List<Connector> connectors) {
+            List<string> sizes = connectors
+                .Select(connector =>
+                    $"{UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(connector.Width))}x" +
+                    UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(connector.Height)))
+                .ToList();
+
+            if(sizes.Count > 0) {
+                return connectors.Count <= 2 && sizes.All(size => size == sizes[0])
+                    ? sizes[0]
+                    : string.Join("-", sizes);
+            }
+
+            double width = element.GetParamValueOrDefault<double>(
+                BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM);
+            double height = element.GetParamValueOrDefault<double>(
+                BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM);
+            if(width == 0 || height == 0) {
+                return string.Empty;
+            }
+
+            return $"{UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(width))}x" +
+                UnitConverter.DoubleToString(UnitConverter.DoubleToMilimeters(height));
+        }
+
+        /// <summary>
+        /// Получение длины перехода
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private string GetTransitionLength(Element element) {
+            FamilyInstance instance = element as FamilyInstance;
+            MechanicalFitting fitting = instance?.MEPModel as MechanicalFitting;
+
+            if(fitting == null || fitting.PartType != PartType.Transition) {
+                return string.Empty;
+            }
+
+            List<Connector> connectors = GetConnectors(element);
+            if(connectors.Count != 2) {
+                return string.Empty;
+            }
+
+            double length = connectors[0].Origin.DistanceTo(connectors[1].Origin);
+            double lengthInMillimeters = UnitConverter.DoubleToMilimeters(length);
+            double roundedLength = Math.Max(
+                50,
+                Math.Round(lengthInMillimeters / 50, MidpointRounding.AwayFromZero) * 50);
+            return UnitConverter.DoubleToString(roundedLength);
         }
 
         /// <summary>
@@ -167,21 +276,21 @@ namespace RevitMechanicalSpecification.Service {
                 element.GetParamValue<double>(BuiltInParameter.RBS_PIPE_INNER_DIAM_PARAM)
                 );
 
-            string pipeThickness = UnitConverter.DoubleToString(((
-                Math.Round(externalSize - internalSize, 2) / 2)));
+            double pipeThicknessValue = Math.Round(externalSize - internalSize, 2) / 2;
+            string pipeThickness = pipeThicknessValue.ToString("0.0#", _ruCulture);
             string pipeDiameter = UnitConverter.DoubleToString(
                     UnitConverter.DoubleToMilimeters(
                     element.GetParamValue<double>(
                     BuiltInParameter.RBS_PIPE_DIAMETER_PARAM)));
 
             if(dy) {
-                return " ⌀" + pipeDiameter;
+                return $"⌀{pipeDiameter}";
             }
             if(dyWall) {
-                return " ⌀" + pipeDiameter + "x" + pipeThickness;
+                return $"⌀{pipeDiameter}x{pipeThickness}";
             }
             if(dExternalWall) {
-                return " ⌀" + UnitConverter.DoubleToString(externalSize) + "x" + pipeThickness;
+                return $"⌀{UnitConverter.DoubleToString(externalSize)}x{pipeThickness}";
             }
 
             return " НЕ ЗАДАН ТИП ДИАМЕТРА";
@@ -323,44 +432,71 @@ namespace RevitMechanicalSpecification.Service {
         /// </summary>
         /// <param name="connectors"></param>
         /// <returns></returns>
-        private Element GetDuctFromFitting(List<Connector> connectors) {
-            var subConnectors = new List<Connector>();
+        private Element GetDuctFromConnectorList(List<Connector> connectors) {
             foreach(Connector connector in connectors) {
-                foreach(Connector reference in connector.AllRefs) {
+                Element duct = GetDuctFromConnector(connector);
+                if(duct != null) {
+                    return duct;
+                }
+            }
+
+            return null;
+        }
+
+        private Element GetDuctFromConnector(Connector connector) {
+            var subConnectors = new List<Connector>();
+
+            foreach(Connector reference in connector.AllRefs) {
+                if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
+                    return reference.Owner;
+                }
+                if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
+                    subConnectors.AddRange(GetConnectors(reference.Owner));
+                }
+            }
+
+            //Мы ищем воздуховод сначала среди коннекторов фитинга, а потом, если не находим, среди коннекторов возможных фитингов вокруг
+            //если там какая-то дикая конструкция из 4 соединенных фитингов - лучше вернуть нулл, а не искать дальше, таких мест вряд ли будет много
+            foreach(Connector subConnector in subConnectors) {
+                foreach(Connector reference in subConnector.AllRefs) {
                     if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
                         return reference.Owner;
                     }
-                    if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
-                        subConnectors.AddRange(GetConnectors(reference.Owner));
-                    }
-                }
-
-                //Мы ищем воздуховод сначала среди коннекторов фитинга, а потом, если не находим, среди коннекторов возможных фитингов вокруг
-                //если там какая-то дикая конструкция из 4 соединенных фитингов - лучше вернуть нулл, а не искать дальше, таких мест вряд ли будет много
-                foreach(Connector subConnector in subConnectors) {
-                    foreach(Connector reference in subConnector.AllRefs) {
-                        if(reference.Owner.Category.IsId(BuiltInCategory.OST_DuctCurves)) {
-                            return reference.Owner;
-                        }
-                    }
                 }
             }
+
             return null;
         }
 
         /// <summary>
-        /// получение толщины фитинга воздуховода
+        /// получение толщины фитинга воздуховода. Возвращает максимальное значение из подключенных воздуховодов
         /// </summary>
         /// <param name="element"></param>
         /// <returns></returns>
         private string GetDuctFittingThikness(Element element) {
             List<Connector> connectors = GetConnectors(element);
-            Element duct = GetDuctFromFitting(connectors);
-            if(duct is null) {
-                return null;
+            double maxValue = 0;
+            bool hasValue = false;
+
+            foreach(Connector connector in connectors) {
+                Element duct = GetDuctFromConnector(connector);
+                if(duct == null)
+                    continue;
+
+                string valueStr = GetDuctThikness(duct, duct.GetElementType());
+
+                if(double.TryParse(valueStr, out double value)) {
+                    if(value > maxValue) {
+                        maxValue = value;
+                        hasValue = true;
+                    }
+                }
             }
 
-            return GetDuctThikness(duct, duct.GetElementType());
+            if(!hasValue)
+                return null;
+
+            return maxValue.ToString();
         }
 
         /// <summary>

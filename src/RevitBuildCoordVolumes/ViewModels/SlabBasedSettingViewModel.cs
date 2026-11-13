@@ -1,0 +1,354 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
+using System.Windows.Input;
+
+using dosymep.Revit;
+using dosymep.SimpleServices;
+using dosymep.WPF.Commands;
+using dosymep.WPF.ViewModels;
+
+using RevitBuildCoordVolumes.Models;
+using RevitBuildCoordVolumes.Models.Enums;
+using RevitBuildCoordVolumes.Models.Services;
+using RevitBuildCoordVolumes.Models.Settings;
+
+namespace RevitBuildCoordVolumes.ViewModels;
+
+internal class SlabBasedSettingViewModel : BaseViewModel {
+    private readonly SystemPluginConfig _systemPluginConfig;
+    private readonly BuildCoordVolumeServices _services;
+    private readonly BuildCoordVolumeSettings _settings;
+    private readonly ILocalizationService _localizationService;
+    private ObservableCollection<BuilderModeViewModel> _builderModes;
+    private ObservableCollection<SlabExtrudeModeViewModel> _slabExtrudeModes;
+    private BuilderModeViewModel _selectedBuilderMode;
+    private bool _isSlabExtrudeMode;
+    private bool _isSlabIntersectMode;
+    private SlabExtrudeModeViewModel _selectedSlabExtrudeMode;
+    private ObservableCollection<DocumentViewModel> _documents;
+    private ObservableCollection<DocumentViewModel> _filteredDocuments;
+    private string _searchTextDocs;
+    private ObservableCollection<SlabViewModel> _slabs;
+    private ObservableCollection<SlabViewModel> _filteredSlabs;
+    private string _searchTextSlabs;
+    private ObservableCollection<LevelViewModel> _levels;
+    private ObservableCollection<LevelViewModel> _filteredLevels;
+    private string _searchTextLevels;
+    private string _squareSideMm;
+    private string _squareAngleDeg;
+    private bool _splitVolumes;
+    private bool _unionVolumes;
+
+    public SlabBasedSettingViewModel(
+        SystemPluginConfig systemPluginConfig,
+        BuildCoordVolumeSettings buildCoordVolumeSettings,
+        BuildCoordVolumeServices buildCoordVolumeServices) {
+        _systemPluginConfig = systemPluginConfig;
+        _settings = buildCoordVolumeSettings;
+        _services = buildCoordVolumeServices;
+        _localizationService = _services.LocalizationService;
+        
+        PropertyChanged += OnPropertyChanged;
+
+        LoadView();
+
+        SearchDocsCommand = RelayCommand.Create(ApplySearchDocs);
+        SearchSlabsCommand = RelayCommand.Create(ApplySearchSlabs);
+        SearchLevelsCommand = RelayCommand.Create(ApplySearchLevels);
+        CheckAllLevelsCommand = RelayCommand.Create(CheckAllLevels);
+        UncheckAllLevelsCommand = RelayCommand.Create(UncheckAllLevels);
+    }
+
+    public ICommand SearchDocsCommand { get; }
+    public ICommand SearchSlabsCommand { get; }
+    public ICommand SearchLevelsCommand { get; }
+    public ICommand CheckAllLevelsCommand { get; }
+    public ICommand UncheckAllLevelsCommand { get; }
+
+    public ObservableCollection<BuilderModeViewModel> BuilderModes {
+        get => _builderModes;
+        set => RaiseAndSetIfChanged(ref _builderModes, value);
+    }
+    public ObservableCollection<SlabExtrudeModeViewModel> SlabExtrudeModes {
+        get => _slabExtrudeModes;
+        set => RaiseAndSetIfChanged(ref _slabExtrudeModes, value);
+    }
+    public BuilderModeViewModel SelectedBuilderMode {
+        get => _selectedBuilderMode;
+        set => RaiseAndSetIfChanged(ref _selectedBuilderMode, value);
+    }
+    public SlabExtrudeModeViewModel SelectedSlabExtrudeMode {
+        get => _selectedSlabExtrudeMode;
+        set => RaiseAndSetIfChanged(ref _selectedSlabExtrudeMode, value);
+    }
+    public bool IsSlabExtrudeMode {
+        get => _isSlabExtrudeMode;
+        set => RaiseAndSetIfChanged(ref _isSlabExtrudeMode, value);
+    }
+    public bool IsSlabIntersectMode {
+        get => _isSlabIntersectMode;
+        set => RaiseAndSetIfChanged(ref _isSlabIntersectMode, value);
+    }
+    public bool SplitVolumes {
+        get => _splitVolumes;
+        set => RaiseAndSetIfChanged(ref _splitVolumes, value);
+    }
+    public bool UnionVolumes {
+        get => _unionVolumes;
+        set => RaiseAndSetIfChanged(ref _unionVolumes, value);
+    }
+    public ObservableCollection<DocumentViewModel> Documents {
+        get => _documents;
+        set => RaiseAndSetIfChanged(ref _documents, value);
+    }
+    public ObservableCollection<DocumentViewModel> FilteredDocuments {
+        get => _filteredDocuments;
+        set => RaiseAndSetIfChanged(ref _filteredDocuments, value);
+    }
+    public string SearchTextDocs {
+        get => _searchTextDocs;
+        set => RaiseAndSetIfChanged(ref _searchTextDocs, value);
+    }
+    public ObservableCollection<SlabViewModel> Slabs {
+        get => _slabs;
+        set => RaiseAndSetIfChanged(ref _slabs, value);
+    }
+    public ObservableCollection<SlabViewModel> FilteredSlabs {
+        get => _filteredSlabs;
+        set => RaiseAndSetIfChanged(ref _filteredSlabs, value);
+    }
+    public string SearchTextSlabs {
+        get => _searchTextSlabs;
+        set => RaiseAndSetIfChanged(ref _searchTextSlabs, value);
+    }
+    public ObservableCollection<LevelViewModel> Levels {
+        get => _levels;
+        set => RaiseAndSetIfChanged(ref _levels, value);
+    }
+    public ObservableCollection<LevelViewModel> FilteredLevels {
+        get => _filteredLevels;
+        set => RaiseAndSetIfChanged(ref _filteredLevels, value);
+    }
+    public string SearchTextLevels {
+        get => _searchTextLevels;
+        set => RaiseAndSetIfChanged(ref _searchTextLevels, value);
+    }
+    public string SquareSideMm {
+        get => _squareSideMm;
+        set => RaiseAndSetIfChanged(ref _squareSideMm, value);
+    }
+    public string SquareAngleDeg {
+        get => _squareAngleDeg;
+        set => RaiseAndSetIfChanged(ref _squareAngleDeg, value);
+    }
+
+    // Метод команды на выделение всех уровней
+    private void CheckAllLevels() {
+        foreach(var vm in FilteredLevels) {
+            vm.IsChecked = true;
+        }
+    }
+
+    // Метод команды на снятие выделения всех уровней
+    private void UncheckAllLevels() {
+        foreach(var vm in FilteredLevels) {
+            vm.IsChecked = false;
+        }
+    }
+
+    // Метод обновления UpLevels и BottomLevels
+    private void UpdateLevels() {
+        Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
+        FilteredLevels = new ObservableCollection<LevelViewModel>(Levels);
+    }
+
+    // Метод для реализации поиска уровнях
+    private void ApplySearchLevels() {
+        FilteredLevels = string.IsNullOrEmpty(SearchTextLevels)
+            ? new ObservableCollection<LevelViewModel>(Levels)
+            : new ObservableCollection<LevelViewModel>(Levels
+                .Where(item => item.Name
+                .IndexOf(SearchTextLevels, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
+
+    // Метод получения коллекции LevelViewModel для UpLevels и BottomLevels
+    private IEnumerable<LevelViewModel> GetLevelViewModels() {
+        string[] typeSlabs = FilteredSlabs.Where(vm => vm.IsChecked).Select(vm => vm.Name).ToArray();
+        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document).ToArray();
+
+        if(typeSlabs.Length == 0 || documents.Length == 0) {
+            return [];
+        }
+        var slabs = _services.SlabService.GetSlabsByTypesAndDocs(typeSlabs, documents);
+        var levels = slabs
+            .Select(slab => slab.Level)
+            .GroupBy(lvl => lvl.Id)
+            .Select(g => g.First())
+            .OrderBy(lvl => lvl.Elevation);
+        return levels
+            .Select(lvl => new LevelViewModel { Level = lvl, Name = lvl.Name, IsChecked = true });
+    }
+
+    // Метод обновления FilteredSlabs
+    private void UpdateFilteredSlabs() {
+        Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
+        FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
+        // Подписка на события в SlabViewModel
+        foreach(var slabVm in FilteredSlabs) {
+            slabVm.PropertyChanged += OnSlabChanged;
+        }
+    }
+
+    // Метод для реализации поиска в плитах перекрытия
+    private void ApplySearchSlabs() {
+        FilteredSlabs = string.IsNullOrEmpty(SearchTextSlabs)
+            ? new ObservableCollection<SlabViewModel>(Slabs)
+            : new ObservableCollection<SlabViewModel>(Slabs
+                .Where(item => item.Name
+                .IndexOf(SearchTextSlabs, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
+
+    // Метод подписанный на событие изменения SlabViewModel
+    private void OnSlabChanged(object sender, PropertyChangedEventArgs e) {
+        if(sender is not SlabViewModel) {
+            return;
+        }
+        if(e.PropertyName != nameof(SlabViewModel.IsChecked)) {
+            return;
+        }
+        UpdateLevels();
+    }
+
+    // Метод получения коллекции SlabViewModel для Slabs
+    private IEnumerable<SlabViewModel> GetSlabViewModels() {
+        var documents = FilteredDocuments.Where(vm => vm.IsChecked).Select(vm => vm.Document);
+        var allSlabs = _services.SlabService.GetTypeSlabsByDocs(documents)?.ToList() ?? [];
+        if(!allSlabs.Any()) {
+            return [];
+        }
+        var savedSlabs = _settings.TypeSlabs?.ToHashSet() ?? [];
+        var defaultNames = _systemPluginConfig.DefaultSlabTypeNames ?? [];
+
+        bool hasSaved = savedSlabs.Any();
+
+        return allSlabs
+            .Select(slabType => new SlabViewModel {
+                Name = slabType,
+                IsChecked = hasSaved
+                    ? savedSlabs.Contains(slabType)
+                    : defaultNames.Any(slabType.Contains)
+            })
+            .OrderByDescending(vm => defaultNames.Any(def => vm.Name.Contains(def)))
+            .ThenBy(vm => vm.Name);
+    }
+
+    // Метод для реализации поиска в документах
+    private void ApplySearchDocs() {
+        FilteredDocuments = string.IsNullOrEmpty(SearchTextDocs)
+            ? new ObservableCollection<DocumentViewModel>(Documents)
+            : new ObservableCollection<DocumentViewModel>(Documents
+                .Where(item => item.Name
+                .IndexOf(SearchTextDocs, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
+
+    // Метод, подписанный на событие изменения DocumentViewModel
+    private void OnDocumentChanged(object sender, PropertyChangedEventArgs e) {
+        if(sender is not DocumentViewModel) {
+            return;
+        }
+
+        if(e.PropertyName != nameof(DocumentViewModel.IsChecked)) {
+            return;
+        }
+
+        UpdateFilteredSlabs();
+        UpdateLevels();
+    }
+
+    // Метод получения коллекции DocumentViewModel для Documents
+    private IEnumerable<DocumentViewModel> GetDocumentViewModels() {
+        var allDocuments = _services.DocumentService.GetAllDocuments().ToArray();
+        var savedDocuments = _settings.Documents;
+        var savedDocumentsNames = savedDocuments.Count == 0
+            ? []
+            : savedDocuments
+                .Select(doc => doc.GetUniqId());
+
+        return allDocuments.Length == 0
+            ? []
+            : allDocuments
+                .Select(document => new DocumentViewModel(_localizationService, document) {
+                    IsChecked = savedDocumentsNames.Contains(document.GetUniqId())
+                })
+                .OrderBy(vm => vm.Name);
+    }
+
+    // Метод получения коллекции BuilderModeViewModel для BuilderModes
+    private IEnumerable<BuilderModeViewModel> GetTypeBuilderModeViewModels() {
+        var builderModes = Enum.GetValues(typeof(BuilderMode)).Cast<BuilderMode>();
+        return builderModes
+            .Select(builderMode => new BuilderModeViewModel {
+                Name = _localizationService.GetLocalizedString($"SlabBasedSettingViewModel.{builderMode}"),
+                BuilderMode = builderMode
+            });
+    }
+    
+    // Метод получения коллекции SlabExtrudeModeViewModel для SlabExtrudeModes
+    private IEnumerable<SlabExtrudeModeViewModel> GetSlabExtrudeModeViewModels() {
+        var extrudeModes = Enum.GetValues(typeof(SlabExtrudeMode)).Cast<SlabExtrudeMode>();
+        return extrudeModes
+            .Select(extrudeMode => new SlabExtrudeModeViewModel {
+                Name = _localizationService.GetLocalizedString($"SlabBasedSettingViewModel.{extrudeMode}"),
+                SlabExtrudeMode = extrudeMode
+            });
+    }
+    
+    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
+        switch(e.PropertyName) {
+            case nameof(SelectedBuilderMode):
+                IsSlabExtrudeMode = SelectedBuilderMode.BuilderMode == BuilderMode.SlabExtrudeBuilder;
+                IsSlabIntersectMode = SelectedBuilderMode.BuilderMode == BuilderMode.SlabIntersectBuilder;
+                break;
+        }
+    }
+
+    // Метод загрузки окна
+    private void LoadView() {
+        BuilderModes = new ObservableCollection<BuilderModeViewModel>(GetTypeBuilderModeViewModels());
+        SelectedBuilderMode = BuilderModes
+            .OrderByDescending(mode => mode.BuilderMode == _settings.BuilderMode)
+            .FirstOrDefault();
+        
+        SlabExtrudeModes = new ObservableCollection<SlabExtrudeModeViewModel>(GetSlabExtrudeModeViewModels());
+        SelectedSlabExtrudeMode = SlabExtrudeModes
+            .LastOrDefault();
+        
+        SplitVolumes = true;
+
+        UnionVolumes = _settings.UnionVolumes;
+
+        Documents = new ObservableCollection<DocumentViewModel>(GetDocumentViewModels());
+        FilteredDocuments = new ObservableCollection<DocumentViewModel>(Documents);
+        // Подписка на события в DocumentViewModel
+        foreach(var documentVm in FilteredDocuments) {
+            documentVm.PropertyChanged += OnDocumentChanged;
+        }
+
+        Slabs = new ObservableCollection<SlabViewModel>(GetSlabViewModels());
+        FilteredSlabs = new ObservableCollection<SlabViewModel>(Slabs);
+        // Подписка на события в SlabViewModel
+        foreach(var slabVm in FilteredSlabs) {
+            slabVm.PropertyChanged += OnSlabChanged;
+        }
+
+        Levels = new ObservableCollection<LevelViewModel>(GetLevelViewModels());
+        FilteredLevels = new ObservableCollection<LevelViewModel>(Levels);
+
+        SquareSideMm = Convert.ToString(_settings.SquareSideMm, CultureInfo.InvariantCulture);
+        SquareAngleDeg = Convert.ToString(_settings.SquareAngleDeg, CultureInfo.InvariantCulture);
+    }
+}

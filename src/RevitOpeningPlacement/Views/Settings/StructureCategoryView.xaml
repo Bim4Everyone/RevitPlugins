@@ -8,7 +8,7 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    xmlns:views="clr-namespace:RevitOpeningPlacement.Views.Settings"
+    xmlns:filtration="clr-namespace:Bim4Everyone.RevitFiltration.Controls.Views;assembly=Bim4Everyone.RevitFiltration.Controls"
     mc:Ignorable="d"
     d:Width="500"
     d:Height="250"
@@ -38,8 +38,10 @@
         </DockPanel>
         <ScrollViewer
             DockPanel.Dock="Bottom">
-            <views:SetView
-                DataContext="{Binding SetViewModel}" />
+            <filtration:PresetCategoriesFilterControl
+                IsEnabled="{Binding IsSelected}"
+                LogicalFilterProvider="{Binding FilterProvider}"
+                LanguageService="{Binding LanguageService}" />
         </ScrollViewer>
     </DockPanel>
 </core:WpfUIPlatformUserControl>

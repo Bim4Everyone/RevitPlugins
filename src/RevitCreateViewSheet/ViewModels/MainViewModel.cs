@@ -10,7 +10,6 @@ using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit.Comparators;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
@@ -34,7 +33,7 @@ namespace RevitCreateViewSheet.ViewModels {
         private readonly ISaveFileDialogService _saveFileService;
         private readonly IProgressDialogFactory _progressFactory;
         private readonly SheetItemsFactory _sheetItemsFactory;
-        private readonly LogicalStringComparer _comparer = new();
+        private readonly RevitStringComparer _comparer = new();
         private TitleBlockViewModel _addSheetsTitleBlock;
         private SheetFormatViewModel _addSheetsFormat;
         private OrientationViewModel _addSheetsOrientation;

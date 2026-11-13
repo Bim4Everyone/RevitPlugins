@@ -14,6 +14,7 @@ internal class CommercialTableInfo : ITableInfo {
         SummerRoomsStart = 0;
         OtherRoomsStart = 0;
         UtpStart = 0;
+        ExtraApartPropsStart = 0;
         NumericColumnsIndexes = new int[] { 7, 8 };
         RowsTotalNumber = RoomGroups.Count;
 
@@ -30,6 +31,7 @@ internal class CommercialTableInfo : ITableInfo {
     public int SummerRoomsStart { get; }
     public int OtherRoomsStart { get; }
     public int UtpStart { get; }
+    public int ExtraApartPropsStart { get; }
     public int[] NumericColumnsIndexes { get; }
     public int[] AreaTypeColumnsIndexes { get; }
     public int[] LengthTypeColumnsIndexes { get; }

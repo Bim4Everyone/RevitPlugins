@@ -146,7 +146,7 @@
     <system:String
         x:Key="Errors.CannotCreateAnnotationOnNotCreatedSheet">Нельзя создать аннотацию на еще не созданном листе.</system:String>
     <system:String
-        x:Key="Errors.CannotUpdateNotCreatetViewPort">Нельзя обновить еще не созданный видовой экран.</system:String>
+        x:Key="Errors.CannotUpdateNotCreatedViewPort">Нельзя обновить еще не созданный видовой экран.</system:String>
     <system:String
         x:Key="Errors.CannotUpdateNotCreatetSheet">Нельзя обновить еще не созданный лист.</system:String>
     <system:String

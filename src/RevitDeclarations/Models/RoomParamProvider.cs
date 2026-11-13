@@ -1,21 +1,28 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using RevitDeclarations.Comparators;
+
 namespace RevitDeclarations.Models;
 internal class RoomParamProvider {
     private readonly DeclarationSettings _settings;
+    private const string _hyphen = "-";
+
     public RoomParamProvider(DeclarationSettings settings) {
         _settings = settings;
     }
-    public string GetTwoParamsWithHyphen(RoomElement room, bool addPrefix) {
+    public string GetTwoParamsWithHyphen(RoomElement room, bool addPrefix, bool addHyphen) {
         string number = room.GetTextParamValue(_settings.RoomNumberParam);
-        if(addPrefix) {
-            string group = room.GetTextParamValue(_settings.ApartmentNumberParam);
-            if(!string.IsNullOrEmpty(group)) {
-                return $"{group}-{number}";
-            }
+        if(!addPrefix) {
+            return number;
         }
-        return number;
+        string group = room.GetTextParamValue(_settings.ApartmentNumberParam);
+        if(string.IsNullOrEmpty(group)) {
+            return number;
+        }
+        return addHyphen 
+            ? $"{group}{_hyphen}{number}" 
+            : $"{group}{number}";
     }
 
     public string GetDepartment(RoomElement room, string name) {
@@ -46,10 +53,11 @@ internal class RoomParamProvider {
         return string.Join(", ", resultString);
     }
 
-    public string GetAllLevels(IEnumerable<RoomElement> rooms) {
+    public string GetAllLevels(IEnumerable<RoomElement> rooms, RevitLogicalStringComparer logicalStrComparer) {
         var levelNames = rooms
             .Select(x => x.GetTextParamValue(_settings.LevelParam))
-            .Distinct();
+            .Distinct()
+            .OrderBy(x => x, logicalStrComparer);
         return string.Join(",", levelNames);
     }
 }

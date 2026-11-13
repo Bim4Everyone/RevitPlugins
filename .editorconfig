@@ -31,6 +31,15 @@ insert_final_newline = true
 dotnet_separate_import_directive_groups = true
 # System usings go first
 dotnet_sort_system_directives_first = true
+# New plugins enable <ImplicitUsings>enable</ImplicitUsings>, so System,
+# System.Collections.Generic, System.IO, System.Linq, System.Threading and
+# System.Threading.Tasks must not be imported with an explicit using directive.
+# The grouping and sorting rules above still apply to every other namespace.
+# Remove unnecessary using directives
+# https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0005
+# Kept at "suggestion": with TreatWarningsAsErrors "warning" would break the plugins
+# that were written before implicit usings were turned on.
+dotnet_diagnostic.IDE0005.severity = suggestion
 # Comment message in header of file
 file_header_template = unset
 
@@ -185,6 +194,18 @@ csharp_style_prefer_switch_expression = true:suggestion
 # Null-checking preferences
 # https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide1005
 csharp_style_conditional_delegate_call = true:suggestion
+
+# Nullable reference types
+# New plugins enable <Nullable>enable</Nullable>. Compiler diagnostics CS86xx stay
+# at "warning" and are promoted to errors by <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+# in src/Directory.Build.props, so a new plugin must be nullable clean to build.
+# Annotate with "?" instead of documenting nullability in comments, and use "!"
+# only where the absence of null is provable.
+# The shared sources in src/dosymep are compiled into every plugin and are opted out
+# with a "#nullable disable" directive.
+# https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/nullable-warnings
+# "?" outside of a nullable context is a mistake, not a silent no-op.
+dotnet_diagnostic.CS8632.severity = error
 
 # Modifier preferences
 # csharp_prefer_static_local_function is applicable in C# 8.0+ 

@@ -87,7 +87,6 @@
                     Style="{StaticResource  CustomResizableDataGridStyle}">
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn
-                            HeaderStyle="{StaticResource CustomDataGridHeaderStyle}"                          
                             Binding="{Binding Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <DataGridCheckBoxColumn.CellStyle>
                                 <Style TargetType="DataGridCell">
@@ -113,7 +112,6 @@
                         </DataGridCheckBoxColumn>
                         <DataGridTextColumn
                             Width="500"
-                            HeaderStyle="{StaticResource CustomDataGridHeaderStyle}"
                             Binding="{Binding Path=Name}"
                             IsReadOnly="True">
                             <DataGridTextColumn.Header>
@@ -123,10 +121,10 @@
                             </DataGridTextColumn.Header>
                         </DataGridTextColumn>
                         <DataGridTextColumn
-                            HeaderStyle="{StaticResource CustomDataGridHeaderStyle}"
                             Binding="{Binding Path=OpenStatus.Name}"
                             SortMemberPath="OpenStatus.Order"
-                            IsReadOnly="True">
+                            IsReadOnly="True"
+                            Width="*">
                             <DataGridTextColumn.Header>
                                 <TextBlock
                                     TextAlignment="Center"

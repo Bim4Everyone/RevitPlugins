@@ -1,0 +1,15 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "RevitPlugins.slnx",
+  "PluginName": "RevitRoundingOfAreas",
+  "PublishDirectory": "02.AR.extension\\АР.tab\\bin",
+  "RevitVersions": [
+    "Rv2022",
+    "Rv2023",
+    "Rv2024"
+  ],
+  "IconUrl": "https://icons8.com/icon/79538/decrease-decimal",
+  "BundleName": "Рассчитать площади (соц. объекты)",
+  "BundleType": "InvokeButton",
+  "BundleOutput": "02.AR.extension\\АР.tab\\Квартирография.panel\\Помещения.pulldown"
+}

@@ -1,0 +1,102 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:RevitSplitMepCurve.ViewModels.Providers"
+    xmlns:res="clr-namespace:RevitSplitMepCurve.Resources"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="../../assets/Styles/CustomStyles.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style
+        TargetType="ComboBox"
+        x:Key="SymbolComboBox"
+        BasedOn="{StaticResource DefaultComboBoxStyle}">
+        <Setter
+            Property="IsEditable"
+            Value="True" />
+        <Setter
+            Property="IsTextSearchEnabled"
+            Value="False" />
+        <Setter
+            Property="StaysOpenOnEdit"
+            Value="True" />
+        <Setter
+            Property="IsSynchronizedWithCurrentItem"
+            Value="False" />
+    </Style>
+
+    <DataTemplate
+        DataType="{x:Type vm:PipesProviderViewModel}">
+        <Grid
+            Margin="0 8 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="200" />
+                <ColumnDefinition
+                    Width="*" />
+            </Grid.ColumnDefinitions>
+            <Label
+                Grid.Column="0"
+                Content="{Binding RoundSymbol.Label}" />
+            <ComboBox
+                Grid.Column="1"
+                DisplayMemberPath="Name"
+                res:ComboBoxBehavior.OpenDropDownOnTextChanged="True"
+                Style="{StaticResource SymbolComboBox}"
+                Text="{Binding RoundSymbol.SearchText, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding RoundSymbol.FilteredItems.View}"
+                SelectedItem="{Binding RoundSymbol.SelectedItem}"
+                ScrollViewer.VerticalScrollBarVisibility="Auto" />
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate
+        DataType="{x:Type vm:DuctsProviderViewModel}">
+        <StackPanel
+            Orientation="Vertical">
+            <Grid
+                Margin="0 8 0 8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="200" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Column="0"
+                    Content="{Binding RoundSymbol.Label}" />
+                <ComboBox
+                    Grid.Column="1"
+                    DisplayMemberPath="Name"
+                    res:ComboBoxBehavior.OpenDropDownOnTextChanged="True"
+                    Style="{StaticResource SymbolComboBox}"
+                    Text="{Binding RoundSymbol.SearchText, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding RoundSymbol.FilteredItems.View}"
+                    SelectedItem="{Binding RoundSymbol.SelectedItem}"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="200" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Column="0"
+                    Content="{Binding RectangleSymbol.Label}" />
+                <ComboBox
+                    Grid.Column="1"
+                    DisplayMemberPath="Name"
+                    res:ComboBoxBehavior.OpenDropDownOnTextChanged="True"
+                    Style="{StaticResource SymbolComboBox}"
+                    Text="{Binding RectangleSymbol.SearchText, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding RectangleSymbol.FilteredItems.View}"
+                    SelectedItem="{Binding RectangleSymbol.SelectedItem}"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto" />
+            </Grid>
+        </StackPanel>
+    </DataTemplate>
+
+</ResourceDictionary>

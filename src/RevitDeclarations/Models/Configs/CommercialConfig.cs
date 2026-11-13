@@ -29,15 +29,17 @@ internal class CommercialConfigSettings : DeclarationConfigSettings {
     public string BuildingNumberParam { get; set; }
     public string ConstrWorksNumberParam { get; set; }
     public bool AddPrefixToNumber { get; set; }
+    public bool AddHyphenToPrefix { get; set; }
     public string RoomsHeightParam { get; set; }
     public string ParkingSpaceClass { get; set; }
     public string ParkingInfo { get; set; }
+    public string PositionType { get; set; }
     public string GroupNameParam { get; set; }
 
     public CommercialConfigSettings GetCompanyConfig() {
         return new CommercialConfigSettings() {
             FilterRoomsParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_DEPARTMENT),
-            FilterRoomsValues = new[] { "нежилое помещение", "машино-место", "кладовая" },
+            FilterRoomsValues = ["нежилое помещение", "машино-место", "кладовая"],
             GroupingBySectionParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
             GroupingByGroupParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NUMBER),
             MultiStoreyParam = SharedParamsConfig.Instance.RoomMultilevelGroup.Name,
@@ -54,11 +56,13 @@ internal class CommercialConfigSettings : DeclarationConfigSettings {
             RoomsHeightParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_HEIGHT),
             ParkingSpaceClass = SharedParamsConfig.Instance.ParkingSpaceClass.Name,
             ParkingInfo = SharedParamsConfig.Instance.ApartmentNameExtra.Name,
+            PositionType = SharedParamsConfig.Instance.RoomPositionType.Name,
             GroupNameParam = SharedParamsConfig.Instance.ApartmentGroupName.Name,
 
             ProjectNameID = "",
 
             AddPrefixToNumber = true,
+            AddHyphenToPrefix = false,
 
             RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,
             RoomNameParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_NAME),

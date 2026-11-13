@@ -5,6 +5,8 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 
+using Bim4Everyone.RevitFiltration.Controls;
+
 using RevitSleeves.Models;
 using RevitSleeves.Models.Config;
 using RevitSleeves.Models.Placing;
@@ -19,8 +21,10 @@ internal class PipeFloorIntersectionsFinder : MepOpeningCollisionFinder, IClashF
         IMepElementsProvider mepElementsProvider,
         IStructureLinksProvider structureLinksProvider,
         IOpeningGeometryProvider openingGeometryProvider,
+        IFilterContextParser filterContextParser,
         SleevePlacementSettingsConfig config)
-        : base(revitRepository, mepElementsProvider, structureLinksProvider, openingGeometryProvider) {
+        : base(revitRepository, mepElementsProvider, structureLinksProvider,
+              openingGeometryProvider, filterContextParser) {
 
         _config = config ?? throw new ArgumentNullException(nameof(config));
     }
@@ -28,16 +32,16 @@ internal class PipeFloorIntersectionsFinder : MepOpeningCollisionFinder, IClashF
     public ICollection<ClashModel<Pipe, Floor>> FindClashes() {
         ICollection<ClashModel<Pipe, Floor>> structureClashes = [.. FindStructureClashes<Floor>(
             _config.PipeSettings.Category,
-            _config.PipeSettings.MepFilterSet,
+            _config.PipeSettings.MepFilterContext,
             _config.PipeSettings.FloorSettings.Category,
-            _config.PipeSettings.FloorSettings.FilterSet)
+            _config.PipeSettings.FloorSettings.FilterContext)
             .Select(clash => new ClashModel<Pipe, Floor>(_revitRepository, clash))];
 
         ICollection<ClashModel<Pipe, Floor>> openingClashes = [.. FindOpeningClashes(
             _config.PipeSettings.Category,
-            _config.PipeSettings.MepFilterSet,
+            _config.PipeSettings.MepFilterContext,
             _config.PipeSettings.FloorSettings.Category,
-            _config.PipeSettings.FloorSettings.FilterSet)
+            _config.PipeSettings.FloorSettings.FilterContext)
             .Select(clash => new ClashModel<Pipe, FamilyInstance>(_revitRepository, clash))
             .Select(openingClash => new ClashModel<Pipe, Floor>(
                 _revitRepository, openingClash.MepElement,

@@ -1,0 +1,52 @@
+using System.Collections.Generic;
+using System.Linq;
+
+using RevitBuildCoordVolumes.Models.Geometry;
+using RevitBuildCoordVolumes.Models.Interfaces;
+using RevitBuildCoordVolumes.Models.Services;
+using RevitBuildCoordVolumes.Models.Settings;
+
+namespace RevitBuildCoordVolumes.Models;
+
+internal class SlabBasedCoordVolumeBuilder : ICoordVolumeBuilder {
+    private readonly ISpatialElementDividerService _spatialElementDividerService;
+    private readonly IColumnFactory _columnFactory;
+    private readonly BuildCoordVolumeServices _services;
+    private readonly BuildCoordVolumeSettings _settings;
+
+    public SlabBasedCoordVolumeBuilder(
+        BuildCoordVolumeServices services,
+        BuildCoordVolumeSettings settings) {
+        _services = services;
+        _spatialElementDividerService = _services.SpatialDivider;
+        _columnFactory = _services.ColumnFactory;
+        _settings = settings;
+    }
+
+    public List<GeomObject> Build(SpatialObject spatialObject, ProgressService progressService) {
+        // Разделение зоны на полигоны  
+        var polygons = _spatialElementDividerService.DivideSpatialElement(spatialObject.SpatialElement, _settings, progressService);
+
+        // Получение всех плит перекрытия из настроек
+        var allSlabs = _services.SlabService.GetSlabsByTypesDocsAndLevels(
+            _settings.TypeSlabs, _settings.Documents, _settings.Levels)
+            .ToList();
+        
+        // Фильтрация плит перекрытий по зоне
+        var filteredSlabs = _services.SlabFilteredService.FilterSlabBySpatialObject(allSlabs, spatialObject);
+        
+        // Построение групп колонн
+        var columnGroups = _columnFactory.CreateColumnGroups(polygons, filteredSlabs, progressService);
+
+        // Финальная сборка
+        var geomObjects = _services.GeomObjectsBuildService.CreateGeomObjects(
+            _settings, 
+            filteredSlabs,
+            columnGroups, 
+            polygons, 
+            spatialObject, 
+            progressService);
+
+        return geomObjects;
+    }
+}

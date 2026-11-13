@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -10,7 +11,6 @@ using RevitMechanicalSpecification.Entities;
 using RevitMechanicalSpecification.Models.Fillers;
 using RevitMechanicalSpecification.Models;
 using dosymep.Revit;
-using System.Windows;
 using System.Threading;
 using dosymep.SimpleServices;
 using dosymep.Xpf.Core.SimpleServices;
@@ -21,29 +21,29 @@ using System.Diagnostics;
 
 namespace RevitMechanicalSpecification.Service {
     internal class ElementProcessor {
-        private readonly string _userName;
         private readonly Document _document;
         private readonly SpecConfiguration _specConfiguration;
+        private readonly IElementEditorTracker _elementEditorTracker;
+        private readonly DuctRotationCorrector _ductRotationCorrector;
         private readonly ParamChecker _paramChecker;
         private readonly MaskReplacer _maskReplacer;
 
-        private readonly List<string> _editors = new List<string>();
-        private readonly HashSet<BuiltInCategory> _possibleGenericCategories = new HashSet<BuiltInCategory>() {
-                        BuiltInCategory.OST_DuctAccessory,
-                        BuiltInCategory.OST_PipeAccessory,
-                        BuiltInCategory.OST_MechanicalEquipment
-    };
         private readonly HashSet<BuiltInCategory> _insulationCategories = new HashSet<BuiltInCategory>() {
                         BuiltInCategory.OST_DuctInsulations,
                         BuiltInCategory.OST_PipeInsulations
     };
 
-        public ElementProcessor(Document document) {
-            _userName = document.Application.Username;
+        public ElementProcessor(
+            Document document,
+            SpecConfiguration specConfiguration,
+            IElementEditorTrackerFactory elementEditorTrackerFactory,
+            DuctRotationCorrector ductRotationCorrector) {
             _document = document;
 
-            _specConfiguration = new SpecConfiguration(_document);
-            _paramChecker = new ParamChecker();
+            _specConfiguration = specConfiguration;
+            _elementEditorTracker = elementEditorTrackerFactory.Create(document);
+            _ductRotationCorrector = ductRotationCorrector;
+            _paramChecker = new ParamChecker(_elementEditorTracker);
             _maskReplacer = new MaskReplacer(_specConfiguration);
         }
 
@@ -83,6 +83,8 @@ namespace RevitMechanicalSpecification.Service {
             _paramChecker.ExecuteParamCheck(_document, _specConfiguration);
 
             using(var t = _document.StartTransaction("Обновление спецификации")) {
+                _ductRotationCorrector.Execute(splitResult, _elementEditorTracker);
+
                 var totalElements = splitResult.SingleElements.Count + splitResult.ManifoldElements.Count;
                 
                 var percent = totalElements * 0.01; //1 процент от элементов
@@ -100,6 +102,7 @@ namespace RevitMechanicalSpecification.Service {
                         nextStepByPercents = percent * percentCount;
                     }
                     
+                    _maskReplacer.ExecuteReplacment(specificationElement);
                     ProcessElement(specificationElement, fillers);
                 }
 
@@ -114,10 +117,12 @@ namespace RevitMechanicalSpecification.Service {
                         percentCount += 1;
                         nextStepByPercents = percent * percentCount;
                     }
+                    _maskReplacer.ExecuteReplacment(manifoldElement);
                     ProcessElement(manifoldElement, fillers);
                 }
                 t.Commit();
-                ShowReport();
+                ShowElementEditorTrackerReport();
+                _ductRotationCorrector.ShowReport();
             }
         }
 
@@ -129,39 +134,6 @@ namespace RevitMechanicalSpecification.Service {
         private void ProcessElement(SpecificationElement specificationElement, List<ElementParamFiller> fillers) {
             foreach(var filler in fillers) {
                 filler.Fill(specificationElement);
-            }
-        }
-
-        /// <summary>
-        /// Проверка на занятость элемента
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        private bool IsEditedBy(string userName, Element element) {
-            string editedBy = element.GetParamValueOrDefault<string>(BuiltInParameter.EDITED_BY);
-
-            if(string.IsNullOrEmpty(editedBy)) {
-                return false;
-            }
-
-            if(!string.Equals(editedBy, userName, StringComparison.OrdinalIgnoreCase)) {
-                if(!_editors.Contains(editedBy)) {
-                    _editors.Add(editedBy);
-                }
-                return true;
-            }
-
-            return false;
-        }
-        /// <summary>
-        /// Выводит отчет с занявшими элемент пользователями
-        /// </summary>
-        /// <param name="editors"></param>
-        private void ShowReport() {
-            if(_editors.Count != 0) {
-                MessageBox.Show("Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
-                    + string.Join(", ", _editors.ToArray()));
             }
         }
 
@@ -180,9 +152,8 @@ namespace RevitMechanicalSpecification.Service {
 
             foreach(Element element in elements) {
 
-                // Это должна быть всегда первая обработка. Если элемент на редактировании - идем дальше, записав 
-                // редактора в список
-                if(IsEditedBy(_userName, element)) {
+                // Это должна быть всегда первая обработка. Если элемент недоступен для редактирования - идем дальше
+                if(!_elementEditorTracker.IsEditAvailable(element)) {
                     continue;
                 }
 
@@ -264,9 +235,39 @@ namespace RevitMechanicalSpecification.Service {
 
                 manifoldPartsIds.Add(subElement.Id);
 
+                if(!_elementEditorTracker.IsEditAvailable(subElement)) {
+                    continue;
+                }
+
                 SpecificationElement subSpecificationElement = CreateSubSpecificationElement(subElement, familyInstance, specificationElement);
                 manifoldElements.Add(subSpecificationElement);
             }
+        }
+
+        private void ShowElementEditorTrackerReport() {
+            var (hasUpdatedInCentralElements, editors) = _elementEditorTracker.GetUnavailabilityInfo();
+            if(!hasUpdatedInCentralElements && editors.Count == 0) {
+                _elementEditorTracker.Reset();
+                return;
+            }
+
+            var reports = new List<string>();
+            if(hasUpdatedInCentralElements) {
+                reports.Add("Вы владеете элементами, но ваш файл устарел. Выполните синхронизацию.");
+            }
+
+            if(editors.Count > 0) {
+                reports.Add(
+                    "Некоторые элементы не были обработаны, так как заняты пользователем/пользователями: "
+                    + string.Join(", ", editors.OrderBy(item => item, StringComparer.OrdinalIgnoreCase)));
+            }
+
+            ServicesProvider.GetPlatformService<IMessageBoxService>().Show(
+                string.Join(Environment.NewLine, reports),
+                "Обновление спецификации",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            _elementEditorTracker.Reset();
         }
 
         /// <summary>
@@ -304,16 +305,5 @@ namespace RevitMechanicalSpecification.Service {
             return elemType.GetSharedParamValueOrDefault<int>(_specConfiguration.IsOutSideOfManifold) == 1;
         }
 
-        /// <summary>
-        /// Если генерик - заполняет его и возвращает True. Иначе возвращает False.
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        private bool FillIfGeneric(Element element) {
-            if(element.InAnyCategory(_possibleGenericCategories)) {
-                return _maskReplacer.ExecuteReplacment(element);
-            }
-            return false;
-        }
     }
 }

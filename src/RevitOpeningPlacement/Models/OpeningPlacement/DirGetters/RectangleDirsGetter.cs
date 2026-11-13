@@ -27,7 +27,8 @@ internal class RectangleDirsGetter : IDirectionsGetter {
         var horizontalDirs = new[] { dirX, -dirX }.Select(item => item * width);
 
         // сложение векторов для получение направлений всех диагоналей и проекция полученных векторов на плоскость
-        return verticalDirs.SelectMany(item => horizontalDirs.Select(hitem => _clash.Element2Transform.OfVector(hitem + item)))
+        return verticalDirs.SelectMany(item =>
+                horizontalDirs.Select(hitem => _clash.Element2Transform.Inverse.OfVector(hitem + item)))
                            .Select(item => plane.ProjectVector(item).Normalize());
     }
 }

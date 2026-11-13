@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Bim4Everyone.Templates;
 using dosymep.Revit;
@@ -18,6 +17,7 @@ using RevitMechanicalSpecification.Models;
 
 namespace RevitMechanicalSpecification.Service {
     internal class ParamChecker {
+        private readonly IElementEditorTracker _elementEditorTracker;
         private readonly List<RevitParam> _paramsToDataGroup = new List<RevitParam>() {
             SharedParamsConfig.Instance.VISHvacSystemFunction,
             SharedParamsConfig.Instance.VISSystemShortName,
@@ -101,10 +101,15 @@ namespace RevitMechanicalSpecification.Service {
             SharedParamsConfig.Instance.VISPipeDuctReserve,
             SharedParamsConfig.Instance.VISIndividualStock,
             SharedParamsConfig.Instance.VISJunction,
-            SharedParamsConfig.Instance.VISExcludeFromJunction
+            SharedParamsConfig.Instance.VISExcludeFromJunction,
+            SharedParamsConfig.Instance.VISSpecNumbersCurrency
         };
         private SpecConfiguration _specConfiguration;
         private Document _document;
+
+        public ParamChecker(IElementEditorTracker elementEditorTracker) {
+            _elementEditorTracker = elementEditorTracker;
+        }
 
         /// <summary>
         /// Если параметр в сведениях о проекте пустой - ставим стандартное значение из согласованных инженерами
@@ -121,7 +126,23 @@ namespace RevitMechanicalSpecification.Service {
         /// <summary>
         /// Отдельная транзакция на проверку стандартных значений параметров
         /// </summary>
-        private void CheckParamterValues() {
+        private void CheckParameterValues() {
+            bool hasEmptyValues =
+                _document.ProjectInformation.GetSharedParamValueOrDefault<double>(
+                    _specConfiguration.ParamNameDuctInsulationStock, 0) == 0
+                || _document.ProjectInformation.GetSharedParamValueOrDefault<double>(
+                    _specConfiguration.ParamNameDuctPipeStock, 0) == 0
+                || _document.ProjectInformation.GetSharedParamValueOrDefault<double>(
+                    _specConfiguration.ParamNamePipeInsulationStock, 0) == 0;
+
+            if(!hasEmptyValues) {
+                return;
+            }
+
+            if(!_elementEditorTracker.IsEditAvailable(_document.ProjectInformation)) {
+                return;
+            }
+
             using(var t = _document.StartTransaction("Установка стандартных значений параметров")) {
                 // Цифры  по запасам получены получены письмом от 08.08.2024 на основании опыта стройки
                 FillInfoParamIfEmpty(_specConfiguration.ParamNameDuctInsulationStock, 20);
@@ -143,21 +164,13 @@ namespace RevitMechanicalSpecification.Service {
             definition.ReInsertToGroup(document, group);
         }
 
-        // Временная проверка пока мы не переходим на редактируемые экземпляры групп. Если ФОП_ВИС_Число и ФОП_ВИС_Число ДЕ в проекте вместе - отменяем работу 
-        private void CheckNumberDuplicate(Document document) {
-            if(document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbers) &&
-                (document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency))) {
-
-                MessageBox.Show(
-                    "Работа невозможна при одновременном наличии в проекте параметров ФОП_ВИС_Число и ФОП_ВИС_Число ДЕ");
-                throw new OperationCanceledException();
-            }
-
-            if(!document.IsExistsParam(SharedParamsConfig.Instance.VISSpecNumbersCurrency)) {
-                _revitParams.Add(SharedParamsConfig.Instance.VISSpecNumbers);
-            } else {
-                _revitParams.Add(SharedParamsConfig.Instance.VISSpecNumbersCurrency);
-            }
+        private List<RevitParam> GetEditableParams(IEnumerable<RevitParam> revitParams) {
+            return revitParams
+                .Where(revitParam => {
+                    SharedParameterElement param = _document.GetSharedParam(revitParam.Name);
+                    return param == null || _elementEditorTracker.IsEditAvailable(param);
+                })
+                .ToList();
         }
 
         /// <summary>
@@ -168,22 +181,24 @@ namespace RevitMechanicalSpecification.Service {
             _document = document;
             _specConfiguration = specConfiguration;
 
-            CheckNumberDuplicate(document);
             ProjectParameters projectParameters = ProjectParameters.Create(document.Application);
-            projectParameters.SetupRevitParams(document, _revitParams);
+            projectParameters.SetupRevitParams(document, GetEditableParams(_revitParams));
+
+            List<RevitParam> paramsToDataGroup = GetEditableParams(_paramsToDataGroup);
+            List<RevitParam> paramsToConstraints = GetEditableParams(_paramsToConstraints);
 
             using(var t = _document.StartTransaction("Смена групп параметров")) {
-                foreach(RevitParam revitParam in _paramsToDataGroup) {
+                foreach(RevitParam revitParam in paramsToDataGroup) {
                     SortParameterToGroup(document, revitParam.Name, GroupTypeId.Data);
                 }
 
-                foreach(RevitParam revitParam in _paramsToConstraints) {
+                foreach(RevitParam revitParam in paramsToConstraints) {
                     SortParameterToGroup(document, revitParam.Name, GroupTypeId.Constraints);
                 }
                 t.Commit();
             }
 
-            CheckParamterValues();
+            CheckParameterValues();
         }
     }
 }

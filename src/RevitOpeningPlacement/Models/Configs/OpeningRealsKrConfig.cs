@@ -32,6 +32,11 @@ internal class OpeningRealsKrConfig : ProjectConfig {
     /// </summary>
     public int ElevationRounding { get; set; } = 1;
 
+    /// <summary>
+    /// Настройки статусов Навигатора
+    /// </summary>
+    public NavigatorKrSettings NavigatorSettings { get; set; } = new();
+
     public static OpeningRealsKrConfig GetOpeningConfig(Document document) {
         return document is null
             ? throw new ArgumentNullException(nameof(document))

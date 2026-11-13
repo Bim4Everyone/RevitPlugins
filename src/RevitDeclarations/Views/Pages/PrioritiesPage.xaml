@@ -1,0 +1,143 @@
+﻿<core:WpfUIPlatformPage 
+    x:Class="RevitDeclarations.Views.PrioritiesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:vms="clr-namespace:RevitDeclarations.ViewModels"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    
+    ScrollViewer.CanContentScroll="False"
+    
+    x:ClassModifier="internal">
+
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+    
+    <ScrollViewer>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border
+                Grid.Row="0"
+                Margin="14,14,14,4"
+                Style="{StaticResource CustomBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        Margin="0,0,0,4"
+                        TextWrapping="Wrap"
+                        Text="{me:LocalizationSource PrioritiesPage.Description}" />
+
+                    <ui:Button
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Margin="0,4,4,4"
+                        HorizontalAlignment="Stretch"
+                        Appearance="Info"
+                        Content="{me:LocalizationSource PrioritiesPage.CorpPriorities}"
+                        Command="{Binding SetDefaultConfigCommand}" />
+                    <ui:Button
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="4"
+                        HorizontalAlignment="Stretch"
+                        Appearance="Info"
+                        Content="{me:LocalizationSource PrioritiesPage.ExportPriorities}"
+                        Command="{Binding ExportConfigCommand}" />
+                    <ui:Button
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Margin="4,4,0,4"
+                        Content="{me:LocalizationSource PrioritiesPage.ImportPriorities}"
+                        Appearance="Info"
+                        HorizontalAlignment="Stretch"
+                        Command="{Binding ImportConfigCommand}" />
+
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Margin="4,8"
+                        VerticalAlignment="Center"
+                        Text="{me:LocalizationSource PrioritiesPage.FileLocation}" />
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        Margin="0, 5, 10, 5"
+                        VerticalAlignment="Center"
+                        TextWrapping="Wrap"
+                        Text="{Binding FilePath}" />
+                </Grid>            
+            </Border>
+
+            <Border
+                Grid.Row="1"
+                Margin="14,0,14,14"
+                Style="{StaticResource CustomBorder}">
+                <DataGrid
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Margin="10"
+                    GridLinesVisibility="All"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    ItemsSource="{Binding PrioritiesVM}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Header="{me:LocalizationSource PrioritiesPage.Number}"
+                            Width="80"
+                            IsReadOnly="True"
+                            Binding="{Binding OrdinalNumber}" />
+                        <DataGridTextColumn
+                            Header="{me:LocalizationSource PrioritiesPage.Name}"
+                            Width="*"
+                            IsReadOnly="True"
+                            Binding="{Binding Name}" />
+                        <DataGridTextColumn
+                            Header="{me:LocalizationSource PrioritiesPage.Coef}"
+                            Width="90"
+                            IsReadOnly="True"
+                            Binding="{Binding AreaCoefficient}" />
+                        <DataGridTextColumn
+                            Header="{me:LocalizationSource PrioritiesPage.IsSummer}"
+                            Width="90"
+                            IsReadOnly="True"
+                            Binding="{Binding IsSummer}" />
+                        <DataGridTextColumn
+                            Header="{me:LocalizationSource PrioritiesPage.IsLiving}"
+                            Width="90"
+                            IsReadOnly="True"
+                            Binding="{Binding IsLiving}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</core:WpfUIPlatformPage>

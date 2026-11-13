@@ -37,4 +37,10 @@ internal abstract class ParamsSetter {
     protected void SetThickness(FamilyInstance sleeve, double thickness) {
         sleeve.SetParamValue(NamesProvider.ParameterSleeveThickness, thickness);
     }
+
+    protected void SetWorkset(FamilyInstance sleeve, WorksetId worksetId) {
+        if(sleeve.Document.IsWorkshared) {
+            sleeve.SetParamValue(BuiltInParameter.ELEM_PARTITION_PARAM, worksetId.IntegerValue);
+        }
+    }
 }

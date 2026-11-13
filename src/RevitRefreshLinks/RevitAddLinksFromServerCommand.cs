@@ -48,7 +48,13 @@ public class RevitAddLinksFromServerCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
+        kernel.UseWpfWindowsTheme();
         kernel.UseWpfUIThemeUpdater();
+        kernel.Bind<IHasTheme>().To<HasTheme>().InSingletonScope();
+        kernel.Bind<IHasLocalization>().To<HasLocalization>().InSingletonScope();
+        kernel.UseWpfUIMessageBox<AddServerLinksViewModel>();
+        kernel.UseWpfUIProgressDialog<AddServerLinksViewModel>();
+
 
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/Localization/Language.xaml",

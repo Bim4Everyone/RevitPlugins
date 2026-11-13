@@ -24,7 +24,8 @@ internal class InstanceManager {
     }
 
     // Основной метод по созданию, загрузке семейства и размещению в модели
-    public void CreateInstances(List<Room> listRoom, string familyName, double extrusionHeight, bool joinExtrusionChecked) {
+    public void CreateInstances(
+        List<Room> listRoom, string familyName, double extrusionHeight, bool joinExtrusionChecked, string familyTemplatePath) {
         string transactionName = _localizationService.GetLocalizedString("InstanceManager.TransactionName");
         using var t = _revitRepository.Document.StartTransaction(transactionName);
         var view3d = _revitRepository.GetView3D(familyName);
@@ -38,7 +39,8 @@ internal class InstanceManager {
             var tempFamilyDocument = new TempFamilyDocument(
                 _localizationService, _revitRepository, _familyLoadOptions, familyName, locationKey);
 
-            var famSymbol = tempFamilyDocument.GetFamilySymbol(groupRooms.ToList(), extrusionHeight, joinExtrusionChecked);
+            var famSymbol = tempFamilyDocument.GetFamilySymbol(
+                groupRooms.ToList(), extrusionHeight, joinExtrusionChecked, familyTemplatePath);
 
             if(!IsPlacedFamilyInstance(familyName)) {
                 PlaceFamilyInstance(famSymbol, groupRooms, locationKey);

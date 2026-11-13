@@ -27,6 +27,7 @@ internal class PublicAreasConfig : ProjectConfig<PublicAreasConfigSettings> {
 
 internal class PublicAreasConfigSettings : DeclarationConfigSettings {
     public bool AddPrefixToNumber { get; set; }
+    public bool AddHyphenToPrefix { get; set; }
 
     public PublicAreasConfigSettings GetCompanyConfig() {
         return new PublicAreasConfigSettings() {
@@ -45,6 +46,7 @@ internal class PublicAreasConfigSettings : DeclarationConfigSettings {
             ApartmentNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
 
             AddPrefixToNumber = true,
+            AddHyphenToPrefix = false,
             ProjectNameID = "",
 
             RoomAreaParam = SharedParamsConfig.Instance.RoomArea.Name,

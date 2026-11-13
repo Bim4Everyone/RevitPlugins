@@ -27,6 +27,16 @@ namespace RevitMechanicalSpecification.Models.Fillers {
 
         public override void SetParamValue(SpecificationElement specificationElement) {
             TargetParam.Set(GetNumber(specificationElement));
+            
+            if(Config.NullifyOutdatedNumber) {
+                if(specificationElement.Element.IsExistsParam(Config.OutdatedNameNumber)) {
+                    Parameter outDateParam = specificationElement.Element.GetParam(Config.OutdatedNameNumber);
+                    if(!outDateParam.IsReadOnly
+                        && specificationElement.Element.GroupId == ElementId.InvalidElementId) {
+                        outDateParam.Set(0);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -35,13 +45,27 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="specificationElement"></param>
         /// <returns></returns>
         private double GetNumber(SpecificationElement specificationElement) {
+            if(specificationElement.BuiltInCategory == BuiltInCategory.OST_CableTrayFitting) {
+                return 1;
+            }
+
             string unit = specificationElement.Element.GetSharedParamValue<string>(Config.TargetNameUnit);
 
+            // Для элементов в семейства которых зашит в формулу расчет по старому параметру треубется возвращаение его значения
+            Parameter outDateParam = specificationElement.Element.GetTypeOrInstanceParam(
+                specificationElement.ElementType, 
+                Config.OutdatedNameNumber);
+            if(!(outDateParam is null)) {
+                if(outDateParam.IsReadOnly) {
+                    return outDateParam.AsDouble();
+                }
+            }
+            
             // Если единица измерения штуки или комплекты - возвращаем 1
             if(unit == Config.SingleUnit || unit == Config.KitUnit) {
                 return 1;
             }
-
+            
             // Если единица измерения метры квадратные - забираем или высчитываем (для фитингов) площадь в дабл и переводим в метры квадратные
             if(unit == Config.SquareUnit) {
                 if(specificationElement.BuiltInCategory == BuiltInCategory.OST_DuctInsulations) {

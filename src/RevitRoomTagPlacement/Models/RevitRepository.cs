@@ -8,6 +8,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitRoomTagPlacement.ViewModels;
 
@@ -15,8 +16,11 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitRoomTagPlacement.Models;
 internal class RevitRepository {
-    public RevitRepository(UIApplication uiApplication) {
+    private readonly ILocalizationService _localizationService;
+
+    public RevitRepository(UIApplication uiApplication, ILocalizationService localizationService) {
         UIApplication = uiApplication;
+        _localizationService = localizationService;
     }
 
     public UIApplication UIApplication { get; }
@@ -29,7 +33,7 @@ internal class RevitRepository {
         return ActiveUIDocument.GetSelectedElements()
             .Where(x => x is Room)
             .OfType<Room>()
-            .Select(x => new RoomFromRevit(x))
+            .Select(x => new RoomFromRevit(x, _localizationService))
             .ToList();
     }
 
@@ -44,7 +48,7 @@ internal class RevitRepository {
         var allRooms = new FilteredElementCollector(Document, Document.ActiveView.Id)
             .OfCategory(BuiltInCategory.OST_Rooms)
             .OfType<Room>()
-            .Select(x => new RoomFromRevit(x))
+            .Select(x => new RoomFromRevit(x, _localizationService))
             .ToList();
 
         foreach(var link in links) {
@@ -53,7 +57,7 @@ internal class RevitRepository {
             var rooms = new FilteredElementCollector(link.GetLinkDocument())
             .OfCategory(BuiltInCategory.OST_Rooms)
             .OfType<Room>()
-            .Select(x => new RoomFromRevit(x, link.Id, transform))
+            .Select(x => new RoomFromRevit(x, _localizationService, link.Id, transform))
             .ToList();
 
             allRooms.AddRange(rooms);
@@ -123,7 +127,8 @@ internal class RevitRepository {
         var viewFilter = new ElementOwnerViewFilter(activeView.Id);
         double indentFeet = ConvertIndentToFeet(indent);
 
-        using var t = Document.StartTransaction("Маркировать помещения");
+        string transactionName = _localizationService.GetLocalizedString("MainWindow.TransactionName");
+        using var t = Document.StartTransaction(transactionName);
         foreach(var room in rooms) {
             var depElements = room.RoomObject
                 .GetDependentElements(viewFilter)

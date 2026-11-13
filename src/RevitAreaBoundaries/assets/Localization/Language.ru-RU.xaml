@@ -1,0 +1,49 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">    
+
+    <system:String x:Key="MainWindow.Title">Границы зон ТЭП</system:String>
+    
+    <system:String x:Key="MainWindow.Settings">Настройки плагина</system:String>
+    <system:String x:Key="MainWindow.CommonSettings">Общие настройки</system:String>
+    <system:String x:Key="MainWindow.ViewPlanSelections">Выбор планов зонирования</system:String>
+    <system:String x:Key="MainWindow.TypeElementSelections">Выбор типов элементов</system:String>
+    
+    <system:String x:Key="ViewPlanSelectionPage.GroupParameters">Параметр группировки</system:String>
+    <system:String x:Key="ViewPlanSelectionPage.GroupParametersDescription">Параметр, используемый в группировке видов</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.AlgorithmType">Тип алгоритма</system:String>
+    <system:String x:Key="CommonSettingsPage.AlgorithmTypeDescription">Выбор типа алгоритма определения границ</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.SectionHeight">Высота от уровня, мм</system:String>
+    <system:String x:Key="CommonSettingsPage.SectionHeightDescription">Высота сечения здания в мм от уровня плана</system:String>
+    <system:String x:Key="CommonSettingsPage.SectionHeightTooltip">Значение нужно указывать в миллиметрах, без дробных частей</system:String>
+    
+    <system:String x:Key="ViewPlanSelectionViewModel.NoViews">В проекте отсутствуют планы зонирования</system:String>
+    <system:String x:Key="ViewPlanSelectionViewModel.NoBrowserParameter">В проекте не настроен параметр группировки видов</system:String>
+    
+    <system:String x:Key="CommonSettingViewModel.OuterBoundary">ГНС</system:String>
+    
+    <system:String x:Key="CustomGroupEditControl.SelectCommandText">Выбрать все</system:String>
+    <system:String x:Key="CustomGroupEditControl.UnSelectCommandText">Снять выбор</system:String>
+    
+    <system:String x:Key="MainViewModel.ErrorNoViewPlans">В файле отсутствуют планы зонирования</system:String>
+    <system:String x:Key="MainViewModel.ErrorNoSelectionViewPlans">Не выбраны планы зонирования</system:String>
+    
+    <system:String x:Key="MainViewModel.ErrorNoElementTypes">В файле отсутствуют типы элементов</system:String>
+    <system:String x:Key="MainViewModel.ErrorNoSelectionElementTypes">Не выбраны типы элементов</system:String>
+    
+    <system:String x:Key="MainViewModel.SectionHeightNoDouble">Вводимые данные должны быть числом</system:String>
+    <system:String x:Key="MainViewModel.SectionHeightNegate">Вводимые данные должны быть положительным числом</system:String>
+    
+    <system:String x:Key="MainViewModel.TransactionName">Построение границ зон ТЭП</system:String>
+    
+    <system:String x:Key="BoundaryProcessor.AreaPlanName">План {0}/{1}: </system:String>
+    <system:String x:Key="ProgressTitle.SectionProcessing">Сечение элементов {0}%</system:String>
+    <system:String x:Key="ProgressTitle.BoundaryProcessing">Поиск границ {0}%</system:String>
+    <system:String x:Key="ProgressTitle.DrawProcessing">Построение границ {0}%</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">Построить</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    
+</ResourceDictionary>

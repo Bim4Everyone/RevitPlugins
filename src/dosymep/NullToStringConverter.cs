@@ -1,9 +1,12 @@
+#nullable disable
+
 using System;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace dosymep.WPF.Converters {
+    [Obsolete("Используйте dosymep.WpfCore.Converters.DefaultToStringConverter")]
     public class NullToStringConverter : MarkupExtension, IValueConverter {
         /// <summary> 
         /// Вывод, когда значение Null

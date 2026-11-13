@@ -1,0 +1,71 @@
+﻿<core:WpfUIPlatformPage
+    x:Class="RevitAreaBoundaries.Views.Pages.TypeElementSelectionPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:edits="clr-namespace:RevitAreaBoundaries.Views.Edits"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vms="clr-namespace:RevitAreaBoundaries.ViewModels"
+    d:DataContext="{d:DesignInstance vms:TypeElementSelectionViewModel, IsDesignTimeCreatable=False}"
+    ScrollViewer.CanContentScroll="False"
+    mc:Ignorable="d" x:ClassModifier="internal">
+    
+    <ScrollViewer>
+        
+        <ItemsControl
+            VerticalAlignment="Top"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.VirtualizationMode="Recycling"
+            ScrollViewer.CanContentScroll="True"
+            ItemsSource="{Binding TypeElementGroupViewModels}">
+                
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <edits:CustomGroupEditControl
+                        Icon="{ui:SymbolIcon selectObject24}"
+                        Header="{Binding Name}"
+                        ButtonCommandSelect="{Binding SelectCommand}"
+                        ButtonCommandUnSelect="{Binding UnSelectCommand}"
+                        CountElements="{Binding CountElements}"
+                        IsExpanded="False">
+                        
+                        <edits:CustomGroupEditControl.EditControl>
+                            <ItemsControl
+                                ItemsSource="{Binding RevitElementViewModels}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate
+                                        DataType="{x:Type vms:RevitElementViewModel}">
+                                           <edits:ItemControl
+                                                ItemName="{Binding Name}"
+                                                IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </edits:CustomGroupEditControl.EditControl>
+                    </edits:CustomGroupEditControl>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+                
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel
+                        IsVirtualizing="True"
+                        VirtualizationMode="Recycling" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        
+    </ScrollViewer>
+    
+    
+      
+     
+</core:WpfUIPlatformPage>

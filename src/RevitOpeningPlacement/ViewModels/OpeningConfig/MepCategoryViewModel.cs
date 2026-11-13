@@ -5,31 +5,55 @@ using System.IO;
 using System.Linq;
 using System.Windows.Input;
 
+using Bim4Everyone.RevitFiltration;
+using Bim4Everyone.RevitFiltration.Controls;
+
+using dosymep.Revit;
 using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitOpeningPlacement.Models;
 using RevitOpeningPlacement.Models.Configs;
+using RevitOpeningPlacement.Models.Filtration;
 using RevitOpeningPlacement.Models.TypeNamesProviders;
 
 namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 internal class MepCategoryViewModel : BaseViewModel {
     private const string _pipeDiameterDisplayName = "Внешний диаметр";
     private readonly ILocalizationService _localization;
+    private readonly IFilterContextParser _filterContextParser;
     private string _name;
     private ObservableCollection<SizeViewModel> _minSizes;
     private ObservableCollection<OffsetViewModel> _offsets;
     private bool _isSelected;
     private ObservableCollection<StructureCategoryViewModel> _structureCategories;
-    private SetViewModel _setViewModel;
     private int _selectedRounding;
     private int _selectedElevationRounding;
 
     public MepCategoryViewModel(RevitRepository revitRepository,
         ILocalizationService localization,
+        ILanguageService languageService,
+        ILogicalFilterProviderFactory filterProviderFactory,
+        IFilterContextParser filterContextParser,
+        ILogicalFilterFactory filterFactory,
         MepCategory mepCategory) {
+        if(revitRepository is null) {
+            throw new ArgumentNullException(nameof(revitRepository));
+        }
+        if(filterProviderFactory is null) {
+            throw new ArgumentNullException(nameof(filterProviderFactory));
+        }
+        if(filterFactory is null) {
+            throw new ArgumentNullException(nameof(filterFactory));
+        }
+        if(mepCategory is null) {
+            throw new ArgumentNullException(nameof(mepCategory));
+        }
         _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+        LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
+        _filterContextParser = filterContextParser ?? throw new ArgumentNullException(nameof(filterContextParser));
+
         Name = mepCategory.Name;
         ImageSource = Path.GetFileName(mepCategory.ImageSource);
         MinSizes = new ObservableCollection<SizeViewModel>(
@@ -40,11 +64,17 @@ internal class MepCategoryViewModel : BaseViewModel {
             mepCategory.Offsets.Select(
                 item => new OffsetViewModel(item, new TypeNamesProvider(mepCategory.IsRound))));
         StructureCategories = new ObservableCollection<StructureCategoryViewModel>(
-            mepCategory.Intersections.Select(c => new StructureCategoryViewModel(revitRepository, c, _localization)));
+            mepCategory.Intersections.Select(c => new StructureCategoryViewModel(
+                revitRepository,
+                c,
+                _localization,
+                LanguageService,
+                filterProviderFactory,
+                _filterContextParser,
+                filterFactory)));
         SelectedRounding = mepCategory.Rounding;
         SelectedElevationRounding = mepCategory.ElevationRounding;
-        var categoriesInfoViewModel = GetCategoriesInfoViewModel(revitRepository, Name);
-        SetViewModel = new SetViewModel(revitRepository, _localization, categoriesInfoViewModel, mepCategory.Set);
+        InitializeFilterProvider(revitRepository, filterProviderFactory, filterFactory, mepCategory);
         RenameDisplayParameters();
         AddOffsetCommand = RelayCommand.Create(AddOffset);
         RemoveOffsetCommand = RelayCommand.Create<OffsetViewModel>(RemoveOffset, CanRemoveOffset);
@@ -98,10 +128,14 @@ internal class MepCategoryViewModel : BaseViewModel {
 
     public IReadOnlyCollection<int> Roundings { get; } = new int[] { 1, 5, 10, 25, 50 };
 
-    public SetViewModel SetViewModel {
-        get => _setViewModel;
-        set => RaiseAndSetIfChanged(ref _setViewModel, value);
-    }
+    /// <summary>
+    /// Фильтр элементов данной категории инженерных систем
+    /// </summary>
+    public ILogicalFilterProvider MepFilterProvider { get; private set; }
+
+    public ILanguageService LanguageService { get; }
+
+    public ILocalizationService LocalizationService => _localization;
 
     public ICommand AddOffsetCommand { get; }
     public ICommand RemoveOffsetCommand { get; }
@@ -122,13 +156,13 @@ internal class MepCategoryViewModel : BaseViewModel {
         if(IsSelected && StructureCategories.All(item => !item.IsSelected)) {
             return $"Для категории \"{Name}\" выберите категории для пересечения";
         }
-        if(SetViewModel.IsEmpty()) {
-            return $"Поля фильтра для ВИС категории \'{Name}\' должны быть заполнены.";
+        string mepFilterError = GetFilterErrorText(MepFilterProvider, Name);
+        if(!string.IsNullOrEmpty(mepFilterError)) {
+            return mepFilterError;
         }
-        var structureEmptyFilter = StructureCategories.FirstOrDefault(item => item.SetViewModel.IsEmpty());
-        return structureEmptyFilter != null
-            ? $"Поля фильтра категории \'{structureEmptyFilter.Name}\' для ВИС категории \'{Name}\' должны быть заполнены."
-            : !string.IsNullOrEmpty(SetViewModel.GetErrorText()) ? SetViewModel.GetErrorText() : null;
+        return StructureCategories
+            .Select(item => GetFilterErrorText(item.FilterProvider, item.Name))
+            .FirstOrDefault(item => !string.IsNullOrEmpty(item));
     }
 
     public MepCategory GetMepCategory() {
@@ -136,18 +170,46 @@ internal class MepCategoryViewModel : BaseViewModel {
             Offsets = Offsets.Select(item => item.GetOffset()).ToList(),
             MinSizes = new SizeCollection(MinSizes.Select(item => item.GetSize())),
             IsSelected = IsSelected,
-            Intersections = StructureCategories.Select(item => new StructureCategory() {
-                Name = item.Name,
-                IsSelected = item.IsSelected,
-                Set = item.SetViewModel.GetSet()
-            })
-            .ToList(),
+            Intersections = StructureCategories.Select(item => item.GetStructureCategory()).ToList(),
             Rounding = SelectedRounding,
             ElevationRounding = SelectedElevationRounding,
-            Set = SetViewModel.GetSet()
+            MepFilterContext = _filterContextParser.Serialize(MepFilterProvider.GetFilter())
         };
     }
 
+
+    private void InitializeFilterProvider(
+        RevitRepository revitRepository,
+        ILogicalFilterProviderFactory filterProviderFactory,
+        ILogicalFilterFactory filterFactory,
+        MepCategory mepCategory) {
+
+        var categories = revitRepository.GetCategories(revitRepository.GetMepCategoryEnum(Name));
+        var dataProvider = new FilterDataProvider(categories, [revitRepository.Doc]).CreateDataProvider();
+        // если фильтр не задан, создается пустой фильтр по заданным категориям,
+        // иначе фильтр останется в состоянии ошибки, пока пользователь не откроет его в интерфейсе
+        MepFilterProvider = _filterContextParser.TryParse(mepCategory.MepFilterContext, out var context)
+            ? filterProviderFactory.Create(dataProvider, context)
+            : filterProviderFactory.Create(
+                dataProvider,
+                filterFactory.CreateAndFilter(),
+                [.. categories.Select(c => c.GetBuiltInCategory())]);
+    }
+
+    /// <summary>
+    /// Возвращает описание ошибки фильтра заданной категории, либо пустую строку, если ошибок нет
+    /// </summary>
+    /// <param name="filterProvider">Фильтр категории</param>
+    /// <param name="categoryName">Название категории</param>
+    private string GetFilterErrorText(ILogicalFilterProvider filterProvider, string categoryName) {
+        if(filterProvider.CanGetFilter(out var errors)) {
+            return string.Empty;
+        }
+        return errors.Length == 0
+            ? _localization.GetLocalizedString("OpeningConfig.Validation.FilterIsEmpty", categoryName)
+            : _localization.GetLocalizedString(
+                "OpeningConfig.Validation.FilterError", categoryName, errors[0].Message);
+    }
 
     private void RenameDisplayParameters() {
         if(Name.Equals(
@@ -186,10 +248,5 @@ internal class MepCategoryViewModel : BaseViewModel {
             }
         }
         return error;
-    }
-
-    private CategoriesInfoViewModel GetCategoriesInfoViewModel(RevitRepository revitRepository, string mepCategoryName) {
-        var revitCategories = revitRepository.GetCategories(revitRepository.GetMepCategoryEnum(mepCategoryName));
-        return new CategoriesInfoViewModel(revitRepository, _localization, revitCategories);
     }
 }

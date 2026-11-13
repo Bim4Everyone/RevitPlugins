@@ -15,11 +15,15 @@
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/GridView/GridViewHeaderRowIndicator.xaml" />
         <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/GridView/GridViewColumnHeader.xaml" />
+        <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/Button/Button.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Resources/Typography.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/TreeView/TreeViewItem.xaml" />
+        <ResourceDictionary
+            Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListView.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ListView/ListViewItem.xaml" />
     </ResourceDictionary.MergedDictionaries>

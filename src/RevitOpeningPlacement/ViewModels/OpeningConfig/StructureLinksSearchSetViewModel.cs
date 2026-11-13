@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using RevitClashDetective.Models.FilterGenerators;
-using RevitClashDetective.Models.FilterModel;
-
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Filtration;
 
 using ElementModel = RevitClashDetective.Models.Clashes.ElementModel;
 
@@ -14,27 +12,27 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 /// </summary>
 internal class StructureLinksSearchSetViewModel : SearchSetViewModel {
     public StructureLinksSearchSetViewModel(
-        RevitRepository revitRepository, Filter filter, RevitFilterGenerator generator)
-        : base(revitRepository, filter, generator) {
+        RevitRepository revitRepository, CategoryFilter filter, bool inverted)
+        : base(revitRepository, filter, inverted) {
     }
 
     private protected override void InitializeGrid() {
         var elements = new List<ElementModel>();
-        var clashRepo = _revitRepository.GetClashRevitRepository();
         string[] linkStructureDocs = _revitRepository.GetSelectedRevitLinks()
             .Select(c => RevitRepository.GetDocumentName(c.GetLinkDocument()))
             .ToArray();
         var docInfos = _revitRepository.DocInfos
             .Where(d => linkStructureDocs.Contains(d.Name))
             .ToArray();
+        var categoryIds = GetCategoryIds();
         foreach(var docInfo in docInfos) {
-            var filter = Filter.GetRevitFilter(docInfo.Doc, FilterGenerator);
-            var elems = _revitRepository.GetFilteredElements(docInfo.Doc, Filter.CategoryIds, filter)
+            var elems = _revitRepository
+                .GetFilteredElements(docInfo.Doc, categoryIds, GetRevitFilter(docInfo.Doc))
                 .Where(item => item != null && item.IsValidObject)
                 .ToList();
             elements.AddRange(elems.Select(item => new ElementModel(item, docInfo.Transform)));
         }
 
-        Grid = new GridControlViewModel(_revitRepository, Filter, elements);
+        Grid = new GridControlViewModel(_revitRepository, elements);
     }
 }

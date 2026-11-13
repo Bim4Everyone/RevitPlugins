@@ -7,7 +7,9 @@ internal class CommercialSettings : DeclarationSettings {
     public Parameter RoomsHeightParam { get; set; }
     public Parameter ParkingSpaceClass { get; set; }
     public Parameter ParkingInfo { get; set; }
+    public Parameter PositionType { get; set; }
 
     public Parameter GroupNameParam { get; set; }
     public bool AddPrefixToNumber { get; set; }
+    public bool AddHyphenToPrefix { get; set; }
 }

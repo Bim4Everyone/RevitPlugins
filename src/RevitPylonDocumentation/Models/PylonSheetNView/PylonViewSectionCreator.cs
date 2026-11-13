@@ -7,14 +7,16 @@ using RevitPylonDocumentation.Models.UserSettings;
 namespace RevitPylonDocumentation.Models.PylonSheetNView;
 public class PylonViewSectionCreator {
     internal PylonViewSectionCreator(CreationSettings settings, Document document, PylonSheetInfo pylonSheetInfo) {
-        SectionSettings = settings.ViewSectionSettings;
-        TypesSettings = settings.TypesSettings;
+        VerticalSectionSettings = settings.VerticalViewSettings;
+        TransverseSectionSettings = settings.TransverseViewSettings;
+        AnnotationTypesSettings = settings.AnnotationSettings;
         Doc = document;
         SheetInfo = pylonSheetInfo;
     }
 
-    internal UserViewSectionSettings SectionSettings { get; set; }
-    internal UserTypesSettings TypesSettings { get; set; }
+    internal UserVerticalViewSettings VerticalSectionSettings { get; set; }
+    internal UserTransverseViewSettings TransverseSectionSettings { get; set; }
+    internal UserAnnotationSettings AnnotationTypesSettings { get; set; }
     internal Document Doc { get; set; }
     internal PylonSheetInfo SheetInfo { get; set; }
 
@@ -39,11 +41,11 @@ public class PylonViewSectionCreator {
         double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
         double generalViewXOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                        int.Parse(SectionSettings.GeneralViewXOffset));
+                                        int.Parse(VerticalSectionSettings.GeneralViewXOffset));
         double generalViewYTopOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                            int.Parse(SectionSettings.GeneralViewYTopOffset));
+                                            int.Parse(VerticalSectionSettings.GeneralViewYTopOffset));
         double generalViewYBottomOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                            int.Parse(SectionSettings.GeneralViewYBottomOffset));
+                                            int.Parse(VerticalSectionSettings.GeneralViewYBottomOffset));
 
         double coordinateX = hostLength * 0.5 + generalViewXOffset;
         double coordinateYTop = maxZ - originPoint.Z + generalViewYTopOffset;
@@ -62,10 +64,10 @@ public class PylonViewSectionCreator {
         try {
             viewSection = ViewSection.CreateSection(Doc, selectedViewFamilyType.Id, sectionBox);
             if(viewSection != null) {
-                viewSection.Name = SectionSettings.GeneralViewPrefix + SheetInfo.PylonKeyName 
-                    + SectionSettings.GeneralViewSuffix;
-                if(TypesSettings.SelectedGeneralViewTemplate != null) {
-                    viewSection.ViewTemplateId = TypesSettings.SelectedGeneralViewTemplate.Id;
+                viewSection.Name = VerticalSectionSettings.GeneralViewPrefix + SheetInfo.PylonKeyName
+                    + VerticalSectionSettings.GeneralViewSuffix;
+                if(VerticalSectionSettings.SelectedGeneralViewTemplate != null) {
+                    viewSection.ViewTemplateId = VerticalSectionSettings.SelectedGeneralViewTemplate.Id;
                 }
             }
         } catch(Exception) {
@@ -101,11 +103,11 @@ public class PylonViewSectionCreator {
         double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
         double generalViewXOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                        int.Parse(SectionSettings.GeneralViewXOffset));
+                                        int.Parse(VerticalSectionSettings.GeneralViewXOffset));
         double generalViewYTopOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                            int.Parse(SectionSettings.GeneralViewYTopOffset));
+                                            int.Parse(VerticalSectionSettings.GeneralViewYTopOffset));
         double generalViewYBottomOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                            int.Parse(SectionSettings.GeneralViewYBottomOffset));
+                                            int.Parse(VerticalSectionSettings.GeneralViewYBottomOffset));
 
         double coordinateX = hostLength * 0.5 + generalViewXOffset;
         double coordinateYTop = maxZ - originPoint.Z + generalViewYTopOffset;
@@ -125,11 +127,11 @@ public class PylonViewSectionCreator {
             viewSection = ViewSection.CreateSection(Doc, selectedViewFamilyType.Id, sectionBox);
             if(viewSection != null) {
                 viewSection.Name =
-                    SectionSettings.GeneralRebarViewPrefix
+                    VerticalSectionSettings.GeneralRebarViewPrefix
                     + SheetInfo.PylonKeyName
-                    + SectionSettings.GeneralRebarViewSuffix;
-                if(TypesSettings.SelectedGeneralRebarViewTemplate != null) {
-                    viewSection.ViewTemplateId = TypesSettings.SelectedGeneralRebarViewTemplate.Id;
+                    + VerticalSectionSettings.GeneralRebarViewSuffix;
+                if(VerticalSectionSettings.SelectedGeneralRebarViewTemplate != null) {
+                    viewSection.ViewTemplateId = VerticalSectionSettings.SelectedGeneralRebarViewTemplate.Id;
                 }
             }
         } catch(Exception) {
@@ -166,11 +168,11 @@ public class PylonViewSectionCreator {
         double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
         double generalViewPerpXOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                            int.Parse(SectionSettings.GeneralViewPerpXOffset));
+                                            int.Parse(VerticalSectionSettings.GeneralViewPerpXOffset));
         double generalViewPerpYTopOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                                int.Parse(SectionSettings.GeneralViewPerpYTopOffset));
+                                                int.Parse(VerticalSectionSettings.GeneralViewPerpYTopOffset));
         double generalViewPerpYBottomOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                                int.Parse(SectionSettings.GeneralViewPerpYBottomOffset));
+                                                int.Parse(VerticalSectionSettings.GeneralViewPerpYBottomOffset));
 
         double coordinateXToMax = hostWidthToMin + generalViewPerpXOffset;
         double coordinateXToMin = hostWidthToMax + generalViewPerpXOffset;
@@ -190,10 +192,10 @@ public class PylonViewSectionCreator {
         try {
             viewSection = ViewSection.CreateSection(Doc, selectedViewFamilyType.Id, sectionBox);
             if(viewSection != null) {
-                viewSection.Name = SectionSettings.GeneralViewPerpendicularPrefix + SheetInfo.PylonKeyName 
-                    + SectionSettings.GeneralViewPerpendicularSuffix;
-                if(TypesSettings.SelectedGeneralViewTemplate != null) {
-                    viewSection.ViewTemplateId = TypesSettings.SelectedGeneralViewTemplate.Id;
+                viewSection.Name = VerticalSectionSettings.GeneralViewPerpendicularPrefix + SheetInfo.PylonKeyName
+                    + VerticalSectionSettings.GeneralViewPerpendicularSuffix;
+                if(VerticalSectionSettings.SelectedGeneralViewTemplate != null) {
+                    viewSection.ViewTemplateId = VerticalSectionSettings.SelectedGeneralViewTemplate.Id;
                 }
             }
         } catch(Exception) {
@@ -230,11 +232,11 @@ public class PylonViewSectionCreator {
         double maxZ = SheetInfo.ElemsInfo.ElemsBoundingBoxMaxZ;
 
         double generalViewPerpXOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                    int.Parse(SectionSettings.GeneralViewPerpXOffset));
+                                    int.Parse(VerticalSectionSettings.GeneralViewPerpXOffset));
         double generalViewPerpYTopOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                                int.Parse(SectionSettings.GeneralViewPerpYTopOffset));
+                                                int.Parse(VerticalSectionSettings.GeneralViewPerpYTopOffset));
         double generalViewPerpYBottomOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                                int.Parse(SectionSettings.GeneralViewPerpYBottomOffset));
+                                                int.Parse(VerticalSectionSettings.GeneralViewPerpYBottomOffset));
 
         double coordinateXToMax = hostWidthToMin + generalViewPerpXOffset;
         double coordinateXToMin = hostWidthToMax + generalViewPerpXOffset;
@@ -255,11 +257,11 @@ public class PylonViewSectionCreator {
             viewSection = ViewSection.CreateSection(Doc, selectedViewFamilyType.Id, sectionBox);
             if(viewSection != null) {
                 viewSection.Name =
-                    SectionSettings.GeneralRebarViewPerpendicularPrefix
+                    VerticalSectionSettings.GeneralRebarViewPerpendicularPrefix
                     + SheetInfo.PylonKeyName
-                    + SectionSettings.GeneralRebarViewPerpendicularSuffix;
-                if(TypesSettings.SelectedGeneralRebarViewTemplate != null) {
-                    viewSection.ViewTemplateId = TypesSettings.SelectedGeneralRebarViewTemplate.Id;
+                    + VerticalSectionSettings.GeneralRebarViewPerpendicularSuffix;
+                if(VerticalSectionSettings.SelectedGeneralRebarViewTemplate != null) {
+                    viewSection.ViewTemplateId = VerticalSectionSettings.SelectedGeneralRebarViewTemplate.Id;
                 }
             }
         } catch(Exception) {
@@ -312,9 +314,9 @@ public class PylonViewSectionCreator {
         double maxZ = SheetInfo.ElemsInfo.LastPylonMaxZ;
 
         double transverseViewXOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                            int.Parse(SectionSettings.TransverseViewXOffset));
+                                            int.Parse(TransverseSectionSettings.TransverseViewXOffset));
         double transverseViewYOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                            int.Parse(SectionSettings.TransverseViewYOffset));
+                                            int.Parse(TransverseSectionSettings.TransverseViewYOffset));
 
         double coordinateX = hostLength * 0.5 + transverseViewXOffset;
         double coordinateYToMax = hostWidthToMax + transverseViewYOffset;
@@ -322,27 +324,27 @@ public class PylonViewSectionCreator {
 
         // Определяем глубину дальней плоскости горизонтального вида
         double viewDepth = UnitUtilsHelper.ConvertToInternalValue(
-                                    double.Parse(SectionSettings.TransverseViewDepth));
+                                    double.Parse(TransverseSectionSettings.TransverseViewDepth));
         XYZ sectionBoxMin;
         XYZ sectionBoxMax;
         if(transverseViewNum == 1) {
             // Располагаем сечение на высоте +1000 мм от низа BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                    double.Parse(SectionSettings.TransverseViewFirstElevation));
+                                    double.Parse(TransverseSectionSettings.TransverseViewFirstElevation));
 
             sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(minZ + elevationOffset - originPoint.Z));
             sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(minZ + elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseViewNum == 2) {
             // Располагаем сечение на высоте -3000 мм от верха BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                    double.Parse(SectionSettings.TransverseViewSecondElevation));
+                                    double.Parse(TransverseSectionSettings.TransverseViewSecondElevation));
 
             sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(maxZ - elevationOffset - originPoint.Z));
             sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseViewNum == 3) {
             // Располагаем сечение на высоте +400 мм от верха BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                    double.Parse(SectionSettings.TransverseViewThirdElevation));
+                                    double.Parse(TransverseSectionSettings.TransverseViewThirdElevation));
 
             sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(maxZ + elevationOffset - originPoint.Z));
             sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(maxZ + elevationOffset - viewDepth - originPoint.Z));
@@ -361,26 +363,26 @@ public class PylonViewSectionCreator {
             viewSection = ViewSection.CreateSection(Doc, selectedViewFamilyType.Id, sectionBox);
             if(viewSection != null) {
                 if(transverseViewNum == 1) {
-                    viewSection.Name = SectionSettings.TransverseViewFirstPrefix + SheetInfo.PylonKeyName 
-                        + SectionSettings.TransverseViewFirstSuffix;
+                    viewSection.Name = TransverseSectionSettings.TransverseViewFirstPrefix + SheetInfo.PylonKeyName
+                        + TransverseSectionSettings.TransverseViewFirstSuffix;
                     // Если был выбран шаблон вида, то назначаем
-                    if(TypesSettings.SelectedTransverseViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseViewTemplate.Id;
+                    if(TransverseSectionSettings.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = TransverseSectionSettings.SelectedTransverseViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewFirst.ViewElement = viewSection;
 
                 } else if(transverseViewNum == 2) {
-                    viewSection.Name = SectionSettings.TransverseViewSecondPrefix + SheetInfo.PylonKeyName 
-                        + SectionSettings.TransverseViewSecondSuffix;
-                    if(TypesSettings.SelectedTransverseViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseViewTemplate.Id;
+                    viewSection.Name = TransverseSectionSettings.TransverseViewSecondPrefix + SheetInfo.PylonKeyName
+                        + TransverseSectionSettings.TransverseViewSecondSuffix;
+                    if(TransverseSectionSettings.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = TransverseSectionSettings.SelectedTransverseViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewSecond.ViewElement = viewSection;
                 } else if(transverseViewNum == 3) {
-                    viewSection.Name = SectionSettings.TransverseViewThirdPrefix + SheetInfo.PylonKeyName 
-                        + SectionSettings.TransverseViewThirdSuffix;
-                    if(TypesSettings.SelectedTransverseViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseViewTemplate.Id;
+                    viewSection.Name = TransverseSectionSettings.TransverseViewThirdPrefix + SheetInfo.PylonKeyName
+                        + TransverseSectionSettings.TransverseViewThirdSuffix;
+                    if(TransverseSectionSettings.SelectedTransverseViewTemplate != null) {
+                        viewSection.ViewTemplateId = TransverseSectionSettings.SelectedTransverseViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewThird.ViewElement = viewSection;
                 }
@@ -415,9 +417,9 @@ public class PylonViewSectionCreator {
         double maxZ = SheetInfo.ElemsInfo.LastPylonMaxZ;
 
         double transverseViewXOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                            int.Parse(SectionSettings.TransverseViewXOffset));
+                                            int.Parse(TransverseSectionSettings.TransverseViewXOffset));
         double transverseViewYOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                            int.Parse(SectionSettings.TransverseViewYOffset));
+                                            int.Parse(TransverseSectionSettings.TransverseViewYOffset));
 
         double hostLength = SheetInfo.ElemsInfo.ElemsBoundingBoxLength;
 
@@ -431,11 +433,11 @@ public class PylonViewSectionCreator {
             _ => false
         };
         double hostWidthToMax = needElemsBoundingBox
-            ? SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax 
+            ? SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMax
             : SheetInfo.ElemsInfo.HostWidth / 2;
 
         double hostWidthToMin = needElemsBoundingBox
-            ? SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin 
+            ? SheetInfo.ElemsInfo.ElemsBoundingBoxWidthToMin
             : SheetInfo.ElemsInfo.HostWidth / 2;
 
         double coordinateX = hostLength * 0.5 + transverseViewXOffset;
@@ -444,27 +446,27 @@ public class PylonViewSectionCreator {
 
         // Определяем глубину дальней плоскости горизонтального вида
         double viewDepth = UnitUtilsHelper.ConvertToInternalValue(
-                                    double.Parse(SectionSettings.TransverseRebarViewDepth));
+                                    double.Parse(TransverseSectionSettings.TransverseRebarViewDepth));
         XYZ sectionBoxMin;
         XYZ sectionBoxMax;
         if(transverseRebarViewNum == 1) {
             // Располагаем сечение на высоте 1000 мм от низа BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                        double.Parse(SectionSettings.TransverseViewFirstElevation));
+                                        double.Parse(TransverseSectionSettings.TransverseViewFirstElevation));
 
             sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(minZ + elevationOffset - originPoint.Z));
             sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(minZ + elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseRebarViewNum == 2) {
             // Располагаем сечение на высоте -1500 мм от верха BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                    double.Parse(SectionSettings.TransverseViewSecondElevation));
+                                    double.Parse(TransverseSectionSettings.TransverseViewSecondElevation));
 
             sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(maxZ - elevationOffset - originPoint.Z));
             sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(maxZ - elevationOffset - viewDepth - originPoint.Z));
         } else if(transverseRebarViewNum == 3) {
             // Располагаем сечение на высоте -300 мм от верха BoundingBox (или по значению указанному пользователем)
             double elevationOffset = UnitUtilsHelper.ConvertToInternalValue(
-                                    double.Parse(SectionSettings.TransverseViewThirdElevation));
+                                    double.Parse(TransverseSectionSettings.TransverseViewThirdElevation));
 
             sectionBoxMin = new XYZ(-coordinateX, -coordinateYToMin, -(maxZ + elevationOffset - originPoint.Z));
             sectionBoxMax = new XYZ(coordinateX, coordinateYToMax, -(maxZ + elevationOffset - viewDepth - originPoint.Z));
@@ -484,32 +486,32 @@ public class PylonViewSectionCreator {
             if(viewSection != null) {
                 if(transverseRebarViewNum == 1) {
                     viewSection.Name =
-                        SectionSettings.TransverseRebarViewFirstPrefix
+                        TransverseSectionSettings.TransverseRebarViewFirstPrefix
                         + SheetInfo.PylonKeyName
-                        + SectionSettings.TransverseRebarViewFirstSuffix;
+                        + TransverseSectionSettings.TransverseRebarViewFirstSuffix;
                     // Если был выбран шаблон вида, то назначаем
-                    if(TypesSettings.SelectedTransverseRebarViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseRebarViewTemplate.Id;
+                    if(TransverseSectionSettings.SelectedTransverseRebarViewTemplate != null) {
+                        viewSection.ViewTemplateId = TransverseSectionSettings.SelectedTransverseRebarViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewFirstRebar.ViewElement = viewSection;
 
                 } else if(transverseRebarViewNum == 2) {
                     viewSection.Name =
-                        SectionSettings.TransverseRebarViewSecondPrefix
+                        TransverseSectionSettings.TransverseRebarViewSecondPrefix
                         + SheetInfo.PylonKeyName
-                        + SectionSettings.TransverseRebarViewSecondSuffix;
-                    if(TypesSettings.SelectedTransverseRebarViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseRebarViewTemplate.Id;
+                        + TransverseSectionSettings.TransverseRebarViewSecondSuffix;
+                    if(TransverseSectionSettings.SelectedTransverseRebarViewTemplate != null) {
+                        viewSection.ViewTemplateId = TransverseSectionSettings.SelectedTransverseRebarViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewSecondRebar.ViewElement = viewSection;
 
                 } else if(transverseRebarViewNum == 3) {
                     viewSection.Name =
-                        SectionSettings.TransverseRebarViewThirdPrefix
+                        TransverseSectionSettings.TransverseRebarViewThirdPrefix
                         + SheetInfo.PylonKeyName
-                        + SectionSettings.TransverseRebarViewThirdSuffix;
-                    if(TypesSettings.SelectedTransverseRebarViewTemplate != null) {
-                        viewSection.ViewTemplateId = TypesSettings.SelectedTransverseRebarViewTemplate.Id;
+                        + TransverseSectionSettings.TransverseRebarViewThirdSuffix;
+                    if(TransverseSectionSettings.SelectedTransverseRebarViewTemplate != null) {
+                        viewSection.ViewTemplateId = TransverseSectionSettings.SelectedTransverseRebarViewTemplate.Id;
                     }
                     SheetInfo.TransverseViewThirdRebar.ViewElement = viewSection;
                 }

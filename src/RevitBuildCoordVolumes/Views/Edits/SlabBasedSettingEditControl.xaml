@@ -1,0 +1,246 @@
+﻿<UserControl
+    x:Class="RevitBuildCoordVolumes.Views.Edits.SlabBasedSettingEditControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:edits="clr-namespace:RevitBuildCoordVolumes.Views.Edits"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    xmlns:converters="clr-namespace:dosymep.WpfCore.Converters;assembly=dosymep.WpfCore"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:vms="clr-namespace:RevitBuildCoordVolumes.ViewModels">
+
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="SlabExtrudeVisible"
+            TrueValue="Visible"
+            FalseValue="Collapsed" />
+        <Style
+            TargetType="ToolTip">
+            <Setter
+                Property="MaxWidth"
+                Value="650" />
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel>
+        <edits:CustomGroupEditControl
+            Icon="{ui:SymbolIcon scanText24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.SourceFiles}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.SourceFilesDescription}"
+            ExtraIconVisible="False">
+            <edits:CustomGroupEditControl.EditControl>                 
+                <StackPanel>
+                    <ui:AutoSuggestBox
+                        Margin="5,0,5,20"
+                        Icon="{ui:SymbolIcon Search24}"
+                        Text="{Binding SearchTextDocs, Mode=TwoWay}"
+                        PlaceholderText="{me:LocalizationSource SlabBasedSettingEditControl.SearchTextDocs}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="TextChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SearchDocsCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ui:AutoSuggestBox>
+
+                    <ItemsControl
+                        ItemsSource="{Binding FilteredDocuments}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate
+                                DataType="{x:Type vms:DocumentViewModel}">
+                                <edits:ItemControl
+                                    ItemName="{Binding Name}"
+                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                    HasWarning="False" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid
+                                    Columns="1" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </edits:CustomGroupEditControl.EditControl>
+        </edits:CustomGroupEditControl>
+        
+        <edits:CustomGroupEditControl
+            Icon="{ui:SymbolIcon form24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.TypeSlabs}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.TypeSlabsDescription}"
+            ExtraIconVisible="False">            
+            <edits:CustomGroupEditControl.EditControl>
+                <StackPanel>
+                    <ui:AutoSuggestBox
+                        Margin="5,0,5,5"
+                        Icon="{ui:SymbolIcon Search24}"
+                        Text="{Binding SearchTextSlabs, Mode=TwoWay}"
+                        PlaceholderText="{me:LocalizationSource SlabBasedSettingEditControl.SearchTextSlabs}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="TextChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SearchSlabsCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ui:AutoSuggestBox>
+
+                    <ItemsControl
+                        ItemsSource="{Binding FilteredSlabs}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate
+                                DataType="{x:Type vms:SlabViewModel}">
+                                <edits:ItemControl
+                                    ItemName="{Binding Name}"
+                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                    HasWarning="False" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid
+                                    Columns="1" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </edits:CustomGroupEditControl.EditControl>
+        </edits:CustomGroupEditControl>
+        
+        <edits:CustomGroupEditControl
+            Icon="{ui:SymbolIcon tableResizeRow24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.Levels}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.LevelsDescription}"
+            ExtraIconVisible="False">            
+            <edits:CustomGroupEditControl.EditControl>
+                <StackPanel>
+                    <Border
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Background="{DynamicResource CardBackground}"
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        CornerRadius="{DynamicResource ControlCornerRadius}"
+                        BorderThickness="{DynamicResource CardControlBorderThemeThickness}">
+                        <StackPanel
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+                            <RadioButton
+                                Margin="20,0,0,0"
+                                GroupName="Choise"
+                                Content="{me:LocalizationSource SlabBasedSettingEditControl.CheckedAllLevels}"
+                                IsChecked="{Binding IsCheckedAllLevels, Mode=TwoWay}"
+                                Command="{Binding CheckAllLevelsCommand}" />
+                            <RadioButton
+                                Margin="20,0,0,0"
+                                GroupName="Choise"
+                                Content="{me:LocalizationSource SlabBasedSettingEditControl.NotCheckedAllLevels}"
+                                Command="{Binding UncheckAllLevelsCommand}" />
+                        </StackPanel>
+                    </Border>
+                    <ui:AutoSuggestBox
+                        Margin="5,0,5,20"
+                        Icon="{ui:SymbolIcon Search24}"
+                        Text="{Binding SearchTextLevels, Mode=TwoWay}"
+                        PlaceholderText="{me:LocalizationSource SlabBasedSettingEditControl.SearchTextLevels}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger
+                                EventName="TextChanged">
+                                <i:InvokeCommandAction
+                                    Command="{Binding SearchLevelsCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ui:AutoSuggestBox>
+                    <ItemsControl
+                        ItemsSource="{Binding FilteredLevels}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate
+                                DataType="{x:Type vms:LevelViewModel}">
+                                <edits:ItemControl
+                                    ItemName="{Binding Name}"
+                                    IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                    HasWarning="False" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid
+                                    Columns="1" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </edits:CustomGroupEditControl.EditControl>
+        </edits:CustomGroupEditControl>
+        
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon brainCircuit24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.BuilderMode}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.BuilderModeDescription}">
+            <ComboBox
+                ItemsSource="{Binding BuilderModes}"
+                SelectedValue="{Binding SelectedBuilderMode}"
+                DisplayMemberPath="Name" />
+        </edits:CustomEditControl>
+        
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon alignStretchVertical20}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.SlabExtrudeMode}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.SlabExtrudeModeDescription}"
+            Visibility="{Binding IsSlabExtrudeMode, Converter={StaticResource SlabExtrudeVisible}}">
+            <ComboBox
+                ItemsSource="{Binding SlabExtrudeModes}"
+                SelectedValue="{Binding SelectedSlabExtrudeMode}"
+                DisplayMemberPath="Name" />
+        </edits:CustomEditControl>
+        
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon arrowMinimizeVertical24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.SplitVolumes}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.SplitVolumesDescription}"
+            Visibility="{Binding IsSlabIntersectMode, Converter={StaticResource SlabExtrudeVisible}}">
+            <ui:ToggleSwitch
+                Margin="10,0,10,0"
+                OnContent="{me:LocalizationSource SlabBasedSettingEditControl.ToggleSwitchOnContent}"
+                OffContent="{me:LocalizationSource SlabBasedSettingEditControl.ToggleSwitchOffContent}"
+                IsChecked="{Binding SplitVolumes, Mode=TwoWay}"/>
+        </edits:CustomEditControl>
+        
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon shapeUnion24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.UnionVolumes}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.UnionVolumesDescription}">
+            <ui:ToggleSwitch
+                Margin="10,0,10,0"
+                OnContent="{me:LocalizationSource SlabBasedSettingEditControl.ToggleSwitchOnContent}"
+                OffContent="{me:LocalizationSource SlabBasedSettingEditControl.ToggleSwitchOffContent}"
+                IsChecked="{Binding UnionVolumes, Mode=TwoWay}"/>
+        </edits:CustomEditControl>
+        
+        
+        
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon fullScreenMaximize24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.SquareSide}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.SquareSideDescription}">
+            <ui:TextBox
+                Text="{Binding SquareSideMm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ToolTip="{me:LocalizationSource SlabBasedSettingEditControl.SquareSideTooltip}" />
+        </edits:CustomEditControl>
+       
+        <edits:CustomEditControl
+            Icon="{ui:SymbolIcon cropInterim24}"
+            Header="{me:LocalizationSource SlabBasedSettingEditControl.SquareAngle}"
+            Description="{me:LocalizationSource SlabBasedSettingEditControl.SquareAngleDescription}">
+            <ui:TextBox
+                Text="{Binding SquareAngleDeg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ToolTip="{me:LocalizationSource SlabBasedSettingEditControl.SquareAngleTooltip}" />
+        </edits:CustomEditControl>
+    </StackPanel>
+</UserControl>

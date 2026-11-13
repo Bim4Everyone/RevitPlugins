@@ -22,6 +22,10 @@
     <i:Interaction.Behaviors>
         <wpfbehaviors:WpfAttachServiceBehavior
             AttachableService="{Binding ProgressDialogFactory}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding MessageBoxService}" />
+        <wpfbehaviors:WpfAttachServiceBehavior
+            AttachableService="{Binding OpenFolderDialogService}" />
     </i:Interaction.Behaviors>
     <i:Interaction.Triggers>
         <i:EventTrigger

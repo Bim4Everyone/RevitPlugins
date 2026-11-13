@@ -1,0 +1,66 @@
+using System.Windows.Input;
+
+using dosymep.WPF.Commands;
+using dosymep.WPF.ViewModels;
+
+using RevitPackageDocumentation.Models;
+using RevitPackageDocumentation.ViewModels.Configuration.SheetSetParameters.Parameters;
+
+namespace RevitPackageDocumentation.ViewModels.FiltrationComboBoxVMs;
+
+/// <summary>
+/// Значение фильтра выпадающего списка, вычисляемое по формуле
+/// </summary>
+internal class FiltrationComboBoxFilterVM : BaseViewModel {
+    private string _valueFormula = string.Empty;
+    private string _value = string.Empty;
+    private bool _isExcluding;
+
+    public FiltrationComboBoxFilterVM(FiltrationComboBoxFilterListVM filterList, StringParamSetService stringParamSetService) {
+        FilterList = filterList;
+        StrParamSetService = stringParamSetService;
+        PropUpdateByFormulaCommand = RelayCommand.Create<string>(PropUpdateByFormula);
+    }
+
+    public ICommand PropUpdateByFormulaCommand { get; }
+
+    public FiltrationComboBoxFilterListVM FilterList { get; }
+    public StringParamSetService StrParamSetService { get; }
+
+    public string ValueFormula {
+        get => _valueFormula;
+        set => RaiseAndSetIfChanged(ref _valueFormula, value);
+    }
+
+    public string Value {
+        get => _value;
+        set => RaiseAndSetIfChanged(ref _value, value);
+    }
+
+    /// <summary>
+    /// Исключающий фильтр: true - имя элемента не должно содержать значение, false - должно содержать
+    /// </summary>
+    public bool IsExcluding {
+        get => _isExcluding;
+        set => RaiseAndSetIfChanged(ref _isExcluding, value);
+    }
+
+    private void PropUpdateByFormula(string formulaPropertyName) {
+        StrParamSetService.Set(this, formulaPropertyName, FilterList.SheetSetParams);
+    }
+
+    /// <summary>
+    /// В случае изменения имени параметра конфигурации нужно пересчитать значение фильтра
+    /// </summary>
+    public void UpdateDueParamNameChange() {
+        StrParamSetService.SetAll(this, FilterList.SheetSetParams);
+    }
+
+    /// <summary>
+    /// В случае изменения значения параметра конфигурации нужно пересчитать значение фильтра,
+    /// если оно на него ссылается
+    /// </summary>
+    public void UpdateDueParamValueChange(StringParamVM stringParam) {
+        StrParamSetService.SetAll(this, FilterList.SheetSetParams, stringParam);
+    }
+}

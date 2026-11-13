@@ -14,6 +14,8 @@ namespace RevitServerFolders.ViewModels;
 internal class NwcExportViewSettingsViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly IModelObjectService _rsOpenFileDialog;
+    private readonly string[] _warningKeepElementsTemplates;
+    private readonly string[] _warningDeleteElementsTemplates;
     private string _errorText;
     private string _rvtFilePath;
     private string _viewTemplateName;
@@ -35,9 +37,11 @@ internal class NwcExportViewSettingsViewModel : BaseViewModel {
         RvtFilePath = settings.RvtFilePath;
         ViewTemplateName = settings.ViewTemplateName;
         WorksetHideTemplates = new ObservableCollection<WorksetHideTemplate>(
-            settings.WorksetHideTemplates
-            .Select(t => new WorksetHideTemplate() { Template = t }) ?? []);
+            (settings.WorksetHideTemplates ?? [])
+            .Select(t => new WorksetHideTemplate() { Template = t }));
         SelectedWorksetHideTemplate = WorksetHideTemplates.FirstOrDefault();
+        _warningKeepElementsTemplates = settings.WarningKeepElementsTemplates;
+        _warningDeleteElementsTemplates = settings.WarningDeleteElementsTemplates;
 
         HelperCommand = RelayCommand.Create(() => { }, CanAcceptDialog);
         SelectRsFileCommand = RelayCommand.CreateAsync(SelectRsFileAsync, CanSelectFile);
@@ -94,7 +98,9 @@ internal class NwcExportViewSettingsViewModel : BaseViewModel {
         return new NwcExportViewSettings() {
             RvtFilePath = RvtFilePath,
             ViewTemplateName = ViewTemplateName,
-            WorksetHideTemplates = [.. WorksetHideTemplates.Select(t => t.Template)]
+            WorksetHideTemplates = [.. WorksetHideTemplates.Select(t => t.Template)],
+            WarningKeepElementsTemplates = _warningKeepElementsTemplates,
+            WarningDeleteElementsTemplates = _warningDeleteElementsTemplates
         };
     }
 

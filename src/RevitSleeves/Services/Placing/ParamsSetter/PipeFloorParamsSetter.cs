@@ -47,5 +47,6 @@ internal class PipeFloorParamsSetter : PipeParamsSetter, IParamsSetter<ClashMode
             + _revitRepository.ConvertToInternal(topOffset);
         SetLength(sleeve, length);
         SetStringParameters(sleeve, _clash.MepElement);
+        SetWorkset(sleeve, _clash.MepElement.WorksetId);
     }
 }

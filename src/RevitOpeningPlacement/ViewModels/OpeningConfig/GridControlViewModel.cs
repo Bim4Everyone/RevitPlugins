@@ -14,9 +14,6 @@ using dosymep.WPF.ViewModels;
 using pyRevitLabs.Json;
 
 using RevitClashDetective.Models.Clashes;
-using RevitClashDetective.Models.FilterModel;
-
-using RevitClashDetective.Models.Interfaces;
 
 using RevitOpeningPlacement.Models;
 
@@ -27,17 +24,12 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 /// </summary>
 internal class GridControlViewModel : BaseViewModel {
     private readonly RevitRepository _revitRepository;
-    private readonly IEnumerable<IFilterableValueProvider> _providers;
     private readonly IEnumerable<ElementModel> _elements;
 
-    public GridControlViewModel(RevitRepository revitRepository, Filter filter, IEnumerable<ElementModel> elements) {
+    public GridControlViewModel(RevitRepository revitRepository, IEnumerable<ElementModel> elements) {
         _revitRepository = revitRepository ?? throw new ArgumentNullException(nameof(revitRepository));
-        if(filter is null) {
-            throw new ArgumentNullException(nameof(filter));
-        }
         _elements = elements ?? throw new ArgumentNullException(nameof(elements));
 
-        _providers = filter.GetProviders();
         InitializeRows();
 
         SelectCommand = RelayCommand.Create<ExpandoObject>(SelectElement, CanSelectElement);
@@ -53,17 +45,6 @@ internal class GridControlViewModel : BaseViewModel {
         foreach(var elementModel in _elements) {
             var element = elementModel.GetElement(_revitRepository.DocInfos);
             IDictionary<string, object> row = new ExpandoObject();
-            foreach(var provider in _providers) {
-                string value = provider.GetElementParamValue(element)?.DisplayValue;
-                if((provider.StorageType == StorageType.Integer || provider.StorageType == StorageType.Double)
-                    && double.TryParse(value, out double resultValue)
-                    && resultValue != 0) {
-                    AddValue(row, provider.Name, resultValue);
-                } else if(!string.IsNullOrEmpty(value) && value != "0") {
-                    AddValue(row, provider.Name, value);
-                }
-
-            }
             row.Add("File", RevitRepository.GetDocumentName(element.Document));
             row.Add("Transform", JsonConvert.SerializeObject(elementModel.TransformModel));
             row.Add("Category", element.Category?.Name);
@@ -73,14 +54,6 @@ internal class GridControlViewModel : BaseViewModel {
             row.Add("Name", element.Name);
             row.Add("Id", element.Id.GetIdValue());
             Rows.Add((ExpandoObject) row);
-        }
-    }
-
-    private void AddValue<T>(IDictionary<string, object> row, string key, T value) {
-        if(!row.ContainsKey(key)) {
-            row.Add(key, value);
-        } else {
-            row[key] = value;
         }
     }
 

@@ -34,12 +34,13 @@ internal abstract class ParametersViewModel : BaseViewModel {
     private Parameter _selectedRoomNameParam;
     private Parameter _selectedRoomNumberParam;
     private bool _addPrefixToNumber;
+    private bool _addHyphenToPrefix;
 
     public ParametersViewModel(RevitRepository revitRepository, MainViewModel mainViewModel) {
         _mainViewModel = mainViewModel;
         _revitRepository = revitRepository;
 
-        SelectedDocument = RevitDocuments.FirstOrDefault();
+        SelectedDocument = _mainViewModel.DeclarationViewModel.RevitDocuments.FirstOrDefault();
 
         UpdateParameters();
 
@@ -54,7 +55,7 @@ internal abstract class ParametersViewModel : BaseViewModel {
     public ICommand SetLastConfigCommand { get; }
     public ICommand SetCompanyConfigCommand { get; }
 
-    public IList<RevitDocumentViewModel> RevitDocuments => _mainViewModel.RevitDocuments;
+    public IList<RevitDocumentViewModel> RevitDocuments => _mainViewModel.DeclarationViewModel.RevitDocuments;
 
     public RevitDocumentViewModel SelectedDocument {
         get => _selectedDocument;
@@ -147,12 +148,16 @@ internal abstract class ParametersViewModel : BaseViewModel {
         get => _addPrefixToNumber;
         set => RaiseAndSetIfChanged(ref _addPrefixToNumber, value);
     }
+    
+    public bool AddHyphenToPrefix {
+        get => _addHyphenToPrefix;
+        set => RaiseAndSetIfChanged(ref _addHyphenToPrefix, value);
+    }
 
     /// <summary>
     /// Список параметров для проверки их заполненности в View
     /// </summary>
     public abstract List<Parameter> AllSelectedParameters { get; }
-
 
     public void AddFilter(object obj) {
         if(!string.IsNullOrEmpty(_filterRoomsValue)) {

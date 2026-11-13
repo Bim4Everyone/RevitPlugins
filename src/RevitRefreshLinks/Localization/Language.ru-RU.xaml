@@ -63,6 +63,8 @@
     <system:String
         x:Key="LinkLoader.Transaction.AddLinks">Добавление связей</system:String>
     <system:String
+        x:Key="LinkLoader.Transaction.PinLinks">Закрепление связей</system:String>
+    <system:String
         x:Key="LinkLoader.Error.Coordinates">Файл с другой системой координат</system:String>
     <system:String
         x:Key="LinkLoader.Error.Version">Файл создан в другой версии Revit</system:String>

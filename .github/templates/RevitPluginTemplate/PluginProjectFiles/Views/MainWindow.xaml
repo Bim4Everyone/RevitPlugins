@@ -53,21 +53,21 @@
             HorizontalAlignment="Right">
 
             <TextBlock
-                Margin="10"
+                Margin="8"
                 Foreground="Orange"
                 VerticalAlignment="Center"
                 Text="{Binding ErrorText}" />
 
             <Button
                 Width="80"
-                Margin="10"
+                Margin="8"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <Button
                 Width="80"
-                Margin="10"
+                Margin="8"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />

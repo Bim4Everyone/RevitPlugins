@@ -2,8 +2,6 @@ using Autodesk.Revit.DB;
 
 using pyRevitLabs.Json;
 
-using RevitClashDetective.Models.FilterModel;
-
 namespace RevitSleeves.Models.Config;
 internal abstract class StructureSettings {
     protected StructureSettings() { }
@@ -12,7 +10,10 @@ internal abstract class StructureSettings {
     [JsonIgnore]
     public abstract BuiltInCategory Category { get; }
 
-    public Set FilterSet { get; set; } = new Set();
+    /// <summary>
+    /// Сериализованный контекст фильтра (<see cref="Bim4Everyone.RevitFiltration.Controls.ILogicalFilterContext"/>)
+    /// </summary>
+    public string FilterContext { get; set; }
 
     public bool IsEnabled { get; set; } = true;
 }

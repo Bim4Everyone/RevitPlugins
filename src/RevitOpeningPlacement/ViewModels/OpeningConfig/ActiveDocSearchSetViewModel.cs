@@ -3,11 +3,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using RevitClashDetective.Models.FilterGenerators;
-
-using RevitClashDetective.Models.FilterModel;
-
 using RevitOpeningPlacement.Models;
+using RevitOpeningPlacement.Models.Filtration;
 
 using ElementModel = RevitClashDetective.Models.Clashes.ElementModel;
 
@@ -16,20 +13,18 @@ namespace RevitOpeningPlacement.ViewModels.OpeningConfig;
 /// Модель представления для фильтра по элементам ВИС из активного документа
 /// </summary>
 internal class ActiveDocSearchSetViewModel : SearchSetViewModel {
-    public ActiveDocSearchSetViewModel(
-        RevitRepository revitRepository, Filter filter, RevitFilterGenerator generator)
-        : base(revitRepository, filter, generator) {
+    public ActiveDocSearchSetViewModel(RevitRepository revitRepository, CategoryFilter filter, bool inverted)
+        : base(revitRepository, filter, inverted) {
     }
 
     private protected override void InitializeGrid() {
         var elements = new List<ElementModel>();
         var doc = _revitRepository.Doc;
-        var filter = Filter.GetRevitFilter(doc, FilterGenerator);
-        var elems = _revitRepository.GetFilteredElements(doc, Filter.CategoryIds, filter)
+        var elems = _revitRepository.GetFilteredElements(doc, GetCategoryIds(), GetRevitFilter(doc))
             .Where(item => item != null && item.IsValidObject)
             .ToList();
         elements.AddRange(elems.Select(item => new ElementModel(item, Transform.Identity)));
 
-        Grid = new GridControlViewModel(_revitRepository, Filter, elements);
+        Grid = new GridControlViewModel(_revitRepository, elements);
     }
 }

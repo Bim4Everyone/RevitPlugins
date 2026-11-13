@@ -47,11 +47,13 @@
     <system:String
         x:Key="MainWindow.ButtonCancel">Отмена</system:String>
     <system:String
-        x:Key="TempFamilyDocument.TemplateFamilyName">{0}\Метрическая система, элементы узлов.rft</system:String>
+        x:Key="TempFamilyDocument.TemplateFamilyName">Метрическая система, элементы узлов.rft</system:String>
     <system:String
         x:Key="TempFamilyDocument.FamilyName">{0}Ведомость_Спецификаций_{1}{2}</system:String>
     <system:String
         x:Key="TempFamilyDocument.TransactionName">Создание окружности</system:String>
+    <system:String
+        x:Key="TempFamilyDocument.ExceptionFamily">Не удалось создать ведомость спецификаций. Переименуйте альбом: {0}</system:String>
     <system:String
         x:Key="RevitRepository.ViewName">Ведомость_Cпецификаций_{0}</system:String>
     <system:String
@@ -71,9 +73,13 @@
     <system:String
         x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
     <system:String
+        x:Key="Common.PluginErrorMessageTitle">Ошибка работы плагина</system:String>
+    <system:String
+        x:Key="Common.ConfigErrorNoFamily">Отсутствует шаблон семейства:  {0}  по пути:  {1}</system:String>
+    <system:String
         x:Key="GroupParameter.NoParameter">Нет параметра группировки</system:String>
     <system:String
         x:Key="GroupValue.NoValue">Нет значения</system:String>
     <system:String
-        x:Key="InstancesAssembly.ApprovedLines">ведомость,спецификация,перечень,список</system:String>
+        x:Key="InstancesAssembly.ApprovedLines">ведомость,спецификация,перечень,список,экспликация</system:String>
 </ResourceDictionary>

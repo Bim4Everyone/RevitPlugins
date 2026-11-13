@@ -1,0 +1,18 @@
+name: publish RevitBatchSpecExport
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [ closed, synchronize, review_requested ]
+    branches: [ main, master ]
+    paths:
+      - '**RevitBatchSpecExport**.cs'
+      - '**RevitBatchSpecExport**.xaml'
+      - '**RevitBatchSpecExport**.csproj'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-plugin.yml
+    with:
+      plugin-name: "RevitBatchSpecExport"
+    secrets: inherit

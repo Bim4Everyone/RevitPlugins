@@ -1,0 +1,62 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Modify volume elements</system:String>
+
+    <system:String x:Key="ParamViewModel.NoParam">The parameter does not exist in the project</system:String>
+
+    <system:String x:Key="MainWindow.Params">Parameter configuration</system:String>
+    <system:String x:Key="MainWindow.ParamsDescription">Construction parameters used by the plugin</system:String>
+    <system:String x:Key="MainWindow.ParamWarningTooltip">Some parameters contain errors</system:String>
+    <system:String x:Key="MainWindow.SaveConfig">Save parameter configuration</system:String>
+
+    <system:String x:Key="MainWindow.JoinPanel">Join elements</system:String>
+    <system:String x:Key="MainWindow.JoinPanelDescription">Selected elements will be joined</system:String>
+    <system:String x:Key="MainWindow.JoinCommand">Join</system:String>
+
+    <system:String x:Key="MainWindow.DividePanel">Divide elements</system:String>
+    <system:String x:Key="MainWindow.DividePanelDescription">Selected elements will be divided</system:String>
+    <system:String x:Key="MainWindow.DivideBySelectHorizontalPointCommand">Divide by horizontal point</system:String>
+    <system:String x:Key="MainWindow.DivideBySelectVerticalPointCommand">Divide by vertical point</system:String>
+    <system:String x:Key="MainWindow.DivideBySelectFacesCommand">Divide by faces</system:String>
+
+    <system:String x:Key="MainWindow.CutPanel">Cut elements</system:String>
+    <system:String x:Key="MainWindow.CutPanelDescription">Selected elements will be cut</system:String>
+    <system:String x:Key="MainWindow.CutCommand">Select elements to cut</system:String>
+
+    <system:String x:Key="MainViewModel.DescriptionParamDescription">SMR description parameter</system:String>
+    <system:String x:Key="MainViewModel.DescriptionParamDetailDescription">Type - Text</system:String>
+    <system:String x:Key="MainViewModel.BlockParamDescription">SMR block parameter</system:String>
+    <system:String x:Key="MainViewModel.BlockParamDetailDescription">Type - Text</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDescription">SMR section parameter</system:String>
+    <system:String x:Key="MainViewModel.SectionParamDetailDescription">Type - Text</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDescription">SMR floor parameter</system:String>
+    <system:String x:Key="MainViewModel.FloorParamDetailDescription">Type - Text</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDescription">Additional floor parameter</system:String>
+    <system:String x:Key="MainViewModel.FloorDEParamDetailDescription">Type - Currency</system:String>
+    <system:String x:Key="MainViewModel.ZoneParamDescription">SMR zone parameter</system:String>
+    <system:String x:Key="MainViewModel.ZoneParamDetailDescription">Type - Text</system:String>
+    <system:String x:Key="MainViewModel.VolumeParamDescription">SMR volume parameter</system:String>
+    <system:String x:Key="MainViewModel.VolumeParamDetailDescription">Type - Volume</system:String>
+
+    <system:String x:Key="MainViewModel.FailedCommand">Operation completed with warnings</system:String>
+    <system:String x:Key="MainViewModel.SuccessCommand">Operation completed successfully</system:String>
+
+    <system:String x:Key="MainViewModel.NoSelection">No elements selected</system:String>
+    <system:String x:Key="MainViewModel.DocumentChangedWarning">Open the original document</system:String>
+    <system:String x:Key="MainViewModel.HasParamWarning">Required parameters are missing in the file</system:String>
+    <system:String x:Key="MainViewModel.SaveConfigNecessary">Parameter configuration must be saved</system:String>
+    <system:String x:Key="MainViewModel.PickPointOnElementPromt">Select a point on the volume element</system:String>
+    <system:String x:Key="MainViewModel.PickFacesPromt">Select faces and click "Finish"</system:String>
+    <system:String x:Key="MainViewModel.CutPromt">Select elements to cut and click "Finish"</system:String>
+
+    <system:String x:Key="RevitRepository.NoParamValue">No value</system:String>
+
+    <system:String x:Key="RevitRepository.TransactionNameJoin">Join SMR volumes</system:String>
+    <system:String x:Key="RevitRepository.TransactionNameDivide">Divide SMR volumes</system:String>
+    <system:String x:Key="RevitRepository.TransactionNameCut">Cut SMR volumes</system:String>
+    <system:String x:Key="RevitPickService.CancelledSelectionPoint">Points selection cancelled</system:String>
+    <system:String x:Key="RevitPickService.CancelledSelectionFaces">Faces selection cancelled</system:String>
+    <system:String x:Key="RevitPickService.CancelledSelectionElements">Cutting elements selection cancelled</system:String>
+</ResourceDictionary>

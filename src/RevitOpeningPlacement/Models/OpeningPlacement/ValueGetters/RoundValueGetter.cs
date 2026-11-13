@@ -62,14 +62,14 @@ internal abstract class RoundValueGetter {
 
 #if REVIT_2020_OR_LESS
     /// <summary>
-    /// Значение округления координат в футах (единицах длины в Revit), равное конвертированному <see cref="MmRound"/>
+    /// Конвертирует значение округления из мм в футы (единицы длины в Revit)
     /// </summary>
     private double GetFeetRound(int mmRound) {
         return UnitUtils.ConvertToInternalUnits(mmRound, DisplayUnitType.DUT_MILLIMETERS);
     }
 #else
     /// <summary>
-    /// Значение округления координат в футах (единицах длины в Revit), равное конвертированному <see cref="MmRound"/>
+    /// Конвертирует значение округления из мм в футы (единицы длины в Revit)
     /// </summary>
     private double GetFeetRound(int mmRound) {
         return UnitUtils.ConvertToInternalUnits(mmRound, UnitTypeId.Millimeters);

@@ -17,6 +17,20 @@ using RevitMechanicalSpecification.Service;
 namespace RevitMechanicalSpecification.Models.Fillers {
     internal class ElementParamNameFiller : ElementParamFiller {
         private readonly VisElementsCalculator _calculator;
+        private const string ManifoldAddon = ", в составе:";
+        private static readonly IReadOnlyList<string> _manifoldNameEndings = new List<string> {
+            "В составе:",
+            "в составе:",
+            "В составе",
+            "в составе",
+            ":"
+        };
+
+        private readonly List<BuiltInCategory> _ductInsulationHostCategories = new List<BuiltInCategory>() {
+            BuiltInCategory.OST_DuctFitting,
+            BuiltInCategory.OST_DuctCurves
+        };
+        
         private string _name;
         private string _nameAddon;
 
@@ -30,8 +44,12 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             _calculator = visElementsCalculator;
         }
 
+        protected override void PrepareValue(SpecificationElement specificationElement) {
+            specificationElement.ElementName = GetName(specificationElement).Trim();
+        }
+
         public override void SetParamValue(SpecificationElement specificationElement) {
-            string name = GetName(specificationElement);
+            string name = specificationElement.ElementName ?? GetName(specificationElement);
 
             TargetParam.Set(specificationElement.ManifoldInstance != null
                 ? $"‎    •  {name}"
@@ -47,9 +65,13 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="specificationElement"></param>
         /// <returns></returns>
         private string GetName(SpecificationElement specificationElement) {
+            if(specificationElement.ReplacedName != null) {
+                return specificationElement.ReplacedName;
+            }
+
             _name = specificationElement.GetTypeOrInstanceParamStringValue(Config.OriginalParamNameName);
             _nameAddon = specificationElement.GetTypeOrInstanceParamStringValue(Config.NameAddition);
-
+            
             if(string.IsNullOrEmpty(_name)) {
                 _name = "ЗАПОЛНИТЕ НАИМЕНОВАНИЕ";
             }
@@ -66,13 +88,45 @@ namespace RevitMechanicalSpecification.Models.Fillers {
                     return GetPipeInsulationName(specificationElement);
                 case BuiltInCategory.OST_CableTray:
                     return GetCableTrayName(specificationElement);
+                case BuiltInCategory.OST_CableTrayFitting:
+                    return GetCableTrayFittingName(specificationElement);
                 case BuiltInCategory.OST_FlexDuctCurves:
                     return GetFlexElementName(specificationElement);
                 case BuiltInCategory.OST_FlexPipeCurves:
                     return GetFlexElementName(specificationElement);
+                case BuiltInCategory.OST_DuctInsulations:
+                    return GetDuctInsulationName(specificationElement);
             }
 
+            string baseName = GetBaseName();
+            if(specificationElement.ElementType.GetSharedParamValueOrDefault<int>(Config.IsManiFoldParamName) == 1) {
+                // Данный пункт необходим для обработки нейросетевым помощником сметчиков, 
+                // необходима подстрока однозначно диктующая что это материнский элемент узла, т.к. его стоимость зануляется
+                return ReplaceOrAppendManifoldAddon(baseName);
+            }
+
+            return baseName;
+        }
+
+        private string GetBaseName() {
             return string.IsNullOrEmpty(_nameAddon) ? _name : $"{_name} {_nameAddon}";
+        }
+
+        private string ReplaceOrAppendManifoldAddon(string name) {
+            string normalizedName = name.TrimEnd();
+
+            foreach(string ending in _manifoldNameEndings.OrderByDescending(item => item.Length)) {
+                if(normalizedName.EndsWith(ending, StringComparison.OrdinalIgnoreCase)) {
+                    string trimmedName = normalizedName
+                        .Substring(0, normalizedName.Length - ending.Length)
+                        .TrimEnd(' ', ',', '.', ':');
+                    return string.IsNullOrEmpty(trimmedName)
+                        ? ManifoldAddon.TrimStart(',', ' ')
+                        : $"{trimmedName}{ManifoldAddon}";
+                }
+            }
+
+            return $"{normalizedName}{ManifoldAddon}";
         }
 
         /// <summary>
@@ -90,6 +144,10 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             height = UnitConverter.DoubleToMilimeters(height);
 
             return $"{_name} {width}x{height}";
+        }
+
+        private string GetCableTrayFittingName(SpecificationElement specificationElement) {
+            return $"{_calculator.GetCableTrayFittingName(specificationElement.Element, _name)} {_nameAddon}".Trim();
         }
 
         /// <summary>
@@ -146,7 +204,7 @@ namespace RevitMechanicalSpecification.Models.Fillers {
         /// <param name="specificationElement"></param>
         /// <returns></returns>
         private string GetDuctFittingName(SpecificationElement specificationElement) {
-            return $"{_calculator.GetDuctFittingName(specificationElement.Element)} {_nameAddon}";
+            return $"{_calculator.GetDuctFittingName(specificationElement.Element, _nameAddon)} {_nameAddon}";
         }
 
         /// <summary>
@@ -195,15 +253,54 @@ namespace RevitMechanicalSpecification.Models.Fillers {
             InsulationLiningBase insulation = (InsulationLiningBase)specificationElement.Element;
 
             // Нужно проверить, что у изоляции реально есть хост. Изредка багует что его нет
+            Element hostElement = GetInsulationHost(
+                insulation,
+                host => host.Category.IsId(BuiltInCategory.OST_PipeCurves));
+
+            return hostElement != null ?
+                $"{_name} " +
+                $"(Для: {GetPipeName(hostElement, hostElement.GetElementType())}) {_nameAddon}"
+                : Config.DoNotCountPlaceHolder;
+        }
+        
+        private string GetDuctInsulationName(SpecificationElement specificationElement) {
+            InsulationLiningBase insulation = (InsulationLiningBase)specificationElement.Element;
+            
+            // Нужно проверить, что у изоляции реально есть хост. Изредка багует что его нет
+            Element hostElement = GetInsulationHost(insulation, IsValidDuctInsulationHost);
+            
+            return hostElement != null
+                ? $"{_name} {_nameAddon}"
+                : Config.DoNotCountPlaceHolder;
+        }
+
+        private Element GetInsulationHost(
+            InsulationLiningBase insulation,
+            Func<Element, bool> hostValidation) {
             if(insulation.HostElementId.IsNull()) {
-                return "!Не учиывать";
+                return null;
             }
 
-            Element pipe = Document.GetElement(insulation.HostElementId);
-            return (pipe != null & pipe.Category.IsId(BuiltInCategory.OST_PipeCurves)) ?
-                $"{_name} " +
-                $"(Для: {GetPipeName(pipe, pipe.GetElementType())}) {_nameAddon}"
-                : "!Не учитывать";
+            Element element = Document.GetElement(insulation.HostElementId);
+            if(element == null) {
+                return null;
+            }
+
+            return hostValidation(element) ? element : null;
+        }
+
+        private bool IsValidDuctInsulationHost(Element element) {
+            if(!element.InAnyCategory(_ductInsulationHostCategories)) {
+                return false;
+            }
+
+            if(element.Category.IsId(BuiltInCategory.OST_DuctFitting)) {
+                return element is FamilyInstance instance
+                    && instance.MEPModel is MechanicalFitting fitting
+                    && fitting.PartType != PartType.Union;
+            }
+
+            return true;
         }
     }
 }

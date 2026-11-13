@@ -4,80 +4,95 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Bim4Everyone;
 using dosymep.Revit;
 using dosymep.SimpleServices;
 
 namespace RevitListOfSchedules.Models;
 internal class InstancesAssembly {
-    private readonly ILocalizationService _localizationService;
     private readonly IList<string> _approvedLines;
     private readonly RevitRepository _revitRepository;
-    private readonly ViewDrafting _viewDrafting;
-    private readonly FamilySymbol _familySymbol;
-    private readonly string _albumName;
 
     public InstancesAssembly(
         ILocalizationService localizationService,
-        RevitRepository revitRepository,
-        ViewDrafting viewDrafting,
-        FamilySymbol familySymbol,
-        string albumName) {
-        _localizationService = localizationService;
+        RevitRepository revitRepository) {
         _revitRepository = revitRepository;
-        _viewDrafting = viewDrafting;
-        _familySymbol = familySymbol;
-        _albumName = albumName;
-
-        string localizedApprovedLines = _localizationService.GetLocalizedString("InstancesAssembly.ApprovedLines");
-
+        string localizedApprovedLines = localizationService.GetLocalizedString("InstancesAssembly.ApprovedLines");
         _approvedLines = localizedApprovedLines
             .Split([','], StringSplitOptions.RemoveEmptyEntries)
             .Select(s => s.Trim())
             .ToList();
     }
 
-    public void PlaceFamilyInstances(string sheetNumber, string sheetRevNumber, IList<ViewSchedule> listOfSchedules) {
-        foreach(var schedule in listOfSchedules) {
-            var tableData = schedule.GetTableData();
-            var headData = tableData.GetSectionData(SectionType.Header);
+    public void PlaceFamilyInstances(
+    string sheetNumber,
+    string sheetRevNumber,
+    IList<ViewSchedule> listOfSchedules,
+    FamilySymbol familySymbol,
+    ViewDrafting viewDrafting,
+    string albumName) {
+        
+    foreach(var schedule in listOfSchedules) {
+        var tableData = schedule.GetTableData();
+        var headData = tableData.GetSectionData(SectionType.Header);
 
-            if(headData != null && !headData.HideSection) {
-                string resultScheduleName = null;
-                bool found = false;
+        // Спецификации без шапки не учитываем
+        if(headData is null || headData.HideSection) {
+            continue;
+        }
 
-                for(int i = headData.FirstRowNumber; i < headData.NumberOfRows && !found; i++) {
-                    for(int j = headData.FirstColumnNumber; j < headData.NumberOfColumns && !found; j++) {
-                        string cellText = headData.GetCellText(i, j);
-                        if(_approvedLines.Any(cellText.ToLower().Contains)) {
-                            resultScheduleName = cellText;
-                            found = true;
-                        }
-                    }
+        // Шапка должна содержать хотя бы одну ячейку
+        if(headData.NumberOfRows < 1 || headData.NumberOfColumns < 1) {
+            continue;
+        }
+
+        string resultScheduleName = null;
+
+        for (int rowIndex = headData.FirstRowNumber; rowIndex <= headData.LastRowNumber; rowIndex++) {
+            for (int columnIndex = headData.FirstColumnNumber; columnIndex <= headData.LastColumnNumber; columnIndex++) {
+                
+                string cellText = schedule.GetCellText(SectionType.Header, rowIndex, columnIndex);
+
+                if(string.IsNullOrEmpty(cellText) || !_approvedLines.Any(x => cellText.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                    continue;
                 }
-                if(found) {
-                    PlaceFamilyInstance(sheetNumber, sheetRevNumber, resultScheduleName);
-                } else if(!found
-                    && headData.NumberOfRows == 1
-                    && headData.NumberOfColumns == 1
-                    && string.IsNullOrEmpty(headData.GetCellText(0, 0))) {
 
-                    PlaceFamilyInstance(sheetNumber, sheetRevNumber, schedule.Name);
-                }
+                resultScheduleName = cellText;
+                break;
+            }
+
+            if(resultScheduleName is not null) {
+                break;
             }
         }
-    }
 
-    public void PlaceFamilyInstance(string sheetNumber, string sheetRevNumber, string scheduleName) {
-        var familyInstance = _revitRepository.Document.Create.NewFamilyInstance(XYZ.Zero, _familySymbol, _viewDrafting);
+        // Если в шапке ничего подходящего нет, проверяем название самой спецификации
+        if(resultScheduleName is null && _approvedLines.Any(x => schedule.Name.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0)) {
+            resultScheduleName = schedule.Name;
+        }
+
+        // Если нашли подходящее имя — размещаем
+        if(resultScheduleName is not null) {
+            PlaceFamilyInstance(sheetNumber, sheetRevNumber, resultScheduleName, familySymbol, viewDrafting, albumName);
+        }
+    }
+}
+
+    public void PlaceFamilyInstance(
+        string sheetNumber,
+        string sheetRevNumber,
+        string scheduleName,
+        FamilySymbol familySymbol,
+        ViewDrafting viewDrafting,
+        string albumName) {
+        var familyInstance = _revitRepository.Document.Create.NewFamilyInstance(XYZ.Zero, familySymbol, viewDrafting);
         familyInstance.SetParamValue(ParamFactory.ListOfSchedulesSheetName, sheetNumber);
         familyInstance.SetParamValue(ParamFactory.ListOfSchedulesRevNumber, sheetRevNumber);
         familyInstance.SetParamValue(ParamFactory.ListOfSchedulesListName, scheduleName);
-        familyInstance.SetParamValue(ParamFactory.ListOfSchedulesGroup, $"{ParamFactory.DefaultScheduleName}_{_albumName}");
+        familyInstance.SetParamValue(ParamFactory.ListOfSchedulesGroup, $"{ParamFactory.DefaultScheduleName}_{albumName}");
     }
 
-    public void DeleteFamilyInstances() {
-        var instances = new FilteredElementCollector(_revitRepository.Document, _viewDrafting.Id)
+    public void DeleteFamilyInstances(ViewDrafting viewDrafting) {
+        var instances = new FilteredElementCollector(_revitRepository.Document, viewDrafting.Id)
             .OfType<FamilyInstance>()
             .Select(instance => instance.Id)
             .ToList();

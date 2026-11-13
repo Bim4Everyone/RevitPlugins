@@ -22,8 +22,10 @@
     <File Path="src/Directory.Build.targets" />
   </Folder>
   <Folder Name="/Solution Items/Project Props/">
+    <File Path="src/_ProjectProps/ClosedXML.props" />
     <File Path="src/_ProjectProps/DevExpress.props" />
     <File Path="src/_ProjectProps/RevitClashes.props" />
+    <File Path="src/_ProjectProps/RevitFiltration.props" />
     <File Path="src/_ProjectProps/WpfUI.props" />
   </Folder>
   <Project Path="build/_build.csproj">
@@ -34,13 +36,14 @@
     <BuildType Solution="D2022|*" Project="Debug" />
     <BuildType Solution="D2023|*" Project="Debug" />
     <BuildType Solution="D2024|*" Project="Debug" />
-	<BuildType Solution="Debug|*" Project="Debug" />
-    <BuildType Solution="Release|*" Project="Release" />
   </Project>
   <Project Path="src/RevitApartmentPlans/RevitApartmentPlans.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitArchitecturalDocumentation/RevitArchitecturalDocumentation.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitAreaBoundaries/RevitAreaBoundaries.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitAxonometryViews/RevitAxonometryViews.csproj">
@@ -49,10 +52,19 @@
   <Project Path="src/RevitBatchPrint/RevitBatchPrint.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitBatchSpecExport/RevitBatchSpecExport.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitBuildCoordVolumes/RevitBuildCoordVolumes.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitCheckingLevels/RevitCheckingLevels.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitClashDetective/RevitClashDetective.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitClassifierParameters/RevitClassifierParameters.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitCopingZones/RevitCopingZones.csproj">
@@ -82,6 +94,9 @@
   <Project Path="src/RevitDeleteUnused/RevitDeleteUnused.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitDocumenter/RevitDocumenter.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitEditingZones/RevitEditingZones.csproj">
     <Platform Project="x64" />
   </Project>
@@ -89,6 +104,9 @@
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitExportSpecToExcel/RevitExportSpecToExcel.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitExportSpecToJson/RevitExportSpecToJson.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitFamilyExplorer/RevitFamilyExplorer.csproj">
@@ -121,6 +139,9 @@
   <Project Path="src/RevitListOfSchedules/RevitListOfSchedules.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitMarkAllDocuments/RevitMarkAllDocuments.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitMarkingElements/RevitMarkingElements.csproj">
     <Platform Project="x64" />
   </Project>
@@ -145,6 +166,12 @@
   <Project Path="src/RevitOverridingGraphicsInViews/RevitOverridingGraphicsInViews.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitPackageDocumentation/RevitPackageDocumentation.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitParamsChecker/RevitParamsChecker.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitPlatformSettings/RevitPlatformSettings.csproj">
     <Platform Project="x64" />
   </Project>
@@ -155,6 +182,9 @@
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitPylonDocumentation/RevitPylonDocumentation.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitPylonLoadAreas/RevitPylonLoadAreas.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitRefreshLinks/RevitRefreshLinks.csproj">
@@ -176,6 +206,9 @@
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitRoomTagPlacement/RevitRoomTagPlacement.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitRoundingOfAreas/RevitRoundingOfAreas.csproj">
     <Platform Project="x64" />
   </Project>
     <Project Path="src/RevitRsnManager/RevitRsnManager.csproj">
@@ -202,10 +235,19 @@
   <Project Path="src/RevitSleeves/RevitSleeves.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitSplitMepCurve/RevitSplitMepCurve.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitSuperfilter/RevitSuperfilter.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitUnmodelingMep/RevitUnmodelingMep.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitValueModifier/RevitValueModifier.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="src/RevitVolumeModifier/RevitVolumeModifier.csproj">
     <Platform Project="x64" />
   </Project>
   <Project Path="src/RevitVolumeOfWork/RevitVolumeOfWork.csproj">

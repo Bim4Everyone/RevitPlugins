@@ -10,7 +10,8 @@ using RevitClashDetective.Models.Clashes;
 using RevitOpeningPlacement.Models.Interfaces;
 
 namespace RevitOpeningPlacement.OpeningModels;
-internal class OpeningKrHost : IOpeningKrHost, ISelectorAndHighlighter, IEquatable<OpeningKrHost> {
+
+internal class OpeningKrHost : IOpeningKrHost, IEquatable<OpeningKrHost> {
     private const string _krModelPartParam = "обр_ФОП_Раздел проекта";
     private readonly Element _element;
 

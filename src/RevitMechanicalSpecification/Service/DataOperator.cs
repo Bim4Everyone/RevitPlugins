@@ -11,6 +11,12 @@ using RevitMechanicalSpecification.Entities;
 
 namespace RevitMechanicalSpecification.Service {
     public static class DataOperator {
+        private static readonly ElementFilter _insulationFilter = new ElementMulticategoryFilter(
+            new List<BuiltInCategory> {
+                BuiltInCategory.OST_PipeInsulations,
+                BuiltInCategory.OST_DuctInsulations
+            });
+
         /// <summary>
         /// возвращает значение параметра по типу или экземпляру, если существует, иначе null
         /// </summary>
@@ -20,10 +26,10 @@ namespace RevitMechanicalSpecification.Service {
         /// <returns></returns>
         public static string GetTypeOrInstanceParamStringValue(this Element element, Element elemType, string paraName) {
             if(element.IsExistsParam(paraName)) {
-                return element.GetSharedParamValueOrDefault<string>(paraName);
+                return element.GetParamValueOrDefault<string>(paraName);
             }
             if(elemType.IsExistsParam(paraName)) {
-                return elemType.GetSharedParamValueOrDefault<string>(paraName);
+                return elemType.GetParamValueOrDefault<string>(paraName);
             }
             return null;
         }
@@ -54,16 +60,16 @@ namespace RevitMechanicalSpecification.Service {
         /// <param name="specificationElement"></param>
         /// <param name="paraName"></param>
         /// <returns></returns>
-        public static Parameter GetTypeOrInstanceParam(this SpecificationElement specificationElement, string paramName) {
-            if(!(specificationElement.Element.IsExistsParam(paramName)
-                || specificationElement.ElementType.IsExistsParam(paramName))) {
-                return null;
+        public static Parameter GetTypeOrInstanceParam(this Element element, Element elementType, string paramName) {
+            if(element.IsExistsParam(paramName)) {
+                return element.GetParam(paramName);
             }
 
-            Parameter parameter = specificationElement.Element.GetSharedParam(paramName) ??
-                specificationElement.ElementType.GetSharedParam(paramName);
+            if(elementType.IsExistsParam(paramName)) {
+                return elementType.GetParam(paramName);
+            }
 
-            return parameter;
+            return null;
         }
 
         public static bool IsTypeOrInstanceParamExist(this SpecificationElement specificationElement, string paramName) {
@@ -81,10 +87,10 @@ namespace RevitMechanicalSpecification.Service {
         /// <returns></returns>
         public static double GetTypeOrInstanceParamDoubleValue(this Element element, Element elemType, string paraName) {
             if(element.IsExistsParam(paraName)) {
-                return element.GetSharedParamValueOrDefault<double>(paraName);
+                return element.GetParamValueOrDefault<double>(paraName);
             }
             if(elemType.IsExistsParam(paraName)) {
-                return elemType.GetSharedParamValueOrDefault<double>(paraName);
+                return elemType.GetParamValueOrDefault<double>(paraName);
             }
             return 0;
         }
@@ -140,6 +146,24 @@ namespace RevitMechanicalSpecification.Service {
                     subs.AddRange(GetSub(subInst, document));
                 }
             }
+            // Для категории арматуры изоляция не является субкомпонентом, требуется сбор через зависимые, иначе
+            // при работе полного обновления выбранного изоляция не обновится на части элементов
+            if(element.InAnyCategory(new List<BuiltInCategory> {
+                BuiltInCategory.OST_PipeAccessory,
+                BuiltInCategory.OST_DuctAccessory
+            })) {
+                foreach(ElementId dependentElementId in element.GetDependentElements(_insulationFilter)) {
+                    Element dependentElement = document.GetElement(dependentElementId);
+                    if(dependentElement == null) {
+                        continue;
+                    }
+
+                    if(subs.All(item => item.Id != dependentElement.Id)) {
+                        subs.Add(dependentElement);
+                    }
+                }
+            }
+
             return subs;
         }
     }
