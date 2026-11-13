@@ -36,7 +36,6 @@ internal class StructColumnPylon : IPylon {
 
         Length = elementType.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeLength, 0);
         Width = elementType.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeWidth, 0);
-        Height = element.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeHeight, 0);
     }
 
     public Element PylonInstance { get; }
@@ -48,7 +47,6 @@ internal class StructColumnPylon : IPylon {
 
     public double Length { get; }
     public double Width { get; }
-    public double Height { get; }
 
     /// <summary>
     /// Возвращает нижнюю центральную точку в координатах текущего проекта

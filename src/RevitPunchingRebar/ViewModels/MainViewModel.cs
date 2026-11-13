@@ -149,10 +149,6 @@ internal class MainViewModel : BaseViewModel {
     public ICommand LoadFamilyTypesCommand { get; }
 
     /// <summary>
-    /// Команда проверки выбранного типа каркаса.
-    /// </summary>
-
-    /// <summary>
     /// Команда сброса поля к значению по умолчанию. Параметр — имя свойства ViewModel.
     /// </summary>
     public ICommand ResetToDefaultCommand { get; }

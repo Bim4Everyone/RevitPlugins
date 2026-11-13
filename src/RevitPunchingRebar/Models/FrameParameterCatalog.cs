@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 
-
 namespace RevitPunchingRebar.Models;
 
 /// <summary>Назначения параметров; идентификаторы используются в конфигурации и не зависят от языка.</summary>

@@ -4,8 +4,6 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <system:Double x:Key="RadioButtonBorderThemeThickness">1</system:Double>
-    <system:Double x:Key="ToggleButtonWidth">40</system:Double>
-    <system:Double x:Key="ToggleButtonHeight">20</system:Double>
     <Thickness x:Key="ToggleSwitchPadding">8,6,0,0</Thickness>
     <Thickness x:Key="ToggleSwitchBorderThemeThickness">1</Thickness>
     <Thickness x:Key="ToggleSwitchContentMargin">8,0,0,0</Thickness>

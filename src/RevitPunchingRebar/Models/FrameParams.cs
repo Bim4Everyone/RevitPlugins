@@ -4,6 +4,9 @@ using RevitPunchingRebar.Models.Interfaces;
 
 namespace RevitPunchingRebar.Models;
 internal class FrameParams : IFrameParams {
+    private readonly double _slabThickness;
+    private readonly double _rebarCoverBottom;
+
     // Шаг округления расстояний зоны продавливания, мм
     private const double _roundingStepMm = 10;
 
@@ -24,13 +27,13 @@ internal class FrameParams : IFrameParams {
         FrameFamilyTypeName = settings.FamilyType;
 
         HostSlab = hostSlab;
-        SlabThickness = hostSlab.Thickness;
+        _slabThickness = hostSlab.Thickness;
 
         // В режиме "из плиты" берется защитный слой плиты, иначе - введенный вручную
         RebarCoverTop = settings.IsRebarCoverFromUser
             ? UnitUtilsHelper.FromMm(settings.RebarCoverTop)
             : hostSlab.RebarCoverTop.Value;
-        RebarCoverBottom = settings.IsRebarCoverFromUser
+        _rebarCoverBottom = settings.IsRebarCoverFromUser
             ? UnitUtilsHelper.FromMm(settings.RebarCoverBottom)
             : hostSlab.RebarCoverBottom.Value;
         PlateRebarDiameter = UnitUtilsHelper.FromMm(settings.SlabRebarDiameter);
@@ -53,11 +56,9 @@ internal class FrameParams : IFrameParams {
     public string FrameFamilyName { get; }
     public string FrameFamilyTypeName { get; }
 
-    public double SlabThickness { get; }
     public Slab HostSlab { get; }
 
     public double RebarCoverTop { get; }
-    public double RebarCoverBottom { get; }
 
     public double PlateRebarDiameter { get; }
 
@@ -71,8 +72,8 @@ internal class FrameParams : IFrameParams {
     public double StirrupBendLength { get; }
 
     public double GetFrameHeight() {
-        double height = SlabThickness - (RebarCoverTop + PlateRebarDiameter) -
-                                        (RebarCoverBottom + 2 * PlateRebarDiameter) -
+        double height = _slabThickness - (RebarCoverTop + PlateRebarDiameter) -
+                                        (_rebarCoverBottom + 2 * PlateRebarDiameter) -
                                         LongRebarDiameter;
 
         return height;
@@ -115,9 +116,6 @@ internal class FrameParams : IFrameParams {
     /// </summary>
     /// <returns></returns>
     private double GetWorkingHeight() {
-        double slabHeight = SlabThickness;
-        double workingHeight = slabHeight - (RebarCoverBottom + PlateRebarDiameter);
-
-        return workingHeight;
+        return _slabThickness - (_rebarCoverBottom + PlateRebarDiameter);
     }
 }

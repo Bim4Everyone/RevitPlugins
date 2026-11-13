@@ -12,8 +12,6 @@ using dosymep.SimpleServices;
 using RevitPunchingRebar.Models.Interfaces;
 using RevitPunchingRebar.Models.SelectionFilters;
 
-using Application = Autodesk.Revit.ApplicationServices.Application;
-
 namespace RevitPunchingRebar.Models;
 
 /// <summary>
@@ -44,11 +42,6 @@ internal class RevitRepository {
     /// Класс доступа к интерфейсу документа Revit.
     /// </summary>
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
-
-    /// <summary>
-    /// Класс доступа к приложению Revit.
-    /// </summary>
-    public Application Application => UIApplication.Application;
 
     /// <summary>
     /// Класс доступа к документу Revit.

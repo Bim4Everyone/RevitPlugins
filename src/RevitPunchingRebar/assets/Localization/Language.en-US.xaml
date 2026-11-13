@@ -51,8 +51,6 @@
     <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">The slab has no top or bottom rebar cover assigned</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamily">Select the frame family</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamilyType">Select the frame type</system:String>
-    <system:String x:Key="MainWindow.ErrorFrameParamsMissing">The frame family lacks parameters: {0}</system:String>
-    <system:String x:Key="MainWindow.ErrorFramePlacement">Failed to place an instance of the selected frame type</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidth">Frame width: enter a whole number of mm greater than 0</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidthTooSmall">Frame width must exceed the sum of the stirrup and longitudinal bar diameters</system:String>
     <system:String x:Key="MainWindow.ErrorFrameHeight">Frame height must be greater than 0 for the selected slab thickness, covers and bar diameters</system:String>
@@ -63,7 +61,6 @@
 
     <system:String x:Key="RevitUI.PickSlab">Select a slab</system:String>
     <system:String x:Key="RevitUI.PickPylons">Select pylons</system:String>
-    <system:String x:Key="RevitUI.CheckFrameTypeTransaction">Checking the frame type</system:String>
 
     <system:String x:Key="RebarClass.A500C">A500C</system:String>
     <system:String x:Key="RebarClass.A240">A240</system:String>
@@ -72,7 +69,6 @@
     <system:String x:Key="Report.SkippedPylons">Skipped pylons:</system:String>
     <system:String x:Key="Report.PylonName">{0}, Id {1}</system:String>
     <system:String x:Key="Report.ErrorPylonSize">pylon length or width is not set</system:String>
-    <system:String x:Key="Report.ErrorPylonHeight">pylon height is not set</system:String>
 
     <system:String x:Key="Parameters.Title">Parameter settings</system:String>
     <system:String x:Key="Parameters.Intro">Enter parameter names. The same name is used on the slab and frame for copying. Settings are saved with OK on the main screen.</system:String>

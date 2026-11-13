@@ -9,7 +9,6 @@ internal interface IPylon {
 
     double Length { get; }
     double Width { get; }
-    double Height { get; }
 
     /// <summary>
     /// Возвращает нижнюю центральную точку

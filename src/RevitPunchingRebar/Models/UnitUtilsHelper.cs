@@ -21,7 +21,7 @@ internal static class UnitUtilsHelper {
     /// <summary>
     /// Переводит внутренние единицы Revit в миллиметры.
     /// </summary>
-    public static double ToMm(double value) {
+    private static double ToMm(double value) {
         return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters);
     }
 

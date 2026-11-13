@@ -5,10 +5,8 @@ internal interface IFrameParams {
     string FrameFamilyName { get; }
     string FrameFamilyTypeName { get; }
 
-    double SlabThickness { get; }
     Slab HostSlab { get; }
     double RebarCoverTop { get; }
-    double RebarCoverBottom { get; }
     double PlateRebarDiameter { get; }
 
     RebarClass StirrupRebarClass { get; }

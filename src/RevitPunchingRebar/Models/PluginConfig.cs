@@ -1,6 +1,5 @@
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
-using dosymep.Serializers;
 
 using pyRevitLabs.Json;
 
@@ -26,10 +25,8 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
     /// <summary>
     /// Метод создания конфигурации плагина.
     /// </summary>
-    /// <returns>
-	/// <param name="configSerializer">Сериализатор конфигурации.</param>
-    /// Возвращает прочитанную конфигурацию плагина, либо созданный конфиг по умолчанию.
-    /// </returns>
+    /// <param name="configSerializer">Сериализатор конфигурации.</param>
+    /// <returns>Прочитанная конфигурация плагина либо новая конфигурация по умолчанию.</returns>
     public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
         return new ProjectConfigBuilder()
             .SetSerializer(configSerializer)
@@ -39,7 +36,6 @@ internal class PluginConfig : ProjectConfig<RevitSettings> {
             .Build<PluginConfig>();
     }
 }
-
 
 internal class RevitSettings : ProjectSettings {
     /// <summary>

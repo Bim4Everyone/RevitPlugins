@@ -51,8 +51,6 @@
     <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">У плиты не назначен защитный слой сверху или снизу</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamily">Выберите семейство каркаса</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamilyType">Выберите тип каркаса</system:String>
-    <system:String x:Key="MainWindow.ErrorFrameParamsMissing">В семействе каркаса нет параметров: {0}</system:String>
-    <system:String x:Key="MainWindow.ErrorFramePlacement">Не удалось разместить экземпляр выбранного типа каркаса</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidth">Ширина каркаса: введите целое число мм больше 0</system:String>
     <system:String x:Key="MainWindow.ErrorFrameWidthTooSmall">Ширина каркаса должна быть больше суммы диаметров хомута и продольного стержня</system:String>
     <system:String x:Key="MainWindow.ErrorFrameHeight">При выбранной толщине плиты, защитных слоях и диаметрах высота каркаса должна быть больше 0</system:String>
@@ -63,7 +61,6 @@
 
     <system:String x:Key="RevitUI.PickSlab">Выберите плиту</system:String>
     <system:String x:Key="RevitUI.PickPylons">Выберите пилоны</system:String>
-    <system:String x:Key="RevitUI.CheckFrameTypeTransaction">Проверка типа каркаса</system:String>
 
     <system:String x:Key="RebarClass.A500C">А500С</system:String>
     <system:String x:Key="RebarClass.A240">А240</system:String>
@@ -72,7 +69,6 @@
     <system:String x:Key="Report.SkippedPylons">Пропущенные пилоны:</system:String>
     <system:String x:Key="Report.PylonName">{0}, Id {1}</system:String>
     <system:String x:Key="Report.ErrorPylonSize">не заданы длина или ширина пилона</system:String>
-    <system:String x:Key="Report.ErrorPylonHeight">не задана высота пилона</system:String>
 
     <system:String x:Key="Parameters.Title">Настройки параметров</system:String>
     <system:String x:Key="Parameters.Intro">Введите имена параметров. Для копирования из плиты используется одно имя: оно должно быть одинаковым у плиты и каркаса. Настройки сохраняются по OK основного экрана.</system:String>

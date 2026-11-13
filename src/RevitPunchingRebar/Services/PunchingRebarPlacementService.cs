@@ -4,7 +4,6 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
-using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitPunchingRebar.Models;
