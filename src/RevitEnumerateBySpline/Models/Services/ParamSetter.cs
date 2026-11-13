@@ -6,31 +6,27 @@ using Autodesk.Revit.DB.Architecture;
 
 using dosymep.Bim4Everyone;
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Settings;
 
 namespace RevitEnumerateBySpline.Models.Services;
 
-/// <summary>Записывает номера помещений и номер основного машиноместа у зависимых.</summary>
-internal sealed class ParamSetter(RevitRepository revitRepository) : IParamSetter {
+/// <summary>Записывает номера помещений и номер основного машино-места у зависимых.</summary>
+internal sealed class ParamSetter(
+    RevitRepository revitRepository,
+    IParamService paramService,
+    ILocalizationService localizationService) : IParamSetter {
     public void SetParams(IReadOnlyList<SpatialPointIntersection> intersections, ConfigSettings settings) {
-        if(intersections is null) {
-            throw new ArgumentNullException(nameof(intersections));
-        }
-        if(settings is null) {
-            throw new ArgumentNullException(nameof(settings));
-        }
-
-        var numberParam = settings.NumberParam
-            ?? throw new ArgumentException("Не выбран параметр номера помещения.", nameof(settings));
-        double number = settings.StartNumber
-            ?? throw new ArgumentException("Не задан стартовый номер.", nameof(settings));
+        var numberParam = settings.NumberParam!;
+        double number = settings.StartNumber!.Value;
         string prefix = settings.Prefix ?? string.Empty;
         string suffix = settings.Suffix ?? string.Empty;
-        string searchKey = settings.SearchKey ?? string.Empty;
+        string searchKey = settings.SearchKey!;
 
-        using var transaction = revitRepository.Document.StartTransaction("Нумерация помещений по линии");
+        using var transaction = revitRepository.Document.StartTransaction(
+            localizationService.GetLocalizedString("ParamSetter.TransactionName"));
         string? previousNumber = null;
 
         foreach(var intersection in intersections) {
@@ -39,10 +35,8 @@ internal sealed class ParamSetter(RevitRepository revitRepository) : IParamSette
             }
 
             bool isDependent = previousNumber is not null
-                && settings.DependentSearchParam is { } searchParam
-                && settings.DependentParam is not null
-                && !string.IsNullOrWhiteSpace(searchKey)
-                && searchParam.GetParam(room)?.AsString()?.IndexOf(
+                && paramService.TryGetParam(settings.DependentSearchParam!, room, out var searchParam)
+                && searchParam?.AsString()?.IndexOf(
                     searchKey, StringComparison.OrdinalIgnoreCase) >= 0;
 
             string currentNumber = prefix + number.ToString(CultureInfo.CurrentCulture) + suffix;

@@ -91,4 +91,5 @@
 
     <system:String x:Key="MainWindow.ButtonOk">Нумеровать</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="ParamSetter.TransactionName">Нумерация помещений по линии</system:String>
 </ResourceDictionary>

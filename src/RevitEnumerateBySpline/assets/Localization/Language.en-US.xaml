@@ -92,5 +92,6 @@
     
     <system:String x:Key="MainWindow.ButtonOk">Number</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="ParamSetter.TransactionName">Number rooms along a line</system:String>
 </ResourceDictionary>
 
