@@ -50,7 +50,6 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         // Тип, который еще не размещался в проекте, нужно активировать до создания экземпляров
         if(!frameSymbol.IsActive) {
             frameSymbol.Activate();
-            _revitRepository.Document.Regenerate();
         }
 
         PlacementResult result = new PlacementResult();
