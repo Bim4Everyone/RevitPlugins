@@ -55,7 +55,7 @@ internal class StructColumnPylon : IPylon {
     /// </summary>
     /// <returns></returns>
     public XYZ GetLocation() {
-        if(PylonInstance != null) {
+        if(PylonInstance is not null) {
             XYZ locationPoint = ((LocationPoint) PylonInstance.Location).Point;
 
             ElementId downLevelId = PylonInstance.GetParamValue<ElementId>(BuiltInParameter.FAMILY_BASE_LEVEL_PARAM);
