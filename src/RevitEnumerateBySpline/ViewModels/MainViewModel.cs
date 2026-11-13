@@ -133,14 +133,16 @@ internal class MainViewModel : BaseViewModel {
     // Проверяет помещения и запускает нумерацию.
     private void AcceptView() {
         var settings = BuildSettings();
-        var warnings = _spatialElementCheckService.CheckSpatialElements(settings.SpatialModels ?? []);
-        if(warnings.Count != 0) {
-            _windowService.RequestWarnings(warnings);
-            return;
-        }
+        SaveConfig();
+        
+        // var warnings = _spatialElementCheckService.CheckSpatialElements(settings.SpatialModels ?? []);
+        // if(warnings.Count != 0) {
+        //     _windowService.RequestWarnings(warnings);
+        //     return;
+        // }
 
         _enumerateBySpline.Enumerate(settings);
-        SaveConfig();
+        
     }
 
     // Проверяет готовность настроек к запуску.

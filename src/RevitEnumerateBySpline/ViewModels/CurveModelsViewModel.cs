@@ -4,26 +4,36 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 
-
+using dosymep.SimpleServices;
 using dosymep.WPF.Commands;
 using dosymep.WPF.ViewModels;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Interfaces;
+using RevitEnumerateBySpline.Models.Services;
 
 namespace RevitEnumerateBySpline.ViewModels;
 
 /// <summary>Управляет списком кривых в порядке нумерации.</summary>
 internal class CurveModelsViewModel : BaseViewModel {
+    private readonly ILocalizationService _localizationService;
+    private readonly SelectionService _selectionService;
+    private readonly RevitRepository _revitRepository;
     private readonly IWindowService _windowService;
     private CurveModelViewModel? _selectedCurveModelViewModel;
     private ObservableCollection<CurveModelViewModel> _curveModelViewModels = [];
 
     /// <summary>Создаёт модель списка выбранных кривых.</summary>
     public CurveModelsViewModel(
-        IWindowService windowService) {
+        IWindowService windowService,
+        ILocalizationService localizationService,
+        SelectionService selectionService,
+        RevitRepository revitRepository) {
         _windowService = windowService;
-        
+        _localizationService = localizationService;
+        _selectionService = selectionService;
+        _revitRepository = revitRepository;
+
         SelectCurvesCommand = RelayCommand.Create(SelectCurves);
         DeleteAllCurvesCommand = RelayCommand.Create(DeleteAllCurves);
         MoveUpCurveCommand = RelayCommand.Create(MoveUpCurve);
@@ -49,7 +59,18 @@ internal class CurveModelsViewModel : BaseViewModel {
 
     // Запрашивает выбор линий.
     private void SelectCurves() {
-        _windowService.RequestCurveSelection();
+        
+        _windowService.HideMainWindow();
+        
+        string prompt = _localizationService.GetLocalizedString("CurveModelsViewModel.SelectCurves.Prompt");
+        var curves = _selectionService.PickCurve(prompt, _revitRepository.ActiveUiDocument);
+        if(curves.Count == 0) {
+            _windowService.ShowMainWindow();
+            return;
+        }
+        AddCurves(curves);
+        
+        _windowService.ShowMainWindow();
     }
 
     /// <summary>Добавляет выбранные линии без повторов.</summary>

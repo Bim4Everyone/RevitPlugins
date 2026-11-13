@@ -7,17 +7,9 @@ namespace RevitEnumerateBySpline.Models.Interfaces;
 
 /// <summary>Управляет окнами и запросами выбора.</summary>
 internal interface IWindowService {
-    /// <summary>Устанавливает текущее главное окно.</summary>
-    /// <param name="mainWindow">Главное окно плагина.</param>
-    void SetMainWindow(MainWindow mainWindow);
 
-    /// <summary>Закрывает окно для выбора линий в Revit.</summary>
-    void RequestCurveSelection();
+    public void HideMainWindow();
+    public void ShowMainWindow();
+    public void CloseMainWindow();
 
-    /// <summary>Передаёт предупреждения для показа после закрытия главного окна.</summary>
-    /// <param name="warnings">Предупреждения о помещениях.</param>
-    void RequestWarnings(IReadOnlyCollection<WarningElement> warnings);
-
-    /// <summary>Показывает окно с предупреждениями о помещениях.</summary>
-    void ShowWarnings();
 }

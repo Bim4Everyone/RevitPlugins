@@ -59,7 +59,7 @@
     <system:String x:Key="RangeViewModel.SelectedElementsProvider">Выделенные</system:String>
     <system:String x:Key="RangeViewModel.CurrentViewProvider">Видимые на виде</system:String>
     
-    <system:String x:Key="CurveModelsViewModel.SelectCurves.Promt">Выберите линии в модели и нажмите ГОТОВО</system:String>
+    <system:String x:Key="CurveModelsViewModel.SelectCurves.Prompt">Выберите линии в модели и нажмите ГОТОВО</system:String>
     
     
     <system:String x:Key="MainViewModel.NotSelected">Не выделены помещения в модели</system:String>

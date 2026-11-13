@@ -1,38 +1,24 @@
-using System.Collections.Generic;
-
-using Ninject;
-using Ninject.Syntax;
-
 using RevitEnumerateBySpline.Models.Interfaces;
-using RevitEnumerateBySpline.Models.Warnings;
-using RevitEnumerateBySpline.ViewModels.Warnings;
 using RevitEnumerateBySpline.Views;
 
 namespace RevitEnumerateBySpline.Models.Services;
 
-internal class WindowService(IResolutionRoot resolutionRoot) : IWindowService {
-    private MainWindow? _mainWindow;
-    private IReadOnlyCollection<WarningElement> _pendingWarnings = [];
+internal class WindowService : IWindowService {
+    private readonly MainWindow? _mainWindow;
 
-    public void SetMainWindow(MainWindow mainWindow) {
+    public WindowService(MainWindow? mainWindow) {
         _mainWindow = mainWindow;
     }
 
-    public void RequestCurveSelection() {
-        _mainWindow!.RequestCurveSelection();
+    public void HideMainWindow() {
+        _mainWindow?.Hide();
     }
 
-    public void RequestWarnings(IReadOnlyCollection<WarningElement> warnings) {
-        _pendingWarnings = warnings;
-        _mainWindow!.RequestWarnings();
+    public void CloseMainWindow() {
+        _mainWindow?.Close();
     }
 
-    public void ShowWarnings() {
-        var viewModel = resolutionRoot.Get<WarningsViewModel>();
-        viewModel.LoadView(_pendingWarnings);
-        var window = resolutionRoot.Get<WarningsWindow>();
-        window.DataContext = viewModel;
-        _pendingWarnings = [];
-        window.ShowDialog();
+    public void ShowMainWindow() {
+        _mainWindow?.ShowDialog();
     }
 }

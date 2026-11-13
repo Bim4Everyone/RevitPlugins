@@ -15,7 +15,6 @@ using Ninject;
 
 using RevitEnumerateBySpline.Models;
 using RevitEnumerateBySpline.Models.Factories;
-using RevitEnumerateBySpline.Models.Handlers;
 using RevitEnumerateBySpline.Models.Interfaces;
 using RevitEnumerateBySpline.Models.Providers;
 using RevitEnumerateBySpline.Models.Services;
@@ -54,11 +53,6 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
         
-        // Настройка доступа к ExternalRevitHandler
-        kernel.Bind<ExternalRevitHandler>()
-            .ToSelf()
-            .InSingletonScope();
-
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
             .ToSelf()
@@ -160,63 +154,6 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        ShowMainWindowLoop(kernel);
-    }
-
-    // Управляет циклом главного окна.
-    private void ShowMainWindowLoop(IKernel kernel) {
-        var mainWindow = kernel.Get<MainWindow>();
-        var mainViewModel = mainWindow.DataContext as MainViewModel
-                            ?? kernel.Get<MainViewModel>();
-        var curveModelsViewModel = mainViewModel.CurveModelsViewModel;
-        var selectionService = kernel.Get<ISelectionService>();
-        var revitRepository = kernel.Get<RevitRepository>();
-        var windowService = kernel.Get<IWindowService>();
-
-        windowService.SetMainWindow(mainWindow);
-
-        while(true) {
-            bool? dialogResult = mainWindow.ShowDialog();
-
-            if(mainWindow.DialogAction == MainWindowAction.SelectCurves) {
-                string prompt = kernel.Get<ILocalizationService>()
-                    .GetLocalizedString("CurveModelsViewModel.SelectCurves.Promt");
-                var curves = selectionService.PickCurve(prompt, revitRepository.ActiveUiDocument);
-                curveModelsViewModel.AddCurves(curves);
-
-                mainWindow = CreateMainWindow(kernel, mainViewModel);
-                windowService.SetMainWindow(mainWindow);
-                continue;
-            }
-
-            if(mainWindow.DialogAction == MainWindowAction.ShowWarnings) {
-                windowService.ShowWarnings();
-                return;
-            }
-
-            if(dialogResult == false) {
-                GetPlatformService<INotificationService>()
-                    .CreateWarningNotification(PluginName, "Выполнение скрипта отменено.")
-                    .ShowAsync();
-                return;
-            }
-
-            Notification(dialogResult);
-            return;
-        }
-    }
-
-    // Создаёт окно с текущей моделью.
-    private static MainWindow CreateMainWindow(IKernel kernel, MainViewModel mainViewModel) {
-        return new MainWindow(
-            kernel.Get<INavigationViewPageProvider>(),
-            kernel.Get<ILoggerService>(),
-            kernel.Get<ISerializationService>(),
-            kernel.Get<ILanguageService>(),
-            kernel.Get<ILocalizationService>(),
-            kernel.Get<IUIThemeService>(),
-            kernel.Get<IUIThemeUpdaterService>()) {
-            DataContext = mainViewModel
-        };
+        Notification(kernel.Get<MainWindow>());
     }
 }
