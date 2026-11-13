@@ -3,6 +3,8 @@ using System;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.SharedParams;
 using dosymep.Revit;
 
 namespace RevitPunchingRebar.Models.SelectionFilters;
@@ -26,12 +28,24 @@ internal class PylonFromModelFilter : ISelectionFilter {
     /// Проверяет, что элемент — несущая колонна, в имени семейства которой есть «пилон».
     /// </summary>
     /// <remarks>
+    /// Для выбора требуются положительные длина и ширина, заданные в типе пилона.
     /// Категория проверяется по BuiltInCategory, поэтому проверка работает в любой языковой версии Revit.
     /// </remarks>
     public static bool IsPylon(Element element) {
-        return element is FamilyInstance familyInstance
-               && familyInstance.InAnyCategory(BuiltInCategory.OST_StructuralColumns)
-               && familyInstance.Symbol.FamilyName.IndexOf(
-                   _pylonFamilyNamePart, StringComparison.OrdinalIgnoreCase) >= 0;
+        if(element is not FamilyInstance familyInstance
+           || !familyInstance.InAnyCategory(BuiltInCategory.OST_StructuralColumns)
+           || familyInstance.Symbol.FamilyName.IndexOf(
+               _pylonFamilyNamePart, StringComparison.OrdinalIgnoreCase) < 0) {
+            return false;
+        }
+
+        Element elementType = familyInstance.GetElementType();
+        if(elementType is null) {
+            return false;
+        }
+
+        double length = elementType.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeLength, 0);
+        double width = elementType.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeWidth, 0);
+        return length > 0 && width > 0;
     }
 }
