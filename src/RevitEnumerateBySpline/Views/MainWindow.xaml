@@ -121,7 +121,6 @@
                 Width="130"
                 Appearance="Primary"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
-                Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
 
             <ui:Button

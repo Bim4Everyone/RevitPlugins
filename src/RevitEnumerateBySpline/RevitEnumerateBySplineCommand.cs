@@ -154,6 +154,13 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
 
-        Notification(kernel.Get<MainWindow>());
+        // Сначала создаём окно и его DataContext, затем запускаем цикл диалогов.
+        _ = kernel.Get<MainWindow>();
+        bool? result = kernel.Get<IWindowService>().ShowMainWindow();
+        if(result == true) {
+            result = kernel.Get<MainViewModel>().Enumerate();
+        }
+
+        Notification(result);
     }
 }

@@ -46,13 +46,10 @@ public partial class MainWindow {
     public override string ProjectConfigName => nameof(MainWindow);
     
 
-    // Закрывает окно после выполнения команды.
-    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
-        DialogResult = true;
-    }
-    
     // Отменяет работу окна.
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
-        DialogResult = false;
+        // После Hide результат уже может быть false. Повторное присваивание
+        // того же значения не закрывает окно, поэтому закрываем его явно.
+        Close();
     }
 }

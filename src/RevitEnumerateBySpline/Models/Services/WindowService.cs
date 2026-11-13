@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using Ninject;
@@ -11,25 +12,42 @@ using RevitEnumerateBySpline.Views;
 namespace RevitEnumerateBySpline.Models.Services;
 
 internal class WindowService : IWindowService {
-    private readonly MainWindow? _mainWindow;
-    private IResolutionRoot _resolutionRoot;
+    private readonly MainWindow _mainWindow;
+    private readonly IResolutionRoot _resolutionRoot;
+    private Action? _pendingSelection;
 
-    public WindowService(MainWindow? mainWindow, IResolutionRoot resolutionRoot) {
+    public WindowService(MainWindow mainWindow, IResolutionRoot resolutionRoot) {
         _mainWindow = mainWindow;
         _resolutionRoot = resolutionRoot;
         
     }
 
-    public void HideMainWindow() {
-        _mainWindow?.Hide();
+    public void RequestSelection(Action select) {
+        _pendingSelection = select;
+        _mainWindow.Hide();
     }
 
-    public void CloseMainWindow() {
-        _mainWindow?.Close();
+    public void CloseMainWindow(bool dialogResult) {
+        _mainWindow.DialogResult = dialogResult;
     }
 
-    public void ShowMainWindow() {
-        _mainWindow?.ShowDialog();
+    public bool? ShowMainWindow() {
+        while(true) {
+            bool? result = _mainWindow.ShowDialog();
+            if(_pendingSelection is not { } select) {
+                return result;
+            }
+
+            // Hide завершает текущий ShowDialog. Выбор и повторный показ выполняются
+            // после выхода из него, без вложенных модальных циклов одного окна.
+            _pendingSelection = null;
+            try {
+                select();
+            } catch {
+                _mainWindow.Close();
+                throw;
+            }
+        }
     }
     
     public void ShowWarningWindow(IReadOnlyCollection<WarningElement> warningElements) {

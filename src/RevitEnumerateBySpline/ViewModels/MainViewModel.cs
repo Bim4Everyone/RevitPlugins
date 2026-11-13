@@ -117,7 +117,7 @@ internal class MainViewModel : BaseViewModel {
 
     // Загружает данные главного окна.
     private void LoadView() {
-        // Окно пересоздаётся после выбора линий, но ViewModel остаётся той же.
+        // После выбора линий повторно показывается то же окно.
         // Повторная загрузка сбрасывает выбранный диапазон, помещения и параметры.
         if(_isViewInitialized) {
             return;
@@ -130,20 +130,24 @@ internal class MainViewModel : BaseViewModel {
         _isViewInitialized = true;
     }
 
-    // Проверяет помещения и запускает нумерацию.
+    // Завершает диалог; нумерация выполняется в контексте команды Revit.
     private void AcceptView() {
+        _windowService.CloseMainWindow(true);
+    }
+
+    /// <summary>Проверяет помещения и выполняет нумерацию после закрытия диалога.</summary>
+    public bool Enumerate() {
         var settings = BuildSettings();
         SaveConfig();
         
         var warnings = _spatialElementCheckService.CheckSpatialElements(settings.SpatialModels ?? []);
         if(warnings.Count != 0) {
-            _windowService.CloseMainWindow();
             _windowService.ShowWarningWindow(warnings);
-            return;
+            return false;
         }
 
         _enumerateBySpline.Enumerate(settings);
-        
+        return true;
     }
 
     // Проверяет готовность настроек к запуску.

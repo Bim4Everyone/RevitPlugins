@@ -59,18 +59,14 @@ internal class CurveModelsViewModel : BaseViewModel {
 
     // Запрашивает выбор линий.
     private void SelectCurves() {
-        
-        _windowService.HideMainWindow();
-        
+        _windowService.RequestSelection(PickCurves);
+    }
+
+    // Выполняется после выхода из модального диалога главного окна.
+    private void PickCurves() {
         string prompt = _localizationService.GetLocalizedString("CurveModelsViewModel.SelectCurves.Prompt");
         var curves = _selectionService.PickCurve(prompt, _revitRepository.ActiveUiDocument);
-        if(curves.Count == 0) {
-            _windowService.ShowMainWindow();
-            return;
-        }
         AddCurves(curves);
-        
-        _windowService.ShowMainWindow();
     }
 
     /// <summary>Добавляет выбранные линии без повторов.</summary>

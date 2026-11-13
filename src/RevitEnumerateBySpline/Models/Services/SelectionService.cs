@@ -33,7 +33,7 @@ internal class SelectionService : ISelectionService {
                 .Where(x => x.CurveElement is not null)
                 .ToList();
 
-        } catch {
+        } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
             return [];
         }
     }
