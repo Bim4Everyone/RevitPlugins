@@ -3,6 +3,8 @@ using System;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 
+using dosymep.Revit;
+
 namespace RevitPunchingRebar.Models;
 internal class Slab {
     // Допуск сравнения отметок верхних граней во внутренних единицах Revit (футах).
@@ -12,7 +14,7 @@ internal class Slab {
         if(element != null) {
             SlabInstance = element as Floor;
             TopElevation = GetTopElevation();
-            Thickness = element.get_Parameter(BuiltInParameter.FLOOR_ATTR_THICKNESS_PARAM).AsDouble();
+            Thickness = element.GetParamValue<double>(BuiltInParameter.FLOOR_ATTR_THICKNESS_PARAM);
 
             RebarCoverTop = GetRebarCover(BuiltInParameter.CLEAR_COVER_TOP);
             RebarCoverBottom = GetRebarCover(BuiltInParameter.CLEAR_COVER_BOTTOM);
@@ -67,7 +69,7 @@ internal class Slab {
     }
 
     private double? GetRebarCover(BuiltInParameter coverParam) {
-        ElementId coverTypeId = SlabInstance?.get_Parameter(coverParam)?.AsElementId();
+        ElementId coverTypeId = SlabInstance?.GetParamValueOrDefault<ElementId>(coverParam, null);
         if(coverTypeId == null) {
             return null;
         }

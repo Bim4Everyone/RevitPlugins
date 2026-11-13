@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using System.Windows;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -9,10 +10,8 @@ using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
 using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
@@ -67,6 +66,9 @@ public class RevitPunchingRebarCommand : BasePluginCommand {
         // Используем сервис обновления тем для WinUI
         kernel.UseWpfUIThemeUpdater();
 
+        // Настройка сервиса окошек сообщений
+        kernel.UseWpfUIMessageBox();
+
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
 
@@ -84,13 +86,19 @@ public class RevitPunchingRebarCommand : BasePluginCommand {
         MainWindow window = kernel.Get<MainWindow>();
         Notification(window);
 
-        ShowPlacementReport((MainViewModel) window.DataContext, kernel.Get<ILocalizationService>());
+        ShowPlacementReport(
+            (MainViewModel) window.DataContext,
+            kernel.Get<ILocalizationService>(),
+            kernel.Get<IMessageBoxService>());
     }
 
     /// <summary>
     /// Показывает итог расстановки: сколько пилонов обработано, сколько каркасов создано и какие пилоны пропущены.
     /// </summary>
-    private void ShowPlacementReport(MainViewModel viewModel, ILocalizationService localizationService) {
+    private void ShowPlacementReport(
+        MainViewModel viewModel,
+        ILocalizationService localizationService,
+        IMessageBoxService messageBoxService) {
         PlacementResult result = viewModel.PlacementResult;
         if(result == null) {
             return;
@@ -112,6 +120,10 @@ public class RevitPunchingRebarCommand : BasePluginCommand {
             }
         }
 
-        TaskDialog.Show(PluginName, report.ToString().TrimEnd());
+        messageBoxService.Show(
+            report.ToString().TrimEnd(),
+            PluginName,
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
     }
 }

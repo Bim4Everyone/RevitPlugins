@@ -156,7 +156,7 @@ internal class RevitRepository {
 
         FamilyInstance instance = Document.Create.NewFamilyInstance(XYZ.Zero, symbol, StructuralType.NonStructural);
         List<string> missingParams = paramNames
-            .Where(paramName => instance.LookupParameter(paramName) == null)
+            .Where(paramName => !instance.IsExistsParam(paramName))
             .ToList();
 
         transaction.RollBack();

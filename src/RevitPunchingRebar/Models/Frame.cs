@@ -153,23 +153,11 @@ internal class Frame {
            || targetParam == null
            || targetParam.IsReadOnly
            || !sourceParam.HasValue
-           || sourceParam.StorageType != targetParam.StorageType) {
+           || sourceParam.StorageType != targetParam.StorageType
+           || sourceParam.StorageType == StorageType.None) {
             return;
         }
 
-        switch(sourceParam.StorageType) {
-            case StorageType.String:
-                targetParam.Set(sourceParam.AsString());
-                break;
-            case StorageType.Double:
-                targetParam.Set(sourceParam.AsDouble());
-                break;
-            case StorageType.Integer:
-                targetParam.Set(sourceParam.AsInteger());
-                break;
-            case StorageType.ElementId:
-                targetParam.Set(sourceParam.AsElementId());
-                break;
-        }
+        targetParam.Set(sourceParam);
     }
 }

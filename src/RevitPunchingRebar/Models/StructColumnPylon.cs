@@ -32,7 +32,7 @@ internal class StructColumnPylon : IPylon {
         PylonInstance = element;
         FacingOrientation = _transform.OfVector(((FamilyInstance) element).FacingOrientation);
 
-        Element elementType = element.Document.GetElement(element.get_Parameter(BuiltInParameter.ELEM_TYPE_PARAM).AsElementId());
+        Element elementType = element.GetElementType();
 
         Length = elementType.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeLength, 0);
         Width = elementType.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeWidth, 0);
@@ -58,10 +58,12 @@ internal class StructColumnPylon : IPylon {
         if(PylonInstance != null) {
             XYZ locationPoint = ((LocationPoint) PylonInstance.Location).Point;
 
-            Level downLevel = PylonInstance.Document.GetElement(PylonInstance.get_Parameter(BuiltInParameter.FAMILY_BASE_LEVEL_PARAM).AsElementId()) as Level;
+            ElementId downLevelId = PylonInstance.GetParamValue<ElementId>(BuiltInParameter.FAMILY_BASE_LEVEL_PARAM);
+            Level downLevel = PylonInstance.Document.GetElement(downLevelId) as Level;
 
             double downLevelMark = downLevel.ProjectElevation;
-            double downOffset = PylonInstance.get_Parameter(BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM).AsDouble();
+            double downOffset = PylonInstance.GetParamValue<double>(
+                BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM);
 
             XYZ columnLocation = new XYZ
                 (
