@@ -65,7 +65,7 @@ internal class Frame {
         _krGroupParam
     ];
 
-    internal Frame(FamilyInstance familyInstance, IFrameParams frameParams) {
+    public Frame(FamilyInstance familyInstance, IFrameParams frameParams) {
         FrameInstance = familyInstance;
 
         //Заполняем необходимые параметры каркаса

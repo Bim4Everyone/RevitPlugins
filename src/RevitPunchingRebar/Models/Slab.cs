@@ -8,7 +8,7 @@ internal class Slab {
     // Допуск сравнения отметок верхних граней во внутренних единицах Revit (футах).
     private const double _elevationTolerance = 1e-6;
 
-    internal Slab(Element element) {
+    public Slab(Element element) {
         if(element != null) {
             SlabInstance = element as Floor;
             TopElevation = GetTopElevation();

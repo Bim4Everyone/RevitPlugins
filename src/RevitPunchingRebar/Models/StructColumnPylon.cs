@@ -14,7 +14,7 @@ internal class StructColumnPylon : IPylon {
     /// <summary>
     /// Создает пилон из несущей колонны текущего проекта.
     /// </summary>
-    internal StructColumnPylon(Element element)
+    public StructColumnPylon(Element element)
         : this(element, Transform.Identity) {
     }
 
@@ -26,7 +26,7 @@ internal class StructColumnPylon : IPylon {
     /// Перевод координат документа колонны в координаты текущего проекта.
     /// Для связи — <see cref="RevitLinkInstance.GetTotalTransform"/>.
     /// </param>
-    internal StructColumnPylon(Element element, Transform transform) {
+    public StructColumnPylon(Element element, Transform transform) {
         _transform = transform;
 
         PylonInstance = element;
