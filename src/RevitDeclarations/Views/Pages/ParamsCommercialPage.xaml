@@ -304,6 +304,11 @@
                         <RowDefinition Height="43"/>
                         <RowDefinition Height="43"/>
                         <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
+                        <RowDefinition Height="43"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="30"/>
@@ -581,32 +586,62 @@
                         Grid.Row="17"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.ComRoomUse}"/>
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="18"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ComRoomUseParam}"/>
                     <ComboBox
                         Grid.Column="2"
-                        Grid.Row="17"
+                        Grid.Row="18"
                         Margin="10, 0"
                         ItemsSource="{Binding TextParameters}"
                         DisplayMemberPath="Definition.Name"
                         SelectedItem="{Binding SelectedParkingInfo}"/>
 
+                    <TextBlock
+                        Grid.Row="19"
+                        Grid.Column="1"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ComRoomUseMainNumberParam}"/>
+                    <ComboBox
+                        Grid.Row="19"
+                        Grid.Column="2"
+                        Margin="10, 0"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedParkingInfoMainNumberParam}"
+                        ToolTip="{me:LocalizationSource ToolTip.MainParkingNumberParamToolTip}"/>
+
+                    <TextBlock
+                        Grid.Row="20"
+                        Grid.Column="1"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ComRoomUseKeyword}"/>
+                    <TextBox
+                        Grid.Row="20"
+                        Grid.Column="2"
+                        Margin="10, 0"
+                        Text="{Binding ParkingInfoKeyword, UpdateSourceTrigger=PropertyChanged}"/>
+
                     <ui:Button
-                        Grid.Row="18"
+                        Grid.Row="21"
                         Grid.Column="0"
                         Style="{StaticResource ToolTipButton}"
                         ToolTip="{me:LocalizationSource ToolTip.CommercialNameClassParamToolTip}" />
                     <TextBlock
-                        Grid.Row="18"
+                        Grid.Row="21"
                         Grid.Column="1"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.ComRoomName}"/>
 
                     <TextBlock
-                        Grid.Row="19"
+                        Grid.Row="22"
                         Grid.Column="1"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.ComRoomGroupNameParam}"/>
                     <ComboBox
-                        Grid.Row="19"
+                        Grid.Row="22"
                         Grid.Column="2"
                         Margin="10, 0"
                         ItemsSource="{Binding TextParameters}"
@@ -614,31 +649,56 @@
                         SelectedItem="{Binding SelectedGroupNameParam}"/>
 
                     <TextBlock
-                        Grid.Row="20"
+                        Grid.Row="23"
                         Grid.Column="1"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.ComRoomNameParam}"/>
                     <ComboBox
-                        Grid.Row="20"
+                        Grid.Row="23"
                         Grid.Column="2"
                         Margin="10, 0"
                         ItemsSource="{Binding TextParameters}"
                         DisplayMemberPath="Definition.Name"
                         SelectedItem="{Binding SelectedRoomNameParam}"/>
 
+                    <TextBlock
+                        Grid.Row="24"
+                        Grid.Column="1"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ComRoomNameMainNumberParam}"/>
+                    <ComboBox
+                        Grid.Row="24"
+                        Grid.Column="2"
+                        Margin="10, 0"
+                        ItemsSource="{Binding TextParameters}"
+                        DisplayMemberPath="Definition.Name"
+                        SelectedItem="{Binding SelectedGroupNameMainNumberParam}"
+                        ToolTip="{me:LocalizationSource ToolTip.MainParkingNumberParamToolTip}"/>
+
+                    <TextBlock
+                        Grid.Row="25"
+                        Grid.Column="1"
+                        Style="{StaticResource PropertyName}"
+                        Text="{me:LocalizationSource ParametersPage.ComRoomNameKeyword}"/>
+                    <TextBox
+                        Grid.Row="25"
+                        Grid.Column="2"
+                        Margin="10, 0"
+                        Text="{Binding GroupNameKeyword, UpdateSourceTrigger=PropertyChanged}"/>
+
                     <ui:Button
-                        Grid.Row="21"
+                        Grid.Row="26"
                         Grid.Column="0"
                         Style="{StaticResource ToolTipButton}"
                         ToolTip="{me:LocalizationSource ToolTip.ProjectNameToolTip}" />
                     <TextBlock
                         Grid.Column="1"
-                        Grid.Row="21"
+                        Grid.Row="26"
                         Style="{StaticResource PropertyName}"
                         Text="{me:LocalizationSource ParametersPage.ComRoomProjectName}"/>
                     <TextBox
                         Grid.Column="2"
-                        Grid.Row="21"
+                        Grid.Row="26"
                         Margin="10, 0"
                         Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>

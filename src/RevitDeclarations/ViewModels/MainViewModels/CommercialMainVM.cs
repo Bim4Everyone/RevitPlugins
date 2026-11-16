@@ -110,6 +110,10 @@ internal class CommercialMainVM : MainViewModel {
         configSettings.GroupNameParam = settings.GroupNameParam?.Definition.Name;
         configSettings.ParkingSpaceClass = settings.ParkingSpaceClass?.Definition.Name;
         configSettings.ParkingInfo = settings.ParkingInfo?.Definition.Name;
+        configSettings.ParkingInfoMainNumberParam = settings.ParkingInfoMainNumberParam?.Definition.Name;
+        configSettings.GroupNameMainNumberParam = settings.GroupNameMainNumberParam?.Definition.Name;
+        configSettings.ParkingInfoKeyword = settings.ParkingInfoKeyword;
+        configSettings.GroupNameKeyword = settings.GroupNameKeyword;
         configSettings.PositionType = settings.PositionType?.Definition.Name;
         configSettings.AddPrefixToNumber = settings.AddPrefixToNumber;
         if(settings.AddPrefixToNumber) {
@@ -141,6 +145,10 @@ internal class CommercialMainVM : MainViewModel {
         _settings.RoomsHeightParam = commercialParamsVM.SelectedRoomsHeightParam;
         _settings.ParkingSpaceClass = commercialParamsVM.SelectedParkingSpaceClass;
         _settings.ParkingInfo = commercialParamsVM.SelectedParkingInfo;
+        _settings.ParkingInfoMainNumberParam = commercialParamsVM.SelectedParkingInfoMainNumberParam;
+        _settings.GroupNameMainNumberParam = commercialParamsVM.SelectedGroupNameMainNumberParam;
+        _settings.ParkingInfoKeyword = commercialParamsVM.ParkingInfoKeyword;
+        _settings.GroupNameKeyword = commercialParamsVM.GroupNameKeyword;
         _settings.PositionType = commercialParamsVM.SelectedPositionType;
         _settings.GroupNameParam = commercialParamsVM.SelectedGroupNameParam;
         _settings.AddPrefixToNumber = commercialParamsVM.AddPrefixToNumber;

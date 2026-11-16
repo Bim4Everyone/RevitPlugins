@@ -86,9 +86,14 @@
     <system:String x:Key="ParametersPage.ComPositionType">10. Тип расположения:</system:String>
     <system:String x:Key="ParametersPage.ComRoomCar">11. Класс машино-места:</system:String>
     <system:String x:Key="ParametersPage.ComRoomUse">12. Применимость:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomUseParam">12.1 Основной параметр:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomUseMainNumberParam">12.2 Параметр для зависимых ММ:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomUseKeyword">12.3 Ключевое слово:</system:String>
     <system:String x:Key="ParametersPage.ComRoomName">13. Наименование помещения</system:String>
     <system:String x:Key="ParametersPage.ComRoomGroupNameParam">13.1 Для группы из нескольких помещений:</system:String>
     <system:String x:Key="ParametersPage.ComRoomNameParam">13.2 Для одного помещения:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomNameMainNumberParam">13.3 Параметр для зависимых ММ:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomNameKeyword">13.4 Ключевое слово:</system:String>
     <system:String x:Key="ParametersPage.ComRoomProjectName">14. ИД Объекта:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaFilterParam">Параметр для фильтрации помещений МОП:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaParam">Параметр группировки МОП:</system:String>
@@ -238,6 +243,7 @@
     </system:String>
     <system:String x:Key="ToolTip.ParkingSpaceClassParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Класс машино-места"</system:String>
     <system:String x:Key="ToolTip.ParkingInfoParamToolTip">Текстовый параметр, значение которого выводится в столбец декларации "Применимость"</system:String>
+    <system:String x:Key="ToolTip.MainParkingNumberParamToolTip">Текстовый параметр с номером основного машино-места. Если исходный текст содержит ключевое слово и номер заполнен, к тексту добавляется «от ММ» и номер основного машино-места.</system:String>
     <system:String x:Key="ToolTip.CommercialAreaParamToolTip">
         Числовой параметр, значение которого выводится в столбец декларации "Общая площадь".
         Необходимо выбрать два параметра. Один для случая, когда группа состоит из нескольких помещений,
