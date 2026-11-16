@@ -1,0 +1,35 @@
+<core:WpfUIPlatformWindow x:Class="RevitEnumerateBySpline.Views.CurveSelectionWindow" x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+        Title="{me:LocalizationSource CurveSelectionWindow.Title}"
+        Width="360" Height="120" MinWidth="0" MinHeight="0" SizeToContent="Manual">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ui:TitleBar Grid.Row="0" Title="{me:LocalizationSource CurveSelectionWindow.Title}"
+                     Icon="{ui:SymbolIcon multiselectLtr24, FontSize=20}"
+                     FontSize="14" FontWeight="DemiBold"
+                     ShowMaximize="False" ShowMinimize="False" />
+        <StackPanel Grid.Row="1" Margin="16">
+            <ui:TextBlock x:Name="_prompt" TextWrapping="Wrap" Margin="0,0,0,12" Visibility="Collapsed" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <ui:Button x:Name="_finishButton" Width="110" Appearance="Primary" IsEnabled="False"
+                           Content="{me:LocalizationSource CurveSelectionWindow.Finish}" Click="Finish_Click" />
+                <ui:Button x:Name="_cancelButton" Width="110" Margin="8,0,0,0"
+                           Content="{me:LocalizationSource CurveSelectionWindow.Cancel}" Click="Cancel_Click" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</core:WpfUIPlatformWindow>

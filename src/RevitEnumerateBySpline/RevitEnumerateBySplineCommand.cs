@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
@@ -57,6 +56,11 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         
         // Настройка доступа к Revit
         kernel.Bind<RevitRepository>()
+            .ToSelf()
+            .InSingletonScope();
+        
+        // Настройка доступа к CurvePreviewService
+        kernel.Bind<CurvePreviewService>()
             .ToSelf()
             .InSingletonScope();
         
@@ -145,6 +149,8 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
         // Настройка запуска окна
         kernel.BindMainWindow<MainViewModel, MainWindow>();
         kernel.BindOtherWindow<WarningsViewModel, WarningsWindow>();
+        // Для каждого нового набора нужна отдельная панель с исходным состоянием.
+        kernel.Bind<CurveSelectionWindow>().ToSelf().InTransientScope();
 
         // Настройка локализации,
         // получение имени сборки откуда брать текст
@@ -176,7 +182,12 @@ public class RevitEnumerateBySplineCommand : BasePluginCommand {
 
         // Сначала создаём окно и его DataContext, затем запускаем цикл диалогов.
         _ = kernel.Get<MainWindow>();
-        bool? result = kernel.Get<IWindowService>().ShowMainWindow();
+        bool? result;
+        try {
+            result = kernel.Get<IWindowService>().ShowMainWindow();
+        } finally {
+            kernel.Get<CurvePreviewService>().Clear();
+        }
         if(result == true) {
             result = kernel.Get<MainViewModel>().Enumerate();
         }

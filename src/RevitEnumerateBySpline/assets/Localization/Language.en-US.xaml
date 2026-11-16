@@ -59,7 +59,12 @@
     <system:String x:Key="RangeViewModel.SelectedElementsProvider">Selected Elements</system:String>
     <system:String x:Key="RangeViewModel.CurrentViewProvider">Visible in View</system:String>
     
-    <system:String x:Key="CurveModelsViewModel.SelectCurves.Prompt">Select lines in the model and click DONE</system:String>
+    <system:String x:Key="CurveModelsViewModel.SelectCurves.Prompt">Click lines in order. Finish with Done on the panel. Esc cancels this batch.</system:String>
+    <system:String x:Key="CurveSelectionWindow.Title">Pick lines in order</system:String>
+    <system:String x:Key="CurveSelectionWindow.Prompt">Click lines in the desired order. Repeated picks are skipped. Click Done to add the list, or Cancel to discard this batch.</system:String>
+    <system:String x:Key="CurveSelectionWindow.Finish">Done</system:String>
+    <system:String x:Key="CurveSelectionWindow.Cancel">Cancel</system:String>
+    <system:String x:Key="CurveSelectionWindow.StopFailed">Could not stop picking. Press Esc in the view to cancel this batch.</system:String>
     
     
     <system:String x:Key="MainViewModel.NotSelected">No rooms are selected in the model</system:String>

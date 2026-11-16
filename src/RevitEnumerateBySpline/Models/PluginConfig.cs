@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
@@ -69,6 +71,13 @@ internal class RevitSettings : ProjectSettings {
 
 /// <summary>Системные значения по умолчанию для плагина.</summary>
 internal class SystemPluginConfig {
+    /// <summary>Шаг номерных меток вдоль выбранных линий, мм.</summary>
+    public double CurveMarkerStepMm => 5000;
+    /// <summary>Цвета меток линий в GUI и на виде Revit, в порядке назначения.</summary>
+    public IReadOnlyList<string> CurveMarkerPalette { get; } = [
+        "#2563EB", "#DC2626", "#15803D", "#9333EA",
+        "#C2410C", "#0E7490", "#BE185D", "#4D7C0F"
+    ];
     // Максимальная длина сегмента при разбиении линий, мм.
     public double MaxSegmentLengthMm => 10;
     // Системный параметр имени помещений по умолчанию

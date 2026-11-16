@@ -162,9 +162,19 @@
                                     </ListBox.ItemContainerStyle>
                                     <ListBox.ItemTemplate>
                                         <DataTemplate DataType="{x:Type vms:CurveModelViewModel}">
+                                            <DockPanel>
+                                                <Border DockPanel.Dock="Left" Width="24" Height="24"
+                                                        VerticalAlignment="Center"
+                                                        Margin="4,0,8,0" CornerRadius="12"
+                                                        Background="{Binding MarkerColor}">
+                                                    <TextBlock Text="{Binding Number}" Foreground="White"
+                                                               FontWeight="Bold" HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+                                                </Border>
                                             <controls:ItemControl
                                                 ItemName="{Binding Name}"
                                                 CheckBoxVisible="False"/>
+                                            </DockPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>

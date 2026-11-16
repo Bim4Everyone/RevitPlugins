@@ -20,6 +20,9 @@ internal class CurveModelsViewModel : BaseViewModel {
     private readonly SelectionService _selectionService;
     private readonly RevitRepository _revitRepository;
     private readonly IWindowService _windowService;
+    private readonly CurvePreviewService _previewService;
+    private readonly SystemPluginConfig _systemPluginConfig;
+    private int _nextColor;
     private CurveModelViewModel? _selectedCurveModelViewModel;
     private ObservableCollection<CurveModelViewModel> _curveModelViewModels = [];
 
@@ -28,7 +31,11 @@ internal class CurveModelsViewModel : BaseViewModel {
         IWindowService windowService,
         ILocalizationService localizationService,
         SelectionService selectionService,
-        RevitRepository revitRepository) {
+        RevitRepository revitRepository,
+        CurvePreviewService previewService,
+        SystemPluginConfig systemPluginConfig) {
+        _systemPluginConfig = systemPluginConfig;
+        _previewService = previewService;
         _windowService = windowService;
         _localizationService = localizationService;
         _selectionService = selectionService;
@@ -62,28 +69,57 @@ internal class CurveModelsViewModel : BaseViewModel {
         _windowService.RequestSelection(PickCurves);
     }
 
-    // Выполняется после выхода из модального диалога главного окна.
+    /// <summary>Добавляет выбранные линии к существующему списку, сохраняя его при отмене.</summary>
     private void PickCurves() {
         string prompt = _localizationService.GetLocalizedString("CurveModelsViewModel.SelectCurves.Prompt");
-        var curves = _selectionService.PickCurve(prompt, _revitRepository.ActiveUiDocument);
-        AddCurves(curves);
+        try {
+            var curves = _selectionService.PickCurve(prompt, _revitRepository.ActiveUiDocument, pending => {
+                // До «Готово» изменяется только графика, а не список GUI и счётчик цветов.
+                int colorIndex = _nextColor;
+                var preview = CurveModelViewModels.ToList();
+                foreach(var curve in pending) {
+                    if(preview.Any(x => x.CurveModel?.ElementId == curve.ElementId)) {
+                        continue;
+                    }
+                    preview.Add(CreateCurveViewModel(curve, colorIndex++));
+                }
+                _previewService.Update(preview);
+            });
+            if(curves.Count > 0) {
+                AddCurves(curves);
+            }
+        } finally {
+            // При отмене или ошибке остаются только ранее подтверждённые метки.
+            _previewService.Update(CurveModelViewModels);
+        }
     }
 
     /// <summary>Добавляет выбранные линии без повторов.</summary>
     /// <param name="curves">Линии в порядке, полученном от Revit.</param>
     public void AddCurves(IEnumerable<CurveModel> curves) {
-        // Revit возвращает выбор в обратном порядке: первая выбранная линия должна быть наверху.
-        foreach(var curve in curves.Reverse()) {
+        // Сохраняем порядок выбора: первая выбранная линия добавляется первой.
+        foreach(var curve in curves) {
             if(curve is null || CurveModelViewModels.Any(x => x.CurveModel?.ElementId == curve.ElementId)) {
                 continue;   
             }
-            CurveModelViewModels.Add(new CurveModelViewModel {
-                Name = $"{curve.CurveElement?.LineStyle.Name}, ID: {curve.ElementId}",
-                CurveModel = curve
-            });
+            CurveModelViewModels.Add(CreateCurveViewModel(curve, _nextColor++));
         }
+        _previewService.Update(CurveModelViewModels);
     }
     
+    /// <summary>Создаёт представление линии и назначает цвет из циклической палитры.</summary>
+    /// <param name="curve">Выбранная линия Revit.</param>
+    /// <param name="colorIndex">Индекс цвета в последовательности назначения, начиная с нуля.</param>
+    /// <returns>Представление линии для списка и предпросмотра.</returns>
+    private CurveModelViewModel CreateCurveViewModel(CurveModel curve, int colorIndex) {
+        var palette = _systemPluginConfig.CurveMarkerPalette;
+        return new CurveModelViewModel {
+            Name = $"{curve.CurveElement?.LineStyle.Name}, ID: {curve.ElementId}",
+            MarkerColor = palette[colorIndex % palette.Count],
+            CurveModel = curve
+        };
+    }
+
     // Удаляет выбранную линию.
     private void DeleteCurve() {
         if(SelectedCurveModelViewModel is null) {
@@ -94,6 +130,7 @@ internal class CurveModelsViewModel : BaseViewModel {
             return;
         }
         CurveModelViewModels.RemoveAt(index);
+        RefreshPreview();
         SelectedCurveModelViewModel = CurveModelViewModels.Count == 0 
             ? null 
             : CurveModelViewModels[Math.Min(index, CurveModelViewModels.Count - 1)];
@@ -109,6 +146,7 @@ internal class CurveModelsViewModel : BaseViewModel {
             return;
         }
         CurveModelViewModels.Move(index, index + 1);
+        RefreshPreview();
     }
 
     // Сдвигает линию вверх.
@@ -121,11 +159,18 @@ internal class CurveModelsViewModel : BaseViewModel {
             return;
         }
         CurveModelViewModels.Move(index, index - 1);
+        RefreshPreview();
     }
 
     // Удаляет все линии.
     private void DeleteAllCurves() {
         CurveModelViewModels.Clear();
         SelectedCurveModelViewModel = null;
+        RefreshPreview();
+    }
+
+    /// <summary>Запрашивает обновление предпросмотра после выхода из модального диалога.</summary>
+    private void RefreshPreview() {
+        _windowService.RequestSelection(() => _previewService.Update(CurveModelViewModels));
     }
 }

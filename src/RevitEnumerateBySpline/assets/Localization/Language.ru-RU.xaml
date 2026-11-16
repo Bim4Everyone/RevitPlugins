@@ -59,7 +59,12 @@
     <system:String x:Key="RangeViewModel.SelectedElementsProvider">Выделенные</system:String>
     <system:String x:Key="RangeViewModel.CurrentViewProvider">Видимые на виде</system:String>
     
-    <system:String x:Key="CurveModelsViewModel.SelectCurves.Prompt">Выберите линии в модели и нажмите ГОТОВО</system:String>
+    <system:String x:Key="CurveModelsViewModel.SelectCurves.Prompt">Щёлкайте линии по порядку. Завершение — «Готово» на панели. Esc — отмена набора.</system:String>
+    <system:String x:Key="CurveSelectionWindow.Title">Выбор линий по порядку</system:String>
+    <system:String x:Key="CurveSelectionWindow.Prompt">Щёлкайте линии в нужном порядке. Повторный выбор линии пропускается. Нажмите «Готово», чтобы добавить список, или «Отмена», чтобы отменить этот набор.</system:String>
+    <system:String x:Key="CurveSelectionWindow.Finish">Готово</system:String>
+    <system:String x:Key="CurveSelectionWindow.Cancel">Отмена</system:String>
+    <system:String x:Key="CurveSelectionWindow.StopFailed">Не удалось завершить выбор. Нажмите Esc на виде для отмены набора.</system:String>
     
     <system:String x:Key="MainViewModel.NotSelected">Не выделены помещения в модели</system:String>
     <system:String x:Key="MainViewModel.NoRoomsOnView">Нет помещений на активном виде</system:String>
