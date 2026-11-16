@@ -6,6 +6,7 @@ using Autodesk.Revit.DB.Structure;
 using dosymep.Revit;
 
 namespace RevitPunchingRebar.Models;
+
 internal class Slab {
     // Допуск сравнения отметок верхних граней во внутренних единицах Revit (футах).
     private const double _elevationTolerance = 1e-6;

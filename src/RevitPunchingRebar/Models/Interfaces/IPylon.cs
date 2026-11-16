@@ -1,6 +1,7 @@
 using Autodesk.Revit.DB;
 
 namespace RevitPunchingRebar.Models.Interfaces;
+
 internal interface IPylon {
     Element PylonInstance { get; }
 
@@ -13,6 +14,5 @@ internal interface IPylon {
     /// <summary>
     /// Возвращает нижнюю центральную точку
     /// </summary>
-    /// <returns></returns>
     XYZ GetLocation();
 }

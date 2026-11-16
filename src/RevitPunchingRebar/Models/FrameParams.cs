@@ -3,10 +3,8 @@ using System;
 using RevitPunchingRebar.Models.Interfaces;
 
 namespace RevitPunchingRebar.Models;
-internal class FrameParams : IFrameParams {
-    private readonly double _slabThickness;
-    private readonly double _rebarCoverBottom;
 
+internal class FrameParams : IFrameParams {
     // Шаг округления расстояний зоны продавливания, мм
     private const double _roundingStepMm = 10;
 
@@ -15,6 +13,9 @@ internal class FrameParams : IFrameParams {
 
     // Расстояние от грани пилона до первого хомута: рабочая высота сечения, деленная на это число
     private const double _afterPylonDistanceDivider = 3;
+
+    private readonly double _slabThickness;
+    private readonly double _rebarCoverBottom;
 
     /// <summary>
     /// Создает параметры каркасов по настройкам пользователя.
@@ -72,49 +73,37 @@ internal class FrameParams : IFrameParams {
     public double StirrupBendLength { get; }
 
     public double GetFrameHeight() {
-        double height = _slabThickness - (RebarCoverTop + PlateRebarDiameter) -
-                                        (_rebarCoverBottom + 2 * PlateRebarDiameter) -
-                                        LongRebarDiameter;
-
-        return height;
+        return _slabThickness - (RebarCoverTop + PlateRebarDiameter)
+            - (_rebarCoverBottom + 2 * PlateRebarDiameter) - LongRebarDiameter;
     }
 
     public double GetFrameLength() {
         double afterColumnDistance = GetAfterPylonDistance();
         double punchingZoneLength = GetPunchingZone();
         double punchingZoneLengthRounded = UnitUtilsHelper.CeilingToMm(punchingZoneLength, _roundingStepMm);
-        double frameLength = Math.Ceiling((punchingZoneLengthRounded - afterColumnDistance) / StirrupStep) * StirrupStep;
-
-        return frameLength;
+        return Math.Ceiling((punchingZoneLengthRounded - afterColumnDistance) / StirrupStep) * StirrupStep;
     }
 
     /// <summary>
     /// Находит расстояние от грани колонны до первого хомута каркаса
     /// </summary>
-    /// <returns></returns>
     public double GetAfterPylonDistance() {
         double workingHeight = GetWorkingHeight();
         double afterColumnDistance = workingHeight / _afterPylonDistanceDivider;
-        double afterColumnDistanceRounded = UnitUtilsHelper.CeilingToMm(afterColumnDistance, _roundingStepMm);
-
-        return afterColumnDistanceRounded;
+        return UnitUtilsHelper.CeilingToMm(afterColumnDistance, _roundingStepMm);
     }
 
     /// <summary>
     /// Находит размер зоны продавливания (расстояние от грани пилона до 1,5h0)
     /// </summary>
-    /// <returns></returns>
     public double GetPunchingZone() {
         double workingHeight = GetWorkingHeight();
-        double punchingZone = UnitUtilsHelper.CeilingToMm(_punchingZoneFactor * workingHeight, _roundingStepMm);
-
-        return punchingZone;
+        return UnitUtilsHelper.CeilingToMm(_punchingZoneFactor * workingHeight, _roundingStepMm);
     }
 
     /// <summary>
     /// Находит рабочую высоту сечения фундамента (h0)
     /// </summary>
-    /// <returns></returns>
     private double GetWorkingHeight() {
         return _slabThickness - (_rebarCoverBottom + PlateRebarDiameter);
     }

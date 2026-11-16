@@ -133,35 +133,29 @@ internal class RevitRepository {
         FamilyInstance frameInstance = Document.Create.NewFamilyInstance(
             location, frameSymbol, StructuralType.NonStructural);
 
-        Frame frame = new Frame(frameInstance, frameParams, _localizationService);
-
-        return frame;
+        return new Frame(frameInstance, frameParams, _localizationService);
     }
 
     /// <summary>
     /// Возвращает имена семейств категории «Несущая арматура», к которой относятся семейства каркасов.
     /// </summary>
     public IList<string> GetFamilyNames() {
-        IList<string> familyNames = new FilteredElementCollector(Document)
-        .OfClass(typeof(Family))
-        .Cast<Family>()
-        .Where(f => f.FamilyCategory?.GetBuiltInCategory() == BuiltInCategory.OST_Rebar)
-        .Select(f => f.Name)
-        .OrderBy(n => n)
-        .ToList();
-
-        return familyNames;
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(Family))
+            .Cast<Family>()
+            .Where(family => family.FamilyCategory?.GetBuiltInCategory() == BuiltInCategory.OST_Rebar)
+            .Select(family => family.Name)
+            .OrderBy(name => name)
+            .ToList();
     }
 
     public IList<string> GetFamilyTypes(string familyName) {
-        IList<string> familyTypes = new FilteredElementCollector(Document)
-        .OfClass(typeof(FamilySymbol))
-        .Cast<FamilySymbol>()
-        .Where(fs => fs.Family.Name.Equals(familyName)).
-        Select(f => f.Name)
-        .OrderBy(n => n)
-        .ToList();
-
-        return familyTypes;
+        return new FilteredElementCollector(Document)
+            .OfClass(typeof(FamilySymbol))
+            .Cast<FamilySymbol>()
+            .Where(symbol => symbol.Family.Name.Equals(familyName))
+            .Select(symbol => symbol.Name)
+            .OrderBy(name => name)
+            .ToList();
     }
 }

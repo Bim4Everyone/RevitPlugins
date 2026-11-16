@@ -9,10 +9,8 @@ using dosymep.SimpleServices;
 using RevitPunchingRebar.Models.Interfaces;
 
 namespace RevitPunchingRebar.Models;
-internal class Frame {
-    private readonly FrameParameterSettings _parameterSettings;
-    private readonly ILocalizationService _localizationService;
 
+internal class Frame {
     // Значения группы КР для каркасов в фундаментной плите и в плите перекрытия
     private const string _foundationSlabKrGroup = "ФП_Каркасы_Продавливание";
     private const string _floorSlabKrGroup = "ПП_Каркасы_Продавливание";
@@ -23,13 +21,17 @@ internal class Frame {
     // Класс продольных стержней каркаса
     private const RebarClass _longRebarClass = RebarClass.A500C;
 
-    public Frame(FamilyInstance familyInstance, IFrameParams frameParams,
+    private readonly FrameParameterSettings _parameterSettings;
+    private readonly ILocalizationService _localizationService;
+
+    public Frame(
+        FamilyInstance familyInstance, IFrameParams frameParams,
         ILocalizationService localizationService) {
         FrameInstance = familyInstance;
         _localizationService = localizationService;
         _parameterSettings = frameParams.ParameterSettings;
 
-        //Заполняем необходимые параметры каркаса
+        // Заполняем необходимые параметры каркаса
         SetParams(frameParams);
     }
 
@@ -145,11 +147,13 @@ internal class Frame {
         }
     }
 
-    /// <summary>Добавляет назначение и имя к ошибке фактической записи или копирования параметра.</summary>
+    /// <summary>
+    /// Добавляет назначение и имя к ошибке фактической записи или копирования параметра.
+    /// </summary>
     private void ApplyParameter(FrameParameterRole role, Action<string> action) {
         string name = _parameterSettings.GetName(role);
         try {
-            action(name);
+            action.Invoke(name);
         } catch(Exception ex) when(ex is Autodesk.Revit.Exceptions.ApplicationException
                                      || ex is ArgumentException || ex is InvalidOperationException) {
             string title = _localizationService.GetLocalizedString($"Parameters.{role}.Title");

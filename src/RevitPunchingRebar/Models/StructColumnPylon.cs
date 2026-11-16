@@ -7,6 +7,7 @@ using dosymep.Revit;
 using RevitPunchingRebar.Models.Interfaces;
 
 namespace RevitPunchingRebar.Models;
+
 internal class StructColumnPylon : IPylon {
     // Перевод из системы координат документа пилона в систему координат текущего проекта
     private readonly Transform _transform;
@@ -51,7 +52,6 @@ internal class StructColumnPylon : IPylon {
     /// <summary>
     /// Возвращает нижнюю центральную точку в координатах текущего проекта
     /// </summary>
-    /// <returns></returns>
     public XYZ GetLocation() {
         if(PylonInstance is not null) {
             XYZ locationPoint = ((LocationPoint) PylonInstance.Location).Point;
@@ -63,11 +63,10 @@ internal class StructColumnPylon : IPylon {
             double downOffset = PylonInstance.GetParamValue<double>(
                 BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM);
 
-            XYZ columnLocation = new XYZ
-                (
-                    locationPoint.X,
-                    locationPoint.Y,
-                    downLevelMark + downOffset);
+            var columnLocation = new XYZ(
+                locationPoint.X,
+                locationPoint.Y,
+                downLevelMark + downOffset);
 
             return _transform.OfPoint(columnLocation);
         } else {

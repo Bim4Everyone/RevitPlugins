@@ -6,24 +6,19 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-
     xmlns:views="clr-namespace:RevitPunchingRebar.Views"
     xmlns:vms="clr-namespace:RevitPunchingRebar.ViewModels"
     xmlns:converters="clr-namespace:RevitPunchingRebar.Views.Converters"
-
     mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Title="{me:LocalizationSource MainWindow.Title}"
-
     Height="780"
     Width="950"
     MinHeight="780"
     MinWidth="950"
-
     d:DataContext="{d:DesignInstance vms:MainViewModel, IsDesignTimeCreatable=False}">
 
     <i:Interaction.Triggers>
@@ -37,82 +32,176 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="SettingsToggleSwitch.xaml" />
             </ResourceDictionary.MergedDictionaries>
-        <converters:SelectedToAppearanceConverter x:Key="SelectedToAppearanceConverter" />
+            <converters:SelectedToAppearanceConverter x:Key="SelectedToAppearanceConverter" />
 
-        <!-- Карточка группы настроек (как CustomBorder в RevitPylonDocumentation) -->
-        <Style x:Key="CardBorder" TargetType="Border">
-            <Setter Property="Padding" Value="10" />
-            <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="SnapsToDevicePixels" Value="True" />
-            <Setter Property="Background" Value="{DynamicResource CardBackground}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
-            <Setter Property="BorderThickness" Value="{DynamicResource CardControlBorderThemeThickness}" />
-        </Style>
+            <!-- Карточка группы настроек (как CustomBorder в RevitPylonDocumentation) -->
+            <Style
+                x:Key="CardBorder"
+                TargetType="Border">
+                <Setter
+                    Property="Padding"
+                    Value="10" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="10" />
+                <Setter
+                    Property="SnapsToDevicePixels"
+                    Value="True" />
+                <Setter
+                    Property="Background"
+                    Value="{DynamicResource CardBackground}" />
+                <Setter
+                    Property="BorderBrush"
+                    Value="{DynamicResource CardBorderBrush}" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="{DynamicResource CardControlBorderThemeThickness}" />
+            </Style>
 
-        <!-- Заголовок карточки -->
-        <Style x:Key="CardTitle" TargetType="ui:TextBlock">
-            <Setter Property="Margin" Value="5" />
-            <Setter Property="FontSize" Value="16" />
-            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
-        </Style>
+            <!-- Заголовок карточки -->
+            <Style
+                x:Key="CardTitle"
+                TargetType="ui:TextBlock">
+                <Setter
+                    Property="Margin"
+                    Value="5" />
+                <Setter
+                    Property="FontSize"
+                    Value="16" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            </Style>
 
-        <!-- Подгруппа внутри карточки -->
-        <Style x:Key="SubCardBorder" TargetType="Border">
-            <Setter Property="Margin" Value="5" />
-            <Setter Property="Padding" Value="5" />
-            <Setter Property="CornerRadius" Value="8" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorSecondaryBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
-        </Style>
+            <!-- Подгруппа внутри карточки -->
+            <Style
+                x:Key="SubCardBorder"
+                TargetType="Border">
+                <Setter
+                    Property="Margin"
+                    Value="5" />
+                <Setter
+                    Property="Padding"
+                    Value="5" />
+                <Setter
+                    Property="CornerRadius"
+                    Value="8" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="1" />
+                <Setter
+                    Property="Background"
+                    Value="{DynamicResource CardBackgroundFillColorSecondaryBrush}" />
+                <Setter
+                    Property="BorderBrush"
+                    Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+            </Style>
 
-        <!-- Подзаголовок подгруппы -->
-        <Style x:Key="SubTitle" TargetType="ui:TextBlock">
-            <Setter Property="Margin" Value="5 5 5 0" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
-        </Style>
+            <!-- Подзаголовок подгруппы -->
+            <Style
+                x:Key="SubTitle"
+                TargetType="ui:TextBlock">
+                <Setter
+                    Property="Margin"
+                    Value="5 5 5 0" />
+                <Setter
+                    Property="FontSize"
+                    Value="14" />
+                <Setter
+                    Property="FontWeight"
+                    Value="SemiBold" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            </Style>
 
-        <!-- Подпись над полем ввода -->
-        <Style x:Key="FieldLabel" TargetType="ui:TextBlock">
-            <Setter Property="Margin" Value="5 5 5 0" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
-        </Style>
+            <!-- Подпись над полем ввода -->
+            <Style
+                x:Key="FieldLabel"
+                TargetType="ui:TextBlock">
+                <Setter
+                    Property="Margin"
+                    Value="5 5 5 0" />
+                <Setter
+                    Property="FontSize"
+                    Value="14" />
+                <Setter
+                    Property="TextWrapping"
+                    Value="Wrap" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            </Style>
 
-        <!-- Схема раскладки каркасов -->
-        <Style x:Key="SchemeZone" TargetType="Rectangle">
-            <Setter Property="Stroke" Value="{DynamicResource TextFillColorTertiaryBrush}" />
-            <Setter Property="StrokeThickness" Value="1" />
-            <Setter Property="StrokeDashArray" Value="4 3" />
-        </Style>
+            <!-- Схема раскладки каркасов -->
+            <Style
+                x:Key="SchemeZone"
+                TargetType="Rectangle">
+                <Setter
+                    Property="Stroke"
+                    Value="{DynamicResource TextFillColorTertiaryBrush}" />
+                <Setter
+                    Property="StrokeThickness"
+                    Value="1" />
+                <Setter
+                    Property="StrokeDashArray"
+                    Value="4 3" />
+            </Style>
 
-        <Style x:Key="SchemeFrames" TargetType="Path">
-            <Setter Property="Fill" Value="{DynamicResource AccentFillColorDefaultBrush}" />
-            <Setter Property="Opacity" Value="0.7" />
-        </Style>
+            <Style
+                x:Key="SchemeFrames"
+                TargetType="Path">
+                <Setter
+                    Property="Fill"
+                    Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                <Setter
+                    Property="Opacity"
+                    Value="0.7" />
+            </Style>
 
-        <Style x:Key="SchemeFrameSwatch" TargetType="Rectangle">
-            <Setter Property="Fill" Value="{DynamicResource AccentFillColorDefaultBrush}" />
-            <Setter Property="Opacity" Value="0.7" />
-        </Style>
+            <Style
+                x:Key="SchemeFrameSwatch"
+                TargetType="Rectangle">
+                <Setter
+                    Property="Fill"
+                    Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                <Setter
+                    Property="Opacity"
+                    Value="0.7" />
+            </Style>
 
-        <Style x:Key="SchemeFirstRow" TargetType="Rectangle">
-            <Setter Property="Stroke" Value="Orange" />
-            <Setter Property="StrokeThickness" Value="1.2" />
-        </Style>
+            <Style
+                x:Key="SchemeFirstRow"
+                TargetType="Rectangle">
+                <Setter
+                    Property="Stroke"
+                    Value="Orange" />
+                <Setter
+                    Property="StrokeThickness"
+                    Value="1.2" />
+            </Style>
 
-        <Style x:Key="SchemePylon" TargetType="Rectangle">
-            <Setter Property="Fill" Value="{DynamicResource TextFillColorPrimaryBrush}" />
-        </Style>
+            <Style
+                x:Key="SchemePylon"
+                TargetType="Rectangle">
+                <Setter
+                    Property="Fill"
+                    Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            </Style>
 
-        <Style x:Key="SchemeLegendText" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
-        </Style>
+            <Style
+                x:Key="SchemeLegendText"
+                TargetType="TextBlock">
+                <Setter
+                    Property="FontSize"
+                    Value="12" />
+                <Setter
+                    Property="TextWrapping"
+                    Value="Wrap" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource TextFillColorSecondaryBrush}" />
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -773,11 +862,14 @@
             </Grid>
         </ScrollViewer>
 
-        <views:ParameterSettingsView Grid.Row="1"
+        <views:ParameterSettingsView
+            Grid.Row="1"
             DataContext="{Binding ParameterEditor}"
             Visibility="{Binding DataContext.ParameterSettingsVisibility, ElementName=mainWindow}" />
 
-        <Grid Grid.Row="2" Visibility="{Binding MainContentVisibility}">
+        <Grid
+            Grid.Row="2"
+            Visibility="{Binding MainContentVisibility}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />

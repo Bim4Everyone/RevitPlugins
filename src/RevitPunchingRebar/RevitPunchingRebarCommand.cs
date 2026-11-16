@@ -104,7 +104,7 @@ public class RevitPunchingRebarCommand : BasePluginCommand {
             return;
         }
 
-        StringBuilder report = new StringBuilder();
+        var report = new StringBuilder();
         report.AppendFormat(
             localizationService.GetLocalizedString("Report.Summary"),
             result.ProcessedPylonsCount,

@@ -22,14 +22,15 @@ namespace RevitPunchingRebar.ViewModels;
 /// Основная ViewModel главного окна плагина.
 /// </summary>
 internal class MainViewModel : BaseViewModel {
-    private bool _isInitialized;
-    private bool _isParameterSettingsOpen;
-    private ParameterSettingsViewModel _parameterEditor;
-    private FrameParameterSettings _parameterSettings = FrameParameterSettings.CopyWithDefaults(null);
     private readonly PluginConfig _pluginConfig;
     private readonly RevitRepository _revitRepository;
     private readonly IPunchingRebarPlacementService _placementService;
     private readonly ILocalizationService _localizationService;
+
+    private bool _isInitialized;
+    private bool _isParameterSettingsOpen;
+    private ParameterSettingsViewModel _parameterEditor;
+    private FrameParameterSettings _parameterSettings = FrameParameterSettings.CopyWithDefaults(null);
 
     private List<ElementId> _pylonsFromModel = [];
     private List<LinkedPylonReference> _pylonsFromLink = [];
@@ -126,7 +127,8 @@ internal class MainViewModel : BaseViewModel {
     }
 
     public Visibility MainContentVisibility => IsParameterSettingsOpen ? Visibility.Collapsed : Visibility.Visible;
-    public Visibility ParameterSettingsVisibility => IsParameterSettingsOpen ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility ParameterSettingsVisibility =>
+        IsParameterSettingsOpen ? Visibility.Visible : Visibility.Collapsed;
 
     /// <summary>
     /// Команда выбора пилонов в текущем проекте.
@@ -360,7 +362,6 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Метод загрузки главного окна.
     /// </summary>
-    /// <remarks>В данном методе должна происходить загрузка настроек окна, а так же инициализация полей окна.</remarks>
     private void LoadView() {
         if(_isInitialized) {
             return;
@@ -374,9 +375,6 @@ internal class MainViewModel : BaseViewModel {
     /// <summary>
     /// Метод применения настроек главного окна. (выполнение плагина)
     /// </summary>
-    /// <remarks>
-    /// В данном методе должны браться настройки пользователя и сохраняться в конфиг, а так же быть основной код плагина.
-    /// </remarks>
     private void AcceptView() {
         RevitSettings settings = SaveConfig();
         PlaceFrames(settings);
@@ -458,7 +456,7 @@ internal class MainViewModel : BaseViewModel {
 
         // Используем те же настройки и расчет высоты, что и при расстановке,
         // но не сохраняем конфигурацию во время проверки ввода.
-        RevitSettings settings = new RevitSettings();
+        var settings = new RevitSettings();
         UpdateSettings(settings);
         IFrameParams frameParams = new FrameParams(settings, _slab);
         if(frameParams.GetFrameHeight() <= 0) {
@@ -537,7 +535,7 @@ internal class MainViewModel : BaseViewModel {
     private void SelectInRevit(Window window, Action selectAction) {
         window.Hide();
         try {
-            selectAction();
+            selectAction.Invoke();
         } catch(Autodesk.Revit.Exceptions.OperationCanceledException) {
             // Пользователь отменил выбор - оставляем предыдущий выбор
         }

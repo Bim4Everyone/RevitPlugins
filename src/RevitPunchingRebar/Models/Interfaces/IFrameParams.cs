@@ -1,4 +1,5 @@
 namespace RevitPunchingRebar.Models.Interfaces;
+
 internal interface IFrameParams {
     FrameParameterSettings ParameterSettings { get; }
 
@@ -33,25 +34,21 @@ internal interface IFrameParams {
     /// <summary>
     /// Находит длину каркаса (без учета "хвостиков")
     /// </summary>
-    /// <returns></returns>
     double GetFrameLength();
 
     /// <summary>
     /// Находит высоту каркаса (расстояние между ц.т.
     /// продольных стержней)
     /// </summary>
-    /// <returns></returns>
     double GetFrameHeight();
 
     /// <summary>
     /// Находит расстояние от грани колонны до первого хомута каркаса
     /// </summary>
-    /// <returns></returns>
     double GetAfterPylonDistance();
 
     /// <summary>
     /// Находит размер зоны продавливания (расстояние от грани пилона до 1,5h0)
     /// </summary>
-    /// <returns></returns>
     double GetPunchingZone();
 }

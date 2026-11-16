@@ -8,16 +8,17 @@ using RevitPunchingRebar.Models;
 
 namespace RevitPunchingRebar.ViewModels;
 
-/// <summary>Назначение параметра и редактируемое имя без обращения к элементам модели.</summary>
+/// <summary>
+/// Назначение параметра и редактируемое имя без обращения к элементам модели.
+/// </summary>
 internal sealed class ParameterBindingViewModel : BaseViewModel {
     private string _parameterName;
 
-    public ParameterBindingViewModel(FrameParameterDefinition definition, FrameParameterBinding binding,
+    public ParameterBindingViewModel(
+        FrameParameterDefinition definition, FrameParameterBinding binding,
         ILocalizationService localization) {
         Definition = definition;
-        string groupKey = definition.IsCopy || definition.Role == FrameParameterRole.KrGroup ? "Data"
-            : definition.Role == FrameParameterRole.WidthStep || definition.Role == FrameParameterRole.HeightStep
-                ? "Geometry" : definition.Role.ToString().StartsWith("Stirrup") ? "Stirrups" : "Longitudinal";
+        string groupKey = GetGroupKey(definition);
         Group = localization.GetLocalizedString($"Parameters.Group.{groupKey}");
         Title = localization.GetLocalizedString(definition.TitleKey);
         Description = localization.GetLocalizedString(definition.DescriptionKey);
@@ -37,5 +38,17 @@ internal sealed class ParameterBindingViewModel : BaseViewModel {
     public string ParameterName {
         get => _parameterName;
         set => RaiseAndSetIfChanged(ref _parameterName, value);
+    }
+
+    private static string GetGroupKey(FrameParameterDefinition definition) {
+        if(definition.IsCopy || definition.Role == FrameParameterRole.KrGroup) {
+            return "Data";
+        }
+
+        if(definition.Role == FrameParameterRole.WidthStep || definition.Role == FrameParameterRole.HeightStep) {
+            return "Geometry";
+        }
+
+        return definition.Role.ToString().StartsWith("Stirrup") ? "Stirrups" : "Longitudinal";
     }
 }
