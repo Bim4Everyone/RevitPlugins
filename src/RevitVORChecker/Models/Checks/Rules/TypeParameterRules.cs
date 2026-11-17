@@ -8,17 +8,22 @@ using RevitVORChecker.Models.Findings;
 namespace RevitVORChecker.Models.Checks.Rules;
 
 /// <summary>
-/// Разделы 15 и 16: ФОП_ТИП_Тип материала и ФОП_Размер.
+/// Разделы 15 и 16: ФОП_ТИП_Тип материала и ФОП_РАЗМ_Толщина_ДЕ.
 /// </summary>
 internal static class TypeParameterRules {
     /// <summary>
-    /// Конструкции, у которых проверяется ФОП_Размер.
+    /// Конструкции, у которых проверяется ФОП_РАЗМ_Толщина_ДЕ.
     /// </summary>
     private static readonly string[] _sizedKeys = {
         "Перекрытие", "Покрытие", "Стена", "Капитель", "ФПлита", "ЛПлощадка", "Рампа", "БПодготовка", "ПСлой",
         "Засыпка", "Парапет", "Подпорная", "Простенок"
     };
-
+    /// <summary>
+    /// Конструкции, у которых проверяется ФОП_РАЗМ_Высота Доп_ДЕ.
+    /// </summary>
+    private static readonly string[] _heightKeys = {
+        "Стена", "Пилон", "Парапет", "Балка", "Пилон", "Балка"
+    };
     /// <summary>
     /// Конструкции без ФОП_ТИП_Тип материала.
     /// </summary>
@@ -98,10 +103,10 @@ internal static class TypeParameterRules {
 
             string value = element.GetParameterOrEmpty(ModelCheckContext.SizeParameter).Trim();
             if(value.Length == 0) {
-                problems.Add("ФОП_Размер не заполнен.", null, element);
+                problems.Add("ФОП_РАЗМ_Толщина_ДЕ не заполнен.", null, element);
                 continue;
             }
-
+           
             string? expectedSize = GetExpectedSize(element, typeName);
             bool isExempt = typeName.Contains("Приям") || typeName.Contains("Перепад") || typeName.Contains("ФПлита");
             if(expectedSize != null && !isExempt && Regex.Replace(value, @"\D", "") != expectedSize) {
@@ -111,7 +116,25 @@ internal static class TypeParameterRules {
 
         problems.AddFindings(findings, ReportSections.Size, context.FileName);
     }
+    private static void CheckHeight(ModelCheckContext context, FindingCollection findings) {
+        var problems = new GroupedElements();
+        foreach(ElementData element in context.VorElements) {
+            string typeName = element.TypeName;
+            
+            if(ModelCheckContext.IsInsulation(element)
+               || !ModelCheckContext.ContainsAny(typeName, _heightKeys)){
+                continue;
+            }
 
+            string value = element.GetParameterOrEmpty(ModelCheckContext.SizeParameter).Trim();
+            if(value.Length == 0) {
+                problems.Add("ФОП_РАЗМ_Толщина_ДЕ не заполнен.", null, element);
+                continue;
+            }
+        }
+
+        problems.AddFindings(findings, ReportSections.Size, context.FileName);
+    }
     /// <summary>
     /// Толщина конструкции, мм: из параметра «Толщина» / «Площадка_Толщина» или из имени типа «…-200 (…)».
     /// </summary>

@@ -20,7 +20,8 @@ internal class ModelCheckContext {
     public const string LocationParameter = "ФОП_ТИП_Местоположение";
     public const string PurposeParameter = "ФОП_ТИП_Назначение";
     public const string MaterialTypeParameter = "ФОП_ТИП_Тип материала";
-    public const string SizeParameter = "ФОП_Размер";
+    public const string SizeParameter = "ФОП_РАЗМ_Толщина_ДЕ";
+    public const string HeightParameter = "ФОП_РАЗМ_Высота Доп_ДЕ";
     public const string ReinforcementParameter = "ФОП_ТИП_Армирование";
     public const string AdditionalSortingParameter = "ФОП_ТИП_Доп. сортировка";
 
