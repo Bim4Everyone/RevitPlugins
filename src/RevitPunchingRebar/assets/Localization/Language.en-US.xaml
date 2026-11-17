@@ -1,0 +1,123 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <system:String x:Key="MainWindow.Title">Punching shear reinforcement</system:String>
+
+    <system:String x:Key="MainWindow.GeneralSettings">General settings</system:String>
+    <system:String x:Key="MainWindow.PylonsFromModel">Pylons from model ({0} selected)</system:String>
+    <system:String x:Key="MainWindow.PylonsFromLink">Pylons from link ({0} selected)</system:String>
+    <system:String x:Key="MainWindow.SlabSelected">Slab (selected)</system:String>
+    <system:String x:Key="MainWindow.SlabNotSelected">Slab (not selected)</system:String>
+    <system:String x:Key="MainWindow.ButtonSelect">Select</system:String>
+
+    <system:String x:Key="MainWindow.SchemeTitle">Frame layout in plan</system:String>
+    <system:String x:Key="MainWindow.SchemeFrames">Frames, gap between them equals frame width</system:String>
+    <system:String x:Key="MainWindow.SchemeFirstRow">a₀ = h₀/3 — from pylon face to frames</system:String>
+    <system:String x:Key="MainWindow.SchemeZone">1.5·h₀ — punching shear zone boundary</system:String>
+    <system:String x:Key="MainWindow.SchemeWorkingHeight">h₀ — effective depth of the slab</system:String>
+
+    <system:String x:Key="MainWindow.SlabRebar">Slab reinforcement</system:String>
+    <system:String x:Key="MainWindow.RebarDiameter">Bar diameter, mm</system:String>
+    <system:String x:Key="MainWindow.RebarCover">Rebar cover</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromSlab">From slab</system:String>
+    <system:String x:Key="MainWindow.RebarCoverFromUser">Manual</system:String>
+    <system:String x:Key="MainWindow.RebarCoverTop">Top, mm</system:String>
+    <system:String x:Key="MainWindow.RebarCoverBottom">Bottom, mm</system:String>
+
+    <system:String x:Key="MainWindow.FrameRebar">Frame reinforcement</system:String>
+    <system:String x:Key="MainWindow.FrameGroup">Frame</system:String>
+    <system:String x:Key="MainWindow.FamilyName">Family</system:String>
+    <system:String x:Key="MainWindow.FamilyType">Type</system:String>
+    <system:String x:Key="MainWindow.FrameWidth">Width, mm</system:String>
+    <system:String x:Key="MainWindow.StirrupsGroup">Stirrups</system:String>
+    <system:String x:Key="MainWindow.StirrupDiameter">Diameter, mm</system:String>
+    <system:String x:Key="MainWindow.StirrupRebarClass">Bar grade</system:String>
+    <system:String x:Key="MainWindow.StirrupStep">Spacing, mm</system:String>
+    <system:String x:Key="MainWindow.StirrupBendLength">Hook length, mm</system:String>
+    <system:String x:Key="MainWindow.LongRebarGroup">Longitudinal bars</system:String>
+    <system:String x:Key="MainWindow.LongRebarDiameter">Diameter, mm</system:String>
+    <system:String x:Key="MainWindow.LongRebarAnchorageLength">Extension beyond end stirrups, mm</system:String>
+
+    <system:String x:Key="MainWindow.ResetToDefault">Reset to default: {0}</system:String>
+    <system:String x:Key="MainWindow.ButtonOk">OK</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+
+    <system:String x:Key="MainWindow.ErrorSelectPylons">Select pylons</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectSlab">Select a slab</system:String>
+    <system:String x:Key="MainWindow.ErrorSlabTopFace">Select a slab with a horizontal top at a single elevation: sloped and stepped slabs are not supported yet</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverTop">Top rebar cover: enter a whole number of mm greater than 0 and not more than half the slab thickness</system:String>
+    <system:String x:Key="MainWindow.ErrorRebarCoverBottom">Bottom rebar cover: enter a whole number of mm greater than 0 and not more than half the slab thickness</system:String>
+    <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">The slab has no top or bottom rebar cover assigned</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamily">Select the frame family</system:String>
+    <system:String x:Key="MainWindow.ErrorSelectFamilyType">Select the frame type</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameWidth">Frame width: enter a whole number of mm greater than 0</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameWidthTooSmall">Frame width must exceed the sum of the stirrup and longitudinal bar diameters</system:String>
+    <system:String x:Key="MainWindow.ErrorFrameHeight">Frame height must be greater than 0 for the selected slab thickness, covers and bar diameters</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupStep">Stirrup spacing: enter a whole number of mm greater than 0</system:String>
+    <system:String x:Key="MainWindow.ErrorStirrupBendLength">Stirrup hook length: enter a whole number of mm greater than 0</system:String>
+    <system:String x:Key="MainWindow.ErrorLongRebarAnchorageLength">Longitudinal bar extension: enter a whole number of mm, 0 or more</system:String>
+    <system:String x:Key="MainWindow.TransactionName">Placing reinforcement frames</system:String>
+
+    <system:String x:Key="RevitUI.PickSlab">Select a slab</system:String>
+    <system:String x:Key="RevitUI.PickPylons">Select pylons</system:String>
+
+    <system:String x:Key="RebarClass.A500C">A500C</system:String>
+    <system:String x:Key="RebarClass.A240">A240</system:String>
+
+    <system:String x:Key="Report.Summary">Pylons processed: {0} of {1}. Frames created: {2}.</system:String>
+    <system:String x:Key="Report.SkippedPylons">Skipped pylons:</system:String>
+    <system:String x:Key="Report.PylonName">{0}, Id {1}</system:String>
+    <system:String x:Key="Report.ErrorPylonSize">pylon length or width is not set</system:String>
+
+    <system:String x:Key="Parameters.Title">Parameter settings</system:String>
+    <system:String x:Key="Parameters.Intro">Enter parameter names. The same name is used on the slab and frame for copying. Settings are saved with OK on the main screen.</system:String>
+    <system:String x:Key="Parameters.Default">Default: {0}</system:String>
+    <system:String x:Key="Parameters.Reset">Reset</system:String>
+    <system:String x:Key="Parameters.ResetAll">Reset all</system:String>
+    <system:String x:Key="Parameters.LongRebarCode.Title">Longitudinal bar class</system:String>
+    <system:String x:Key="Parameters.LongRebarCode.Description">Class code of longitudinal bars. A500C currently uses code 501.</system:String>
+    <system:String x:Key="Parameters.LongRebarDiameterTop.Title">Top longitudinal bar diameter</system:String>
+    <system:String x:Key="Parameters.LongRebarDiameterTop.Description">Diameter of the two top bars; uses the diameter selected in the main window.</system:String>
+    <system:String x:Key="Parameters.LongRebarDiameterBottom.Title">Bottom longitudinal bar diameter</system:String>
+    <system:String x:Key="Parameters.LongRebarDiameterBottom.Description">Diameter of the two bottom bars; uses the same selected diameter.</system:String>
+    <system:String x:Key="Parameters.StirrupCode.Title">Stirrup class</system:String>
+    <system:String x:Key="Parameters.StirrupCode.Description">Selected stirrup class code: A240 = 240; A500C = 501.</system:String>
+    <system:String x:Key="Parameters.WidthStep.Title">Longitudinal bar spacing across width</system:String>
+    <system:String x:Key="Parameters.WidthStep.Description">Frame width minus stirrup and longitudinal bar diameters. Also used to locate the frame.</system:String>
+    <system:String x:Key="Parameters.HeightStep.Title">Longitudinal bar spacing in height</system:String>
+    <system:String x:Key="Parameters.HeightStep.Description">Vertical spacing calculated from slab thickness, covers and bar diameters.</system:String>
+    <system:String x:Key="Parameters.AnchorageTop1.Title">Top anchorage, end 1</system:String>
+    <system:String x:Key="Parameters.AnchorageTop1.Description">Length of the first anchorage of the top longitudinal bars.</system:String>
+    <system:String x:Key="Parameters.AnchorageTop2.Title">Top anchorage, end 2</system:String>
+    <system:String x:Key="Parameters.AnchorageTop2.Description">Length of the second anchorage of the top longitudinal bars.</system:String>
+    <system:String x:Key="Parameters.AnchorageBottom1.Title">Bottom anchorage, end 1</system:String>
+    <system:String x:Key="Parameters.AnchorageBottom1.Description">Length of the first anchorage of the bottom longitudinal bars.</system:String>
+    <system:String x:Key="Parameters.AnchorageBottom2.Title">Bottom anchorage, end 2</system:String>
+    <system:String x:Key="Parameters.AnchorageBottom2.Description">Length of the second anchorage of the bottom longitudinal bars.</system:String>
+    <system:String x:Key="Parameters.StirrupChangeBinding.Title">Change stirrup binding</system:String>
+    <system:String x:Key="Parameters.StirrupChangeBinding.Description">Family control switch. The plugin writes 1; its meaning must match the original family.</system:String>
+    <system:String x:Key="Parameters.StirrupDiameter.Title">Stirrup diameter</system:String>
+    <system:String x:Key="Parameters.StirrupDiameter.Description">Stirrup diameter selected in the main window.</system:String>
+    <system:String x:Key="Parameters.StirrupBendLength.Title">Stirrup bend length</system:String>
+    <system:String x:Key="Parameters.StirrupBendLength.Description">Stirrup bend length entered by the user.</system:String>
+    <system:String x:Key="Parameters.StirrupStep.Title">Stirrup spacing</system:String>
+    <system:String x:Key="Parameters.StirrupStep.Description">Distance between stirrups along the frame.</system:String>
+    <system:String x:Key="Parameters.StirrupCount.Title">Stirrup count</system:String>
+    <system:String x:Key="Parameters.StirrupCount.Description">Frame length / stirrup spacing + 1. Requires a writable Number parameter stored as Double.</system:String>
+    <system:String x:Key="Parameters.KrGroup.Title">KR frame group</system:String>
+    <system:String x:Key="Parameters.KrGroup.Description">Writes the foundation or floor punching-rebar group according to the selected slab.</system:String>
+    <system:String x:Key="Parameters.ProjectSection.Title">Project section</system:String>
+    <system:String x:Key="Parameters.ProjectSection.Description">Copies the value from the slab into the frame parameter with the same name.</system:String>
+    <system:String x:Key="Parameters.ConsumptionMark.Title">Rebar consumption schedule mark</system:String>
+    <system:String x:Key="Parameters.ConsumptionMark.Description">Copies the slab value into the frame for rebar consumption schedules.</system:String>
+    <system:String x:Key="Parameters.OrgLevel.Title">Organizational level</system:String>
+    <system:String x:Key="Parameters.OrgLevel.Description">Copies the organizational classification from the slab into the frame.</system:String>
+    <system:String x:Key="Parameters.Group.Longitudinal">Longitudinal bars</system:String>
+    <system:String x:Key="Parameters.Group.Stirrups">Stirrups</system:String>
+    <system:String x:Key="Parameters.Group.Geometry">Dimensions and positioning</system:String>
+    <system:String x:Key="Parameters.Group.Data">Slab and frame data</system:String>
+    <system:String x:Key="Parameters.Apply">Apply</system:String>
+    <system:String x:Key="Report.ParameterError">Parameter role "{0}", name "{1}": {2}</system:String>
+    <system:String x:Key="Report.CopyParameterMissing">The parameter with this name was not found on the slab or frame.</system:String>
+</ResourceDictionary>

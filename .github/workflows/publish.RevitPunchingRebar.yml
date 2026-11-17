@@ -1,0 +1,19 @@
+name: publish RevitPunchingRebar
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [ closed, synchronize, review_requested ]
+    branches: [ main, master ]
+    paths:
+      - '**RevitPunchingRebar**.cs'
+      - '**RevitPunchingRebar**.xaml'
+      - '**RevitPunchingRebar**.csproj'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-plugin.yml
+    with:
+      plugin-name: "RevitPunchingRebar"
+      use-devexpress: false
+    secrets: inherit
