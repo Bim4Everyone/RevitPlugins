@@ -8,7 +8,8 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:edits="clr-namespace:RevitLintelsManager.Views.Edits"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=ui:NavigationView}}">
+    MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=ui:NavigationView}}"
+    ScrollViewer.CanContentScroll="False">
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,10 +17,11 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
-    <ScrollViewer
-        VerticalScrollBarVisibility="Auto"
-        HorizontalScrollBarVisibility="Disabled">
-        <StackPanel>
+    <Grid Margin="0,0,0,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
             <ui:Card Margin="10" Padding="20">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -69,6 +71,7 @@
                 </Grid>
             </ui:Card>
             <edits:CustomGroupEditControl
+                Grid.Row="1"
                 Header="{me:LocalizationSource General.StructureWalls}"
                 Icon="{ui:SymbolIcon Building24}">
                 <edits:CustomGroupEditControl.EditControl>
@@ -88,7 +91,6 @@
                         <ListBox
                             Style="{StaticResource SettingsListStyle}"
                             ItemContainerStyle="{StaticResource SettingsCheckListItemStyle}"
-                            MaxHeight="300"
                             Background="Transparent"
                             BorderThickness="0"
                             ItemsSource="{Binding FilteredStructureWalls}">
@@ -105,6 +107,5 @@
                     </DockPanel>
                 </edits:CustomGroupEditControl.EditControl>
             </edits:CustomGroupEditControl>
-        </StackPanel>
-    </ScrollViewer>
+    </Grid>
 </core:WpfUIPlatformPage>

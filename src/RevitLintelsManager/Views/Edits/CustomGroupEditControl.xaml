@@ -12,7 +12,10 @@
     d:DesignHeight="300" d:DesignWidth="300">
 
     <ui:CardExpander
-        IsExpanded="{Binding IsExpanded, ElementName=_this}"
+        IsExpanded="{Binding IsExpanded, ElementName=_this, Mode=TwoWay}"
+        Loaded="OnCardExpanderLoaded"
+        VerticalAlignment="Stretch"
+        VerticalContentAlignment="Stretch"
         Icon="{Binding Icon, ElementName=_this}">
 
         <ui:CardExpander.Header>
@@ -26,7 +29,9 @@
             
         </ui:CardExpander.Header>
         <ContentControl
-            VerticalAlignment="Center"
+            VerticalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch"
             Content="{Binding EditControl, ElementName=_this}" />
     </ui:CardExpander>
 </UserControl>

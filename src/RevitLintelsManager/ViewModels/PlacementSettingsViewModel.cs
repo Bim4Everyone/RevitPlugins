@@ -484,12 +484,16 @@ internal class PlacementSettingsViewModel : BaseViewModel {
     }
 
     private void AddRule() {
+        const int rangeStepMm = 1000;
         var rules = SelectedConfig.SelectedRule.Rules;
-        int min = int.TryParse(rules.LastOrDefault()?.MaxWidthText, out int max)
-            ? max + 1 : (int) _systemConfig.DefaultMinWidthMm;
+        bool hasPreviousMaxWidth = int.TryParse(rules.LastOrDefault()?.MaxWidthText, out int previousMaxWidth);
+        int min = hasPreviousMaxWidth ? previousMaxWidth + 1 : (int) _systemConfig.DefaultMinWidthMm;
+        int max = hasPreviousMaxWidth
+            ? (int) Math.Min((long) previousMaxWidth + rangeStepMm, int.MaxValue)
+            : (int) _systemConfig.DefaultMaxWidthMm;
         rules.Add(new LintelRuleViewModel(new LintelRule {
             MinWidth = min,
-            MaxWidth = (int) Math.Min((long) min + 499, int.MaxValue),
+            MaxWidth = max,
             WallSupport = (int) _systemConfig.DefaultWallSupportMm,
             LintelType = rules.LastOrDefault()?.LintelType ?? string.Empty
         }));

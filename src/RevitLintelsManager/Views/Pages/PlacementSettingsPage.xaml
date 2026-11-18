@@ -7,7 +7,9 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-    MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=ui:NavigationView}}">
+    MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=ui:NavigationView}}"
+    ScrollViewer.CanContentScroll="False">
+    
     <core:WpfUIPlatformPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -15,6 +17,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
+    
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -38,25 +41,25 @@
                     Margin="3,0"
                     ToolTip="{me:LocalizationSource Config.Create}"
                     Command="{Binding CreateConfigCommand}">
-                    <ui:SymbolIcon Symbol="DocumentAdd24" />
+                    <ui:SymbolIcon Symbol="add24" />
                 </ui:Button>
                 <ui:Button
                     Margin="3,0"
                     ToolTip="{me:LocalizationSource Config.Import}"
                     Command="{Binding ImportConfigCommand}">
-                    <ui:SymbolIcon Symbol="ArrowDownload24" />
+                    <ui:SymbolIcon Symbol="arrowDown24" />
                 </ui:Button>
                 <ui:Button
                     Margin="3,0"
                     ToolTip="{me:LocalizationSource Config.Save}"
                     Command="{Binding SaveConfigCommand}">
-                    <ui:SymbolIcon Symbol="Save24" />
+                    <ui:SymbolIcon Symbol="save24" />
                 </ui:Button>
                 <ui:Button
                     Margin="3,0"
                     ToolTip="{me:LocalizationSource Config.SaveAs}"
                     Command="{Binding SaveAsConfigCommand}">
-                    <ui:SymbolIcon Symbol="ArrowUpload24" />
+                    <ui:SymbolIcon Symbol="saveEdit24" />
                 </ui:Button>
                 <ui:Button
                     Margin="3,0"
@@ -110,6 +113,7 @@
                                 Padding="12,4"
                                 VerticalAlignment="Stretch"
                                 FontSize="20"
+                                Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
                                 ToolTip="{DynamicResource Rule.Create}"
                                 AutomationProperties.Name="{DynamicResource Rule.Create}"
                                 Command="{Binding DataContext.AddPlaceRuleCommand, 
@@ -119,8 +123,9 @@
                         </Grid>
                         <Border
                             Grid.Row="1"
-                            Margin="0,2,0,0"
-                            BorderBrush="{DynamicResource ControlStrongStrokeColorDefaultBrush}">
+                            Margin="0"
+                            BorderThickness="0"
+                            Background="{DynamicResource SolidBackgroundFillColorQuarternaryBrush}">
                             <ContentPresenter
                                 x:Name="PART_SelectedContentHost"
                                 ContentSource="SelectedContent"
@@ -158,7 +163,7 @@
                             Padding="5"
                             ToolTip="{DynamicResource Rule.Rename}"
                             Command="{Binding DataContext.RenamePlaceRuleCommand, 
-                            RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}"
+                            RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
                             CommandParameter="{Binding}">
                             <ui:SymbolIcon Symbol="Edit16" />
                         </ui:Button>
@@ -167,7 +172,7 @@
                             Padding="5"
                             ToolTip="{DynamicResource Rule.Delete}"
                             Command="{Binding DataContext.DeletePlaceRuleCommand,
-                            RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}"
+                            RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
                             CommandParameter="{Binding}">
                             <ui:SymbolIcon Symbol="Dismiss16" />
                         </ui:Button>
@@ -176,21 +181,12 @@
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <Grid Margin="12">
+                    <Grid Margin="12,12,0,12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*" MinWidth="230" />
                             <ColumnDefinition Width="3*" MinWidth="490" />
                         </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <ui:TextBlock
-                            Margin="0,0,12,12"
-                            VerticalAlignment="Center"
-                            Text="{DynamicResource Rule.WallTypes}" />
-                        
-                        <DockPanel Grid.Row="1" Grid.Column="0" Margin="0,0,16,0">
+                        <DockPanel Grid.Column="0" Margin="0,0,16,0">
                             <ui:AutoSuggestBox
                                 Icon="{ui:SymbolIcon Search24}"
                                 DockPanel.Dock="Top"
@@ -220,24 +216,11 @@
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </DockPanel>
-                        <DockPanel Grid.Column="1" Margin="0,0,0,12">
-                            <ui:Button
-                                DockPanel.Dock="Right"
-                                Padding="8,4"
-                                ToolTip="{DynamicResource Rule.AddRange}"
-                                Command="{Binding DataContext.AddRuleCommand, 
-                                RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}">
-                                <ui:SymbolIcon Symbol="Add20" />
-                            </ui:Button>
-                            <ui:TextBlock
-                                VerticalAlignment="Center"
-                                Text="{DynamicResource Rule.Ranges}" />
-                        </DockPanel>
+                        
                         <DataGrid
-                            Grid.Row="1"
                             Grid.Column="1"
-                            MaxHeight="400"
-                            VerticalAlignment="Top"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
                             ScrollViewer.VerticalScrollBarVisibility="Auto"
                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
                             HeadersVisibility="Column"
@@ -248,8 +231,20 @@
                             CanUserReorderColumns="False"
                             IsReadOnly="True"
                             ItemsSource="{Binding Rules}"
-                            RowHeight="50"
-                            ColumnHeaderHeight="40">
+                            RowHeight="50">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style
+                                    TargetType="{x:Type DataGridColumnHeader}"
+                                    BasedOn="{StaticResource DefaultUiDataGridColumnHeaderStyle}">
+                                    <Setter Property="FontWeight" Value="Normal" />
+                                    <Setter Property="FontSize" Value="14" />
+                                    <Setter Property="Height" Value="Auto" />
+                                    <Setter Property="MinHeight" Value="0" />
+                                    <Setter Property="Padding" Value="4" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn
                                     Width="140">
@@ -268,7 +263,7 @@
                                                     Padding="4"
                                                     VerticalContentAlignment="Center"
                                                     IsReadOnly="{Binding DataContext.IsReadOnly, 
-                                                    RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}"
+                                                    RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
                                                     Text="{Binding MinWidthText, UpdateSourceTrigger=PropertyChanged}" />
                                                 <TextBlock
                                                     Grid.Column="1"
@@ -280,14 +275,14 @@
                                                     Padding="4"
                                                     VerticalContentAlignment="Center"
                                                     IsReadOnly="{Binding DataContext.IsReadOnly, 
-                                                    RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}"
+                                                    RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
                                                     Text="{Binding MaxWidthText, UpdateSourceTrigger=PropertyChanged}" />
                                             </Grid>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
                                 <DataGridTemplateColumn
-                                    Width="110">
+                                    Width="140">
                                     <DataGridTemplateColumn.Header>
                                         <TextBlock Text="{DynamicResource Rule.Support}" />
                                     </DataGridTemplateColumn.Header>
@@ -298,7 +293,7 @@
                                                 Padding="4"
                                                 VerticalContentAlignment="Center"
                                                 IsReadOnly="{Binding DataContext.IsReadOnly, 
-                                                RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}"
+                                                RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
                                                 Text="{Binding WallSupportText, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -316,19 +311,34 @@
                                                 IsEditable="True"
                                                 IsReadOnly="True"
                                                 IsEnabled="{Binding DataContext.CanEditRules, 
-                                                RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}"
+                                                RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
                                                 ItemsSource="{Binding DataContext.LintelTypes, 
-                                                RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}"
+                                                RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
                                                 ToolTip="{Binding LintelType}"
                                                 Text="{Binding LintelType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Width="68">
+                                <DataGridTemplateColumn Width="Auto" MinWidth="80">
+                                    <DataGridTemplateColumn.Header>
+                                        <ui:Button
+                                            Width="60"
+                                            MinHeight="0"
+                                            Padding="12,2"
+                                            HorizontalAlignment="Right"
+                                            Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
+                                            ToolTip="{DynamicResource Rule.AddRange}"
+                                            AutomationProperties.Name="{DynamicResource Rule.AddRange}"
+                                            Command="{Binding DataContext.AddRuleCommand,
+                                                RelativeSource={RelativeSource AncestorType={x:Type Page}}}">
+                                            <ui:SymbolIcon Symbol="Add20" />
+                                        </ui:Button>
+                                    </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel
                                                 Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
                                                 VerticalAlignment="Center">
                                                 <ui:SymbolIcon
                                                     Margin="3"
@@ -340,10 +350,12 @@
                                                     Visibility="{Binding HasErrors, 
                                                     Converter={StaticResource BooleanToVisibilityConverter}}" />
                                                 <ui:Button
+                                                    Width="60"
                                                     Padding="3"
+                                                    Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
                                                     ToolTip="{DynamicResource Rule.DeleteRange}"
                                                     Command="{Binding DataContext.DeleteRuleCommand, 
-                                                    RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}"
+                                                    RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
                                                     CommandParameter="{Binding}">
                                                     <ui:SymbolIcon Symbol="Dismiss16" />
                                                 </ui:Button>

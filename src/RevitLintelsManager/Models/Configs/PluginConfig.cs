@@ -66,7 +66,6 @@ public class SystemPluginConfig {
         "Двр_Про_Проем",
         "Двр_Люк_Ревизия",
         "Окн_Окн_1 Ств Бизнес",
-        "Окн_Про_Проем",
         "Окн_Отв_Прямоуг_Стена"
     ];
     public string OpeningHeightParamName  => LabelUtils.GetLabelFor(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM);
@@ -74,7 +73,7 @@ public class SystemPluginConfig {
     public string DefaultLintelConfigRuleName  => "A101";
     public string DefaultLintelFixParamName  => "ФОП_Фиксация решения";
     public double DefaultMinimalHeightAboveLintelMm  => 100;
-    public IEnumerable<string> StructureWallNameParts => ["(ЖБ)", "(КР)"];
+    public IEnumerable<string> StructureWallNameParts => ["(ЖБ)", "(К)", "(КР)"];
     public string DefaultPhaseName  => "Основная планировка";
     public string DefaultRuleFolderName  => "Rules";
     public string DefaultSettingFolderName  => "dosymep";

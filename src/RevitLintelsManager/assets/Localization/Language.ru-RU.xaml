@@ -37,7 +37,7 @@
     <system:String x:Key="Config.Current">Текущая конфигурация</system:String>
     <system:String x:Key="Config.Create">Создать конфигурацию</system:String>
     <system:String x:Key="Config.NewName">Новая конфигурация</system:String>
-    <system:String x:Key="Config.Import">Импортировать JSON</system:String>
+    <system:String x:Key="Config.Import">Загрузить конфигурацию</system:String>
     <system:String x:Key="Config.Save">Подготовить конфигурацию к сохранению</system:String>
     <system:String x:Key="Config.SaveAs">Сохранить как…</system:String>
     <system:String x:Key="Config.Delete">Удалить конфигурацию</system:String>

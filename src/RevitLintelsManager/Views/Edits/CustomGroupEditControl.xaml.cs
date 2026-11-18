@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Markup;
+using System.Windows.Media;
 
 using Wpf.Ui.Controls;
 
@@ -43,5 +45,15 @@ public partial class CustomGroupEditControl {
     public bool IsExpanded {
         get => (bool) GetValue(IsExpandedProperty);
         set => SetValue(IsExpandedProperty, value);
+    }
+
+    private void OnCardExpanderLoaded(object sender, RoutedEventArgs e) {
+        if(sender is not CardExpander expander || VisualTreeHelper.GetChildrenCount(expander) == 0) {
+            return;
+        }
+        if(VisualTreeHelper.GetChild(expander, 0) is Grid grid && grid.RowDefinitions.Count > 1) {
+            // WPF UI 4.0 задаёт Auto для содержимого; спискам нужна ограниченная строка.
+            grid.RowDefinitions[1].Height = new GridLength(1, GridUnitType.Star);
+        }
     }
 }

@@ -37,7 +37,7 @@
     <system:String x:Key="Config.Current">Current configuration</system:String>
     <system:String x:Key="Config.Create">Create configuration</system:String>
     <system:String x:Key="Config.NewName">New configuration</system:String>
-    <system:String x:Key="Config.Import">Import JSON</system:String>
+    <system:String x:Key="Config.Import">Load configuration</system:String>
     <system:String x:Key="Config.Save">Stage configuration for saving</system:String>
     <system:String x:Key="Config.SaveAs">Save as…</system:String>
     <system:String x:Key="Config.Delete">Delete configuration</system:String>

@@ -22,12 +22,24 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
-    <ScrollViewer
-        VerticalScrollBarVisibility="Auto"
-        HorizontalScrollBarVisibility="Disabled">
-        <StackPanel>
-            <edits:CustomGroupEditControl
-            VerticalAlignment="Top"
+    <Grid Margin="0,0,0,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition>
+                <RowDefinition.Style>
+                    <Style TargetType="{x:Type RowDefinition}">
+                        <Setter Property="Height" Value="*" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsExpanded, ElementName=_openingFamiliesGroup}" Value="False">
+                                <Setter Property="Height" Value="Auto" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </RowDefinition.Style>
+            </RowDefinition>
+        </Grid.RowDefinitions>
+        <edits:CustomGroupEditControl
+            VerticalAlignment="Stretch"
             Icon="{ui:SymbolIcon scanText24}"
             Header="{me:LocalizationSource FamilySettingsPage.LintelFamilies}">
                 
@@ -56,7 +68,9 @@
                         
                         <ListBox
                             Style="{StaticResource SettingsListStyle}"
+                            MaxHeight="330"
                             ItemsSource="{Binding FilteredLintelFamilies}"
+                            Loaded="OnLintelFamiliesLoaded"
                             SelectionMode="Single"
                             Background="Transparent"
                             BorderThickness="0">
@@ -93,15 +107,14 @@
                                         GroupName="LintelFamilies"
                                         IsChecked="{Binding IsChecked, Mode=TwoWay}"
                                         Command="{Binding DataContext.SelectLintelFamilyCommand,
-                                            RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}"
+                                            RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
                                         CommandParameter="{Binding}" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </DockPanel>
                     
-                    <StackPanel
-                        Grid.Column="1">
+                    <StackPanel Grid.Column="1">
                         <edits:ComboBoxControl
                             WidthTextBlock="250"
                             TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelWidthParamLabel}" 
@@ -156,7 +169,9 @@
         </edits:CustomGroupEditControl>
         
         <edits:CustomGroupEditControl
-            VerticalAlignment="Top"
+            x:Name="_openingFamiliesGroup"
+            Grid.Row="1"
+            VerticalAlignment="Stretch"
             Icon="{ui:SymbolIcon scanText24}"
             Header="{me:LocalizationSource FamilySettingsPage.OpeningFamilies}">
                 
@@ -183,14 +198,12 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </ui:AutoSuggestBox>
-
                         
                         <ListBox
                             Background="Transparent"
                             BorderThickness="0"
                             Style="{StaticResource SettingsListStyle}"
                             ItemContainerStyle="{StaticResource SettingsCheckListItemStyle}"
-                            MaxHeight="400"
                             ItemsSource="{Binding FilteredOpeningFamilies}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate
@@ -203,8 +216,11 @@
                         </ListBox>
                     </DockPanel>
                     
-                    <StackPanel
-                        Grid.Column="1">
+                    <ScrollViewer
+                        Grid.Column="1"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
                         <edits:ComboBoxControl
                             WidthTextBlock="250"
                             TextTextBlock="{me:LocalizationSource FamilySettingsPage.OpeningHeightParamLabel}" 
@@ -217,9 +233,9 @@
                             ItemsSource="{Binding OpeningParameters}"
                             SelectedValue="{Binding SelectedOpeningWidthParam}"/>
                     </StackPanel>
+                    </ScrollViewer>
                 </Grid>
             </edits:CustomGroupEditControl.EditControl>
         </edits:CustomGroupEditControl>
-        </StackPanel>
-    </ScrollViewer>
+    </Grid>
 </core:WpfUIPlatformPage>

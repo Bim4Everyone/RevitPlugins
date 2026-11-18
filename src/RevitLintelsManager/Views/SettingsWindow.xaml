@@ -38,7 +38,7 @@
         </Grid.RowDefinitions>
         <ui:TitleBar
             Grid.Row="0"
-            Icon="{ui:SymbolIcon BorderNone24, FontSize=20}"
+            Icon="{ui:SymbolIcon Settings24, FontSize=20}"
             Title="{me:LocalizationSource MainWindow.Title}"
             FontSize="14"
             FontWeight="DemiBold" />

@@ -41,15 +41,16 @@ internal class GeneralSettingsViewModel : BaseViewModel {
         SelectedPhase = Phases.FirstOrDefault(phase => phase.Name == settings.PhaseName);
         MinimalHeightText = settings.MinimalHeightAboveOpeningMm.ToString(CultureInfo.CurrentCulture);
         var selectedNames = (settings.StructureWallTypeNames ?? []).ToHashSet();
-        StructureWalls = new ObservableCollection<WallTypeViewModel>(repository.RevitWalls
-            .OrderBy(wall => wall.WallType.Name).Select(wall => new WallTypeViewModel {
-                Name = wall.WallType.Name,
-                WallType = wall.WallType,
-                IsChecked = selectedNames.Contains(wall.WallType.Name)
-            }));
-        foreach(string name in selectedNames.Except(StructureWalls.Select(wall => wall.Name))) {
-            StructureWalls.Add(new WallTypeViewModel { Name = name, IsChecked = true });
+        var walls = repository.RevitWalls.Select(wall => new WallTypeViewModel {
+            Name = wall.WallType.Name,
+            WallType = wall.WallType,
+            IsChecked = selectedNames.Contains(wall.WallType.Name)
+        }).ToList();
+        foreach(string name in selectedNames.Except(walls.Select(wall => wall.Name))) {
+            walls.Add(new WallTypeViewModel { Name = name, IsChecked = true });
         }
+        StructureWalls = new ObservableCollection<WallTypeViewModel>(walls
+            .OrderByDescending(wall => wall.IsChecked).ThenBy(wall => wall.Name));
         foreach(var wall in StructureWalls) {
             wall.PropertyChanged += OnWallChanged;
         }

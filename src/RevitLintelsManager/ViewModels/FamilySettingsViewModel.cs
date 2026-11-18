@@ -60,7 +60,7 @@ internal class FamilySettingsViewModel : BaseViewModel {
         LintelFamilyViewModels = new ObservableCollection<FamilyViewModel>(
             _revitRepository.LintelFamilies.OrderBy(family => family.Family.Name).Select(CreateFamilyViewModel));
         OpeningFamilyViewModels = new ObservableCollection<FamilyViewModel>(
-            _revitRepository.OpeningFamilies.OrderBy(family => family.Family.Name).Select(CreateFamilyViewModel));
+            _revitRepository.OpeningFamilies.Select(CreateFamilyViewModel));
         if(settings.LintelFamilySettings?.LintelFamily is not null) {
             _familySettings[settings.LintelFamilySettings.LintelFamily] = settings.LintelFamilySettings;
         }
@@ -75,6 +75,8 @@ internal class FamilySettingsViewModel : BaseViewModel {
                 OpeningFamilyViewModels.Add(new FamilyViewModel { Name = name });
             }
         }
+        OpeningFamilyViewModels = new ObservableCollection<FamilyViewModel>(OpeningFamilyViewModels
+            .OrderByDescending(family => selectedNames.Contains(family.Name)).ThenBy(family => family.Name));
         SelectedOpeningFamilyViewModels = [];
         foreach(var family in OpeningFamilyViewModels) {
             family.IsChecked = selectedNames.Contains(family.Name);
