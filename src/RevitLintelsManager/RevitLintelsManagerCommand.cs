@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
@@ -13,14 +13,13 @@ using dosymep.Serializers;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
-using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
 using RevitLintelsManager.Models;
 using RevitLintelsManager.Models.Configs;
 using RevitLintelsManager.Models.Rules;
+using RevitLintelsManager.Services;
 using RevitLintelsManager.ViewModels;
 using RevitLintelsManager.Views;
 
@@ -38,7 +37,9 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
         // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
-        
+
+        SettingsPlatformServices.Configure(kernel);
+
         // Настройка доступа к провайдеру по навигации страниц
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
@@ -93,9 +94,6 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        // Используем сервис обновления тем для WinUI
-        kernel.UseWpfUIThemeUpdater();
-
         // Настройка запуска окна
         kernel.BindMainWindow<SettingsViewModel, SettingsWindow>();
 
@@ -117,7 +115,7 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
         
         if (lintelManagerSettings is null) {
             ShowSettingsWarningWindow(messageBoxService, localizationService);
-            throw new OperationCanceledException();
+            return;
         }
         
         var lintelManagerConfigResolver = kernel.Get<LintelManagerConfigResolver>();
@@ -127,11 +125,10 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
 
         if(!lintelManagerConfigValidator.Validate(lintelManagerConfig)) {
             ShowSettingsWarningWindow(messageBoxService, localizationService);
-            throw new OperationCanceledException();       
+            return;
         }
 
-        // Вызывает стандартное уведомление
-        Notification(kernel.Get<SettingsWindow>());
+        SettingsPlatformServices.ShowSettingsWindow(kernel);
     }
     
     private static void ShowSettingsWarningWindow( IMessageBoxService messageBoxService, ILocalizationService localizationService) {

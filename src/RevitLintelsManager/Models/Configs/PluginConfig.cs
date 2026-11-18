@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -74,7 +74,7 @@ public class SystemPluginConfig {
     public string DefaultLintelConfigRuleName  => "A101";
     public string DefaultLintelFixParamName  => "ФОП_Фиксация решения";
     public double DefaultMinimalHeightAboveLintelMm  => 100;
-    public IEnumerable<string> DefaultStructureWallTypeNames  => [];
+    public IEnumerable<string> StructureWallNameParts => ["(ЖБ)", "(КР)"];
     public string DefaultPhaseName  => "Основная планировка";
     public string DefaultRuleFolderName  => "Rules";
     public string DefaultSettingFolderName  => "dosymep";

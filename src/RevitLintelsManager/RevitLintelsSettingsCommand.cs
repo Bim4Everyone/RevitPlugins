@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using System.Windows;
 
@@ -11,14 +11,13 @@ using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
-using dosymep.WpfUI.Core.Ninject;
-using dosymep.Xpf.Core.Ninject;
 
 using Ninject;
 
 using RevitLintelsManager.Models;
 using RevitLintelsManager.Models.Configs;
 using RevitLintelsManager.Models.Rules;
+using RevitLintelsManager.Services;
 using RevitLintelsManager.ViewModels;
 using RevitLintelsManager.Views;
 
@@ -36,7 +35,9 @@ public class RevitLintelsSettingsCommand : BasePluginCommand {
     protected override void Execute(UIApplication uiApplication) {
        // Создание контейнера зависимостей плагина с сервисами из платформы
         using IKernel kernel = uiApplication.CreatePlatformServices();
-        
+
+        SettingsPlatformServices.Configure(kernel);
+
         // Настройка доступа к провайдеру по навигации страниц
         kernel.Bind<INavigationViewPageProvider>()
             .To<NavigationViewPageProvider>()
@@ -91,9 +92,6 @@ public class RevitLintelsSettingsCommand : BasePluginCommand {
             .ToSelf()
             .InSingletonScope();
 
-        // Используем сервис обновления тем для WinUI
-        kernel.UseWpfUIThemeUpdater();
-
         // Настройка локализации,
         // получение имени сборки откуда брать текст
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
@@ -104,24 +102,9 @@ public class RevitLintelsSettingsCommand : BasePluginCommand {
             $"/{assemblyName};component/assets/localization/language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
         
-        var messageBoxService = kernel.Get<IMessageBoxService>();
-        var localizationService = kernel.Get<ILocalizationService>();
-        
-        var pluginConfigRepository = kernel.Get<PluginConfigRepository>();
-        var lintelManagerSettings = pluginConfigRepository.LoadSettings() 
-                                    ?? pluginConfigRepository.GetDefaultLintelManagerSettings();
-
-        var lintelManagerConfigResolver = kernel.Get<LintelManagerConfigResolver>();
-        var lintelManagerConfig = lintelManagerConfigResolver.BuildLintelManagerConfig(lintelManagerSettings);
-        
-        kernel.Bind<LintelManagerConfig>()
-            .ToMethod(_ => lintelManagerConfig)
-            .InSingletonScope();
-
         // Настройка запуска окна
         kernel.BindMainWindow<SettingsViewModel, SettingsWindow>();
 
-        // Вызывает стандартное уведомление
-        Notification(kernel.Get<SettingsWindow>());
+        SettingsPlatformServices.ShowSettingsWindow(kernel);
     }
 }

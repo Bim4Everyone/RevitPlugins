@@ -5,110 +5,139 @@ using System.Linq;
 using Autodesk.Revit.DB;
 
 using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.CustomParams;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitLintelsManager.Models.Configs;
 
 namespace RevitLintelsManager.Models;
 
-internal class ParamService(IRevitParamFactory revitParamFactory) {
-    public IEnumerable<RevitParam> CreateRevitParams(Document document, FamilySymbol symbol, FamilyInstance instance) {
-        var symbolParams =  CreateRevitParams(document, symbol);
-        if(instance is null) {
-            return symbolParams;
-        }
-        var instanceParams = CreateRevitParams(document, instance);
-        return symbolParams.Union(instanceParams);
+internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService loggerService) {
+    public (IList<RevitParam> Parameters, IList<RevitParam> InstanceParameters) CreateRevitParams(
+        Document document, FamilySymbol symbol, FamilyInstance instance) {
+        var typeParams = CreateRevitParams(document, symbol).ToArray();
+        var instanceParams = instance is null
+            ? GetFamilyInstanceParams(document, symbol.Family)
+            : CreateRevitParams(document, instance).ToArray();
+        return (typeParams.Union(instanceParams).ToArray(), instanceParams);
     }
 
-    private IEnumerable<RevitParam> CreateRevitParams(Document document, Element element) {
-        return element.GetOrderedParameters()
-            .Select(parameter => TryCreateRevitParam(document, parameter))
-            .Where(revitParam => revitParam is not null);
-    }
-    
-    private RevitParam TryCreateRevitParam(Document document, Parameter parameter) {
-        if(!revitParamFactory.CanCreate(document, parameter.Id)) {
-            return null;
+    public static bool IsYesNo(RevitParam parameter) {
+        if(parameter is null || parameter.StorageType != StorageType.Integer) {
+            return false;
         }
 
         try {
-            return revitParamFactory.Create(document, parameter.Id);
+            return parameter.UnitType == SpecTypeId.Boolean.YesNo;
+        } catch(ArgumentOutOfRangeException) {
+            // Тип некоторых встроенных параметров определяется только при чтении UnitType.
+            // Неизвестный тип нельзя считать параметром «Да/Нет».
+            return false;
+        }
+    }
+
+    public RevitParam GetLintelParam(RevitFamily family, string paramName, StorageType storageType) {
+        return family?.OrderedParams?.FirstOrDefault(param =>
+            param.Name == paramName && param.StorageType == storageType);
+    }
+
+    public RevitParam GetOpeningParam(RevitFamily[] families, string paramName, StorageType storageType) {
+        if(families is null || families.Length == 0) {
+            return null;
+        }
+        var parameter = GetLintelParam(families[0], paramName, storageType);
+        return parameter is not null && families.All(family => family.OrderedParams.Any(param =>
+            param.Name == parameter.Name && param.StorageType == storageType)) ? parameter : null;
+    }
+
+    public RevitParam GetFixParam(LintelFamilyConfig lintelConfig,
+        OpeningFamilyConfig openingConfig, string paramName) {
+        if(lintelConfig?.RevitLintelFamily is null || openingConfig?.RevitOpeningFamily is null) {
+            return null;
+        }
+        return GetCommonFixParams(new[] { lintelConfig.RevitLintelFamily }
+                .Concat(openingConfig.RevitOpeningFamily))
+            .FirstOrDefault(param => param.Name == paramName);
+    }
+
+    public IEnumerable<RevitParam> GetCommonFixParams(IEnumerable<RevitFamily> families) {
+        var familyArray = families.ToArray();
+        if(familyArray.Length == 0) {
+            return [];
+        }
+        return familyArray[0].InstanceParams.Where(IsYesNo)
+            .Where(param => familyArray.All(family => family.InstanceParams.Any(other =>
+                other.Equals(param) && IsYesNo(other))))
+            .OrderBy(param => param.Name)
+            .ToArray();
+    }
+
+    private IEnumerable<RevitParam> CreateRevitParams(Document document, Element element) {
+        return element.Parameters.Cast<Parameter>()
+            .Select(parameter => TryCreateRevitParam(document, parameter.Id)
+                ?? CreateCustomParam(parameter.Definition, parameter.StorageType))
+            .ToArray();
+    }
+
+    private RevitParam TryCreateRevitParam(Document document, ElementId parameterId) {
+        if(!revitParamFactory.CanCreate(document, parameterId)) {
+            return null;
+        }
+        try {
+            return revitParamFactory.Create(document, parameterId);
         } catch(ArgumentOutOfRangeException) {
             return null;
         }
     }
-    
-    
-    public RevitParam GetLintelParam(RevitFamily revitLintelFamily, string paramName, StorageType storageType) {
-        return revitLintelFamily.OrderedParams
-            .FirstOrDefault(param => param.Name.Equals(paramName) && param.StorageType == storageType);
-    }
-    
-    public RevitParam GetOpeningParam(RevitFamily[] revitOpeningFamilies, string paramName, StorageType storageType) {
-        if (revitOpeningFamilies == null || revitOpeningFamilies.Length == 0) {
-            return null;
-        }
 
-        bool existsInAll = revitOpeningFamilies.All(f =>
-            f.OrderedParams.Any(p => p.Name == paramName));
-
-        return !existsInAll 
-            ? null 
-            : revitOpeningFamilies[0].OrderedParams
-                .FirstOrDefault(param => param.Name.Equals(paramName) && param.StorageType == storageType);
-    }
-    
-    
-    public RevitParam GetFixParam(Document document, LintelFamilyConfig lintelFamilyConfig, OpeningFamilyConfig openingFamilyConfig, string paramName, StorageType storageType) {
-        if(lintelFamilyConfig is null || openingFamilyConfig is null) {
-            return null;
-        }
-        
-        var allInstances = lintelFamilyConfig.RevitLintelFamily.FamilyInstances
-            .Concat(openingFamilyConfig.RevitOpeningFamily.SelectMany(family => family.FamilyInstances))
-            .GroupBy(instance => instance.Symbol.Family.Id)
-            .ToArray();
-
-        if(allInstances.Length == 0) {
-            return null;
-        }
-        
-        bool existsInAll = allInstances
-            .All(group => {
-                var instance = group.First();
-                return instance.IsExistsParam(paramName);
-            });
-        
-        if(!existsInAll) {
-            return null;
-        }
-        
-        var instance = allInstances[0].First();
-        var param = CreateRevitParamByName(document, instance, paramName);
-
-        if(param is not null && param.StorageType == storageType) {
-            return param;
-        }
-        
-        return null;
-    }
-    
-    private RevitParam CreateRevitParamByName(Document document, Element element, string paramName) {
-        if(TryGetParam(element, paramName, out var param) && revitParamFactory.CanCreate(document, param.Id)) {
-            return revitParamFactory.Create(document, param.Id);
-        }
-        return null;
-    }
-    
-    private static bool TryGetParam(Element element, string paramName, out Parameter param) {
+    private RevitParam[] GetFamilyInstanceParams(Document document, Family family) {
+        var parameters = new List<RevitParam>();
+        Document familyDocument = null;
         try {
-            param = element.GetParam(paramName);
-            return param != null;
-        } catch {
-            param = null;
-            return false;
+            if(family.IsEditable) {
+                familyDocument = document.EditFamily(family);
+                parameters.AddRange(familyDocument.FamilyManager.GetParameters()
+                    .Where(parameter => parameter.IsInstance)
+                    .Select(parameter => CreateFamilyParam(document, parameter)));
+            }
+        } catch(Exception ex) {
+            loggerService.Warning(ex, family.Name);
+        } finally {
+            familyDocument?.Close(false);
         }
+
+        var bindings = document.ParameterBindings.ForwardIterator();
+        while(bindings.MoveNext()) {
+            if(bindings.Current is InstanceBinding binding && binding.Categories.Contains(family.FamilyCategory)
+                && bindings.Key is InternalDefinition definition) {
+                var parameter = TryCreateRevitParam(document, definition.Id);
+                if(parameter is not null) {
+                    parameters.Add(parameter);
+                }
+            }
+        }
+        return parameters.Distinct().ToArray();
+    }
+
+    private RevitParam CreateFamilyParam(Document document, FamilyParameter parameter) {
+        if(parameter.IsShared) {
+            var sharedParameter = SharedParameterElement.Lookup(document, parameter.GUID);
+            if(sharedParameter is not null) {
+                var result = TryCreateRevitParam(document, sharedParameter.Id);
+                if(result is not null) {
+                    return result;
+                }
+            }
+        }
+        return CreateCustomParam(parameter.Definition, parameter.StorageType);
+    }
+
+    private static RevitParam CreateCustomParam(Definition definition, StorageType storageType) {
+        return new CustomParam(definition.Name) {
+            Name = definition.Name,
+            StorageType = storageType,
+            UnitType = definition.GetDataType()
+        };
     }
 }

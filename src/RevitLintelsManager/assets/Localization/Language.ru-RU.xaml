@@ -1,15 +1,70 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
-    
-    
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <system:String x:Key="MainWindow.Settings">Настройки</system:String>
+    <system:String x:Key="MainWindow.PlacementSettings">Настройки расстановки</system:String>
+    <system:String x:Key="MainWindow.GeneralSettings">Настройки общие</system:String>
+    <system:String x:Key="Common.Ok">ОК</system:String>
+    <system:String x:Key="Common.Error">Ошибка настроек</system:String>
+    <system:String x:Key="Search.Family">Поиск по имени семейства</system:String>
+    <system:String x:Key="Search.WallType">Поиск по имени типоразмера</system:String>
+    <system:String x:Key="General.FixParameter">Параметр блокировки для семейств проёмов и перемычек</system:String>
+    <system:String x:Key="General.Phase">Стадия</system:String>
+    <system:String x:Key="General.MinimalHeight">Минимальная толщина кладки над проёмом, при которой ставится перемычка, мм</system:String>
+    <system:String x:Key="General.Millimeters">Миллиметры</system:String>
+    <system:String x:Key="General.StructureWalls">Настройка железобетонных стен</system:String>
+    <system:String x:Key="Validation.SelectLintelFamily">Выберите семейство перемычки.</system:String>
+    <system:String x:Key="Validation.SelectOpeningFamilies">Выберите хотя бы одно семейство проёмов.</system:String>
+    <system:String x:Key="Validation.SelectFamilyParameters">Выберите все параметры перемычки и проёмов.</system:String>
+    <system:String x:Key="Validation.SelectFixParameter">Выберите общий для выбранных семейств параметр экземпляра типа «Да/Нет».</system:String>
+    <system:String x:Key="Validation.SelectPhase">Выберите стадию проекта.</system:String>
+    <system:String x:Key="Validation.MinimalHeight">Введите неотрицательную толщину кладки над проёмом в миллиметрах.</system:String>
+    <system:String x:Key="Validation.SelectStructureWalls">Отметьте типы железобетонных стен.</system:String>
+    <system:String x:Key="Validation.MissingStructureWall">Сохранённый тип железобетонной стены отсутствует в проекте. Снимите его отметку.</system:String>
+    <system:String x:Key="Validation.SelectConfig">Выберите или создайте конфигурацию правил.</system:String>
+    <system:String x:Key="Validation.ConfigRules">Конфигурация должна иметь корректное имя и хотя бы одну вкладку правил.</system:String>
+    <system:String x:Key="Validation.RuleName">Имена вкладок правил должны быть заполнены и не повторяться.</system:String>
+    <system:String x:Key="Validation.EmptyRules">Добавьте хотя бы один диапазон ширины проёма.</system:String>
+    <system:String x:Key="Validation.RuleDimensions">Ширина и опирание должны быть положительными целыми числами; конец диапазона не меньше начала.</system:String>
+    <system:String x:Key="Validation.RuleSequence">Диапазоны должны идти без пересечений и пропусков: следующий начинается с предыдущего максимума + 1 мм.</system:String>
+    <system:String x:Key="Validation.MissingLintelType">Выберите существующий типоразмер выбранного семейства перемычки.</system:String>
+    <system:String x:Key="Validation.MissingWallType">Назначенный тип стены отсутствует в проекте. Снимите его отметку.</system:String>
+    <system:String x:Key="Validation.DuplicateWall">Тип стены может быть назначен только одной вкладке конфигурации.</system:String>
+    <system:String x:Key="Validation.RulesFolder">Не удалось открыть папку пользовательских правил.</system:String>
+    <system:String x:Key="Dialog.Name">Имя</system:String>
+    <system:String x:Key="Dialog.InvalidName">Введите уникальное имя. Для конфигурации нельзя использовать имя A101, служебные имена Windows и недопустимые символы имени файла.</system:String>
+    <system:String x:Key="Config.Current">Текущая конфигурация</system:String>
+    <system:String x:Key="Config.Create">Создать конфигурацию</system:String>
+    <system:String x:Key="Config.NewName">Новая конфигурация</system:String>
+    <system:String x:Key="Config.Import">Импортировать JSON</system:String>
+    <system:String x:Key="Config.Save">Подготовить конфигурацию к сохранению</system:String>
+    <system:String x:Key="Config.SaveAs">Сохранить как…</system:String>
+    <system:String x:Key="Config.Delete">Удалить конфигурацию</system:String>
+    <system:String x:Key="Config.Copy">Копировать для текущего проекта</system:String>
+    <system:String x:Key="Config.JsonFilter">Файлы JSON (*.json)|*.json</system:String>
+    <system:String x:Key="Config.InvalidFile">Файл не содержит конфигурацию правил перемычек.</system:String>
+    <system:String x:Key="Config.ReplaceConfirm">Конфигурация с этим именем уже существует. Заменить её текущими правилами?</system:String>
+    <system:String x:Key="Config.DeleteConfirm">Удалить конфигурацию после сохранения настроек?</system:String>
+    <system:String x:Key="Config.Staged">Конфигурация будет записана при сохранении настроек.</system:String>
+    <system:String x:Key="Config.Exported">JSON сохранён. Локальная копия и выбор конфигурации будут сохранены вместе с настройками.</system:String>
+    <system:String x:Key="Config.ReadOnlyNote">Корпоративные правила защищены от изменений. Назначения типов стен сохраняются для текущего проекта.</system:String>
+    <system:String x:Key="Config.LoadErrors">Не удалось прочитать следующие файлы правил:</system:String>
+    <system:String x:Key="Rule.Create">Добавить правило стены</system:String>
+    <system:String x:Key="Rule.Rename">Переименовать правило стены</system:String>
+    <system:String x:Key="Rule.Delete">Удалить правило стены</system:String>
+    <system:String x:Key="Rule.WallTypes">Типоразмеры стен</system:String>
+    <system:String x:Key="Rule.Ranges">Правила подбора перемычек</system:String>
+    <system:String x:Key="Rule.OpeningWidth">Ширина, мм</system:String>
+    <system:String x:Key="Rule.Support">Опирание, мм</system:String>
+    <system:String x:Key="Rule.LintelType">Типоразмер перемычки</system:String>
+    <system:String x:Key="Rule.AddRange">Добавить диапазон</system:String>
+    <system:String x:Key="Rule.DeleteRange">Удалить диапазон</system:String>
     <system:String x:Key="MainWindow.Title">Настройки менеджера перемычек</system:String>
     <system:String x:Key="MainWindow.FamilySettings">Настройки семейств</system:String>
-    
     <system:String x:Key="FamilySettingsPage.LintelFamilies">Соответствие параметров плагина и перемычки</system:String>
     <system:String x:Key="FamilySettingsPage.OpeningFamilies">Соответствие параметров плагина и проемов</system:String>
-    
-    <system:String x:Key="FamilySettingsPage.LintelWidthParamLabel">Ширина перемычки</system:String>
+    <system:String x:Key="FamilySettingsPage.LintelWidthParamLabel">Ширина проёма</system:String>
     <system:String x:Key="FamilySettingsPage.LintelThicknessParamLabel">Толщина перемычки</system:String>
     <system:String x:Key="FamilySettingsPage.LintelRightOffsetParamLabel">Опирание справа</system:String>
     <system:String x:Key="FamilySettingsPage.LintelLeftOffsetParamLabel">Опирание слева</system:String>
@@ -17,28 +72,16 @@
     <system:String x:Key="FamilySettingsPage.LintelLeftCornerParamLabel">Уголок слева</system:String>
     <system:String x:Key="FamilySettingsPage.LintelRightWeldingParamLabel">Крепление на металл справа</system:String>
     <system:String x:Key="FamilySettingsPage.LintelLeftWeldingParamLabel">Крепление на металл слева</system:String>
-    
     <system:String x:Key="FamilySettingsPage.OpeningHeightParamLabel">Высота проема</system:String>
     <system:String x:Key="FamilySettingsPage.OpeningWidthParamLabel">Ширина проема</system:String>
-    
-    
     <system:String x:Key="FamilySettingsViewModel.ParamNoSelect">&lt; Параметр не выбран &gt;</system:String>
     <system:String x:Key="FamilySettingsViewModel.NoLintelFamilies">&lt; Семейства перемычек отсутствует &gt;</system:String>
     <system:String x:Key="FamilySettingsViewModel.NoOpeningFamilies">&lt; Семейства проемов отсутствует &gt;</system:String>
-    
     <system:String x:Key="MainWindow.ButtonOk">Сохранить</system:String>
     <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
-
-    
-    <system:String x:Key="MainWindow.Hello">Привет, Revit!</system:String>
-    <system:String x:Key="MainWindow.HelloCheck">Введите значение сохраняемого свойства.</system:String>
-    
-    
     <system:String x:Key="LintelConfigRuleResolver.DefaultRuleName">Без имени</system:String>
     <system:String x:Key="LintelConfigRuleResolver.DefaultRuleWallName">Стена</system:String>
-    
-    
     <system:String x:Key="RevitLintelsManagerCommand.SettingsCheckNecessaryMessageBody">Необходимо проверить настройки плагина</system:String>
     <system:String x:Key="RevitLintelsManagerCommand.SettingsCheckNecessaryMessageTitle">Ошибки настройки плагина</system:String>
-    
+    <system:String x:Key="Validation.MissingOpeningFamily">Сохранённое семейство проёмов отсутствует в проекте. Снимите его отметку.</system:String>
 </ResourceDictionary>

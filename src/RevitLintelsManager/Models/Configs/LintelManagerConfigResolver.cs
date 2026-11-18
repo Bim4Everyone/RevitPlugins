@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -8,125 +9,73 @@ using RevitLintelsManager.Models.Settings;
 
 namespace RevitLintelsManager.Models.Configs;
 
-internal class LintelManagerConfigResolver {
-    private readonly RevitRepository _revitRepository;  
-    private readonly LintelConfigRuleResolver _lintelConfigRuleResolver;
-    
-    private readonly ParamService _paramService;
-    
-    public LintelManagerConfigResolver(
-        RevitRepository revitRepository, 
-        LintelConfigRuleResolver lintelConfigRuleResolver,
-        ParamService paramService) {
-        _revitRepository = revitRepository;
-        _lintelConfigRuleResolver = lintelConfigRuleResolver;
-        _paramService = paramService;
-    }
- 
-    public LintelManagerConfig BuildLintelManagerConfig(LintelManagerSettings lintelManagerSettings) {
-        var lintelFamilyConfig = BuildLintelFamilyConfig(lintelManagerSettings.LintelFamilySettings);
-        var openingFamilyConfig = BuildOpeningFamilyConfig(lintelManagerSettings.OpeningFamilySettings);
-        var lintelConfigRule = _lintelConfigRuleResolver.GetLintelConfigRule(lintelManagerSettings.LintelConfigRuleName);
-        
-        var fixParam = _paramService.GetFixParam(
-            _revitRepository.Document, 
-            lintelFamilyConfig, 
-            openingFamilyConfig, 
-            lintelManagerSettings.LintelFixParamName, 
-            StorageType.Integer);
-        
-        double? minimalHeightAboveOpeningMm = GetMinimalHeightAboveOpeningMm(lintelManagerSettings);
-        var structureWalls = GetStructureWalls(lintelManagerSettings.StructureWallTypeNames);
-        var phaseId = GetPhaseId(lintelManagerSettings);
-        
+internal class LintelManagerConfigResolver(RevitRepository repository,
+    LintelConfigRuleResolver ruleResolver, ParamService paramService) {
+    public LintelManagerConfig BuildLintelManagerConfig(LintelManagerSettings settings) {
+        if(settings is null) {
+            return null;
+        }
+        var lintelFamily = BuildLintelFamilyConfig(settings.LintelFamilySettings);
+        var openingFamilies = BuildOpeningFamilyConfig(settings.OpeningFamilySettings);
+        var source = ruleResolver.GetLintelConfigRule(settings.LintelConfigRuleName);
+        var config = source is null ? null : new LintelConfigRule {
+            RuleConfigName = source.RuleConfigName,
+            LintelPlaceRules = source.LintelPlaceRules?.Select(rule => new LintelPlaceRule {
+                LintelPlaceRuleName = rule?.LintelPlaceRuleName,
+                LintelRules = rule?.LintelRules,
+                WallTypeNames = (settings.LintelWallSettings ?? []).Where(wallSettings =>
+                    string.Equals(wallSettings.RuleConfigName, source.RuleConfigName,
+                        StringComparison.OrdinalIgnoreCase)
+                    && wallSettings.LintelPlaceRuleName == rule?.LintelPlaceRuleName)
+                    .SelectMany(wallSettings => wallSettings.WallTypeNames ?? []).ToArray()
+            }).ToArray()
+        };
         return new LintelManagerConfig {
-            LintelFamilyConfig = lintelFamilyConfig,
-            OpeningFamilyConfig = openingFamilyConfig,
-            LintelConfigRule = lintelConfigRule,
-            LintelFixParam = fixParam,
-            MinimalHeightAboveOpeningMm = minimalHeightAboveOpeningMm,
-            StructureWalls = structureWalls,
-            PhaseId = phaseId
+            LintelFamilyConfig = lintelFamily,
+            OpeningFamilyConfig = openingFamilies,
+            LintelConfigRule = config,
+            LintelFixParam = paramService.GetFixParam(lintelFamily, openingFamilies, settings.LintelFixParamName),
+            MinimalHeightAboveOpeningMm = settings.MinimalHeightAboveOpeningMm,
+            StructureWalls = GetStructureWalls(settings.StructureWallTypeNames),
+            PhaseId = repository.GetPhaseIdByName(settings.PhaseName)
         };
     }
 
-    private LintelFamilyConfig BuildLintelFamilyConfig(LintelFamilySettings lintelFamilySettings) {
-        var revitLintelFamily = _revitRepository.LintelFamilies
-            .FirstOrDefault(family => family.Family.Name.Equals(lintelFamilySettings.LintelFamily));
-
-        if(revitLintelFamily is not null) {
-            return new LintelFamilyConfig {
-                RevitLintelFamily = revitLintelFamily,
-                LintelWidth = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelWidth, StorageType.Double),
-                LintelThickness = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelThickness, StorageType.Double),
-                LintelRightOffset = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelRightOffset, StorageType.Double),
-                LintelLeftOffset = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelLeftOffset, StorageType.Double),
-                LintelRightCorner = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelRightCorner, StorageType.Double),
-                LintelLeftCorner = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelLeftCorner, StorageType.Double),
-                LintelRightWelding = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelRightWelding, StorageType.Double),
-                LintelLeftWelding = _paramService.GetLintelParam(revitLintelFamily, lintelFamilySettings.LintelLeftWelding, StorageType.Double)
-            };
-        }
-        return null;
-    }
-    
-    private OpeningFamilyConfig BuildOpeningFamilyConfig(OpeningFamilySettings openingFamilySettings) {
-        var revitOpeningFamily = openingFamilySettings.FamilyNames.ToHashSet();
-        
-        if(revitOpeningFamily.Count == 0) {
+    private LintelFamilyConfig BuildLintelFamilyConfig(LintelFamilySettings settings) {
+        if(settings is null) {
             return null;
         }
-
-        var revitOpeningFamilyInstances = _revitRepository.OpeningFamilies
-            .Where(family => revitOpeningFamily.Contains(family.Family.Name))
-            .ToArray();
-
-        if(revitOpeningFamilyInstances.Length != 0) {
-            return new OpeningFamilyConfig {
-                RevitOpeningFamily = revitOpeningFamilyInstances,
-                LintelOpeningHeight = _paramService.GetOpeningParam(revitOpeningFamilyInstances, openingFamilySettings.LintelOpeningHeight, StorageType.Double),
-                LintelOpeningWidth = _paramService.GetOpeningParam(revitOpeningFamilyInstances, openingFamilySettings.LintelOpeningWidth, StorageType.Double)
-            };
-        }
-        return null;
+        var family = repository.LintelFamilies.FirstOrDefault(item => item.Family.Name == settings.LintelFamily);
+        return family is null ? null : new LintelFamilyConfig {
+            RevitLintelFamily = family,
+            LintelWidth = paramService.GetLintelParam(family, settings.LintelWidth, StorageType.Double),
+            LintelThickness = paramService.GetLintelParam(family, settings.LintelThickness, StorageType.Double),
+            LintelRightOffset = paramService.GetLintelParam(family, settings.LintelRightOffset, StorageType.Double),
+            LintelLeftOffset = paramService.GetLintelParam(family, settings.LintelLeftOffset, StorageType.Double),
+            LintelRightCorner = paramService.GetLintelParam(family, settings.LintelRightCorner, StorageType.Integer),
+            LintelLeftCorner = paramService.GetLintelParam(family, settings.LintelLeftCorner, StorageType.Integer),
+            LintelRightWelding = paramService.GetLintelParam(family, settings.LintelRightWelding, StorageType.Integer),
+            LintelLeftWelding = paramService.GetLintelParam(family, settings.LintelLeftWelding, StorageType.Integer)
+        };
     }
 
-    private static double? GetMinimalHeightAboveOpeningMm(LintelManagerSettings lintelManagerSettings) {
-        double minimalHeightAboveOpeningMm = lintelManagerSettings.MinimalHeightAboveOpeningMm;
-        if(minimalHeightAboveOpeningMm >= 0) {
-            return minimalHeightAboveOpeningMm;
-        }
-        return null;
-    }
-
-    private ElementId GetPhaseId(LintelManagerSettings lintelManagerSettings) {
-        var savedPhaseId = _revitRepository.GetPhaseIdByName(lintelManagerSettings.PhaseName);
-        if(savedPhaseId == null) {
+    private OpeningFamilyConfig BuildOpeningFamilyConfig(OpeningFamilySettings settings) {
+        var names = (settings?.FamilyNames ?? []).ToHashSet();
+        var families = repository.OpeningFamilies.Where(family => names.Contains(family.Family.Name)).ToArray();
+        if(names.Count == 0 || families.Length != names.Count) {
             return null;
         }
-        return GetExistIds([savedPhaseId], _revitRepository.PhaseIds)
-            .FirstOrDefault();
+        return new OpeningFamilyConfig {
+            RevitOpeningFamily = families,
+            LintelOpeningHeight = paramService.GetOpeningParam(families, settings.LintelOpeningHeight,
+                StorageType.Double),
+            LintelOpeningWidth = paramService.GetOpeningParam(families, settings.LintelOpeningWidth, StorageType.Double)
+        };
     }
-    
-    private static IEnumerable<ElementId> GetExistIds(IEnumerable<ElementId> savedIds, IEnumerable<ElementId> existIds) {
-        var savedIdsArr = savedIds.ToArray();
-        var existIdsHashSet = existIds.ToHashSet();
 
-        if(savedIdsArr.Length != 0 || existIdsHashSet.Count != 0) {
-            return savedIdsArr
-                .Select(savedId => existIdsHashSet.FirstOrDefault(existId => existId == savedId))
-                .Where(savedId => savedId != null);
-        }
-        return null;
-    }
-    
     private IEnumerable<RevitWall> GetStructureWalls(IEnumerable<string> wallTypeNames) {
-        var names = wallTypeNames.ToHashSet();
-        var revitWalls = _revitRepository.RevitWalls.ToArray();
-        if(names.Count == 0 || revitWalls.Length == 0) {
-            return null;
-        }
-        return _revitRepository.RevitWalls
-            .Where(x => names.Contains(x.WallType.Name));
+        var names = (wallTypeNames ?? []).ToHashSet();
+        var walls = repository.RevitWalls.Where(wall => names.Contains(wall.WallType.Name)).ToArray();
+        return names.Count == walls.Length ? walls : null;
     }
 }

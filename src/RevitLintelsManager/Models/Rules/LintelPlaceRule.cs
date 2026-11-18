@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 
-using Autodesk.Revit.DB;
+using pyRevitLabs.Json;
 
 namespace RevitLintelsManager.Models;
 
 public class LintelPlaceRule {
     public string LintelPlaceRuleName { get; set; }
     public IEnumerable<LintelRule> LintelRules { get; set; }
-    public IEnumerable<string> WallTypeIds { get; set; }
+
+    [JsonIgnore]
+    public IEnumerable<string> WallTypeNames { get; set; } = [];
 }

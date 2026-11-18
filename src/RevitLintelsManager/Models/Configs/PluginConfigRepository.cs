@@ -1,4 +1,7 @@
-﻿using RevitLintelsManager.Models.Settings;
+﻿using System;
+using System.Linq;
+
+using RevitLintelsManager.Models.Settings;
 
 namespace RevitLintelsManager.Models.Configs;
 
@@ -6,7 +9,7 @@ internal class PluginConfigRepository {
     private readonly PluginConfig _pluginConfig;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
-    
+
     public PluginConfigRepository(
         PluginConfig pluginConfig, 
         SystemPluginConfig systemPluginConfig, 
@@ -17,6 +20,8 @@ internal class PluginConfigRepository {
     }
     
     
+    public string ConfigPath => _pluginConfig.ProjectConfigPath;
+
     public LintelManagerSettings LoadSettings() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
         return setting?.LintelManagerSettings;
@@ -26,8 +31,14 @@ internal class PluginConfigRepository {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                       ?? _pluginConfig.AddSettings(_revitRepository.Document);
 
+        var previousSettings = setting.LintelManagerSettings;
         setting.LintelManagerSettings = lintelManagerSettings;
-        _pluginConfig.SaveProjectConfig();
+        try {
+            _pluginConfig.SaveProjectConfig();
+        } catch {
+            setting.LintelManagerSettings = previousSettings;
+            throw;
+        }
     }
     
     public LintelManagerSettings GetDefaultLintelManagerSettings() {
@@ -37,7 +48,11 @@ internal class PluginConfigRepository {
             LintelConfigRuleName = _systemPluginConfig.DefaultLintelConfigRuleName,
             LintelFixParamName = _systemPluginConfig.DefaultLintelFixParamName,
             MinimalHeightAboveOpeningMm = _systemPluginConfig.DefaultMinimalHeightAboveLintelMm,
-            StructureWallTypeNames = _systemPluginConfig.DefaultStructureWallTypeNames,
+            StructureWallTypeNames = _revitRepository.RevitWalls
+                .Where(wall => _systemPluginConfig.StructureWallNameParts.Any(part =>
+                    wall.WallType.Name.IndexOf(part, StringComparison.OrdinalIgnoreCase) >= 0))
+                .Select(wall => wall.WallType.Name)
+                .ToArray(),
             PhaseName = _systemPluginConfig.DefaultPhaseName,
         };
     }

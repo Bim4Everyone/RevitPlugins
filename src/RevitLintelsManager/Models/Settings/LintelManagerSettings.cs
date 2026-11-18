@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-using Autodesk.Revit.DB;
-
 namespace RevitLintelsManager.Models.Settings;
 
 public class LintelManagerSettings {
@@ -12,5 +10,6 @@ public class LintelManagerSettings {
     public double MinimalHeightAboveOpeningMm { get; set; }
     public IEnumerable<string> StructureWallTypeNames { get; set; }
     public string PhaseName { get; set; }
+    public IEnumerable<LintelWallSettings> LintelWallSettings { get; set; } = [];
     
 }

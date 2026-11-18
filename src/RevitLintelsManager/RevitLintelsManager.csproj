@@ -1,6 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <UseWpfUI>true</UseWpfUI>
+        <UseDevExpress>false</UseDevExpress>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
+    <ItemGroup>
+        <Reference Remove="dosymep.Xpf.Core" />
+        <Reference Remove="dosymep.Xpf.Core.Ninject" />
+    </ItemGroup>
 </Project>

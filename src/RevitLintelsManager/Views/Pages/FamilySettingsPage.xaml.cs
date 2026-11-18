@@ -1,10 +1,6 @@
-﻿using System.Windows.Data;
-
-using Autodesk.Revit.DB;
+﻿using RevitLintelsManager.ViewModels;
 
 using dosymep.SimpleServices;
-
-using RevitLintelsManager.ViewModels;
 
 namespace RevitLintelsManager.Views.Pages;
 

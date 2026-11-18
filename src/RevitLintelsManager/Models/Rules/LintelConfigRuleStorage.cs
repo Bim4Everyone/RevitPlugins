@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
@@ -29,10 +30,27 @@ public class LintelConfigRuleStorage {
 
     // Метод получения пути сохраняемого пользовательского конфига
     public string GetProjectConfigRulePath(string lintelConfigRuleName) {
+        if(!IsValidRuleName(lintelConfigRuleName)) {
+            throw new ArgumentException(nameof(lintelConfigRuleName));
+        }
         string directory = ProjectConfigRuleDirectory;
         return !Directory.Exists(directory) 
             ? null 
             : Path.Combine(directory, lintelConfigRuleName + ".json");
+    }
+
+    public static bool IsValidRuleName(string name) {
+        if(string.IsNullOrWhiteSpace(name) || name.Length > 150 || name != name.Trim()
+            || name.EndsWith(".", StringComparison.Ordinal)
+            || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) {
+            return false;
+        }
+        string stem = name.Split('.')[0];
+        string[] reservedNames = ["CON", "PRN", "AUX", "NUL", "CLOCK$"];
+        return !reservedNames.Contains(stem, StringComparer.OrdinalIgnoreCase)
+               && !Enumerable.Range(1, 9).Any(index =>
+                   string.Equals(stem, "COM" + index, StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(stem, "LPT" + index, StringComparison.OrdinalIgnoreCase));
     }
 
     
@@ -76,9 +94,12 @@ public class LintelConfigRuleStorage {
     // Метод получения всех конфигов из папки пользователя
     private IList<string> GetProjectConfigRulePaths() {
         string directory = ProjectConfigRuleDirectory;
-        return !Directory.Exists(directory) 
-            ? [] 
-            : Directory.GetFiles(directory, "*.json");
+        try {
+            return !Directory.Exists(directory) ? [] : Directory.GetFiles(directory, "*.json");
+        } catch(Exception ex) {
+            _loggerService.Error(ex.Message);
+            return [];
+        }
     }
     
 }

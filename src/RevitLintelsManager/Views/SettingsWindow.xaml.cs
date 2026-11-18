@@ -1,14 +1,12 @@
-using System.Windows;
-using System.Windows.Data;
+﻿using System.Windows;
 using System.Windows.Threading;
-
-using Autodesk.Revit.DB;
 
 using dosymep.SimpleServices;
 
 using RevitLintelsManager.ViewModels;
 using RevitLintelsManager.Views.Pages;
 
+using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 
 namespace RevitLintelsManager.Views;
@@ -26,7 +24,8 @@ public partial class SettingsWindow {
         ILanguageService languageService,
         ILocalizationService localizationService,
         IUIThemeService uiThemeService,
-        IUIThemeUpdaterService themeUpdaterService) 
+        IUIThemeUpdaterService themeUpdaterService,
+        IContentDialogService contentDialogService)
         : base(loggerService,
             serializationService,
             languageService,
@@ -34,6 +33,9 @@ public partial class SettingsWindow {
             uiThemeService,
             themeUpdaterService) {
         InitializeComponent();
+
+        contentDialogService.SetDialogHost(_rootContentDialog);
+        DataContextChanged += OnDataContextChanged;
         
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
 
@@ -46,8 +48,17 @@ public partial class SettingsWindow {
     
     public override string ProjectConfigName => nameof(SettingsWindow);
     
-    private void ButtonOk_Click(object sender, RoutedEventArgs e) {
+    private void CloseAcceptedView() {
         DialogResult = true;
+    }
+
+    private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
+        if(e.OldValue is SettingsViewModel oldViewModel) {
+            oldViewModel.CloseRequested -= CloseAcceptedView;
+        }
+        if(e.NewValue is SettingsViewModel viewModel) {
+            viewModel.CloseRequested += CloseAcceptedView;
+        }
     }
 
     private void ButtonCancel_Click(object sender, RoutedEventArgs e) {

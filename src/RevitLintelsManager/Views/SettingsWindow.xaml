@@ -1,59 +1,50 @@
-<core:WpfUIPlatformWindow
+﻿<core:WpfUIPlatformWindow
     x:Class="RevitLintelsManager.Views.SettingsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:pages="clr-namespace:RevitLintelsManager.Views.Pages"
-    xmlns:vms="clr-namespace:RevitLintelsManager.ViewModels"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:pages="clr-namespace:RevitLintelsManager.Views.Pages"
+    xmlns:vms="clr-namespace:RevitLintelsManager.ViewModels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
-   
     mc:Ignorable="d"
     Title="{me:LocalizationSource MainWindow.Title}"
-    
-    Height="1000"
-    Width="1400"
-    
-    MinHeight="1000"
-    MinWidth="1400"
-   
+    Height="850"
+    Width="1450"
+    MinHeight="850"
+    MinWidth="1450"
     d:DataContext="{d:DesignInstance vms:SettingsViewModel, IsDesignTimeCreatable=False}">
-
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadViewCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                    Source="Styles.xaml" />
+                <ResourceDictionary Source="Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Controls/ContentDialog/ContentDialog.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
         <ui:TitleBar
             Grid.Row="0"
-            Icon="{ui:SymbolIcon borderNone24, FontSize=20}"
+            Icon="{ui:SymbolIcon BorderNone24, FontSize=20}"
             Title="{me:LocalizationSource MainWindow.Title}"
             FontSize="14"
             FontWeight="DemiBold" />
-        
         <ui:NavigationView
-            Grid.Row="1"
             x:Name="_rootNavigationView"
+            Grid.Row="1"
             FrameMargin="0"
             OpenPaneLength="300"
             IsPaneOpen="True"
@@ -61,55 +52,90 @@
             IsBackButtonVisible="Collapsed"
             IsPaneVisible="True"
             IsPaneToggleVisible="True"
-            PaneTitle="{me:LocalizationSource MainWindow.Settings}"
-            BreadcrumbBar="{Binding ElementName=_breadcrumbBar}">
-
+            PaneTitle="{me:LocalizationSource MainWindow.Settings}">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Height="50"
-                    Content="{me:LocalizationSource MainWindow.FamilySettings}"
                     FontSize="20"
                     HorizontalAlignment="Stretch"
+                    Content="{me:LocalizationSource MainWindow.FamilySettings}"
                     TargetPageType="{x:Type pages:FamilySettingsPage}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="Settings24" FontSize="25" />
+                        <ui:SymbolIcon Symbol="Settings24" FontSize="25"/>
                     </ui:NavigationViewItem.Icon>
                     <ui:NavigationViewItem.InfoBadge>
                         <ui:InfoBadge
                             Style="{StaticResource RoundInfoBadgeStyle}"
-                            Visibility="{Binding Path=HasFamilySettingsErrors,
-                            Converter={StaticResource BooleanToVisibilityConverter}}">
-                        </ui:InfoBadge>
+                            Visibility="{Binding HasFamilySettingsErrors, 
+                            Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem
+                    Height="50"
+                    FontSize="20"
+                    HorizontalAlignment="Stretch"
+                    Content="{me:LocalizationSource MainWindow.PlacementSettings}"
+                    TargetPageType="{x:Type pages:PlacementSettingsPage}">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="slideSettings24" FontSize="25"/>
+                    </ui:NavigationViewItem.Icon>
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Style="{StaticResource RoundInfoBadgeStyle}"
+                            Visibility="{Binding HasPlacementSettingsErrors, 
+                            Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </ui:NavigationViewItem.InfoBadge>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem
+                    Height="50"
+                    FontSize="20"
+                    HorizontalAlignment="Stretch"
+                    Content="{me:LocalizationSource MainWindow.GeneralSettings}"
+                    TargetPageType="{x:Type pages:GeneralSettingsPage}">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="Options24" FontSize="25"/>
+                    </ui:NavigationViewItem.Icon>
+                    <ui:NavigationViewItem.InfoBadge>
+                        <ui:InfoBadge
+                            Style="{StaticResource RoundInfoBadgeStyle}"
+                            Visibility="{Binding HasGeneralSettingsErrors, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </ui:NavigationViewItem.InfoBadge>
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
         </ui:NavigationView>
-
-        <StackPanel
+        <Grid
             Grid.Row="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Right">
-
+            Margin="12,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
             <ui:TextBlock
-                Margin="10"
+                Margin="8"
                 Foreground="Orange"
                 VerticalAlignment="Center"
+                TextWrapping="Wrap"
                 Text="{Binding ErrorText}" />
-
             <ui:Button
-                Margin="10"
-                Width="100"
+                Grid.Column="1"
+                Margin="8,0"
+                MinWidth="110"
                 Appearance="Info"
+                IsDefault="True"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
-                Click="ButtonOk_Click"
                 Command="{Binding AcceptViewCommand}" />
-
             <ui:Button
-                Margin="10"
-                Width="100"
+                Grid.Column="2"
+                Margin="8,0"
+                MinWidth="110"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
-        </StackPanel>
+        </Grid>
+        <ContentPresenter
+            x:Name="_rootContentDialog"
+            Grid.RowSpan="3"
+            Panel.ZIndex="10" />
     </Grid>
 </core:WpfUIPlatformWindow>

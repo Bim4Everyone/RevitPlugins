@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -13,6 +13,7 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
     private IEnumerable<RevitFamily> _lintelFamilies;
     private IEnumerable<RevitFamily> _openingFamilies;
     private IEnumerable<ElementId> _phaseIds;
+    private IEnumerable<RevitWall> _revitWalls;
     
     
     public UIApplication UIApplication { get; } = uiApplication;
@@ -23,7 +24,7 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
     
     public IEnumerable<RevitFamily> LintelFamilies => _lintelFamilies ??= GetLintelFamilies();
     public IEnumerable<RevitFamily> OpeningFamilies => _openingFamilies ??= GetOpeningFamilies();
-    public IEnumerable<RevitWall> RevitWalls => GetRevitWalls();
+    public IEnumerable<RevitWall> RevitWalls => _revitWalls ??= GetRevitWalls().ToArray();
     public IEnumerable<ElementId> PhaseIds => _phaseIds ??= GetPhaseIds();
     
     /// <summary>
@@ -84,13 +85,15 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
                 var instances = instancesByFamilyId[group.Key].ToList();
                 var firstInstance = instances.FirstOrDefault();
 
-                return new RevitFamily {
+                var family = new RevitFamily {
                     Family = firstSymbol.Family,
                     FamilySymbols = group.ToList(),
-                    FamilyInstances = instancesByFamilyId[group.Key].ToList(),
-                    OrderedParams = paramService.CreateRevitParams(Document, firstSymbol, firstInstance)
+                    FamilyInstances = instances
                 };
-            });
+                family.SetParameterProvider(() =>
+                    paramService.CreateRevitParams(Document, firstSymbol, firstInstance));
+                return family;
+            }).ToArray();
     }
     
     private IEnumerable<WallType> GetWallTypes() {

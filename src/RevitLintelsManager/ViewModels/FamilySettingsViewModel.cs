@@ -1,27 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows;
+using System.Windows.Input;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Bim4Everyone;
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelsManager.Models;
 using RevitLintelsManager.Models.Configs;
+using RevitLintelsManager.Models.Settings;
+using RevitLintelsManager.Services;
 
 namespace RevitLintelsManager.ViewModels;
 
 internal class FamilySettingsViewModel : BaseViewModel {
+    public event Action SelectionChanged;
+
     private readonly RevitRepository _revitRepository;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly ILocalizationService _localizationService;
-    
+    private readonly Dictionary<string, LintelFamilySettings> _familySettings = [];
     private ObservableCollection<FamilyViewModel> _lintelFamilyViewModels;
     private FamilyViewModel _selectedLintelFamilyViewModel;
-    
     private ObservableCollection<ParamViewModel> _lintelParametersDouble;
     private ObservableCollection<ParamViewModel> _lintelParametersInteger;
     private ObservableCollection<ParamViewModel> _openingParameters;
@@ -33,24 +38,81 @@ internal class FamilySettingsViewModel : BaseViewModel {
     private ParamViewModel _selectedLintelLeftCornerParam;
     private ParamViewModel _selectedLintelRightWeldingParam;
     private ParamViewModel _selectedLintelLeftWeldingParam;
-    
     private ParamViewModel _selectedOpeningHeightParam;
     private ParamViewModel _selectedOpeningWidthParam;
-    
     private ObservableCollection<FamilyViewModel> _openingFamilyViewModels;
     private ObservableCollection<FamilyViewModel> _selectedOpeningFamilyViewModels;
+    private ObservableCollection<FamilyViewModel> _filteredLintelFamilies;
+    private ObservableCollection<FamilyViewModel> _filteredOpeningFamilies;
+    private string _lintelSearchText;
+    private string _openingSearchText;
 
-    internal FamilySettingsViewModel(
-        RevitRepository revitRepository, 
-        SystemPluginConfig systemPluginConfig,
-        ILocalizationService localizationService) {
+    public FamilySettingsViewModel(RevitRepository revitRepository, SystemPluginConfig systemPluginConfig,
+        ILocalizationService localizationService, LintelManagerSettings settings, bool hasSavedSettings,
+        SettingsCommandFactory commandFactory) {
         _revitRepository = revitRepository;
         _systemPluginConfig = systemPluginConfig;
         _localizationService = localizationService;
-        PropertyChanged += OnPropertyChanged;
-        LoadView();
+        SelectLintelFamilyCommand = commandFactory.Create<FamilyViewModel>(
+            family => SelectedLintelFamilyViewModel = family);
+        SearchLintelFamiliesCommand = commandFactory.Create(ApplySearchLintelFamilies);
+        SearchOpeningFamiliesCommand = commandFactory.Create(ApplySearchOpeningFamilies);
+        LintelFamilyViewModels = new ObservableCollection<FamilyViewModel>(
+            _revitRepository.LintelFamilies.OrderBy(family => family.Family.Name).Select(CreateFamilyViewModel));
+        OpeningFamilyViewModels = new ObservableCollection<FamilyViewModel>(
+            _revitRepository.OpeningFamilies.OrderBy(family => family.Family.Name).Select(CreateFamilyViewModel));
+        if(settings.LintelFamilySettings?.LintelFamily is not null) {
+            _familySettings[settings.LintelFamilySettings.LintelFamily] = settings.LintelFamilySettings;
+        }
+        SelectedLintelFamilyViewModel = LintelFamilyViewModels.FirstOrDefault(
+            family => family.Name == settings.LintelFamilySettings?.LintelFamily);
+        if(SelectedLintelFamilyViewModel is null) {
+            UpdateLintelParameters();
+        }
+        var selectedNames = (settings.OpeningFamilySettings?.FamilyNames ?? []).ToHashSet();
+        if(hasSavedSettings) {
+            foreach(string name in selectedNames.Except(OpeningFamilyViewModels.Select(family => family.Name))) {
+                OpeningFamilyViewModels.Add(new FamilyViewModel { Name = name });
+            }
+        }
+        SelectedOpeningFamilyViewModels = [];
+        foreach(var family in OpeningFamilyViewModels) {
+            family.IsChecked = selectedNames.Contains(family.Name);
+            if(family.IsChecked) {
+                SelectedOpeningFamilyViewModels.Add(family);
+            }
+            family.PropertyChanged += OnOpeningFamilyChanged;
+        }
+        UpdateOpeningParameters(settings.OpeningFamilySettings?.LintelOpeningHeight,
+            settings.OpeningFamilySettings?.LintelOpeningWidth);
+        ApplySearchLintelFamilies();
+        ApplySearchOpeningFamilies();
     }
-    
+
+    public ICommand SearchLintelFamiliesCommand { get; }
+    public ICommand SearchOpeningFamiliesCommand { get; }
+
+    public ObservableCollection<FamilyViewModel> FilteredLintelFamilies {
+        get => _filteredLintelFamilies;
+        private set => RaiseAndSetIfChanged(ref _filteredLintelFamilies, value);
+    }
+
+    public ObservableCollection<FamilyViewModel> FilteredOpeningFamilies {
+        get => _filteredOpeningFamilies;
+        private set => RaiseAndSetIfChanged(ref _filteredOpeningFamilies, value);
+    }
+    public ICommand SelectLintelFamilyCommand { get; }
+
+    public string LintelSearchText {
+        get => _lintelSearchText;
+        set => RaiseAndSetIfChanged(ref _lintelSearchText, value);
+    }
+
+    public string OpeningSearchText {
+        get => _openingSearchText;
+        set => RaiseAndSetIfChanged(ref _openingSearchText, value);
+    }
+
     public ObservableCollection<FamilyViewModel> LintelFamilyViewModels {
         get => _lintelFamilyViewModels;
         set => RaiseAndSetIfChanged(ref _lintelFamilyViewModels, value);
@@ -58,7 +120,20 @@ internal class FamilySettingsViewModel : BaseViewModel {
     
     public FamilyViewModel SelectedLintelFamilyViewModel {
         get => _selectedLintelFamilyViewModel;
-        set => RaiseAndSetIfChanged(ref _selectedLintelFamilyViewModel, value);
+        set {
+            if(_selectedLintelFamilyViewModel == value) {
+                return;
+            }
+            if(_selectedLintelFamilyViewModel is not null) {
+                _familySettings[_selectedLintelFamilyViewModel.Name] = GetLintelSettings();
+            }
+            RaiseAndSetIfChanged(ref _selectedLintelFamilyViewModel, value);
+            foreach(var family in LintelFamilyViewModels) {
+                family.IsChecked = family == value;
+            }
+            UpdateLintelParameters();
+            SelectionChanged?.Invoke();
+        }
     }
     
     public ObservableCollection<ParamViewModel> LintelParametersDouble {
@@ -136,181 +211,144 @@ internal class FamilySettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _selectedOpeningWidthParam, value);
     }
     
-    private IEnumerable<FamilyViewModel> GetLintelFamiliesViewModels() {
-        var lintelFamilies = _revitRepository.LintelFamilies.ToArray();
-        if(lintelFamilies.Length == 0) {
-            return [
-                new FamilyViewModel {
-                    Name = _localizationService.GetLocalizedString("FamilySettingsViewModel.NoLintelFamilies"),
-                    Family = null,
-                    OrderedParams = null
-                }];
+    public IEnumerable<RevitFamily> GetSelectedFamilies() {
+        var lintelFamily = _revitRepository.LintelFamilies.FirstOrDefault(
+            family => family.Family == SelectedLintelFamilyViewModel?.Family);
+        if(lintelFamily is null) {
+            return [];
         }
-        return lintelFamilies
-            .Select(revitFamily => new FamilyViewModel {
-                Name = revitFamily.Family.Name,
-                Family = revitFamily.Family,
-                OrderedParams = revitFamily.OrderedParams
-            });
-    } 
-    
-    private IEnumerable<FamilyViewModel> GetOpeningFamiliesViewModels() {
-        var openingFamilies = _revitRepository.OpeningFamilies.ToArray();
-        if(openingFamilies.Length == 0) {
-            return [
-                new FamilyViewModel {
-                Name = _localizationService.GetLocalizedString("FamilySettingsViewModel.NoOpeningFamilies"),
-                Family = null,
-                OrderedParams = null
-            }];
-        }
-        return openingFamilies
-            .Select(revitFamily => new FamilyViewModel {
-                Name = revitFamily.Family.Name,
-                Family = revitFamily.Family,
-                OrderedParams = revitFamily.OrderedParams
-            });
+        var names = SelectedOpeningFamilyViewModels.Select(family => family.Name).ToHashSet();
+        return new[] { lintelFamily }.Concat(_revitRepository.OpeningFamilies
+            .Where(family => names.Contains(family.Family.Name)));
     }
 
-    private IEnumerable<ParamViewModel> GetLintelParamViewModels(FamilyViewModel familyViewModel, StorageType storageType) {
-        return new[] {
+    public LintelFamilySettings GetLintelSettings() {
+        return new LintelFamilySettings {
+            LintelFamily = SelectedLintelFamilyViewModel?.Name,
+            LintelWidth = SelectedLintelWidthParam?.RevitParam?.Name,
+            LintelThickness = SelectedLintelThicknessParam?.RevitParam?.Name,
+            LintelRightOffset = SelectedLintelRightOffsetParam?.RevitParam?.Name,
+            LintelLeftOffset = SelectedLintelLeftOffsetParam?.RevitParam?.Name,
+            LintelRightCorner = SelectedLintelRightCornerParam?.RevitParam?.Name,
+            LintelLeftCorner = SelectedLintelLeftCornerParam?.RevitParam?.Name,
+            LintelRightWelding = SelectedLintelRightWeldingParam?.RevitParam?.Name,
+            LintelLeftWelding = SelectedLintelLeftWeldingParam?.RevitParam?.Name
+        };
+    }
+
+    public OpeningFamilySettings GetOpeningSettings() {
+        return new OpeningFamilySettings {
+            FamilyNames = SelectedOpeningFamilyViewModels.Select(family => family.Name).ToArray(),
+            LintelOpeningHeight = SelectedOpeningHeightParam?.RevitParam?.Name,
+            LintelOpeningWidth = SelectedOpeningWidthParam?.RevitParam?.Name
+        };
+    }
+
+    public string GetErrorText() {
+        if(SelectedLintelFamilyViewModel?.Family is null) {
+            return _localizationService.GetLocalizedString("Validation.SelectLintelFamily");
+        }
+        if(SelectedOpeningFamilyViewModels.Count == 0) {
+            return _localizationService.GetLocalizedString("Validation.SelectOpeningFamilies");
+        }
+        if(SelectedOpeningFamilyViewModels.Any(family => family.Family is null)) {
+            return _localizationService.GetLocalizedString("Validation.MissingOpeningFamily");
+        }
+        var parameters = new[] {
+            SelectedLintelWidthParam, SelectedLintelThicknessParam,
+            SelectedLintelRightOffsetParam, SelectedLintelLeftOffsetParam,
+            SelectedLintelRightCornerParam, SelectedLintelLeftCornerParam,
+            SelectedLintelRightWeldingParam, SelectedLintelLeftWeldingParam,
+            SelectedOpeningHeightParam, SelectedOpeningWidthParam
+        };
+        return parameters.Any(parameter => parameter?.RevitParam is null)
+            ? _localizationService.GetLocalizedString("Validation.SelectFamilyParameters") : null;
+    }
+
+    private static FamilyViewModel CreateFamilyViewModel(RevitFamily family) {
+        return new FamilyViewModel {
+            Name = family.Family.Name,
+            RevitFamily = family
+        };
+    }
+
+    private void ApplySearchLintelFamilies() {
+        FilteredLintelFamilies = new ObservableCollection<FamilyViewModel>(string.IsNullOrEmpty(LintelSearchText)
+            ? LintelFamilyViewModels
+            : LintelFamilyViewModels.Where(family =>
+                family.Name.IndexOf(LintelSearchText, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
+
+    private void ApplySearchOpeningFamilies() {
+        FilteredOpeningFamilies = new ObservableCollection<FamilyViewModel>(string.IsNullOrEmpty(OpeningSearchText)
+            ? OpeningFamilyViewModels
+            : OpeningFamilyViewModels.Where(family =>
+                family.Name.IndexOf(OpeningSearchText, StringComparison.OrdinalIgnoreCase) >= 0));
+    }
+
+    private ObservableCollection<ParamViewModel> CreateParameters(IEnumerable<RevitParam> parameters) {
+        return new ObservableCollection<ParamViewModel>(new[] {
             new ParamViewModel {
-                Name = _localizationService.GetLocalizedString("FamilySettingsViewModel.ParamNoSelect"),
-                RevitParam = null
+                Name = _localizationService.GetLocalizedString("FamilySettingsViewModel.ParamNoSelect")
             }
-        }.Concat(
-            familyViewModel.OrderedParams
-                .Where(param => param.StorageType == storageType)
-                .Select(param => new ParamViewModel {
-                Name = param?.Name,
-                RevitParam = param
-            }));
+        }.Concat(parameters.Distinct().OrderBy(param => param.Name).Select(param => new ParamViewModel {
+            Name = param.Name,
+            RevitParam = param
+        })));
     }
 
-    private IEnumerable<ParamViewModel> GetOpeningParamViewModels(ObservableCollection<FamilyViewModel> familyViewModels, StorageType storageType) {
-
-        var selectedFamilies = familyViewModels
-            .Where(vm => vm.IsChecked)
-            .ToList();
-
-        if(selectedFamilies.Count == 0) {
-            return new[] {
-                new ParamViewModel {
-                    Name = _localizationService.GetLocalizedString("FamilySettingsViewModel.ParamNoSelect"),
-                    RevitParam = null
-                }
-            };
-        }
-
-        var commonParamNames = selectedFamilies
-            .Select(vm => vm.OrderedParams
-                .Where(param => param.StorageType == storageType)
-                .Select(param => param.Name)
-                .ToHashSet())
-            .Aggregate((common, current) => common.Intersect(current).ToHashSet());
-
-        var firstFamily = selectedFamilies.First();
-
-        return new[] {
-            new ParamViewModel {
-                Name = _localizationService.GetLocalizedString("FamilySettingsViewModel.ParamNoSelect"),
-                RevitParam = null
-            }
-        }.Concat(
-            firstFamily.OrderedParams
-                .Where(param =>
-                    param.StorageType == storageType && commonParamNames.Contains(param.Name))
-                .Select(param => new ParamViewModel {
-                    Name = param.Name,
-                    RevitParam = param
-                }));
-    }
-
-    private void OnOpeningFamilyPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        if(sender is not FamilyViewModel vm) {
-            return;
-        }
-
-        if(e.PropertyName != nameof(vm.IsChecked)) {
-            return;
-        }
-
-        if(vm.IsChecked) {
-            if(SelectedOpeningFamilyViewModels.Contains(vm)) {
-                return;
-            }
-            SelectedOpeningFamilyViewModels.Add(vm);
-        } else {
-            SelectedOpeningFamilyViewModels.Remove(vm);
-        }
-
-        UpdateOpeningParameters();
-    }
-    
-    private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
-        switch (e.PropertyName) {
-            case nameof(SelectedLintelFamilyViewModel):
-                UpdateLintelParameters();
-                break;
-            case nameof(SelectedOpeningFamilyViewModels):
-                UpdateOpeningParameters();
-                break;
-        }
+    private static ParamViewModel SelectParameter(IEnumerable<ParamViewModel> parameters, string name) {
+        return parameters.FirstOrDefault(parameter => parameter.RevitParam?.Name == name)
+               ?? parameters.First();
     }
 
     private void UpdateLintelParameters() {
-        LintelParametersDouble = new ObservableCollection<ParamViewModel>(GetLintelParamViewModels(SelectedLintelFamilyViewModel, StorageType.Double));
-        SelectedLintelWidthParam = LintelParametersDouble
-            .FirstOrDefault(vm => vm.Name.Equals(_systemPluginConfig.LintelWidthParamName))
-                                   ?? LintelParametersDouble.FirstOrDefault();
-        SelectedLintelThicknessParam = LintelParametersDouble
-            .FirstOrDefault(vm => vm.Name.Equals(_systemPluginConfig.LintelThicknessParamName))
-                                       ?? LintelParametersDouble.FirstOrDefault();
-        SelectedLintelRightOffsetParam = LintelParametersDouble
-            .FirstOrDefault(vm => vm.Name.Equals(_systemPluginConfig.LintelRightOffsetParamName))
-                                         ?? LintelParametersDouble.FirstOrDefault();
-        SelectedLintelLeftOffsetParam = LintelParametersDouble
-            .FirstOrDefault(vm => vm.Name.Equals(_systemPluginConfig.LintelLeftOffsetParamName))
-                                        ?? LintelParametersDouble.FirstOrDefault();
-        LintelParametersInteger = new ObservableCollection<ParamViewModel>(GetLintelParamViewModels(SelectedLintelFamilyViewModel, StorageType.Integer));
-        SelectedLintelRightCornerParam = LintelParametersInteger
-            .FirstOrDefault(vm => vm.Name.Equals(_systemPluginConfig.LintelRightCornerParamName))
-                                         ?? LintelParametersInteger.FirstOrDefault();
-        SelectedLintelLeftCornerParam = LintelParametersInteger
-            .FirstOrDefault(vm => vm.Name.Equals(_systemPluginConfig.LintelLeftCornerParamName))
-                                        ?? LintelParametersInteger.FirstOrDefault();
-        SelectedLintelRightWeldingParam = LintelParametersInteger
-            .FirstOrDefault(vm => vm.Name.Equals(_systemPluginConfig.LintelRightWeldingParamName))
-                                          ?? LintelParametersInteger.FirstOrDefault();
-        SelectedLintelLeftWeldingParam = LintelParametersInteger
-            .FirstOrDefault(vm => vm.Name.Equals(_systemPluginConfig.LintelLeftWeldingParamName))
-                                         ?? LintelParametersInteger.FirstOrDefault();
+        var parameters = SelectedLintelFamilyViewModel?.OrderedParams?.ToArray() ?? [];
+        LintelParametersDouble = CreateParameters(parameters.Where(param => param.StorageType == StorageType.Double));
+        LintelParametersInteger = CreateParameters(parameters.Where(param => param.StorageType == StorageType.Integer));
+        _familySettings.TryGetValue(SelectedLintelFamilyViewModel?.Name ?? string.Empty, out var settings);
+        settings ??= new LintelFamilySettings {
+            LintelWidth = _systemPluginConfig.LintelWidthParamName,
+            LintelThickness = _systemPluginConfig.LintelThicknessParamName,
+            LintelRightOffset = _systemPluginConfig.LintelRightOffsetParamName,
+            LintelLeftOffset = _systemPluginConfig.LintelLeftOffsetParamName,
+            LintelRightCorner = _systemPluginConfig.LintelRightCornerParamName,
+            LintelLeftCorner = _systemPluginConfig.LintelLeftCornerParamName,
+            LintelRightWelding = _systemPluginConfig.LintelRightWeldingParamName,
+            LintelLeftWelding = _systemPluginConfig.LintelLeftWeldingParamName
+        };
+        SelectedLintelWidthParam = SelectParameter(LintelParametersDouble, settings.LintelWidth);
+        SelectedLintelThicknessParam = SelectParameter(LintelParametersDouble, settings.LintelThickness);
+        SelectedLintelRightOffsetParam = SelectParameter(LintelParametersDouble, settings.LintelRightOffset);
+        SelectedLintelLeftOffsetParam = SelectParameter(LintelParametersDouble, settings.LintelLeftOffset);
+        SelectedLintelRightCornerParam = SelectParameter(LintelParametersInteger, settings.LintelRightCorner);
+        SelectedLintelLeftCornerParam = SelectParameter(LintelParametersInteger, settings.LintelLeftCorner);
+        SelectedLintelRightWeldingParam = SelectParameter(LintelParametersInteger, settings.LintelRightWelding);
+        SelectedLintelLeftWeldingParam = SelectParameter(LintelParametersInteger, settings.LintelLeftWelding);
     }
 
-    private void UpdateOpeningParameters() {
-        OpeningParameters = new ObservableCollection<ParamViewModel>(GetOpeningParamViewModels(SelectedOpeningFamilyViewModels, StorageType.Double));
-        SelectedOpeningHeightParam = OpeningParameters
-            .FirstOrDefault(vm => vm.Name.Equals(_systemPluginConfig.OpeningHeightParamName))
-                                       ?? OpeningParameters.FirstOrDefault();
-        SelectedOpeningWidthParam = OpeningParameters
-            .FirstOrDefault(vm => vm.Name.Equals(_systemPluginConfig.OpeningWidthParamName))
-                                      ?? OpeningParameters.FirstOrDefault();
+    private void UpdateOpeningParameters(string heightName, string widthName) {
+        var families = SelectedOpeningFamilyViewModels.ToArray();
+        var parameters = families.Length == 0 ? [] : families[0].OrderedParams
+            .Where(param => param.StorageType == StorageType.Double)
+            .Where(param => families.All(family => family.OrderedParams.Any(other => other.Name == param.Name
+                && other.StorageType == StorageType.Double)));
+        OpeningParameters = CreateParameters(parameters);
+        SelectedOpeningHeightParam = SelectParameter(OpeningParameters, heightName);
+        SelectedOpeningWidthParam = SelectParameter(OpeningParameters, widthName);
     }
 
-    private void LoadView() {
-        LintelFamilyViewModels = new ObservableCollection<FamilyViewModel>(GetLintelFamiliesViewModels());
-        SelectedLintelFamilyViewModel = LintelFamilyViewModels
-            .FirstOrDefault(lintelFamilyViewModel => lintelFamilyViewModel.Family.Name.Equals(_systemPluginConfig.DefaultLintelFamilyName));
-        
-        OpeningFamilyViewModels = new ObservableCollection<FamilyViewModel>(GetOpeningFamiliesViewModels());
-        SelectedOpeningFamilyViewModels = [];
-        foreach(var item in OpeningFamilyViewModels) {
-            item.PropertyChanged += OnOpeningFamilyPropertyChanged;
-            if(item.IsChecked) {
-                SelectedOpeningFamilyViewModels.Add(item);
-            }
+    private void OnOpeningFamilyChanged(object sender, PropertyChangedEventArgs e) {
+        if(e.PropertyName != nameof(FamilyViewModel.IsChecked) || sender is not FamilyViewModel family) {
+            return;
         }
-        UpdateLintelParameters();
-        UpdateOpeningParameters();
+        if(family.IsChecked) {
+            SelectedOpeningFamilyViewModels.Add(family);
+        } else {
+            SelectedOpeningFamilyViewModels.Remove(family);
+        }
+        UpdateOpeningParameters(SelectedOpeningHeightParam?.RevitParam?.Name,
+            SelectedOpeningWidthParam?.RevitParam?.Name);
+        SelectionChanged?.Invoke();
     }
 }

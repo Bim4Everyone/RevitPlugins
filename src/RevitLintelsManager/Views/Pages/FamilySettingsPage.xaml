@@ -7,13 +7,24 @@
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:edits="clr-namespace:RevitLintelsManager.Views.Edits"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     xmlns:vms="clr-namespace:RevitLintelsManager.ViewModels"
     d:DataContext="{d:DesignInstance vms:FamilySettingsViewModel, IsDesignTimeCreatable=False}"
+    MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=ui:NavigationView}}"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d" x:ClassModifier="internal">
     
-    <ScrollViewer>
+    <core:WpfUIPlatformPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </core:WpfUIPlatformPage.Resources>
+    <ScrollViewer
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Disabled">
         <StackPanel>
             <edits:CustomGroupEditControl
             VerticalAlignment="Top"
@@ -21,22 +32,31 @@
             Header="{me:LocalizationSource FamilySettingsPage.LintelFamilies}">
                 
             <edits:CustomGroupEditControl.EditControl>
-                
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition
-                            Width="500"/>
+                            Width="*"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     
-                    <ScrollViewer
-                        Grid.Column="0"
-                        MaxHeight="350">
+                    <DockPanel Grid.Column="0" Margin="0,0,12,0">
+                        <ui:AutoSuggestBox
+                            Icon="{ui:SymbolIcon Search24}"
+                            DockPanel.Dock="Top"
+                            Margin="10,0,10,8"
+                            PlaceholderText="{me:LocalizationSource Search.Family}"
+                            Text="{Binding LintelSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="TextChanged">
+                                    <i:InvokeCommandAction Command="{Binding SearchLintelFamiliesCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ui:AutoSuggestBox>
+
                         
                         <ListBox
-                            ItemsSource="{Binding LintelFamilyViewModels}"
-                            SelectedItem="{Binding SelectedLintelFamilyViewModel, Mode=TwoWay}"
-                            
+                            Style="{StaticResource SettingsListStyle}"
+                            ItemsSource="{Binding FilteredLintelFamilies}"
                             SelectionMode="Single"
                             Background="Transparent"
                             BorderThickness="0">
@@ -70,19 +90,15 @@
                                 <DataTemplate DataType="{x:Type vms:FamilyViewModel}">
                                     <RadioButton
                                         Content="{Binding Name}"
-                                        IsChecked="{Binding IsSelected,
-                                            RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}},
-                                            Mode=TwoWay}" />
+                                        GroupName="LintelFamilies"
+                                        IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                        Command="{Binding DataContext.SelectLintelFamilyCommand,
+                                            RelativeSource={RelativeSource AncestorType=core:WpfUIPlatformPage}}"
+                                        CommandParameter="{Binding}" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
-
-                            <ListBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel />
-                                </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
                         </ListBox>
-                    </ScrollViewer>
+                    </DockPanel>
                     
                     <StackPanel
                         Grid.Column="1">
@@ -145,37 +161,47 @@
             Header="{me:LocalizationSource FamilySettingsPage.OpeningFamilies}">
                 
             <edits:CustomGroupEditControl.EditControl>
-                
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition
-                            Width="500"/>
+                            Width="*"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    
-                    <ScrollViewer
-                        Grid.Column="0"
-                        MaxHeight="300">
+                    <DockPanel 
+                        Grid.Column="0" 
+                        Margin="0,0,12,0">
                         
-                        <ItemsControl
-                            ItemsSource="{Binding OpeningFamilyViewModels}">
-                            <ItemsControl.ItemTemplate>
+                        <ui:AutoSuggestBox
+                            Icon="{ui:SymbolIcon Search24}"
+                            DockPanel.Dock="Top"
+                            Margin="10,0,10,8"
+                            PlaceholderText="{me:LocalizationSource Search.Family}"
+                            Text="{Binding OpeningSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="TextChanged">
+                                    <i:InvokeCommandAction Command="{Binding SearchOpeningFamiliesCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </ui:AutoSuggestBox>
+
+                        
+                        <ListBox
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Style="{StaticResource SettingsListStyle}"
+                            ItemContainerStyle="{StaticResource SettingsCheckListItemStyle}"
+                            MaxHeight="400"
+                            ItemsSource="{Binding FilteredOpeningFamilies}">
+                            <ListBox.ItemTemplate>
                                 <DataTemplate
                                     DataType="{x:Type vms:FamilyViewModel}">
                                     <edits:ItemControl
                                         ItemName="{Binding Name}"
                                         IsChecked="{Binding IsChecked, Mode=TwoWay}" />
                                 </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                        
-                    </ScrollViewer>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
                     
                     <StackPanel
                         Grid.Column="1">

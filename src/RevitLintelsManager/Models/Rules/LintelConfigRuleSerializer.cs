@@ -35,6 +35,18 @@ public class LintelConfigRuleSerializer {
             Directory.CreateDirectory(directory);
         }
 
-        File.WriteAllText(configPath, _serializer.Serialize(lintelConfigRule));
+        string temporaryPath = configPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try {
+            File.WriteAllText(temporaryPath, _serializer.Serialize(lintelConfigRule));
+            if(File.Exists(configPath)) {
+                File.Replace(temporaryPath, configPath, null);
+            } else {
+                File.Move(temporaryPath, configPath);
+            }
+        } finally {
+            if(File.Exists(temporaryPath)) {
+                File.Delete(temporaryPath);
+            }
+        }
     }
 }

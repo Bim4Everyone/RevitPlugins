@@ -392,4 +392,118 @@
             Property="Margin"
             Value="0 5" />
     </Style>
+    <Style
+        x:Key="SettingsCheckListItemStyle"
+        TargetType="{x:Type ListBoxItem}"
+        BasedOn="{StaticResource {x:Type ListBoxItem}}">
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    </Style>
+    <Style
+        x:Key="SettingsListStyle"
+        TargetType="{x:Type ListBox}"
+        BasedOn="{StaticResource {x:Type ListBox}}">
+        <Setter Property="MaxHeight" Value="350" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+    </Style>
+    
+    <Style
+        x:Key="SettingsRuleTabItemStyle"
+        TargetType="{x:Type TabItem}"
+        BasedOn="{StaticResource {x:Type TabItem}}">
+
+        <Setter Property="Margin" Value="0,0,6,0" />
+        <Setter Property="Padding" Value="4,2" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="BorderBrush"
+                Value="{DynamicResource SurfaceStrokeColorDefaultBrush}" />
+        <Setter Property="Background"
+                Value="{DynamicResource SubtleFillColorTransparentBrush}" />
+        <Setter Property="Foreground"
+                Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabItem}">
+                    <Border
+                        x:Name="TabBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}"
+                        CornerRadius="5"
+                        SnapsToDevicePixels="True">
+
+                        <ContentPresenter
+                            ContentSource="Header"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RecognizesAccessKey="True" />
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+
+                        <!-- Наведение на вкладку -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter
+                                TargetName="TabBorder"
+                                Property="Background"
+                                Value="{DynamicResource ControlAltFillColorTertiaryBrush}" />
+                            <Setter
+                                TargetName="TabBorder"
+                                Property="BorderBrush"
+                                Value="{DynamicResource ControlStrongStrokeColorDefaultBrush}" />
+                        </Trigger>
+
+                        <!-- Активная вкладка -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter
+                                TargetName="TabBorder"
+                                Property="Background"
+                                Value="{DynamicResource ControlAltFillColorQuarternaryBrush}" />
+                            <Setter
+                                TargetName="TabBorder"
+                                Property="BorderBrush"
+                                Value="{DynamicResource ControlStrongStrokeColorDefaultBrush}" />
+                        </Trigger>
+
+                        <!-- Наведение на активную вкладку -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter
+                                TargetName="TabBorder"
+                                Property="Background"
+                                Value="{DynamicResource ControlAltFillColorQuarternaryBrush}" />
+                            <Setter
+                                TargetName="TabBorder"
+                                Property="BorderBrush"
+                                Value="{DynamicResource ControlStrokeColorTertiaryBrush}" />
+                        </MultiTrigger>
+
+                        <!-- Отключенная вкладка -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter
+                                TargetName="TabBorder"
+                                Property="Opacity"
+                                Value="0.5" />
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

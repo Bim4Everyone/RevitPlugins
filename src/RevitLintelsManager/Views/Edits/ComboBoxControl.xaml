@@ -28,6 +28,7 @@
             Grid.Column="1"
             ItemsSource="{Binding ItemsSource, ElementName=_this}"
             SelectedValue="{Binding SelectedValue, ElementName=_this}"
+            ToolTip="{Binding SelectedValue.Name, ElementName=_this}"
             DisplayMemberPath="Name" />
     </Grid>
     
