@@ -1,0 +1,76 @@
+<core:WpfUIPlatformWindow
+    x:Class="RevitLintelsManager.Views.NameInputWindow"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    Title="{Binding Title}"
+    Width="520"
+    MinHeight="0"
+    SizeToContent="Height"
+    ResizeMode="NoResize"
+    WindowStartupLocation="CenterOwner"
+    ShowInTaskbar="False"
+    Loaded="OnLoaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ui:TitleBar
+            Title="{Binding Title}"
+            ShowMinimize="False"
+            ShowMaximize="False" />
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ui:TextBlock
+                Margin="0,0,0,8"
+                Text="{me:LocalizationSource Dialog.Name}" />
+            <ui:TextBox
+                x:Name="_nameTextBox"
+                Grid.Row="1"
+                MaxLength="150"
+                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+            <ui:TextBlock
+                Grid.Row="2"
+                Margin="0,8,0,0"
+                Foreground="{DynamicResource SystemFillColorCautionBrush}"
+                TextWrapping="Wrap"
+                Text="{Binding ErrorText}">
+                <ui:TextBlock.Style>
+                    <Style TargetType="{x:Type ui:TextBlock}">
+                        <Style.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:TextBlock.Style>
+            </ui:TextBlock>
+            <StackPanel
+                Grid.Row="3"
+                Margin="0,12,0,0"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right">
+                <ui:Button
+                    MinWidth="100"
+                    Margin="0,0,8,0"
+                    Appearance="Primary"
+                    IsDefault="True"
+                    Content="{me:LocalizationSource Common.Ok}"
+                    Command="{Binding AcceptCommand}" />
+                <ui:Button
+                    MinWidth="100"
+                    IsCancel="True"
+                    Content="{me:LocalizationSource MainWindow.ButtonCancel}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</core:WpfUIPlatformWindow>

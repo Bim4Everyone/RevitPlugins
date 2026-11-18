@@ -26,7 +26,6 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Controls/ContentDialog/ContentDialog.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -103,14 +102,11 @@
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
         </ui:NavigationView>
-        <Grid
+        <StackPanel
             Grid.Row="2"
-            Margin="12,8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+            Margin="12,8"
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
             <ui:TextBlock
                 Margin="8"
                 Foreground="Orange"
@@ -118,7 +114,6 @@
                 TextWrapping="Wrap"
                 Text="{Binding ErrorText}" />
             <ui:Button
-                Grid.Column="1"
                 Margin="8,0"
                 MinWidth="110"
                 Appearance="Info"
@@ -126,16 +121,11 @@
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Command="{Binding AcceptViewCommand}" />
             <ui:Button
-                Grid.Column="2"
                 Margin="8,0"
                 MinWidth="110"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />
-        </Grid>
-        <ContentPresenter
-            x:Name="_rootContentDialog"
-            Grid.RowSpan="3"
-            Panel.ZIndex="10" />
+        </StackPanel>
     </Grid>
 </core:WpfUIPlatformWindow>

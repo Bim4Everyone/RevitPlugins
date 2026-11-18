@@ -6,7 +6,6 @@ using dosymep.SimpleServices;
 using RevitLintelsManager.ViewModels;
 using RevitLintelsManager.Views.Pages;
 
-using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 
 namespace RevitLintelsManager.Views;
@@ -24,8 +23,7 @@ public partial class SettingsWindow {
         ILanguageService languageService,
         ILocalizationService localizationService,
         IUIThemeService uiThemeService,
-        IUIThemeUpdaterService themeUpdaterService,
-        IContentDialogService contentDialogService)
+        IUIThemeUpdaterService themeUpdaterService)
         : base(loggerService,
             serializationService,
             languageService,
@@ -34,7 +32,6 @@ public partial class SettingsWindow {
             themeUpdaterService) {
         InitializeComponent();
 
-        contentDialogService.SetDialogHost(_rootContentDialog);
         DataContextChanged += OnDataContextChanged;
         
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);

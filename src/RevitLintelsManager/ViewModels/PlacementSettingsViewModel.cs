@@ -37,7 +37,6 @@ internal class PlacementSettingsViewModel : BaseViewModel {
     private LintelConfigRuleViewModel _selectedConfig;
     private ObservableCollection<string> _lintelTypes;
     private bool _updating;
-    private string _statusText;
 
     public PlacementSettingsViewModel(RevitRepository repository, SystemPluginConfig systemConfig,
         ILocalizationService localization, LintelConfigRuleStorage storage, LintelConfigRuleSerializer serializer,
@@ -60,7 +59,7 @@ internal class PlacementSettingsViewModel : BaseViewModel {
         _settings = settings;
         CreateConfigCommand = commandFactory.CreateAsync(CreateConfigAsync);
         ImportConfigCommand = commandFactory.CreateAsync(ImportConfigAsync);
-        SaveConfigCommand = commandFactory.Create(StageConfig, () => CanEditRules);
+        SaveConfigCommand = commandFactory.Create(SaveConfig, () => CanEditRules);
         SaveAsConfigCommand = commandFactory.Create(SaveAsConfig, () => SelectedConfig is not null);
         DeleteConfigCommand = commandFactory.Create(DeleteConfig, () => CanEditRules);
         CopyConfigCommand = commandFactory.Create(CopyConfig, () => SelectedConfig is not null);
@@ -110,7 +109,6 @@ internal class PlacementSettingsViewModel : BaseViewModel {
             RaiseAndSetIfChanged(ref _selectedConfig, value);
             RaisePropertyChanged(nameof(CanEditRules));
             RaisePropertyChanged(nameof(IsReadOnly));
-            StatusText = null;
             RefreshWalls();
             CommandManager.InvalidateRequerySuggested();
         }
@@ -119,11 +117,6 @@ internal class PlacementSettingsViewModel : BaseViewModel {
     public ObservableCollection<string> LintelTypes {
         get => _lintelTypes;
         private set => RaiseAndSetIfChanged(ref _lintelTypes, value);
-    }
-
-    public string StatusText {
-        get => _statusText;
-        private set => RaiseAndSetIfChanged(ref _statusText, value);
     }
 
     public LintelWallSettings[] GetWallSettings() {
@@ -336,14 +329,17 @@ internal class PlacementSettingsViewModel : BaseViewModel {
         }
     }
 
-    private void StageConfig() {
-        string error = ValidateConfig(SelectedConfig);
+    private void SaveConfig() {
+        var config = SelectedConfig;
+        string error = ValidateConfig(config);
         if(error is not null) {
             ShowError(new InvalidDataException(error));
             return;
         }
-        SelectedConfig.IsDirty = true;
-        StatusText = Text("Config.Staged");
+        string path = _storage.GetProjectConfigRulePath(config.Name)
+                      ?? throw new IOException(Text("Validation.RulesFolder"));
+        _serializer.SaveConfigRule(config.GetConfig(), path);
+        config.IsDirty = false;
     }
 
     private void SaveAsConfig() {
@@ -377,7 +373,6 @@ internal class PlacementSettingsViewModel : BaseViewModel {
             }
             Configs.Add(newConfig);
             SelectedConfig = newConfig;
-            StatusText = Text("Config.Exported");
         } catch(Exception ex) {
             ShowError(ex);
         }

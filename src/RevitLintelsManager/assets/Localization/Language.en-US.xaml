@@ -38,7 +38,7 @@
     <system:String x:Key="Config.Create">Create configuration</system:String>
     <system:String x:Key="Config.NewName">New configuration</system:String>
     <system:String x:Key="Config.Import">Load configuration</system:String>
-    <system:String x:Key="Config.Save">Stage configuration for saving</system:String>
+    <system:String x:Key="Config.Save">Save configuration</system:String>
     <system:String x:Key="Config.SaveAs">Save as…</system:String>
     <system:String x:Key="Config.Delete">Delete configuration</system:String>
     <system:String x:Key="Config.Copy">Copy for the current project</system:String>
@@ -46,8 +46,6 @@
     <system:String x:Key="Config.InvalidFile">The file does not contain a lintel rule configuration.</system:String>
     <system:String x:Key="Config.ReplaceConfirm">A configuration with this name already exists. Replace it with the current rules?</system:String>
     <system:String x:Key="Config.DeleteConfirm">Delete this configuration when settings are saved?</system:String>
-    <system:String x:Key="Config.Staged">The configuration will be written when settings are saved.</system:String>
-    <system:String x:Key="Config.Exported">JSON saved. The local copy and selected configuration will be saved with the settings.</system:String>
     <system:String x:Key="Config.ReadOnlyNote">Corporate rules are protected. Wall type assignments are saved for the current project.</system:String>
     <system:String x:Key="Config.LoadErrors">The following rule files could not be read:</system:String>
     <system:String x:Key="Rule.Create">Add wall rule</system:String>

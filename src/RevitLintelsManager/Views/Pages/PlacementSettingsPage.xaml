@@ -23,7 +23,6 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ui:Card Padding="16">
             <WrapPanel VerticalAlignment="Center">
@@ -369,10 +368,5 @@
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>
-        <ui:TextBlock
-            Grid.Row="3"
-            Margin="8"
-            TextWrapping="Wrap"
-            Text="{Binding StatusText}" />
     </Grid>
 </core:WpfUIPlatformPage>

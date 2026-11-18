@@ -38,7 +38,7 @@
     <system:String x:Key="Config.Create">Создать конфигурацию</system:String>
     <system:String x:Key="Config.NewName">Новая конфигурация</system:String>
     <system:String x:Key="Config.Import">Загрузить конфигурацию</system:String>
-    <system:String x:Key="Config.Save">Подготовить конфигурацию к сохранению</system:String>
+    <system:String x:Key="Config.Save">Сохранить конфигурацию</system:String>
     <system:String x:Key="Config.SaveAs">Сохранить как…</system:String>
     <system:String x:Key="Config.Delete">Удалить конфигурацию</system:String>
     <system:String x:Key="Config.Copy">Копировать для текущего проекта</system:String>
@@ -46,8 +46,6 @@
     <system:String x:Key="Config.InvalidFile">Файл не содержит конфигурацию правил перемычек.</system:String>
     <system:String x:Key="Config.ReplaceConfirm">Конфигурация с этим именем уже существует. Заменить её текущими правилами?</system:String>
     <system:String x:Key="Config.DeleteConfirm">Удалить конфигурацию после сохранения настроек?</system:String>
-    <system:String x:Key="Config.Staged">Конфигурация будет записана при сохранении настроек.</system:String>
-    <system:String x:Key="Config.Exported">JSON сохранён. Локальная копия и выбор конфигурации будут сохранены вместе с настройками.</system:String>
     <system:String x:Key="Config.ReadOnlyNote">Корпоративные правила защищены от изменений. Назначения типов стен сохраняются для текущего проекта.</system:String>
     <system:String x:Key="Config.LoadErrors">Не удалось прочитать следующие файлы правил:</system:String>
     <system:String x:Key="Rule.Create">Добавить правило стены</system:String>
