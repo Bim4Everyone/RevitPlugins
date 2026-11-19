@@ -67,8 +67,9 @@ internal class PipeWallPointFinder : IPointFinder<ClashModel<Pipe, Wall>> {
     private (Face FrontFace, Face BackFace) GetFaces(Wall wall, Transform transform) {
         var wallSolid = _geometryUtils.CreateWallSolid(wall, transform);
         var faces = wallSolid.Faces.OfType<PlanarFace>().ToArray();
-        var frontFace = faces.First(f => f.FaceNormal.IsAlmostEqualTo(wall.Orientation));
-        var backFace = faces.First(f => f.FaceNormal.Negate().IsAlmostEqualTo(wall.Orientation));
+        var orientation = transform.OfVector(wall.Orientation);
+        var frontFace = faces.First(f => f.FaceNormal.IsAlmostEqualTo(orientation));
+        var backFace = faces.First(f => f.FaceNormal.Negate().IsAlmostEqualTo(orientation));
         return (frontFace, backFace);
     }
 
