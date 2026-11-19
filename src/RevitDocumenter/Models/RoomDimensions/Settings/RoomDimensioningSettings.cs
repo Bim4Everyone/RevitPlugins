@@ -17,6 +17,11 @@ internal class RoomDimensioningSettings {
     public LayoutSettings Layout { get; set; } = new();
 
     /// <summary>
+    /// Независимые правила исключения условных границ из областей образмеривания.
+    /// </summary>
+    public AreaSettings Areas { get; set; } = new();
+
+    /// <summary>
     /// Типы помещений с собственными порогами и типоразмером размера.
     /// </summary>
     public List<RoomTypeSettings> RoomTypes { get; set; } = [];
@@ -123,4 +128,35 @@ internal class DebugSettings {
     /// Папка для журнала и изображения. Если не задана - папка файла настроек.
     /// </summary>
     public string OutputFolder { get; set; }
+}
+
+/// <summary>
+/// Настройки расчётных областей. По умолчанию каждое помещение образмеривается отдельно.
+/// </summary>
+internal class AreaSettings {
+    private const string _defaultBeaconPartitionText = "Маячковая перегородка";
+
+    /// <summary>
+    /// Объединять помещения через линии разделения помещений.
+    /// </summary>
+    public bool IgnoreRoomSeparationLines { get; set; }
+
+    /// <summary>
+    /// Игнорировать стены, назначение экземпляра которых содержит заданный текст.
+    /// </summary>
+    public bool IgnoreBeaconPartitions { get; set; }
+
+    /// <summary>
+    /// Искомый фрагмент значения параметра экземпляра стены ФОП_ТИП_Назначение.
+    /// </summary>
+    public string BeaconPartitionText { get; set; } = _defaultBeaconPartitionText;
+
+    public static string NormalizeBeaconPartitionText(string value) {
+        return string.IsNullOrWhiteSpace(value) ? _defaultBeaconPartitionText : value.Trim();
+    }
+
+    /// <summary>
+    /// Требуется ли построение расчётных областей вместо отдельных помещений.
+    /// </summary>
+    public bool IsEnabled() => IgnoreRoomSeparationLines || IgnoreBeaconPartitions;
 }

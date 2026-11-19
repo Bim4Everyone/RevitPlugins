@@ -45,6 +45,9 @@ internal class RoomDimensioningSettingsReader {
 
         // Пропущенные в JSON блоки заменяем значениями по умолчанию
         settings.Layout ??= new LayoutSettings();
+        settings.Areas ??= new AreaSettings();
+        settings.Areas.BeaconPartitionText =
+            AreaSettings.NormalizeBeaconPartitionText(settings.Areas.BeaconPartitionText);
         settings.RoomTypes ??= [];
         settings.Debug ??= new DebugSettings();
 

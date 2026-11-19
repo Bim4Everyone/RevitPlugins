@@ -75,4 +75,10 @@
     <system:String x:Key="RoomDimensioningSettings.NoRoomTypes">Settings contain no room types (RoomTypes)</system:String>
     <system:String x:Key="RoomDimensioningSettings.RoomTypeFieldEmpty">Room type No. {0} has an empty field {1}</system:String>
     <system:String x:Key="RoomDimensioningSettings.DuplicatePurposeValue">The same purpose value is used by several room types:</system:String>
+    <system:String x:Key="RoomDimensioningWindow.IgnoreRoomSeparationLines">Ignore room separation lines</system:String>
+    <system:String x:Key="RoomDimensioningWindow.IgnoreBeaconPartitions">Ignore indicative partitions</system:String>
+    <system:String x:Key="RoomDimensioningWindow.BeaconPartitionText">Text in wall purpose</system:String>
+    <system:String x:Key="RoomDimensioningWindow.BeaconPartitionTextHint">Matches part of ФОП_ТИП_Назначение. An empty field uses «Маячковая перегородка».</system:String>
+    <system:String x:Key="RoomDimensioningResult.Areas">Dimensioning areas:</system:String>
+    <system:String x:Key="RoomDimensioningResult.AreaErrors">Areas with errors (skipped):</system:String>
 </ResourceDictionary>

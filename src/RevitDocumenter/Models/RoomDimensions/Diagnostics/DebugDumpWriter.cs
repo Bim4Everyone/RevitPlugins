@@ -42,15 +42,17 @@ internal class DebugDumpWriter {
                 Rooms = result.Rooms.Count,
                 result.UnmatchedRoomCount,
                 result.RoomErrorCount,
+                Areas = result.Areas.Count,
+                result.AreaErrorCount,
                 Lines = result.LineCount,
                 LinesWithoutReference = result.LinesWithoutReferenceCount,
                 Dimensions = result.DimensionCount,
                 DimensionsOk = result.DimensionOkCount,
-                DimensionsByStatus = result.Rooms
+                DimensionsByStatus = result.PlanningResults
                     .SelectMany(r => r.Dimensions)
                     .GroupBy(d => d.Status ?? "NotCreated")
                     .ToDictionary(g => g.Key, g => g.Count()),
-                TextIssues = result.Rooms
+                TextIssues = result.PlanningResults
                     .SelectMany(r => r.Dimensions)
                     .SelectMany(d => d.TextIssues)
                     .GroupBy(k => k)
@@ -73,7 +75,14 @@ internal class DebugDumpWriter {
                 result.DoorObstacles.WithoutRecognizedLeaf,
                 result.DoorObstacles.Errors
             },
-            Rooms = result.Rooms.Select(DumpRoom).ToList()
+            AreaSettings = new {
+                result.IgnoreRoomSeparationLines,
+                result.IgnoreBeaconPartitions,
+                result.BeaconPartitionText
+            },
+            result.AreaDiagnostics,
+            Rooms = result.Rooms.Select(DumpRoom).ToList(),
+            Areas = result.Areas.Select(DumpRoom).ToList()
         };
 
         string json = JsonConvert.SerializeObject(dump, Formatting.Indented);
@@ -84,9 +93,15 @@ internal class DebugDumpWriter {
     private object DumpRoom(RoomRunResult roomResult) {
         var contour = roomResult.Contour;
         return new {
-            RoomId = IdValue(contour.Room.Id),
-            contour.Room.Number,
-            Name = contour.Room.get_Parameter(BuiltInParameter.ROOM_NAME)?.AsString(),
+            RoomId = contour.Room is null ? (long?) null : IdValue(contour.Room.Id),
+            Number = contour.Room?.Number,
+            Name = contour.Room?.get_Parameter(BuiltInParameter.ROOM_NAME)?.AsString(),
+            MemberRoomIds = roomResult.MemberContours.Select(c => IdValue(c.Room.Id)).ToList(),
+            MemberRoomNumbers = roomResult.MemberContours.Select(c => c.Room.Number).ToList(),
+            IgnoredSourceIds = roomResult.MemberContours.SelectMany(c => c.Loops)
+                .SelectMany(l => l.Lines).Select(l => l.SourceId)
+                .Where(id => id != null && contour.IgnoredSourceIds.Contains(id))
+                .Distinct().Select(IdValue).OrderBy(id => id).ToList(),
             RoomType = contour.RoomType.Name,
             contour.BoundaryLocation,
             contour.Error,
@@ -146,6 +161,15 @@ internal class DebugDumpWriter {
                 line.IsFiltered,
                 StartMm = Mm(line.Segment.Start),
                 EndMm = Mm(line.Segment.End),
+                // Для воспроизведения топологии не теряем микрозазоры округлением до 0,1 мм.
+                StartMmExact = new[] {
+                    UnitUtilsHelper.ConvertFromInternalValue(line.Segment.Start.X),
+                    UnitUtilsHelper.ConvertFromInternalValue(line.Segment.Start.Y)
+                },
+                EndMmExact = new[] {
+                    UnitUtilsHelper.ConvertFromInternalValue(line.Segment.End.X),
+                    UnitUtilsHelper.ConvertFromInternalValue(line.Segment.End.Y)
+                },
                 LengthMm = Math.Round(UnitUtilsHelper.ConvertFromInternalValue(line.Segment.Length), 1),
                 DirectionDeg = Math.Round(Math.Atan2(line.Segment.Direction.Y, line.Segment.Direction.X) * 180 / Math.PI, 3),
                 InwardNormal = new[] { Math.Round(line.InwardNormal.X, 4), Math.Round(line.InwardNormal.Y, 4) },

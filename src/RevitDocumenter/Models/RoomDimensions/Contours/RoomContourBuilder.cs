@@ -25,7 +25,7 @@ internal class RoomContourBuilder {
         _normalizer = normalizer.ThrowIfNull();
     }
 
-    public RoomContour Build(Room room, RoomTypeSettings roomType) {
+    public RoomContour Build(Room room, RoomTypeSettings roomType, bool normalize = true) {
         room.ThrowIfNull();
         roomType.ThrowIfNull();
 
@@ -55,6 +55,24 @@ internal class RoomContourBuilder {
             return contour;
         }
 
+        CompleteArea(contour, lineLoops, normalize);
+        return contour;
+    }
+
+    /// <summary>
+    /// Нормализует ранее сохранённые исходные петли без повторного запроса границ Revit.
+    /// </summary>
+    public void Normalize(RoomContour contour) {
+        var loops = contour.Loops.Select(l => l.Lines.ToList()).ToList();
+        contour.Loops.Clear();
+        CompleteArea(contour, loops);
+    }
+
+    /// <summary>
+    /// Подготавливает нормали, петли и контурные точки области к существующему планировщику.
+    /// </summary>
+    public void CompleteArea(RoomContour contour, List<List<ContourLine>> lineLoops, bool normalize = true) {
+        var roomType = contour.RoomType;
         // Внешний контур - петля с наибольшей площадью
         var areas = lineLoops.Select(GetSignedArea).ToList();
         int outerIndex = areas
@@ -82,12 +100,12 @@ internal class RoomContourBuilder {
             for(int k = 0; k < lineLoops[i].Count; k++) {
                 lineLoops[i][k].RawIndices = [k];
             }
-            var normalized = _normalizer.Normalize(
+            var normalized = normalize ? _normalizer.Normalize(
                 lineLoops[i],
                 UnitUtilsHelper.ConvertToInternalValue(roomType.MergeOffsetMm),
                 UnitUtilsHelper.ConvertToInternalValue(roomType.MinLineLengthMm),
-                loop.NormalizationLog);
-            loop.Elements = InsertContourPoints(normalized);
+                loop.NormalizationLog) : lineLoops[i];
+            loop.Elements = normalize ? InsertContourPoints(normalized) : normalized.Cast<ContourElement>().ToList();
             for(int j = 0; j < loop.Elements.Count; j++) {
                 loop.Elements[j].Index = j;
             }
@@ -96,7 +114,6 @@ internal class RoomContourBuilder {
 
         // Внешний контур первым, затем внутренние
         contour.Loops.Sort((a, b) => b.IsOuter.CompareTo(a.IsOuter));
-        return contour;
     }
 
     private static SpatialElementBoundaryLocation ParseBoundaryLocation(string value) {

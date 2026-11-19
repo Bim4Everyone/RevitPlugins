@@ -36,6 +36,9 @@ internal class RoomDimensioningViewModel : BaseViewModel {
     private int _unmatchedRoomCount;
     private string _errorText;
     private bool _debugMode;
+    private bool _ignoreRoomSeparationLines;
+    private bool _ignoreBeaconPartitions;
+    private string _beaconPartitionText;
     private bool _isSettingsLoaded;
 
     public RoomDimensioningViewModel(
@@ -117,6 +120,30 @@ internal class RoomDimensioningViewModel : BaseViewModel {
     }
 
     /// <summary>
+    /// Объединять расчётные области через разделители помещений.
+    /// </summary>
+    public bool IgnoreRoomSeparationLines {
+        get => _ignoreRoomSeparationLines;
+        set => RaiseAndSetIfChanged(ref _ignoreRoomSeparationLines, value);
+    }
+
+    /// <summary>
+    /// Исключать маячковые перегородки по назначению экземпляра стены.
+    /// </summary>
+    public bool IgnoreBeaconPartitions {
+        get => _ignoreBeaconPartitions;
+        set => RaiseAndSetIfChanged(ref _ignoreBeaconPartitions, value);
+    }
+
+    /// <summary>
+    /// Искомый текст в назначении экземпляра маячковой стены.
+    /// </summary>
+    public string BeaconPartitionText {
+        get => _beaconPartitionText;
+        set => RaiseAndSetIfChanged(ref _beaconPartitionText, value);
+    }
+
+    /// <summary>
     /// Файл настроек прочитан без ошибок.
     /// </summary>
     public bool IsSettingsLoaded {
@@ -168,6 +195,9 @@ internal class RoomDimensioningViewModel : BaseViewModel {
             _settings = _settingsReader.Read(path);
             SettingsErrorText = string.Empty;
             DebugMode = _settings.Debug.Enabled;
+            IgnoreRoomSeparationLines = _settings.Areas.IgnoreRoomSeparationLines;
+            IgnoreBeaconPartitions = _settings.Areas.IgnoreBeaconPartitions;
+            BeaconPartitionText = _settings.Areas.BeaconPartitionText;
             IsSettingsLoaded = true;
         } catch(InvalidOperationException ex) {
             SettingsErrorText = ex.Message;
@@ -207,7 +237,7 @@ internal class RoomDimensioningViewModel : BaseViewModel {
 
     private void AcceptView() {
         SaveConfig();
-        string settingsSaveError = SaveDebugMode();
+        string settingsSaveError = SaveRunOptions();
         var result = _dimensioningService.Run(_settings, SettingsPath);
 
         string message = BuildResultMessage(result);
@@ -218,14 +248,21 @@ internal class RoomDimensioningViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Записывает режим отладки в файл настроек, если пользователь его изменил.
+    /// Записывает режим отладки и независимые правила областей в файл настроек.
     /// </summary>
     /// <returns>Текст ошибки записи или null.</returns>
-    private string SaveDebugMode() {
-        if(_settings.Debug.Enabled == DebugMode) {
+    private string SaveRunOptions() {
+        string beaconText = AreaSettings.NormalizeBeaconPartitionText(BeaconPartitionText);
+        if(_settings.Debug.Enabled == DebugMode
+           && _settings.Areas.IgnoreRoomSeparationLines == IgnoreRoomSeparationLines
+           && _settings.Areas.IgnoreBeaconPartitions == IgnoreBeaconPartitions
+           && string.Equals(_settings.Areas.BeaconPartitionText, beaconText, StringComparison.Ordinal)) {
             return null;
         }
         _settings.Debug.Enabled = DebugMode;
+        _settings.Areas.IgnoreRoomSeparationLines = IgnoreRoomSeparationLines;
+        _settings.Areas.IgnoreBeaconPartitions = IgnoreBeaconPartitions;
+        _settings.Areas.BeaconPartitionText = beaconText;
         try {
             _settingsReader.Save(_settings, SettingsPath);
             return null;
@@ -245,6 +282,14 @@ internal class RoomDimensioningViewModel : BaseViewModel {
             $"{Localize("RoomDimensioningResult.Deleted")} {result.DeletedDimensionCount}",
             $"{Localize("RoomDimensioningResult.Warnings")} {result.Warnings.Count}"
         };
+        if(result.Areas.Count > 0) {
+            lines.Add($"{Localize("RoomDimensioningResult.Areas")} {result.Areas.Count}");
+            lines.Add($"{Localize("RoomDimensioningResult.AreaErrors")} {result.AreaErrorCount}");
+            foreach(var area in result.Areas.Where(a => a.Contour.Error != null).Take(3)) {
+                lines.Add($"[{string.Join(", ", area.MemberContours.Select(c => c.Room.Number))}]: "
+                          + area.Contour.Error);
+            }
+        }
         if(result.DebugLineCount > 0) {
             lines.Add($"{Localize("RoomDimensioningResult.DebugLines")} {result.DebugLineCount}");
         }

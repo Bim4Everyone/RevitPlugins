@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Autodesk.Revit.DB;
+
 using RevitDocumenter.Models.RoomDimensions.Geometry;
 
 namespace RevitDocumenter.Models.RoomDimensions.Contours;
@@ -16,6 +18,9 @@ internal class ContourNormalizer {
     private const double _angleTolerance = 1e-4;
     // Линии с разницей отступа меньше этого значения считаются лежащими на одной прямой, футы (~0.3 мм)
     private const double _sameLineTolerance = 1e-3;
+    // Численная соосность граней по всем концам, мм модели; не заменяет MergeOffset.
+    private const double _numericalOffsetMm = 0.1;
+    private const double _numericalDirectionDot = 0.999;
 
     /// <param name="lines">Линии петли по порядку обхода. Нормали внутрь уже должны быть заданы.</param>
     /// <param name="mergeOffset">Отступ между параллельными линиями, меньше которого они сращиваются, футы.</param>
@@ -33,11 +38,57 @@ internal class ContourNormalizer {
         var result = lines.ToList();
         bool changed;
         do {
-            changed = result.Count > 3 && (RemoveStep(result, mergeOffset, log) || MergeAdjacent(result, mergeOffset, log));
+            changed = result.Count > 3 && (RemoveNumericalConnector(result, mergeOffset, log)
+                || RemoveStep(result, mergeOffset, log) || MergeAdjacent(result, mergeOffset, log));
         } while(changed);
 
         MarkShortLines(result, minLength, log);
         return result;
+    }
+
+    /// <summary>
+    /// Убирает ложный наклон связки без источника между реальными соосными гранями.
+    /// Сразу сращивает соседние грани, чтобы в петле не осталось разрыва.
+    /// </summary>
+    private static bool RemoveNumericalConnector(List<ContourLine> lines, double mergeOffset, List<string> log) {
+        // Удаление связки и сращивание её соседей сокращают петлю на две линии.
+        if(lines.Count < 5 || mergeOffset <= 0) {
+            return false;
+        }
+        double tolerance = UnitUtilsHelper.ConvertToInternalValue(_numericalOffsetMm);
+        for(int i = 0; i < lines.Count; i++) {
+            var line = lines[i];
+            var previous = lines[(i - 1 + lines.Count) % lines.Count];
+            var next = lines[(i + 1) % lines.Count];
+            if(HasSource(line) || line.IsArc || !HasSource(previous) || !HasSource(next)
+               || !AreCodirectional(previous, next)
+               || line.Segment.Direction.Dot(previous.Segment.Direction) < _numericalDirectionDot
+               || GetOffset(previous, next) >= mergeOffset) {
+                continue;
+            }
+
+            var origin = previous.Segment.Start;
+            var normal = previous.Segment.Direction.PerpendicularLeft();
+            var points = new[] { line.Segment.Start, line.Segment.End, next.Segment.Start, next.Segment.End };
+            double deviation = points.Max(p => Math.Abs((p - origin).Dot(normal)));
+            if(deviation > tolerance) {
+                continue;
+            }
+
+            var (merged, _) = Merge(previous, next);
+            lines.RemoveAt(i);
+            int previousIndex = (i - 1 + lines.Count) % lines.Count;
+            ReplaceAdjacent(lines, previousIndex, merged);
+            log.Add($"Численная связка {Raw(line)} ({Mm(line.Segment.Length)} мм) без источника удалена "
+                    + $"между {Raw(previous)} и {Raw(next)}: отклонение "
+                    + $"{UnitUtilsHelper.ConvertFromInternalValue(deviation):0.######} мм");
+            return true;
+        }
+        return false;
+    }
+
+    private static bool HasSource(ContourLine line) {
+        return line.SourceId != null && line.SourceId != ElementId.InvalidElementId;
     }
 
     /// <summary>
@@ -83,14 +134,17 @@ internal class ContourNormalizer {
                     + $"({Mm(merged.Segment.Length)} мм, отступ {Mm(GetOffset(first, second))} мм, "
                     + $"прямая и источник от линии {Raw(basis)})");
 
-            // Первая линия заменяется сращённой, вторая удаляется (при j = 0 петля переходит через начало)
-            lines[i] = merged;
-            lines.RemoveAt(j);
-            int mergedIndex = j == 0 ? i - 1 : i;
-            ConnectNeighbors(lines, mergedIndex);
+            ReplaceAdjacent(lines, i, merged);
             return true;
         }
         return false;
+    }
+
+    private static void ReplaceAdjacent(List<ContourLine> lines, int index, ContourLine merged) {
+        int next = (index + 1) % lines.Count;
+        lines[index] = merged;
+        lines.RemoveAt(next);
+        ConnectNeighbors(lines, next == 0 ? index - 1 : index);
     }
 
     /// <summary>

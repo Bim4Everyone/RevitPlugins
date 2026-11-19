@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
 using RevitDocumenter.Models.RoomDimensions.Settings;
@@ -15,6 +16,15 @@ internal class RoomContour {
         Room = room;
         RoomType = roomType;
     }
+
+    /// <summary>
+    /// Геометрия общей области не принадлежит одному помещению Revit.
+    /// </summary>
+    public RoomContour(RoomTypeSettings roomType) {
+        RoomType = roomType;
+    }
+
+    public HashSet<ElementId> IgnoredSourceIds { get; } = [];
 
     public Room Room { get; }
     public RoomTypeSettings RoomType { get; }

@@ -14,7 +14,7 @@
     Title="{me:LocalizationSource RoomDimensioningWindow.Title}"
     KeyDown="Window_KeyDown"
 
-    Height="520"
+    Height="615"
     Width="760"
 
     MinHeight="420"
@@ -117,14 +117,38 @@
                     Content="{me:LocalizationSource RoomDimensioningWindow.Browse}"
                     Command="{Binding BrowseSettingsCommand}" />
 
-                <CheckBox
+                <StackPanel
                     Grid.Row="2"
                     Grid.Column="1"
                     Grid.ColumnSpan="2"
                     Margin="0 5"
-                    Content="{me:LocalizationSource RoomDimensioningWindow.DebugMode}"
-                    IsEnabled="{Binding IsSettingsLoaded}"
-                    IsChecked="{Binding DebugMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    IsEnabled="{Binding IsSettingsLoaded}">
+                    <CheckBox
+                        Margin="0 3"
+                        Content="{me:LocalizationSource RoomDimensioningWindow.IgnoreRoomSeparationLines}"
+                        IsChecked="{Binding IgnoreRoomSeparationLines, Mode=TwoWay}" />
+                    <CheckBox
+                        Margin="0 3"
+                        Content="{me:LocalizationSource RoomDimensioningWindow.IgnoreBeaconPartitions}"
+                        IsChecked="{Binding IgnoreBeaconPartitions, Mode=TwoWay}" />
+                    <DockPanel
+                        Margin="22 3 0 3"
+                        IsEnabled="{Binding IgnoreBeaconPartitions}">
+                        <Label
+                            Margin="0 0 8 0"
+                            VerticalAlignment="Center"
+                            Target="{Binding ElementName=BeaconPartitionTextBox}"
+                            Content="{me:LocalizationSource RoomDimensioningWindow.BeaconPartitionText}" />
+                        <ui:TextBox
+                            x:Name="BeaconPartitionTextBox"
+                            Text="{Binding BeaconPartitionText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            ToolTip="{me:LocalizationSource RoomDimensioningWindow.BeaconPartitionTextHint}" />
+                    </DockPanel>
+                    <CheckBox
+                        Margin="0 3"
+                        Content="{me:LocalizationSource RoomDimensioningWindow.DebugMode}"
+                        IsChecked="{Binding DebugMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
 
                 <ui:TextBlock
                     Grid.Row="3"

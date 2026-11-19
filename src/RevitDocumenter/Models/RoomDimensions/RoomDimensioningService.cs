@@ -54,7 +54,11 @@ internal class RoomDimensioningService {
 
     public RoomDimensioningResult Run(RoomDimensioningSettings settings, string settingsPath) {
         settings.ThrowIfNull();
-        var result = new RoomDimensioningResult();
+        var result = new RoomDimensioningResult {
+            IgnoreRoomSeparationLines = settings.Areas.IgnoreRoomSeparationLines,
+            IgnoreBeaconPartitions = settings.Areas.IgnoreBeaconPartitions,
+            BeaconPartitionText = AreaSettings.NormalizeBeaconPartitionText(settings.Areas.BeaconPartitionText)
+        };
 
         var dimensionTypes = _revitRepository.DimensionTypes
             .GroupBy(t => t.Name)
@@ -90,9 +94,17 @@ internal class RoomDimensioningService {
                     continue;
                 }
 
-                var contour = _contourBuilder.Build(room, roomType);
+                var contour = _contourBuilder.Build(room, roomType, !settings.Areas.IsEnabled());
                 var roomResult = new RoomRunResult(contour);
                 result.Rooms.Add(roomResult);
+            }
+            if(settings.Areas.IsEnabled()) {
+                result.Areas.AddRange(new DimensioningAreaBuilder(_revitRepository.Document, _contourBuilder)
+                    .Build(result.Rooms, settings.Areas, result.AreaDiagnostics));
+            }
+            foreach(var roomResult in result.PlanningResults) {
+                var contour = roomResult.Contour;
+                var roomType = contour.RoomType;
                 if(contour.Error != null) {
                     continue;
                 }
@@ -184,7 +196,7 @@ internal class RoomDimensioningService {
         transaction.Start();
 
         result.DebugLineCount = _contourDrawer.Draw(
-            result.Rooms.Where(r => r.Contour.Error == null).Select(r => r.Contour));
+            result.PlanningResults.Where(r => r.Contour.Error == null).Select(r => r.Contour));
 
         transaction.Commit();
         result.Warnings.AddRange(warningSwallower.Messages);

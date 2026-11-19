@@ -1,5 +1,10 @@
 {
   "PurposeParameterName": "Назначение",
+  "Areas": {
+    "IgnoreRoomSeparationLines": false,
+    "IgnoreBeaconPartitions": false,
+    "BeaconPartitionText": "Маячковая перегородка"
+  },
   "Layout": {
     "FirstTierOffsetPrintMm": 8,
     "TierStepPrintMm": 7,

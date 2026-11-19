@@ -18,6 +18,7 @@ internal class ReferenceResolver {
     private const double _normalTolerance = 1e-4;
 
     private readonly RevitRepository _revitRepository;
+    private HashSet<ElementId> _ignoredSourceIds = [];
 
     public ReferenceResolver(RevitRepository revitRepository) {
         _revitRepository = revitRepository.ThrowIfNull();
@@ -25,6 +26,7 @@ internal class ReferenceResolver {
 
     public void Resolve(RoomContour contour) {
         contour.ThrowIfNull();
+        _ignoredSourceIds = contour.IgnoredSourceIds;
         var geometryCache = new Dictionary<ElementId, List<GeometryItem>>();
 
         foreach(var loop in contour.Loops) {
@@ -53,6 +55,10 @@ internal class ReferenceResolver {
             return;
         }
 
+        if(line.SourceId != null && _ignoredSourceIds.Contains(line.SourceId)) {
+            line.ReferenceError = "Источник исключён из области образмеривания";
+            return;
+        }
         var ownSource = GetSourceElement(line);
 
         // Разделитель помещений или другая линия модели
@@ -204,7 +210,8 @@ internal class ReferenceResolver {
     }
 
     private Element GetSourceElement(ContourLine line) {
-        if(line?.SourceId is null || line.SourceId == ElementId.InvalidElementId) {
+        if(line?.SourceId is null || line.SourceId == ElementId.InvalidElementId
+           || _ignoredSourceIds.Contains(line.SourceId)) {
             return null;
         }
         return _revitRepository.Document.GetElement(line.SourceId);

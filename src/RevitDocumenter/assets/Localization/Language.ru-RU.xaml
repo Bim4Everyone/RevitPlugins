@@ -75,4 +75,10 @@
     <system:String x:Key="RoomDimensioningSettings.NoRoomTypes">В настройках нет ни одного типа помещений (RoomTypes)</system:String>
     <system:String x:Key="RoomDimensioningSettings.RoomTypeFieldEmpty">У типа помещений № {0} не заполнено поле {1}</system:String>
     <system:String x:Key="RoomDimensioningSettings.DuplicatePurposeValue">Значение назначения повторяется у нескольких типов помещений:</system:String>
+    <system:String x:Key="RoomDimensioningWindow.IgnoreRoomSeparationLines">Игнорировать разделители помещений</system:String>
+    <system:String x:Key="RoomDimensioningWindow.IgnoreBeaconPartitions">Игнорировать маячковые перегородки</system:String>
+    <system:String x:Key="RoomDimensioningWindow.BeaconPartitionText">Текст в назначении стены</system:String>
+    <system:String x:Key="RoomDimensioningWindow.BeaconPartitionTextHint">Поиск по вхождению в ФОП_ТИП_Назначение. Для пустого поля используется «Маячковая перегородка».</system:String>
+    <system:String x:Key="RoomDimensioningResult.Areas">Расчётных областей:</system:String>
+    <system:String x:Key="RoomDimensioningResult.AreaErrors">Областей с ошибкой (пропущено):</system:String>
 </ResourceDictionary>

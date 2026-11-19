@@ -14,6 +14,13 @@ internal class RoomDimensioningResult {
     public int DeletedDimensionCount { get; set; }
     public int UnmatchedRoomCount { get; set; }
     public List<RoomRunResult> Rooms { get; } = [];
+    public List<RoomRunResult> Areas { get; } = [];
+    public List<string> AreaDiagnostics { get; } = [];
+    public bool IgnoreRoomSeparationLines { get; set; }
+    public bool IgnoreBeaconPartitions { get; set; }
+    public string BeaconPartitionText { get; set; }
+    public IEnumerable<RoomRunResult> PlanningResults => Areas.Count > 0 ? Areas : Rooms;
+    public int AreaErrorCount => Areas.Count(a => a.Contour.Error != null);
 
     /// <summary>
     /// Скрытые предупреждения Revit.
@@ -44,19 +51,22 @@ internal class RoomDimensioningResult {
     public DoorObstacleResult DoorObstacles { get; set; } = new();
 
     public int RoomErrorCount => Rooms.Count(r => r.Contour.Error != null);
-    public int LineCount => Rooms.Sum(r => r.Contour.Loops.Sum(l => l.Lines.Count()));
-    public int LinesWithoutReferenceCount => Rooms.Sum(r => r.Contour.Loops.Sum(l => l.Lines.Count(x => x.Reference is null)));
-    public int DimensionCount => Rooms.Sum(r => r.Dimensions.Count);
-    public int DimensionOkCount => Rooms.Sum(r => r.Dimensions.Count(d => d.Status == "Ok"));
+    public int LineCount => PlanningResults.Sum(r => r.Contour.Loops.Sum(l => l.Lines.Count()));
+    public int LinesWithoutReferenceCount => PlanningResults.Sum(r => r.Contour.Loops.Sum(l => l.Lines.Count(x => x.Reference is null)));
+    public int DimensionCount => PlanningResults.Sum(r => r.Dimensions.Count);
+    public int DimensionOkCount => PlanningResults.Sum(r => r.Dimensions.Count(d => d.Status == "Ok"));
 }
 
 /// <summary>
 /// Итог по одному помещению.
 /// </summary>
 internal class RoomRunResult {
-    public RoomRunResult(RoomContour contour) {
+    public RoomRunResult(RoomContour contour, IEnumerable<RoomContour> members = null) {
         Contour = contour;
+        MemberContours = members?.ToList() ?? [];
     }
+
+    public List<RoomContour> MemberContours { get; }
 
     public RoomContour Contour { get; }
     /// <summary>
