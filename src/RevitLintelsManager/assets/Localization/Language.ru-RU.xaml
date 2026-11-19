@@ -100,4 +100,27 @@
     <system:String x:Key="Manager.SignalRejected">Не удалось передать запрос в Revit. Повторите обновление.</system:String>
     <system:String x:Key="Manager.ReadFailed">Не удалось прочитать текущий вид и выделение. Повторите обновление.</system:String>
     <system:String x:Key="Manager.ClosePending">Окно ожидает завершения запроса Revit перед освобождением ресурсов.</system:String>
+    <system:String x:Key="Manager.Action.Correct">Исправить</system:String>
+    <system:String x:Key="Manager.Action.Delete">Удалить</system:String>
+    <system:String x:Key="Manager.Action.Install">Установить</system:String>
+    <system:String x:Key="Manager.Action.Lock">Поставить замок</system:String>
+    <system:String x:Key="Manager.Action.Replace">Заменить</system:String>
+    <system:String x:Key="Manager.Action.Skip">Пропустить</system:String>
+    <system:String x:Key="Manager.Count">Количество: {0}</system:String>
+    <system:String x:Key="Manager.Expand">Раскрыть / свернуть группу</system:String>
+    <system:String x:Key="Manager.Information">Информация</system:String>
+    <system:String x:Key="Manager.Navigate">Показать элементы</system:String>
+    <system:String x:Key="Manager.NoLintel">&lt; Нет перемычки &gt;</system:String>
+    <system:String x:Key="Manager.NoOpening">&lt; Нет проёма &gt;</system:String>
+    <system:String x:Key="Manager.Process">Обработать (0)</system:String>
+    <system:String x:Key="Manager.Project">Во всём проекте</system:String>
+    <system:String x:Key="Manager.Range">Диапазон отображения:</system:String>
+    <system:String x:Key="Manager.Selected">Выделенные</system:String>
+    <system:String x:Key="Manager.Status.Correct">Соответствует</system:String>
+    <system:String x:Key="Manager.Status.Fixed">Зафиксирован</system:String>
+    <system:String x:Key="Manager.Status.Grouped">В группе модели</system:String>
+    <system:String x:Key="Manager.Status.Missing">Элемент отсутствует</system:String>
+    <system:String x:Key="Manager.Status.Warning">Предупреждение</system:String>
+    <system:String x:Key="Manager.Variants">Варианты</system:String>
+    <system:String x:Key="Manager.View">Видимые на виде</system:String>
 </ResourceDictionary>

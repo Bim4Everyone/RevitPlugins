@@ -1,0 +1,299 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:RevitLintelsManager.ViewModels"
+    xmlns:models="clr-namespace:RevitLintelsManager.Models"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore">
+    <DataTemplate
+        DataType="{x:Type vm:ManagerElementViewModel}">
+        <Border
+            MinWidth="0"
+            Height="32"
+            Padding="8,0"
+            Background="{DynamicResource ControlFillColorDefaultBrush}"
+            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="4">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="Auto" />
+                    <ColumnDefinition
+                        Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    x:Name="ElementName"
+                    VerticalAlignment="Center"
+                    Text="{Binding TypeName}"
+                    TextTrimming="CharacterEllipsis"
+                    ToolTip="{Binding TypeName}" />
+                <ui:Button
+                    x:Name="InformationButton"
+                    Grid.Column="1"
+                    Margin="4,0"
+                    Padding="0"
+                    Appearance="Transparent"
+                    IsEnabled="False"
+                    ToolTip="{me:LocalizationSource Manager.Information}">
+                    <ui:SymbolIcon
+                        Symbol="Info24"
+                        FontSize="16" />
+                </ui:Button>
+                <ui:SymbolIcon
+                    x:Name="StatusIcon"
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    Foreground="ForestGreen"
+                    Symbol="CheckmarkCircle24"
+                    FontSize="18"
+                    ToolTip="{Binding StatusText}" />
+            </Grid>
+        </Border>
+        <DataTemplate.Triggers>
+            <DataTrigger
+                Binding="{Binding ShowInformation}"
+                Value="False">
+                <Setter
+                    TargetName="InformationButton"
+                    Property="Visibility"
+                    Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger
+                Binding="{Binding Status}"
+                Value="{x:Static models:ManagerElementStatus.Warning}">
+                <Setter
+                    TargetName="StatusIcon"
+                    Property="Symbol"
+                    Value="Warning24" />
+                <Setter
+                    TargetName="StatusIcon"
+                    Property="Foreground"
+                    Value="DarkOrange" />
+            </DataTrigger>
+            <DataTrigger
+                Binding="{Binding Status}"
+                Value="{x:Static models:ManagerElementStatus.Fixed}">
+                <Setter
+                    TargetName="StatusIcon"
+                    Property="Symbol"
+                    Value="LockClosed24" />
+                <Setter
+                    TargetName="StatusIcon"
+                    Property="Foreground"
+                    Value="DarkOrange" />
+            </DataTrigger>
+            <DataTrigger
+                Binding="{Binding Status}"
+                Value="{x:Static models:ManagerElementStatus.Grouped}">
+                <Setter
+                    TargetName="StatusIcon"
+                    Property="Symbol"
+                    Value="Cube24" />
+                <Setter
+                    TargetName="StatusIcon"
+                    Property="Foreground"
+                    Value="DarkOrange" />
+            </DataTrigger>
+            <DataTrigger
+                Binding="{Binding IsMissing}"
+                Value="True">
+                <Setter
+                    TargetName="ElementName"
+                    Property="Foreground"
+                    Value="DarkOrange" />
+                <Setter
+                    TargetName="InformationButton"
+                    Property="Visibility"
+                    Value="Collapsed" />
+                <Setter
+                    TargetName="StatusIcon"
+                    Property="Visibility"
+                    Value="Collapsed" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+    <DataTemplate
+        DataType="{x:Type vm:ManagerGroupViewModel}">
+        <Border
+            Margin="0,8,0,0"
+            Padding="12,14,12,14"
+            Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="30" />
+                    <ColumnDefinition
+                        Width="48" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="140" />
+                </Grid.ColumnDefinitions>
+                <CheckBox
+                    Width="24"
+                    MinWidth="0"
+                    Padding="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsChecked="{Binding IsChecked, Mode=OneWay}"
+                    IsThreeState="True"
+                    IsEnabled="False" />
+                <ui:Button
+                    Grid.Column="1"
+                    Width="36"
+                    Height="30"
+                    Padding="0"
+                    HorizontalAlignment="Left"
+                    Appearance="Primary"
+                    IsEnabled="False"
+                    ToolTip="{me:LocalizationSource Manager.Navigate}">
+                    <ui:SymbolIcon
+                        Symbol="Search24"
+                        FontSize="18"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                </ui:Button>
+                <ContentControl
+                    Grid.Column="2"
+                    Margin="0,0,12,0"
+                    Content="{Binding Opening}" />
+                <ContentControl
+                    Grid.Column="3"
+                    Margin="0,0,12,0"
+                    Content="{Binding Lintel}" />
+                <Grid
+                    Grid.Column="4"
+                    Grid.ColumnSpan="1">
+                    <ComboBox
+                        Height="32"
+                        IsEnabled="False"
+                        ItemsSource="{Binding Actions}"
+                        DisplayMemberPath="Title"
+                        SelectedItem="{Binding SelectedAction, Mode=OneWay}" />
+                    <TextBlock
+                        Margin="12,0,32,0"
+                        VerticalAlignment="Center"
+                        IsHitTestVisible="False"
+                        Text="{Binding MixedActionsText}"
+                        TextTrimming="CharacterEllipsis"
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                </Grid>
+                <DockPanel
+                    Grid.Column="5"
+                    Margin="12,0,0,0">
+                    <ui:Button
+                        DockPanel.Dock="Right"
+                        Width="28"
+                        Height="28"
+                        Padding="0"
+                        Appearance="Transparent"
+                        IsEnabled="False"
+                        ToolTip="{me:LocalizationSource Manager.Expand}">
+                        <ui:SymbolIcon
+                            x:Name="ExpandIcon"
+                            Symbol="ChevronDown24"
+                            FontSize="18" />
+                    </ui:Button>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding CountText}"
+                        TextTrimming="CharacterEllipsis" />
+                </DockPanel>
+            </Grid>
+        </Border>
+        <DataTemplate.Triggers>
+            <DataTrigger
+                Binding="{Binding IsExpanded}"
+                Value="True">
+                <Setter
+                    TargetName="ExpandIcon"
+                    Property="Symbol"
+                    Value="ChevronUp24" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+    <DataTemplate
+        DataType="{x:Type vm:ManagerItemViewModel}">
+        <Border
+            Margin="0,0,0,0"
+            Padding="12,6,12,6"
+            Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1,0,1,0"
+            CornerRadius="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="30" />
+                    <ColumnDefinition
+                        Width="48" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="140" />
+                </Grid.ColumnDefinitions>
+                <CheckBox
+                    Width="24"
+                    MinWidth="0"
+                    Padding="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    IsChecked="{Binding IsChecked, Mode=OneWay}"
+                    IsThreeState="True"
+                    IsEnabled="False" />
+                <ui:Button
+                    Grid.Column="1"
+                    Width="36"
+                    Height="30"
+                    Padding="0"
+                    HorizontalAlignment="Left"
+                    Appearance="Primary"
+                    IsEnabled="False"
+                    ToolTip="{me:LocalizationSource Manager.Navigate}">
+                    <ui:SymbolIcon
+                        Symbol="Search24"
+                        FontSize="18"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                </ui:Button>
+                <ContentControl
+                    Grid.Column="2"
+                    Margin="0,0,12,0"
+                    Content="{Binding Opening}" />
+                <ContentControl
+                    Grid.Column="3"
+                    Margin="0,0,12,0"
+                    Content="{Binding Lintel}" />
+                <Grid
+                    Grid.Column="4"
+                    Grid.ColumnSpan="2">
+                    <ComboBox
+                        Height="32"
+                        IsEnabled="False"
+                        ItemsSource="{Binding Actions}"
+                        DisplayMemberPath="Title"
+                        SelectedItem="{Binding SelectedAction, Mode=OneWay}" />
+                    <TextBlock
+                        Margin="12,0,32,0"
+                        VerticalAlignment="Center"
+                        IsHitTestVisible="False"
+                        Text="{Binding MixedActionsText}"
+                        TextTrimming="CharacterEllipsis"
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                </Grid>
+            </Grid>
+        </Border>
+    </DataTemplate>
+</ResourceDictionary>

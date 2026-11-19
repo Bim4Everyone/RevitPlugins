@@ -6,14 +6,17 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     Title="{me:LocalizationSource Manager.Title}"
+    Background="{DynamicResource ApplicationBackgroundBrush}"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     Width="1100"
     Height="650"
-    MinWidth="650"
-    MinHeight="350">
+    MinWidth="1000"
+    MinHeight="450">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles.xaml" />
+                <ResourceDictionary Source="ManagerRows.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
         </ResourceDictionary>
@@ -28,18 +31,34 @@
         <ui:TitleBar
             Grid.Row="0"
             Title="{me:LocalizationSource Manager.Title}" />
-        <ui:Button
+        <WrapPanel
             Grid.Row="1"
             Margin="20,16,20,0"
-            HorizontalAlignment="Right"
-            Content="{me:LocalizationSource Manager.Refresh}"
-            Command="{Binding RefreshCommand}"
-            ToolTip="{Binding ContextSummary}" />
+            HorizontalAlignment="Right">
+            <TextBlock
+                Margin="0,0,12,0"
+                VerticalAlignment="Center"
+                Text="{me:LocalizationSource Manager.Range}" />
+            <ui:Button
+                Margin="0,0,8,0"
+                IsEnabled="False"
+                Content="{me:LocalizationSource Manager.Project}" />
+            <ui:Button
+                Margin="0,0,8,0"
+                IsEnabled="False"
+                Content="{me:LocalizationSource Manager.View}" />
+            <ui:Button
+                Margin="0,0,8,0"
+                IsEnabled="False"
+                Content="{me:LocalizationSource Manager.Selected}" />
+            <ui:Button
+                Content="{me:LocalizationSource Manager.Refresh}"
+                Command="{Binding RefreshCommand}"
+                ToolTip="{Binding ContextSummary}" />
+        </WrapPanel>
         <Border
             Grid.Row="2"
             Margin="20"
-            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
-            BorderThickness="1"
             CornerRadius="8">
             <Border.Style>
                 <Style TargetType="Border">
@@ -54,13 +73,39 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <ItemsControl ItemsSource="{Binding Items}" />
+            <ListBox
+                x:Name="RowsList"
+                BorderThickness="0"
+                Background="Transparent"
+                Style="{StaticResource SettingsListStyle}"
+                ItemsSource="{Binding VisibleRows}"
+                ScrollViewer.CanContentScroll="True"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                VirtualizingPanel.IsVirtualizing="True"
+                VirtualizingPanel.VirtualizationMode="Recycling"
+                VirtualizingPanel.ScrollUnit="Pixel">
+                <ListBox.ItemContainerStyle>
+                    <Style
+                        TargetType="ListBoxItem"
+                        BasedOn="{StaticResource SettingsCheckListItemStyle}">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Focusable" Value="False" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
         </Border>
         <Grid
             Grid.Row="3"
             Margin="20,0,20,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock
@@ -73,6 +118,13 @@
                 Visibility="{Binding IsBlocked, Converter={StaticResource BoolToVisibility}}" />
             <ui:Button
                 Grid.Column="1"
+                MinWidth="130"
+                Margin="0,0,16,0"
+                Appearance="Primary"
+                IsEnabled="False"
+                Content="{me:LocalizationSource Manager.Process}" />
+            <ui:Button
+                Grid.Column="2"
                 MinWidth="130"
                 Content="{me:LocalizationSource Manager.Close}"
                 Command="{Binding CloseCommand}" />

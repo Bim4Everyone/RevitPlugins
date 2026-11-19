@@ -100,4 +100,27 @@
     <system:String x:Key="Manager.SignalRejected">The request could not be sent to Revit. Try refreshing again.</system:String>
     <system:String x:Key="Manager.ReadFailed">The current view and selection could not be read. Try refreshing again.</system:String>
     <system:String x:Key="Manager.ClosePending">The window is waiting for the Revit request to finish before releasing resources.</system:String>
+    <system:String x:Key="Manager.Action.Correct">Correct</system:String>
+    <system:String x:Key="Manager.Action.Delete">Delete</system:String>
+    <system:String x:Key="Manager.Action.Install">Install</system:String>
+    <system:String x:Key="Manager.Action.Lock">Create lock</system:String>
+    <system:String x:Key="Manager.Action.Replace">Replace</system:String>
+    <system:String x:Key="Manager.Action.Skip">Skip</system:String>
+    <system:String x:Key="Manager.Count">Count: {0}</system:String>
+    <system:String x:Key="Manager.Expand">Expand / collapse group</system:String>
+    <system:String x:Key="Manager.Information">Information</system:String>
+    <system:String x:Key="Manager.Navigate">Show elements</system:String>
+    <system:String x:Key="Manager.NoLintel">&lt; No lintel &gt;</system:String>
+    <system:String x:Key="Manager.NoOpening">&lt; No opening &gt;</system:String>
+    <system:String x:Key="Manager.Process">Process (0)</system:String>
+    <system:String x:Key="Manager.Project">Entire project</system:String>
+    <system:String x:Key="Manager.Range">Display range:</system:String>
+    <system:String x:Key="Manager.Selected">Selected</system:String>
+    <system:String x:Key="Manager.Status.Correct">Correct</system:String>
+    <system:String x:Key="Manager.Status.Fixed">Fixed</system:String>
+    <system:String x:Key="Manager.Status.Grouped">In model group</system:String>
+    <system:String x:Key="Manager.Status.Missing">Element missing</system:String>
+    <system:String x:Key="Manager.Status.Warning">Warning</system:String>
+    <system:String x:Key="Manager.Variants">Variants</system:String>
+    <system:String x:Key="Manager.View">Visible in view</system:String>
 </ResourceDictionary>

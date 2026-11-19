@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -15,13 +17,15 @@ namespace RevitLintelsManager.ViewModels;
 
 internal sealed class ManagerViewModel : BaseViewModel {
     public event Action CloseRequested;
+    private readonly IManagerRequestDispatcher _requests;
+    private readonly Dispatcher _dispatcher;
+    private readonly ILocalizationService _localization;
+    private readonly ObservableCollection<ManagerRowViewModel> _visibleRows = new();
     private bool _isBlocked;
     private bool _isRefreshing;
     private string _contextSummary;
     private ManagerDocumentContext _lastContext;
-    private readonly IManagerRequestDispatcher _requests;
-    private readonly Dispatcher _dispatcher;
-    private readonly ILocalizationService _localization;
+    private IReadOnlyList<ManagerGroupViewModel> _groups = Array.Empty<ManagerGroupViewModel>();
 
     /// <summary>Создаёт команды окна без непосредственных зависимостей от Revit API.</summary>
     public ManagerViewModel(ManagerSessionState state, ISettingsCommandFactory commands,
@@ -30,6 +34,7 @@ internal sealed class ManagerViewModel : BaseViewModel {
         _requests = requests;
         _dispatcher = dispatcher;
         _localization = localization;
+        VisibleRows = new ReadOnlyObservableCollection<ManagerRowViewModel>(_visibleRows);
         ContextSummary = localization.GetLocalizedString("Manager.Refresh");
         RefreshCommand = commands.CreateAsync(RefreshContextAsync,
             () => !IsBlocked && !State.IsClosing && !IsRefreshing);
@@ -37,7 +42,7 @@ internal sealed class ManagerViewModel : BaseViewModel {
     }
 
     public ManagerSessionState State { get; }
-    public IReadOnlyList<ManagerItemSnapshot> Items { get; } = Array.Empty<ManagerItemSnapshot>();
+    public ReadOnlyObservableCollection<ManagerRowViewModel> VisibleRows { get; }
     public ICommand CloseCommand { get; }
     public ICommand RefreshCommand { get; }
     public ManagerDocumentContext LastContext {
@@ -57,11 +62,42 @@ internal sealed class ManagerViewModel : BaseViewModel {
         private set => RaiseAndSetIfChanged(ref _isBlocked, value);
     }
 
+    /// <summary>Заменяет готовую проекцию групп без получения данных из Revit.</summary>
+    /// <param name="groups">Материализованные заголовки с дочерними строками.</param>
+    public void SetGroups(IReadOnlyList<ManagerGroupViewModel> groups) {
+        _groups = (groups ?? throw new ArgumentNullException(nameof(groups))).ToList().AsReadOnly();
+        RebuildVisibleRows();
+    }
+
+    /// <summary>Обновляет плоскую проекцию; UI-команда раскрытия подключается в TASK-005.</summary>
+    /// <param name="group">Группа текущей проекции.</param>
+    /// <param name="isExpanded">Требуемая видимость дочерних строк.</param>
+    public void SetExpanded(ManagerGroupViewModel group, bool isExpanded) {
+        if(!_groups.Contains(group)) {
+            return;
+        }
+        group.IsExpanded = isExpanded;
+        RebuildVisibleRows();
+    }
+
     /// <summary>Применяет проверенное в API-контексте состояние исходного документа.</summary>
     public void SetBlocked(bool isBlocked) {
         State.IsBlocked = isBlocked;
         IsBlocked = isBlocked;
         CommandManager.InvalidateRequerySuggested();
+    }
+
+    // В коллекцию попадают только заголовки и дети раскрытых групп, без визуальных контейнеров.
+    private void RebuildVisibleRows() {
+        _visibleRows.Clear();
+        foreach(var group in _groups) {
+            _visibleRows.Add(group);
+            if(group.IsExpanded) {
+                foreach(var item in group.Items) {
+                    _visibleRows.Add(item);
+                }
+            }
+        }
     }
 
     // Передаёт только token/generation в очередь и публикует независимый ответ на UI Dispatcher.
