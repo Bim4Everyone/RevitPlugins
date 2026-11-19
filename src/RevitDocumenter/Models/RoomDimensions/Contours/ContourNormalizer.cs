@@ -21,6 +21,7 @@ internal class ContourNormalizer {
     // Численная соосность граней по всем концам, мм модели; не заменяет MergeOffset.
     private const double _numericalOffsetMm = 0.1;
     private const double _numericalDirectionDot = 0.999;
+    private const double _maxNumericalReturnMm = 1.0;
 
     /// <param name="lines">Линии петли по порядку обхода. Нормали внутрь уже должны быть заданы.</param>
     /// <param name="mergeOffset">Отступ между параллельными линиями, меньше которого они сращиваются, футы.</param>
@@ -38,12 +39,69 @@ internal class ContourNormalizer {
         var result = lines.ToList();
         bool changed;
         do {
-            changed = result.Count > 3 && (RemoveNumericalConnector(result, mergeOffset, log)
+            changed = result.Count > 3 && (RemoveNumericalReturn(result, mergeOffset, log)
+                || RemoveNumericalConnector(result, mergeOffset, log)
                 || RemoveStep(result, mergeOffset, log) || MergeAdjacent(result, mergeOffset, log));
         } while(changed);
 
         MarkShortLines(result, minLength, log);
         return result;
+    }
+
+    /// <summary>
+    /// Убирает короткий обратный ход и соосную связку без источников у прямого угла.
+    /// Две реальные грани доводятся до пересечения их опорных прямых.
+    /// </summary>
+    private static bool RemoveNumericalReturn(List<ContourLine> lines, double mergeOffset, List<string> log) {
+        if(lines.Count < 5 || mergeOffset <= 0) {
+            return false;
+        }
+
+        double tolerance = Math.Min(mergeOffset, UnitUtilsHelper.ConvertToInternalValue(_numericalOffsetMm));
+        double maxReturn = UnitUtilsHelper.ConvertToInternalValue(_maxNumericalReturnMm + 1e-6);
+        int count = lines.Count;
+        for(int i = 0; i < count; i++) {
+            var first = lines[i];
+            var second = lines[(i + 1) % count];
+            var before = lines[(i + count - 1) % count];
+            var after = lines[(i + 2) % count];
+            if(first.IsArc || second.IsArc || before.IsArc || after.IsArc
+               || HasSource(first) || HasSource(second) || !HasSource(before) || !HasSource(after)
+               || first.Segment.Direction.Dot(second.Segment.Direction) > -_numericalDirectionDot) {
+                continue;
+            }
+
+            bool returnFirst = first.Segment.Length < second.Segment.Length;
+            var backtrack = returnFirst ? first : second;
+            var connector = returnFirst ? second : first;
+            var basis = returnFirst ? after : before;
+            var transverse = returnFirst ? before : after;
+            if(backtrack.Segment.Length > maxReturn
+               || connector.Segment.Direction.Dot(basis.Segment.Direction) < _numericalDirectionDot
+               || !transverse.Segment.IsPerpendicularTo(basis.Segment, _angleTolerance)) {
+                continue;
+            }
+
+            var normal = basis.Segment.Direction.PerpendicularLeft();
+            var points = new[] { first.Segment.Start, first.Segment.End, second.Segment.End };
+            double deviation = points.Max(p => Math.Abs((p - basis.Segment.Start).Dot(normal)));
+            var transverseEnd = returnFirst ? before.Segment.End : after.Segment.Start;
+            if(deviation > tolerance || !TryIntersect(before.Segment, after.Segment, out var corner)
+               || transverseEnd.DistanceTo(corner) > tolerance
+               || (corner - before.Segment.Start).Dot(before.Segment.Direction) <= 0
+               || (after.Segment.End - corner).Dot(after.Segment.Direction) <= 0) {
+                continue;
+            }
+
+            before.Segment = new Segment2D(before.Segment.Start, corner);
+            after.Segment = new Segment2D(corner, after.Segment.End);
+            lines.Remove(first);
+            lines.Remove(second);
+            log.Add($"Численный обратный ход {Raw(backtrack)} ({Mm(backtrack.Segment.Length)} мм) "
+                    + $"и связка {Raw(connector)} убраны между {Raw(before)} и {Raw(after)}");
+            return true;
+        }
+        return false;
     }
 
     /// <summary>

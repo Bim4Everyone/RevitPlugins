@@ -315,6 +315,7 @@ internal class ContourDimensionPlanner {
     /// Проверяет, что размерная линия целиком лежит внутри помещения и не пересекает контуры.
     /// Общий размер, кроме того, должен стоять свободно: с отступом от контура (со стороны текста - еще
     /// и на высоту текста) и не ближе шага яруса к параллельным размерам, иначе он режет их текст.
+    /// У опорной цепочки предпочтителен больший отступ, если линия и текст свободны.
     /// Иначе он переносится в ближайшее свободное положение: у граней контура с отступом или следующим
     /// ярусом за параллельным размером; если такого нет - не ставится.
     /// Остальные размеры, вышедшие за пределы помещения (например, линия стены проходит через пилон у стены),
@@ -351,6 +352,17 @@ internal class ContourDimensionPlanner {
             var parallel = result
                 .Where(d => IsSameDirection(d, overall) && Overlaps(d, overall, options))
                 .ToList();
+            double extraSpacing = options.PreferredOverallTierStep - options.TierStep;
+            double preferred = overall.LinePosition + overall.SideSign * extraSpacing;
+            if(extraSpacing > options.CoordinateTolerance
+               && GetPlacementConflict(shape, overall, preferred, parallel, options, options.PreferredOverallTierStep) is null
+               && TextConflictCounter.FindConflict(overall, preferred, result, options) is null) {
+                overall.LinePosition = preferred;
+                result.Add(overall);
+                log.Add($"Общий размер {Names(overall)}: отступ от цепочки увеличен на {Mm(extraSpacing)} мм");
+                continue;
+            }
+
             string conflict = GetPlacementConflict(shape, overall, overall.LinePosition, parallel, options);
             string textConflict = TextConflictCounter.FindConflict(overall, overall.LinePosition, result, options);
             conflict ??= textConflict is null ? null : $"конфликт {textConflict}";
@@ -401,8 +413,16 @@ internal class ContourDimensionPlanner {
             return false;
         }
         return dimensions.Where(d => d != chain && IsSameDirection(d, chain) && Overlaps(d, chain, options))
-            .All(d => Math.Abs(d.LinePosition - position) >= options.TierStep - tolerance
+            .All(d => Math.Abs(d.LinePosition - position) >= GetLocalTierStep(chain, d, options) - tolerance
                       && (d.LinePosition - position) * (d.LinePosition - chain.LinePosition) > 0);
+    }
+
+    private static double GetLocalTierStep(VirtualDimension chain, VirtualDimension neighbor, PlanningOptions options) {
+        if(chain.Kind != "Overall" && neighbor.Kind != "Overall") {
+            return options.TierStep;
+        }
+        double currentDistance = Math.Abs(neighbor.LinePosition - chain.LinePosition);
+        return Math.Max(options.TierStep, Math.Min(options.PreferredOverallTierStep, currentDistance));
     }
 
     /// <summary>
@@ -462,7 +482,8 @@ internal class ContourDimensionPlanner {
         VirtualDimension dimension,
         double position,
         List<VirtualDimension> parallel,
-        PlanningOptions options) {
+        PlanningOptions options,
+        double? tierStep = null) {
         if(!shape.Contains(dimension, position)) {
             return "размерная линия выходит за пределы помещения";
         }
@@ -475,8 +496,9 @@ internal class ContourDimensionPlanner {
         if(!shape.ContainsBand(dimension, Math.Min(from, to) + tolerance, Math.Max(from, to) - tolerance)) {
             return "размерная линия или ее текст ближе отступа к контуру";
         }
+        double minDistance = (tierStep ?? options.TierStep) - tolerance;
         var near = parallel.FirstOrDefault(
-            d => Math.Abs(d.LinePosition - position) < options.TierStep - options.CoordinateTolerance);
+            d => Math.Abs(d.LinePosition - position) < minDistance);
         if(near != null) {
             return $"размерная линия ближе шага яруса к размеру {Names(near)}";
         }

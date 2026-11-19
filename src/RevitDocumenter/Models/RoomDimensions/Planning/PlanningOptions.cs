@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using RevitDocumenter.Models.RoomDimensions.Geometry;
@@ -67,6 +68,11 @@ internal class PlanningOptions {
     /// Шаг между ярусами размеров.
     /// </summary>
     public double TierStep { get; set; }
+
+    /// <summary>
+    /// Предпочтительный шаг для общего размера с дополнительным просветом над текстом цепочки.
+    /// </summary>
+    public double PreferredOverallTierStep => Math.Max(TierStep, 2 * TextSize + TextGap);
 
     /// <summary>
     /// Общий размер ставится, если в самой длинной цепочке вдоль оси больше этого числа сегментов.
