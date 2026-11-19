@@ -95,4 +95,9 @@
     <system:String x:Key="Manager.Validation.StructureRuleConflict">Тип железобетонной стены не может одновременно иметь правило расстановки.</system:String>
     <system:String x:Key="Manager.SettingsCommandHint">Проверьте настройки отдельной командой «Настройки менеджера перемычек».</system:String>
     <system:String x:Key="Manager.StartFailed">Не удалось загрузить конфигурацию или открыть менеджер. Подробности записаны в журнал.</system:String>
+    <system:String x:Key="Manager.Refresh">Обновить данные</system:String>
+    <system:String x:Key="Manager.ContextSummary">Документ: {0}&#10;Вид: {1}&#10;Выбрано элементов: {2}</system:String>
+    <system:String x:Key="Manager.SignalRejected">Не удалось передать запрос в Revit. Повторите обновление.</system:String>
+    <system:String x:Key="Manager.ReadFailed">Не удалось прочитать текущий вид и выделение. Повторите обновление.</system:String>
+    <system:String x:Key="Manager.ClosePending">Окно ожидает завершения запроса Revit перед освобождением ресурсов.</system:String>
 </ResourceDictionary>

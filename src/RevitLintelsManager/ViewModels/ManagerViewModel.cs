@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 
+using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelsManager.Models;
@@ -12,15 +16,42 @@ namespace RevitLintelsManager.ViewModels;
 internal sealed class ManagerViewModel : BaseViewModel {
     public event Action CloseRequested;
     private bool _isBlocked;
+    private bool _isRefreshing;
+    private string _contextSummary;
+    private ManagerDocumentContext _lastContext;
+    private readonly IManagerRequestDispatcher _requests;
+    private readonly Dispatcher _dispatcher;
+    private readonly ILocalizationService _localization;
 
-    public ManagerViewModel(ManagerSessionState state, ISettingsCommandFactory commands) {
+    /// <summary>Создаёт команды окна без непосредственных зависимостей от Revit API.</summary>
+    public ManagerViewModel(ManagerSessionState state, ISettingsCommandFactory commands,
+        IManagerRequestDispatcher requests, Dispatcher dispatcher, ILocalizationService localization) {
         State = state;
+        _requests = requests;
+        _dispatcher = dispatcher;
+        _localization = localization;
+        ContextSummary = localization.GetLocalizedString("Manager.Refresh");
+        RefreshCommand = commands.CreateAsync(RefreshContextAsync,
+            () => !IsBlocked && !State.IsClosing && !IsRefreshing);
         CloseCommand = commands.Create(() => CloseRequested?.Invoke());
     }
 
     public ManagerSessionState State { get; }
     public IReadOnlyList<ManagerItemSnapshot> Items { get; } = Array.Empty<ManagerItemSnapshot>();
     public ICommand CloseCommand { get; }
+    public ICommand RefreshCommand { get; }
+    public ManagerDocumentContext LastContext {
+        get => _lastContext;
+        private set => RaiseAndSetIfChanged(ref _lastContext, value);
+    }
+    public string ContextSummary {
+        get => _contextSummary;
+        private set => RaiseAndSetIfChanged(ref _contextSummary, value);
+    }
+    public bool IsRefreshing {
+        get => _isRefreshing;
+        private set => RaiseAndSetIfChanged(ref _isRefreshing, value);
+    }
     public bool IsBlocked {
         get => _isBlocked;
         private set => RaiseAndSetIfChanged(ref _isBlocked, value);
@@ -30,5 +61,51 @@ internal sealed class ManagerViewModel : BaseViewModel {
     public void SetBlocked(bool isBlocked) {
         State.IsBlocked = isBlocked;
         IsBlocked = isBlocked;
+        CommandManager.InvalidateRequerySuggested();
+    }
+
+    // Передаёт только token/generation в очередь и публикует независимый ответ на UI Dispatcher.
+    private async Task RefreshContextAsync() {
+        IsRefreshing = true;
+        CommandManager.InvalidateRequerySuggested();
+        var request = new ManagerRequest(State.DocumentToken, State.AdvanceGeneration());
+        try {
+            var context = await _requests.Enqueue(request).ConfigureAwait(false);
+            if(!_dispatcher.HasShutdownStarted) {
+                await _dispatcher.InvokeAsync(() => ApplyContext(context)).Task.ConfigureAwait(false);
+            }
+        } catch(InvalidOperationException exception) {
+            if(!_dispatcher.HasShutdownStarted) {
+                await _dispatcher.InvokeAsync(() => {
+                    if(IsCurrentResponse(request.DocumentToken, request.Generation)) {
+                        ContextSummary = exception.Message;
+                    }
+                }).Task.ConfigureAwait(false);
+            }
+        } finally {
+            if(!_dispatcher.HasShutdownStarted) {
+                await _dispatcher.InvokeAsync(() => {
+                    IsRefreshing = false;
+                    CommandManager.InvalidateRequerySuggested();
+                }).Task.ConfigureAwait(false);
+            }
+        }
+    }
+
+    // Отбрасывает результат, устаревший между завершением API и исполнением UI continuation.
+    private void ApplyContext(ManagerDocumentContext context) {
+        if(!IsCurrentResponse(context.DocumentToken, context.Generation)) {
+            return;
+        }
+        LastContext = context;
+        ContextSummary = string.Format(CultureInfo.CurrentCulture,
+            _localization.GetLocalizedString("Manager.ContextSummary"), context.DocumentTitle,
+            context.ViewName, context.SelectionUniqueIds.Count);
+    }
+
+    // Проверяет актуальность успешного ответа и ошибки в момент их применения на UI-потоке.
+    private bool IsCurrentResponse(Guid documentToken, long generation) {
+        return !State.IsClosing && !State.IsBlocked && documentToken == State.DocumentToken
+            && generation == State.Generation;
     }
 }

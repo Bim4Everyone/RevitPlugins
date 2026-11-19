@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
@@ -19,7 +20,8 @@ namespace RevitLintelsManager.Services;
 
 /// <summary>Владелец окна и контейнера; API доступен только команде и callbacks Revit.</summary>
 internal sealed class ManagerSession(RevitRepository repository, ManagerWindow window,
-    ManagerViewModel viewModel, WindowPlatformEvents platformEvents, ILoggerService logger) : IManagerSession {
+    ManagerViewModel viewModel, WindowPlatformEvents platformEvents, ILoggerService logger,
+    IManagerRequestDispatcher requests) : IManagerSession {
     private IKernel _kernel;
     private bool _subscribed;
     private bool _windowClosed;
@@ -44,14 +46,18 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             repository.Application.DocumentClosed += OnDocumentClosed;
             repository.UIApplication.ApplicationClosing += OnApplicationClosing;
             window.Closed += OnWindowClosed;
+            window.Closing += OnWindowClosing;
             viewModel.CloseRequested += RequestClose;
             UpdateDocumentState();
             window.Show();
-            if(_windowClosed) {
+            if(_windowClosed || viewModel.State.IsClosing) {
                 throw new OperationCanceledException();
             }
             _kernel = kernel;
+            requests.StartAcceptingRequests();
         } catch {
+            requests.BeginClose();
+            requests.TryDisposeInApiContext();
             Unsubscribe();
             platformEvents.Dispose();
             try {
@@ -80,16 +86,24 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
 
     /// <inheritdoc />
     public void RequestClose() {
-        viewModel.State.IsClosing = true;
-        if(!_windowClosed) {
-            window.Close();
+        if(!viewModel.State.IsClosing) {
+            viewModel.State.IsClosing = true;
+            viewModel.State.AdvanceGeneration();
         }
+        requests.BeginClose();
+        viewModel.SetBlocked(true);
+    }
+
+    // Оставляет окно живым до безопасного возврата pending/active обработчика.
+    private void OnWindowClosing(object sender, CancelEventArgs e) {
+        e.Cancel = true;
+        RequestClose();
     }
 
     // Запоминает закрытие без обращения к Revit API из WPF.
     private void OnWindowClosed(object sender, EventArgs e) {
         _windowClosed = true;
-        viewModel.State.IsClosing = true;
+        RequestClose();
     }
 
     // Проверяет документ и завершает отложенное освобождение в разрешённом контексте.
@@ -100,6 +114,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
         }
         _documentClosing = false;
         UpdateDocumentState();
+        requests.PumpInApiContext();
     }
 
     // Блокирует окно сразу после смены активного документа.
@@ -109,9 +124,9 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
 
     // Блокирует сессию до подтверждения закрытия исходного документа.
     private void OnDocumentClosing(object sender, DocumentClosingEventArgs e) {
-        if(ReferenceEquals(e.Document, repository.Document)) {
+        if(repository.Document.IsValidObject && repository.Document.Equals(e.Document)) {
             _documentClosing = true;
-            viewModel.SetBlocked(true);
+            SetDocumentBlocked(true);
         }
     }
 
@@ -129,9 +144,20 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
 
     // Передаёт в GUI только результат проверки идентичности исходного документа.
     private void UpdateDocumentState() {
+        var activeDocument = repository.UIApplication.ActiveUIDocument?.Document;
         bool isSourceDocument = repository.Document.IsValidObject
-            && ReferenceEquals(repository.UIApplication.ActiveUIDocument?.Document, repository.Document);
-        viewModel.SetBlocked(_documentClosing || !isSourceDocument);
+            && activeDocument?.IsValidObject == true
+            && repository.Document.Equals(activeDocument);
+        SetDocumentBlocked(_documentClosing || !isSourceDocument);
+    }
+
+    // Смена доступности документа инвалидирует задачи и ещё не опубликованные UI-ответы.
+    private void SetDocumentBlocked(bool isBlocked) {
+        if(viewModel.State.IsBlocked != isBlocked) {
+            viewModel.State.AdvanceGeneration();
+            requests.InvalidateRequests();
+        }
+        viewModel.SetBlocked(isBlocked);
     }
 
     // Снимает API-подписки до выхода из callback, а контейнер освобождает после его возврата.
@@ -139,8 +165,11 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
         if(_releaseScheduled) {
             return;
         }
+        RequestClose();
+        if(!requests.TryDisposeInApiContext()) {
+            return;
+        }
         _releaseScheduled = true;
-        viewModel.State.IsClosing = true;
         Unsubscribe();
         window.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(ReleaseResources));
     }
@@ -157,6 +186,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
         repository.Application.DocumentClosed -= OnDocumentClosed;
         repository.UIApplication.ApplicationClosing -= OnApplicationClosing;
         window.Closed -= OnWindowClosed;
+        window.Closing -= OnWindowClosing;
         viewModel.CloseRequested -= RequestClose;
     }
 

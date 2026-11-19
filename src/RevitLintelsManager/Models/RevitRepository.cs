@@ -45,6 +45,22 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
                 .Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null));
     }
 
+    /// <summary>Читает текущий вид и выделение только из Execute обработчика ExternalEvent.</summary>
+    /// <param name="app">Приложение текущего API-вызова.</param>
+    /// <param name="request">Неизменяемая идентичность запроса.</param>
+    /// <returns>Независимый контекст или null при чужом/недоступном документе.</returns>
+    public ManagerDocumentContext ReadDocumentContext(UIApplication app, ManagerRequest request) {
+        var activeDocument = app.ActiveUIDocument;
+        if(!Document.IsValidObject || activeDocument?.Document?.IsValidObject != true
+            || !Document.Equals(activeDocument.Document) || Document.IsReadOnly || Document.IsModifiable) {
+            return null;
+        }
+        var view = activeDocument.ActiveView;
+        return new ManagerDocumentContext(request.DocumentToken, request.Generation, Document.Title,
+            view?.UniqueId, view?.Name, activeDocument.Selection.GetElementIds()
+                .Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null));
+    }
+
     /// <summary>Освобождает API-каталоги этапа старта перед немодальной работой.</summary>
     public void ReleaseCatalogs() {
         _lintelFamilies = null;

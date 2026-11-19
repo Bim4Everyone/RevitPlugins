@@ -95,4 +95,9 @@
     <system:String x:Key="Manager.Validation.StructureRuleConflict">A structural wall type cannot also have a placement rule.</system:String>
     <system:String x:Key="Manager.SettingsCommandHint">Check the settings using the separate Lintel Manager Settings command.</system:String>
     <system:String x:Key="Manager.StartFailed">The configuration could not be loaded or the manager could not be opened. See the log for details.</system:String>
+    <system:String x:Key="Manager.Refresh">Refresh data</system:String>
+    <system:String x:Key="Manager.ContextSummary">Document: {0}&#10;View: {1}&#10;Selected elements: {2}</system:String>
+    <system:String x:Key="Manager.SignalRejected">The request could not be sent to Revit. Try refreshing again.</system:String>
+    <system:String x:Key="Manager.ReadFailed">The current view and selection could not be read. Try refreshing again.</system:String>
+    <system:String x:Key="Manager.ClosePending">The window is waiting for the Revit request to finish before releasing resources.</system:String>
 </ResourceDictionary>

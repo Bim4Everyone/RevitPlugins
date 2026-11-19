@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Threading;
 
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
@@ -66,6 +67,8 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             repository.ReleaseCatalogs();
             kernel.Bind<ManagerSessionState>().ToConstant(state);
             kernel.Bind<WindowPlatformEvents>().ToSelf().InSingletonScope();
+            kernel.Bind<Dispatcher>().ToConstant(Dispatcher.CurrentDispatcher);
+            kernel.Bind<IManagerRequestDispatcher>().To<ManagerExternalEventHandler>().InSingletonScope();
             kernel.BindMainWindow<ManagerViewModel, ManagerWindow>();
             kernel.Bind<IManagerSession>().To<ManagerSession>().InSingletonScope();
             var session = kernel.Get<IManagerSession>();

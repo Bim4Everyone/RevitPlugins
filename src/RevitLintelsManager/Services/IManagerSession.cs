@@ -15,6 +15,6 @@ internal interface IManagerSession {
     /// <summary>Активирует единственное окно и проверяет документ в контексте основной команды.</summary>
     void Activate();
 
-    /// <summary>Запрашивает закрытие; API-подписки снимаются ближайшим callback Revit.</summary>
+    /// <summary>Запрашивает закрытие после безопасного завершения pending/active обработчика Revit.</summary>
     void RequestClose();
 }
