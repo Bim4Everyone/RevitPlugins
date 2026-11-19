@@ -1,15 +1,16 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using RevitLintelsManager.Models.Settings;
 
 namespace RevitLintelsManager.Models.Configs;
 
-internal class PluginConfigRepository {
+internal class PluginConfigRepository : IPluginConfigRepository {
     private readonly PluginConfig _pluginConfig;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly RevitRepository _revitRepository;
 
+    /// <summary>Создаёт PluginConfigRepository с переданными зависимостями.</summary>
     public PluginConfigRepository(
         PluginConfig pluginConfig, 
         SystemPluginConfig systemPluginConfig, 
@@ -22,11 +23,13 @@ internal class PluginConfigRepository {
     
     public string ConfigPath => _pluginConfig.ProjectConfigPath;
 
+    /// <inheritdoc />
     public LintelManagerSettings LoadSettings() {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document);
         return setting?.LintelManagerSettings;
     }
     
+    /// <inheritdoc />
     public void SaveSettings(LintelManagerSettings lintelManagerSettings) {
         var setting = _pluginConfig.GetSettings(_revitRepository.Document)
                       ?? _pluginConfig.AddSettings(_revitRepository.Document);
@@ -41,6 +44,7 @@ internal class PluginConfigRepository {
         }
     }
     
+    /// <inheritdoc />
     public LintelManagerSettings GetDefaultLintelManagerSettings() {
         return new LintelManagerSettings {
             LintelFamilySettings = GetLintelFamilySettings(),
@@ -57,6 +61,7 @@ internal class PluginConfigRepository {
         };
     }
 
+    // Создаёт настройки семейства перемычки по умолчанию.
     private LintelFamilySettings GetLintelFamilySettings() {
         return  new LintelFamilySettings {
             LintelFamily = _systemPluginConfig.DefaultLintelFamilyName,
@@ -71,6 +76,7 @@ internal class PluginConfigRepository {
         };
     }
 
+    // Создаёт настройки семейств проёмов по умолчанию.
     private OpeningFamilySettings GetOpeningFamilySettings() {
         return new OpeningFamilySettings {
             FamilyNames = _systemPluginConfig.DefaultOpeningFamilyNames,

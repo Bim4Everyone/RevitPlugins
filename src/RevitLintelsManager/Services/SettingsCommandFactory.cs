@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -8,25 +8,30 @@ using dosymep.SimpleServices;
 namespace RevitLintelsManager.Services;
 
 internal class SettingsCommandFactory(IMessageBoxService messages, ILoggerService logger,
-    ILocalizationService localization) {
+    ILocalizationService localization) : ISettingsCommandFactory {
+    /// <inheritdoc />
     public ICommand Create(Action execute, Func<bool> canExecute = null) {
         return new SettingsCommand(_ => Execute(execute), _ => canExecute?.Invoke() ?? true);
     }
 
+    /// <inheritdoc />
     public ICommand Create<T>(Action<T> execute, Func<T, bool> canExecute = null) {
         return new SettingsCommand(parameter => Execute(() => execute((T) parameter)),
             parameter => parameter is T value && (canExecute?.Invoke(value) ?? true));
     }
 
+    /// <inheritdoc />
     public ICommand CreateAsync(Func<Task> execute, Func<bool> canExecute = null) {
         return new SettingsCommand(_ => ExecuteAsync(execute), _ => canExecute?.Invoke() ?? true);
     }
 
+    /// <inheritdoc />
     public ICommand CreateAsync<T>(Func<T, Task> execute, Func<T, bool> canExecute = null) {
         return new SettingsCommand(parameter => ExecuteAsync(() => execute((T) parameter)),
             parameter => parameter is T value && (canExecute?.Invoke(value) ?? true));
     }
 
+    // Выполняет действие с обработкой отмены и ошибок.
     private void Execute(Action execute) {
         try {
             execute();
@@ -39,6 +44,7 @@ internal class SettingsCommandFactory(IMessageBoxService messages, ILoggerServic
         }
     }
 
+    // Ожидает действие с обработкой отмены и ошибок.
     private async Task ExecuteAsync(Func<Task> execute) {
         try {
             await execute();
@@ -51,6 +57,7 @@ internal class SettingsCommandFactory(IMessageBoxService messages, ILoggerServic
         }
     }
 
+    // Записывает ошибку в журнал и показывает сообщение.
     private void ShowError(Exception exception) {
         string title = localization.GetLocalizedString("Common.Error");
         logger.Warning(exception, title);
@@ -65,11 +72,13 @@ internal class SettingsCommandFactory(IMessageBoxService messages, ILoggerServic
         private readonly Func<object, bool> _canExecute;
         private bool _isExecuting;
 
+        /// <summary>Создаёт SettingsCommand с переданными зависимостями.</summary>
         public SettingsCommand(Action<object> execute, Func<object, bool> canExecute) {
             _execute = execute;
             _canExecute = canExecute;
         }
 
+        /// <summary>Создаёт SettingsCommand с переданными зависимостями.</summary>
         public SettingsCommand(Func<object, Task> executeAsync, Func<object, bool> canExecute) {
             _executeAsync = executeAsync;
             _canExecute = canExecute;
@@ -80,10 +89,12 @@ internal class SettingsCommandFactory(IMessageBoxService messages, ILoggerServic
             remove => CommandManager.RequerySuggested -= value;
         }
 
+        /// <inheritdoc />
         public bool CanExecute(object parameter) {
             return !_isExecuting && _canExecute(parameter);
         }
 
+        /// <inheritdoc />
         public async void Execute(object parameter) {
             if(!CanExecute(parameter)) {
                 return;

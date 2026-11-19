@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -23,10 +23,10 @@ internal class PlacementSettingsViewModel : BaseViewModel {
     private readonly RevitRepository _repository;
     private readonly SystemPluginConfig _systemConfig;
     private readonly ILocalizationService _localization;
-    private readonly LintelConfigRuleStorage _storage;
-    private readonly LintelConfigRuleSerializer _serializer;
-    private readonly SettingsDialogService _dialogs;
-    private readonly SettingsCommandFactory _commandFactory;
+    private readonly ILintelConfigRuleStorage _storage;
+    private readonly ILintelConfigRuleSerializer _serializer;
+    private readonly ISettingsDialogService _dialogs;
+    private readonly ISettingsCommandFactory _commandFactory;
     private readonly IOpenFileDialogService _openDialog;
     private readonly ISaveFileDialogService _saveDialog;
     private readonly IMessageBoxService _messages;
@@ -39,11 +39,11 @@ internal class PlacementSettingsViewModel : BaseViewModel {
     private bool _updating;
 
     public PlacementSettingsViewModel(RevitRepository repository, SystemPluginConfig systemConfig,
-        ILocalizationService localization, LintelConfigRuleStorage storage, LintelConfigRuleSerializer serializer,
-        LintelConfigRuleResolver resolver, SettingsDialogService dialogs, IOpenFileDialogService openDialog,
+        ILocalizationService localization, ILintelConfigRuleStorage storage, ILintelConfigRuleSerializer serializer,
+        ILintelConfigRuleResolver resolver, ISettingsDialogService dialogs, IOpenFileDialogService openDialog,
         ISaveFileDialogService saveDialog, IMessageBoxService messages, FamilySettingsViewModel familySettings,
         GeneralSettingsViewModel generalSettings, LintelManagerSettings settings,
-        SettingsCommandFactory commandFactory) {
+        ISettingsCommandFactory commandFactory) {
         _repository = repository;
         _systemConfig = systemConfig;
         _localization = localization;

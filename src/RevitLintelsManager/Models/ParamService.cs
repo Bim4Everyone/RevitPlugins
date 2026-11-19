@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +13,8 @@ using RevitLintelsManager.Models.Configs;
 
 namespace RevitLintelsManager.Models;
 
-internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService loggerService) {
+internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService loggerService) : IParamService {
+    /// <inheritdoc />
     public (IList<RevitParam> Parameters, IList<RevitParam> InstanceParameters) CreateRevitParams(
         Document document, FamilySymbol symbol, FamilyInstance instance) {
         var typeParams = CreateRevitParams(document, symbol).ToArray();
@@ -23,6 +24,7 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
         return (typeParams.Union(instanceParams).ToArray(), instanceParams);
     }
 
+    /// <summary>Проверяет, что параметр имеет тип Да/Нет.</summary>
     public static bool IsYesNo(RevitParam parameter) {
         if(parameter is null || parameter.StorageType != StorageType.Integer) {
             return false;
@@ -37,11 +39,13 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
         }
     }
 
+    /// <inheritdoc />
     public RevitParam GetLintelParam(RevitFamily family, string paramName, StorageType storageType) {
         return family?.OrderedParams?.FirstOrDefault(param =>
             param.Name == paramName && param.StorageType == storageType);
     }
 
+    /// <inheritdoc />
     public RevitParam GetOpeningParam(RevitFamily[] families, string paramName, StorageType storageType) {
         if(families is null || families.Length == 0) {
             return null;
@@ -51,6 +55,7 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
             param.Name == parameter.Name && param.StorageType == storageType)) ? parameter : null;
     }
 
+    /// <inheritdoc />
     public RevitParam GetFixParam(LintelFamilyConfig lintelConfig,
         OpeningFamilyConfig openingConfig, string paramName) {
         if(lintelConfig?.RevitLintelFamily is null || openingConfig?.RevitOpeningFamily is null) {
@@ -61,6 +66,7 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
             .FirstOrDefault(param => param.Name == paramName);
     }
 
+    /// <inheritdoc />
     public IEnumerable<RevitParam> GetCommonFixParams(IEnumerable<RevitFamily> families) {
         var familyArray = families.ToArray();
         if(familyArray.Length == 0) {
@@ -73,6 +79,7 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
             .ToArray();
     }
 
+    // Создаёт каталог параметров элемента.
     private IEnumerable<RevitParam> CreateRevitParams(Document document, Element element) {
         return element.Parameters.Cast<Parameter>()
             .Select(parameter => TryCreateRevitParam(document, parameter.Id)
@@ -80,6 +87,7 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
             .ToArray();
     }
 
+    // Создаёт параметр фабрикой Dosymep, если тип поддерживается.
     private RevitParam TryCreateRevitParam(Document document, ElementId parameterId) {
         if(!revitParamFactory.CanCreate(document, parameterId)) {
             return null;
@@ -91,6 +99,7 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
         }
     }
 
+    // Получает параметры экземпляров семейства и проектные привязки.
     private RevitParam[] GetFamilyInstanceParams(Document document, Family family) {
         var parameters = new List<RevitParam>();
         Document familyDocument = null;
@@ -120,6 +129,7 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
         return parameters.Distinct().ToArray();
     }
 
+    // Разрешает общий параметр или создаёт описание параметра семейства.
     private RevitParam CreateFamilyParam(Document document, FamilyParameter parameter) {
         if(parameter.IsShared) {
             var sharedParameter = SharedParameterElement.Lookup(document, parameter.GUID);
@@ -133,6 +143,7 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
         return CreateCustomParam(parameter.Definition, parameter.StorageType);
     }
 
+    // Создаёт описание пользовательского параметра без записи в модель.
     private static RevitParam CreateCustomParam(Definition definition, StorageType storageType) {
         return new CustomParam(definition.Name) {
             Name = definition.Name,

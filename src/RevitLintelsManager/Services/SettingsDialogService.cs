@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 using Ninject;
@@ -9,7 +9,8 @@ using RevitLintelsManager.Views;
 
 namespace RevitLintelsManager.Services;
 
-internal class SettingsDialogService(IResolutionRoot resolutionRoot) {
+internal class SettingsDialogService(IResolutionRoot resolutionRoot) : ISettingsDialogService {
+    /// <inheritdoc />
     public Task<string> RequestNameAsync(string title, string initialName, Func<string, bool> validate) {
         var window = resolutionRoot.Get<NameInputWindow>();
         var viewModel = (NameInputViewModel) window.DataContext;

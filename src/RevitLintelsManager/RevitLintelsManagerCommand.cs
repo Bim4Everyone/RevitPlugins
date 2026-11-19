@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 
@@ -9,16 +10,16 @@ using Autodesk.Revit.UI;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
-using dosymep.Serializers;
 using dosymep.SimpleServices;
-using dosymep.WPF.Views;
 using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.SimpleServices;
 
 using Ninject;
 
 using RevitLintelsManager.Models;
 using RevitLintelsManager.Models.Configs;
 using RevitLintelsManager.Models.Rules;
+using RevitLintelsManager.Models.Settings;
 using RevitLintelsManager.Services;
 using RevitLintelsManager.ViewModels;
 using RevitLintelsManager.Views;
@@ -29,113 +30,112 @@ namespace RevitLintelsManager;
 
 [Transaction(TransactionMode.Manual)]
 public class RevitLintelsManagerCommand : BasePluginCommand {
-    
+    private static IManagerSession _session;
+
+    /// <summary>Создаёт основную команду менеджера.</summary>
     public RevitLintelsManagerCommand() {
         PluginName = "Менеджер перемычек";
     }
-    
+
+    /// <summary>Проверяет настройки и передаёт владение контейнером немодальной сессии.</summary>
     protected override void Execute(UIApplication uiApplication) {
-        // Создание контейнера зависимостей плагина с сервисами из платформы
-        using IKernel kernel = uiApplication.CreatePlatformServices();
-
-        SettingsPlatformServices.Configure(kernel);
-
-        // Настройка доступа к провайдеру по навигации страниц
-        kernel.Bind<INavigationViewPageProvider>()
-            .To<NavigationViewPageProvider>()
-            .InSingletonScope();
-
-        // Настройка доступа к Revit
-        kernel.Bind<RevitRepository>()
-            .ToSelf()
-            .InSingletonScope();
-        
-        // Настройка конфигурации плагина
-        kernel.Bind<PluginConfig>()
-            .ToMethod(c => PluginConfig.GetPluginConfig(c.Kernel.Get<IConfigSerializer>()));
-        
-        // Настройка доступа к классу с основными константами плагина
-        kernel.Bind<SystemPluginConfig>()
-            .ToSelf()
-            .InSingletonScope();
-        
-        // Настройка доступа к классу с настройками правил
-        kernel.Bind<LintelConfigRuleStorage>()
-            .ToSelf()
-            .InSingletonScope();
-        
-        // Настройка доступа к сериализатору настроек правил
-        kernel.Bind<LintelConfigRuleSerializer>()
-            .ToSelf()
-            .InSingletonScope();
-        
-        // Настройка доступа к валидатору настроек правил
-        kernel.Bind<LintelConfigRuleValidator>()
-            .ToSelf()
-            .InSingletonScope();
-        
-        // Настройка доступа к резолверу настроек правил
-        kernel.Bind<LintelConfigRuleResolver>()
-            .ToSelf()
-            .InSingletonScope();
-        
-        // Настройка доступа к классу с основными настройками плагина
-        kernel.Bind<PluginConfigRepository>()
-            .ToSelf()
-            .InSingletonScope();
-        
-        // Настройка доступа к классу с настройками менеджера перемычек
-        kernel.Bind<LintelManagerConfigResolver>()
-            .ToSelf()
-            .InSingletonScope();
-        
-        // Настройка доступа к классу с валидатором настроек менеджера перемычек
-        kernel.Bind<LintelManagerConfigValidator>()
-            .ToSelf()
-            .InSingletonScope();
-
-        // Настройка запуска окна
-        kernel.BindMainWindow<SettingsViewModel, SettingsWindow>();
-
-        // Настройка локализации,
-        // получение имени сборки откуда брать текст
-        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
-
-        // Настройка локализации,
-        // установка дефолтной локализации "ru-RU"
-        kernel.UseWpfLocalization(
-            $"/{assemblyName};component/assets/localization/language.xaml",
-            CultureInfo.GetCultureInfo("ru-RU"));
-        
-        var messageBoxService = kernel.Get<IMessageBoxService>();
-        var localizationService = kernel.Get<ILocalizationService>();
-        
-        var pluginConfigRepository = kernel.Get<PluginConfigRepository>();
-        var lintelManagerSettings = pluginConfigRepository.LoadSettings();
-        
-        if (lintelManagerSettings is null) {
-            ShowSettingsWarningWindow(messageBoxService, localizationService);
+        if(_session is not null) {
+            _session.Activate();
             return;
         }
-        
-        var lintelManagerConfigResolver = kernel.Get<LintelManagerConfigResolver>();
-        var lintelManagerConfig = lintelManagerConfigResolver.BuildLintelManagerConfig(lintelManagerSettings);
-        
-        var lintelManagerConfigValidator = kernel.Get<LintelManagerConfigValidator>();
-
-        if(!lintelManagerConfigValidator.Validate(lintelManagerConfig)) {
-            ShowSettingsWarningWindow(messageBoxService, localizationService);
-            return;
+        IKernel kernel = uiApplication.CreatePlatformServices();
+        try {
+            ConfigureDependencies(kernel);
+            var messages = kernel.Get<WpfUIMessageBoxService>();
+            var localization = kernel.Get<ILocalizationService>();
+            if(uiApplication.ActiveUIDocument is null || uiApplication.ActiveUIDocument.Document.IsFamilyDocument) {
+                ShowSettingsWarning(messages, localization, new[] { "Manager.Validation.ProjectRequired" });
+                return;
+            }
+            var settings = kernel.Get<IPluginConfigRepository>().LoadSettings();
+            var resolver = kernel.Get<ILintelManagerConfigResolver>();
+            var config = resolver.BuildLintelManagerConfig(settings);
+            var errors = kernel.Get<ILintelManagerConfigValidator>().ValidateDetailed(config);
+            if(errors.Count > 0) {
+                ShowSettingsWarning(messages, localization, errors);
+                return;
+            }
+            var snapshot = resolver.CreateSnapshot(config);
+            var repository = kernel.Get<RevitRepository>();
+            var state = repository.CaptureInitialState(snapshot);
+            repository.ReleaseCatalogs();
+            kernel.Bind<ManagerSessionState>().ToConstant(state);
+            kernel.Bind<WindowPlatformEvents>().ToSelf().InSingletonScope();
+            kernel.BindMainWindow<ManagerViewModel, ManagerWindow>();
+            kernel.Bind<IManagerSession>().To<ManagerSession>().InSingletonScope();
+            var session = kernel.Get<IManagerSession>();
+            session.Released += OnSessionReleased;
+            session.Start(kernel);
+            _session = session;
+            kernel = null;
+        } catch(OperationCanceledException) {
+            // Закрытие при запуске не требует сообщения об ошибке.
+        } catch(Exception exception) {
+            kernel.Get<ILoggerService>().Warning(exception, "Ошибка запуска менеджера перемычек.");
+            ShowSettingsWarning(kernel.Get<WpfUIMessageBoxService>(), kernel.Get<ILocalizationService>(),
+                new[] { "Manager.StartFailed" });
+        } finally {
+            kernel?.Dispose();
         }
-
-        SettingsPlatformServices.ShowSettingsWindow(kernel);
     }
-    
-    private static void ShowSettingsWarningWindow( IMessageBoxService messageBoxService, ILocalizationService localizationService) {
-        messageBoxService.Show(
-            localizationService.GetLocalizedString("RevitLintelsManagerCommand.SettingsCheckNecessaryMessageBody"),
-            localizationService.GetLocalizedString("RevitLintelsManagerCommand.SettingsCheckNecessaryMessageTitle"),
-            MessageBoxButton.OK,
-            MessageBoxImage.Exclamation);
+
+    // Регистрирует только общие используемые зависимости; главное окно выбирает вызывающая команда.
+    internal static void ConfigureDependencies(IKernel kernel) {
+        SettingsPlatformServices.Configure(kernel);
+        kernel.Bind<RevitRepository>().ToSelf().InSingletonScope();
+        kernel.Bind<IParamService>().To<ParamService>().InSingletonScope();
+        kernel.Bind<PluginConfig>()
+            .ToMethod(context => PluginConfig.GetPluginConfig(context.Kernel.Get<IConfigSerializer>()))
+            .InSingletonScope();
+        kernel.Bind<SystemPluginConfig>().ToSelf().InSingletonScope();
+        kernel.Bind<ILintelConfigRuleStorage>().To<LintelConfigRuleStorage>().InSingletonScope();
+        kernel.Bind<ILintelConfigRuleSerializer>().To<LintelConfigRuleSerializer>().InSingletonScope();
+        kernel.Bind<ILintelConfigRuleResolver>().To<LintelConfigRuleResolver>().InSingletonScope();
+        kernel.Bind<IPluginConfigRepository>().To<PluginConfigRepository>().InSingletonScope();
+        kernel.Bind<ILintelManagerConfigResolver>().To<LintelManagerConfigResolver>().InSingletonScope();
+        kernel.Bind<ILintelManagerConfigValidator>().To<LintelManagerConfigValidator>().InSingletonScope();
+        kernel.Bind<ISettingsCommandFactory>().To<SettingsCommandFactory>().InSingletonScope();
+        string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
+        kernel.UseWpfLocalization($"/{assemblyName};component/assets/Localization/Language.xaml",
+            CultureInfo.GetCultureInfo("ru-RU"));
+    }
+
+    // Регистрирует модальные настройки с единственной загрузкой исходных данных.
+    internal static void ConfigureSettingsDependencies(IKernel kernel) {
+        kernel.Bind<INavigationViewPageProvider>().To<NavigationViewPageProvider>().InSingletonScope();
+        kernel.Bind<ISettingsDialogService>().To<SettingsDialogService>().InSingletonScope();
+        kernel.Bind<SettingsLaunchContext>().ToMethod(context => {
+            var repository = context.Kernel.Get<IPluginConfigRepository>();
+            var saved = repository.LoadSettings();
+            return new SettingsLaunchContext(saved ?? repository.GetDefaultLintelManagerSettings(), saved is not null);
+        }).InSingletonScope();
+        kernel.Bind<LintelManagerSettings>().ToMethod(context => context.Kernel.Get<SettingsLaunchContext>().Settings);
+        kernel.Bind<FamilySettingsViewModel>().ToSelf().InSingletonScope()
+            .WithConstructorArgument("hasSavedSettings",
+                context => context.Kernel.Get<SettingsLaunchContext>().HasSavedSettings);
+        kernel.Bind<GeneralSettingsViewModel>().ToSelf().InSingletonScope();
+        kernel.Bind<PlacementSettingsViewModel>().ToSelf().InSingletonScope();
+        kernel.BindOtherWindow<NameInputViewModel, NameInputWindow>();
+        kernel.BindMainWindow<SettingsViewModel, SettingsWindow>();
+    }
+
+    // Показывает локализованные причины отказа и предлагает отдельную команду настроек.
+    private static void ShowSettingsWarning(IMessageBoxService messages, ILocalizationService localization,
+        System.Collections.Generic.IEnumerable<string> errors) {
+        string reasons = string.Join(Environment.NewLine, errors.Select(localization.GetLocalizedString));
+        messages.Show(reasons + Environment.NewLine + Environment.NewLine
+            + localization.GetLocalizedString("Manager.SettingsCommandHint"),
+            localization.GetLocalizedString("RevitLintelsManagerCommand.SettingsCheckNecessaryMessageTitle"),
+            MessageBoxButton.OK, MessageBoxImage.Warning);
+    }
+
+    // Удаляет единственную ссылку после фактического освобождения сессии.
+    private static void OnSessionReleased() {
+        _session = null;
     }
 }

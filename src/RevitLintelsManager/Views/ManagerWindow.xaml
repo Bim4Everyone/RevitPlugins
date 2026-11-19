@@ -1,0 +1,73 @@
+<core:WpfUIPlatformWindow
+    x:Class="RevitLintelsManager.Views.ManagerWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
+    Title="{me:LocalizationSource Manager.Title}"
+    Width="1100"
+    Height="650"
+    MinWidth="650"
+    MinHeight="350">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ui:TitleBar
+            Grid.Row="0"
+            Title="{me:LocalizationSource Manager.Title}" />
+        <Border
+            Grid.Row="1"
+            Margin="20"
+            BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <DataTrigger
+                            Binding="{Binding IsBlocked}"
+                            Value="True">
+                            <Setter
+                                Property="IsEnabled"
+                                Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <ItemsControl ItemsSource="{Binding Items}" />
+        </Border>
+        <Grid
+            Grid.Row="2"
+            Margin="20,0,20,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Grid.Column="0"
+                Margin="0,0,20,0"
+                VerticalAlignment="Center"
+                Foreground="DarkOrange"
+                TextWrapping="Wrap"
+                Text="{me:LocalizationSource Manager.DocumentChanged}"
+                Visibility="{Binding IsBlocked, Converter={StaticResource BoolToVisibility}}" />
+            <ui:Button
+                Grid.Column="1"
+                MinWidth="130"
+                Content="{me:LocalizationSource Manager.Close}"
+                Command="{Binding CloseCommand}" />
+        </Grid>
+    </Grid>
+</core:WpfUIPlatformWindow>

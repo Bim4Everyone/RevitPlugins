@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,10 +10,11 @@ using RevitLintelsManager.Models.Configs;
 
 namespace RevitLintelsManager.Models.Rules;
 
-public class LintelConfigRuleStorage {
+public class LintelConfigRuleStorage : ILintelConfigRuleStorage {
     private readonly ILoggerService _loggerService;
     private readonly SystemPluginConfig _systemPluginConfig;
 
+    /// <summary>Создаёт LintelConfigRuleStorage с переданными зависимостями.</summary>
     public LintelConfigRuleStorage(ILoggerService loggerService, SystemPluginConfig systemPluginConfig) {
         _loggerService = loggerService;
         _systemPluginConfig = systemPluginConfig;
@@ -29,6 +30,7 @@ public class LintelConfigRuleStorage {
     public IList<string> ProjectConfigRulePaths => GetProjectConfigRulePaths();
 
     // Метод получения пути сохраняемого пользовательского конфига
+    /// <inheritdoc />
     public string GetProjectConfigRulePath(string lintelConfigRuleName) {
         if(!IsValidRuleName(lintelConfigRuleName)) {
             throw new ArgumentException(nameof(lintelConfigRuleName));
@@ -39,6 +41,7 @@ public class LintelConfigRuleStorage {
             : Path.Combine(directory, lintelConfigRuleName + ".json");
     }
 
+    /// <summary>Проверяет допустимость имени файла правил.</summary>
     public static bool IsValidRuleName(string name) {
         if(string.IsNullOrWhiteSpace(name) || name.Length > 150 || name != name.Trim()
             || name.EndsWith(".", StringComparison.Ordinal)

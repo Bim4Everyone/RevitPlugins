@@ -18,7 +18,7 @@ internal class NameInputViewModel : BaseViewModel {
     private string _errorText;
     private bool _isValid;
 
-    public NameInputViewModel(ILocalizationService localization, SettingsCommandFactory commandFactory) {
+    public NameInputViewModel(ILocalizationService localization, ISettingsCommandFactory commandFactory) {
         _localization = localization;
         AcceptCommand = commandFactory.Create(() => AcceptRequested?.Invoke(), () => _isValid);
     }

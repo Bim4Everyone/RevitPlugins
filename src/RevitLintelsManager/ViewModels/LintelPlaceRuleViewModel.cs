@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -21,7 +21,7 @@ internal class LintelPlaceRuleViewModel : BaseViewModel {
     private string _errorText;
 
     public LintelPlaceRuleViewModel(string name, IEnumerable<LintelRule> rules,
-        IEnumerable<WallTypeViewModel> walls, SettingsCommandFactory commandFactory) {
+        IEnumerable<WallTypeViewModel> walls, ISettingsCommandFactory commandFactory) {
         Name = name;
         Rules = new ObservableCollection<LintelRuleViewModel>(rules.Select(rule =>
             new LintelRuleViewModel(rule ?? new LintelRule())));

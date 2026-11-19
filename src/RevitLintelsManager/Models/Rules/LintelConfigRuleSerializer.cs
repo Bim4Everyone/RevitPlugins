@@ -1,18 +1,20 @@
-﻿using System;
+using System;
 using System.IO;
 
 using dosymep.Bim4Everyone.ProjectConfigs;
 
 namespace RevitLintelsManager.Models.Rules;
 
-public class LintelConfigRuleSerializer {
+public class LintelConfigRuleSerializer : ILintelConfigRuleSerializer {
     private readonly IConfigSerializer _serializer;
     
+    /// <summary>Создаёт LintelConfigRuleSerializer с переданными зависимостями.</summary>
     public LintelConfigRuleSerializer(IConfigSerializer serializer) {
         _serializer = serializer;
     }
 
-    public LintelConfigRule LoadConfigRule (string configPath) {
+    /// <inheritdoc />
+    public LintelConfigRule LoadConfigRule(string configPath) {
         if(string.IsNullOrEmpty(configPath) || !File.Exists(configPath)) {
             return null;
         }
@@ -20,7 +22,8 @@ public class LintelConfigRuleSerializer {
         return _serializer.Deserialize<LintelConfigRule>(fileContent);
     }
     
-    public void SaveConfigRule (LintelConfigRule lintelConfigRule, string configPath) {
+    /// <inheritdoc />
+    public void SaveConfigRule(LintelConfigRule lintelConfigRule, string configPath) {
         if(lintelConfigRule is null) {
             throw new ArgumentNullException(nameof(lintelConfigRule));
         }

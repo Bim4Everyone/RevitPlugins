@@ -1,4 +1,4 @@
-﻿<ResourceDictionary
+<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:system="clr-namespace:System;assembly=mscorlib">
@@ -82,4 +82,17 @@
     <system:String x:Key="RevitLintelsManagerCommand.SettingsCheckNecessaryMessageBody">Review the plugin settings.</system:String>
     <system:String x:Key="RevitLintelsManagerCommand.SettingsCheckNecessaryMessageTitle">Plugin settings errors</system:String>
     <system:String x:Key="Validation.MissingOpeningFamily">A saved opening family is missing from the project. Clear its selection.</system:String>
+    <system:String x:Key="Manager.Title">Lintel manager</system:String>
+    <system:String x:Key="Manager.Close">Close</system:String>
+    <system:String x:Key="Manager.DocumentChanged">The active document has changed. Return to the original document to continue.</system:String>
+    <system:String x:Key="Manager.Validation.ProjectRequired">Open a Revit project before starting the manager.</system:String>
+    <system:String x:Key="Manager.Validation.SettingsMissing">Project settings have not been saved.</system:String>
+    <system:String x:Key="Manager.Validation.LintelFamily">The saved lintel family is missing from the project.</system:String>
+    <system:String x:Key="Manager.Validation.OpeningFamilies">Opening families are not selected, or a saved family is missing.</system:String>
+    <system:String x:Key="Manager.Validation.StructureWalls">Structural wall types are not selected, or a saved type is missing.</system:String>
+    <system:String x:Key="Manager.Validation.Parameters">Some mapped lintel or opening parameters could not be resolved.</system:String>
+    <system:String x:Key="Manager.Validation.Rules">The selected rule configuration is unavailable, empty, or contains invalid rule groups.</system:String>
+    <system:String x:Key="Manager.Validation.StructureRuleConflict">A structural wall type cannot also have a placement rule.</system:String>
+    <system:String x:Key="Manager.SettingsCommandHint">Check the settings using the separate Lintel Manager Settings command.</system:String>
+    <system:String x:Key="Manager.StartFailed">The configuration could not be loaded or the manager could not be opened. See the log for details.</system:String>
 </ResourceDictionary>

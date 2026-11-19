@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -49,7 +49,7 @@ internal class FamilySettingsViewModel : BaseViewModel {
 
     public FamilySettingsViewModel(RevitRepository revitRepository, SystemPluginConfig systemPluginConfig,
         ILocalizationService localizationService, LintelManagerSettings settings, bool hasSavedSettings,
-        SettingsCommandFactory commandFactory) {
+        ISettingsCommandFactory commandFactory) {
         _revitRepository = revitRepository;
         _systemPluginConfig = systemPluginConfig;
         _localizationService = localizationService;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -6,7 +6,6 @@ using System.Windows.Input;
 using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
-using RevitLintelsManager.Models;
 using RevitLintelsManager.Models.Configs;
 using RevitLintelsManager.Models.Rules;
 using RevitLintelsManager.Models.Settings;
@@ -17,34 +16,28 @@ namespace RevitLintelsManager.ViewModels;
 internal class SettingsViewModel : BaseViewModel {
     public event Action CloseRequested;
 
-    private readonly PluginConfigRepository _configRepository;
+    private readonly IPluginConfigRepository _configRepository;
     private readonly ILocalizationService _localization;
     private readonly IMessageBoxService _messages;
-    private readonly LintelConfigRuleResolver _ruleResolver;
+    private readonly ILintelConfigRuleResolver _ruleResolver;
     private string _errorText;
     private bool _hasFamilySettingsErrors;
     private bool _hasPlacementSettingsErrors;
     private bool _hasGeneralSettingsErrors;
     private bool _isLoaded;
 
-    public SettingsViewModel(RevitRepository repository, SystemPluginConfig systemConfig,
-        ILocalizationService localization, PluginConfigRepository configRepository, ParamService paramService,
-        LintelConfigRuleStorage storage, LintelConfigRuleSerializer serializer, LintelConfigRuleResolver resolver,
-        SettingsDialogService dialogs, IOpenFileDialogService openDialog, ISaveFileDialogService saveDialog,
-        IMessageBoxService messages, SettingsCommandFactory commandFactory) {
+    /// <summary>Создаёт SettingsViewModel с переданными зависимостями.</summary>
+    public SettingsViewModel(ILocalizationService localization, IPluginConfigRepository configRepository,
+        ILintelConfigRuleResolver resolver, IMessageBoxService messages, ISettingsCommandFactory commandFactory,
+        FamilySettingsViewModel familySettings, GeneralSettingsViewModel generalSettings,
+        PlacementSettingsViewModel placementSettings) {
         _configRepository = configRepository;
         _localization = localization;
         _messages = messages;
         _ruleResolver = resolver;
-        var savedSettings = configRepository.LoadSettings();
-        var settings = savedSettings ?? configRepository.GetDefaultLintelManagerSettings();
-        FamilySettingsViewModel = new FamilySettingsViewModel(repository, systemConfig, localization, settings,
-            savedSettings is not null, commandFactory);
-        GeneralSettingsViewModel = new GeneralSettingsViewModel(repository, paramService, localization,
-            FamilySettingsViewModel, settings, commandFactory);
-        PlacementSettingsViewModel = new PlacementSettingsViewModel(repository, systemConfig, localization,
-            storage, serializer, resolver, dialogs, openDialog, saveDialog, messages,
-            FamilySettingsViewModel, GeneralSettingsViewModel, settings, commandFactory);
+        FamilySettingsViewModel = familySettings;
+        GeneralSettingsViewModel = generalSettings;
+        PlacementSettingsViewModel = placementSettings;
         LoadViewCommand = commandFactory.Create(LoadView);
         AcceptViewCommand = commandFactory.Create(AcceptView, CanAcceptView);
         CanAcceptView();
@@ -76,6 +69,7 @@ internal class SettingsViewModel : BaseViewModel {
         private set => RaiseAndSetIfChanged(ref _hasGeneralSettingsErrors, value);
     }
 
+    // Однократно показывает ошибки загрузки файлов правил.
     private void LoadView() {
         if(_isLoaded) {
             return;
@@ -88,6 +82,7 @@ internal class SettingsViewModel : BaseViewModel {
         }
     }
 
+    // Проверяет вкладки и доступность сохранения настроек.
     private bool CanAcceptView() {
         string familyError = FamilySettingsViewModel.GetErrorText();
         string placementError = PlacementSettingsViewModel.GetErrorText();
@@ -99,6 +94,7 @@ internal class SettingsViewModel : BaseViewModel {
         return ErrorText is null;
     }
 
+    // Сохраняет правила и настройки с восстановлением файлов при ошибке.
     private void AcceptView() {
         if(!CanAcceptView()) {
             return;

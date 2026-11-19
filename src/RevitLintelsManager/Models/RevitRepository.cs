@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.ApplicationServices;
@@ -9,7 +9,7 @@ using RevitLintelsManager.Models.Configs;
 
 namespace RevitLintelsManager.Models;
 
-internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig systemPluginConfig, ParamService paramService) {
+internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig systemPluginConfig, IParamService paramService) {
     private IEnumerable<RevitFamily> _lintelFamilies;
     private IEnumerable<RevitFamily> _openingFamilies;
     private IEnumerable<ElementId> _phaseIds;
@@ -19,7 +19,7 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
     public UIApplication UIApplication { get; } = uiApplication;
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
     public Application Application => UIApplication.Application;
-    public Document Document => ActiveUIDocument.Document;
+    public Document Document { get; } = uiApplication.ActiveUIDocument.Document;
     
     
     public IEnumerable<RevitFamily> LintelFamilies => _lintelFamilies ??= GetLintelFamilies();
@@ -38,14 +38,32 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
                 && Document.GetElement(phaseId)?.Name == name);
     }
 
+    /// <summary>Сохраняет исходный UI-контекст до будущей подготовки служебного вида.</summary>
+    public ManagerSessionState CaptureInitialState(ManagerConfigSnapshot config) {
+        return new ManagerSessionState(config, Document.Title, ActiveUIDocument.ActiveView?.UniqueId,
+            ActiveUIDocument.Selection.GetElementIds()
+                .Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null));
+    }
+
+    /// <summary>Освобождает API-каталоги этапа старта перед немодальной работой.</summary>
+    public void ReleaseCatalogs() {
+        _lintelFamilies = null;
+        _openingFamilies = null;
+        _phaseIds = null;
+        _revitWalls = null;
+    }
+
+    // Получает каталог семейств перемычек.
     private IEnumerable<RevitFamily> GetLintelFamilies() {
         return GetRevitFamilies(systemPluginConfig.DefaultLintelCats.ToList());
     }
 
+    // Получает каталог семейств проёмов.
     private IEnumerable<RevitFamily> GetOpeningFamilies() {
         return GetRevitFamilies(systemPluginConfig.DefaultOpeningCats.ToList());
     }
 
+    // Получает типы семейств допустимых категорий.
     private IEnumerable<FamilySymbol> GetFamilySymbols(IEnumerable<BuiltInCategory> categories) {
         return categories
             .SelectMany(category =>
@@ -59,6 +77,7 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
             .Select(group => group.First());
     }
     
+    // Получает экземпляры допустимых категорий.
     private IEnumerable<FamilyInstance> GetFamilyInstances(IEnumerable<BuiltInCategory> categories) {
         return categories
             .SelectMany(category =>
@@ -72,6 +91,7 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
             .Select(group => group.First());
     }
     
+    // Материализует каталог семейств с отложенным чтением параметров.
     private IEnumerable<RevitFamily> GetRevitFamilies(IList<BuiltInCategory> categories) {
         var symbols = GetFamilySymbols(categories);
 
@@ -96,6 +116,7 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
             }).ToArray();
     }
     
+    // Получает типы стен исходного документа.
     private IEnumerable<WallType> GetWallTypes() {
         return new FilteredElementCollector(Document)
             .OfClass(typeof(WallType))
@@ -104,6 +125,7 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
             .Select(x => x.First());
     }
 
+    // Получает экземпляры стен исходного документа.
     private IEnumerable<Wall> GetWalls() {
         return new FilteredElementCollector(Document)
             .OfClass(typeof(Wall))
@@ -113,6 +135,7 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
             .Select(x => x.First());
     }
 
+    // Сопоставляет типы стен с экземплярами.
     private IEnumerable<RevitWall> GetRevitWalls() {
         var wallTypes = GetWallTypes();
 

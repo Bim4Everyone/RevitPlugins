@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,15 +9,16 @@ using RevitLintelsManager.Models.Configs;
 
 namespace RevitLintelsManager.Models.Rules;
 
-public class LintelConfigRuleResolver {
+public class LintelConfigRuleResolver : ILintelConfigRuleResolver {
     private readonly ILoggerService _loggerService;
-    private readonly LintelConfigRuleStorage _storage;
-    private readonly LintelConfigRuleSerializer _serializer;
+    private readonly ILintelConfigRuleStorage _storage;
+    private readonly ILintelConfigRuleSerializer _serializer;
     private readonly SystemPluginConfig _systemPluginConfig;
     private IList<LintelConfigRule> _configs;
 
-    public LintelConfigRuleResolver(ILoggerService loggerService, LintelConfigRuleStorage storage,
-        LintelConfigRuleSerializer serializer, SystemPluginConfig systemPluginConfig) {
+    /// <summary>Создаёт LintelConfigRuleResolver с переданными зависимостями.</summary>
+    public LintelConfigRuleResolver(ILoggerService loggerService, ILintelConfigRuleStorage storage,
+        ILintelConfigRuleSerializer serializer, SystemPluginConfig systemPluginConfig) {
         _loggerService = loggerService;
         _storage = storage;
         _serializer = serializer;
@@ -27,11 +28,13 @@ public class LintelConfigRuleResolver {
     public IList<string> LoadErrors { get; } = new List<string>();
     public IList<LintelConfigRule> LintelConfigRules => _configs ??= LoadConfigs();
 
+    /// <inheritdoc />
     public LintelConfigRule GetLintelConfigRule(string name) {
         return LintelConfigRules.FirstOrDefault(config =>
             string.Equals(config.RuleConfigName, name, StringComparison.OrdinalIgnoreCase));
     }
 
+    // Загружает пользовательские правила и корпоративный шаблон.
     private IList<LintelConfigRule> LoadConfigs() {
         var configs = new List<LintelConfigRule>();
         foreach(string path in _storage.ProjectConfigRulePaths) {
@@ -51,6 +54,7 @@ public class LintelConfigRuleResolver {
         return configs;
     }
 
+    // Читает один файл и фиксирует ошибку загрузки.
     private LintelConfigRule LoadConfig(string path) {
         if(string.IsNullOrEmpty(path)) {
             return null;

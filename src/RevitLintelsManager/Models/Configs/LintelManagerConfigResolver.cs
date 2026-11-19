@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,7 +10,8 @@ using RevitLintelsManager.Models.Settings;
 namespace RevitLintelsManager.Models.Configs;
 
 internal class LintelManagerConfigResolver(RevitRepository repository,
-    LintelConfigRuleResolver ruleResolver, ParamService paramService) {
+    ILintelConfigRuleResolver ruleResolver, IParamService paramService) : ILintelManagerConfigResolver {
+    /// <inheritdoc />
     public LintelManagerConfig BuildLintelManagerConfig(LintelManagerSettings settings) {
         if(settings is null) {
             return null;
@@ -22,9 +23,12 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
             RuleConfigName = source.RuleConfigName,
             LintelPlaceRules = source.LintelPlaceRules?.Select(rule => new LintelPlaceRule {
                 LintelPlaceRuleName = rule?.LintelPlaceRuleName,
-                LintelRules = rule?.LintelRules,
+                LintelRules = rule?.LintelRules?.Select(range => range is null ? null : new LintelRule {
+                    MinWidth = range.MinWidth, MaxWidth = range.MaxWidth,
+                    WallSupport = range.WallSupport, LintelType = range.LintelType
+                }).ToArray(),
                 WallTypeNames = (settings.LintelWallSettings ?? []).Where(wallSettings =>
-                    string.Equals(wallSettings.RuleConfigName, source.RuleConfigName,
+                    wallSettings is not null && string.Equals(wallSettings.RuleConfigName, source.RuleConfigName,
                         StringComparison.OrdinalIgnoreCase)
                     && wallSettings.LintelPlaceRuleName == rule?.LintelPlaceRuleName)
                     .SelectMany(wallSettings => wallSettings.WallTypeNames ?? []).ToArray()
@@ -41,6 +45,39 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
         };
     }
 
+    /// <inheritdoc />
+    public ManagerConfigSnapshot CreateSnapshot(LintelManagerConfig config) {
+        var family = config.LintelFamilyConfig;
+        var opening = config.OpeningFamilyConfig;
+        var wallTypes = repository.RevitWalls.Select(wall => wall.WallType)
+            .ToDictionary(wall => wall.Name, wall => new ConfigElementKey(wall.UniqueId, wall.Name));
+        var parameters = new Dictionary<string, string> {
+            [nameof(family.LintelWidth)] = family.LintelWidth.Name,
+            [nameof(family.LintelThickness)] = family.LintelThickness.Name,
+            [nameof(family.LintelRightOffset)] = family.LintelRightOffset.Name,
+            [nameof(family.LintelLeftOffset)] = family.LintelLeftOffset.Name,
+            [nameof(family.LintelRightCorner)] = family.LintelRightCorner.Name,
+            [nameof(family.LintelLeftCorner)] = family.LintelLeftCorner.Name,
+            [nameof(family.LintelRightWelding)] = family.LintelRightWelding.Name,
+            [nameof(family.LintelLeftWelding)] = family.LintelLeftWelding.Name,
+            [nameof(opening.LintelOpeningHeight)] = opening.LintelOpeningHeight.Name,
+            [nameof(opening.LintelOpeningWidth)] = opening.LintelOpeningWidth.Name,
+            [nameof(config.LintelFixParam)] = config.LintelFixParam.Name
+        };
+        var phase = repository.Document.GetElement(config.PhaseId);
+        return new ManagerConfigSnapshot(
+            new ConfigElementKey(family.RevitLintelFamily.Family.UniqueId, family.RevitLintelFamily.Family.Name),
+            family.RevitLintelFamily.FamilySymbols.Select(type => new ConfigElementKey(type.UniqueId, type.Name)),
+            opening.RevitOpeningFamily.Select(item => new ConfigElementKey(item.Family.UniqueId, item.Family.Name)),
+            config.StructureWalls.Select(wall => wallTypes[wall.WallType.Name]),
+            new ConfigElementKey(phase.UniqueId, phase.Name), parameters, config.LintelConfigRule.RuleConfigName,
+            config.LintelConfigRule.LintelPlaceRules.Select(rule => new PlacementRuleSnapshot(
+                rule.LintelPlaceRuleName, (rule.WallTypeNames ?? []).Select(name => wallTypes[name]),
+                rule.LintelRules.Select(range => new LintelRuleSnapshot(range.MinWidth, range.MaxWidth,
+                    range.WallSupport, range.LintelType)))), config.MinimalHeightAboveOpeningMm.Value);
+    }
+
+    // Разрешает семейство перемычки и сопоставленные параметры.
     private LintelFamilyConfig BuildLintelFamilyConfig(LintelFamilySettings settings) {
         if(settings is null) {
             return null;
@@ -59,6 +96,7 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
         };
     }
 
+    // Разрешает все выбранные семейства проёмов.
     private OpeningFamilyConfig BuildOpeningFamilyConfig(OpeningFamilySettings settings) {
         var names = (settings?.FamilyNames ?? []).ToHashSet();
         var families = repository.OpeningFamilies.Where(family => names.Contains(family.Family.Name)).ToArray();
@@ -73,6 +111,7 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
         };
     }
 
+    // Проверяет разрешимость выбранных конструктивных стен.
     private IEnumerable<RevitWall> GetStructureWalls(IEnumerable<string> wallTypeNames) {
         var names = (wallTypeNames ?? []).ToHashSet();
         var walls = repository.RevitWalls.Where(wall => names.Contains(wall.WallType.Name)).ToArray();

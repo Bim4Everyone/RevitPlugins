@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -18,7 +18,7 @@ internal class GeneralSettingsViewModel : BaseViewModel {
     public event Action StructureWallsChanged;
 
     private readonly ILocalizationService _localizationService;
-    private readonly ParamService _paramService;
+    private readonly IParamService _paramService;
     private readonly FamilySettingsViewModel _familySettings;
     private ObservableCollection<ParamViewModel> _fixParameters;
     private ParamViewModel _selectedFixParameter;
@@ -28,9 +28,9 @@ internal class GeneralSettingsViewModel : BaseViewModel {
     private string _wallSearchText;
     private string _fixParameterName;
 
-    public GeneralSettingsViewModel(RevitRepository repository, ParamService paramService,
+    public GeneralSettingsViewModel(RevitRepository repository, IParamService paramService,
         ILocalizationService localizationService, FamilySettingsViewModel familySettings,
-        LintelManagerSettings settings, SettingsCommandFactory commandFactory) {
+        LintelManagerSettings settings, ISettingsCommandFactory commandFactory) {
         _localizationService = localizationService;
         _paramService = paramService;
         _familySettings = familySettings;
