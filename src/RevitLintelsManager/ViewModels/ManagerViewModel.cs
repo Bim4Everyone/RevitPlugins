@@ -15,7 +15,7 @@ using RevitLintelsManager.Services;
 
 namespace RevitLintelsManager.ViewModels;
 
-internal sealed class ManagerViewModel : BaseViewModel {
+internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public event Action CloseRequested;
     private readonly IManagerRequestDispatcher _requests;
     private readonly Dispatcher _dispatcher;
@@ -25,6 +25,7 @@ internal sealed class ManagerViewModel : BaseViewModel {
     private bool _isRefreshing;
     private string _contextSummary;
     private ManagerDocumentContext _lastContext;
+    private int _processingCount;
     private IReadOnlyList<ManagerGroupViewModel> _groups = Array.Empty<ManagerGroupViewModel>();
 
     /// <summary>Создаёт команды окна без непосредственных зависимостей от Revit API.</summary>
@@ -39,12 +40,20 @@ internal sealed class ManagerViewModel : BaseViewModel {
         RefreshCommand = commands.CreateAsync(RefreshContextAsync,
             () => !IsBlocked && !State.IsClosing && !IsRefreshing);
         CloseCommand = commands.Create(() => CloseRequested?.Invoke());
+        ToggleGroupCommand = commands.Create<ManagerGroupViewModel>(
+            group => SetExpanded(group, !group.IsExpanded),
+            group => !IsBlocked && !State.IsClosing && !IsRefreshing && _groups.Contains(group));
     }
 
     public ManagerSessionState State { get; }
     public ReadOnlyObservableCollection<ManagerRowViewModel> VisibleRows { get; }
     public ICommand CloseCommand { get; }
     public ICommand RefreshCommand { get; }
+    public ICommand ToggleGroupCommand { get; }
+    public int ProcessingCount => _processingCount;
+    public string ProcessText => string.Format(CultureInfo.CurrentCulture,
+        _localization.GetLocalizedString("Manager.ProcessCount"), ProcessingCount);
+    public bool CanEditRows => !IsBlocked && !State.IsClosing && !IsRefreshing;
     public ManagerDocumentContext LastContext {
         get => _lastContext;
         private set => RaiseAndSetIfChanged(ref _lastContext, value);
@@ -55,7 +64,10 @@ internal sealed class ManagerViewModel : BaseViewModel {
     }
     public bool IsRefreshing {
         get => _isRefreshing;
-        private set => RaiseAndSetIfChanged(ref _isRefreshing, value);
+        private set {
+            RaiseAndSetIfChanged(ref _isRefreshing, value);
+            RaisePropertyChanged(nameof(CanEditRows));
+        }
     }
     public bool IsBlocked {
         get => _isBlocked;
@@ -65,26 +77,73 @@ internal sealed class ManagerViewModel : BaseViewModel {
     /// <summary>Заменяет готовую проекцию групп без получения данных из Revit.</summary>
     /// <param name="groups">Материализованные заголовки с дочерними строками.</param>
     public void SetGroups(IReadOnlyList<ManagerGroupViewModel> groups) {
-        _groups = (groups ?? throw new ArgumentNullException(nameof(groups))).ToList().AsReadOnly();
+        var replacement = (groups ?? throw new ArgumentNullException(nameof(groups))).ToList().AsReadOnly();
+        var keys = new HashSet<ManagerItemKey>();
+        if(replacement.Distinct().Count() != replacement.Count
+            || replacement.SelectMany(group => group.Items).Any(item => !keys.Add(item.Snapshot.Key))) {
+            throw new ArgumentException("Строки не должны повторяться между группами.", nameof(groups));
+        }
+        foreach(var group in _groups) {
+            group.StateChanged -= OnGroupStateChanged;
+            if(!replacement.Contains(group)) {
+                group.Dispose();
+            }
+        }
+        _groups = replacement;
+        foreach(var group in _groups) {
+            group.StateChanged += OnGroupStateChanged;
+        }
+        _processingCount = _groups.Sum(group => group.ProcessingCount);
+        NotifyProcessingCount();
         RebuildVisibleRows();
     }
 
-    /// <summary>Обновляет плоскую проекцию; UI-команда раскрытия подключается в TASK-005.</summary>
+    /// <summary>Обновляет только видимые строки выбранной группы, сохраняя дочерние VM.</summary>
     /// <param name="group">Группа текущей проекции.</param>
     /// <param name="isExpanded">Требуемая видимость дочерних строк.</param>
     public void SetExpanded(ManagerGroupViewModel group, bool isExpanded) {
-        if(!_groups.Contains(group)) {
+        if(!_groups.Contains(group) || group.IsExpanded == isExpanded) {
             return;
         }
         group.IsExpanded = isExpanded;
-        RebuildVisibleRows();
+        int index = _visibleRows.IndexOf(group) + 1;
+        foreach(var item in group.Items) {
+            if(isExpanded) {
+                _visibleRows.Insert(index++, item);
+            } else {
+                _visibleRows.RemoveAt(index);
+            }
+        }
     }
 
     /// <summary>Применяет проверенное в API-контексте состояние исходного документа.</summary>
     public void SetBlocked(bool isBlocked) {
         State.IsBlocked = isBlocked;
         IsBlocked = isBlocked;
+        RaisePropertyChanged(nameof(CanEditRows));
         CommandManager.InvalidateRequerySuggested();
+    }
+
+    /// <summary>Снимает подписки менеджера и групп при освобождении контейнера сессии.</summary>
+    public void Dispose() {
+        foreach(var group in _groups) {
+            group.StateChanged -= OnGroupStateChanged;
+            group.Dispose();
+        }
+        _groups = Array.Empty<ManagerGroupViewModel>();
+        _visibleRows.Clear();
+    }
+
+    // Обновляет итог на величину изменения одной группы, независимо от раскрытия.
+    private void OnGroupStateChanged(ManagerGroupViewModel group, int previousCount) {
+        _processingCount += group.ProcessingCount - previousCount;
+        NotifyProcessingCount();
+    }
+
+    // Оповещает кнопку только после изменения агрегированного количества.
+    private void NotifyProcessingCount() {
+        RaisePropertyChanged(nameof(ProcessingCount));
+        RaisePropertyChanged(nameof(ProcessText));
     }
 
     // В коллекцию попадают только заголовки и дети раскрытых групп, без визуальных контейнеров.

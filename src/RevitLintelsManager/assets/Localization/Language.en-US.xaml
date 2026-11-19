@@ -123,4 +123,5 @@
     <system:String x:Key="Manager.Status.Warning">Warning</system:String>
     <system:String x:Key="Manager.Variants">Variants</system:String>
     <system:String x:Key="Manager.View">Visible in view</system:String>
+    <system:String x:Key="Manager.ProcessCount">Process ({0})</system:String>
 </ResourceDictionary>

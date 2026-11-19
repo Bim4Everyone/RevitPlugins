@@ -145,9 +145,8 @@
                     Padding="0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    IsChecked="{Binding IsChecked, Mode=OneWay}"
-                    IsThreeState="True"
-                    IsEnabled="False" />
+                    IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    IsThreeState="False" />
                 <ui:Button
                     Grid.Column="1"
                     Width="36"
@@ -175,10 +174,9 @@
                     Grid.ColumnSpan="1">
                     <ComboBox
                         Height="32"
-                        IsEnabled="False"
                         ItemsSource="{Binding Actions}"
                         DisplayMemberPath="Title"
-                        SelectedItem="{Binding SelectedAction, Mode=OneWay}" />
+                        SelectedItem="{Binding SelectedAction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock
                         Margin="12,0,32,0"
                         VerticalAlignment="Center"
@@ -196,7 +194,8 @@
                         Height="28"
                         Padding="0"
                         Appearance="Transparent"
-                        IsEnabled="False"
+                        Command="{Binding DataContext.ToggleGroupCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                        CommandParameter="{Binding}"
                         ToolTip="{me:LocalizationSource Manager.Expand}">
                         <ui:SymbolIcon
                             x:Name="ExpandIcon"
@@ -251,9 +250,8 @@
                     Padding="0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    IsChecked="{Binding IsChecked, Mode=OneWay}"
-                    IsThreeState="True"
-                    IsEnabled="False" />
+                    IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    IsThreeState="False" />
                 <ui:Button
                     Grid.Column="1"
                     Width="36"
@@ -281,10 +279,9 @@
                     Grid.ColumnSpan="2">
                     <ComboBox
                         Height="32"
-                        IsEnabled="False"
                         ItemsSource="{Binding Actions}"
                         DisplayMemberPath="Title"
-                        SelectedItem="{Binding SelectedAction, Mode=OneWay}" />
+                        SelectedItem="{Binding SelectedAction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock
                         Margin="12,0,32,0"
                         VerticalAlignment="Center"

@@ -8,27 +8,24 @@ using RevitLintelsManager.Models;
 
 namespace RevitLintelsManager.ViewModels;
 
-/// <summary>Общее представление полей строки; назначение действий появится в TASK-004.</summary>
+/// <summary>Общие поля строки без предметного расчёта допустимости действий.</summary>
 internal abstract class ManagerRowViewModel : BaseViewModel {
     /// <summary>Материализует только данные представления и локализованные подписи действий.</summary>
     protected ManagerRowViewModel(ManagerElementPresentation opening, ManagerElementPresentation lintel,
-        IEnumerable<ManagerAction> actions, ManagerAction? action, bool? isChecked,
+        IEnumerable<ManagerAction> actions,
         ILocalizationService localization, bool showInformation = true) {
         Opening = new ManagerElementViewModel(opening, true, localization, showInformation);
         Lintel = new ManagerElementViewModel(lintel, false, localization, showInformation);
-        Actions = actions.Select(value => new ManagerActionViewModel(value,
+        Actions = actions.Distinct().Select(value => new ManagerActionViewModel(value,
             localization.GetLocalizedString("Manager.Action." + value))).ToList().AsReadOnly();
-        SelectedAction = Actions.FirstOrDefault(value => value.Action == action);
-        MixedActionsText = action is null ? localization.GetLocalizedString("Manager.Variants") : null;
-        IsChecked = isChecked;
     }
 
     public ManagerElementViewModel Opening { get; }
     public ManagerElementViewModel Lintel { get; }
     public IReadOnlyList<ManagerActionViewModel> Actions { get; }
-    public ManagerActionViewModel SelectedAction { get; }
-    public string MixedActionsText { get; }
-    public bool? IsChecked { get; }
+    public abstract ManagerActionViewModel SelectedAction { get; set; }
+    public virtual string MixedActionsText => null;
+    public abstract bool? IsChecked { get; set; }
 }
 
 /// <summary>Подпись операции; «Варианты» не входит в список операций.</summary>
