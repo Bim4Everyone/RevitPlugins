@@ -17,6 +17,8 @@ namespace RevitLintelsManager.ViewModels;
 
 internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public event Action CloseRequested;
+    public event Action<ManagerDetailsViewModel> DetailsRequested;
+    public event Action DetailsDismissRequested;
     private readonly IManagerRequestDispatcher _requests;
     private readonly Dispatcher _dispatcher;
     private readonly ILocalizationService _localization;
@@ -43,6 +45,12 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         ToggleGroupCommand = commands.Create<ManagerGroupViewModel>(
             group => SetExpanded(group, !group.IsExpanded),
             group => !IsBlocked && !State.IsClosing && !IsRefreshing && _groups.Contains(group));
+        ShowInformationCommand = commands.Create<ManagerElementViewModel>(
+            element => DetailsRequested?.Invoke(new ManagerDetailsViewModel(element, false, _localization)),
+            element => CanEditRows && element.ShowInformation && ContainsElement(element));
+        ShowWarningsCommand = commands.Create<ManagerElementViewModel>(
+            element => DetailsRequested?.Invoke(new ManagerDetailsViewModel(element, true, _localization)),
+            element => CanEditRows && ContainsElement(element));
     }
 
     public ManagerSessionState State { get; }
@@ -50,10 +58,16 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public ICommand CloseCommand { get; }
     public ICommand RefreshCommand { get; }
     public ICommand ToggleGroupCommand { get; }
+    public ICommand ShowInformationCommand { get; }
+    public ICommand ShowWarningsCommand { get; }
     public int ProcessingCount => _processingCount;
     public string ProcessText => string.Format(CultureInfo.CurrentCulture,
         _localization.GetLocalizedString("Manager.ProcessCount"), ProcessingCount);
     public bool CanEditRows => !IsBlocked && !State.IsClosing && !IsRefreshing;
+    public string GeneralMessage => State.IsClosing ? _localization.GetLocalizedString("Manager.Closing")
+        : IsBlocked ? _localization.GetLocalizedString("Manager.DocumentChanged")
+        : IsRefreshing ? _localization.GetLocalizedString("Manager.Busy") : null;
+    public bool HasGeneralMessage => GeneralMessage is not null;
     public ManagerDocumentContext LastContext {
         get => _lastContext;
         private set => RaiseAndSetIfChanged(ref _lastContext, value);
@@ -67,6 +81,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         private set {
             RaiseAndSetIfChanged(ref _isRefreshing, value);
             RaisePropertyChanged(nameof(CanEditRows));
+            NotifyPresentationState();
         }
     }
     public bool IsBlocked {
@@ -83,6 +98,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
             || replacement.SelectMany(group => group.Items).Any(item => !keys.Add(item.Snapshot.Key))) {
             throw new ArgumentException("Строки не должны повторяться между группами.", nameof(groups));
         }
+        DetailsDismissRequested?.Invoke();
         foreach(var group in _groups) {
             group.StateChanged -= OnGroupStateChanged;
             if(!replacement.Contains(group)) {
@@ -105,6 +121,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         if(!_groups.Contains(group) || group.IsExpanded == isExpanded) {
             return;
         }
+        DetailsDismissRequested?.Invoke();
         group.IsExpanded = isExpanded;
         int index = _visibleRows.IndexOf(group) + 1;
         foreach(var item in group.Items) {
@@ -121,17 +138,57 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         State.IsBlocked = isBlocked;
         IsBlocked = isBlocked;
         RaisePropertyChanged(nameof(CanEditRows));
+        NotifyPresentationState();
         CommandManager.InvalidateRequerySuggested();
     }
 
     /// <summary>Снимает подписки менеджера и групп при освобождении контейнера сессии.</summary>
     public void Dispose() {
+        DetailsDismissRequested?.Invoke();
         foreach(var group in _groups) {
             group.StateChanged -= OnGroupStateChanged;
             group.Dispose();
         }
         _groups = Array.Empty<ManagerGroupViewModel>();
         _visibleRows.Clear();
+        DetailsRequested = null;
+        DetailsDismissRequested = null;
+    }
+
+    /// <summary>Обновляет подписи существующих строк при смене языка платформы.</summary>
+    public void RefreshLocalization() {
+        DetailsDismissRequested?.Invoke();
+        foreach(var group in _groups) {
+            group.RefreshLocalization(_localization);
+            foreach(var item in group.Items) {
+                item.RefreshLocalization(_localization);
+            }
+        }
+        RaisePropertyChanged(nameof(ProcessText));
+        RaisePropertyChanged(nameof(GeneralMessage));
+        if(LastContext is not null) {
+            ContextSummary = string.Format(CultureInfo.CurrentCulture,
+                _localization.GetLocalizedString("Manager.ContextSummary"), LastContext.DocumentTitle,
+                LastContext.ViewName, LastContext.SelectionUniqueIds.Count);
+        } else {
+            ContextSummary = _localization.GetLocalizedString("Manager.Refresh");
+        }
+    }
+
+    // Отбрасывает команды со старым DataContext после замены или recycling строки.
+    private bool ContainsElement(ManagerElementViewModel element) {
+        return _groups.Any(group => ReferenceEquals(group.Opening, element) || ReferenceEquals(group.Lintel, element)
+            || group.Items.Any(item => ReferenceEquals(item.Opening, element)
+                || ReferenceEquals(item.Lintel, element)));
+    }
+
+    // Использует существующие флаги сессии и запроса, без второй машины состояний.
+    private void NotifyPresentationState() {
+        RaisePropertyChanged(nameof(GeneralMessage));
+        RaisePropertyChanged(nameof(HasGeneralMessage));
+        if(!CanEditRows) {
+            DetailsDismissRequested?.Invoke();
+        }
     }
 
     // Обновляет итог на величину изменения одной группы, независимо от раскрытия.

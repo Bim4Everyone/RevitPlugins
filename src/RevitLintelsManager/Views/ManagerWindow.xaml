@@ -42,15 +42,21 @@
             <ui:Button
                 Margin="0,0,8,0"
                 IsEnabled="False"
-                Content="{me:LocalizationSource Manager.Project}" />
+                Content="{me:LocalizationSource Manager.Project}"
+                ToolTip="{me:LocalizationSource Manager.NotImplemented}"
+                ToolTipService.ShowOnDisabled="True" />
             <ui:Button
                 Margin="0,0,8,0"
                 IsEnabled="False"
-                Content="{me:LocalizationSource Manager.View}" />
+                Content="{me:LocalizationSource Manager.View}"
+                ToolTip="{me:LocalizationSource Manager.NotImplemented}"
+                ToolTipService.ShowOnDisabled="True" />
             <ui:Button
                 Margin="0,0,8,0"
                 IsEnabled="False"
-                Content="{me:LocalizationSource Manager.Selected}" />
+                Content="{me:LocalizationSource Manager.Selected}"
+                ToolTip="{me:LocalizationSource Manager.NotImplemented}"
+                ToolTipService.ShowOnDisabled="True" />
             <ui:Button
                 Content="{me:LocalizationSource Manager.Refresh}"
                 Command="{Binding RefreshCommand}"
@@ -75,6 +81,7 @@
             </Border.Style>
             <ListBox
                 x:Name="RowsList"
+                ScrollViewer.ScrollChanged="OnRowsScrollChanged"
                 IsEnabled="{Binding CanEditRows}"
                 BorderThickness="0"
                 Background="Transparent"
@@ -113,17 +120,19 @@
                 Grid.Column="0"
                 Margin="0,0,20,0"
                 VerticalAlignment="Center"
-                Foreground="DarkOrange"
+                Foreground="{DynamicResource SystemFillColorCautionBrush}"
                 TextWrapping="Wrap"
-                Text="{me:LocalizationSource Manager.DocumentChanged}"
-                Visibility="{Binding IsBlocked, Converter={StaticResource BoolToVisibility}}" />
+                Text="{Binding GeneralMessage}"
+                Visibility="{Binding HasGeneralMessage, Converter={StaticResource BoolToVisibility}}" />
             <ui:Button
                 Grid.Column="1"
                 MinWidth="130"
                 Margin="0,0,16,0"
                 Appearance="Primary"
                 IsEnabled="False"
-                Content="{Binding ProcessText}" />
+                Content="{Binding ProcessText}"
+                ToolTip="{me:LocalizationSource Manager.NotImplemented}"
+                ToolTipService.ShowOnDisabled="True" />
             <ui:Button
                 Grid.Column="2"
                 MinWidth="130"

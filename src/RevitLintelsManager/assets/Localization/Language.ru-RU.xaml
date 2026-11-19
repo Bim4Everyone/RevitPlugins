@@ -124,4 +124,22 @@
     <system:String x:Key="Manager.Variants">Варианты</system:String>
     <system:String x:Key="Manager.View">Видимые на виде</system:String>
     <system:String x:Key="Manager.ProcessCount">Обработать ({0})</system:String>
+    <system:String x:Key="Manager.Busy">Обновление данных…</system:String>
+    <system:String x:Key="Manager.Closing">Завершение запроса и закрытие менеджера…</system:String>
+    <system:String x:Key="Manager.DiagnosticUnavailable">Текст предупреждения недоступен</system:String>
+    <system:String x:Key="Manager.Info.Family">Семейство</system:String>
+    <system:String x:Key="Manager.Info.FixedLintel">Зафиксирована</system:String>
+    <system:String x:Key="Manager.Info.FixedOpening">Зафиксирован</system:String>
+    <system:String x:Key="Manager.Info.Group">Группа модели</system:String>
+    <system:String x:Key="Manager.Info.Id">ID элемента</system:String>
+    <system:String x:Key="Manager.Info.Level">Уровень</system:String>
+    <system:String x:Key="Manager.Info.Type">Типоразмер</system:String>
+    <system:String x:Key="Manager.Info.Workset">Рабочий набор</system:String>
+    <system:String x:Key="Manager.No">нет</system:String>
+    <system:String x:Key="Manager.NotImplemented">Функция будет доступна на следующем этапе</system:String>
+    <system:String x:Key="Manager.NoWarnings">Предупреждений нет</system:String>
+    <system:String x:Key="Manager.RowWarnings">Причины пары / группы</system:String>
+    <system:String x:Key="Manager.Unavailable">Нет данных</system:String>
+    <system:String x:Key="Manager.Warnings">Предупреждения</system:String>
+    <system:String x:Key="Manager.Yes">да</system:String>
 </ResourceDictionary>

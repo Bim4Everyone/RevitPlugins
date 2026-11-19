@@ -18,6 +18,8 @@ internal sealed class ManagerItemViewModel : ManagerRowViewModel {
         ManagerElementPresentation lintel, ILocalizationService localization)
         : base(opening, lintel, snapshot.AllowedActions, localization) {
         Snapshot = snapshot;
+        Opening.SetRowDiagnostics(snapshot.Diagnostics);
+        Lintel.SetRowDiagnostics(snapshot.Diagnostics);
         _selectedAction = Actions.FirstOrDefault(value => value.Action == snapshot.DefaultAction)
             ?? throw new ArgumentException("Действие по умолчанию должно входить в допустимые действия.",
                 nameof(snapshot));

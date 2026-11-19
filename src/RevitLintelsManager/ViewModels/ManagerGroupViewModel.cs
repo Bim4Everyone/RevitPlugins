@@ -31,11 +31,13 @@ internal sealed class ManagerGroupViewModel : ManagerRowViewModel, IDisposable {
         Key = key;
         _localization = localization;
         Items = items.ToList().AsReadOnly();
+        Opening.SetRowDiagnostics(Items.SelectMany(item => item.Snapshot.Diagnostics
+            .Concat(item.Opening.Element?.Diagnostics ?? Array.Empty<ManagerDiagnostic>())));
+        Lintel.SetRowDiagnostics(Items.SelectMany(item => item.Snapshot.Diagnostics
+            .Concat(item.Lintel.Element?.Diagnostics ?? Array.Empty<ManagerDiagnostic>())));
         if(Items.Distinct().Count() != Items.Count) {
             throw new ArgumentException("Дочерняя строка не должна повторяться в группе.", nameof(items));
         }
-        CountText = string.Format(CultureInfo.CurrentCulture,
-            localization.GetLocalizedString("Manager.Count"), Items.Count);
         foreach(var item in Items) {
             _selectedCount += item.IsChecked == true ? 1 : 0;
             _processingCount += item.IsProcessingSelected ? 1 : 0;
@@ -49,7 +51,8 @@ internal sealed class ManagerGroupViewModel : ManagerRowViewModel, IDisposable {
     public IReadOnlyList<ManagerItemViewModel> Items { get; }
     public int Count => Items.Count;
     public int ProcessingCount => _processingCount;
-    public string CountText { get; }
+    public string CountText => string.Format(CultureInfo.CurrentCulture,
+        _localization.GetLocalizedString("Manager.Count"), Items.Count);
     public bool IsExpanded {
         get => _isExpanded;
         internal set => RaiseAndSetIfChanged(ref _isExpanded, value);
@@ -75,6 +78,13 @@ internal sealed class ManagerGroupViewModel : ManagerRowViewModel, IDisposable {
             // Назначение действует также на снятых checkbox детей.
             UpdateItems(item => item.SelectedAction = item.Actions.First(option => option.Action == action.Action));
         }
+    }
+
+    /// <inheritdoc />
+    public override void RefreshLocalization(ILocalizationService localization) {
+        base.RefreshLocalization(localization);
+        RaisePropertyChanged(nameof(CountText));
+        RaisePropertyChanged(nameof(MixedActionsText));
     }
 
     /// <summary>Снимает подписки на детей при замене группы или освобождении менеджера.</summary>

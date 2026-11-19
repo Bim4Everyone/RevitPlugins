@@ -124,4 +124,22 @@
     <system:String x:Key="Manager.Variants">Variants</system:String>
     <system:String x:Key="Manager.View">Visible in view</system:String>
     <system:String x:Key="Manager.ProcessCount">Process ({0})</system:String>
+    <system:String x:Key="Manager.Busy">Refreshing data…</system:String>
+    <system:String x:Key="Manager.Closing">Finishing request and closing manager…</system:String>
+    <system:String x:Key="Manager.DiagnosticUnavailable">Warning text is not available</system:String>
+    <system:String x:Key="Manager.Info.Family">Family</system:String>
+    <system:String x:Key="Manager.Info.FixedLintel">Fixed</system:String>
+    <system:String x:Key="Manager.Info.FixedOpening">Fixed</system:String>
+    <system:String x:Key="Manager.Info.Group">Model group</system:String>
+    <system:String x:Key="Manager.Info.Id">Element ID</system:String>
+    <system:String x:Key="Manager.Info.Level">Level</system:String>
+    <system:String x:Key="Manager.Info.Type">Type</system:String>
+    <system:String x:Key="Manager.Info.Workset">Workset</system:String>
+    <system:String x:Key="Manager.No">no</system:String>
+    <system:String x:Key="Manager.NotImplemented">This function will be available in a later stage</system:String>
+    <system:String x:Key="Manager.NoWarnings">No warnings</system:String>
+    <system:String x:Key="Manager.RowWarnings">Pair / group reasons</system:String>
+    <system:String x:Key="Manager.Unavailable">Not available</system:String>
+    <system:String x:Key="Manager.Warnings">Warnings</system:String>
+    <system:String x:Key="Manager.Yes">yes</system:String>
 </ResourceDictionary>

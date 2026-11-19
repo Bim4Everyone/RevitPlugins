@@ -1,4 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
+
 using dosymep.SimpleServices;
+using dosymep.WPF.ViewModels;
 
 using RevitLintelsManager.Models;
 
@@ -6,11 +10,29 @@ namespace RevitLintelsManager.ViewModels;
 
 /// <summary>Отображает сведения элемента, не обращаясь к модели Revit.</summary>
 internal sealed class ManagerElementViewModel(ManagerElementPresentation element, bool isOpening,
-    ILocalizationService localization, bool showInformation = true) {
+    ILocalizationService localization, bool showInformation = true) : BaseViewModel {
+    public ManagerElementPresentation Element => element;
+    public bool IsOpening => isOpening;
+    public IReadOnlyList<ManagerDiagnostic> RowDiagnostics { get; private set; } =
+        new List<ManagerDiagnostic>().AsReadOnly();
     public bool IsMissing => element is null;
     public bool ShowInformation => showInformation && !IsMissing;
-    public string TypeName => element?.TypeName ?? localization.GetLocalizedString(
-        isOpening ? "Manager.NoOpening" : "Manager.NoLintel");
+    public string TypeName => element is null
+        ? localization.GetLocalizedString(isOpening ? "Manager.NoOpening" : "Manager.NoLintel")
+        : string.IsNullOrWhiteSpace(element.TypeName)
+            ? localization.GetLocalizedString("Manager.Unavailable") : element.TypeName;
     public ManagerElementStatus Status => element?.Status ?? ManagerElementStatus.Missing;
     public string StatusText => localization.GetLocalizedString("Manager.Status." + Status);
+
+    /// <summary>Привязывает подготовленную диагностику строки, не приписывая её конкретному элементу.</summary>
+    /// <param name="diagnostics">Диагностика пары или агрегированного заголовка.</param>
+    public void SetRowDiagnostics(IEnumerable<ManagerDiagnostic> diagnostics) {
+        RowDiagnostics = diagnostics.ToList().AsReadOnly();
+    }
+
+    /// <summary>Обновляет локализованные подписи без изменения имён элементов.</summary>
+    public void RefreshLocalization() {
+        RaisePropertyChanged(nameof(TypeName));
+        RaisePropertyChanged(nameof(StatusText));
+    }
 }

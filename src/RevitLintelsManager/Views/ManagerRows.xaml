@@ -36,20 +36,27 @@
                     Margin="4,0"
                     Padding="0"
                     Appearance="Transparent"
-                    IsEnabled="False"
+                    Command="{Binding DataContext.ShowInformationCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                    CommandParameter="{Binding}"
                     ToolTip="{me:LocalizationSource Manager.Information}">
                     <ui:SymbolIcon
                         Symbol="Info24"
                         FontSize="16" />
                 </ui:Button>
-                <ui:SymbolIcon
-                    x:Name="StatusIcon"
+                <ui:Button
                     Grid.Column="2"
-                    VerticalAlignment="Center"
-                    Foreground="ForestGreen"
-                    Symbol="CheckmarkCircle24"
-                    FontSize="18"
-                    ToolTip="{Binding StatusText}" />
+                    Padding="0"
+                    Appearance="Transparent"
+                    Command="{Binding DataContext.ShowWarningsCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                    CommandParameter="{Binding}"
+                    ToolTip="{Binding StatusText}">
+                    <ui:SymbolIcon
+                        x:Name="StatusIcon"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource SystemFillColorSuccessBrush}"
+                        Symbol="CheckmarkCircle24"
+                        FontSize="18" />
+                </ui:Button>
             </Grid>
         </Border>
         <DataTemplate.Triggers>
@@ -71,7 +78,7 @@
                 <Setter
                     TargetName="StatusIcon"
                     Property="Foreground"
-                    Value="DarkOrange" />
+                    Value="{DynamicResource SystemFillColorCautionBrush}" />
             </DataTrigger>
             <DataTrigger
                 Binding="{Binding Status}"
@@ -83,7 +90,7 @@
                 <Setter
                     TargetName="StatusIcon"
                     Property="Foreground"
-                    Value="DarkOrange" />
+                    Value="{DynamicResource SystemFillColorCautionBrush}" />
             </DataTrigger>
             <DataTrigger
                 Binding="{Binding Status}"
@@ -95,7 +102,7 @@
                 <Setter
                     TargetName="StatusIcon"
                     Property="Foreground"
-                    Value="DarkOrange" />
+                    Value="{DynamicResource SystemFillColorCautionBrush}" />
             </DataTrigger>
             <DataTrigger
                 Binding="{Binding IsMissing}"
@@ -103,15 +110,19 @@
                 <Setter
                     TargetName="ElementName"
                     Property="Foreground"
-                    Value="DarkOrange" />
+                    Value="{DynamicResource SystemFillColorCautionBrush}" />
                 <Setter
                     TargetName="InformationButton"
                     Property="Visibility"
                     Value="Collapsed" />
                 <Setter
                     TargetName="StatusIcon"
-                    Property="Visibility"
-                    Value="Collapsed" />
+                    Property="Symbol"
+                    Value="Warning24" />
+                <Setter
+                    TargetName="StatusIcon"
+                    Property="Foreground"
+                    Value="{DynamicResource SystemFillColorCautionBrush}" />
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
@@ -205,6 +216,7 @@
                     <TextBlock
                         VerticalAlignment="Center"
                         Text="{Binding CountText}"
+                        ToolTip="{Binding CountText}"
                         TextTrimming="CharacterEllipsis" />
                 </DockPanel>
             </Grid>

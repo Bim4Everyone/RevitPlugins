@@ -26,10 +26,27 @@ internal abstract class ManagerRowViewModel : BaseViewModel {
     public abstract ManagerActionViewModel SelectedAction { get; set; }
     public virtual string MixedActionsText => null;
     public abstract bool? IsChecked { get; set; }
+
+    /// <summary>Обновляет подписи, сохраняя внутренние enum и назначенные действия.</summary>
+    /// <param name="localization">Существующий сервис локализации.</param>
+    public virtual void RefreshLocalization(ILocalizationService localization) {
+        Opening.RefreshLocalization();
+        Lintel.RefreshLocalization();
+        foreach(var action in Actions) {
+            action.RefreshLocalization(localization);
+        }
+    }
 }
 
 /// <summary>Подпись операции; «Варианты» не входит в список операций.</summary>
-internal sealed class ManagerActionViewModel(ManagerAction action, string title) {
+internal sealed class ManagerActionViewModel(ManagerAction action, string title) : BaseViewModel {
+    private string _title = title;
     public ManagerAction Action { get; } = action;
-    public string Title { get; } = title;
+    public string Title => _title;
+
+    /// <summary>Обновляет только подпись операции.</summary>
+    /// <param name="localization">Существующий сервис локализации.</param>
+    public void RefreshLocalization(ILocalizationService localization) {
+        RaiseAndSetIfChanged(ref _title, localization.GetLocalizedString("Manager.Action." + Action), nameof(Title));
+    }
 }

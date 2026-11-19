@@ -69,6 +69,11 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             kernel.Bind<WindowPlatformEvents>().ToSelf().InSingletonScope();
             kernel.Bind<Dispatcher>().ToConstant(Dispatcher.CurrentDispatcher);
             kernel.Bind<IManagerRequestDispatcher>().To<ManagerExternalEventHandler>().InSingletonScope();
+            kernel.Bind<ManagerDetailsWindow>().ToSelf();
+            kernel.Bind<Func<ManagerDetailsWindow>>().ToMethod(context => {
+                var owner = context.Kernel;
+                return () => owner.Get<ManagerDetailsWindow>();
+            });
             kernel.BindMainWindow<ManagerViewModel, ManagerWindow>();
             kernel.Bind<IManagerSession>().To<ManagerSession>().InSingletonScope();
             var session = kernel.Get<IManagerSession>();
