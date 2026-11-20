@@ -86,9 +86,14 @@
     <system:String x:Key="ParametersPage.ComPositionType">10. Position type:</system:String>
     <system:String x:Key="ParametersPage.ComRoomCar">11. Parking space class:</system:String>
     <system:String x:Key="ParametersPage.ComRoomUse">12. Applicability:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomUseParam">12.1 Main parameter:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomUseMainNumberParam">12.2 Parameter for dependent parking spaces:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomUseKeyword">12.3 Keyword:</system:String>
     <system:String x:Key="ParametersPage.ComRoomName">13. Room name</system:String>
     <system:String x:Key="ParametersPage.ComRoomGroupNameParam">13.1 For a group of multiple rooms:</system:String>
     <system:String x:Key="ParametersPage.ComRoomNameParam">13.2 For a single room:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomNameMainNumberParam">13.3 Parameter for dependent parking spaces:</system:String>
+    <system:String x:Key="ParametersPage.ComRoomNameKeyword">13.4 Keyword:</system:String>
     <system:String x:Key="ParametersPage.ComRoomProjectName">14. Project ID:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaFilterParam">Parameter for filtering public areas:</system:String>
     <system:String x:Key="ParametersPage.PublicAreaParam">Parameter for grouping public areas:</system:String>
@@ -238,6 +243,7 @@
     </system:String>
     <system:String x:Key="ToolTip.ParkingSpaceClassParamToolTip">Text parameter whose value is output to the declaration column "Parking space class"</system:String>
     <system:String x:Key="ToolTip.ParkingInfoParamToolTip">Text parameter whose value is output to the declaration column "Applicability"</system:String>
+    <system:String x:Key="ToolTip.MainParkingNumberParamToolTip">Text parameter containing the main parking space number. If the source text contains the keyword and the number is filled in, the text is followed by «от ММ» and the main parking space number.</system:String>
     <system:String x:Key="ToolTip.CommercialAreaParamToolTip">
         Numeric parameter whose value is output to the declaration column "Total area".
         Two parameters must be selected: one for when the group consists of multiple rooms,

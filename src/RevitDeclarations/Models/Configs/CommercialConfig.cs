@@ -33,6 +33,10 @@ internal class CommercialConfigSettings : DeclarationConfigSettings {
     public string RoomsHeightParam { get; set; }
     public string ParkingSpaceClass { get; set; }
     public string ParkingInfo { get; set; }
+    public string ParkingInfoMainNumberParam { get; set; }
+    public string GroupNameMainNumberParam { get; set; }
+    public string ParkingInfoKeyword { get; set; } = CommercialSettings.DefaultParkingKeyword;
+    public string GroupNameKeyword { get; set; } = CommercialSettings.DefaultParkingKeyword;
     public string PositionType { get; set; }
     public string GroupNameParam { get; set; }
 
@@ -56,6 +60,8 @@ internal class CommercialConfigSettings : DeclarationConfigSettings {
             RoomsHeightParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_HEIGHT),
             ParkingSpaceClass = SharedParamsConfig.Instance.ParkingSpaceClass.Name,
             ParkingInfo = SharedParamsConfig.Instance.ApartmentNameExtra.Name,
+            ParkingInfoMainNumberParam = SharedParamsConfig.Instance.MainParkingSpaceNumber.Name,
+            GroupNameMainNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
             PositionType = SharedParamsConfig.Instance.RoomPositionType.Name,
             GroupNameParam = SharedParamsConfig.Instance.ApartmentGroupName.Name,
 
