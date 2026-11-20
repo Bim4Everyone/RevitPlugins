@@ -81,6 +81,7 @@
     <system:String x:Key="Parameters.Intro">Введите имена параметров. Для копирования из плиты используется одно имя: оно должно быть одинаковым у плиты и каркаса. Настройки сохраняются по OK основного экрана.</system:String>
     <system:String x:Key="Parameters.Default">По умолчанию: {0}</system:String>
     <system:String x:Key="Parameters.Reset">Сбросить</system:String>
+    <system:String x:Key="Parameters.WriteYes">Записывать «Да»</system:String>
     <system:String x:Key="Parameters.ResetAll">Сбросить все</system:String>
     <system:String x:Key="Parameters.LongRebarCode.Title">Класс продольных стержней</system:String>
     <system:String x:Key="Parameters.LongRebarCode.Description">Запись кода класса продольной арматуры. Сейчас A500C соответствует коду 501.</system:String>
@@ -102,8 +103,8 @@
     <system:String x:Key="Parameters.AnchorageBottom1.Description">Длина первой анкеровки нижних продольных стержней.</system:String>
     <system:String x:Key="Parameters.AnchorageBottom2.Title">Анкеровка нижнего стержня, конец 2</system:String>
     <system:String x:Key="Parameters.AnchorageBottom2.Description">Длина второй анкеровки нижних продольных стержней.</system:String>
-    <system:String x:Key="Parameters.StirrupChangeBinding.Title">Изменение привязки хомутов</system:String>
-    <system:String x:Key="Parameters.StirrupChangeBinding.Description">Управляющий переключатель семейства. Плагин записывает 1. Точный смысл переключателя должен соответствовать исходному семейству.</system:String>
+    <system:String x:Key="Parameters.StirrupChangeBinding.Title">Привязка продольных стержней к хомуту</system:String>
+    <system:String x:Key="Parameters.StirrupChangeBinding.Description">Параметр «Да/Нет» определяет, к какой внутренней грани хомута привязаны продольные стержни. По умолчанию галочка снята, плагин записывает «Нет».</system:String>
     <system:String x:Key="Parameters.StirrupDiameter.Title">Диаметр хомутов</system:String>
     <system:String x:Key="Parameters.StirrupDiameter.Description">Диаметр поперечной арматуры, выбранный в основном окне.</system:String>
     <system:String x:Key="Parameters.StirrupBendLength.Title">Длина отгибов хомутов</system:String>

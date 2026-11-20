@@ -81,6 +81,7 @@
     <system:String x:Key="Parameters.Intro">Enter parameter names. The same name is used on the slab and frame for copying. Settings are saved with OK on the main screen.</system:String>
     <system:String x:Key="Parameters.Default">Default: {0}</system:String>
     <system:String x:Key="Parameters.Reset">Reset</system:String>
+    <system:String x:Key="Parameters.WriteYes">Write Yes</system:String>
     <system:String x:Key="Parameters.ResetAll">Reset all</system:String>
     <system:String x:Key="Parameters.LongRebarCode.Title">Longitudinal bar class</system:String>
     <system:String x:Key="Parameters.LongRebarCode.Description">Class code of longitudinal bars. A500C currently uses code 501.</system:String>
@@ -102,8 +103,8 @@
     <system:String x:Key="Parameters.AnchorageBottom1.Description">Length of the first anchorage of the bottom longitudinal bars.</system:String>
     <system:String x:Key="Parameters.AnchorageBottom2.Title">Bottom anchorage, end 2</system:String>
     <system:String x:Key="Parameters.AnchorageBottom2.Description">Length of the second anchorage of the bottom longitudinal bars.</system:String>
-    <system:String x:Key="Parameters.StirrupChangeBinding.Title">Change stirrup binding</system:String>
-    <system:String x:Key="Parameters.StirrupChangeBinding.Description">Family control switch. The plugin writes 1; its meaning must match the original family.</system:String>
+    <system:String x:Key="Parameters.StirrupChangeBinding.Title">Longitudinal bar attachment to stirrup</system:String>
+    <system:String x:Key="Parameters.StirrupChangeBinding.Description">This Yes/No parameter selects the inside face of the stirrup to which the longitudinal bars are attached. The checkbox is cleared by default and the plugin writes No.</system:String>
     <system:String x:Key="Parameters.StirrupDiameter.Title">Stirrup diameter</system:String>
     <system:String x:Key="Parameters.StirrupDiameter.Description">Stirrup diameter selected in the main window.</system:String>
     <system:String x:Key="Parameters.StirrupBendLength.Title">Stirrup bend length</system:String>

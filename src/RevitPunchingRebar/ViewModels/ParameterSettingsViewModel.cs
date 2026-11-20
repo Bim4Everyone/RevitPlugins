@@ -13,7 +13,7 @@ using RevitPunchingRebar.Models;
 namespace RevitPunchingRebar.ViewModels;
 
 /// <summary>
-/// Черновик имён параметров. Проверки выполняются только при работе с каркасами.
+/// Черновик настроек параметров. Проверки выполняются только при работе с каркасами.
 /// </summary>
 internal sealed class ParameterSettingsViewModel : BaseViewModel {
     private readonly List<ParameterBindingViewModel> _parameters;
@@ -33,7 +33,8 @@ internal sealed class ParameterSettingsViewModel : BaseViewModel {
         var settings = new FrameParameterSettings();
         foreach(ParameterBindingViewModel parameter in _parameters) {
             settings.Bindings[parameter.Definition.Role.ToString()] = new FrameParameterBinding {
-                TargetName = parameter.ParameterName?.Trim()
+                TargetName = parameter.ParameterName?.Trim(),
+                YesNoValue = parameter.YesNoValue
             };
         }
 

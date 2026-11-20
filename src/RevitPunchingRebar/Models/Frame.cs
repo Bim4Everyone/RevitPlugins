@@ -15,9 +15,6 @@ internal class Frame {
     private const string _foundationSlabKrGroup = "ФП_Каркасы_Продавливание";
     private const string _floorSlabKrGroup = "ПП_Каркасы_Продавливание";
 
-    // Значение параметра "мод_Х_Изменить привязку"
-    private const int _stirrupChangeBindingValue = 1;
-
     // Класс продольных стержней каркаса
     private const RebarClass _longRebarClass = RebarClass.A500C;
 
@@ -74,8 +71,9 @@ internal class Frame {
         ApplyParameter(FrameParameterRole.AnchorageBottom2, name =>
             FrameInstance.SetParamValue(name, frameParams.LongRebarAnchorageLength));
 
+        FrameParameterBinding stirrupBinding = _parameterSettings.GetBinding(FrameParameterRole.StirrupChangeBinding);
         ApplyParameter(FrameParameterRole.StirrupChangeBinding, name =>
-            FrameInstance.SetParamValue(name, _stirrupChangeBindingValue));
+            FrameInstance.SetParamValue(name, stirrupBinding.YesNoValue == true ? 1 : 0));
 
         ApplyParameter(FrameParameterRole.StirrupDiameter, name =>
             FrameInstance.SetParamValue(name, frameParams.StirrupRebarDiameter));
