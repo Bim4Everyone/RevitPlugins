@@ -58,7 +58,7 @@ internal class MainViewModel : BaseViewModel {
     private int _selectedStirrupDiameter;
     private RebarClass _selectedRebarClass;
     private string _stirrupStep;
-    private string _frameWidth;
+    private string _widthStep;
     private int _selectedLongRebarDiameter;
     private string _longRebarAnchorageLength;
     private string _stirrupBendLength;
@@ -328,11 +328,11 @@ internal class MainViewModel : BaseViewModel {
     }
 
     /// <summary>
-    /// Ширина каркаса, мм.
+    /// Шаг продольных стержней по ширине, мм.
     /// </summary>
-    public string FrameWidth {
-        get => _frameWidth;
-        set => RaiseAndSetIfChanged(ref _frameWidth, value);
+    public string WidthStep {
+        get => _widthStep;
+        set => RaiseAndSetIfChanged(ref _widthStep, value);
     }
 
     /// <summary>
@@ -429,16 +429,6 @@ internal class MainViewModel : BaseViewModel {
             return false;
         }
 
-        if(!TryParseMm(FrameWidth, out int frameWidth) || frameWidth <= 0) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorFrameWidth");
-            return false;
-        }
-
-        if(frameWidth <= SelectedStirrupDiameter + SelectedLongRebarDiameter) {
-            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorFrameWidthTooSmall");
-            return false;
-        }
-
         if(!TryParseMm(StirrupStep, out int stirrupStep) || stirrupStep <= 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorStirrupStep");
             return false;
@@ -446,6 +436,11 @@ internal class MainViewModel : BaseViewModel {
 
         if(!TryParseMm(StirrupBendLength, out int stirrupBendLength) || stirrupBendLength <= 0) {
             ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorStirrupBendLength");
+            return false;
+        }
+
+        if(!TryParseMm(WidthStep, out int widthStep) || widthStep <= 0) {
+            ErrorText = _localizationService.GetLocalizedString("MainWindow.ErrorWidthStep");
             return false;
         }
 
@@ -629,7 +624,7 @@ internal class MainViewModel : BaseViewModel {
         SelectedStirrupDiameter = setting?.StirrupDiameter ?? DefaultSettings.StirrupDiameterMm;
         SelectedRebarClass = setting?.StirrupRebarClass ?? DefaultSettings.StirrupRebarClass;
         StirrupStep = (setting?.StirrupStep ?? DefaultSettings.StirrupStepMm).ToString();
-        FrameWidth = (setting?.FrameWidth ?? DefaultSettings.FrameWidthMm).ToString();
+        WidthStep = (setting?.GetWidthStepMm() ?? DefaultSettings.WidthStepMm).ToString();
         StirrupBendLength = (setting?.StirrupBendLength ?? DefaultSettings.StirrupBendLengthMm).ToString();
         SelectedLongRebarDiameter = setting?.LongRebarDiameter ?? DefaultSettings.LongRebarDiameterMm;
         LongRebarAnchorageLength = (setting?.LongRebarAnchorageLength
@@ -666,8 +661,8 @@ internal class MainViewModel : BaseViewModel {
             case nameof(StirrupStep):
                 StirrupStep = DefaultSettings.StirrupStepMm.ToString();
                 break;
-            case nameof(FrameWidth):
-                FrameWidth = DefaultSettings.FrameWidthMm.ToString();
+            case nameof(WidthStep):
+                WidthStep = DefaultSettings.WidthStepMm.ToString();
                 break;
             case nameof(StirrupBendLength):
                 StirrupBendLength = DefaultSettings.StirrupBendLengthMm.ToString();
@@ -720,7 +715,7 @@ internal class MainViewModel : BaseViewModel {
             [nameof(SelectedStirrupDiameter)] = string.Format(format, DefaultSettings.StirrupDiameterMm),
             [nameof(SelectedRebarClass)] = string.Format(format, defaultRebarClass),
             [nameof(StirrupStep)] = string.Format(format, DefaultSettings.StirrupStepMm),
-            [nameof(FrameWidth)] = string.Format(format, DefaultSettings.FrameWidthMm),
+            [nameof(WidthStep)] = string.Format(format, DefaultSettings.WidthStepMm),
             [nameof(StirrupBendLength)] = string.Format(format, DefaultSettings.StirrupBendLengthMm),
             [nameof(SelectedLongRebarDiameter)] = string.Format(format, DefaultSettings.LongRebarDiameterMm),
             [nameof(LongRebarAnchorageLength)] = string.Format(format, DefaultSettings.LongRebarAnchorageLengthMm)
@@ -774,7 +769,8 @@ internal class MainViewModel : BaseViewModel {
         setting.StirrupDiameter = SelectedStirrupDiameter;
         setting.StirrupRebarClass = SelectedRebarClass;
         setting.StirrupStep = int.Parse(StirrupStep.Trim());
-        setting.FrameWidth = int.Parse(FrameWidth.Trim());
+        setting.WidthStep = int.Parse(WidthStep.Trim());
+        setting.FrameWidth = null;
         setting.StirrupBendLength = int.Parse(StirrupBendLength.Trim());
         setting.LongRebarDiameter = SelectedLongRebarDiameter;
         setting.LongRebarAnchorageLength = int.Parse(LongRebarAnchorageLength.Trim());

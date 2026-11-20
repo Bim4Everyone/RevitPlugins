@@ -42,10 +42,12 @@ internal class FrameParams : IFrameParams {
         StirrupRebarClass = settings.StirrupRebarClass ?? DefaultSettings.StirrupRebarClass;
         StirrupRebarDiameter = UnitUtilsHelper.FromMm(settings.StirrupDiameter);
         StirrupStep = UnitUtilsHelper.FromMm(settings.StirrupStep);
-        FrameWidth = UnitUtilsHelper.FromMm(settings.FrameWidth);
 
-        LongRebarDiameter = UnitUtilsHelper.FromMm(
-            settings.LongRebarDiameter ?? DefaultSettings.LongRebarDiameterMm);
+        int widthStepMm = settings.GetWidthStepMm();
+        int longRebarDiameterMm = settings.LongRebarDiameter ?? DefaultSettings.LongRebarDiameterMm;
+        WidthStep = UnitUtilsHelper.FromMm(widthStepMm);
+        FrameWidth = UnitUtilsHelper.FromMm((double) widthStepMm + settings.StirrupDiameter + longRebarDiameterMm);
+        LongRebarDiameter = UnitUtilsHelper.FromMm(longRebarDiameterMm);
         LongRebarAnchorageLength = UnitUtilsHelper.FromMm(
             settings.LongRebarAnchorageLength ?? DefaultSettings.LongRebarAnchorageLengthMm);
         StirrupBendLength = UnitUtilsHelper.FromMm(
@@ -66,6 +68,7 @@ internal class FrameParams : IFrameParams {
     public RebarClass StirrupRebarClass { get; }
     public double StirrupRebarDiameter { get; }
     public double StirrupStep { get; }
+    public double WidthStep { get; }
     public double FrameWidth { get; }
 
     public double LongRebarDiameter { get; }

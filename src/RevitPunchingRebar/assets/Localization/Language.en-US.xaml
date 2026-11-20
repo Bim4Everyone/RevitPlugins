@@ -29,7 +29,7 @@
     <system:String x:Key="MainWindow.FrameGroup">Frame</system:String>
     <system:String x:Key="MainWindow.FamilyName">Family</system:String>
     <system:String x:Key="MainWindow.FamilyType">Type</system:String>
-    <system:String x:Key="MainWindow.FrameWidth">Width, mm</system:String>
+    <system:String x:Key="MainWindow.WidthStep">Width spacing, mm</system:String>
     <system:String x:Key="MainWindow.StirrupsGroup">Stirrups</system:String>
     <system:String x:Key="MainWindow.StirrupDiameter">Diameter, mm</system:String>
     <system:String x:Key="MainWindow.StirrupRebarClass">Bar grade</system:String>
@@ -51,8 +51,7 @@
     <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">The slab has no top or bottom rebar cover assigned</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamily">Select the frame family</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamilyType">Select the frame type</system:String>
-    <system:String x:Key="MainWindow.ErrorFrameWidth">Frame width: enter a whole number of mm greater than 0</system:String>
-    <system:String x:Key="MainWindow.ErrorFrameWidthTooSmall">Frame width must exceed the sum of the stirrup and longitudinal bar diameters</system:String>
+    <system:String x:Key="MainWindow.ErrorWidthStep">Width spacing: enter a whole number of mm greater than 0</system:String>
     <system:String x:Key="MainWindow.ErrorFrameHeight">Frame height must be greater than 0 for the selected slab thickness, covers and bar diameters</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupStep">Stirrup spacing: enter a whole number of mm greater than 0</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupBendLength">Stirrup hook length: enter a whole number of mm greater than 0</system:String>
@@ -84,7 +83,7 @@
     <system:String x:Key="Parameters.StirrupCode.Title">Stirrup class</system:String>
     <system:String x:Key="Parameters.StirrupCode.Description">Selected stirrup class code: A240 = 240; A500C = 501.</system:String>
     <system:String x:Key="Parameters.WidthStep.Title">Longitudinal bar spacing across width</system:String>
-    <system:String x:Key="Parameters.WidthStep.Description">Frame width minus stirrup and longitudinal bar diameters. Also used to locate the frame.</system:String>
+    <system:String x:Key="Parameters.WidthStep.Description">Longitudinal bar spacing across the frame. Set in the main window and used to locate the frame.</system:String>
     <system:String x:Key="Parameters.HeightStep.Title">Longitudinal bar spacing in height</system:String>
     <system:String x:Key="Parameters.HeightStep.Description">Vertical spacing calculated from slab thickness, covers and bar diameters.</system:String>
     <system:String x:Key="Parameters.AnchorageTop1.Title">Top anchorage, end 1</system:String>

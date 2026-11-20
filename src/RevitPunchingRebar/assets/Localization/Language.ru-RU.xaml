@@ -29,7 +29,7 @@
     <system:String x:Key="MainWindow.FrameGroup">Каркас</system:String>
     <system:String x:Key="MainWindow.FamilyName">Семейство</system:String>
     <system:String x:Key="MainWindow.FamilyType">Тип</system:String>
-    <system:String x:Key="MainWindow.FrameWidth">Ширина, мм</system:String>
+    <system:String x:Key="MainWindow.WidthStep">Шаг по ширине, мм</system:String>
     <system:String x:Key="MainWindow.StirrupsGroup">Хомуты</system:String>
     <system:String x:Key="MainWindow.StirrupDiameter">Диаметр, мм</system:String>
     <system:String x:Key="MainWindow.StirrupRebarClass">Класс стержней</system:String>
@@ -51,8 +51,7 @@
     <system:String x:Key="MainWindow.ErrorSlabRebarCoverMissing">У плиты не назначен защитный слой сверху или снизу</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamily">Выберите семейство каркаса</system:String>
     <system:String x:Key="MainWindow.ErrorSelectFamilyType">Выберите тип каркаса</system:String>
-    <system:String x:Key="MainWindow.ErrorFrameWidth">Ширина каркаса: введите целое число мм больше 0</system:String>
-    <system:String x:Key="MainWindow.ErrorFrameWidthTooSmall">Ширина каркаса должна быть больше суммы диаметров хомута и продольного стержня</system:String>
+    <system:String x:Key="MainWindow.ErrorWidthStep">Шаг по ширине: введите целое число мм больше 0</system:String>
     <system:String x:Key="MainWindow.ErrorFrameHeight">При выбранной толщине плиты, защитных слоях и диаметрах высота каркаса должна быть больше 0</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupStep">Шаг хомутов: введите целое число мм больше 0</system:String>
     <system:String x:Key="MainWindow.ErrorStirrupBendLength">Длина отгибов хомутов: введите целое число мм больше 0</system:String>
@@ -84,7 +83,7 @@
     <system:String x:Key="Parameters.StirrupCode.Title">Класс хомутов</system:String>
     <system:String x:Key="Parameters.StirrupCode.Description">Код выбранного класса хомутов: A240 — 240, A500C — 501. Иные соглашения о кодах требуют отдельного решения.</system:String>
     <system:String x:Key="Parameters.WidthStep.Title">Шаг продольных стержней по ширине</system:String>
-    <system:String x:Key="Parameters.WidthStep.Description">Ширина каркаса за вычетом диаметров хомута и продольного стержня. Также используется для определения положения каркаса.</system:String>
+    <system:String x:Key="Parameters.WidthStep.Description">Шаг продольных стержней по ширине. Записывается из основного окна и используется для определения положения каркаса.</system:String>
     <system:String x:Key="Parameters.HeightStep.Title">Шаг продольных стержней по высоте</system:String>
     <system:String x:Key="Parameters.HeightStep.Description">Расстояние по высоте, рассчитанное по толщине плиты, защитным слоям и диаметрам арматуры.</system:String>
     <system:String x:Key="Parameters.AnchorageTop1.Title">Анкеровка верхнего стержня, конец 1</system:String>

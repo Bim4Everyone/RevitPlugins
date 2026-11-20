@@ -640,34 +640,6 @@
                                             Command="{Binding ResetToDefaultCommand}"
                                             CommandParameter="SelectedFamilyType" />
                                     </Grid>
-
-                                    <ui:TextBlock
-                                        Style="{StaticResource FieldLabel}"
-                                        Text="{me:LocalizationSource MainWindow.FrameWidth}" />
-
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <ui:TextBox
-                                            Grid.Column="0"
-                                            Margin="5"
-                                            ClearButtonEnabled="False"
-                                            Text="{Binding FrameWidth, UpdateSourceTrigger=PropertyChanged}" />
-
-                                        <ui:Button
-                                            Grid.Column="1"
-                                            Margin="0 5 5 5"
-                                            Padding="8"
-                                            VerticalAlignment="Stretch"
-                                            ToolTipService.ShowOnDisabled="True"
-                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
-                                            ToolTip="{Binding DefaultValueHints[FrameWidth]}"
-                                            Command="{Binding ResetToDefaultCommand}"
-                                            CommandParameter="FrameWidth" />
-                                    </Grid>
                                 </StackPanel>
                             </Border>
 
@@ -825,6 +797,34 @@
                                             ToolTip="{Binding DefaultValueHints[SelectedLongRebarDiameter]}"
                                             Command="{Binding ResetToDefaultCommand}"
                                             CommandParameter="SelectedLongRebarDiameter" />
+                                    </Grid>
+
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.WidthStep}" />
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <ui:TextBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            ClearButtonEnabled="False"
+                                            Text="{Binding WidthStep, UpdateSourceTrigger=PropertyChanged}" />
+
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[WidthStep]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="WidthStep" />
                                     </Grid>
 
                                     <ui:TextBlock

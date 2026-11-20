@@ -61,8 +61,7 @@ internal class Frame {
             FrameInstance.SetParamValue(name, (int) frameParams.StirrupRebarClass));
 
         ApplyParameter(FrameParameterRole.WidthStep, name =>
-            FrameInstance.SetParamValue(
-                name, frameParams.FrameWidth - frameParams.StirrupRebarDiameter - frameParams.LongRebarDiameter));
+            FrameInstance.SetParamValue(name, frameParams.WidthStep));
         ApplyParameter(FrameParameterRole.HeightStep, name =>
             FrameInstance.SetParamValue(name, frameParams.GetFrameHeight()));
 

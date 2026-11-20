@@ -14,6 +14,7 @@ internal interface IFrameParams {
     double StirrupRebarDiameter { get; }
     double StirrupStep { get; }
 
+    double WidthStep { get; }
     double FrameWidth { get; }
 
     /// <summary>

@@ -54,9 +54,23 @@ internal class RevitSettings : ProjectSettings {
     public int StirrupDiameter { get; set; }
     public RebarClass? StirrupRebarClass { get; set; }
     public int StirrupStep { get; set; }
-    public int FrameWidth { get; set; }
+
+    // Полная ширина в конфигурациях до перехода на ввод шага.
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public int? FrameWidth { get; set; }
+    public int? WidthStep { get; set; }
     public int? LongRebarDiameter { get; set; }
     public int? LongRebarAnchorageLength { get; set; }
     public int? StirrupBendLength { get; set; }
 
+    public int GetWidthStepMm() {
+        if(WidthStep is int widthStep) {
+            return widthStep;
+        }
+
+        int stirrupDiameter = StirrupDiameter > 0 ? StirrupDiameter : DefaultSettings.StirrupDiameterMm;
+        int longRebarDiameter = LongRebarDiameter ?? DefaultSettings.LongRebarDiameterMm;
+        int previousStep = FrameWidth.GetValueOrDefault() - stirrupDiameter - longRebarDiameter;
+        return previousStep > 0 ? previousStep : DefaultSettings.WidthStepMm;
+    }
 }

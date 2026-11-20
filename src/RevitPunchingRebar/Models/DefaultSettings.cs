@@ -49,9 +49,9 @@ internal static class DefaultSettings {
     public const int StirrupStepMm = 200;
 
     /// <summary>
-    /// Ширина каркаса, мм.
+    /// Шаг продольных стержней по ширине, мм.
     /// </summary>
-    public const int FrameWidthMm = 200;
+    public const int WidthStepMm = 180;
 
     /// <summary>
     /// Длина отгибов хомутов, мм.
