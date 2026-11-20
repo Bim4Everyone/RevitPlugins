@@ -1,0 +1,37 @@
+using System.Windows;
+
+namespace RevitEnumerateBySpline.Views.Controls;
+
+/// <summary>Элемент списка с возможностью выбора.</summary>
+public partial class ItemControl {
+
+    public static readonly DependencyProperty SlabNameProperty = DependencyProperty.Register(
+        nameof(ItemName), typeof(string), typeof(ItemControl), new PropertyMetadata(default(string)));
+
+    public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register(
+        nameof(IsChecked), typeof(bool), typeof(ItemControl), new PropertyMetadata(true));
+    
+    public static readonly DependencyProperty CheckBoxVisibleProperty = DependencyProperty.Register(
+        nameof(CheckBoxVisible), typeof(bool), typeof(ItemControl), new PropertyMetadata(true));
+
+
+    /// <summary>Создаёт элемент списка.</summary>
+    public ItemControl() {
+        InitializeComponent();
+    }
+
+    public string ItemName {
+        get => (string) GetValue(SlabNameProperty);
+        set => SetValue(SlabNameProperty, value);
+    }
+
+    public bool IsChecked {
+        get => (bool) GetValue(IsCheckedProperty);
+        set => SetValue(IsCheckedProperty, value);
+    }
+    
+    public bool CheckBoxVisible {
+        get => (bool) GetValue(CheckBoxVisibleProperty);
+        set => SetValue(CheckBoxVisibleProperty, value);
+    }
+}

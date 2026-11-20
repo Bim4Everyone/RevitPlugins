@@ -1,0 +1,102 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <system:String x:Key="MainWindow.Title">Нумератор по линии</system:String>
+    <system:String x:Key="MainWindow.Settings">Настройки плагина</system:String>
+    <system:String x:Key="MainWindow.CommonSettings">Общие настройки</system:String>
+    <system:String x:Key="MainWindow.ParamSettings">Настройки параметров</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.RangeElements">Диапазон обработки помещений</system:String>
+    <system:String x:Key="CommonSettingsPage.RangeElementsDescription">Выбор варианта обработки помещений</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.FilterElements">Фильтрация помещений по параметру</system:String>
+    <system:String x:Key="CommonSettingsPage.FilterElementsDescription">Выбор параметра и фильтрация по его значению</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.LineSet">Линии / сплайны для нумерации</system:String>
+    <system:String x:Key="CommonSettingsPage.LineSetDescription">Выбор линии ли сплайнов для нумерации</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.ResetFilter">По умолчанию</system:String>
+    <system:String x:Key="CommonSettingsPage.DeleteAllLines">Удалить все</system:String>
+    <system:String x:Key="CommonSettingsPage.SelectLines">Выбрать линии в модели</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParameters">Параметры нумерации</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParametersDescription">Настройки, влияющие на отображения итогового номера</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParkParameter">Параметры нумерации машино-мест</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParkParameterDescription">Выбор параметров для нумерации зависимых машино-мест</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParameter">Параметр нумерации</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParameterDescription">Параметр, в которое будет записано значение</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.StartNumber">Стартовый номер</system:String>
+    <system:String x:Key="CommonSettingsPage.StartNumberDescription">Номер, с которого начинается нумерация</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Prefix">Префикс</system:String>
+    <system:String x:Key="CommonSettingsPage.PrefixDescription">Символ до числа нумерации</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Suffix">Суффикс</system:String>
+    <system:String x:Key="CommonSettingsPage.SuffixDescription">Символ после числа нумерации</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.SearchDependentParkParameter">Искать признак в параметре</system:String>
+    <system:String x:Key="CommonSettingsPage.SearchDependentParkParameterDescription">Параметр, в значении которого будет производиться поиск ключевого слова</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Key">Ключевое слово</system:String>
+    <system:String x:Key="CommonSettingsPage.KeyDescription">Параметр, в значении которого будет производиться поиск ключевого слова</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.MainParkParameter">Параметр основного машино-места</system:String>
+    <system:String x:Key="CommonSettingsPage.MainParkParameterDescription">Параметр, в значение которого будет записано основное машино-место</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.SelectAll">Выбрать все</system:String>
+    <system:String x:Key="CommonSettingsPage.ClearSelections">Сбросить выбор</system:String>
+    <system:String x:Key="CommonSettingsPage.SearchText">Поиск по значению</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.MoveUpCurveCommand">Переместить вверх</system:String>
+    <system:String x:Key="CommonSettingsPage.MoveDownCurveCommand">Переместить вниз</system:String>
+    <system:String x:Key="CommonSettingsPage.DeleteCurveCommand">Удалить выделенную</system:String>
+    
+    <system:String x:Key="RangeViewModel.AllElementsProvider">Все элементы</system:String>
+    <system:String x:Key="RangeViewModel.SelectedElementsProvider">Выделенные</system:String>
+    <system:String x:Key="RangeViewModel.CurrentViewProvider">Видимые на виде</system:String>
+    
+    <system:String x:Key="CurveModelsViewModel.SelectCurves.Prompt">Щёлкайте линии по порядку. Завершение — «Готово» на панели. Esc — отмена набора.</system:String>
+    <system:String x:Key="CurveSelectionWindow.Title">Выбор линий по порядку</system:String>
+    <system:String x:Key="CurveSelectionWindow.Prompt">Щёлкайте линии в нужном порядке. Повторный выбор линии пропускается. Нажмите «Готово», чтобы добавить список, или «Отмена», чтобы отменить этот набор.</system:String>
+    <system:String x:Key="CurveSelectionWindow.Finish">Готово</system:String>
+    <system:String x:Key="CurveSelectionWindow.Cancel">Отмена</system:String>
+    <system:String x:Key="CurveSelectionWindow.StopFailed">Не удалось завершить выбор. Нажмите Esc на виде для отмены набора.</system:String>
+    
+    <system:String x:Key="MainViewModel.NotSelected">Не выделены помещения в модели</system:String>
+    <system:String x:Key="MainViewModel.NoRoomsOnView">Нет помещений на активном виде</system:String>
+    <system:String x:Key="MainViewModel.NoSelection">Не выбраны помещения</system:String>
+    <system:String x:Key="MainViewModel.NoCurves">Не выбраны линии</system:String>
+    <system:String x:Key="MainViewModel.RangeRequired">Выберите диапазон обработки помещений</system:String>
+    <system:String x:Key="MainViewModel.NumberParamRequired">Выберите параметр нумерации</system:String>
+    <system:String x:Key="MainViewModel.StartNumberInvalid">Стартовый номер должен быть числом</system:String>
+    <system:String x:Key="MainViewModel.DependentParamRequired">Выберите параметр основного машино-места</system:String>
+    <system:String x:Key="MainViewModel.SearchKeyRequired">Введите ключевое слово для поиска машино-мест</system:String>
+    <system:String x:Key="MainViewModel.DependentSearchParamRequired">Выберите параметр для поиска машино-места</system:String>
+
+    <system:String x:Key="WarningsViewModel.Redundant">Избыточные помещения</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Помещения, расположенные в одной ограждённой области</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Не окруженные или не размещённые помещения</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Помещения без границ или без размещения на плане</system:String>
+    <system:String x:Key="WarningWindow.Title">Нумератор по линии — предупреждения</system:String>
+    <system:String x:Key="WarningWindow.ShowHeader">Выделить</system:String>
+    <system:String x:Key="WarningWindow.ElementIdHeader">ИД помещения</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Имя помещения</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Уровень помещения</system:String>
+    <system:String x:Key="RevitRepository.NoLevel">— Нет уровня —</system:String>
+    
+    <system:String x:Key="SelectionService.CancelledSelectionElements">Ошибка</system:String>
+
+    <system:String x:Key="ParamService.NoValue">Нет значения</system:String>
+    <system:String x:Key="ParamService.Yes">Да</system:String>
+    <system:String x:Key="ParamService.No">Нет</system:String>
+
+    <system:String x:Key="MainWindow.ButtonOk">Нумеровать</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Отмена</system:String>
+    <system:String x:Key="ParamSetter.TransactionName">Нумерация помещений по линии</system:String>
+    <system:String x:Key="Common.ParamErrorMessageBody">Ошибка загрузки параметров</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Ошибка настройки плагина</system:String>
+</ResourceDictionary>

@@ -1,0 +1,98 @@
+using System.Collections.Generic;
+
+using Autodesk.Revit.DB;
+
+using dosymep.Bim4Everyone;
+using dosymep.Bim4Everyone.ProjectConfigs;
+using dosymep.Bim4Everyone.SharedParams;
+
+using pyRevitLabs.Json;
+
+using RevitEnumerateBySpline.Models.Settings;
+
+namespace RevitEnumerateBySpline.Models;
+
+/// <summary>
+/// Класс конфигурации плагина.
+/// (Если не используется удалить)
+/// </summary>
+internal class PluginConfig : ProjectConfig<RevitSettings> {
+    /// <summary>
+    /// Системное свойство конфигурации. (Не трогать)
+    /// </summary>
+    [JsonIgnore]
+    public override string? ProjectConfigPath { get; set; }
+
+    /// <summary>
+    /// Системное свойство конфигурации. (Не трогать)
+    /// </summary>
+    [JsonIgnore]
+    public override IConfigSerializer? Serializer { get; set; }
+
+    /// <summary>
+    /// Метод создания конфигурации плагина.
+    /// </summary>
+    /// <param name="configSerializer">Сериализатор конфигурации.</param>
+    /// <returns>Прочитанная или новая конфигурация плагина.</returns>
+    public static PluginConfig GetPluginConfig(IConfigSerializer configSerializer) {
+        return new ProjectConfigBuilder()
+            .SetSerializer(configSerializer)
+            .SetPluginName(nameof(RevitEnumerateBySpline))
+            .SetRevitVersion(ModuleEnvironment.RevitVersion)
+            .SetProjectConfigName(nameof(PluginConfig) + ".json")
+            .Build<PluginConfig>();
+    }
+}
+
+/// <summary>
+/// Настройки проекта.
+/// В настройках проекта обычно хранится выбор пользователя в основном окне плагина.
+/// </summary>
+/// <remarks>
+/// Проектом по умолчанию является текст до первого нижнего подчеркивания.
+/// <see cref="ProjectConfig" />
+/// https://github.com/dosymep/dosymep.Revit/blob/master/src/dosymep.Bim4Everyone/ProjectConfigs/ProjectConfig.cs#L102
+/// Если плагин работает без открытых проектов,
+/// то требуется данный класс удалять из проекта,
+/// как сделано в плагине RevitServerFolders
+/// https://github.com/Bim4Everyone/RevitPlugins/blob/master/src/RevitServerFolders/Models/PluginConfig.cs#L8
+/// </remarks>
+internal class RevitSettings : ProjectSettings {
+    /// <summary>
+    /// Наименование проекта. Системное свойство. (Не трогать)
+    /// </summary>
+    public override string ProjectName { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Сохраняемое свойство
+    /// </summary>
+    public ConfigSettings? ConfigSettings { get; set; }
+}
+
+/// <summary>Системные значения по умолчанию для плагина.</summary>
+internal class SystemPluginConfig {
+    /// <summary>Шаг номерных меток вдоль выбранных линий, мм.</summary>
+    public double CurveMarkerStepMm => 5000;
+    /// <summary>Цвета меток линий в GUI и на виде Revit, в порядке назначения.</summary>
+    public IReadOnlyList<string> CurveMarkerPalette { get; } = [
+        "#2563EB", "#DC2626", "#15803D", "#9333EA",
+        "#C2410C", "#0E7490", "#BE185D", "#4D7C0F"
+    ];
+    // Максимальная длина сегмента при разбиении линий, мм.
+    public double MaxSegmentLengthMm => 10;
+    // Системный параметр имени помещений по умолчанию
+    public BuiltInParameter SystemRoomNameParamId => BuiltInParameter.ROOM_NAME;
+    // Системный параметр номера помещений по умолчанию
+    public BuiltInParameter SystemRoomNumberParamId => BuiltInParameter.ROOM_NUMBER;
+    // Параметр зависимого машино-места по умолчанию.
+    public RevitParam DefaultDependentParam => SharedParamsConfig.Instance.MainParkingSpaceNumber;
+    // Стартовый номер по умолчанию
+    public double DefaultStartNumber => 1;
+    // Префикс марки по умолчанию
+    public string DefaultPrefix => string.Empty;
+    // Суффикс марки по умолчанию
+    public string DefaultSuffix => string.Empty;
+    // Ключевое слово для поиска зависимого маштно-места по умолчанию
+    public string DefaultSearchKey => "зависимое";
+    
+}

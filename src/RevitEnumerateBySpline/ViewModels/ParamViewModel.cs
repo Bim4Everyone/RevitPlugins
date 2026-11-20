@@ -1,0 +1,16 @@
+using dosymep.Bim4Everyone;
+using dosymep.WPF.ViewModels;
+
+namespace RevitEnumerateBySpline.ViewModels;
+
+/// <summary>Представление параметра Revit.</summary>
+internal class ParamViewModel : BaseViewModel {
+    private string _name = string.Empty;
+
+    public RevitParam? RevitParam { get; set; }
+
+    public string Name {
+        get => _name;
+        set => RaiseAndSetIfChanged(ref _name, value);
+    }
+}

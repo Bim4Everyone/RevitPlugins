@@ -100,6 +100,9 @@
   <Project Path="src/RevitEditingZones/RevitEditingZones.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="src/RevitEnumerateBySpline/RevitEnumerateBySpline.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="src/RevitExamplePlugin/RevitExamplePlugin.csproj">
     <Platform Project="x64" />
   </Project>

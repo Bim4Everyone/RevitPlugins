@@ -1,0 +1,103 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    
+    <system:String x:Key="MainWindow.Title">Spline Enumerator</system:String>
+    <system:String x:Key="MainWindow.Settings">Plugin Settings</system:String>
+    <system:String x:Key="MainWindow.CommonSettings">General Settings</system:String>
+    <system:String x:Key="MainWindow.ParamSettings">Parameter Settings</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.RangeElements">Room Processing Scope</system:String>
+    <system:String x:Key="CommonSettingsPage.RangeElementsDescription">Select which rooms to process</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.FilterElements">Filter Rooms by Parameter</system:String>
+    <system:String x:Key="CommonSettingsPage.FilterElementsDescription">Select a parameter and filter by its value</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.LineSet">Lines / Splines for Numbering</system:String>
+    <system:String x:Key="CommonSettingsPage.LineSetDescription">Select lines or splines for numbering</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.ResetFilter">Default</system:String>
+    <system:String x:Key="CommonSettingsPage.DeleteAllLines">Delete All</system:String>
+    <system:String x:Key="CommonSettingsPage.SelectLines">Select Lines in Model</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParameters">Numbering Settings</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParametersDescription">Settings that affect the displayed number</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParkParameter">Numbering Settings Parking Spaces</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParkParameterDescription">Select parameters for numbering dependent parking spaces</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.NumericParameter">Numbering Parameter</system:String>
+    <system:String x:Key="CommonSettingsPage.NumericParameterDescription">Parameter where the value will be stored</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.StartNumber">Starting Number</system:String>
+    <system:String x:Key="CommonSettingsPage.StartNumberDescription">Number to start numbering from</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Prefix">Prefix</system:String>
+    <system:String x:Key="CommonSettingsPage.PrefixDescription">Text before the number</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Suffix">Suffix</system:String>
+    <system:String x:Key="CommonSettingsPage.SuffixDescription">Text after the number</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.SearchDependentParkParameter">Search for Marker in Parameter</system:String>
+    <system:String x:Key="CommonSettingsPage.SearchDependentParkParameterDescription">Parameter value to search for the keyword</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.Key">Keyword</system:String>
+    <system:String x:Key="CommonSettingsPage.KeyDescription">Parameter value to search for the keyword</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.MainParkParameter">Main Parking Space Parameter</system:String>
+    <system:String x:Key="CommonSettingsPage.MainParkParameterDescription">Parameter where the main parking space will be stored</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.SelectAll">Select All</system:String>
+    <system:String x:Key="CommonSettingsPage.ClearSelections">Clear Selection</system:String>
+    <system:String x:Key="CommonSettingsPage.SearchText">Search by Value</system:String>
+    
+    <system:String x:Key="CommonSettingsPage.MoveUpCurveCommand">Move Up</system:String>
+    <system:String x:Key="CommonSettingsPage.MoveDownCurveCommand">Move Down</system:String>
+    <system:String x:Key="CommonSettingsPage.DeleteCurveCommand">Delete Selected</system:String>
+    
+    <system:String x:Key="RangeViewModel.AllElementsProvider">All Elements</system:String>
+    <system:String x:Key="RangeViewModel.SelectedElementsProvider">Selected Elements</system:String>
+    <system:String x:Key="RangeViewModel.CurrentViewProvider">Visible in View</system:String>
+    
+    <system:String x:Key="CurveModelsViewModel.SelectCurves.Prompt">Click lines in order. Finish with Done on the panel. Esc cancels this batch.</system:String>
+    <system:String x:Key="CurveSelectionWindow.Title">Pick lines in order</system:String>
+    <system:String x:Key="CurveSelectionWindow.Prompt">Click lines in the desired order. Repeated picks are skipped. Click Done to add the list, or Cancel to discard this batch.</system:String>
+    <system:String x:Key="CurveSelectionWindow.Finish">Done</system:String>
+    <system:String x:Key="CurveSelectionWindow.Cancel">Cancel</system:String>
+    <system:String x:Key="CurveSelectionWindow.StopFailed">Could not stop picking. Press Esc in the view to cancel this batch.</system:String>
+    
+    <system:String x:Key="MainViewModel.NotSelected">No rooms are selected in the model</system:String>
+    <system:String x:Key="MainViewModel.NoRoomsOnView">No rooms are on view</system:String>
+    <system:String x:Key="MainViewModel.NoSelection">No rooms selected</system:String>
+    <system:String x:Key="MainViewModel.NoCurves">No lines selected</system:String>
+    <system:String x:Key="MainViewModel.RangeRequired">Select a room processing scope</system:String>
+    <system:String x:Key="MainViewModel.NumberParamRequired">Select a numbering parameter</system:String>
+    <system:String x:Key="MainViewModel.StartNumberInvalid">Starting Number must be a number</system:String>
+    <system:String x:Key="MainViewModel.DependentParamRequired">Select the main parking space parameter</system:String>
+    <system:String x:Key="MainViewModel.SearchKeyRequired">Enter a keyword to search for parking spaces</system:String>
+    <system:String x:Key="MainViewModel.DependentSearchParamRequired">Select a parameter to search for parking spaces</system:String>
+
+    <system:String x:Key="WarningsViewModel.Redundant">Duplicate Rooms</system:String>
+    <system:String x:Key="WarningsViewModel.RedundantDescription">Rooms located in the same enclosed area</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosed">Unenclosed or Unplaced Rooms</system:String>
+    <system:String x:Key="WarningsViewModel.NotEnclosedDescription">Rooms without boundaries or without a location on the plan</system:String>
+    <system:String x:Key="WarningWindow.Title">Spline Enumerator — Warnings</system:String>
+    <system:String x:Key="WarningWindow.ShowHeader">Highlight</system:String>
+    <system:String x:Key="WarningWindow.ElementIdHeader">Room ID</system:String>
+    <system:String x:Key="WarningWindow.NameHeader">Room Name</system:String>
+    <system:String x:Key="WarningWindow.LevelNameHeader">Room Level</system:String>
+    <system:String x:Key="RevitRepository.NoLevel">— No Level —</system:String>
+    
+    <system:String x:Key="SelectionService.CancelledSelectionElements">Error</system:String>
+
+    <system:String x:Key="ParamService.NoValue">No Value</system:String>
+    <system:String x:Key="ParamService.Yes">Yes</system:String>
+    <system:String x:Key="ParamService.No">No</system:String>
+    
+    <system:String x:Key="MainWindow.ButtonOk">Number</system:String>
+    <system:String x:Key="MainWindow.ButtonCancel">Cancel</system:String>
+    <system:String x:Key="ParamSetter.TransactionName">Number rooms along a line</system:String>
+    <system:String x:Key="Common.ParamErrorMessageBody">Error loading parameters</system:String>
+    <system:String x:Key="Common.ConfigErrorMessageTitle">Plug-in configuration error</system:String>
+</ResourceDictionary>
+

@@ -1,0 +1,55 @@
+using System.Windows;
+using System.Windows.Threading;
+
+using dosymep.SimpleServices;
+
+using Ninject.Syntax;
+
+using RevitEnumerateBySpline.Views.Pages;
+
+using Wpf.Ui.Abstractions;
+
+namespace RevitEnumerateBySpline.Views;
+
+/// <summary>
+/// Класс главного окна плагина.
+/// </summary>
+public partial class MainWindow {
+    /// <summary>
+    /// Иницализирует главное окно плагина.
+    /// </summary>
+    public MainWindow(
+        INavigationViewPageProvider navigationViewPageProvider,
+        ILoggerService loggerService,
+        ISerializationService serializationService,
+        ILanguageService languageService,
+        ILocalizationService localizationService,
+        IUIThemeService uiThemeService,
+        IUIThemeUpdaterService themeUpdaterService) 
+        : base(loggerService,
+            serializationService,
+            languageService,
+            localizationService,
+            uiThemeService,
+            themeUpdaterService) {
+        InitializeComponent();
+        
+        _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
+
+        Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => {
+            _rootNavigationView.Navigate(typeof(CommonSettingsPage));
+        });
+    }
+    
+    public override string PluginName => nameof(RevitEnumerateBySpline);
+    
+    public override string ProjectConfigName => nameof(MainWindow);
+    
+
+    // Отменяет работу окна.
+    private void ButtonCancel_Click(object sender, RoutedEventArgs e) {
+        // После Hide результат уже может быть false. Повторное присваивание
+        // того же значения не закрывает окно, поэтому закрываем его явно.
+        Close();
+    }
+}
