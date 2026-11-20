@@ -14,10 +14,6 @@ using Frame = RevitPunchingRebar.Models.Frame;
 namespace RevitPunchingRebar.Services;
 
 internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
-    // Диаметр оправки загиба хомута в долях диаметра хомута для классов А240 и А500С
-    private const double _stirrupBendFactorA240 = 2.5;
-    private const double _stirrupBendFactorA500C = 5;
-
     // Угол между каркасом и пилоном, при котором каркас стоит у коротких граней пилона, градусы
     private const double _crossAngle = 90;
 
@@ -26,6 +22,9 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
     // Допуск при сравнении углов, радианы
     private const double _angleTolerance = 1e-6;
+
+    // Допуск при сравнении отметок, футы.
+    private const double _elevationTolerance = 1e-6;
 
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
@@ -110,15 +109,22 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         // Плановое положение определяется пилоном, а отметка — выбранной плитой.
         // Для нижней и верхней плиты используется ее фактический верх, независимо от высоты пилона.
-        var location = new XYZ(pylonLocation.X, pylonLocation.Y, frameParams.HostSlab.TopElevation.Value);
+        double slabTopElevation = frameParams.HostSlab.TopElevation.Value;
+        var location = new XYZ(pylonLocation.X, pylonLocation.Y, slabTopElevation);
 
-        CreateFrameRows(pylon, frameSymbol, frameParams, location, 0, -pylon.FacingOrientation);
+        double longSideDepth = frameParams.RebarCoverTop;
+        double shortSideDepth = longSideDepth + 2 * frameParams.PlateRebarDiameter - frameParams.StirrupRebarDiameter;
+
+        // Продольная ось каркаса перпендикулярна его FacingOrientation.
+        CreateFrameRows(pylon, frameSymbol, frameParams, location, slabTopElevation - shortSideDepth,
+            0, -pylon.FacingOrientation);
 
         var copyOrientation = new XYZ(
             -pylon.FacingOrientation.Y,
             pylon.FacingOrientation.X,
             pylon.FacingOrientation.Z);
-        CreateFrameRows(pylon, frameSymbol, frameParams, location, Math.PI / 2, -copyOrientation);
+        CreateFrameRows(pylon, frameSymbol, frameParams, location, slabTopElevation - longSideDepth,
+            Math.PI / 2, -copyOrientation);
     }
 
     /// <summary>
@@ -126,15 +132,17 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     /// </summary>
     private void CreateFrameRows(
         IPylon pylon, FamilySymbol frameSymbol, IFrameParams frameParams,
-        XYZ location, double rotationOffset, XYZ copyDirection) {
+        XYZ location, double targetElevation, double rotationOffset, XYZ copyDirection) {
         var frame = _revitRepository.CreateFrame(frameSymbol, frameParams, location);
         _createdFramesCount++;
 
-        MoveFrameDown(frame, frameParams);
+        SetFrameElevation(frame, targetElevation);
         double angle = GetAlignAngle(frame.FrameInstance.FacingOrientation, pylon.FacingOrientation);
         RotateFrame(frame, angle + rotationOffset);
         MoveFrameCrossColumn(pylon, frame, frameParams);
         MoveFrameAlongColumn(pylon, frame, frameParams);
+        _revitRepository.EnsureFrameHost(
+            frame.FrameInstance, frameSymbol, frameParams.HostSlab.SlabInstance, "Report.FrameHost.Move");
         CopyFrame(pylon, frame, frameParams, copyDirection);
 
         var mirroredFrame = MirrorFrame(pylon, frame, frameParams);
@@ -142,25 +150,19 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     }
 
     /// <summary>
-    /// Перемещает семейство из верхней точки вставки вниз на необходимую с учетом фоновой арматуры
+    /// Устанавливает расчётную отметку точки вставки каркаса.
     /// </summary>
-    private void MoveFrameDown(Frame frame, IFrameParams frameParams) {
-        XYZ startPoint = frame.GetLocation();
-        double bendFactor = GetStirrupBendFactor(frameParams.StirrupRebarClass);
-        double stirrupOffset = frameParams.StirrupRebarDiameter
-            + 0.5 * bendFactor * frameParams.StirrupRebarDiameter;
-        double verticalOffset = stirrupOffset - 0.5 * frameParams.LongRebarDiameter
-            - frameParams.RebarCoverTop - frameParams.PlateRebarDiameter;
+    private void SetFrameElevation(Frame frame, double targetElevation) {
+        var location = (LocationPoint) frame.FrameInstance.Location;
+        double elevationChange = targetElevation - location.Point.Z;
+        if(Math.Abs(elevationChange) <= _elevationTolerance) {
+            return;
+        }
 
-        var endPoint = new XYZ(startPoint.X, startPoint.Y, startPoint.Z + verticalOffset);
-        frame.FrameInstance.Location.Move(endPoint - startPoint);
-    }
-
-    /// <summary>
-    /// Возвращает диаметр оправки загиба хомута в долях диаметра хомута
-    /// </summary>
-    private double GetStirrupBendFactor(RebarClass rebarClass) {
-        return rebarClass == RebarClass.A240 ? _stirrupBendFactorA240 : _stirrupBendFactorA500C;
+        if(!location.Move(XYZ.BasisZ * elevationChange)
+           || Math.Abs(((LocationPoint) frame.FrameInstance.Location).Point.Z - targetElevation) > _elevationTolerance) {
+            throw new InvalidOperationException(_localizationService.GetLocalizedString("Report.ErrorFrameElevation"));
+        }
     }
 
     /// <summary>
@@ -276,8 +278,10 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
                 startPoint.Y + direction.Y * step * i,
                 startPoint.Z);
 
-            ElementTransformUtils.CopyElement(
+            ICollection<ElementId> copiedIds = ElementTransformUtils.CopyElement(
                 frame.FrameInstance.Document, frame.FrameInstance.Id, endPoint - startPoint);
+            GetTransformedFrame(
+                copiedIds, frame.FrameInstance, frameParams.HostSlab.SlabInstance, "Report.FrameHost.Copy");
             _createdFramesCount++;
 
             startPoint = endPoint;
@@ -314,12 +318,24 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
             plane,
             true);
 
-        Element element = frame.FrameInstance.Document.GetElement(mirrorElements.FirstOrDefault());
-        var mirroredFrame = new Frame((FamilyInstance) element, frameParams, _localizationService);
+        FamilyInstance instance = GetTransformedFrame(
+            mirrorElements, frame.FrameInstance, frameParams.HostSlab.SlabInstance, "Report.FrameHost.Mirror");
+        var mirroredFrame = new Frame(instance, frameParams, _localizationService);
 
         _createdFramesCount++;
 
         return mirroredFrame;
+    }
+
+    private FamilyInstance GetTransformedFrame(
+        IEnumerable<ElementId> ids, FamilyInstance original, Floor slab, string operationKey) {
+        // Revit может вернуть вместе с каркасом идентификаторы его зависимых элементов.
+        ElementId typeId = original.GetTypeId();
+        FamilyInstance instance = ids.Select(id => original.Document.GetElement(id))
+            .OfType<FamilyInstance>()
+            .FirstOrDefault(candidate => candidate.GetTypeId() == typeId && candidate.SuperComponent is null);
+        _revitRepository.EnsureFrameHost(instance, original.Symbol, slab, operationKey);
+        return instance;
     }
 
     private double GetAngleBetweenInstances(IPylon pylon, Frame frame) {

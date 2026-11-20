@@ -68,6 +68,14 @@
     <system:String x:Key="Report.SkippedPylons">Пропущенные пилоны:</system:String>
     <system:String x:Key="Report.PylonName">{0}, Id {1}</system:String>
     <system:String x:Key="Report.ErrorPylonSize">не заданы длина или ширина пилона</system:String>
+    <system:String x:Key="Report.ErrorFrameHost">{0}: основа в выбранной плите (Id {1}) не подтверждена. Тип размещения: {2}. Id основы: {3}. Поле «Основа»: {4}.</system:String>
+    <system:String x:Key="Report.FrameHost.Create">Создание каркаса</system:String>
+    <system:String x:Key="Report.FrameHost.Move">Перемещение каркаса</system:String>
+    <system:String x:Key="Report.FrameHost.Copy">Копирование каркаса</system:String>
+    <system:String x:Key="Report.FrameHost.Mirror">Отражение каркаса</system:String>
+    <system:String x:Key="Report.ErrorSlabLevel">Не удалось определить уровень выбранной плиты для создания каркаса.</system:String>
+    <system:String x:Key="Report.ErrorSlabFaceAtPylon">В точке вставки у пилона нет верхней грани выбранной плиты.</system:String>
+    <system:String x:Key="Report.ErrorFrameElevation">Revit не установил каркас на расчётную отметку относительно верха выбранной плиты.</system:String>
 
     <system:String x:Key="Parameters.Title">Настройки параметров</system:String>
     <system:String x:Key="Parameters.Intro">Введите имена параметров. Для копирования из плиты используется одно имя: оно должно быть одинаковым у плиты и каркаса. Настройки сохраняются по OK основного экрана.</system:String>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -130,10 +131,55 @@ internal class RevitRepository {
     }
 
     public Frame CreateFrame(FamilySymbol frameSymbol, IFrameParams frameParams, XYZ location) {
-        FamilyInstance frameInstance = Document.Create.NewFamilyInstance(
-            location, frameSymbol, StructuralType.NonStructural);
+        Floor slab = frameParams.HostSlab.SlabInstance;
+        FamilyInstance frameInstance;
+        if(frameSymbol.Family.FamilyPlacementType == FamilyPlacementType.WorkPlaneBased) {
+            frameInstance = CreateFrameOnTopFace(frameSymbol, slab, location);
+        } else {
+            if(Document.GetElement(slab.LevelId) is not Level level) {
+                throw new InvalidOperationException(_localizationService.GetLocalizedString("Report.ErrorSlabLevel"));
+            }
+
+            XYZ levelLocation = location - XYZ.BasisZ * level.ProjectElevation;
+            frameInstance = Document.Create.NewFamilyInstance(
+                levelLocation, frameSymbol, slab, level, StructuralType.NonStructural);
+        }
+
+        EnsureFrameHost(frameInstance, frameSymbol, slab, "Report.FrameHost.Create");
 
         return new Frame(frameInstance, frameParams, _localizationService);
+    }
+
+    public void EnsureFrameHost(FamilyInstance instance, FamilySymbol symbol, Floor slab, string operationKey) {
+        ElementId hostId = instance?.HostFace?.ElementId ?? instance?.Host?.Id;
+        if(hostId == slab.Id) {
+            return;
+        }
+
+        FamilyPlacementType placementType = symbol.Family.FamilyPlacementType;
+        string freeHost = instance?.GetParamValueOrDefault<string>(BuiltInParameter.INSTANCE_FREE_HOST_PARAM);
+        // У свободной основы в поддерживаемых версиях API доступно описание, а не идентификатор.
+        if(placementType == FamilyPlacementType.OneLevelBased && hostId is null
+           && freeHost?.Split(new[] { ':' }, 2) is { Length: 2 } hostParts
+           && string.Equals(hostParts[1].Trim(), slab.Name, StringComparison.Ordinal)) {
+            return;
+        }
+
+        throw new InvalidOperationException(string.Format(
+            _localizationService.GetLocalizedString("Report.ErrorFrameHost"),
+            _localizationService.GetLocalizedString(operationKey),
+            slab.Id, placementType, hostId?.ToString() ?? "—", freeHost ?? "—"));
+    }
+
+    private FamilyInstance CreateFrameOnTopFace(FamilySymbol symbol, Floor slab, XYZ location) {
+        foreach(Reference reference in HostObjectUtils.GetTopFaces(slab)) {
+            if(slab.GetGeometryObjectFromReference(reference) is PlanarFace face
+               && face.Project(location) is IntersectionResult projection) {
+                return Document.Create.NewFamilyInstance(reference, projection.XYZPoint, XYZ.BasisX, symbol);
+            }
+        }
+
+        throw new InvalidOperationException(_localizationService.GetLocalizedString("Report.ErrorSlabFaceAtPylon"));
     }
 
     /// <summary>
