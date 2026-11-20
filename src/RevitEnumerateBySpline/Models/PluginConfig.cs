@@ -84,11 +84,15 @@ internal class SystemPluginConfig {
     public BuiltInParameter SystemRoomNameParamId => BuiltInParameter.ROOM_NAME;
     // Системный параметр номера помещений по умолчанию
     public BuiltInParameter SystemRoomNumberParamId => BuiltInParameter.ROOM_NUMBER;
-    // Параметр основного машино-места по умолчанию.
-    public RevitParam DefaultDependentParam => SharedParamsConfig.Instance.RoomArea;
+    // Параметр зависимого машино-места по умолчанию.
+    public RevitParam DefaultDependentParam => SharedParamsConfig.Instance.MainParkingSpaceNumber;
+    // Стартовый номер по умолчанию
     public double DefaultStartNumber => 1;
+    // Префикс марки по умолчанию
     public string DefaultPrefix => string.Empty;
+    // Суффикс марки по умолчанию
     public string DefaultSuffix => string.Empty;
+    // Ключевое слово для поиска зависимого маштно-места по умолчанию
     public string DefaultSearchKey => "зависимое";
     
 }

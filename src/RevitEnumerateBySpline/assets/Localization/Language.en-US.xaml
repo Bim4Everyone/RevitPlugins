@@ -66,7 +66,6 @@
     <system:String x:Key="CurveSelectionWindow.Cancel">Cancel</system:String>
     <system:String x:Key="CurveSelectionWindow.StopFailed">Could not stop picking. Press Esc in the view to cancel this batch.</system:String>
     
-    
     <system:String x:Key="MainViewModel.NotSelected">No rooms are selected in the model</system:String>
     <system:String x:Key="MainViewModel.NoRoomsOnView">No rooms are on view</system:String>
     <system:String x:Key="MainViewModel.NoSelection">No rooms selected</system:String>

@@ -1,5 +1,3 @@
-using System;
-
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 
