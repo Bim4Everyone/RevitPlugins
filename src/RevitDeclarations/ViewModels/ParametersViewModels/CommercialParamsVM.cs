@@ -138,7 +138,6 @@ internal class CommercialParamsVM : ParametersViewModel {
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.GroupingByGroupParam);
         SelectedMultiStoreyParam = TextParameters
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.MultiStoreyParam);
-
         SelectedDepartmentParam = TextParameters
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.DepartmentParam);
         SelectedLevelParam = TextParameters
@@ -170,7 +169,6 @@ internal class CommercialParamsVM : ParametersViewModel {
         SelectedPositionType = TextParameters
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.PositionType);
         ProjectName = commercialConfigSettings.ProjectNameID;
-
         SelectedRoomNumberParam = TextParameters
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.RoomNumberParam);
         SelectedRoomNameParam = TextParameters

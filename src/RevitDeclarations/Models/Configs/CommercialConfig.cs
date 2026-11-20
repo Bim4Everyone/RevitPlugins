@@ -60,8 +60,7 @@ internal class CommercialConfigSettings : DeclarationConfigSettings {
             RoomsHeightParam = LabelUtils.GetLabelFor(BuiltInParameter.ROOM_HEIGHT),
             ParkingSpaceClass = SharedParamsConfig.Instance.ParkingSpaceClass.Name,
             ParkingInfo = SharedParamsConfig.Instance.ApartmentNameExtra.Name,
-            // TODO: Заменить на ФОП_Номер основного ММ после обновления библиотеки.
-            ParkingInfoMainNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
+            ParkingInfoMainNumberParam = SharedParamsConfig.Instance.MainParkingSpaceNumber.Name,
             GroupNameMainNumberParam = SharedParamsConfig.Instance.RoomGroupShortName.Name,
             PositionType = SharedParamsConfig.Instance.RoomPositionType.Name,
             GroupNameParam = SharedParamsConfig.Instance.ApartmentGroupName.Name,

@@ -672,7 +672,7 @@
                         Margin="10, 0"
                         ItemsSource="{Binding TextParameters}"
                         DisplayMemberPath="Definition.Name"
-                        SelectedItem="{Binding SelectedGroupNameMainNumberParam}"
+                        SelectedItem="{Binding SelectedParkingInfoMainNumberParam}"
                         ToolTip="{me:LocalizationSource ToolTip.MainParkingNumberParamToolTip}"/>
 
                     <TextBlock
