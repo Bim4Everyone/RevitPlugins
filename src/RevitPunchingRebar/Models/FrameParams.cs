@@ -14,6 +14,10 @@ internal class FrameParams : IFrameParams {
     // Расстояние от грани пилона до первого хомута: рабочая высота сечения, деленная на это число
     private const double _afterPylonDistanceDivider = 3;
 
+    // Диаметр оправки в долях диаметра хомута
+    private const double _stirrupBendFactorA240 = 2.5;
+    private const double _stirrupBendFactorA500C = 5;
+
     private readonly double _slabThickness;
     private readonly double _rebarCoverBottom;
 
@@ -43,11 +47,11 @@ internal class FrameParams : IFrameParams {
         StirrupRebarDiameter = UnitUtilsHelper.FromMm(settings.StirrupDiameter);
         StirrupStep = UnitUtilsHelper.FromMm(settings.StirrupStep);
 
-        int widthStepMm = settings.GetWidthStepMm();
-        int longRebarDiameterMm = settings.LongRebarDiameter ?? DefaultSettings.LongRebarDiameterMm;
-        WidthStep = UnitUtilsHelper.FromMm(widthStepMm);
-        FrameWidth = UnitUtilsHelper.FromMm((double) widthStepMm + settings.StirrupDiameter + longRebarDiameterMm);
-        LongRebarDiameter = UnitUtilsHelper.FromMm(longRebarDiameterMm);
+        WidthStep = UnitUtilsHelper.FromMm(settings.GetWidthStepMm());
+        LongRebarDiameter = UnitUtilsHelper.FromMm(settings.LongRebarDiameter ?? DefaultSettings.LongRebarDiameterMm);
+        double stirrupBendFactor = StirrupRebarClass == RebarClass.A240 ? _stirrupBendFactorA240 : _stirrupBendFactorA500C;
+        double stirrupBendDiameter = stirrupBendFactor * StirrupRebarDiameter;
+        FrameWidth = WidthStep + LongRebarDiameter + 2 * StirrupRebarDiameter + stirrupBendDiameter;
         LongRebarAnchorageLength = UnitUtilsHelper.FromMm(
             settings.LongRebarAnchorageLength ?? DefaultSettings.LongRebarAnchorageLengthMm);
         StirrupBendLength = UnitUtilsHelper.FromMm(
