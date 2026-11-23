@@ -34,7 +34,7 @@ public partial class ManagerWindow {
     }
 
     public override string PluginName => nameof(RevitLintelsManager);
-    public override string ProjectConfigName => nameof(ManagerWindow);
+    public override string ProjectConfigName => nameof(ManagerWindow) + "Layout2";
 
     // Подключает запросы представления к текущей VM и отсоединяет предыдущую.
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
@@ -115,7 +115,6 @@ public partial class ManagerWindow {
             if(_detailsWindow is not null) {
                 _detailsWindow.Resources.MergedDictionaries.Clear();
                 _detailsWindow.Resources.MergedDictionaries.Add(Resources);
-                _detailsWindow.SetResourceReference(BackgroundProperty, "ApplicationBackgroundBrush");
                 _detailsWindow.SetResourceReference(ForegroundProperty, "TextFillColorPrimaryBrush");
             }
         }));

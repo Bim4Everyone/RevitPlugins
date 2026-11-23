@@ -16,6 +16,13 @@ public partial class CustomGroupEditControl {
 
     public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
         nameof(Header), typeof(string), typeof(CustomGroupEditControl), new PropertyMetadata(default(string)));
+
+    public static readonly DependencyProperty HeaderContentProperty = DependencyProperty.Register(
+        nameof(HeaderContent), typeof(object), typeof(CustomGroupEditControl), new PropertyMetadata(null));
+
+    public static readonly DependencyProperty ContentPaddingProperty = DependencyProperty.Register(
+        nameof(ContentPadding), typeof(Thickness), typeof(CustomGroupEditControl),
+        new PropertyMetadata(CardExpander.ContentPaddingProperty.DefaultMetadata.DefaultValue));
     
     public static readonly DependencyProperty EditControlProperty = DependencyProperty.Register(
         nameof(EditControl), typeof(object), typeof(CustomGroupEditControl), new PropertyMetadata(default(object)));
@@ -23,6 +30,7 @@ public partial class CustomGroupEditControl {
     public static readonly DependencyProperty IsExpandedProperty = DependencyProperty.Register(
         nameof(IsExpanded), typeof(bool), typeof(CustomGroupEditControl), new PropertyMetadata(true));
 
+    /// <summary>Создаёт общий раскрывающийся блок настроек или строк менеджера.</summary>
     public CustomGroupEditControl() {
         InitializeComponent();
     }
@@ -37,6 +45,16 @@ public partial class CustomGroupEditControl {
         set => SetValue(HeaderProperty, value);
     }
 
+    public object HeaderContent {
+        get => GetValue(HeaderContentProperty);
+        set => SetValue(HeaderContentProperty, value);
+    }
+
+    public Thickness ContentPadding {
+        get => (Thickness) GetValue(ContentPaddingProperty);
+        set => SetValue(ContentPaddingProperty, value);
+    }
+
     public object EditControl {
         get => GetValue(EditControlProperty);
         set => SetValue(EditControlProperty, value);
@@ -47,6 +65,7 @@ public partial class CustomGroupEditControl {
         set => SetValue(IsExpandedProperty, value);
     }
 
+    // Ограничивает строку содержимого для виртуализированных списков настроек и менеджера.
     private void OnCardExpanderLoaded(object sender, RoutedEventArgs e) {
         if(sender is not CardExpander expander || VisualTreeHelper.GetChildrenCount(expander) == 0) {
             return;

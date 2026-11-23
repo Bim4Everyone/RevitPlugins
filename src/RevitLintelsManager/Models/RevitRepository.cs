@@ -40,9 +40,11 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
 
     /// <summary>Сохраняет исходный UI-контекст до будущей подготовки служебного вида.</summary>
     public ManagerSessionState CaptureInitialState(ManagerConfigSnapshot config) {
+        var selection = ActiveUIDocument.Selection.GetElementIds();
+        var scope = selection.Count > 0 ? ManagerScope.Selected
+            : HasManagerElementsOnActiveView(config) ? ManagerScope.View : ManagerScope.Project;
         return new ManagerSessionState(config, Document.Title, ActiveUIDocument.ActiveView?.UniqueId,
-            ActiveUIDocument.Selection.GetElementIds()
-                .Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null));
+            selection.Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null), scope);
     }
 
     /// <summary>Читает текущий вид и выделение только из Execute обработчика ExternalEvent.</summary>
@@ -67,6 +69,20 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
         _openingFamilies = null;
         _phaseIds = null;
         _revitWalls = null;
+    }
+
+    // Проверяет наличие экземпляров настроенных семейств на исходном виде, не выполняя анализ или запись.
+    private bool HasManagerElementsOnActiveView(ManagerConfigSnapshot config) {
+        var view = ActiveUIDocument.ActiveView;
+        if(view is null || !FilteredElementCollector.IsViewValidForElementIteration(Document, view.Id)) {
+            return false;
+        }
+        var families = new HashSet<string>(config.OpeningFamilies.Select(family => family.UniqueId)) {
+            config.LintelFamily.UniqueId
+        };
+        using var collector = new FilteredElementCollector(Document, view.Id);
+        return collector.OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType()
+            .Cast<FamilyInstance>().Any(instance => families.Contains(instance.Symbol.Family.UniqueId));
     }
 
     // Получает каталог семейств перемычек.

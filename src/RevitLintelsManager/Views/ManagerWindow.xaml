@@ -3,30 +3,38 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
+    xmlns:edits="clr-namespace:RevitLintelsManager.Views.Edits"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     Title="{me:LocalizationSource Manager.Title}"
     Background="{DynamicResource ApplicationBackgroundBrush}"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    Width="1100"
-    Height="650"
+    Width="1430"
+    Height="845"
     MinWidth="1000"
     MinHeight="450">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles.xaml" />
-                <ResourceDictionary Source="ManagerRows.xaml" />
+                <ResourceDictionary
+                    Source="Styles.xaml" />
+                <ResourceDictionary
+                    Source="ManagerRows.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+            <BooleanToVisibilityConverter
+                x:Key="BoolToVisibility" />
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="Auto" />
         </Grid.RowDefinitions>
         <ui:TitleBar
             Grid.Row="0"
@@ -39,35 +47,38 @@
                 Margin="0,0,12,0"
                 VerticalAlignment="Center"
                 Text="{me:LocalizationSource Manager.Range}" />
-            <ui:Button
+            <edits:ModeSwitcherControl
                 Margin="0,0,8,0"
-                IsEnabled="False"
-                Content="{me:LocalizationSource Manager.Project}"
-                ToolTip="{me:LocalizationSource Manager.NotImplemented}"
-                ToolTipService.ShowOnDisabled="True" />
+                IsEnabled="{Binding CanChangeScope}"
+                ItemsSource="{Binding Scopes}"
+                SelectedItem="{Binding SelectedScope, Mode=TwoWay}"
+                ItemInvokedCommand="{Binding SelectScopeCommand}"
+                ToolTip="{Binding ScopeToolTip}" />
             <ui:Button
-                Margin="0,0,8,0"
-                IsEnabled="False"
-                Content="{me:LocalizationSource Manager.View}"
-                ToolTip="{me:LocalizationSource Manager.NotImplemented}"
-                ToolTipService.ShowOnDisabled="True" />
-            <ui:Button
-                Margin="0,0,8,0"
-                IsEnabled="False"
-                Content="{me:LocalizationSource Manager.Selected}"
-                ToolTip="{me:LocalizationSource Manager.NotImplemented}"
-                ToolTipService.ShowOnDisabled="True" />
-            <ui:Button
-                Content="{me:LocalizationSource Manager.Refresh}"
+                Width="33"
+                Height="33"
+                MinWidth="0"
+                Padding="0"
+                CornerRadius="4"
+                VerticalAlignment="Center"
+                Appearance="Primary"
+                Background="{DynamicResource AccentFillColorDefaultBrush}"
+                Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
                 Command="{Binding RefreshCommand}"
-                ToolTip="{Binding ContextSummary}" />
+                ToolTip="{me:LocalizationSource Manager.Refresh}"
+                AutomationProperties.Name="{me:LocalizationSource Manager.Refresh}">
+                <ui:SymbolIcon
+                    Symbol="ArrowSync24"
+                    FontSize="20" />
+            </ui:Button>
         </WrapPanel>
         <Border
             Grid.Row="2"
             Margin="20"
             CornerRadius="8">
             <Border.Style>
-                <Style TargetType="Border">
+                <Style
+                    TargetType="Border">
                     <Style.Triggers>
                         <DataTrigger
                             Binding="{Binding IsBlocked}"
@@ -86,21 +97,13 @@
                 BorderThickness="0"
                 Background="Transparent"
                 Style="{StaticResource SettingsListStyle}"
-                ItemsSource="{Binding VisibleRows}"
+                ItemsSource="{Binding Groups}"
+                ItemContainerStyle="{StaticResource ManagerChildItemStyle}"
                 ScrollViewer.CanContentScroll="True"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 VirtualizingPanel.IsVirtualizing="True"
                 VirtualizingPanel.VirtualizationMode="Recycling"
                 VirtualizingPanel.ScrollUnit="Pixel">
-                <ListBox.ItemContainerStyle>
-                    <Style
-                        TargetType="ListBoxItem"
-                        BasedOn="{StaticResource SettingsCheckListItemStyle}">
-                        <Setter Property="Padding" Value="0" />
-                        <Setter Property="Focusable" Value="False" />
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    </Style>
-                </ListBox.ItemContainerStyle>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel />
@@ -112,15 +115,18 @@
             Grid.Row="3"
             Margin="20,0,20,20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition
+                    Width="*" />
+                <ColumnDefinition
+                    Width="Auto" />
+                <ColumnDefinition
+                    Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock
                 Grid.Column="0"
                 Margin="0,0,20,0"
                 VerticalAlignment="Center"
-                Foreground="{DynamicResource SystemFillColorCautionBrush}"
+                Foreground="{DynamicResource ManagerWarningBrush}"
                 TextWrapping="Wrap"
                 Text="{Binding GeneralMessage}"
                 Visibility="{Binding HasGeneralMessage, Converter={StaticResource BoolToVisibility}}" />

@@ -13,13 +13,15 @@ internal sealed class ManagerElementPresentation(string typeName, ManagerElement
         (diagnostics ?? Enumerable.Empty<ManagerDiagnostic>()).ToList().AsReadOnly();
 }
 
-/// <summary>Подготовленные сведения элемента; null означает неизвестное, пустая группа — отсутствие группы.</summary>
+/// <summary>Подготовленные сведения; DisplayId позволяет явно показать внешний ID без числового ID Revit.</summary>
+/// <remarks>Null означает неизвестное, пустая группа — отсутствие группы.</remarks>
 internal sealed class ManagerElementInfo(string familyName, string worksetName, string levelName,
-    string groupName, bool? isFixed, long? elementId) {
+    string groupName, bool? isFixed, long? elementId, string displayId = null) {
     public string FamilyName { get; } = familyName;
     public string WorksetName { get; } = worksetName;
     public string LevelName { get; } = levelName;
     public string GroupName { get; } = groupName;
     public bool? IsFixed { get; } = isFixed;
     public long? ElementId { get; } = elementId;
+    public string DisplayId { get; } = displayId;
 }

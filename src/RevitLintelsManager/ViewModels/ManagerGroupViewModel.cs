@@ -12,6 +12,7 @@ namespace RevitLintelsManager.ViewModels;
 /// <summary>Агрегирует выбор и действия всех детей независимо от визуальных контейнеров.</summary>
 internal sealed class ManagerGroupViewModel : ManagerRowViewModel, IDisposable {
     public event Action<ManagerGroupViewModel, int> StateChanged;
+    public event Action<ManagerGroupViewModel> ExpansionChanged;
     private readonly Dictionary<ManagerAction, int> _actionCounts = new();
     private readonly ILocalizationService _localization;
     private bool _isExpanded;
@@ -55,7 +56,13 @@ internal sealed class ManagerGroupViewModel : ManagerRowViewModel, IDisposable {
         _localization.GetLocalizedString("Manager.Count"), Items.Count);
     public bool IsExpanded {
         get => _isExpanded;
-        internal set => RaiseAndSetIfChanged(ref _isExpanded, value);
+        set {
+            if(_disposed || _isExpanded == value) {
+                return;
+            }
+            RaiseAndSetIfChanged(ref _isExpanded, value);
+            ExpansionChanged?.Invoke(this);
+        }
     }
     public override string MixedActionsText => _hasMixedActions
         ? _localization.GetLocalizedString("Manager.Variants") : null;
@@ -97,6 +104,7 @@ internal sealed class ManagerGroupViewModel : ManagerRowViewModel, IDisposable {
             item.StateChanged -= OnItemStateChanged;
         }
         StateChanged = null;
+        ExpansionChanged = null;
     }
 
     // Пересекает предоставленные наборы, не вычисляя предметные ограничения.

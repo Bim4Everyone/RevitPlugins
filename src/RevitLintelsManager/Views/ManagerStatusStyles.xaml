@@ -1,0 +1,36 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <SolidColorBrush
+        x:Key="ManagerWarningBrush"
+        Color="Orange" />
+    <SolidColorBrush
+        x:Key="ManagerSuccessBrush"
+        Color="#279B70" />
+    <Style
+        x:Key="ManagerStatusIconStyle"
+        TargetType="ui:SymbolIcon">
+        <Setter
+            Property="FontSize"
+            Value="20" />
+        <Setter
+            Property="Symbol"
+            Value="CheckmarkCircle24" />
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource ManagerSuccessBrush}" />
+        <Style.Triggers>
+            <DataTrigger
+                Binding="{Binding HasWarnings}"
+                Value="True">
+                <Setter
+                    Property="Symbol"
+                    Value="ErrorCircle24" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource ManagerWarningBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

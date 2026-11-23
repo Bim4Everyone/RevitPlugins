@@ -14,9 +14,12 @@ internal sealed class ManagerDetailsViewModel {
     /// <summary>Подготавливает предоставленные сведения или диагностические причины.</summary>
     public ManagerDetailsViewModel(ManagerElementViewModel element, bool warnings,
         ILocalizationService localization) {
-        Title = localization.GetLocalizedString(warnings ? "Manager.Warnings" : "Manager.Information");
-        Subject = element.TypeName;
+        string family = element.Element?.Information?.FamilyName;
+        Subject = string.IsNullOrWhiteSpace(family) ? element.TypeName : $"{family}: {element.TypeName}";
         IsWarnings = warnings;
+        HasWarnings = element.HasWarnings;
+        Title = localization.GetLocalizedString(!warnings ? "Manager.Information"
+            : HasWarnings ? "Manager.HasWarnings" : "Manager.NoWarnings");
         Status = warnings ? element.StatusText : null;
         var fields = new List<ManagerDetailField>();
         if(!warnings) {
@@ -37,23 +40,35 @@ internal sealed class ManagerDetailsViewModel {
                     ? localization.GetLocalizedString(isFixed ? "Manager.Yes" : "Manager.No")
                     : localization.GetLocalizedString("Manager.Unavailable")));
             fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.Id"),
-                info?.ElementId?.ToString(CultureInfo.InvariantCulture)
+                info?.DisplayId ?? info?.ElementId?.ToString(CultureInfo.InvariantCulture)
                     ?? localization.GetLocalizedString("Manager.Unavailable")));
         }
         Fields = fields.AsReadOnly();
         ElementWarnings = warnings ? Format(element.Element?.Diagnostics, localization) : Array.Empty<string>();
         RowWarnings = warnings ? Format(element.RowDiagnostics, localization) : Array.Empty<string>();
-        EmptyWarningsText = warnings && ElementWarnings.Count == 0 && RowWarnings.Count == 0
+        var descriptions = ElementWarnings.Concat(RowWarnings).Distinct().ToList();
+        if(warnings && HasWarnings && descriptions.Count == 0) {
+            descriptions.Add(element.StatusText);
+        }
+        Descriptions = descriptions.AsReadOnly();
+        PositiveMessage = warnings && !HasWarnings ? localization.GetLocalizedString(element.IsOpening
+            ? "Manager.CorrectOpening" : "Manager.CorrectLintel") : null;
+        EmptyWarningsText = warnings && !HasWarnings
             ? localization.GetLocalizedString("Manager.NoWarnings") : null;
     }
 
     public string Title { get; }
     public string Subject { get; }
     public bool IsWarnings { get; }
+    public bool HasWarnings { get; }
+    public bool IsStatusOk => IsWarnings && !HasWarnings;
+    public string PositiveMessage { get; }
     public string Status { get; }
     public IReadOnlyList<ManagerDetailField> Fields { get; }
     public IReadOnlyList<string> ElementWarnings { get; }
     public IReadOnlyList<string> RowWarnings { get; }
+    public IReadOnlyList<string> Descriptions { get; }
+    public bool HasDescriptions => Descriptions.Count > 0;
     public bool HasRowWarnings => RowWarnings.Count > 0;
     public string EmptyWarningsText { get; }
 

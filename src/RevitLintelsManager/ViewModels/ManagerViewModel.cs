@@ -28,6 +28,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private string _contextSummary;
     private ManagerDocumentContext _lastContext;
     private int _processingCount;
+    private ManagerScopeViewModel _selectedScope;
     private IReadOnlyList<ManagerGroupViewModel> _groups = Array.Empty<ManagerGroupViewModel>();
 
     /// <summary>Создаёт команды окна без непосредственных зависимостей от Revit API.</summary>
@@ -37,11 +38,15 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         _requests = requests;
         _dispatcher = dispatcher;
         _localization = localization;
+        Scopes = Enum.GetValues(typeof(ManagerScope)).Cast<ManagerScope>()
+            .Select(scope => new ManagerScopeViewModel(scope, localization)).ToList().AsReadOnly();
+        _selectedScope = Scopes.First(scope => scope.Scope == state.InitialScope);
         VisibleRows = new ReadOnlyObservableCollection<ManagerRowViewModel>(_visibleRows);
         ContextSummary = localization.GetLocalizedString("Manager.Refresh");
         RefreshCommand = commands.CreateAsync(RefreshContextAsync,
             () => !IsBlocked && !State.IsClosing && !IsRefreshing);
         CloseCommand = commands.Create(() => CloseRequested?.Invoke());
+        SelectScopeCommand = commands.Create<ManagerScopeViewModel>(SelectScope, _ => CanChangeScope);
         ToggleGroupCommand = commands.Create<ManagerGroupViewModel>(
             group => SetExpanded(group, !group.IsExpanded),
             group => !IsBlocked && !State.IsClosing && !IsRefreshing && _groups.Contains(group));
@@ -55,11 +60,24 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
 
     public ManagerSessionState State { get; }
     public ReadOnlyObservableCollection<ManagerRowViewModel> VisibleRows { get; }
+    public IReadOnlyList<ManagerGroupViewModel> Groups => _groups;
+    public IReadOnlyList<ManagerScopeViewModel> Scopes { get; }
+    public ManagerScopeViewModel SelectedScope {
+        get => _selectedScope;
+        set => RaiseAndSetIfChanged(ref _selectedScope, value);
+    }
     public ICommand CloseCommand { get; }
+    public ICommand SelectScopeCommand { get; }
     public ICommand RefreshCommand { get; }
     public ICommand ToggleGroupCommand { get; }
     public ICommand ShowInformationCommand { get; }
     public ICommand ShowWarningsCommand { get; }
+    public ICommand ProjectScopeCommand { get; private set; }
+    public ICommand ViewScopeCommand { get; private set; }
+    public ICommand SelectedScopeCommand { get; private set; }
+    public bool CanChangeScope => CanEditRows && ProjectScopeCommand is not null;
+    public string ScopeToolTip => ProjectScopeCommand is null
+        ? _localization.GetLocalizedString("Manager.NotImplemented") : ContextSummary;
     public int ProcessingCount => _processingCount;
     public string ProcessText => string.Format(CultureInfo.CurrentCulture,
         _localization.GetLocalizedString("Manager.ProcessCount"), ProcessingCount);
@@ -74,7 +92,10 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     }
     public string ContextSummary {
         get => _contextSummary;
-        private set => RaiseAndSetIfChanged(ref _contextSummary, value);
+        private set {
+            RaiseAndSetIfChanged(ref _contextSummary, value);
+            RaisePropertyChanged(nameof(ScopeToolTip));
+        }
     }
     public bool IsRefreshing {
         get => _isRefreshing;
@@ -89,6 +110,21 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         private set => RaiseAndSetIfChanged(ref _isBlocked, value);
     }
 
+    /// <summary>Подключает команды диапазонов из композиции, когда источник поддерживает их.</summary>
+    /// <param name="project">Команда всего набора.</param>
+    /// <param name="view">Команда набора видимых элементов.</param>
+    /// <param name="selected">Команда набора выделенных элементов.</param>
+    public void SetScopeCommands(ICommand project, ICommand view, ICommand selected) {
+        ProjectScopeCommand = project;
+        ViewScopeCommand = view;
+        SelectedScopeCommand = selected;
+        RaisePropertyChanged(nameof(ProjectScopeCommand));
+        RaisePropertyChanged(nameof(ViewScopeCommand));
+        RaisePropertyChanged(nameof(SelectedScopeCommand));
+        RaisePropertyChanged(nameof(CanChangeScope));
+        RaisePropertyChanged(nameof(ScopeToolTip));
+    }
+
     /// <summary>Заменяет готовую проекцию групп без получения данных из Revit.</summary>
     /// <param name="groups">Материализованные заголовки с дочерними строками.</param>
     public void SetGroups(IReadOnlyList<ManagerGroupViewModel> groups) {
@@ -101,6 +137,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         DetailsDismissRequested?.Invoke();
         foreach(var group in _groups) {
             group.StateChanged -= OnGroupStateChanged;
+            group.ExpansionChanged -= OnGroupExpansionChanged;
             if(!replacement.Contains(group)) {
                 group.Dispose();
             }
@@ -108,7 +145,9 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         _groups = replacement;
         foreach(var group in _groups) {
             group.StateChanged += OnGroupStateChanged;
+            group.ExpansionChanged += OnGroupExpansionChanged;
         }
+        RaisePropertyChanged(nameof(Groups));
         _processingCount = _groups.Sum(group => group.ProcessingCount);
         NotifyProcessingCount();
         RebuildVisibleRows();
@@ -121,16 +160,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         if(!_groups.Contains(group) || group.IsExpanded == isExpanded) {
             return;
         }
-        DetailsDismissRequested?.Invoke();
         group.IsExpanded = isExpanded;
-        int index = _visibleRows.IndexOf(group) + 1;
-        foreach(var item in group.Items) {
-            if(isExpanded) {
-                _visibleRows.Insert(index++, item);
-            } else {
-                _visibleRows.RemoveAt(index);
-            }
-        }
     }
 
     /// <summary>Применяет проверенное в API-контексте состояние исходного документа.</summary>
@@ -147,6 +177,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         DetailsDismissRequested?.Invoke();
         foreach(var group in _groups) {
             group.StateChanged -= OnGroupStateChanged;
+            group.ExpansionChanged -= OnGroupExpansionChanged;
             group.Dispose();
         }
         _groups = Array.Empty<ManagerGroupViewModel>();
@@ -158,6 +189,9 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     /// <summary>Обновляет подписи существующих строк при смене языка платформы.</summary>
     public void RefreshLocalization() {
         DetailsDismissRequested?.Invoke();
+        foreach(var scope in Scopes) {
+            scope.RefreshLocalization();
+        }
         foreach(var group in _groups) {
             group.RefreshLocalization(_localization);
             foreach(var item in group.Items) {
@@ -175,6 +209,19 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
     }
 
+    // Синхронизирует раскрытие CardExpander и прежнюю независимую проекцию строк.
+    private void OnGroupExpansionChanged(ManagerGroupViewModel group) {
+        DetailsDismissRequested?.Invoke();
+        int index = _visibleRows.IndexOf(group) + 1;
+        foreach(var item in group.Items) {
+            if(group.IsExpanded) {
+                _visibleRows.Insert(index++, item);
+            } else {
+                _visibleRows.RemoveAt(index);
+            }
+        }
+    }
+
     // Отбрасывает команды со старым DataContext после замены или recycling строки.
     private bool ContainsElement(ManagerElementViewModel element) {
         return _groups.Any(group => ReferenceEquals(group.Opening, element) || ReferenceEquals(group.Lintel, element)
@@ -182,8 +229,25 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
                 || ReferenceEquals(item.Lintel, element)));
     }
 
+    // Повторное нажатие выбранного диапазона также обновляет данные существующей командой источника.
+    private void SelectScope(ManagerScopeViewModel scope) {
+        if(!Scopes.Contains(scope)) {
+            return;
+        }
+        var command = scope.Scope switch {
+            ManagerScope.View => ViewScopeCommand,
+            ManagerScope.Selected => SelectedScopeCommand,
+            _ => ProjectScopeCommand
+        };
+        if(command?.CanExecute(null) == true) {
+            SelectedScope = scope;
+            command.Execute(null);
+        }
+    }
+
     // Использует существующие флаги сессии и запроса, без второй машины состояний.
     private void NotifyPresentationState() {
+        RaisePropertyChanged(nameof(CanChangeScope));
         RaisePropertyChanged(nameof(GeneralMessage));
         RaisePropertyChanged(nameof(HasGeneralMessage));
         if(!CanEditRows) {

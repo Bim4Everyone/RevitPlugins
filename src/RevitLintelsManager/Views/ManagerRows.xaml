@@ -3,13 +3,106 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="clr-namespace:RevitLintelsManager.ViewModels"
     xmlns:models="clr-namespace:RevitLintelsManager.Models"
+    xmlns:edits="clr-namespace:RevitLintelsManager.Views.Edits"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="ManagerStatusStyles.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style
+        x:Key="ManagerIconButtonStyle"
+        TargetType="ui:Button">
+        <Setter
+            Property="Width"
+            Value="22" />
+        <Setter
+            Property="Height"
+            Value="22" />
+        <Setter
+            Property="MinWidth"
+            Value="0" />
+        <Setter
+            Property="MinHeight"
+            Value="0" />
+        <Setter
+            Property="Padding"
+            Value="0" />
+        <Setter
+            Property="Background"
+            Value="Transparent" />
+        <Setter
+            Property="BorderThickness"
+            Value="0" />
+        <Setter
+            Property="Cursor"
+            Value="Hand" />
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="ui:Button">
+                    <ContentPresenter
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                    <ControlTemplate.Triggers>
+                        <Trigger
+                            Property="IsMouseOver"
+                            Value="True">
+                            <Setter
+                                Property="Opacity"
+                                Value="0.7" />
+                        </Trigger>
+                        <Trigger
+                            Property="IsKeyboardFocused"
+                            Value="True">
+                            <Setter
+                                Property="Opacity"
+                                Value="0.7" />
+                        </Trigger>
+                        <Trigger
+                            Property="IsEnabled"
+                            Value="False">
+                            <Setter
+                                Property="Opacity"
+                                Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="ManagerChildItemStyle"
+        TargetType="ListBoxItem">
+        <Setter
+            Property="Margin"
+            Value="0,0,12,0" />
+        <Setter
+            Property="Padding"
+            Value="0" />
+        <Setter
+            Property="Focusable"
+            Value="False" />
+        <Setter
+            Property="HorizontalContentAlignment"
+            Value="Stretch" />
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="ListBoxItem">
+                    <ContentPresenter
+                        HorizontalAlignment="Stretch" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <DataTemplate
         DataType="{x:Type vm:ManagerElementViewModel}">
         <Border
             MinWidth="0"
-            Height="32"
+            Height="36"
             Padding="8,0"
             Background="{DynamicResource ControlFillColorDefaultBrush}"
             BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
@@ -35,27 +128,29 @@
                     Grid.Column="1"
                     Margin="4,0"
                     Padding="0"
-                    Appearance="Transparent"
-                    Command="{Binding DataContext.ShowInformationCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                    Style="{StaticResource ManagerIconButtonStyle}"
+                    Command="{Binding DataContext.ShowInformationCommand,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
                     CommandParameter="{Binding}"
-                    ToolTip="{me:LocalizationSource Manager.Information}">
+                    ToolTip="{Binding InformationToolTip}">
                     <ui:SymbolIcon
                         Symbol="Info24"
-                        FontSize="16" />
+                        FontSize="20"
+                        ToolTip="{Binding InformationToolTip}" />
                 </ui:Button>
                 <ui:Button
                     Grid.Column="2"
                     Padding="0"
-                    Appearance="Transparent"
-                    Command="{Binding DataContext.ShowWarningsCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                    Style="{StaticResource ManagerIconButtonStyle}"
+                    Command="{Binding DataContext.ShowWarningsCommand,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
                     CommandParameter="{Binding}"
-                    ToolTip="{Binding StatusText}">
+                    ToolTip="{Binding StatusToolTip}">
                     <ui:SymbolIcon
                         x:Name="StatusIcon"
                         VerticalAlignment="Center"
-                        Foreground="{DynamicResource SystemFillColorSuccessBrush}"
-                        Symbol="CheckmarkCircle24"
-                        FontSize="18" />
+                        Style="{StaticResource ManagerStatusIconStyle}"
+                        ToolTip="{Binding StatusToolTip}" />
                 </ui:Button>
             </Grid>
         </Border>
@@ -69,240 +164,188 @@
                     Value="Collapsed" />
             </DataTrigger>
             <DataTrigger
-                Binding="{Binding Status}"
-                Value="{x:Static models:ManagerElementStatus.Warning}">
-                <Setter
-                    TargetName="StatusIcon"
-                    Property="Symbol"
-                    Value="Warning24" />
-                <Setter
-                    TargetName="StatusIcon"
-                    Property="Foreground"
-                    Value="{DynamicResource SystemFillColorCautionBrush}" />
-            </DataTrigger>
-            <DataTrigger
-                Binding="{Binding Status}"
-                Value="{x:Static models:ManagerElementStatus.Fixed}">
-                <Setter
-                    TargetName="StatusIcon"
-                    Property="Symbol"
-                    Value="LockClosed24" />
-                <Setter
-                    TargetName="StatusIcon"
-                    Property="Foreground"
-                    Value="{DynamicResource SystemFillColorCautionBrush}" />
-            </DataTrigger>
-            <DataTrigger
-                Binding="{Binding Status}"
-                Value="{x:Static models:ManagerElementStatus.Grouped}">
-                <Setter
-                    TargetName="StatusIcon"
-                    Property="Symbol"
-                    Value="Cube24" />
-                <Setter
-                    TargetName="StatusIcon"
-                    Property="Foreground"
-                    Value="{DynamicResource SystemFillColorCautionBrush}" />
-            </DataTrigger>
-            <DataTrigger
                 Binding="{Binding IsMissing}"
                 Value="True">
                 <Setter
                     TargetName="ElementName"
                     Property="Foreground"
-                    Value="{DynamicResource SystemFillColorCautionBrush}" />
+                    Value="{DynamicResource ManagerWarningBrush}" />
                 <Setter
                     TargetName="InformationButton"
                     Property="Visibility"
                     Value="Collapsed" />
-                <Setter
-                    TargetName="StatusIcon"
-                    Property="Symbol"
-                    Value="Warning24" />
-                <Setter
-                    TargetName="StatusIcon"
-                    Property="Foreground"
-                    Value="{DynamicResource SystemFillColorCautionBrush}" />
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
     <DataTemplate
         DataType="{x:Type vm:ManagerGroupViewModel}">
-        <Border
+        <edits:CustomGroupEditControl
             Margin="0,8,0,0"
-            Padding="12,14,12,14"
-            Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="6">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="30" />
-                    <ColumnDefinition
-                        Width="48" />
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="140" />
-                </Grid.ColumnDefinitions>
-                <CheckBox
-                    Width="24"
-                    MinWidth="0"
-                    Padding="0"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    IsThreeState="False" />
-                <ui:Button
-                    Grid.Column="1"
-                    Width="36"
-                    Height="30"
-                    Padding="0"
-                    HorizontalAlignment="Left"
-                    Appearance="Primary"
-                    IsEnabled="False"
-                    ToolTip="{me:LocalizationSource Manager.Navigate}">
-                    <ui:SymbolIcon
-                        Symbol="Search24"
-                        FontSize="18"
-                        Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                </ui:Button>
-                <ContentControl
-                    Grid.Column="2"
-                    Margin="0,0,12,0"
-                    Content="{Binding Opening}" />
-                <ContentControl
-                    Grid.Column="3"
-                    Margin="0,0,12,0"
-                    Content="{Binding Lintel}" />
+            ContentPadding="0"
+            IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+            <edits:CustomGroupEditControl.HeaderContent>
                 <Grid
-                    Grid.Column="4"
-                    Grid.ColumnSpan="1">
-                    <ComboBox
-                        Height="32"
-                        ItemsSource="{Binding Actions}"
-                        DisplayMemberPath="Title"
-                        SelectedItem="{Binding SelectedAction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock
-                        Margin="12,0,32,0"
-                        VerticalAlignment="Center"
-                        IsHitTestVisible="False"
-                        Text="{Binding MixedActionsText}"
-                        TextTrimming="CharacterEllipsis"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                </Grid>
-                <DockPanel
-                    Grid.Column="5"
-                    Margin="12,0,0,0">
-                    <ui:Button
-                        DockPanel.Dock="Right"
-                        Width="28"
-                        Height="28"
+                    MinHeight="44">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="30" />
+                        <ColumnDefinition
+                            Width="48" />
+                        <ColumnDefinition
+                            Width="*" />
+                        <ColumnDefinition
+                            Width="*" />
+                        <ColumnDefinition
+                            Width="*" />
+                        <ColumnDefinition
+                            Width="112" />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox
+                        Width="24"
+                        MinWidth="0"
                         Padding="0"
-                        Appearance="Transparent"
-                        Command="{Binding DataContext.ToggleGroupCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                        CommandParameter="{Binding}"
-                        ToolTip="{me:LocalizationSource Manager.Expand}">
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        IsThreeState="False" />
+                    <ui:Button
+                        Grid.Column="1"
+                        Width="36"
+                        Height="36"
+                        Padding="0"
+                        HorizontalAlignment="Left"
+                        Appearance="Primary"
+                        IsEnabled="False"
+                        ToolTip="{me:LocalizationSource Manager.Navigate}">
                         <ui:SymbolIcon
-                            x:Name="ExpandIcon"
-                            Symbol="ChevronDown24"
-                            FontSize="18" />
+                            Symbol="Search24"
+                            FontSize="20"
+                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
                     </ui:Button>
+                    <ContentControl
+                        Grid.Column="2"
+                        Margin="0,0,12,0"
+                        VerticalAlignment="Center"
+                        Content="{Binding Opening}" />
+                    <ContentControl
+                        Grid.Column="3"
+                        Margin="0,0,12,0"
+                        VerticalAlignment="Center"
+                        Content="{Binding Lintel}" />
+                    <Grid
+                        Grid.Column="4"
+                        VerticalAlignment="Center">
+                        <ComboBox
+                            Height="40"
+                            Padding="10,4"
+                            VerticalContentAlignment="Center"
+                            ItemsSource="{Binding Actions}"
+                            DisplayMemberPath="Title"
+                            SelectedItem="{Binding SelectedAction, Mode=TwoWay,
+                                UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Margin="12,0,32,0"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Text="{Binding MixedActionsText}"
+                            TextTrimming="CharacterEllipsis"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    </Grid>
                     <TextBlock
+                        Grid.Column="5"
+                        Margin="12,0,0,0"
                         VerticalAlignment="Center"
                         Text="{Binding CountText}"
                         ToolTip="{Binding CountText}"
                         TextTrimming="CharacterEllipsis" />
-                </DockPanel>
-            </Grid>
-        </Border>
-        <DataTemplate.Triggers>
-            <DataTrigger
-                Binding="{Binding IsExpanded}"
-                Value="True">
-                <Setter
-                    TargetName="ExpandIcon"
-                    Property="Symbol"
-                    Value="ChevronUp24" />
-            </DataTrigger>
-        </DataTemplate.Triggers>
+                </Grid>
+            </edits:CustomGroupEditControl.HeaderContent>
+            <edits:CustomGroupEditControl.EditControl>
+                <ListBox
+                    MaxHeight="480"
+                    Padding="0"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    ItemsSource="{Binding Items}"
+                    ItemContainerStyle="{StaticResource ManagerChildItemStyle}"
+                    ScrollViewer.CanContentScroll="True"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    VirtualizingPanel.IsVirtualizing="True"
+                    VirtualizingPanel.VirtualizationMode="Recycling"
+                    VirtualizingPanel.ScrollUnit="Pixel">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+            </edits:CustomGroupEditControl.EditControl>
+        </edits:CustomGroupEditControl>
     </DataTemplate>
     <DataTemplate
         DataType="{x:Type vm:ManagerItemViewModel}">
-        <Border
-            Margin="0,0,0,0"
-            Padding="12,6,12,6"
-            Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1,0,1,0"
-            CornerRadius="0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="30" />
-                    <ColumnDefinition
-                        Width="48" />
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="*" />
-                    <ColumnDefinition
-                        Width="140" />
-                </Grid.ColumnDefinitions>
-                <CheckBox
-                    Width="24"
-                    MinWidth="0"
-                    Padding="0"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    IsThreeState="False" />
-                <ui:Button
-                    Grid.Column="1"
-                    Width="36"
-                    Height="30"
-                    Padding="0"
-                    HorizontalAlignment="Left"
-                    Appearance="Primary"
-                    IsEnabled="False"
-                    ToolTip="{me:LocalizationSource Manager.Navigate}">
-                    <ui:SymbolIcon
-                        Symbol="Search24"
-                        FontSize="18"
-                        Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                </ui:Button>
-                <ContentControl
-                    Grid.Column="2"
-                    Margin="0,0,12,0"
-                    Content="{Binding Opening}" />
-                <ContentControl
-                    Grid.Column="3"
-                    Margin="0,0,12,0"
-                    Content="{Binding Lintel}" />
-                <Grid
-                    Grid.Column="4"
-                    Grid.ColumnSpan="2">
-                    <ComboBox
-                        Height="32"
-                        ItemsSource="{Binding Actions}"
-                        DisplayMemberPath="Title"
-                        SelectedItem="{Binding SelectedAction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock
-                        Margin="12,0,32,0"
-                        VerticalAlignment="Center"
-                        IsHitTestVisible="False"
-                        Text="{Binding MixedActionsText}"
-                        TextTrimming="CharacterEllipsis"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                </Grid>
-            </Grid>
-        </Border>
+        <Grid
+            Margin="16,6,48,6"
+            MinHeight="40"
+            Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="30" />
+                <ColumnDefinition
+                    Width="48" />
+                <ColumnDefinition
+                    Width="*" />
+                <ColumnDefinition
+                    Width="*" />
+                <ColumnDefinition
+                    Width="*" />
+                <ColumnDefinition
+                    Width="112" />
+            </Grid.ColumnDefinitions>
+            <CheckBox
+                Width="24"
+                MinWidth="0"
+                Padding="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                IsThreeState="False" />
+            <ui:Button
+                Grid.Column="1"
+                Width="36"
+                Height="36"
+                Padding="0"
+                HorizontalAlignment="Left"
+                Appearance="Primary"
+                IsEnabled="False"
+                ToolTip="{me:LocalizationSource Manager.Navigate}">
+                <ui:SymbolIcon
+                    Symbol="Search24"
+                    FontSize="20"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+            </ui:Button>
+            <ContentControl
+                Grid.Column="2"
+                Margin="0,0,12,0"
+                VerticalAlignment="Center"
+                Content="{Binding Opening}" />
+            <ContentControl
+                Grid.Column="3"
+                Margin="0,0,12,0"
+                VerticalAlignment="Center"
+                Content="{Binding Lintel}" />
+            <ComboBox
+                Grid.Column="4"
+                Grid.ColumnSpan="2"
+                Height="40"
+                Padding="10,4"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                ItemsSource="{Binding Actions}"
+                DisplayMemberPath="Title"
+                SelectedItem="{Binding SelectedAction, Mode=TwoWay,
+                                UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
     </DataTemplate>
 </ResourceDictionary>

@@ -113,7 +113,7 @@
     <system:String x:Key="Manager.NoLintel">&lt; No lintel &gt;</system:String>
     <system:String x:Key="Manager.NoOpening">&lt; No opening &gt;</system:String>
     <system:String x:Key="Manager.Process">Process (0)</system:String>
-    <system:String x:Key="Manager.Project">Entire project</system:String>
+    <system:String x:Key="Manager.Project">All elements</system:String>
     <system:String x:Key="Manager.Range">Display range:</system:String>
     <system:String x:Key="Manager.Selected">Selected</system:String>
     <system:String x:Key="Manager.Status.Correct">Correct</system:String>
@@ -138,8 +138,21 @@
     <system:String x:Key="Manager.No">no</system:String>
     <system:String x:Key="Manager.NotImplemented">This function will be available in a later stage</system:String>
     <system:String x:Key="Manager.NoWarnings">No warnings</system:String>
-    <system:String x:Key="Manager.RowWarnings">Pair / group reasons</system:String>
+    <system:String x:Key="Manager.RowWarnings">Description</system:String>
     <system:String x:Key="Manager.Unavailable">Not available</system:String>
-    <system:String x:Key="Manager.Warnings">Warnings</system:String>
+    <system:String x:Key="Manager.Warnings">Status</system:String>
     <system:String x:Key="Manager.Yes">yes</system:String>
+    <system:String x:Key="Manager.Demo.MissingLintel">The opening has no lintel.</system:String>
+    <system:String x:Key="Manager.Demo.MissingOpening">No opening was found for the lintel.</system:String>
+    <system:String x:Key="Manager.Demo.WrongType">Incorrect type: type 1L is installed; 2L is required.</system:String>
+    <system:String x:Key="Manager.Demo.Offset">The lintel is offset from the opening by 25 mm.</system:String>
+    <system:String x:Key="Manager.Demo.MissingLock">The geometric lock is missing.</system:String>
+    <system:String x:Key="Manager.Demo.WrongParameters">Lintel thickness is 200 mm; 250 mm is required.</system:String>
+    <system:String x:Key="Manager.Demo.FixedOpening">The opening is fixed; only Skip is allowed.</system:String>
+    <system:String x:Key="Manager.Demo.FixedLintel">The lintel is fixed; only Skip is allowed.</system:String>
+    <system:String x:Key="Manager.Demo.GroupedLintel">The lintel belongs to a model group; only Skip is allowed.</system:String>
+    <system:String x:Key="Manager.HasWarnings">Warnings found</system:String>
+    <system:String x:Key="Manager.StatusElement">Element:</system:String>
+    <system:String x:Key="Manager.CorrectOpening">The opening meets the requirements</system:String>
+    <system:String x:Key="Manager.CorrectLintel">The lintel is installed correctly</system:String>
 </ResourceDictionary>

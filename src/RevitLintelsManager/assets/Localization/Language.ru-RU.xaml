@@ -113,7 +113,7 @@
     <system:String x:Key="Manager.NoLintel">&lt; Нет перемычки &gt;</system:String>
     <system:String x:Key="Manager.NoOpening">&lt; Нет проёма &gt;</system:String>
     <system:String x:Key="Manager.Process">Обработать (0)</system:String>
-    <system:String x:Key="Manager.Project">Во всём проекте</system:String>
+    <system:String x:Key="Manager.Project">Все элементы</system:String>
     <system:String x:Key="Manager.Range">Диапазон отображения:</system:String>
     <system:String x:Key="Manager.Selected">Выделенные</system:String>
     <system:String x:Key="Manager.Status.Correct">Соответствует</system:String>
@@ -137,9 +137,22 @@
     <system:String x:Key="Manager.Info.Workset">Рабочий набор</system:String>
     <system:String x:Key="Manager.No">нет</system:String>
     <system:String x:Key="Manager.NotImplemented">Функция будет доступна на следующем этапе</system:String>
-    <system:String x:Key="Manager.NoWarnings">Предупреждений нет</system:String>
-    <system:String x:Key="Manager.RowWarnings">Причины пары / группы</system:String>
+    <system:String x:Key="Manager.NoWarnings">Нет предупреждений</system:String>
+    <system:String x:Key="Manager.RowWarnings">Описание</system:String>
     <system:String x:Key="Manager.Unavailable">Нет данных</system:String>
-    <system:String x:Key="Manager.Warnings">Предупреждения</system:String>
+    <system:String x:Key="Manager.Warnings">Статус</system:String>
     <system:String x:Key="Manager.Yes">да</system:String>
+    <system:String x:Key="Manager.Demo.MissingLintel">Над проёмом отсутствует перемычка.</system:String>
+    <system:String x:Key="Manager.Demo.MissingOpening">Для перемычки не найден проём.</system:String>
+    <system:String x:Key="Manager.Demo.WrongType">Некорректный тип: установлен 1L, требуется 2L.</system:String>
+    <system:String x:Key="Manager.Demo.Offset">Перемычка смещена относительно проёма на 25 мм.</system:String>
+    <system:String x:Key="Manager.Demo.MissingLock">Геометрический замок отсутствует.</system:String>
+    <system:String x:Key="Manager.Demo.WrongParameters">Толщина перемычки 200 мм; требуется 250 мм.</system:String>
+    <system:String x:Key="Manager.Demo.FixedOpening">Проём зафиксирован, разрешён только пропуск.</system:String>
+    <system:String x:Key="Manager.Demo.FixedLintel">Перемычка зафиксирована, разрешён только пропуск.</system:String>
+    <system:String x:Key="Manager.Demo.GroupedLintel">Перемычка входит в группу модели, разрешён только пропуск.</system:String>
+    <system:String x:Key="Manager.HasWarnings">Есть предупреждения</system:String>
+    <system:String x:Key="Manager.StatusElement">Элемент:</system:String>
+    <system:String x:Key="Manager.CorrectOpening">Проём соответствует требованиям</system:String>
+    <system:String x:Key="Manager.CorrectLintel">Перемычка установлена корректно</system:String>
 </ResourceDictionary>

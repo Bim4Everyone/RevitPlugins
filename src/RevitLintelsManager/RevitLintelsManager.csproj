@@ -4,6 +4,13 @@
         <UseDevExpress>false</UseDevExpress>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(RevitLintelsDemo)' == 'true' And '$(Configuration)' == 'Debug'">
+        <DefineConstants>$(DefineConstants);LINTELS_DEMO</DefineConstants>
+        <OutputPath>bin\x64\Demo</OutputPath>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(RevitLintelsDemo)' != 'true' Or '$(Configuration)' != 'Debug'">
+        <Compile Remove="Services\ManagerDemoSource.cs" />
+    </ItemGroup>
     <ItemGroup>
         <Reference Remove="dosymep.Xpf.Core" />
         <Reference Remove="dosymep.Xpf.Core.Ninject" />

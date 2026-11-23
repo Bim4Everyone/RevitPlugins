@@ -23,16 +23,25 @@ internal sealed class ManagerElementViewModel(ManagerElementPresentation element
             ? localization.GetLocalizedString("Manager.Unavailable") : element.TypeName;
     public ManagerElementStatus Status => element?.Status ?? ManagerElementStatus.Missing;
     public string StatusText => localization.GetLocalizedString("Manager.Status." + Status);
+    public string InformationToolTip => localization.GetLocalizedString("Manager.Information");
+    public string StatusToolTip => localization.GetLocalizedString(
+        HasWarnings ? "Manager.HasWarnings" : "Manager.NoWarnings");
+    public bool HasWarnings => Status != ManagerElementStatus.Correct
+        || element?.Diagnostics.Count > 0 || RowDiagnostics.Count > 0;
 
     /// <summary>Привязывает подготовленную диагностику строки, не приписывая её конкретному элементу.</summary>
     /// <param name="diagnostics">Диагностика пары или агрегированного заголовка.</param>
     public void SetRowDiagnostics(IEnumerable<ManagerDiagnostic> diagnostics) {
         RowDiagnostics = diagnostics.ToList().AsReadOnly();
+        RaisePropertyChanged(nameof(HasWarnings));
+        RaisePropertyChanged(nameof(StatusToolTip));
     }
 
     /// <summary>Обновляет локализованные подписи без изменения имён элементов.</summary>
     public void RefreshLocalization() {
         RaisePropertyChanged(nameof(TypeName));
         RaisePropertyChanged(nameof(StatusText));
+        RaisePropertyChanged(nameof(InformationToolTip));
+        RaisePropertyChanged(nameof(StatusToolTip));
     }
 }
