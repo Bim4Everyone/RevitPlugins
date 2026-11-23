@@ -34,8 +34,7 @@ internal class LintelManagerConfigValidator(RevitRepository repository) : ILinte
             || config.MinimalHeightAboveOpeningMm.Value < 0) {
             errors.Add("Validation.MinimalHeight");
         }
-        if(double.IsNaN(config.MinimalBearingMm) || double.IsInfinity(config.MinimalBearingMm)
-            || config.MinimalBearingMm < 1) {
+        if(!IsValidMinimalBearing(config.MinimalBearingMm)) {
             errors.Add("Manager.Validation.MinimalBearing");
         }
         var concreteKeys = ValidateStructureTypes(config.ReinforcedConcreteTypes, errors);
@@ -89,6 +88,11 @@ internal class LintelManagerConfigValidator(RevitRepository repository) : ILinte
             }
         }
         return errors.Distinct().ToList().AsReadOnly();
+    }
+
+    /// <summary>Проверяет нижнюю границу и конечность пользовательского опирания в миллиметрах.</summary>
+    internal static bool IsValidMinimalBearing(double value) {
+        return value >= 1 && !double.IsInfinity(value);
     }
 
     // Проверяет сохранённые ключи одного перечня независимо от другого.

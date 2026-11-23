@@ -65,7 +65,6 @@ public class SystemPluginConfig {
     });
 
     public double DefaultMinimalBearingMm => 70;
-    
     public string DefaultLintelFamilyName  => "ОбщМд_Перемычка";
     public string LintelWidthParamName  => "Ширина проема";
     public string LintelThicknessParamName  => "Толщина стены";

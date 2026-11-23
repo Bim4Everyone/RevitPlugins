@@ -37,27 +37,13 @@ public class LintelManagerSettings {
         return ReinforcedConcreteTypes ?? (StructureWallTypeNames ?? []).Select(StructureTypeSettings.FromLegacyWall);
     }
 
-    /// <summary>Подготавливает отдельный DTO для явного сохранения из существующего редактора стен.</summary>
-    internal LintelManagerSettings WithStructureWallSelection(IEnumerable<string> wallNames) {
+    /// <summary>Подготавливает отдельный DTO для сохранения общих настроек, включая исходные legacy-данные.</summary>
+    internal LintelManagerSettings WithGeneralSettings(double minimalBearingMm,
+        IEnumerable<StructureTypeSettings> concreteTypes, IEnumerable<StructureTypeSettings> steelTypes) {
         var updated = (LintelManagerSettings) MemberwiseClone();
-        var selectedNames = wallNames.ToHashSet();
-        if(ReinforcedConcreteTypes is null) {
-            var previousNames = (StructureWallTypeNames ?? []).ToArray();
-            var mergedNames = previousNames.Where(selectedNames.Contains)
-                .Concat(selectedNames.Except(previousNames)).ToArray();
-            updated.StructureWallTypeNames = mergedNames;
-            updated.ReinforcedConcreteTypes = mergedNames.Select(StructureTypeSettings.FromLegacyWall).ToArray();
-        } else {
-            var previousWallNames = ReinforcedConcreteTypes.Where(type => type?.IsWallType() == true)
-                .Select(type => type.TypeName).ToHashSet();
-            if(!selectedNames.SetEquals(previousWallNames)) {
-                updated.ReinforcedConcreteTypes = ReinforcedConcreteTypes
-                    .Where(type => type?.IsWallType() != true || selectedNames.Contains(type.TypeName))
-                    .Concat(selectedNames.Except(previousWallNames).Select(StructureTypeSettings.FromLegacyWall))
-                    .ToArray();
-            }
-        }
-        updated.SteelTypes ??= [];
+        updated.MinimalBearingMm = minimalBearingMm;
+        updated.ReinforcedConcreteTypes = concreteTypes.ToArray();
+        updated.SteelTypes = steelTypes.ToArray();
         return updated;
     }
 }

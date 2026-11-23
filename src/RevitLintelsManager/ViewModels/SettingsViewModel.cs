@@ -101,7 +101,7 @@ internal class SettingsViewModel : BaseViewModel {
         if(!CanAcceptView()) {
             return;
         }
-        var settings = _sourceSettings.WithStructureWallSelection(GeneralSettingsViewModel.GetStructureWallNames());
+        var settings = GeneralSettingsViewModel.BuildSettings(_sourceSettings);
         settings.LintelFamilySettings = FamilySettingsViewModel.GetLintelSettings();
         settings.OpeningFamilySettings = FamilySettingsViewModel.GetOpeningSettings();
         settings.LintelConfigRuleName = PlacementSettingsViewModel.SelectedConfig.Name;

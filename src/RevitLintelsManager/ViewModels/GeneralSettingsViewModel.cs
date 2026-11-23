@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
@@ -9,13 +9,13 @@ using dosymep.SimpleServices;
 using dosymep.WPF.ViewModels;
 
 using RevitLintelsManager.Models;
+using RevitLintelsManager.Models.Configs;
 using RevitLintelsManager.Models.Settings;
-using RevitLintelsManager.Services;
 
 namespace RevitLintelsManager.ViewModels;
 
 internal class GeneralSettingsViewModel : BaseViewModel {
-    public event Action<WallTypeViewModel> StructureWallsChanged;
+    public event Action<string> StructureWallSelectionChanged;
 
     private readonly ILocalizationService _localizationService;
     private readonly IParamService _paramService;
@@ -24,50 +24,41 @@ internal class GeneralSettingsViewModel : BaseViewModel {
     private ParamViewModel _selectedFixParameter;
     private ItemViewModel _selectedPhase;
     private string _minimalHeightText;
-    private ObservableCollection<WallTypeViewModel> _filteredStructureWalls;
-    private string _wallSearchText;
+    private string _minimalBearingText;
     private string _fixParameterName;
 
+    /// <summary>Загружает общие настройки и оба перечня типов для исходного проекта.</summary>
     public GeneralSettingsViewModel(RevitRepository repository, IParamService paramService,
         ILocalizationService localizationService, FamilySettingsViewModel familySettings,
-        LintelManagerSettings settings, ISettingsCommandFactory commandFactory) {
+        LintelManagerSettings settings, SystemPluginConfig systemConfig) {
         _localizationService = localizationService;
         _paramService = paramService;
         _familySettings = familySettings;
-        SearchStructureWallsCommand = commandFactory.Create(ApplySearchStructureWalls);
         _fixParameterName = settings.LintelFixParamName;
         Phases = new ObservableCollection<ItemViewModel>(repository.PhaseIds.Select(id =>
             new ItemViewModel { Name = repository.Document.GetElement(id).Name }));
         SelectedPhase = Phases.FirstOrDefault(phase => phase.Name == settings.PhaseName);
         MinimalHeightText = settings.MinimalHeightAboveOpeningMm.ToString(CultureInfo.CurrentCulture);
-        var selectedNames = settings.GetReinforcedConcreteTypes().Where(type => type?.IsWallType() == true)
-            .Select(type => type.TypeName).ToHashSet();
-        var walls = repository.RevitWalls.Select(wall => new WallTypeViewModel {
-            Name = wall.WallType.Name,
-            WallType = wall.WallType,
-            IsChecked = selectedNames.Contains(wall.WallType.Name)
-        }).ToList();
-        foreach(string name in selectedNames.Except(walls.Select(wall => wall.Name))) {
-            walls.Add(new WallTypeViewModel { Name = name, IsChecked = true });
-        }
-        StructureWalls = new ObservableCollection<WallTypeViewModel>(walls
-            .OrderByDescending(wall => wall.IsChecked).ThenBy(wall => wall.Name));
-        foreach(var wall in StructureWalls) {
-            wall.PropertyChanged += OnWallChanged;
-        }
-        ApplySearchStructureWalls();
+        double minimalBearing = settings.MinimalBearingMm ?? systemConfig.DefaultMinimalBearingMm;
+        _minimalBearingText = minimalBearing.ToString("R", CultureInfo.CurrentCulture);
+        var catalog = repository.GetStructureTypes().ToLookup(type => type.Settings.GetKey());
+        ReinforcedConcreteTypes = new StructureTypeListViewModel(settings.GetReinforcedConcreteTypes(),
+            systemConfig.ReinforcedConcreteCategories, catalog, localizationService);
+        SteelTypes = new StructureTypeListViewModel(settings.SteelTypes ?? [], systemConfig.SteelCategories,
+            catalog, localizationService);
+        ReinforcedConcreteTypes.SelectionChanged += OnConcreteTypeChanged;
         RefreshFixParameters();
         _familySettings.SelectionChanged += RefreshFixParameters;
     }
 
     public ObservableCollection<ItemViewModel> Phases { get; }
-    public ObservableCollection<WallTypeViewModel> StructureWalls { get; }
-    public ICommand SearchStructureWallsCommand { get; }
-
-    public ObservableCollection<WallTypeViewModel> FilteredStructureWalls {
-        get => _filteredStructureWalls;
-        private set => RaiseAndSetIfChanged(ref _filteredStructureWalls, value);
-    }
+    public StructureTypeListViewModel ReinforcedConcreteTypes { get; }
+    public StructureTypeListViewModel SteelTypes { get; }
+    public string MinimalBearingError =>
+        double.TryParse(MinimalBearingText, NumberStyles.Float, CultureInfo.CurrentCulture, out double bearing)
+        && LintelManagerConfigValidator.IsValidMinimalBearing(bearing)
+            ? null
+            : _localizationService.GetLocalizedString("Validation.MinimalBearing");
 
     public ObservableCollection<ParamViewModel> FixParameters {
         get => _fixParameters;
@@ -94,19 +85,39 @@ internal class GeneralSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _minimalHeightText, value);
     }
 
-    public string WallSearchText {
-        get => _wallSearchText;
-        set => RaiseAndSetIfChanged(ref _wallSearchText, value);
+    public string MinimalBearingText {
+        get => _minimalBearingText;
+        set {
+            if(_minimalBearingText == value) {
+                return;
+            }
+            RaiseAndSetIfChanged(ref _minimalBearingText, value);
+            OnPropertyChanged(nameof(MinimalBearingError));
+            CommandManager.InvalidateRequerySuggested();
+        }
     }
 
-    public string[] GetStructureWallNames() {
-        return StructureWalls.Where(wall => wall.IsChecked).Select(wall => wall.Name).ToArray();
+    /// <summary>Возвращает имена разрешённых ЖБ стен для редактора назначений.</summary>
+    public IEnumerable<string> GetStructureWallNames() {
+        return ReinforcedConcreteTypes.GetSelectedTypes().Where(type =>
+                type.Resolution == StructureTypeResolution.Resolved && type.Settings.IsWallType())
+            .Select(type => type.Settings.TypeName);
     }
 
+    /// <summary>Возвращает проверенное значение высоты кладки в миллиметрах.</summary>
     public double GetMinimalHeight() {
         return double.Parse(MinimalHeightText, NumberStyles.Float, CultureInfo.CurrentCulture);
     }
 
+    /// <summary>Подготавливает копию общих настроек с обоими перечнями для сохранения.</summary>
+    public LintelManagerSettings BuildSettings(LintelManagerSettings source) {
+        double bearing = double.Parse(MinimalBearingText, NumberStyles.Float, CultureInfo.CurrentCulture);
+        return source.WithGeneralSettings(bearing,
+            ReinforcedConcreteTypes.GetSelectedTypes().Select(type => type.Settings),
+            SteelTypes.GetSelectedTypes().Select(type => type.Settings));
+    }
+
+    /// <summary>Возвращает первую ошибку общих настроек для окна и команды сохранения.</summary>
     public string GetErrorText() {
         if(!ParamService.IsYesNo(SelectedFixParameter?.RevitParam)) {
             return _localizationService.GetLocalizedString("Validation.SelectFixParameter");
@@ -118,16 +129,10 @@ internal class GeneralSettingsViewModel : BaseViewModel {
             || double.IsNaN(height) || double.IsInfinity(height) || height < 0) {
             return _localizationService.GetLocalizedString("Validation.MinimalHeight");
         }
-        return null;
+        return MinimalBearingError;
     }
 
-    private void ApplySearchStructureWalls() {
-        FilteredStructureWalls = new ObservableCollection<WallTypeViewModel>(string.IsNullOrEmpty(WallSearchText)
-            ? StructureWalls
-            : StructureWalls.Where(wall => wall.Name?.IndexOf(WallSearchText,
-                StringComparison.OrdinalIgnoreCase) >= 0));
-    }
-
+    // Подбирает параметры фиксации, общие для выбранных семейств.
     private void RefreshFixParameters() {
         FixParameters = new ObservableCollection<ParamViewModel>(new[] {
             new ParamViewModel {
@@ -139,9 +144,11 @@ internal class GeneralSettingsViewModel : BaseViewModel {
                                ?? FixParameters.First();
     }
 
-    private void OnWallChanged(object sender, PropertyChangedEventArgs e) {
-        if(e.PropertyName == nameof(WallTypeViewModel.IsChecked) && sender is WallTypeViewModel wall) {
-            StructureWallsChanged?.Invoke(wall);
+    // Синхронизирует назначения правил при явной отметке разрешённой стены.
+    private void OnConcreteTypeChanged(StructureTypeViewModel type) {
+        if(type.IsAvailable && type.Selection.Settings.IsWallType()) {
+            StructureWallSelectionChanged?.Invoke(type.IsChecked ? type.Selection.Settings.TypeName : null);
+            CommandManager.InvalidateRequerySuggested();
         }
     }
 }

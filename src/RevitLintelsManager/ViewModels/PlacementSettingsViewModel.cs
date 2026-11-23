@@ -85,7 +85,7 @@ internal class PlacementSettingsViewModel : BaseViewModel {
         RefreshLintelTypes();
         RefreshWalls();
         _familySettings.SelectionChanged += RefreshLintelTypes;
-        _generalSettings.StructureWallsChanged += OnStructureWallsChanged;
+        _generalSettings.StructureWallSelectionChanged += RefreshWalls;
     }
 
     public ObservableCollection<LintelConfigRuleViewModel> Configs { get; } = [];
@@ -214,11 +214,6 @@ internal class PlacementSettingsViewModel : BaseViewModel {
         LintelTypes = new ObservableCollection<string>((family?.FamilySymbols ?? [])
             .Select(symbol => symbol.Name).OrderBy(name => name));
         CommandManager.InvalidateRequerySuggested();
-    }
-
-    // Снимает конфликтующие назначения только после явного изменения списка стен пользователем.
-    private void OnStructureWallsChanged(WallTypeViewModel wall) {
-        RefreshWalls(wall.IsChecked ? wall.Name : null);
     }
 
     // Обновляет доступность стен, сохраняя загруженные назначения при открытии настройки.

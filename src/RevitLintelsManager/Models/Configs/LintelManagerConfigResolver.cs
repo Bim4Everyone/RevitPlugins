@@ -125,8 +125,8 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
         };
     }
 
-    // Разрешает составные ключи только в допустимых категориях, сохраняя каждую исходную запись.
-    private static IReadOnlyList<StructureTypeSelection> ResolveStructureTypes(
+    /// <summary>Разрешает составные ключи в допустимых категориях, сохраняя каждую исходную запись.</summary>
+    internal static IReadOnlyList<StructureTypeSelection> ResolveStructureTypes(
         IEnumerable<StructureTypeSettings> settings, IEnumerable<BuiltInCategory> categories,
         ILookup<(string Category, string FamilyName, string TypeName), StructureTypeSelection> catalog) {
         var allowed = categories.Select(category => category.ToString()).ToHashSet();

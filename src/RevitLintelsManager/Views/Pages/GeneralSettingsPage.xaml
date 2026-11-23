@@ -1,11 +1,10 @@
-﻿<core:WpfUIPlatformPage
+<core:WpfUIPlatformPage
     x:Class="RevitLintelsManager.Views.Pages.GeneralSettingsPage"
     x:ClassModifier="internal"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:edits="clr-namespace:RevitLintelsManager.Views.Edits"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
     MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=ui:NavigationView}}"
@@ -15,97 +14,175 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style
+                x:Key="StructureTypeListStyle"
+                TargetType="ListBox"
+                BasedOn="{StaticResource SettingsListStyle}">
+                <Setter
+                    Property="IsSynchronizedWithCurrentItem"
+                    Value="False" />
+                <Setter
+                    Property="Background"
+                    Value="Transparent" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="0" />
+                <Setter
+                    Property="ItemContainerStyle"
+                    Value="{StaticResource SettingsCheckListItemStyle}" />
+                <Setter
+                    Property="ItemsSource"
+                    Value="{Binding FilteredTypes}" />
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <CheckBox
+                                Margin="4"
+                                Content="{Binding Name}"
+                                ToolTip="{Binding Name}"
+                                IsChecked="{Binding IsChecked, Mode=TwoWay}" />
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </core:WpfUIPlatformPage.Resources>
     <Grid Margin="0,0,0,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition>
+                <RowDefinition.Style>
+                    <Style TargetType="{x:Type RowDefinition}">
+                        <Setter Property="Height" Value="*" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsExpanded, ElementName=_limitingStructuresGroup}"
+                                         Value="False">
+                                <Setter Property="Height" Value="Auto" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </RowDefinition.Style>
+            </RowDefinition>
         </Grid.RowDefinitions>
-            <ui:Card Margin="10" Padding="20">
+        <ui:Card
+            Margin="10"
+            Padding="20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="280" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ui:TextBlock
+                    Margin="0,8,20,8"
+                    VerticalAlignment="Center"
+                    TextWrapping="Wrap"
+                    Text="{me:LocalizationSource General.FixParameter}" />
+                <ComboBox
+                    Grid.Column="1"
+                    Margin="0,5"
+                    ItemsSource="{Binding FixParameters}"
+                    SelectedItem="{Binding SelectedFixParameter}"
+                    DisplayMemberPath="Name" />
+                <ui:TextBlock
+                    Grid.Row="1"
+                    Margin="0,8,20,8"
+                    VerticalAlignment="Center"
+                    Text="{me:LocalizationSource General.Phase}" />
+                <ComboBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="0,5"
+                    ItemsSource="{Binding Phases}"
+                    SelectedItem="{Binding SelectedPhase}"
+                    DisplayMemberPath="Name" />
+                <ui:TextBlock
+                    Grid.Row="2"
+                    Margin="0,8,20,8"
+                    VerticalAlignment="Center"
+                    TextWrapping="Wrap"
+                    Text="{me:LocalizationSource General.MinimalHeight}" />
+                <ui:TextBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Margin="0,5"
+                    PlaceholderText="{me:LocalizationSource General.Millimeters}"
+                    Text="{Binding MinimalHeightText, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:TextBlock
+                    x:Name="_minimalBearingLabel"
+                    Grid.Row="3"
+                    Margin="0,8,20,8"
+                    VerticalAlignment="Center"
+                    TextWrapping="Wrap"
+                    Text="{me:LocalizationSource General.MinimalBearing}" />
+                <ui:TextBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Margin="0,5"
+                    AutomationProperties.LabeledBy="{Binding ElementName=_minimalBearingLabel}"
+                    Text="{Binding MinimalBearingText, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+        </ui:Card>
+        <edits:CustomGroupEditControl
+            x:Name="_limitingStructuresGroup"
+            Grid.Row="1"
+            VerticalAlignment="Stretch"
+            Header="{me:LocalizationSource General.LimitingStructures}"
+            Icon="{ui:SymbolIcon Building24}">
+            <edits:CustomGroupEditControl.EditControl>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="280" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <ui:TextBlock
-                        Margin="0,8,20,8"
-                        VerticalAlignment="Center"
-                        TextWrapping="Wrap"
-                        Text="{me:LocalizationSource General.FixParameter}" />
-                    <ComboBox
-                        Grid.Column="1"
-                        Margin="0,5"
-                        ItemsSource="{Binding FixParameters}"
-                        SelectedItem="{Binding SelectedFixParameter}"
-                        DisplayMemberPath="Name" />
-                    <ui:TextBlock
-                        Grid.Row="1"
-                        Margin="0,8,20,8"
-                        VerticalAlignment="Center"
-                        Text="{me:LocalizationSource General.Phase}" />
-                    <ComboBox
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Margin="0,5"
-                        ItemsSource="{Binding Phases}"
-                        SelectedItem="{Binding SelectedPhase}"
-                        DisplayMemberPath="Name" />
-                    <ui:TextBlock
-                        Grid.Row="2"
-                        Margin="0,8,20,8"
-                        VerticalAlignment="Center"
-                        TextWrapping="Wrap"
-                        Text="{me:LocalizationSource General.MinimalHeight}" />
-                    <ui:TextBox
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Margin="0,5"
-                        PlaceholderText="{me:LocalizationSource General.Millimeters}"
-                        Text="{Binding MinimalHeightText, UpdateSourceTrigger=PropertyChanged}" />
-                </Grid>
-            </ui:Card>
-            <edits:CustomGroupEditControl
-                Grid.Row="1"
-                Header="{me:LocalizationSource General.StructureWalls}"
-                Icon="{ui:SymbolIcon Building24}">
-                <edits:CustomGroupEditControl.EditControl>
-                    <DockPanel Margin="8">
+                    <DockPanel
+                        Margin="8,8,10,8"
+                        DataContext="{Binding ReinforcedConcreteTypes}">
+                        <ui:TextBlock
+                            DockPanel.Dock="Top"
+                            Margin="0,0,0,8"
+                            FontTypography="BodyStrong"
+                            TextWrapping="Wrap"
+                            Text="{me:LocalizationSource General.ReinforcedConcreteTypes}" />
                         <ui:AutoSuggestBox
-                            Icon="{ui:SymbolIcon Search24}"
                             DockPanel.Dock="Top"
                             Margin="0,0,0,12"
-                            PlaceholderText="{me:LocalizationSource Search.WallType}"
-                            Text="{Binding WallSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="TextChanged">
-                                    <i:InvokeCommandAction Command="{Binding SearchStructureWallsCommand}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ui:AutoSuggestBox>
+                            Icon="{ui:SymbolIcon Search24}"
+                            PlaceholderText="{me:LocalizationSource Search.StructureType}"
+                            AutomationProperties.Name="{me:LocalizationSource Search.StructureType}"
+                            Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <ListBox
-                            Style="{StaticResource SettingsListStyle}"
-                            ItemContainerStyle="{StaticResource SettingsCheckListItemStyle}"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            ItemsSource="{Binding FilteredStructureWalls}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox
-                                        Margin="4"
-                                        Content="{Binding Name}"
-                                        ToolTip="{Binding Name}"
-                                        IsChecked="{Binding IsChecked, Mode=TwoWay}" />
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                            Style="{StaticResource StructureTypeListStyle}"
+                            AutomationProperties.Name="{me:LocalizationSource General.ReinforcedConcreteTypes}" />
                     </DockPanel>
-                </edits:CustomGroupEditControl.EditControl>
-            </edits:CustomGroupEditControl>
+                    <DockPanel
+                        Grid.Column="1"
+                        Margin="10,8,8,8"
+                        DataContext="{Binding SteelTypes}">
+                        <ui:TextBlock
+                            DockPanel.Dock="Top"
+                            Margin="0,0,0,8"
+                            FontTypography="BodyStrong"
+                            TextWrapping="Wrap"
+                            Text="{me:LocalizationSource General.SteelTypes}" />
+                        <ui:AutoSuggestBox
+                            DockPanel.Dock="Top"
+                            Margin="0,0,0,12"
+                            Icon="{ui:SymbolIcon Search24}"
+                            PlaceholderText="{me:LocalizationSource Search.StructureType}"
+                            AutomationProperties.Name="{me:LocalizationSource Search.StructureType}"
+                            Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <ListBox
+                            Style="{StaticResource StructureTypeListStyle}"
+                            AutomationProperties.Name="{me:LocalizationSource General.SteelTypes}" />
+                    </DockPanel>
+                </Grid>
+            </edits:CustomGroupEditControl.EditControl>
+        </edits:CustomGroupEditControl>
     </Grid>
 </core:WpfUIPlatformPage>
