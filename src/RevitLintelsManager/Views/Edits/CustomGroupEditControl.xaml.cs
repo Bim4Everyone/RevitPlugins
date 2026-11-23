@@ -65,14 +65,16 @@ public partial class CustomGroupEditControl {
         set => SetValue(IsExpandedProperty, value);
     }
 
-    // Ограничивает строку содержимого для виртуализированных списков настроек и менеджера.
+    // Оставляет строку содержимого для настроек и скрывает её у заголовка плоского списка.
     private void OnCardExpanderLoaded(object sender, RoutedEventArgs e) {
         if(sender is not CardExpander expander || VisualTreeHelper.GetChildrenCount(expander) == 0) {
             return;
         }
         if(VisualTreeHelper.GetChild(expander, 0) is Grid grid && grid.RowDefinitions.Count > 1) {
             // WPF UI 4.0 задаёт Auto для содержимого; спискам нужна ограниченная строка.
-            grid.RowDefinitions[1].Height = new GridLength(1, GridUnitType.Star);
+            grid.RowDefinitions[1].Height = EditControl is null
+                ? new GridLength(0)
+                : new GridLength(1, GridUnitType.Star);
         }
     }
 }

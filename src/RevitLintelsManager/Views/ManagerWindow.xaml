@@ -97,7 +97,7 @@
                 BorderThickness="0"
                 Background="Transparent"
                 Style="{StaticResource SettingsListStyle}"
-                ItemsSource="{Binding Groups}"
+                ItemsSource="{Binding VisibleRows}"
                 ItemContainerStyle="{StaticResource ManagerChildItemStyle}"
                 ScrollViewer.CanContentScroll="True"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"

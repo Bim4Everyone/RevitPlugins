@@ -11,10 +11,27 @@ internal enum ManagerAction { Install, Replace, Correct, Lock, Delete, Skip }
 internal enum ManagerElementStatus { Missing, Correct, Warning, Fixed, Grouped }
 
 /// <summary>Составной ключ строки в исходном документе.</summary>
-internal readonly struct ManagerItemKey(Guid documentToken, string openingUniqueId, string lintelUniqueId) {
+internal readonly struct ManagerItemKey(Guid documentToken, string openingUniqueId, string lintelUniqueId)
+    : IEquatable<ManagerItemKey> {
     public Guid DocumentToken { get; } = documentToken;
     public string OpeningUniqueId { get; } = openingUniqueId;
     public string LintelUniqueId { get; } = lintelUniqueId;
+
+    /// <inheritdoc />
+    public bool Equals(ManagerItemKey other) {
+        return DocumentToken == other.DocumentToken && OpeningUniqueId == other.OpeningUniqueId
+            && LintelUniqueId == other.LintelUniqueId;
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object obj) {
+        return obj is ManagerItemKey other && Equals(other);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode() {
+        return (DocumentToken, OpeningUniqueId, LintelUniqueId).GetHashCode();
+    }
 }
 
 /// <summary>Ключ группировки по типам, статусам и фиксации перемычки.</summary>

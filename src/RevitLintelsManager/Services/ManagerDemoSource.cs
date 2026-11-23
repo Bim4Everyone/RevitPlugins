@@ -10,15 +10,15 @@ using RevitLintelsManager.ViewModels;
 
 namespace RevitLintelsManager.Services;
 
-/// <summary>Временные GUI-данные TASK-006; компилируются только в явно включённую Debug-демонстрацию.</summary>
+/// <summary>Детерминированные GUI-данные только для явно включённой Debug-демонстрации.</summary>
 internal sealed class ManagerDemoSource(ManagerSessionState state, ILocalizationService localization)
     : IManagerRequestDispatcher {
     private const string _secondLevel = "DEMO — 02 этаж +5.700";
-    private readonly Dictionary<ManagerGroupKey, bool> _expanded = new();
     private IReadOnlyList<ManagerItemViewModel> _items;
-    private IReadOnlyList<ManagerGroupViewModel> _groups = Array.Empty<ManagerGroupViewModel>();
     private ManagerViewModel _viewModel;
     private ManagerScope _scope;
+    private ManagerScope _publishedScope;
+    private bool _alternate;
     private bool _accepting;
     private bool _closing;
 
@@ -28,13 +28,14 @@ internal sealed class ManagerDemoSource(ManagerSessionState state, ILocalization
     public void Connect(ManagerViewModel viewModel, ISettingsCommandFactory commands) {
         _viewModel = viewModel;
         _scope = state.InitialScope;
-        _items = CreateItems(55);
+        string size = Environment.GetEnvironmentVariable("REVIT_LINTELS_DEMO_MISSING_COUNT");
+        _items = CreateItems(int.TryParse(size, out int count) && count >= 3 ? count : 55);
         _viewModel.SetScopeCommands(
             commands.Create(() => ChangeScope(ManagerScope.Project), () => viewModel.CanEditRows),
             commands.Create(() => ChangeScope(ManagerScope.View), () => viewModel.CanEditRows),
             commands.Create(() => ChangeScope(ManagerScope.Selected), () => viewModel.CanEditRows));
         PublishGroups();
-        _viewModel.SetExpanded(_groups[0], true);
+        _viewModel.SetExpanded(_viewModel.Groups[0], true);
     }
 
     /// <inheritdoc />
@@ -50,6 +51,9 @@ internal sealed class ManagerDemoSource(ManagerSessionState state, ILocalization
         if(!_accepting || _closing || state.IsClosing || state.IsBlocked
             || request.DocumentToken != state.DocumentToken || request.Generation != state.Generation) {
             return Task.FromCanceled<ManagerDocumentContext>(new System.Threading.CancellationToken(true));
+        }
+        if(_scope == _publishedScope) {
+            ChangeDemoItems();
         }
         PublishGroups();
         return Task.FromResult(new ManagerDocumentContext(state.DocumentToken, request.Generation,
@@ -86,8 +90,6 @@ internal sealed class ManagerDemoSource(ManagerSessionState state, ILocalization
         BeginClose();
         _viewModel = null;
         _items = null;
-        _groups = Array.Empty<ManagerGroupViewModel>();
-        _expanded.Clear();
     }
 
     /// <summary>Формирует тот же набор сценариев с заданным числом проёмов без перемычек.</summary>
@@ -100,45 +102,43 @@ internal sealed class ManagerDemoSource(ManagerSessionState state, ILocalization
         }
         var items = new List<ManagerItemViewModel>();
         for(int index = 0; index < 5; index++) {
-            AddItem(items, "door-900", "2L", ManagerElementStatus.Correct, ManagerElementStatus.Correct,
-                ManagerAction.Skip,
-                new[] { ManagerAction.Delete, ManagerAction.Skip });
+            items.Add(CreateItem(index + 1, "door-900", "2L",
+                ManagerElementStatus.Correct, ManagerElementStatus.Correct,
+                ManagerAction.Skip, new[] { ManagerAction.Delete, ManagerAction.Skip }));
         }
         // Подготовленное ручное назначение воспроизводит «Варианты» на макете; default остаётся Skip.
         items[4].SelectedAction = items[4].Actions.First(option => option.Action == ManagerAction.Delete);
         for(int index = 0; index < missingLintelCount; index++) {
-            AddItem(items, "door-1200", null, ManagerElementStatus.Correct, ManagerElementStatus.Missing,
-                ManagerAction.Install, new[] { ManagerAction.Install, ManagerAction.Skip },
-                rowReasons: new[] { "MissingLintel" });
+            items.Add(CreateMissingLintel(index < 55 ? index + 6 : index + 10000));
         }
         for(int index = 0; index < 3; index++) {
-            AddItem(items, "door-1800", "1L", ManagerElementStatus.Correct, ManagerElementStatus.Warning,
-                ManagerAction.Replace, new[] { ManagerAction.Replace, ManagerAction.Delete, ManagerAction.Skip },
-                lintelReasons: new[] { "WrongType" });
+            items.Add(CreateWrongTypeLintel(index + 61));
         }
-        AddItem(items, "door-1400", "2L", ManagerElementStatus.Correct, ManagerElementStatus.Warning,
+        items.Add(CreateItem(64, "door-1400", "2L", ManagerElementStatus.Correct, ManagerElementStatus.Warning,
             ManagerAction.Correct, new[] { ManagerAction.Correct, ManagerAction.Delete, ManagerAction.Skip },
-            lintelReasons: new[] { "Offset", "MissingLock" });
-        AddItem(items, "door-1400", "2L", ManagerElementStatus.Correct, ManagerElementStatus.Warning,
+            lintelReasons: new[] { "Offset", "MissingLock" }));
+        items.Add(CreateItem(65, "door-1400", "2L", ManagerElementStatus.Correct, ManagerElementStatus.Warning,
             ManagerAction.Replace,
             new[] { ManagerAction.Replace, ManagerAction.Correct, ManagerAction.Delete, ManagerAction.Skip },
-            lintelReasons: new[] { "Offset", "WrongParameters", "MissingLock" });
+            lintelReasons: new[] { "Offset", "WrongParameters", "MissingLock" }));
         for(int index = 0; index < 2; index++) {
-            AddItem(items, "window-1500", "2L", ManagerElementStatus.Correct, ManagerElementStatus.Warning,
+            items.Add(CreateItem(index + 66, "window-1500", "2L",
+                ManagerElementStatus.Correct, ManagerElementStatus.Warning,
                 ManagerAction.Lock, new[] { ManagerAction.Lock, ManagerAction.Delete, ManagerAction.Skip },
-                lintelReasons: new[] { "MissingLock" });
+                lintelReasons: new[] { "MissingLock" }));
         }
-        AddItem(items, "door-900", "2L", ManagerElementStatus.Fixed, ManagerElementStatus.Correct,
-            ManagerAction.Skip, new[] { ManagerAction.Skip }, openingReasons: new[] { "FixedOpening" });
+        items.Add(CreateItem(68, "door-900", "2L", ManagerElementStatus.Fixed, ManagerElementStatus.Correct,
+            ManagerAction.Skip, new[] { ManagerAction.Skip }, openingReasons: new[] { "FixedOpening" }));
         for(int index = 0; index < 2; index++) {
-            AddItem(items, "door-1200", "2L", ManagerElementStatus.Correct, ManagerElementStatus.Fixed,
-                ManagerAction.Skip, new[] { ManagerAction.Skip }, lintelReasons: new[] { "FixedLintel" });
+            items.Add(CreateItem(index + 69, "door-1200", "2L",
+                ManagerElementStatus.Correct, ManagerElementStatus.Fixed,
+                ManagerAction.Skip, new[] { ManagerAction.Skip }, lintelReasons: new[] { "FixedLintel" }));
         }
-        AddItem(items, "door-1800", "2L", ManagerElementStatus.Correct, ManagerElementStatus.Grouped,
-            ManagerAction.Skip, new[] { ManagerAction.Skip }, lintelReasons: new[] { "GroupedLintel" });
-        AddItem(items, null, "2L", ManagerElementStatus.Missing, ManagerElementStatus.Warning,
+        items.Add(CreateItem(71, "door-1800", "2L", ManagerElementStatus.Correct, ManagerElementStatus.Grouped,
+            ManagerAction.Skip, new[] { ManagerAction.Skip }, lintelReasons: new[] { "GroupedLintel" }));
+        items.Add(CreateItem(72, null, "2L", ManagerElementStatus.Missing, ManagerElementStatus.Warning,
             ManagerAction.Delete, new[] { ManagerAction.Delete, ManagerAction.Skip },
-            rowReasons: new[] { "MissingOpening" });
+            rowReasons: new[] { "MissingOpening" }));
         return items.AsReadOnly();
     }
 
@@ -152,31 +152,56 @@ internal sealed class ManagerDemoSource(ManagerSessionState state, ILocalization
         _viewModel.RefreshCommand.Execute(null);
     }
 
-    // Повторно использует дочерние VM; все агрегаты вычисляют прежние GroupVM и ManagerVM.
+    // Передаёт полный набор для сверки и ключи отдельно от проекции диапазона.
     private void PublishGroups() {
-        foreach(var group in _groups) {
-            _expanded[group.Key] = group.IsExpanded;
+        var visible = _scope switch {
+            ManagerScope.View => _items.Where(item => item.Opening.Element?.Information.LevelName == _secondLevel),
+            ManagerScope.Selected => _items.Take(2),
+            _ => _items
+        };
+        _viewModel.SetItems(_items, visible.Select(item => item.Snapshot.Key), _scope);
+        _publishedScope = _scope;
+    }
+
+    // Чередует снимки только по обновлению текущего диапазона, сохраняя неизменившиеся строки.
+    private void ChangeDemoItems() {
+        _alternate = !_alternate;
+        string removedId = _alternate ? "DEMO-Opening-61" : "DEMO-Opening-9000";
+        var items = _items.Where(item => item.Snapshot.Key.OpeningUniqueId != removedId)
+            .Select(item => item.Snapshot.Key.OpeningUniqueId switch {
+                "DEMO-Opening-7" => CreateMissingLintel(7, skipOnly: _alternate),
+                "DEMO-Opening-8" => CreateMissingLintel(8, openingWarning: _alternate),
+                _ => item
+            }).ToList();
+        if(_alternate) {
+            items.Add(CreateMissingLintel(9000));
+        } else {
+            int index = items.FindIndex(item => item.Snapshot.Key.OpeningUniqueId == "DEMO-Opening-62");
+            items.Insert(index, CreateWrongTypeLintel(61));
         }
-        var visible = _scope == ManagerScope.Project ? _items
-            : _scope == ManagerScope.View ? _items.Where(item => item.Opening.Element?.Information.LevelName
-                == _secondLevel).ToList()
-            : _items.Take(2).ToList();
-        _groups = visible.GroupBy(item => item.Snapshot.GroupKey).Select(group => {
-            var first = group.First();
-            return new ManagerGroupViewModel(group.Key, first.Opening.Element, first.Lintel.Element,
-                group.ToList().AsReadOnly(), localization) {
-                IsExpanded = _expanded.TryGetValue(group.Key, out bool expanded) && expanded
-            };
-        }).ToList().AsReadOnly();
-        _viewModel.SetGroups(_groups);
+        _items = items.AsReadOnly();
+    }
+
+    // Формирует отсутствующую перемычку с контролируемой сменой допуска или признака группировки.
+    private ManagerItemViewModel CreateMissingLintel(int number, bool skipOnly = false, bool openingWarning = false) {
+        var allowed = skipOnly ? new[] { ManagerAction.Skip } : new[] { ManagerAction.Install, ManagerAction.Skip };
+        var openingStatus = openingWarning ? ManagerElementStatus.Warning : ManagerElementStatus.Correct;
+        return CreateItem(number, "door-1200", null, openingStatus, ManagerElementStatus.Missing, allowed[0],
+            allowed, rowReasons: new[] { "MissingLintel" });
+    }
+
+    // Готовая пара для сценария исчезновения и повторного добавления строки.
+    private ManagerItemViewModel CreateWrongTypeLintel(int number) {
+        return CreateItem(number, "door-1800", "1L", ManagerElementStatus.Correct, ManagerElementStatus.Warning,
+            ManagerAction.Replace, new[] { ManagerAction.Replace, ManagerAction.Delete, ManagerAction.Skip },
+            lintelReasons: new[] { "WrongType" });
     }
 
     // Явно задаёт результаты сценария, не выполняя диагностику или подбор.
-    private void AddItem(List<ManagerItemViewModel> items, string openingType, string lintelType,
+    private ManagerItemViewModel CreateItem(int number, string openingType, string lintelType,
         ManagerElementStatus openingStatus, ManagerElementStatus lintelStatus, ManagerAction action,
         ManagerAction[] allowed, string[] openingReasons = null, string[] lintelReasons = null,
         string[] rowReasons = null) {
-        int number = items.Count + 1;
         var opening = CreateElement(openingType, openingStatus, number, true, openingReasons);
         var lintel = CreateElement(lintelType, lintelStatus, number, false, lintelReasons);
         var key = new ManagerItemKey(state.DocumentToken, opening is null ? null : $"DEMO-Opening-{number}",
@@ -185,7 +210,7 @@ internal sealed class ManagerDemoSource(ManagerSessionState state, ILocalization
             lintelType is null ? null : "DEMO-Type-" + lintelType, openingStatus, lintelStatus,
             lintelStatus == ManagerElementStatus.Fixed);
         var snapshot = new ManagerItemSnapshot(key, groupKey, Reasons(rowReasons), allowed, action);
-        items.Add(new ManagerItemViewModel(snapshot, opening, lintel, localization));
+        return new ManagerItemViewModel(snapshot, opening, lintel, localization);
     }
 
     // Строковые демонстрационные ID отделены от nullable числового идентификатора Revit.

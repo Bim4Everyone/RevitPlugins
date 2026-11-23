@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,19 +18,43 @@ using RevitLintelsManager.Services;
 namespace RevitLintelsManager.ViewModels;
 
 internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
+    private sealed class VisibleRowCollection : ObservableCollection<ManagerRowViewModel> {
+        /// <summary>Выполняет массовое обновление одним поддерживаемым WPF событием.</summary>
+        public void ReplaceRows(IReadOnlyList<ManagerRowViewModel> rows) {
+            CheckReentrancy();
+            bool countChanged = Count != rows.Count;
+            Items.Clear();
+            foreach(var row in rows) {
+                Items.Add(row);
+            }
+            if(countChanged) {
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
+            }
+            OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+    }
+
     public event Action CloseRequested;
     public event Action<ManagerDetailsViewModel> DetailsRequested;
     public event Action DetailsDismissRequested;
+    public event Action<ManagerScope> ProjectionChanging;
+    public event Action<ManagerScope> ProjectionChanged;
+    private const int _maximumIncrementalChanges = 128;
     private readonly IManagerRequestDispatcher _requests;
     private readonly Dispatcher _dispatcher;
     private readonly ILocalizationService _localization;
-    private readonly ObservableCollection<ManagerRowViewModel> _visibleRows = new();
+    private readonly VisibleRowCollection _visibleRows = new();
+    private readonly HashSet<ManagerGroupKey> _expandedGroups = new();
+    private Dictionary<ManagerItemKey, ManagerItemViewModel> _items = new();
+    private HashSet<ManagerElementViewModel> _elements = new();
     private bool _isBlocked;
     private bool _isRefreshing;
     private string _contextSummary;
     private ManagerDocumentContext _lastContext;
     private int _processingCount;
     private ManagerScopeViewModel _selectedScope;
+    private ManagerScope _projectionScope;
     private IReadOnlyList<ManagerGroupViewModel> _groups = Array.Empty<ManagerGroupViewModel>();
 
     /// <summary>Создаёт команды окна без непосредственных зависимостей от Revit API.</summary>
@@ -41,6 +67,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         Scopes = Enum.GetValues(typeof(ManagerScope)).Cast<ManagerScope>()
             .Select(scope => new ManagerScopeViewModel(scope, localization)).ToList().AsReadOnly();
         _selectedScope = Scopes.First(scope => scope.Scope == state.InitialScope);
+        _projectionScope = state.InitialScope;
         VisibleRows = new ReadOnlyObservableCollection<ManagerRowViewModel>(_visibleRows);
         ContextSummary = localization.GetLocalizedString("Manager.Refresh");
         RefreshCommand = commands.CreateAsync(RefreshContextAsync,
@@ -125,32 +152,59 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         RaisePropertyChanged(nameof(ScopeToolTip));
     }
 
-    /// <summary>Заменяет готовую проекцию групп без получения данных из Revit.</summary>
-    /// <param name="groups">Материализованные заголовки с дочерними строками.</param>
-    public void SetGroups(IReadOnlyList<ManagerGroupViewModel> groups) {
-        var replacement = (groups ?? throw new ArgumentNullException(nameof(groups))).ToList().AsReadOnly();
-        var keys = new HashSet<ManagerItemKey>();
-        if(replacement.Distinct().Count() != replacement.Count
-            || replacement.SelectMany(group => group.Items).Any(item => !keys.Add(item.Snapshot.Key))) {
-            throw new ArgumentException("Строки не должны повторяться между группами.", nameof(groups));
-        }
-        DetailsDismissRequested?.Invoke();
-        foreach(var group in _groups) {
-            group.StateChanged -= OnGroupStateChanged;
-            group.ExpansionChanged -= OnGroupExpansionChanged;
-            if(!replacement.Contains(group)) {
-                group.Dispose();
+    /// <summary>Сверяет полный набор строк и публикует группы для выбранного диапазона.</summary>
+    /// <param name="items">Известные существующие строки, включая скрытые текущим диапазоном.</param>
+    /// <param name="visibleKeys">Ключи строк выбранного диапазона в порядке источника.</param>
+    /// <param name="scope">Диапазон публикуемой проекции.</param>
+    public void SetItems(IReadOnlyList<ManagerItemViewModel> items, IEnumerable<ManagerItemKey> visibleKeys,
+        ManagerScope scope) {
+        var replacement = items.ToDictionary(item => item.Snapshot.Key);
+        var visibleItems = visibleKeys.Distinct().Select(key => replacement[key]).ToList();
+        foreach(var item in items) {
+            if(_items.TryGetValue(item.Snapshot.Key, out var previous) && !ReferenceEquals(previous, item)) {
+                item.RestoreState(previous);
             }
         }
-        _groups = replacement;
-        foreach(var group in _groups) {
-            group.StateChanged += OnGroupStateChanged;
-            group.ExpansionChanged += OnGroupExpansionChanged;
+        _items = replacement;
+        _expandedGroups.IntersectWith(items.Select(item => item.Snapshot.GroupKey));
+
+        var previousGroups = _groups.ToDictionary(group => group.Key);
+        var groups = new List<ManagerGroupViewModel>();
+        foreach(var group in visibleItems.GroupBy(item => item.Snapshot.GroupKey)) {
+            var children = group.ToList();
+            if(previousGroups.TryGetValue(group.Key, out var previous) && previous.Items.SequenceEqual(children)) {
+                groups.Add(previous);
+                continue;
+            }
+            for(int index = 0; index < children.Count; index++) {
+                children[index].IsLastInGroup = index == children.Count - 1;
+            }
+            var first = children[0];
+            var created = new ManagerGroupViewModel(group.Key, first.Opening.Element, first.Lintel.Element,
+                children, _localization) { IsExpanded = _expandedGroups.Contains(group.Key) };
+            created.StateChanged += OnGroupStateChanged;
+            created.ExpansionChanged += OnGroupExpansionChanged;
+            groups.Add(created);
         }
+        if(scope == _projectionScope && _groups.SequenceEqual(groups)) {
+            return;
+        }
+
+        ProjectionChanging?.Invoke(_projectionScope);
+        DetailsDismissRequested?.Invoke();
+        var retainedGroups = new HashSet<ManagerGroupViewModel>(groups);
+        foreach(var group in _groups.Where(group => !retainedGroups.Contains(group))) {
+            group.Dispose();
+        }
+        _projectionScope = scope;
+        _groups = groups.AsReadOnly();
+        _elements = new HashSet<ManagerElementViewModel>(_groups.SelectMany(group =>
+            new[] { group.Opening, group.Lintel }.Concat(
+                group.Items.SelectMany(item => new[] { item.Opening, item.Lintel }))));
         RaisePropertyChanged(nameof(Groups));
-        _processingCount = _groups.Sum(group => group.ProcessingCount);
-        NotifyProcessingCount();
-        RebuildVisibleRows();
+        SetProcessingCount(_groups.Sum(group => group.ProcessingCount));
+        UpdateVisibleRows(CreateVisibleRows());
+        ProjectionChanged?.Invoke(scope);
     }
 
     /// <summary>Обновляет только видимые строки выбранной группы, сохраняя дочерние VM.</summary>
@@ -165,6 +219,9 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
 
     /// <summary>Применяет проверенное в API-контексте состояние исходного документа.</summary>
     public void SetBlocked(bool isBlocked) {
+        if(IsBlocked == isBlocked && !State.IsClosing) {
+            return;
+        }
         State.IsBlocked = isBlocked;
         IsBlocked = isBlocked;
         RaisePropertyChanged(nameof(CanEditRows));
@@ -181,9 +238,15 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
             group.Dispose();
         }
         _groups = Array.Empty<ManagerGroupViewModel>();
+        _items.Clear();
+        _elements.Clear();
+        _expandedGroups.Clear();
         _visibleRows.Clear();
+        CloseRequested = null;
         DetailsRequested = null;
         DetailsDismissRequested = null;
+        ProjectionChanging = null;
+        ProjectionChanged = null;
     }
 
     /// <summary>Обновляет подписи существующих строк при смене языка платформы.</summary>
@@ -194,9 +257,9 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
         foreach(var group in _groups) {
             group.RefreshLocalization(_localization);
-            foreach(var item in group.Items) {
-                item.RefreshLocalization(_localization);
-            }
+        }
+        foreach(var item in _items.Values) {
+            item.RefreshLocalization(_localization);
         }
         RaisePropertyChanged(nameof(ProcessText));
         RaisePropertyChanged(nameof(GeneralMessage));
@@ -212,6 +275,17 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     // Синхронизирует раскрытие CardExpander и прежнюю независимую проекцию строк.
     private void OnGroupExpansionChanged(ManagerGroupViewModel group) {
         DetailsDismissRequested?.Invoke();
+        if(group.IsExpanded) {
+            _expandedGroups.Add(group.Key);
+        } else {
+            _expandedGroups.Remove(group.Key);
+        }
+        if(group.Count > _maximumIncrementalChanges) {
+            ProjectionChanging?.Invoke(_projectionScope);
+            _visibleRows.ReplaceRows(CreateVisibleRows());
+            ProjectionChanged?.Invoke(_projectionScope);
+            return;
+        }
         int index = _visibleRows.IndexOf(group) + 1;
         foreach(var item in group.Items) {
             if(group.IsExpanded) {
@@ -224,9 +298,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
 
     // Отбрасывает команды со старым DataContext после замены или recycling строки.
     private bool ContainsElement(ManagerElementViewModel element) {
-        return _groups.Any(group => ReferenceEquals(group.Opening, element) || ReferenceEquals(group.Lintel, element)
-            || group.Items.Any(item => ReferenceEquals(item.Opening, element)
-                || ReferenceEquals(item.Lintel, element)));
+        return _elements.Contains(element);
     }
 
     // Повторное нажатие выбранного диапазона также обновляет данные существующей командой источника.
@@ -257,25 +329,54 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
 
     // Обновляет итог на величину изменения одной группы, независимо от раскрытия.
     private void OnGroupStateChanged(ManagerGroupViewModel group, int previousCount) {
-        _processingCount += group.ProcessingCount - previousCount;
-        NotifyProcessingCount();
+        SetProcessingCount(_processingCount + group.ProcessingCount - previousCount);
     }
 
     // Оповещает кнопку только после изменения агрегированного количества.
-    private void NotifyProcessingCount() {
+    private void SetProcessingCount(int count) {
+        if(_processingCount == count) {
+            return;
+        }
+        _processingCount = count;
         RaisePropertyChanged(nameof(ProcessingCount));
         RaisePropertyChanged(nameof(ProcessText));
     }
 
-    // В коллекцию попадают только заголовки и дети раскрытых групп, без визуальных контейнеров.
-    private void RebuildVisibleRows() {
-        _visibleRows.Clear();
+    // Собирает заголовки и только видимых детей в порядке текущего диапазона.
+    private List<ManagerRowViewModel> CreateVisibleRows() {
+        var rows = new List<ManagerRowViewModel>();
         foreach(var group in _groups) {
-            _visibleRows.Add(group);
+            rows.Add(group);
             if(group.IsExpanded) {
-                foreach(var item in group.Items) {
-                    _visibleRows.Add(item);
-                }
+                rows.AddRange(group.Items);
+            }
+        }
+        return rows;
+    }
+
+    // Передаёт небольшую дельту без Reset, а массовую замену публикует одним событием WPF.
+    private void UpdateVisibleRows(IReadOnlyList<ManagerRowViewModel> rows) {
+        var existingRows = new HashSet<ManagerRowViewModel>(_visibleRows);
+        var targetRows = new HashSet<ManagerRowViewModel>(rows);
+        int removed = _visibleRows.Count(row => !targetRows.Contains(row));
+        int added = rows.Count(row => !existingRows.Contains(row));
+        if(removed + added > _maximumIncrementalChanges) {
+            _visibleRows.ReplaceRows(rows);
+            return;
+        }
+        for(int index = _visibleRows.Count - 1; index >= 0; index--) {
+            if(!targetRows.Contains(_visibleRows[index])) {
+                _visibleRows.RemoveAt(index);
+            }
+        }
+        for(int index = 0; index < rows.Count; index++) {
+            if(index < _visibleRows.Count && ReferenceEquals(_visibleRows[index], rows[index])) {
+                continue;
+            }
+            if(existingRows.Contains(rows[index])) {
+                _visibleRows.Move(_visibleRows.IndexOf(rows[index]), index);
+            } else {
+                _visibleRows.Insert(index, rows[index]);
             }
         }
     }
