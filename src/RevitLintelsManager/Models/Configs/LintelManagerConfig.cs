@@ -12,6 +12,9 @@ public class LintelManagerConfig {
     public LintelConfigRule LintelConfigRule { get; set; }
     public RevitParam LintelFixParam { get; set; }
     public double? MinimalHeightAboveOpeningMm { get; set; }
+    public double MinimalBearingMm { get; set; }
+    public IReadOnlyList<StructureTypeSelection> ReinforcedConcreteTypes { get; set; } = [];
+    public IReadOnlyList<StructureTypeSelection> SteelTypes { get; set; } = [];
     public IEnumerable<RevitWall> StructureWalls { get; set; }
     public ElementId PhaseId { get; set; }
 }

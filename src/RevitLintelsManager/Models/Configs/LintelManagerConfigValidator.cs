@@ -34,8 +34,14 @@ internal class LintelManagerConfigValidator(RevitRepository repository) : ILinte
             || config.MinimalHeightAboveOpeningMm.Value < 0) {
             errors.Add("Validation.MinimalHeight");
         }
-        if(config.StructureWalls?.Any() != true) {
-            errors.Add("Manager.Validation.StructureWalls");
+        if(double.IsNaN(config.MinimalBearingMm) || double.IsInfinity(config.MinimalBearingMm)
+            || config.MinimalBearingMm < 1) {
+            errors.Add("Manager.Validation.MinimalBearing");
+        }
+        var concreteKeys = ValidateStructureTypes(config.ReinforcedConcreteTypes, errors);
+        var steelKeys = ValidateStructureTypes(config.SteelTypes, errors);
+        if(concreteKeys.Overlaps(steelKeys)) {
+            errors.Add("Manager.Validation.StructureTypeConflict");
         }
         RevitParam[] parameters = [
             family?.LintelWidth, family?.LintelThickness, family?.LintelRightOffset, family?.LintelLeftOffset,
@@ -48,10 +54,10 @@ internal class LintelManagerConfigValidator(RevitRepository repository) : ILinte
         var rules = config.LintelConfigRule?.LintelPlaceRules?.ToArray();
         if(rules is null || rules.Length == 0) {
             errors.Add("Manager.Validation.Rules");
-            return errors.AsReadOnly();
+            return errors.Distinct().ToList().AsReadOnly();
         }
         var types = (family?.RevitLintelFamily?.FamilySymbols ?? []).Select(symbol => symbol.Name).ToHashSet();
-        var wallNames = repository.RevitWalls.Select(wall => wall.WallType.Name).ToHashSet();
+        var wallNames = repository.RevitWalls.ToLookup(wall => wall.WallType.Name);
         var structureNames = (config.StructureWalls ?? []).Select(wall => wall.WallType.Name).ToHashSet();
         var usedWalls = new HashSet<string>();
         var ruleNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -70,8 +76,11 @@ internal class LintelManagerConfigValidator(RevitRepository repository) : ILinte
                 previousMax = range?.MaxWidth;
             }
             foreach(string name in rule.WallTypeNames ?? []) {
-                if(!wallNames.Contains(name)) {
+                int matches = wallNames[name].Count();
+                if(matches == 0) {
                     errors.Add("Validation.MissingWallType");
+                } else if(matches > 1) {
+                    errors.Add("Manager.Validation.AmbiguousWallType");
                 } else if(structureNames.Contains(name)) {
                     errors.Add("Manager.Validation.StructureRuleConflict");
                 } else if(!usedWalls.Add(name)) {
@@ -80,5 +89,27 @@ internal class LintelManagerConfigValidator(RevitRepository repository) : ILinte
             }
         }
         return errors.Distinct().ToList().AsReadOnly();
+    }
+
+    // Проверяет сохранённые ключи одного перечня независимо от другого.
+    private static HashSet<(string Category, string FamilyName, string TypeName)> ValidateStructureTypes(
+        IEnumerable<StructureTypeSelection> selections, ICollection<string> errors) {
+        var keys = new HashSet<(string Category, string FamilyName, string TypeName)>();
+        foreach(var selection in selections) {
+            if(selection.Settings is not null && !keys.Add(selection.Settings.GetKey())) {
+                errors.Add("Manager.Validation.DuplicateStructureType");
+            }
+            string error = selection.Resolution switch {
+                StructureTypeResolution.Resolved => null,
+                StructureTypeResolution.Missing => "Manager.Validation.MissingStructureType",
+                StructureTypeResolution.Ambiguous => "Manager.Validation.AmbiguousStructureType",
+                StructureTypeResolution.UnsupportedCategory => "Manager.Validation.StructureTypeCategory",
+                _ => "Manager.Validation.InvalidStructureType"
+            };
+            if(error is not null) {
+                errors.Add(error);
+            }
+        }
+        return keys;
     }
 }

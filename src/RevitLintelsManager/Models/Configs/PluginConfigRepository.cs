@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-
 using RevitLintelsManager.Models.Settings;
 
 namespace RevitLintelsManager.Models.Configs;
@@ -52,11 +49,10 @@ internal class PluginConfigRepository : IPluginConfigRepository {
             LintelConfigRuleName = _systemPluginConfig.DefaultLintelConfigRuleName,
             LintelFixParamName = _systemPluginConfig.DefaultLintelFixParamName,
             MinimalHeightAboveOpeningMm = _systemPluginConfig.DefaultMinimalHeightAboveLintelMm,
-            StructureWallTypeNames = _revitRepository.RevitWalls
-                .Where(wall => _systemPluginConfig.StructureWallNameParts.Any(part =>
-                    wall.WallType.Name.IndexOf(part, StringComparison.OrdinalIgnoreCase) >= 0))
-                .Select(wall => wall.WallType.Name)
-                .ToArray(),
+            MinimalBearingMm = _systemPluginConfig.DefaultMinimalBearingMm,
+            StructureWallTypeNames = [],
+            ReinforcedConcreteTypes = [],
+            SteelTypes = [],
             PhaseName = _systemPluginConfig.DefaultPhaseName,
         };
     }

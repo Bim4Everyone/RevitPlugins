@@ -17,6 +17,8 @@ using dosymep.WpfUI.Core.SimpleServices;
 
 using Ninject;
 
+using pyRevitLabs.Json;
+
 using RevitLintelsManager.Models;
 using RevitLintelsManager.Models.Configs;
 using RevitLintelsManager.Models.Rules;
@@ -95,11 +97,23 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             // Закрытие при запуске не требует сообщения об ошибке.
         } catch(Exception exception) {
             kernel.Get<ILoggerService>().Warning(exception, "Ошибка запуска менеджера перемычек.");
+            string message = IsInvalidSettingsJson(exception)
+                ? "Manager.Validation.InvalidSettingsJson" : "Manager.StartFailed";
             ShowSettingsWarning(kernel.Get<WpfUIMessageBoxService>(), kernel.Get<ILocalizationService>(),
-                new[] { "Manager.StartFailed" });
+                new[] { message });
         } finally {
             kernel?.Dispose();
         }
+    }
+
+    // Распознаёт ошибку десериализации и при обёртке исключения контейнером DI.
+    private static bool IsInvalidSettingsJson(Exception exception) {
+        for(var cause = exception; cause is not null; cause = cause.InnerException) {
+            if(cause is JsonException) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Регистрирует только общие используемые зависимости; главное окно выбирает вызывающая команда.

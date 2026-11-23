@@ -9,7 +9,9 @@ internal sealed class ManagerConfigSnapshot(
     ConfigElementKey lintelFamily, IEnumerable<ConfigElementKey> lintelTypes,
     IEnumerable<ConfigElementKey> openingFamilies, IEnumerable<ConfigElementKey> structureWallTypes,
     ConfigElementKey phase, IEnumerable<KeyValuePair<string, string>> parameters,
-    string ruleConfigName, IEnumerable<PlacementRuleSnapshot> rules, double minimalHeightAboveOpeningMm) {
+    string ruleConfigName, IEnumerable<PlacementRuleSnapshot> rules, double minimalHeightAboveOpeningMm,
+    double minimalBearingMm, IEnumerable<StructureTypeSelection> reinforcedConcreteTypes,
+    IEnumerable<StructureTypeSelection> steelTypes) {
     public ConfigElementKey LintelFamily { get; } = lintelFamily;
     public IReadOnlyList<ConfigElementKey> LintelTypes { get; } = lintelTypes.ToList().AsReadOnly();
     public IReadOnlyList<ConfigElementKey> OpeningFamilies { get; } = openingFamilies.ToList().AsReadOnly();
@@ -20,6 +22,10 @@ internal sealed class ManagerConfigSnapshot(
     public string RuleConfigName { get; } = ruleConfigName;
     public IReadOnlyList<PlacementRuleSnapshot> Rules { get; } = rules.ToList().AsReadOnly();
     public double MinimalHeightAboveOpeningMm { get; } = minimalHeightAboveOpeningMm;
+    public double MinimalBearingMm { get; } = minimalBearingMm;
+    public IReadOnlyList<StructureTypeSelection> ReinforcedConcreteTypes { get; } =
+        reinforcedConcreteTypes.ToList().AsReadOnly();
+    public IReadOnlyList<StructureTypeSelection> SteelTypes { get; } = steelTypes.ToList().AsReadOnly();
 }
 
 /// <summary>Ключ элемента конфигурации в исходном документе.</summary>

@@ -20,6 +20,7 @@ internal class SettingsViewModel : BaseViewModel {
     private readonly ILocalizationService _localization;
     private readonly IMessageBoxService _messages;
     private readonly ILintelConfigRuleResolver _ruleResolver;
+    private readonly LintelManagerSettings _sourceSettings;
     private string _errorText;
     private bool _hasFamilySettingsErrors;
     private bool _hasPlacementSettingsErrors;
@@ -30,11 +31,12 @@ internal class SettingsViewModel : BaseViewModel {
     public SettingsViewModel(ILocalizationService localization, IPluginConfigRepository configRepository,
         ILintelConfigRuleResolver resolver, IMessageBoxService messages, ISettingsCommandFactory commandFactory,
         FamilySettingsViewModel familySettings, GeneralSettingsViewModel generalSettings,
-        PlacementSettingsViewModel placementSettings) {
+        PlacementSettingsViewModel placementSettings, LintelManagerSettings sourceSettings) {
         _configRepository = configRepository;
         _localization = localization;
         _messages = messages;
         _ruleResolver = resolver;
+        _sourceSettings = sourceSettings;
         FamilySettingsViewModel = familySettings;
         GeneralSettingsViewModel = generalSettings;
         PlacementSettingsViewModel = placementSettings;
@@ -99,16 +101,14 @@ internal class SettingsViewModel : BaseViewModel {
         if(!CanAcceptView()) {
             return;
         }
-        var settings = new LintelManagerSettings {
-            LintelFamilySettings = FamilySettingsViewModel.GetLintelSettings(),
-            OpeningFamilySettings = FamilySettingsViewModel.GetOpeningSettings(),
-            LintelConfigRuleName = PlacementSettingsViewModel.SelectedConfig.Name,
-            LintelWallSettings = PlacementSettingsViewModel.GetWallSettings(),
-            LintelFixParamName = GeneralSettingsViewModel.SelectedFixParameter.RevitParam.Name,
-            MinimalHeightAboveOpeningMm = GeneralSettingsViewModel.GetMinimalHeight(),
-            PhaseName = GeneralSettingsViewModel.SelectedPhase.Name,
-            StructureWallTypeNames = GeneralSettingsViewModel.GetStructureWallNames()
-        };
+        var settings = _sourceSettings.WithStructureWallSelection(GeneralSettingsViewModel.GetStructureWallNames());
+        settings.LintelFamilySettings = FamilySettingsViewModel.GetLintelSettings();
+        settings.OpeningFamilySettings = FamilySettingsViewModel.GetOpeningSettings();
+        settings.LintelConfigRuleName = PlacementSettingsViewModel.SelectedConfig.Name;
+        settings.LintelWallSettings = PlacementSettingsViewModel.GetWallSettings();
+        settings.LintelFixParamName = GeneralSettingsViewModel.SelectedFixParameter.RevitParam.Name;
+        settings.MinimalHeightAboveOpeningMm = GeneralSettingsViewModel.GetMinimalHeight();
+        settings.PhaseName = GeneralSettingsViewModel.SelectedPhase.Name;
         try {
             SettingsFileTransaction.Execute(PlacementSettingsViewModel.GetPendingPaths()
                 .Append(_configRepository.ConfigPath), () => {

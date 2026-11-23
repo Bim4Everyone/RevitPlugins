@@ -20,8 +20,6 @@
     <system:String x:Key="Validation.SelectFixParameter">Выберите общий для выбранных семейств параметр экземпляра типа «Да/Нет».</system:String>
     <system:String x:Key="Validation.SelectPhase">Выберите стадию проекта.</system:String>
     <system:String x:Key="Validation.MinimalHeight">Введите неотрицательную толщину кладки над проёмом в миллиметрах.</system:String>
-    <system:String x:Key="Validation.SelectStructureWalls">Отметьте типы железобетонных стен.</system:String>
-    <system:String x:Key="Validation.MissingStructureWall">Сохранённый тип железобетонной стены отсутствует в проекте. Снимите его отметку.</system:String>
     <system:String x:Key="Validation.SelectConfig">Выберите или создайте конфигурацию правил.</system:String>
     <system:String x:Key="Validation.ConfigRules">Конфигурация должна иметь корректное имя и хотя бы одну вкладку правил.</system:String>
     <system:String x:Key="Validation.RuleName">Имена вкладок правил должны быть заполнены и не повторяться.</system:String>
@@ -89,7 +87,15 @@
     <system:String x:Key="Manager.Validation.SettingsMissing">Настройки проекта не сохранены.</system:String>
     <system:String x:Key="Manager.Validation.LintelFamily">Сохранённое семейство перемычки отсутствует в проекте.</system:String>
     <system:String x:Key="Manager.Validation.OpeningFamilies">Не выбраны семейства проёмов или сохранённое семейство отсутствует.</system:String>
-    <system:String x:Key="Manager.Validation.StructureWalls">Не выбраны типы железобетонных стен или сохранённый тип отсутствует.</system:String>
+    <system:String x:Key="Manager.Validation.MinimalBearing">Минимальное опирание должно быть конечным числом не меньше 1 мм.</system:String>
+    <system:String x:Key="Manager.Validation.MissingStructureType">Сохранённый тип конструкции отсутствует в исходном проекте.</system:String>
+    <system:String x:Key="Manager.Validation.AmbiguousStructureType">Сохранённому ключу конструкции соответствует несколько типов.</system:String>
+    <system:String x:Key="Manager.Validation.InvalidStructureType">Сохранённый ключ конструкции содержит неполные или некорректные данные.</system:String>
+    <system:String x:Key="Manager.Validation.StructureTypeCategory">Категория сохранённого типа недопустима для его перечня конструкций.</system:String>
+    <system:String x:Key="Manager.Validation.DuplicateStructureType">Один и тот же тип указан несколько раз в перечне конструкций.</system:String>
+    <system:String x:Key="Manager.Validation.StructureTypeConflict">Один и тот же тип указан в перечнях железобетонных и металлических конструкций.</system:String>
+    <system:String x:Key="Manager.Validation.AmbiguousWallType">Имени стены в назначении правила соответствует несколько типов.</system:String>
+    <system:String x:Key="Manager.Validation.InvalidSettingsJson">Файл настроек проекта содержит некорректный JSON или поля неверного формата.</system:String>
     <system:String x:Key="Manager.Validation.Parameters">Не удалось разрешить все сопоставленные параметры перемычки и проёмов.</system:String>
     <system:String x:Key="Manager.Validation.Rules">Выбранная конфигурация правил недоступна, пуста или содержит некорректные вкладки.</system:String>
     <system:String x:Key="Manager.Validation.StructureRuleConflict">Тип железобетонной стены не может одновременно иметь правило расстановки.</system:String>

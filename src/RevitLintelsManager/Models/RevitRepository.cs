@@ -5,7 +5,10 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
+
 using RevitLintelsManager.Models.Configs;
+using RevitLintelsManager.Models.Settings;
 
 namespace RevitLintelsManager.Models;
 
@@ -36,6 +39,22 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
             .FirstOrDefault(phaseId =>
                 phaseId != ElementId.InvalidElementId 
                 && Document.GetElement(phaseId)?.Name == name);
+    }
+
+    /// <summary>Читает ключи типов согласованных категорий в исходном документе.</summary>
+    public IReadOnlyList<StructureTypeSelection> GetStructureTypes() {
+        var categories = systemPluginConfig.ReinforcedConcreteCategories.Union(systemPluginConfig.SteelCategories);
+        var filter = new ElementMulticategoryFilter(categories.ToList());
+        using var collector = new FilteredElementCollector(Document);
+        return collector.WherePasses(filter).WhereElementIsElementType().Cast<ElementType>()
+            .Where(type => type.Category is not null)
+            .Select(type => (Type: type, Category: type.Category.GetBuiltInCategory()))
+            .Where(item => item.Category != BuiltInCategory.OST_Walls || item.Type is WallType)
+            .Where(item => item.Type is not FamilySymbol symbol || symbol.Family is not null)
+            .Select(item => new StructureTypeSelection(
+                new StructureTypeSettings(item.Category.ToString(), (item.Type as FamilySymbol)?.Family.Name,
+                    item.Type.Name), StructureTypeResolution.Resolved, item.Type.UniqueId))
+            .ToList().AsReadOnly();
     }
 
     /// <summary>Сохраняет исходный UI-контекст до будущей подготовки служебного вида.</summary>

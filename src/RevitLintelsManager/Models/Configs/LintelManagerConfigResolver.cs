@@ -10,12 +10,21 @@ using RevitLintelsManager.Models.Settings;
 namespace RevitLintelsManager.Models.Configs;
 
 internal class LintelManagerConfigResolver(RevitRepository repository,
-    ILintelConfigRuleResolver ruleResolver, IParamService paramService) : ILintelManagerConfigResolver {
+    ILintelConfigRuleResolver ruleResolver, IParamService paramService, SystemPluginConfig systemConfig)
+    : ILintelManagerConfigResolver {
     /// <inheritdoc />
     public LintelManagerConfig BuildLintelManagerConfig(LintelManagerSettings settings) {
         if(settings is null) {
             return null;
         }
+        var concreteTypes = settings.GetReinforcedConcreteTypes().ToArray();
+        var steelTypes = (settings.SteelTypes ?? []).ToArray();
+        var catalog = concreteTypes.Length + steelTypes.Length == 0 ? [] : repository.GetStructureTypes();
+        var typesByKey = catalog.ToLookup(type => type.Settings.GetKey());
+        var concrete = ResolveStructureTypes(concreteTypes, systemConfig.ReinforcedConcreteCategories, typesByKey);
+        var steel = ResolveStructureTypes(steelTypes, systemConfig.SteelCategories, typesByKey);
+        var structuralWallIds = concrete.Where(type => type.Settings?.IsWallType() == true)
+            .Select(type => type.UniqueId).Where(id => id is not null).ToHashSet();
         var lintelFamily = BuildLintelFamilyConfig(settings.LintelFamilySettings);
         var openingFamilies = BuildOpeningFamilyConfig(settings.OpeningFamilySettings);
         var source = ruleResolver.GetLintelConfigRule(settings.LintelConfigRuleName);
@@ -40,7 +49,11 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
             LintelConfigRule = config,
             LintelFixParam = paramService.GetFixParam(lintelFamily, openingFamilies, settings.LintelFixParamName),
             MinimalHeightAboveOpeningMm = settings.MinimalHeightAboveOpeningMm,
-            StructureWalls = GetStructureWalls(settings.StructureWallTypeNames),
+            MinimalBearingMm = settings.MinimalBearingMm ?? systemConfig.DefaultMinimalBearingMm,
+            ReinforcedConcreteTypes = concrete,
+            SteelTypes = steel,
+            StructureWalls = structuralWallIds.Count == 0 ? []
+                : repository.RevitWalls.Where(wall => structuralWallIds.Contains(wall.WallType.UniqueId)).ToArray(),
             PhaseId = repository.GetPhaseIdByName(settings.PhaseName)
         };
     }
@@ -50,7 +63,7 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
         var family = config.LintelFamilyConfig;
         var opening = config.OpeningFamilyConfig;
         var wallTypes = repository.RevitWalls.Select(wall => wall.WallType)
-            .ToDictionary(wall => wall.Name, wall => new ConfigElementKey(wall.UniqueId, wall.Name));
+            .ToLookup(wall => wall.Name, wall => new ConfigElementKey(wall.UniqueId, wall.Name));
         var parameters = new Dictionary<string, string> {
             [nameof(family.LintelWidth)] = family.LintelWidth.Name,
             [nameof(family.LintelThickness)] = family.LintelThickness.Name,
@@ -69,12 +82,13 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
             new ConfigElementKey(family.RevitLintelFamily.Family.UniqueId, family.RevitLintelFamily.Family.Name),
             family.RevitLintelFamily.FamilySymbols.Select(type => new ConfigElementKey(type.UniqueId, type.Name)),
             opening.RevitOpeningFamily.Select(item => new ConfigElementKey(item.Family.UniqueId, item.Family.Name)),
-            config.StructureWalls.Select(wall => wallTypes[wall.WallType.Name]),
+            config.StructureWalls.Select(wall => new ConfigElementKey(wall.WallType.UniqueId, wall.WallType.Name)),
             new ConfigElementKey(phase.UniqueId, phase.Name), parameters, config.LintelConfigRule.RuleConfigName,
             config.LintelConfigRule.LintelPlaceRules.Select(rule => new PlacementRuleSnapshot(
-                rule.LintelPlaceRuleName, (rule.WallTypeNames ?? []).Select(name => wallTypes[name]),
+                rule.LintelPlaceRuleName, (rule.WallTypeNames ?? []).Select(name => wallTypes[name].Single()),
                 rule.LintelRules.Select(range => new LintelRuleSnapshot(range.MinWidth, range.MaxWidth,
-                    range.WallSupport, range.LintelType)))), config.MinimalHeightAboveOpeningMm.Value);
+                    range.WallSupport, range.LintelType)))), config.MinimalHeightAboveOpeningMm.Value,
+            config.MinimalBearingMm, config.ReinforcedConcreteTypes, config.SteelTypes);
     }
 
     // Разрешает семейство перемычки и сопоставленные параметры.
@@ -111,10 +125,29 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
         };
     }
 
-    // Проверяет разрешимость выбранных конструктивных стен.
-    private IEnumerable<RevitWall> GetStructureWalls(IEnumerable<string> wallTypeNames) {
-        var names = (wallTypeNames ?? []).ToHashSet();
-        var walls = repository.RevitWalls.Where(wall => names.Contains(wall.WallType.Name)).ToArray();
-        return names.Count == walls.Length ? walls : null;
+    // Разрешает составные ключи только в допустимых категориях, сохраняя каждую исходную запись.
+    private static IReadOnlyList<StructureTypeSelection> ResolveStructureTypes(
+        IEnumerable<StructureTypeSettings> settings, IEnumerable<BuiltInCategory> categories,
+        ILookup<(string Category, string FamilyName, string TypeName), StructureTypeSelection> catalog) {
+        var allowed = categories.Select(category => category.ToString()).ToHashSet();
+        var selections = new List<StructureTypeSelection>();
+        foreach(var type in settings) {
+            if(type is null || string.IsNullOrWhiteSpace(type.Category) || string.IsNullOrWhiteSpace(type.TypeName)
+                || (type.FamilyName is not null && string.IsNullOrWhiteSpace(type.FamilyName))) {
+                selections.Add(new StructureTypeSelection(type, StructureTypeResolution.Invalid));
+                continue;
+            }
+            if(!allowed.Contains(type.Category)) {
+                selections.Add(new StructureTypeSelection(type, StructureTypeResolution.UnsupportedCategory));
+                continue;
+            }
+            var matches = catalog[type.GetKey()].Take(2).ToArray();
+            selections.Add(matches.Length switch {
+                0 => new StructureTypeSelection(type, StructureTypeResolution.Missing),
+                1 => new StructureTypeSelection(type, StructureTypeResolution.Resolved, matches[0].UniqueId),
+                _ => new StructureTypeSelection(type, StructureTypeResolution.Ambiguous)
+            });
+        }
+        return selections.AsReadOnly();
     }
 }

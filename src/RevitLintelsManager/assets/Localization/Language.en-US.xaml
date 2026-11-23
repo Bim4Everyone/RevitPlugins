@@ -20,8 +20,6 @@
     <system:String x:Key="Validation.SelectFixParameter">Select an instance Yes/No parameter common to the selected families.</system:String>
     <system:String x:Key="Validation.SelectPhase">Select a project phase.</system:String>
     <system:String x:Key="Validation.MinimalHeight">Enter a nonnegative masonry height above the opening in millimeters.</system:String>
-    <system:String x:Key="Validation.SelectStructureWalls">Select reinforced concrete wall types.</system:String>
-    <system:String x:Key="Validation.MissingStructureWall">A saved reinforced concrete wall type is missing. Clear its selection.</system:String>
     <system:String x:Key="Validation.SelectConfig">Select or create a rule configuration.</system:String>
     <system:String x:Key="Validation.ConfigRules">The configuration must have a valid name and at least one rule tab.</system:String>
     <system:String x:Key="Validation.RuleName">Rule tab names must be nonempty and unique.</system:String>
@@ -89,7 +87,15 @@
     <system:String x:Key="Manager.Validation.SettingsMissing">Project settings have not been saved.</system:String>
     <system:String x:Key="Manager.Validation.LintelFamily">The saved lintel family is missing from the project.</system:String>
     <system:String x:Key="Manager.Validation.OpeningFamilies">Opening families are not selected, or a saved family is missing.</system:String>
-    <system:String x:Key="Manager.Validation.StructureWalls">Structural wall types are not selected, or a saved type is missing.</system:String>
+    <system:String x:Key="Manager.Validation.MinimalBearing">Minimum bearing must be a finite number of at least 1 mm.</system:String>
+    <system:String x:Key="Manager.Validation.MissingStructureType">A saved structural type is missing from the source project.</system:String>
+    <system:String x:Key="Manager.Validation.AmbiguousStructureType">A saved structural type key matches more than one type.</system:String>
+    <system:String x:Key="Manager.Validation.InvalidStructureType">A saved structural type key is incomplete or invalid.</system:String>
+    <system:String x:Key="Manager.Validation.StructureTypeCategory">A saved type category is invalid for its structural type list.</system:String>
+    <system:String x:Key="Manager.Validation.DuplicateStructureType">A structural type appears more than once in its list.</system:String>
+    <system:String x:Key="Manager.Validation.StructureTypeConflict">The same type appears in both the reinforced concrete and steel lists.</system:String>
+    <system:String x:Key="Manager.Validation.AmbiguousWallType">A wall name in a placement rule matches more than one type.</system:String>
+    <system:String x:Key="Manager.Validation.InvalidSettingsJson">The project settings file contains invalid JSON or incorrectly formatted fields.</system:String>
     <system:String x:Key="Manager.Validation.Parameters">Some mapped lintel or opening parameters could not be resolved.</system:String>
     <system:String x:Key="Manager.Validation.Rules">The selected rule configuration is unavailable, empty, or contains invalid rule groups.</system:String>
     <system:String x:Key="Manager.Validation.StructureRuleConflict">A structural wall type cannot also have a placement rule.</system:String>

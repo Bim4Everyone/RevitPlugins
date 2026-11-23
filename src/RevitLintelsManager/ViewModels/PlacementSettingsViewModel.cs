@@ -85,7 +85,7 @@ internal class PlacementSettingsViewModel : BaseViewModel {
         RefreshLintelTypes();
         RefreshWalls();
         _familySettings.SelectionChanged += RefreshLintelTypes;
-        _generalSettings.StructureWallsChanged += RefreshWalls;
+        _generalSettings.StructureWallsChanged += OnStructureWallsChanged;
     }
 
     public ObservableCollection<LintelConfigRuleViewModel> Configs { get; } = [];
@@ -216,7 +216,13 @@ internal class PlacementSettingsViewModel : BaseViewModel {
         CommandManager.InvalidateRequerySuggested();
     }
 
-    private void RefreshWalls() {
+    // Снимает конфликтующие назначения только после явного изменения списка стен пользователем.
+    private void OnStructureWallsChanged(WallTypeViewModel wall) {
+        RefreshWalls(wall.IsChecked ? wall.Name : null);
+    }
+
+    // Обновляет доступность стен, сохраняя загруженные назначения при открытии настройки.
+    private void RefreshWalls(string newlySelectedWall = null) {
         if(_updating) {
             return;
         }
@@ -229,11 +235,11 @@ internal class PlacementSettingsViewModel : BaseViewModel {
                         .SelectMany(other => other.Walls.Where(wall => wall.IsChecked))
                         .Select(wall => wall.Name).ToHashSet();
                     foreach(var wall in rule.Walls) {
-                        if(structureNames.Contains(wall.Name)) {
+                        bool isStructural = structureNames.Contains(wall.Name);
+                        if(newlySelectedWall is not null && wall.Name == newlySelectedWall) {
                             wall.IsChecked = false;
                         }
-                        wall.IsAvailable = !structureNames.Contains(wall.Name)
-                                           && (wall.IsChecked || !usedNames.Contains(wall.Name));
+                        wall.IsAvailable = wall.IsChecked || (!isStructural && !usedNames.Contains(wall.Name));
                     }
                     rule.ApplySearchWalls();
                 }
@@ -248,6 +254,7 @@ internal class PlacementSettingsViewModel : BaseViewModel {
             return Text("Validation.ConfigRules");
         }
         var types = LintelTypes.ToHashSet();
+        var structureNames = _generalSettings.GetStructureWallNames().ToHashSet();
         var usedWalls = new HashSet<string>();
         var ruleNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         string configError = null;
@@ -276,6 +283,9 @@ internal class PlacementSettingsViewModel : BaseViewModel {
             foreach(var wall in rule.Walls.Where(wall => wall.IsChecked)) {
                 if(wall.WallType is null) {
                     error ??= Text("Validation.MissingWallType");
+                }
+                if(structureNames.Contains(wall.Name)) {
+                    error ??= Text("Manager.Validation.StructureRuleConflict");
                 }
                 if(!usedWalls.Add(wall.Name)) {
                     error ??= Text("Validation.DuplicateWall");

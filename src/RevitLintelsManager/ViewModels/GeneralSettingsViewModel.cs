@@ -15,7 +15,7 @@ using RevitLintelsManager.Services;
 namespace RevitLintelsManager.ViewModels;
 
 internal class GeneralSettingsViewModel : BaseViewModel {
-    public event Action StructureWallsChanged;
+    public event Action<WallTypeViewModel> StructureWallsChanged;
 
     private readonly ILocalizationService _localizationService;
     private readonly IParamService _paramService;
@@ -40,7 +40,8 @@ internal class GeneralSettingsViewModel : BaseViewModel {
             new ItemViewModel { Name = repository.Document.GetElement(id).Name }));
         SelectedPhase = Phases.FirstOrDefault(phase => phase.Name == settings.PhaseName);
         MinimalHeightText = settings.MinimalHeightAboveOpeningMm.ToString(CultureInfo.CurrentCulture);
-        var selectedNames = (settings.StructureWallTypeNames ?? []).ToHashSet();
+        var selectedNames = settings.GetReinforcedConcreteTypes().Where(type => type?.IsWallType() == true)
+            .Select(type => type.TypeName).ToHashSet();
         var walls = repository.RevitWalls.Select(wall => new WallTypeViewModel {
             Name = wall.WallType.Name,
             WallType = wall.WallType,
@@ -117,17 +118,13 @@ internal class GeneralSettingsViewModel : BaseViewModel {
             || double.IsNaN(height) || double.IsInfinity(height) || height < 0) {
             return _localizationService.GetLocalizedString("Validation.MinimalHeight");
         }
-        if(!StructureWalls.Any(wall => wall.IsChecked)) {
-            return _localizationService.GetLocalizedString("Validation.SelectStructureWalls");
-        }
-        return StructureWalls.Any(wall => wall.IsChecked && wall.WallType is null)
-            ? _localizationService.GetLocalizedString("Validation.MissingStructureWall") : null;
+        return null;
     }
 
     private void ApplySearchStructureWalls() {
         FilteredStructureWalls = new ObservableCollection<WallTypeViewModel>(string.IsNullOrEmpty(WallSearchText)
             ? StructureWalls
-            : StructureWalls.Where(wall => wall.Name.IndexOf(WallSearchText,
+            : StructureWalls.Where(wall => wall.Name?.IndexOf(WallSearchText,
                 StringComparison.OrdinalIgnoreCase) >= 0));
     }
 
@@ -143,8 +140,8 @@ internal class GeneralSettingsViewModel : BaseViewModel {
     }
 
     private void OnWallChanged(object sender, PropertyChangedEventArgs e) {
-        if(e.PropertyName == nameof(WallTypeViewModel.IsChecked)) {
-            StructureWallsChanged?.Invoke();
+        if(e.PropertyName == nameof(WallTypeViewModel.IsChecked) && sender is WallTypeViewModel wall) {
+            StructureWallsChanged?.Invoke(wall);
         }
     }
 }

@@ -50,6 +50,21 @@ public class SystemPluginConfig {
         BuiltInCategory.OST_Doors,    
         BuiltInCategory.OST_Windows
     ];
+
+    public IReadOnlyList<BuiltInCategory> ReinforcedConcreteCategories { get; } = Array.AsReadOnly(new[] {
+        BuiltInCategory.OST_Walls,
+        BuiltInCategory.OST_Floors,
+        BuiltInCategory.OST_StructuralFraming,
+        BuiltInCategory.OST_StructuralColumns,
+        BuiltInCategory.OST_StructuralFoundation
+    });
+
+    public IReadOnlyList<BuiltInCategory> SteelCategories { get; } = Array.AsReadOnly(new[] {
+        BuiltInCategory.OST_StructuralFraming,
+        BuiltInCategory.OST_StructuralColumns
+    });
+
+    public double DefaultMinimalBearingMm => 70;
     
     public string DefaultLintelFamilyName  => "ОбщМд_Перемычка";
     public string LintelWidthParamName  => "Ширина проема";
@@ -73,7 +88,6 @@ public class SystemPluginConfig {
     public string DefaultLintelConfigRuleName  => "A101";
     public string DefaultLintelFixParamName  => "ФОП_Фиксация решения";
     public double DefaultMinimalHeightAboveLintelMm  => 100;
-    public IEnumerable<string> StructureWallNameParts => ["(ЖБ)", "(К)", "(КР)"];
     public string DefaultPhaseName  => "Основная планировка";
     public string DefaultRuleFolderName  => "Rules";
     public string DefaultSettingFolderName  => "dosymep";
