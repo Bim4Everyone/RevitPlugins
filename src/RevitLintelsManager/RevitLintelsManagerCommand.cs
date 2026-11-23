@@ -33,8 +33,6 @@ namespace RevitLintelsManager;
 
 [Transaction(TransactionMode.Manual)]
 public class RevitLintelsManagerCommand : BasePluginCommand {
-    private static IManagerSession _session;
-
     /// <summary>Создаёт основную команду менеджера.</summary>
     public RevitLintelsManagerCommand() {
         PluginName = "Менеджер перемычек";
@@ -42,12 +40,14 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
 
     /// <summary>Проверяет настройки и передаёт владение контейнером немодальной сессии.</summary>
     protected override void Execute(UIApplication uiApplication) {
-        if(_session is not null) {
-            _session.Activate();
+        var registration = ManagerSessionRegistration.RegisterOrActivate();
+        if(registration is null) {
             return;
         }
-        IKernel kernel = uiApplication.CreatePlatformServices();
+        IKernel kernel = null;
         try {
+            registration.KeepWindowResources();
+            kernel = uiApplication.CreatePlatformServices();
             ConfigureDependencies(kernel);
             var messages = kernel.Get<WpfUIMessageBoxService>();
             var localization = kernel.Get<ILocalizationService>();
@@ -65,22 +65,12 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             }
             var snapshot = resolver.CreateSnapshot(config);
             var repository = kernel.Get<RevitRepository>();
-#if LINTELS_DEMO
             var state = repository.CaptureInitialState(snapshot);
-#else
-            var state = repository.CaptureProjectState(snapshot);
-#endif
             repository.ReleaseCatalogs();
             kernel.Bind<ManagerSessionState>().ToConstant(state);
             kernel.Bind<WindowPlatformEvents>().ToSelf().InSingletonScope();
             kernel.Bind<Dispatcher>().ToConstant(Dispatcher.CurrentDispatcher);
-#if LINTELS_DEMO
-            kernel.Bind<ManagerDemoSource>().ToSelf().InSingletonScope();
-            kernel.Bind<IManagerRequestDispatcher>()
-                .ToMethod(context => context.Kernel.Get<ManagerDemoSource>());
-#else
             kernel.Bind<IManagerRequestDispatcher>().To<ManagerExternalEventHandler>().InSingletonScope();
-#endif
             kernel.Bind<ManagerDetailsWindow>().ToSelf();
             kernel.Bind<Func<ManagerDetailsWindow>>().ToMethod(context => {
                 var owner = context.Kernel;
@@ -89,27 +79,30 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             kernel.BindMainWindow<ManagerViewModel, ManagerWindow>();
             kernel.Bind<IManagerSession>().To<ManagerSession>().InSingletonScope();
             var viewModel = kernel.Get<ManagerViewModel>();
-#if LINTELS_DEMO
-            kernel.Get<ManagerDemoSource>().Connect(viewModel, kernel.Get<ISettingsCommandFactory>());
-#endif
             var session = kernel.Get<IManagerSession>();
-            session.Released += OnSessionReleased;
+            session.Released += registration.Dispose;
             session.Start(kernel);
-            _session = session;
+            registration.SetActivation(session.Activate);
+            registration = null;
             kernel = null;
-#if !LINTELS_DEMO
             Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => viewModel.RefreshCommand.Execute(null)));
-#endif
         } catch(OperationCanceledException) {
             // Закрытие при запуске не требует сообщения об ошибке.
         } catch(Exception exception) {
+            if(kernel is null) {
+                throw;
+            }
             kernel.Get<ILoggerService>().Warning(exception, "Ошибка запуска менеджера перемычек.");
             string message = IsInvalidSettingsJson(exception)
                 ? "Manager.Validation.InvalidSettingsJson" : "Manager.StartFailed";
             ShowSettingsWarning(kernel.Get<WpfUIMessageBoxService>(), kernel.Get<ILocalizationService>(),
                 new[] { message });
         } finally {
-            kernel?.Dispose();
+            try {
+                kernel?.Dispose();
+            } finally {
+                registration?.Dispose();
+            }
         }
     }
 
@@ -171,10 +164,5 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             + localization.GetLocalizedString("Manager.SettingsCommandHint"),
             localization.GetLocalizedString("RevitLintelsManagerCommand.SettingsCheckNecessaryMessageTitle"),
             MessageBoxButton.OK, MessageBoxImage.Warning);
-    }
-
-    // Удаляет единственную ссылку после фактического освобождения сессии.
-    private static void OnSessionReleased() {
-        _session = null;
     }
 }

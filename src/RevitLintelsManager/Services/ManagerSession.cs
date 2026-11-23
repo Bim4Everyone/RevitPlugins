@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
@@ -8,6 +9,7 @@ using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using Ninject;
@@ -28,6 +30,9 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
     private bool _documentClosing;
     private bool _releaseScheduled;
     private bool _started;
+    private bool _refreshAfterReturn;
+    private long? _observedGeneration;
+    private ManagerScopeStamp _observedScope;
 
     public event Action Released;
 
@@ -44,6 +49,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             repository.UIApplication.ViewActivated += OnViewActivated;
             repository.Application.DocumentClosing += OnDocumentClosing;
             repository.Application.DocumentClosed += OnDocumentClosed;
+            repository.Application.DocumentChanged += OnDocumentChanged;
             repository.UIApplication.ApplicationClosing += OnApplicationClosing;
             window.Closed += OnWindowClosed;
             window.Closing += OnWindowClosing;
@@ -115,6 +121,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
         _documentClosing = false;
         UpdateDocumentState();
         requests.PumpInApiContext();
+        RefreshChangedScope();
     }
 
     // Блокирует окно сразу после смены активного документа.
@@ -137,6 +144,22 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
         }
     }
 
+    // Инвалидирует снимок исходного документа без автоматического чтения после правки или Undo.
+    private void OnDocumentChanged(object sender, DocumentChangedEventArgs e) {
+        if(viewModel.State.IsClosing || !repository.Document.IsValidObject
+            || !repository.Document.Equals(e.GetDocument())) {
+            return;
+        }
+        if(viewModel.IsRefreshing && viewModel.LastContext?.ScopeStamp is { } acceptedScope
+            && _observedScope?.Scope == acceptedScope.Scope) {
+            // Позволяет Idling снова заметить смену источника, если её запрос ещё не применён.
+            _observedScope = acceptedScope;
+        }
+        viewModel.State.AdvanceGeneration();
+        requests.InvalidateRequests();
+        viewModel.InvalidateModel(e.GetDeletedElementIds().Select(id => (long) id.GetIdValue()));
+    }
+
     // Завершает сессию при выходе из приложения.
     private void OnApplicationClosing(object sender, ApplicationClosingEventArgs e) {
         FinishInApiContext();
@@ -156,8 +179,33 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
         if(viewModel.State.IsBlocked != isBlocked) {
             viewModel.State.AdvanceGeneration();
             requests.InvalidateRequests();
+            _refreshAfterReturn = !isBlocked;
         }
         viewModel.SetBlocked(isBlocked);
+    }
+
+    // Сравнивает источник текущего диапазона на Idling и ставит изменившийся диапазон в существующую очередь.
+    private void RefreshChangedScope() {
+        if(_kernel is null || !viewModel.RefreshCommand.CanExecute(null)) {
+            return;
+        }
+        var context = viewModel.LastContext;
+        if(context is not null && _observedGeneration != context.Generation) {
+            _observedGeneration = context.Generation;
+            _observedScope = context.ScopeStamp;
+        }
+        var scope = viewModel.SelectedScope?.Scope ?? viewModel.State.InitialScope;
+        if(!_refreshAfterReturn && (_observedScope is null || scope == ManagerScope.Project)) {
+            return;
+        }
+
+        var currentScope = repository.CaptureScopeStamp(scope);
+        bool sourceChanged = _observedScope?.Scope == scope && !_observedScope.Matches(currentScope);
+        _observedScope = currentScope;
+        if(_refreshAfterReturn || sourceChanged) {
+            _refreshAfterReturn = false;
+            viewModel.RefreshCommand.Execute(null);
+        }
     }
 
     // Снимает API-подписки до выхода из callback, а контейнер освобождает после его возврата.
@@ -184,6 +232,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
         repository.UIApplication.ViewActivated -= OnViewActivated;
         repository.Application.DocumentClosing -= OnDocumentClosing;
         repository.Application.DocumentClosed -= OnDocumentClosed;
+        repository.Application.DocumentChanged -= OnDocumentChanged;
         repository.UIApplication.ApplicationClosing -= OnApplicationClosing;
         window.Closed -= OnWindowClosed;
         window.Closing -= OnWindowClosing;

@@ -183,7 +183,7 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
     // Читает модель только внутри Execute и повторно проверяет поколение перед публикацией результата.
     private void ReadContext(UIApplication app, PendingRequest pending) {
         try {
-            var context = _repository.ReadDocumentContext(app, pending.Request, _state.Config);
+            var context = _repository.ReadDocumentContext(app, pending.Request, _state);
             lock(_sync) {
                 if(context is null || !IsCurrent(pending.Request)) {
                     pending.Completion.TrySetCanceled();

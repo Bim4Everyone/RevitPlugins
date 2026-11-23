@@ -54,7 +54,7 @@
                 SelectedItem="{Binding SelectedScope, Mode=TwoWay}"
                 ItemInvokedCommand="{Binding SelectScopeCommand}"
                 ToolTipService.ShowOnDisabled="True"
-                ToolTip="{Binding ScopeToolTip}" />
+                ToolTip="{Binding ContextSummary}" />
             <ui:Button
                 Width="33"
                 Height="33"

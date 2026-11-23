@@ -22,30 +22,34 @@ internal partial class RevitRepository {
         public bool IsOpening { get; } = isOpening;
     }
 
-    // Собирает данные документа целиком, не читая геометрию и видимость на виде.
-    private ManagerProjectSnapshot ReadProject(ManagerConfigSnapshot config) {
-        if(Document.GetElement(config.Phase.UniqueId) is not Phase phase) {
-            throw new InvalidOperationException("Настроенная стадия удалена из исходного документа.");
-        }
+    // Собирает факты экземпляров из переданного диапазона и опорные данные по всему проекту при его выборе.
+    private ManagerProjectSnapshot ReadScopeSnapshot(ManagerConfigSnapshot config, ElementId phaseId,
+        ManagerScope scope, FilteredElementCollector collector) {
         var openings = new List<ManagerOpeningSnapshot>();
         var lintels = new List<ManagerLintelSnapshot>();
         var walls = new List<ManagerWallSnapshot>();
         var structures = new List<ManagerStructureSnapshot>();
         var phaseNames = Document.Phases.Cast<Phase>().ToDictionary(item => item.Id, item => item.Name);
-        var phaseId = phase.Id;
-        int unreadableCount = ReadProjectFamilies(config, phaseId, phaseNames, openings, lintels)
-            + ReadProjectStructures(config, phaseId, phaseNames, walls, structures);
+        int unreadableCount = collector is null ? 0
+            : ReadFamilySnapshots(collector, config, phaseId, phaseNames, openings, lintels);
+        if(scope == ManagerScope.Project) {
+            unreadableCount += ReadProjectStructures(config, phaseId, phaseNames, walls, structures);
+        }
         return new ManagerProjectSnapshot(openings, lintels, walls, structures, unreadableCount);
     }
 
-    // Разрешает семейство по ключу один раз на тип; экземпляры отбирает без фильтра по активному виду.
-    private int ReadProjectFamilies(ManagerConfigSnapshot config, ElementId phaseId,
+    // Получает стадию из неизменяемой конфигурации текущей сессии.
+    private ElementId GetReadPhaseId(ManagerConfigSnapshot config) {
+        if(Document.GetElement(config.Phase.UniqueId) is not Phase phase) {
+            throw new InvalidOperationException("Настроенная стадия удалена из исходного документа.");
+        }
+        return phase.Id;
+    }
+
+    // Материализует экземпляры области с переиспользованием справочных данных за одно чтение.
+    private int ReadFamilySnapshots(FilteredElementCollector collector, ManagerConfigSnapshot config, ElementId phaseId,
         IReadOnlyDictionary<ElementId, string> phaseNames,
         ICollection<ManagerOpeningSnapshot> openings, ICollection<ManagerLintelSnapshot> lintels) {
-        using var categories = new ElementMulticategoryFilter(
-            systemPluginConfig.DefaultOpeningCats.Union(systemPluginConfig.DefaultLintelCats).ToList());
-        var openingFamilies = new HashSet<string>(config.OpeningFamilies.Select(family => family.UniqueId));
-        var types = new Dictionary<ElementId, ProjectFamilyType>();
         var elementNames = new Dictionary<ElementId, string>();
         var worksetNames = new Dictionary<WorksetId, string>();
         using var worksets = Document.GetWorksetTable();
@@ -55,23 +59,9 @@ internal partial class RevitRepository {
             ? null : GetCachedName(id, elementNames, readElementName);
         Func<WorksetId, string> getWorksetName = id => id is null
             ? null : GetCachedName(id, worksetNames, readWorksetName);
-        using var instances = new FilteredElementCollector(Document);
-        instances.WherePasses(categories).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType();
         int unreadableCount = 0;
-        foreach(FamilyInstance instance in instances) {
+        foreach(var (instance, type) in GetMatchingFamilies(collector, config, phaseId, () => unreadableCount++)) {
             try {
-                var typeId = instance.GetTypeId();
-                if(typeId is null || typeId == ElementId.InvalidElementId) {
-                    unreadableCount++;
-                    continue;
-                }
-                if(!types.TryGetValue(typeId, out var type)) {
-                    type = ResolveProjectFamilyType(typeId, openingFamilies, config.LintelFamily.UniqueId);
-                    types.Add(typeId, type);
-                }
-                if(type is null || !ExistsOnPhase(instance, phaseId)) {
-                    continue;
-                }
                 var element = ReadFamilySnapshot(instance, type, phaseNames, config.Parameters,
                     getElementName, getWorksetName);
                 if(type.IsOpening) {
@@ -86,15 +76,50 @@ internal partial class RevitRepository {
         return unreadableCount;
     }
 
+    // Применяет общий отбор экземпляров по категории, семейству и стадии внутри одного API-вызова.
+    private IEnumerable<(FamilyInstance Instance, ProjectFamilyType Type)> GetMatchingFamilies(
+        FilteredElementCollector collector, ManagerConfigSnapshot config, ElementId phaseId, Action unreadable = null) {
+        using var categories = new ElementMulticategoryFilter(
+            systemPluginConfig.DefaultOpeningCats.Union(systemPluginConfig.DefaultLintelCats).ToList());
+        var openingFamilies = new HashSet<string>(config.OpeningFamilies.Select(family => family.UniqueId));
+        var types = new Dictionary<ElementId, ProjectFamilyType>();
+        collector.WherePasses(categories).OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType();
+        foreach(FamilyInstance instance in collector) {
+            ProjectFamilyType type;
+            try {
+                var typeId = instance.GetTypeId();
+                if(typeId is null || typeId == ElementId.InvalidElementId) {
+                    unreadable?.Invoke();
+                    continue;
+                }
+                if(!types.TryGetValue(typeId, out type)) {
+                    type = ResolveProjectFamilyType(typeId, openingFamilies, config.LintelFamily.UniqueId);
+                    types.Add(typeId, type);
+                }
+                if(type is null || !ExistsOnPhase(instance, phaseId)) {
+                    continue;
+                }
+            } catch(Exception exception) when(IsElementReadException(exception)) {
+                unreadable?.Invoke();
+                continue;
+            }
+            yield return (instance, type);
+        }
+    }
+
     // Сопоставляет тип с настроенным семейством по UniqueId.
     private ProjectFamilyType ResolveProjectFamilyType(ElementId typeId, HashSet<string> openingFamilies,
         string lintelFamily) {
-        if(Document.GetElement(typeId) is not FamilySymbol symbol || symbol.Family is not Family family) {
+        if(Document.GetElement(typeId) is not FamilySymbol symbol || symbol.Family is not Family family
+            || symbol.Category is not Category category) {
             return null;
         }
         string familyId = family.UniqueId;
-        bool isOpening = openingFamilies.Contains(familyId);
-        return isOpening || familyId == lintelFamily ? new ProjectFamilyType(symbol, family, isOpening) : null;
+        var categoryId = category.GetBuiltInCategory();
+        bool isOpening = openingFamilies.Contains(familyId)
+            && systemPluginConfig.DefaultOpeningCats.Contains(categoryId);
+        bool isLintel = familyId == lintelFamily && systemPluginConfig.DefaultLintelCats.Contains(categoryId);
+        return isOpening || isLintel ? new ProjectFamilyType(symbol, family, isOpening) : null;
     }
 
     // Материализует сведения элемента, оставляя недоступные поля пустыми.

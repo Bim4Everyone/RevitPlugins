@@ -46,10 +46,14 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private readonly ILocalizationService _localization;
     private readonly VisibleRowCollection _visibleRows = new();
     private readonly HashSet<ManagerGroupKey> _expandedGroups = new();
+    private readonly Dictionary<ManagerItemKey, ManagerItemState> _hiddenState = new();
+    private readonly HashSet<ManagerItemKey> _deletionCandidates = new();
     private Dictionary<ManagerItemKey, ManagerItemViewModel> _items = new();
     private HashSet<ManagerElementViewModel> _elements = new();
     private bool _isBlocked;
     private bool _isRefreshing;
+    private bool _firstRead = true;
+    private bool _modelIsDirty;
     private string _contextSummary;
     private string _readError;
     private ManagerDocumentContext _lastContext;
@@ -79,10 +83,10 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
             group => SetExpanded(group, !group.IsExpanded),
             group => !IsBlocked && !State.IsClosing && !IsRefreshing && _groups.Contains(group));
         ShowInformationCommand = commands.Create<ManagerElementViewModel>(
-            element => DetailsRequested?.Invoke(new ManagerDetailsViewModel(element, false, _localization)),
+            element => ShowDetails(element, false),
             element => CanEditRows && element.ShowInformation && ContainsElement(element));
         ShowWarningsCommand = commands.Create<ManagerElementViewModel>(
-            element => DetailsRequested?.Invoke(new ManagerDetailsViewModel(element, true, _localization)),
+            element => ShowDetails(element, true),
             element => CanEditRows && element.ShowStatus && ContainsElement(element));
     }
 
@@ -100,12 +104,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public ICommand ToggleGroupCommand { get; }
     public ICommand ShowInformationCommand { get; }
     public ICommand ShowWarningsCommand { get; }
-    public ICommand ProjectScopeCommand { get; private set; }
-    public ICommand ViewScopeCommand { get; private set; }
-    public ICommand SelectedScopeCommand { get; private set; }
-    public bool CanChangeScope => CanEditRows && ProjectScopeCommand is not null;
-    public string ScopeToolTip => ProjectScopeCommand is null && LastContext?.Project is null
-        ? _localization.GetLocalizedString("Manager.NotImplemented") : ContextSummary;
+    public bool CanChangeScope => CanEditRows;
     public int ProcessingCount => _processingCount;
     public string ProcessText => string.Format(CultureInfo.CurrentCulture,
         _localization.GetLocalizedString("Manager.ProcessCount"), ProcessingCount);
@@ -113,7 +112,8 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public string GeneralMessage => State.IsClosing ? _localization.GetLocalizedString("Manager.Closing")
         : IsBlocked ? _localization.GetLocalizedString("Manager.DocumentChanged")
         : IsRefreshing ? _localization.GetLocalizedString("Manager.Busy")
-        : _readError ?? GetProjectMessage();
+        : _readError is not null ? GetReadErrorMessage()
+        : _modelIsDirty ? _localization.GetLocalizedString("Manager.DataOutdated") : GetProjectMessage();
     public bool HasGeneralMessage => GeneralMessage is not null;
     public ManagerDocumentContext LastContext {
         get => _lastContext;
@@ -121,10 +121,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     }
     public string ContextSummary {
         get => _contextSummary;
-        private set {
-            RaiseAndSetIfChanged(ref _contextSummary, value);
-            RaisePropertyChanged(nameof(ScopeToolTip));
-        }
+        private set => RaiseAndSetIfChanged(ref _contextSummary, value);
     }
     public bool IsRefreshing {
         get => _isRefreshing;
@@ -139,40 +136,29 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         private set => RaiseAndSetIfChanged(ref _isBlocked, value);
     }
 
-    /// <summary>Подключает команды диапазонов из композиции, когда источник поддерживает их.</summary>
-    /// <param name="project">Команда всего набора.</param>
-    /// <param name="view">Команда набора видимых элементов.</param>
-    /// <param name="selected">Команда набора выделенных элементов.</param>
-    public void SetScopeCommands(ICommand project, ICommand view, ICommand selected) {
-        ProjectScopeCommand = project;
-        ViewScopeCommand = view;
-        SelectedScopeCommand = selected;
-        RaisePropertyChanged(nameof(ProjectScopeCommand));
-        RaisePropertyChanged(nameof(ViewScopeCommand));
-        RaisePropertyChanged(nameof(SelectedScopeCommand));
-        RaisePropertyChanged(nameof(CanChangeScope));
-        RaisePropertyChanged(nameof(ScopeToolTip));
+    /// <summary>Помечает отображаемые данные устаревшими и запоминает кандидатов на удаление.</summary>
+    public void InvalidateModel(IEnumerable<long> deletedIds) {
+        var deleted = new HashSet<long>(deletedIds);
+        if(deleted.Count > 0) {
+            CollectDeletionCandidates(deleted);
+        }
+        if(!_firstRead && !_modelIsDirty) {
+            _modelIsDirty = true;
+            RaisePropertyChanged(nameof(GeneralMessage));
+            RaisePropertyChanged(nameof(HasGeneralMessage));
+        }
     }
 
-    /// <summary>Сверяет полный набор строк и публикует группы для выбранного диапазона.</summary>
-    /// <param name="items">Известные существующие строки, включая скрытые текущим диапазоном.</param>
-    /// <param name="visibleKeys">Ключи строк выбранного диапазона в порядке источника.</param>
+    /// <summary>Сверяет прочитанные строки и публикует группы выбранного диапазона.</summary>
+    /// <param name="items">Строки, полученные от источника для сверки.</param>
     /// <param name="scope">Диапазон публикуемой проекции.</param>
-    public void SetItems(IReadOnlyList<ManagerItemViewModel> items, IEnumerable<ManagerItemKey> visibleKeys,
-        ManagerScope scope) {
-        var replacement = items.ToDictionary(item => item.Snapshot.Key);
-        var visibleItems = visibleKeys.Distinct().Select(key => replacement[key]).ToList();
-        foreach(var item in items) {
-            if(_items.TryGetValue(item.Snapshot.Key, out var previous) && !ReferenceEquals(previous, item)) {
-                item.RestoreState(previous);
-            }
-        }
-        _items = replacement;
-        _expandedGroups.IntersectWith(items.Select(item => item.Snapshot.GroupKey));
+    /// <param name="retainUnseen">Сохранять состояние строк вне прочитанной выборки.</param>
+    public void SetItems(IReadOnlyList<ManagerItemViewModel> items, ManagerScope scope, bool retainUnseen = false) {
+        ReconcileItemStates(items, retainUnseen);
 
         var previousGroups = _groups.ToDictionary(group => group.Key);
         var groups = new List<ManagerGroupViewModel>();
-        foreach(var group in visibleItems.GroupBy(item => item.Snapshot.GroupKey)) {
+        foreach(var group in items.GroupBy(item => item.Snapshot.GroupKey)) {
             var children = group.ToList();
             if(previousGroups.TryGetValue(group.Key, out var previous) && previous.Items.SequenceEqual(children)) {
                 groups.Add(previous);
@@ -193,7 +179,9 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
 
         ProjectionChanging?.Invoke(_projectionScope);
-        DetailsDismissRequested?.Invoke();
+        if(scope != _projectionScope) {
+            DetailsDismissRequested?.Invoke();
+        }
         var retainedGroups = new HashSet<ManagerGroupViewModel>(groups);
         foreach(var group in _groups.Where(group => !retainedGroups.Contains(group))) {
             group.Dispose();
@@ -207,6 +195,54 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         SetProcessingCount(_groups.Sum(group => group.ProcessingCount));
         UpdateVisibleRows(CreateVisibleRows());
         ProjectionChanged?.Invoke(scope);
+    }
+
+    // Хранит объекты представления только для текущей выборки и восстанавливает состояние по ключу строки.
+    private void ReconcileItemStates(IReadOnlyList<ManagerItemViewModel> items, bool retainUnseen) {
+        var replacement = items.ToDictionary(item => item.Snapshot.Key);
+        foreach(var item in items) {
+            var key = item.Snapshot.Key;
+            if(_items.TryGetValue(key, out var previous)) {
+                if(!ReferenceEquals(previous, item)) {
+                    item.RestoreState(previous.CaptureState());
+                }
+            } else if(_hiddenState.TryGetValue(key, out var state)) {
+                item.RestoreState(state);
+                _hiddenState.Remove(key);
+            }
+        }
+        if(retainUnseen) {
+            foreach(var previous in _items) {
+                if(!replacement.ContainsKey(previous.Key)) {
+                    _hiddenState[previous.Key] = previous.Value.CaptureState();
+                }
+            }
+        } else {
+            _hiddenState.Clear();
+        }
+        _items = replacement;
+        _expandedGroups.IntersectWith(items.Select(item => item.Snapshot.GroupKey)
+            .Concat(_hiddenState.Values.Select(state => state.GroupKey)));
+    }
+
+    // Сопоставляет числовые ID из события с известными ключами, которые проверит следующий запрос.
+    private void CollectDeletionCandidates(HashSet<long> deleted) {
+        foreach(var row in _items) {
+            if(IsDeletionCandidate(row.Value.CaptureState(), deleted)) {
+                _deletionCandidates.Add(row.Key);
+            }
+        }
+        foreach(var row in _hiddenState) {
+            if(IsDeletionCandidate(row.Value, deleted)) {
+                _deletionCandidates.Add(row.Key);
+            }
+        }
+    }
+
+    // У пары достаточно проверить исчезновение любого из её элементов.
+    private static bool IsDeletionCandidate(ManagerItemState state, HashSet<long> deleted) {
+        return (state.OpeningId is long openingId && deleted.Contains(openingId))
+            || (state.LintelId is long lintelId && deleted.Contains(lintelId));
     }
 
     /// <summary>Обновляет только видимые строки выбранной группы, сохраняя дочерние VM.</summary>
@@ -241,9 +277,12 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
         _groups = Array.Empty<ManagerGroupViewModel>();
         _items.Clear();
+        _hiddenState.Clear();
+        _deletionCandidates.Clear();
         _elements.Clear();
         _expandedGroups.Clear();
         _visibleRows.Clear();
+        LastContext = null;
         CloseRequested = null;
         DetailsRequested = null;
         DetailsDismissRequested = null;
@@ -266,7 +305,9 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         RaisePropertyChanged(nameof(ProcessText));
         RaisePropertyChanged(nameof(GeneralMessage));
         RaisePropertyChanged(nameof(HasGeneralMessage));
-        if(LastContext is not null) {
+        if(_readError is not null) {
+            ContextSummary = GetReadErrorMessage();
+        } else if(LastContext is not null) {
             ContextSummary = FormatContextSummary(LastContext);
         } else {
             ContextSummary = _localization.GetLocalizedString("Manager.Refresh");
@@ -302,20 +343,42 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         return _elements.Contains(element);
     }
 
-    // Повторное нажатие выбранного диапазона также обновляет данные существующей командой источника.
+    // Запоминает устойчивый ключ строки, из которой открыто мини-окно.
+    private void ShowDetails(ManagerElementViewModel element, bool warnings) {
+        var row = _visibleRows.FirstOrDefault(row => ReferenceEquals(row.Opening, element)
+            || ReferenceEquals(row.Lintel, element));
+        if(row is not null) {
+            DetailsRequested?.Invoke(new ManagerDetailsViewModel(element, warnings, _localization,
+                (row as ManagerItemViewModel)?.Snapshot.Key, (row as ManagerGroupViewModel)?.Key));
+        }
+    }
+
+    /// <summary>Находит актуальные сведения мини-окна или возвращает null для исчезнувшей строки.</summary>
+    public ManagerDetailsViewModel UpdateDetails(ManagerDetailsViewModel previous) {
+        var row = FindVisibleRow(previous.ItemKey, previous.GroupKey);
+        var element = previous.IsOpening ? row?.Opening : row?.Lintel;
+        bool canShow = !IsBlocked && !State.IsClosing
+            && (previous.IsWarnings ? element?.ShowStatus == true : element?.ShowInformation == true);
+        return canShow ? new ManagerDetailsViewModel(element, previous.IsWarnings, _localization,
+            previous.ItemKey, previous.GroupKey) : null;
+    }
+
+    /// <summary>Находит видимую строку для восстановления выбора и мини-окна.</summary>
+    public ManagerRowViewModel FindVisibleRow(ManagerItemKey? itemKey, ManagerGroupKey? groupKey) {
+        if(itemKey is ManagerItemKey item && _items.TryGetValue(item, out var row)) {
+            return _expandedGroups.Contains(row.Snapshot.GroupKey) ? row : null;
+        }
+        return groupKey is ManagerGroupKey group
+            ? _groups.FirstOrDefault(current => current.Key.Equals(group)) : null;
+    }
+
+    // Повторное нажатие выбранного диапазона также запускает чтение.
     private void SelectScope(ManagerScopeViewModel scope) {
-        if(!Scopes.Contains(scope)) {
+        if(!Scopes.Contains(scope) || !RefreshCommand.CanExecute(null)) {
             return;
         }
-        var command = scope.Scope switch {
-            ManagerScope.View => ViewScopeCommand,
-            ManagerScope.Selected => SelectedScopeCommand,
-            _ => ProjectScopeCommand
-        };
-        if(command?.CanExecute(null) == true) {
-            SelectedScope = scope;
-            command.Execute(null);
-        }
+        SelectedScope = scope;
+        RefreshCommand.Execute(null);
     }
 
     // Использует существующие флаги сессии и запроса, без второй машины состояний.
@@ -323,7 +386,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         RaisePropertyChanged(nameof(CanChangeScope));
         RaisePropertyChanged(nameof(GeneralMessage));
         RaisePropertyChanged(nameof(HasGeneralMessage));
-        if(!CanEditRows) {
+        if(IsBlocked || State.IsClosing) {
             DetailsDismissRequested?.Invoke();
         }
     }
@@ -382,22 +445,30 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
     }
 
-    // Передаёт только token/generation в очередь и публикует независимый ответ на UI Dispatcher.
+    // Передаёт в очередь диапазон и идентичность запроса, публикует независимый ответ на UI Dispatcher.
     private async Task RefreshContextAsync() {
         IsRefreshing = true;
         CommandManager.InvalidateRequerySuggested();
-        var request = new ManagerRequest(State.DocumentToken, State.AdvanceGeneration());
+        var scope = SelectedScope?.Scope ?? State.InitialScope;
+        var request = new ManagerRequest(State.DocumentToken, State.AdvanceGeneration(), scope,
+            _firstRead && scope == State.InitialScope, _deletionCandidates);
+        _firstRead = false;
         try {
             var context = await _requests.Enqueue(request).ConfigureAwait(false);
             if(!_dispatcher.HasShutdownStarted) {
-                await _dispatcher.InvokeAsync(() => ApplyContext(context)).Task.ConfigureAwait(false);
+                await _dispatcher.InvokeAsync(() => ApplyContext(context, scope)).Task.ConfigureAwait(false);
             }
-        } catch(InvalidOperationException exception) {
+        } catch(Exception exception) when(exception is InvalidOperationException or OperationCanceledException) {
             if(!_dispatcher.HasShutdownStarted) {
                 await _dispatcher.InvokeAsync(() => {
                     if(IsCurrentResponse(request.DocumentToken, request.Generation)) {
-                        _readError = exception.Message;
-                        ContextSummary = exception.Message;
+                        DetailsDismissRequested?.Invoke();
+                        if(_projectionScope != scope) {
+                            SetItems(Array.Empty<ManagerItemViewModel>(), scope, retainUnseen: true);
+                        }
+                        _readError = exception is OperationCanceledException
+                            ? _localization.GetLocalizedString("Manager.ReadFailed") : exception.Message;
+                        ContextSummary = GetReadErrorMessage();
                     }
                 }).Task.ConfigureAwait(false);
             }
@@ -412,19 +483,26 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     }
 
     // Отбрасывает результат, устаревший между завершением API и исполнением UI continuation.
-    private void ApplyContext(ManagerDocumentContext context) {
+    private void ApplyContext(ManagerDocumentContext context, ManagerScope scope) {
         if(!IsCurrentResponse(context.DocumentToken, context.Generation)) {
             return;
         }
         if(context.Project is not null) {
+            foreach(var key in context.RemovedKeys) {
+                _items.Remove(key);
+                _hiddenState.Remove(key);
+            }
+            _deletionCandidates.Clear();
             var items = new List<ManagerItemViewModel>(context.Project.Openings.Count + context.Project.Lintels.Count);
             items.AddRange(context.Project.Openings.Select(opening => CreateProjectRow(context.DocumentToken,
                 opening.Element, true, opening.WidthMm, heightMm: opening.HeightMm)));
             items.AddRange(context.Project.Lintels.Select(lintel => CreateProjectRow(context.DocumentToken,
                 lintel.Element, false, lintel.OpeningWidthMm, thicknessMm: lintel.WallThicknessMm)));
-            SetItems(items, items.Select(item => item.Snapshot.Key), ManagerScope.Project);
+            bool retainUnseen = scope != ManagerScope.Project || context.Project.UnreadableCount > 0;
+            SetItems(items, scope, retainUnseen);
         }
         _readError = null;
+        _modelIsDirty = false;
         LastContext = context;
         ContextSummary = FormatContextSummary(context);
     }
@@ -433,12 +511,19 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private ManagerItemViewModel CreateProjectRow(Guid documentToken, ManagerFamilySnapshot element,
         bool isOpening, double? widthMm, double? heightMm = null, double? thicknessMm = null) {
         const ManagerElementStatus status = ManagerElementStatus.NotAnalyzed;
-        var presentation = new ManagerElementPresentation(element.TypeName, status, element.Information,
-            widthMm: widthMm, heightMm: heightMm, thicknessMm: thicknessMm);
         var key = new ManagerItemKey(documentToken, isOpening ? element.UniqueId : null,
             isOpening ? null : element.UniqueId);
         var group = new ManagerGroupKey(isOpening ? element.TypeUniqueId : null,
             isOpening ? null : element.TypeUniqueId, status, status, isOpening ? null : element.Information.IsFixed);
+        if(_items.TryGetValue(key, out var previous) && previous.Snapshot.GroupKey.Equals(group)) {
+            var old = isOpening ? previous.Opening.Element : previous.Lintel.Element;
+            if(old.TypeName == element.TypeName && old.WidthMm == widthMm && old.HeightMm == heightMm
+                && old.ThicknessMm == thicknessMm && old.Information.HasSameValues(element.Information)) {
+                return previous;
+            }
+        }
+        var presentation = new ManagerElementPresentation(element.TypeName, status, element.Information,
+            widthMm: widthMm, heightMm: heightMm, thicknessMm: thicknessMm);
         var snapshot = new ManagerItemSnapshot(key, group, Array.Empty<ManagerDiagnostic>(),
             new[] { ManagerAction.Skip }, ManagerAction.Skip);
         return new ManagerItemViewModel(snapshot, isOpening ? presentation : null,
@@ -455,17 +540,24 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
             return string.Format(CultureInfo.CurrentCulture, _localization.GetLocalizedString("Manager.ReadPartial"),
                 project.UnreadableCount);
         }
-        return project.Openings.Count == 0 && project.Lintels.Count == 0
-            ? _localization.GetLocalizedString("Manager.ProjectEmpty") : null;
+        if(project.Openings.Count > 0 || project.Lintels.Count > 0) {
+            return null;
+        }
+        bool isScoped = LastContext.ScopeStamp?.Scope is ManagerScope.View or ManagerScope.Selected;
+        return _localization.GetLocalizedString(isScoped ? "Manager.ScopeEmpty" : "Manager.ProjectEmpty");
     }
 
-    // Сохраняет подпись UI-контекста демонстрации и считает фактические строки проекта.
+    // Добавляет явное предупреждение, только если показана предыдущая выборка.
+    private string GetReadErrorMessage() {
+        return _groups.Count > 0
+            ? _readError + " " + _localization.GetLocalizedString("Manager.PreviousData") : _readError;
+    }
+
+    // Подписывает фактическую выборку текущего диапазона.
     private string FormatContextSummary(ManagerDocumentContext context) {
-        return context.Project is { } project
-            ? string.Format(CultureInfo.CurrentCulture, _localization.GetLocalizedString("Manager.ProjectSummary"),
-                context.DocumentTitle, project.Openings.Count, project.Lintels.Count)
-            : string.Format(CultureInfo.CurrentCulture, _localization.GetLocalizedString("Manager.ContextSummary"),
-                context.DocumentTitle, context.ViewName, context.SelectionUniqueIds.Count);
+        var project = context.Project;
+        return string.Format(CultureInfo.CurrentCulture, _localization.GetLocalizedString("Manager.ProjectSummary"),
+            context.DocumentTitle, project?.Openings.Count ?? 0, project?.Lintels.Count ?? 0);
     }
 
     // Проверяет актуальность успешного ответа и ошибки в момент их применения на UI-потоке.

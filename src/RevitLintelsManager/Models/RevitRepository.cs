@@ -59,37 +59,63 @@ internal partial class RevitRepository(UIApplication uiApplication, SystemPlugin
             .ToList().AsReadOnly();
     }
 
-    /// <summary>Сохраняет исходный UI-контекст до будущей подготовки служебного вида.</summary>
+    /// <summary>Запоминает исходные вид и выделение и определяет диапазон по подходящим экземплярам.</summary>
     public ManagerSessionState CaptureInitialState(ManagerConfigSnapshot config) {
-        var selection = ActiveUIDocument.Selection.GetElementIds();
-        var scope = selection.Count > 0 ? ManagerScope.Selected
-            : HasManagerElementsOnActiveView(config) ? ManagerScope.View : ManagerScope.Project;
-        return new ManagerSessionState(config, Document.Title, ActiveUIDocument.ActiveView?.UniqueId,
-            selection.Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null), scope);
+        var uiDocument = ActiveUIDocument;
+        var view = uiDocument.ActiveView;
+        var selection = uiDocument.Selection.GetElementIds();
+        var phaseId = GetReadPhaseId(config);
+        var scope = HasScopeElements(ManagerScope.Selected, view, selection, config, phaseId) ? ManagerScope.Selected
+            : HasScopeElements(ManagerScope.View, view, selection, config, phaseId) ? ManagerScope.View
+            : ManagerScope.Project;
+        return new ManagerSessionState(config, Document.Title, view?.UniqueId, GetSelectionUniqueIds(selection), scope);
     }
 
-    /// <summary>Привязывает запросы всего проекта к исходному документу.</summary>
-    public ManagerSessionState CaptureProjectState(ManagerConfigSnapshot config) {
-        return new ManagerSessionState(config, Document.Title, null, Array.Empty<string>());
+    /// <summary>Читает контекст действующего диапазона из проверки исходного документа на Idling.</summary>
+    public ManagerScopeStamp CaptureScopeStamp(ManagerScope scope) {
+        var uiDocument = ActiveUIDocument;
+        var selection = scope == ManagerScope.Selected ? uiDocument.Selection.GetElementIds()
+            : Array.Empty<ElementId>();
+        string viewUniqueId = scope == ManagerScope.View ? uiDocument.ActiveView?.UniqueId : null;
+        return CreateScopeStamp(scope, viewUniqueId, selection);
     }
 
-    /// <summary>Читает контекст и снимок исходного проекта только из Execute обработчика ExternalEvent.</summary>
+    /// <summary>Читает снимки выбранного диапазона только из Execute обработчика ExternalEvent.</summary>
     /// <param name="app">Приложение текущего API-вызова.</param>
     /// <param name="request">Неизменяемая идентичность запроса.</param>
-    /// <param name="config">Настройки, зафиксированные при запуске сессии.</param>
+    /// <param name="state">Зафиксированные настройки, исходные вид и выделение сессии.</param>
     /// <returns>Независимый контекст или null при чужом/недоступном документе.</returns>
     public ManagerDocumentContext ReadDocumentContext(UIApplication app, ManagerRequest request,
-        ManagerConfigSnapshot config) {
+        ManagerSessionState state) {
         var activeDocument = app.ActiveUIDocument;
         if(!Document.IsValidObject || activeDocument?.Document?.IsValidObject != true
             || !Document.Equals(activeDocument.Document) || Document.IsReadOnly || Document.IsModifiable) {
             return null;
         }
-        var project = ReadProject(config);
+        var phaseId = GetReadPhaseId(state.Config);
         var view = activeDocument.ActiveView;
+        if(request.UseInitialContext && request.Scope == ManagerScope.View) {
+            view = state.InitialViewUniqueId is string initialView
+                ? ReadOptional(() => Document.GetElement(initialView) as View) : null;
+        }
+        var selection = GetScopeSelection(activeDocument, request, state);
+        using var collector = CreateScopeCollector(request.Scope, view, selection);
+        var project = ReadScopeSnapshot(state.Config, phaseId, request.Scope, collector);
+        string viewUniqueId = view?.UniqueId;
         return new ManagerDocumentContext(request.DocumentToken, request.Generation, Document.Title,
-            view?.UniqueId, view?.Name, activeDocument.Selection.GetElementIds()
-                .Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null), project);
+            viewUniqueId, view?.Name, GetSelectionUniqueIds(selection), project,
+            CreateScopeStamp(request.Scope, viewUniqueId, selection), GetRemovedKeys(request));
+    }
+
+    // Уточняет исчезновение по UniqueId, чтобы сохранить состояние после Undo до обновления.
+    private IEnumerable<ManagerItemKey> GetRemovedKeys(ManagerRequest request) {
+        return request.DeletionCandidates.Where(key => key.DocumentToken == request.DocumentToken
+            && (IsMissing(key.OpeningUniqueId) || IsMissing(key.LintelUniqueId)));
+    }
+
+    // Проверка выполняется только в исходном документе и в том же запросе, что и чтение диапазона.
+    private bool IsMissing(string uniqueId) {
+        return uniqueId is not null && Document.GetElement(uniqueId)?.IsValidObject != true;
     }
 
     /// <summary>Освобождает API-каталоги этапа старта перед немодальной работой.</summary>
@@ -98,20 +124,6 @@ internal partial class RevitRepository(UIApplication uiApplication, SystemPlugin
         _openingFamilies = null;
         _phaseIds = null;
         _revitWalls = null;
-    }
-
-    // Проверяет наличие экземпляров настроенных семейств на исходном виде, не выполняя анализ или запись.
-    private bool HasManagerElementsOnActiveView(ManagerConfigSnapshot config) {
-        var view = ActiveUIDocument.ActiveView;
-        if(view is null || !FilteredElementCollector.IsViewValidForElementIteration(Document, view.Id)) {
-            return false;
-        }
-        var families = new HashSet<string>(config.OpeningFamilies.Select(family => family.UniqueId)) {
-            config.LintelFamily.UniqueId
-        };
-        using var collector = new FilteredElementCollector(Document, view.Id);
-        return collector.OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType()
-            .Cast<FamilyInstance>().Any(instance => families.Contains(instance.Symbol.Family.UniqueId));
     }
 
     // Получает каталог семейств перемычек.

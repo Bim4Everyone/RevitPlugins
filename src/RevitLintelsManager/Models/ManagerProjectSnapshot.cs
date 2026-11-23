@@ -77,4 +77,10 @@ internal sealed class ManagerElementPhases(string createdName, string demolished
     public string DemolishedName { get; } = demolishedName;
     public long? CreatedId { get; } = createdId;
     public long? DemolishedId { get; } = demolishedId;
+
+    /// <summary>Сравнивает идентичность и отображаемые имена стадий.</summary>
+    public bool HasSameValues(ManagerElementPhases other) {
+        return other is not null && CreatedId == other.CreatedId && DemolishedId == other.DemolishedId
+            && CreatedName == other.CreatedName && DemolishedName == other.DemolishedName;
+    }
 }

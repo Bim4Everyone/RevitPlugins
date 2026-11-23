@@ -13,7 +13,10 @@ namespace RevitLintelsManager.ViewModels;
 internal sealed class ManagerDetailsViewModel {
     /// <summary>Подготавливает предоставленные сведения или диагностические причины.</summary>
     public ManagerDetailsViewModel(ManagerElementViewModel element, bool warnings,
-        ILocalizationService localization) {
+        ILocalizationService localization, ManagerItemKey? itemKey = null, ManagerGroupKey? groupKey = null) {
+        ItemKey = itemKey;
+        GroupKey = groupKey;
+        IsOpening = element.IsOpening;
         string family = element.Element?.Information?.FamilyName;
         Subject = string.IsNullOrWhiteSpace(family) ? element.TypeName : $"{family}: {element.TypeName}";
         IsWarnings = warnings;
@@ -60,6 +63,9 @@ internal sealed class ManagerDetailsViewModel {
     }
 
     public string Title { get; }
+    public ManagerItemKey? ItemKey { get; }
+    public ManagerGroupKey? GroupKey { get; }
+    public bool IsOpening { get; }
     public string Subject { get; }
     public bool IsWarnings { get; }
     public bool IsAnalysisPending { get; }

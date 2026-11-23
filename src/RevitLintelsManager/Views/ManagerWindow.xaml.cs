@@ -29,6 +29,9 @@ public partial class ManagerWindow {
     private ManagerViewModel _viewModel;
     private ManagerDetailsWindow _detailsWindow;
     private DispatcherOperation _restoreScroll;
+    private ManagerScope _previousScope;
+    private ManagerItemKey? _selectedItemKey;
+    private ManagerGroupKey? _selectedGroupKey;
 
     /// <summary>Создаёт немодальное окно с отсоединяемыми платформенными событиями.</summary>
     public ManagerWindow(ILoggerService loggerService, ISerializationService serializationService,
@@ -119,6 +122,9 @@ public partial class ManagerWindow {
 
     // Запоминает первую видимую строку и её смещение в текущем диапазоне.
     private void SaveScrollAnchor(ManagerScope scope) {
+        _previousScope = scope;
+        _selectedItemKey = (RowsList.SelectedItem as ManagerItemViewModel)?.Snapshot.Key;
+        _selectedGroupKey = (RowsList.SelectedItem as ManagerGroupViewModel)?.Key;
         if(_restoreScroll?.Abort() == true) {
             _restoreScroll = null;
             return;
@@ -149,14 +155,32 @@ public partial class ManagerWindow {
 
     // Ожидает применения изменений коллекции к генератору контейнеров.
     private void ScheduleScrollRestore(ManagerScope scope) {
+        if(scope == _previousScope && (_selectedItemKey.HasValue || _selectedGroupKey.HasValue)) {
+            RowsList.SelectedItem = _viewModel.FindVisibleRow(_selectedItemKey, _selectedGroupKey);
+        } else if(scope != _previousScope) {
+            RowsList.SelectedItem = null;
+        }
+        if(_detailsWindow?.DataContext is ManagerDetailsViewModel details) {
+            var current = _viewModel.UpdateDetails(details);
+            if(current is null) {
+                CloseDetails();
+            } else {
+                _detailsWindow.DataContext = current;
+            }
+        }
         if(IsLoaded) {
-            _restoreScroll = Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() => RestoreScroll(scope)));
+            _restoreScroll = Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() => {
+                try {
+                    RestoreScroll(scope);
+                } finally {
+                    _restoreScroll = null;
+                }
+            }));
         }
     }
 
     // Восстанавливает строку по ключу, при её отсутствии пробует заголовок той же группы.
     private void RestoreScroll(ManagerScope scope) {
-        _restoreScroll = null;
         var scrollViewer = FindVisualChild<ScrollViewer>(RowsList);
         if(scrollViewer is null) {
             return;
@@ -208,7 +232,8 @@ public partial class ManagerWindow {
 
     // Не удерживает сведения строки после recycling или смены положения списка.
     private void OnRowsScrollChanged(object sender, ScrollChangedEventArgs e) {
-        if(e.VerticalChange != 0 || e.HorizontalChange != 0) {
+        if(_restoreScroll is null && _viewModel?.IsRefreshing != true
+            && (e.VerticalChange != 0 || e.HorizontalChange != 0)) {
             CloseDetails();
         }
     }

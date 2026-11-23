@@ -31,4 +31,12 @@ internal sealed class ManagerElementInfo(string familyName, string worksetName, 
     public long? ElementId { get; } = elementId;
     public string DisplayId { get; } = displayId;
     public ManagerElementPhases Phases { get; } = phases;
+
+    /// <summary>Сравнивает сведения, которые отображаются в строке и мини-окне.</summary>
+    public bool HasSameValues(ManagerElementInfo other) {
+        return other is not null && FamilyName == other.FamilyName && WorksetName == other.WorksetName
+            && LevelName == other.LevelName && GroupName == other.GroupName && IsInGroup == other.IsInGroup
+            && IsFixed == other.IsFixed && ElementId == other.ElementId && DisplayId == other.DisplayId
+            && (Phases is null ? other.Phases is null : Phases.HasSameValues(other.Phases));
+    }
 }

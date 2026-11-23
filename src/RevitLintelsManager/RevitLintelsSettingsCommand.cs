@@ -19,6 +19,13 @@ public class RevitLintelsSettingsCommand : BasePluginCommand {
 
     /// <summary>Открывает настройки модально с отдельным контейнером.</summary>
     protected override void Execute(UIApplication uiApplication) {
+        if(!ManagerSessionRegistration.TryShowSettings(uiApplication)) {
+            ShowSettings(uiApplication);
+        }
+    }
+
+    /// <summary>Открывает окно настроек в сборке, владеющей его WPF-ресурсами.</summary>
+    internal static void ShowSettings(UIApplication uiApplication) {
         using IKernel kernel = uiApplication.CreatePlatformServices();
         RevitLintelsManagerCommand.ConfigureDependencies(kernel);
         RevitLintelsManagerCommand.ConfigureSettingsDependencies(kernel);

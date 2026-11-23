@@ -7,6 +7,16 @@ using RevitLintelsManager.Models;
 
 namespace RevitLintelsManager.ViewModels;
 
+/// <summary>Состояние строки вне диапазона без снимка элемента и объектов представления.</summary>
+internal readonly struct ManagerItemState(ManagerGroupKey groupKey, bool isChecked,
+    ManagerAction? manualAction, long? openingId, long? lintelId) {
+    public ManagerGroupKey GroupKey { get; } = groupKey;
+    public bool IsChecked { get; } = isChecked;
+    public ManagerAction? ManualAction { get; } = manualAction;
+    public long? OpeningId { get; } = openingId;
+    public long? LintelId { get; } = lintelId;
+}
+
 /// <summary>Индивидуальная строка на независимом снимке без операций модели.</summary>
 internal sealed class ManagerItemViewModel : ManagerRowViewModel {
     public event Action<ManagerItemViewModel, bool, ManagerAction> StateChanged;
@@ -69,13 +79,16 @@ internal sealed class ManagerItemViewModel : ManagerRowViewModel {
         }
     }
 
-    /// <summary>Переносит выбор и допустимое ручное действие до подключения строки к группе.</summary>
-    public void RestoreState(ManagerItemViewModel previous) {
-        if(!Snapshot.Key.Equals(previous.Snapshot.Key)) {
-            throw new ArgumentException("Состояние относится к другой строке.", nameof(previous));
-        }
-        _isChecked = previous._isChecked;
-        var action = Actions.FirstOrDefault(option => option.Action == previous._manualAction);
+    /// <summary>Фиксирует введённое пользователем состояние для ключа текущей строки.</summary>
+    public ManagerItemState CaptureState() {
+        return new ManagerItemState(Snapshot.GroupKey, _isChecked, _manualAction,
+            Opening.Element?.Information?.ElementId, Lintel.Element?.Information?.ElementId);
+    }
+
+    /// <summary>Восстанавливает чекбокс и допустимое ручное действие по совпавшему ключу.</summary>
+    public void RestoreState(ManagerItemState previous) {
+        _isChecked = previous.IsChecked;
+        var action = Actions.FirstOrDefault(option => option.Action == previous.ManualAction);
         if(action is not null) {
             _manualAction = action.Action;
             _selectedAction = action;
