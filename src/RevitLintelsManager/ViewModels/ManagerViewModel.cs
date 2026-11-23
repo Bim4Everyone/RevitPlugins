@@ -136,6 +136,11 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         private set => RaiseAndSetIfChanged(ref _isBlocked, value);
     }
 
+    /// <summary>Загружает исходный диапазон до начала работы с окном.</summary>
+    public Task LoadInitialContextAsync() {
+        return RefreshCommand.CanExecute(null) ? RefreshContextAsync() : Task.CompletedTask;
+    }
+
     /// <summary>Помечает отображаемые данные устаревшими и запоминает кандидатов на удаление.</summary>
     public void InvalidateModel(IEnumerable<long> deletedIds) {
         var deleted = new HashSet<long>(deletedIds);

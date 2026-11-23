@@ -70,6 +70,7 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             kernel.Bind<ManagerSessionState>().ToConstant(state);
             kernel.Bind<WindowPlatformEvents>().ToSelf().InSingletonScope();
             kernel.Bind<Dispatcher>().ToConstant(Dispatcher.CurrentDispatcher);
+            kernel.Bind<IManagerNavigationService>().To<ManagerNavigationService>().InSingletonScope();
             kernel.Bind<IManagerRequestDispatcher>().To<ManagerExternalEventHandler>().InSingletonScope();
             kernel.Bind<ManagerDetailsWindow>().ToSelf();
             kernel.Bind<Func<ManagerDetailsWindow>>().ToMethod(context => {
@@ -78,25 +79,21 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             });
             kernel.BindMainWindow<ManagerViewModel, ManagerWindow>();
             kernel.Bind<IManagerSession>().To<ManagerSession>().InSingletonScope();
-            var viewModel = kernel.Get<ManagerViewModel>();
             var session = kernel.Get<IManagerSession>();
+            var logger = kernel.Get<ILoggerService>();
             session.Released += registration.Dispose;
-            session.Start(kernel);
+            session.Start(kernel, exception => ReportStartupFailure(logger, messages, localization, exception));
             registration.SetActivation(session.Activate);
             registration = null;
             kernel = null;
-            Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => viewModel.RefreshCommand.Execute(null)));
         } catch(OperationCanceledException) {
             // Закрытие при запуске не требует сообщения об ошибке.
         } catch(Exception exception) {
             if(kernel is null) {
                 throw;
             }
-            kernel.Get<ILoggerService>().Warning(exception, "Ошибка запуска менеджера перемычек.");
-            string message = IsInvalidSettingsJson(exception)
-                ? "Manager.Validation.InvalidSettingsJson" : "Manager.StartFailed";
-            ShowSettingsWarning(kernel.Get<WpfUIMessageBoxService>(), kernel.Get<ILocalizationService>(),
-                new[] { message });
+            ReportStartupFailure(kernel.Get<ILoggerService>(), kernel.Get<WpfUIMessageBoxService>(),
+                kernel.Get<ILocalizationService>(), exception);
         } finally {
             try {
                 kernel?.Dispose();
@@ -104,6 +101,15 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
                 registration?.Dispose();
             }
         }
+    }
+
+    // Сохраняет штатное сообщение команды и для отложенного открытия окна.
+    private static void ReportStartupFailure(ILoggerService logger, IMessageBoxService messages,
+        ILocalizationService localization, Exception exception) {
+        logger.Warning(exception, "Ошибка запуска менеджера перемычек.");
+        string message = IsInvalidSettingsJson(exception)
+            ? "Manager.Validation.InvalidSettingsJson" : "Manager.StartFailed";
+        ShowSettingsWarning(messages, localization, new[] { message });
     }
 
     // Распознаёт ошибку десериализации и при обёртке исключения контейнером DI.

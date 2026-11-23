@@ -10,12 +10,13 @@ using RevitLintelsManager.Models;
 
 namespace RevitLintelsManager.Services;
 
-/// <summary>Сериализует чтение контекста и владеет native ExternalEvent до безопасного закрытия.</summary>
+/// <summary>Сериализует подготовку вида и чтение контекста, владеет ExternalEvent до закрытия.</summary>
 internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, IExternalEventHandler {
     private readonly object _sync = new();
     private readonly Queue<PendingRequest> _queue = new();
     private readonly RevitRepository _repository;
     private readonly ManagerSessionState _state;
+    private readonly IManagerNavigationService _navigation;
     private readonly ILoggerService _logger;
     private readonly ILocalizationService _localization;
     private readonly ExternalEvent _externalEvent;
@@ -25,16 +26,21 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
     private bool _executing;
     private bool _signalPending;
     private bool _disposed;
+    private bool _managerViewPrepared;
 
     /// <summary>Создаёт ExternalEvent в исходном API-контексте команды.</summary>
     public ManagerExternalEventHandler(RevitRepository repository, ManagerSessionState state,
-        ILoggerService logger, ILocalizationService localization) {
+        IManagerNavigationService navigation, ILoggerService logger, ILocalizationService localization) {
         _repository = repository;
         _state = state;
+        _navigation = navigation;
         _logger = logger;
         _localization = localization;
         _externalEvent = ExternalEvent.Create(this);
     }
+
+    /// <inheritdoc />
+    public bool IsPreparingManagerView { get; private set; }
 
     /// <inheritdoc />
     public void StartAcceptingRequests() {
@@ -154,7 +160,7 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
 
     /// <inheritdoc />
     public string GetName() {
-        return nameof(RevitLintelsManager) + ".ReadDocumentContext";
+        return nameof(RevitLintelsManager) + ".ManagerRequests";
     }
 
     // Проверяет только независимое состояние; вызывается под блокировкой очереди.
@@ -180,10 +186,11 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
         }
     }
 
-    // Читает модель только внутри Execute и повторно проверяет поколение перед публикацией результата.
+    // Подготавливает вид перед первым чтением и проверяет поколение перед публикацией результата.
     private void ReadContext(UIApplication app, PendingRequest pending) {
         try {
-            var context = _repository.ReadDocumentContext(app, pending.Request, _state);
+            var context = PrepareManagerView(app) ? _repository.ReadDocumentContext(app, pending.Request, _state)
+                : null;
             lock(_sync) {
                 if(context is null || !IsCurrent(pending.Request)) {
                     pending.Completion.TrySetCanceled();
@@ -196,15 +203,30 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
                 if(!IsCurrent(pending.Request)) {
                     pending.Completion.TrySetCanceled();
                 } else {
-                    pending.Completion.TrySetException(new InvalidOperationException(
-                        _localization.GetLocalizedString("Manager.ReadFailed"), exception));
+                    pending.Completion.TrySetException(_managerViewPrepared ? new InvalidOperationException(
+                        _localization.GetLocalizedString("Manager.ReadFailed"), exception) : exception);
                 }
             }
-            _logger.Warning(exception, "Ошибка чтения контекста менеджера перемычек.");
+            _logger.Warning(exception, _managerViewPrepared ? "Ошибка чтения контекста менеджера перемычек."
+                : "Ошибка подготовки 3D-вида менеджера перемычек.");
         } finally {
             lock(_sync) {
                 _activeRequest = null;
             }
+        }
+    }
+
+    // Повторяет неудачную подготовку при обновлении, успешную выполняет один раз за запуск.
+    private bool PrepareManagerView(UIApplication app) {
+        if(_managerViewPrepared) {
+            return true;
+        }
+        IsPreparingManagerView = true;
+        try {
+            _managerViewPrepared = _navigation.EnsureView(app, _state.Config) is not null;
+            return _managerViewPrepared;
+        } finally {
+            IsPreparingManagerView = false;
         }
     }
 

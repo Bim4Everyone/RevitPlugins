@@ -115,6 +115,7 @@
     <system:String x:Key="Manager.Refresh">Обновить данные</system:String>
     <system:String x:Key="Manager.SignalRejected">Не удалось передать запрос в Revit. Повторите обновление.</system:String>
     <system:String x:Key="Manager.ReadFailed">Не удалось прочитать данные проекта. Повторите обновление.</system:String>
+    <system:String x:Key="Manager.ViewPreparationFailed">Не удалось подготовить персональный 3D-вид. Проверьте наличие типа 3D-вида, стадию и права на изменение модели, затем повторите обновление. Подробности записаны в журнал.</system:String>
     <system:String x:Key="Manager.DataOutdated">Модель изменилась. Обновите данные текущего диапазона.</system:String>
     <system:String x:Key="Manager.PreviousData">Показаны данные предыдущего чтения.</system:String>
     <system:String x:Key="Manager.ReadPartial">Не удалось прочитать часть элементов проекта ({0}).</system:String>

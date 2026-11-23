@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -37,7 +38,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
     public event Action Released;
 
     /// <inheritdoc />
-    public void Start(IKernel kernel) {
+    public void Start(IKernel kernel, Action<Exception> reportStartupFailure) {
         if(_started) {
             throw new InvalidOperationException();
         }
@@ -55,13 +56,11 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             window.Closing += OnWindowClosing;
             viewModel.CloseRequested += RequestClose;
             UpdateDocumentState();
-            window.Show();
-            if(_windowClosed || viewModel.State.IsClosing) {
-                throw new OperationCanceledException();
-            }
-            _kernel = kernel;
             requests.StartAcceptingRequests();
+            _kernel = kernel;
+            window.Dispatcher.InvokeAsync(() => ShowWindowAsync(reportStartupFailure));
         } catch {
+            _kernel = null;
             requests.BeginClose();
             requests.TryDisposeInApiContext();
             Unsubscribe();
@@ -84,6 +83,9 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             return;
         }
         UpdateDocumentState();
+        if(!window.IsVisible) {
+            return;
+        }
         if(window.WindowState == WindowState.Minimized) {
             window.WindowState = WindowState.Normal;
         }
@@ -98,6 +100,25 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
         }
         requests.BeginClose();
         viewModel.SetBlocked(true);
+    }
+
+    // Показывает окно после завершения первого запроса, если исходная сессия ещё открыта.
+    private async Task ShowWindowAsync(Action<Exception> reportStartupFailure) {
+        try {
+            if(viewModel.State.IsClosing) {
+                return;
+            }
+            await viewModel.LoadInitialContextAsync();
+            if(!viewModel.State.IsClosing) {
+                window.Show();
+            }
+        } catch(Exception exception) {
+            try {
+                reportStartupFailure(exception);
+            } finally {
+                RequestClose();
+            }
+        }
     }
 
     // Оставляет окно живым до безопасного возврата pending/active обработчика.
@@ -150,6 +171,11 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             || !repository.Document.Equals(e.GetDocument())) {
             return;
         }
+        if(requests.IsPreparingManagerView
+            && e.GetTransactionNames().SequenceEqual(new[] { RevitRepository.ManagerViewTransactionName })) {
+            // Снимок первого чтения формируется после подготовки вида.
+            return;
+        }
         if(viewModel.IsRefreshing && viewModel.LastContext?.ScopeStamp is { } acceptedScope
             && _observedScope?.Scope == acceptedScope.Scope) {
             // Позволяет Idling снова заметить смену источника, если её запрос ещё не применён.
@@ -186,7 +212,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
 
     // Сравнивает источник текущего диапазона на Idling и ставит изменившийся диапазон в существующую очередь.
     private void RefreshChangedScope() {
-        if(_kernel is null || !viewModel.RefreshCommand.CanExecute(null)) {
+        if(!window.IsVisible || !viewModel.RefreshCommand.CanExecute(null)) {
             return;
         }
         var context = viewModel.LastContext;

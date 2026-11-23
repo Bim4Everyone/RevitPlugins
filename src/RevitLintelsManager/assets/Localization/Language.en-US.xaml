@@ -115,6 +115,7 @@
     <system:String x:Key="Manager.Refresh">Refresh data</system:String>
     <system:String x:Key="Manager.SignalRejected">The request could not be sent to Revit. Try refreshing again.</system:String>
     <system:String x:Key="Manager.ReadFailed">Project data could not be read. Try refreshing again.</system:String>
+    <system:String x:Key="Manager.ViewPreparationFailed">The personal 3D view could not be prepared. Check the 3D view type, phase, and model editing permissions, then refresh. See the log for details.</system:String>
     <system:String x:Key="Manager.DataOutdated">The model has changed. Refresh the data for the current range.</system:String>
     <system:String x:Key="Manager.PreviousData">Showing data from the previous read.</system:String>
     <system:String x:Key="Manager.ReadPartial">Some project elements could not be read ({0}).</system:String>
