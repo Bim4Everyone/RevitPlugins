@@ -40,4 +40,24 @@ internal interface IParamService {
     /// <param name="families">Проверяемые семейства.</param>
     /// <returns>Материализованные общие параметры.</returns>
     IEnumerable<RevitParam> GetCommonFixParams(IEnumerable<RevitFamily> families);
+
+    /// <summary>Читает параметр длины в миллиметрах, сохраняя отсутствие значения.</summary>
+    /// <param name="instance">Читаемый экземпляр.</param>
+    /// <param name="type">Тип для поиска параметра, отсутствующего у экземпляра.</param>
+    /// <param name="name">Имя из сохранённого сопоставления.</param>
+    /// <returns>Длина в мм или null при отсутствии доступного значения длины.</returns>
+    double? ReadLengthMm(Element instance, Element type, string name);
+
+    /// <summary>Читает параметр с целочисленным хранением.</summary>
+    /// <param name="instance">Читаемый экземпляр.</param>
+    /// <param name="type">Тип для поиска параметра, отсутствующего у экземпляра.</param>
+    /// <param name="name">Имя из сохранённого сопоставления.</param>
+    /// <returns>Целое значение или null при отсутствии доступного значения.</returns>
+    int? ReadInteger(Element instance, Element type, string name);
+
+    /// <summary>Читает пользовательский параметр Да/Нет только у экземпляра.</summary>
+    /// <param name="instance">Читаемый экземпляр.</param>
+    /// <param name="name">Имя настроенного параметра фиксации.</param>
+    /// <returns>Значение фиксации или null при отсутствии доступного значения.</returns>
+    bool? ReadFixation(Element instance, string name);
 }

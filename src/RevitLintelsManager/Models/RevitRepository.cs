@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,7 +13,8 @@ using RevitLintelsManager.Models.Settings;
 
 namespace RevitLintelsManager.Models;
 
-internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig systemPluginConfig, IParamService paramService) {
+internal partial class RevitRepository(UIApplication uiApplication, SystemPluginConfig systemPluginConfig,
+    IParamService paramService) {
     private IEnumerable<RevitFamily> _lintelFamilies;
     private IEnumerable<RevitFamily> _openingFamilies;
     private IEnumerable<ElementId> _phaseIds;
@@ -66,20 +68,28 @@ internal class RevitRepository(UIApplication uiApplication, SystemPluginConfig s
             selection.Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null), scope);
     }
 
-    /// <summary>Читает текущий вид и выделение только из Execute обработчика ExternalEvent.</summary>
+    /// <summary>Привязывает запросы всего проекта к исходному документу.</summary>
+    public ManagerSessionState CaptureProjectState(ManagerConfigSnapshot config) {
+        return new ManagerSessionState(config, Document.Title, null, Array.Empty<string>());
+    }
+
+    /// <summary>Читает контекст и снимок исходного проекта только из Execute обработчика ExternalEvent.</summary>
     /// <param name="app">Приложение текущего API-вызова.</param>
     /// <param name="request">Неизменяемая идентичность запроса.</param>
+    /// <param name="config">Настройки, зафиксированные при запуске сессии.</param>
     /// <returns>Независимый контекст или null при чужом/недоступном документе.</returns>
-    public ManagerDocumentContext ReadDocumentContext(UIApplication app, ManagerRequest request) {
+    public ManagerDocumentContext ReadDocumentContext(UIApplication app, ManagerRequest request,
+        ManagerConfigSnapshot config) {
         var activeDocument = app.ActiveUIDocument;
         if(!Document.IsValidObject || activeDocument?.Document?.IsValidObject != true
             || !Document.Equals(activeDocument.Document) || Document.IsReadOnly || Document.IsModifiable) {
             return null;
         }
+        var project = ReadProject(config);
         var view = activeDocument.ActiveView;
         return new ManagerDocumentContext(request.DocumentToken, request.Generation, Document.Title,
             view?.UniqueId, view?.Name, activeDocument.Selection.GetElementIds()
-                .Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null));
+                .Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null), project);
     }
 
     /// <summary>Освобождает API-каталоги этапа старта перед немодальной работой.</summary>

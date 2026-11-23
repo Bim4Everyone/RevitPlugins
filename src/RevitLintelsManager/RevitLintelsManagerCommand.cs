@@ -65,7 +65,11 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             }
             var snapshot = resolver.CreateSnapshot(config);
             var repository = kernel.Get<RevitRepository>();
+#if LINTELS_DEMO
             var state = repository.CaptureInitialState(snapshot);
+#else
+            var state = repository.CaptureProjectState(snapshot);
+#endif
             repository.ReleaseCatalogs();
             kernel.Bind<ManagerSessionState>().ToConstant(state);
             kernel.Bind<WindowPlatformEvents>().ToSelf().InSingletonScope();
@@ -84,15 +88,18 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             });
             kernel.BindMainWindow<ManagerViewModel, ManagerWindow>();
             kernel.Bind<IManagerSession>().To<ManagerSession>().InSingletonScope();
+            var viewModel = kernel.Get<ManagerViewModel>();
 #if LINTELS_DEMO
-            kernel.Get<ManagerDemoSource>().Connect(kernel.Get<ManagerViewModel>(),
-                kernel.Get<ISettingsCommandFactory>());
+            kernel.Get<ManagerDemoSource>().Connect(viewModel, kernel.Get<ISettingsCommandFactory>());
 #endif
             var session = kernel.Get<IManagerSession>();
             session.Released += OnSessionReleased;
             session.Start(kernel);
             _session = session;
             kernel = null;
+#if !LINTELS_DEMO
+            Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => viewModel.RefreshCommand.Execute(null)));
+#endif
         } catch(OperationCanceledException) {
             // Закрытие при запуске не требует сообщения об ошибке.
         } catch(Exception exception) {

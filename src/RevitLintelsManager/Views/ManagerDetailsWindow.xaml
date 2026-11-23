@@ -126,6 +126,13 @@
                                         Property="Foreground"
                                         Value="{DynamicResource ManagerWarningBrush}" />
                                 </MultiDataTrigger>
+                                <DataTrigger
+                                    Binding="{Binding IsAnalysisPending}"
+                                    Value="True">
+                                    <Setter
+                                        Property="Foreground"
+                                        Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBlock.Style>

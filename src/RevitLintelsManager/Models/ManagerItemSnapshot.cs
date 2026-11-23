@@ -8,7 +8,7 @@ namespace RevitLintelsManager.Models;
 internal enum ManagerAction { Install, Replace, Correct, Lock, Delete, Skip }
 
 /// <summary>Основной статус элемента; причины представлены отдельными диагностиками.</summary>
-internal enum ManagerElementStatus { Missing, Correct, Warning, Fixed, Grouped }
+internal enum ManagerElementStatus { Missing, Correct, Warning, Fixed, Grouped, NotAnalyzed }
 
 /// <summary>Составной ключ строки в исходном документе.</summary>
 internal readonly struct ManagerItemKey(Guid documentToken, string openingUniqueId, string lintelUniqueId)
@@ -36,12 +36,12 @@ internal readonly struct ManagerItemKey(Guid documentToken, string openingUnique
 
 /// <summary>Ключ группировки по типам, статусам и фиксации перемычки.</summary>
 internal readonly struct ManagerGroupKey(string openingTypeUniqueId, string lintelTypeUniqueId,
-    ManagerElementStatus openingStatus, ManagerElementStatus lintelStatus, bool isLintelFixed) {
+    ManagerElementStatus openingStatus, ManagerElementStatus lintelStatus, bool? isLintelFixed) {
     public string OpeningTypeUniqueId { get; } = openingTypeUniqueId;
     public string LintelTypeUniqueId { get; } = lintelTypeUniqueId;
     public ManagerElementStatus OpeningStatus { get; } = openingStatus;
     public ManagerElementStatus LintelStatus { get; } = lintelStatus;
-    public bool IsLintelFixed { get; } = isLintelFixed;
+    public bool? IsLintelFixed { get; } = isLintelFixed;
 }
 
 /// <summary>Локализуемая диагностическая причина без объектов API.</summary>
@@ -50,7 +50,7 @@ internal sealed class ManagerDiagnostic(string localizationKey, IEnumerable<stri
     public IReadOnlyList<string> Arguments { get; } = arguments.ToList().AsReadOnly();
 }
 
-/// <summary>Контракт независимой строки; источник реальных строк появится в следующих задачах.</summary>
+/// <summary>Контракт независимой строки менеджера.</summary>
 internal sealed class ManagerItemSnapshot(ManagerItemKey key, ManagerGroupKey groupKey,
     IEnumerable<ManagerDiagnostic> diagnostics, IEnumerable<ManagerAction> allowedActions, ManagerAction defaultAction) {
     public ManagerItemKey Key { get; } = key;

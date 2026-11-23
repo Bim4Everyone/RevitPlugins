@@ -14,8 +14,10 @@ internal abstract class ManagerRowViewModel : BaseViewModel {
     protected ManagerRowViewModel(ManagerElementPresentation opening, ManagerElementPresentation lintel,
         IEnumerable<ManagerAction> actions,
         ILocalizationService localization, bool showInformation = true) {
-        Opening = new ManagerElementViewModel(opening, true, localization, showInformation);
-        Lintel = new ManagerElementViewModel(lintel, false, localization, showInformation);
+        bool analysisPending = opening?.Status == ManagerElementStatus.NotAnalyzed
+            || lintel?.Status == ManagerElementStatus.NotAnalyzed;
+        Opening = new ManagerElementViewModel(opening, true, localization, showInformation, analysisPending);
+        Lintel = new ManagerElementViewModel(lintel, false, localization, showInformation, analysisPending);
         Actions = actions.Distinct().Select(value => new ManagerActionViewModel(value,
             localization.GetLocalizedString("Manager.Action." + value))).ToList().AsReadOnly();
     }

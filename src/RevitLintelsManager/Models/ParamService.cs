@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.CustomParams;
 using dosymep.Bim4Everyone.SimpleServices;
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitLintelsManager.Models.Configs;
@@ -77,6 +78,47 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
                 other.Equals(param) && IsYesNo(other))))
             .OrderBy(param => param.Name)
             .ToArray();
+    }
+
+    /// <inheritdoc />
+    public double? ReadLengthMm(Element instance, Element type, string name) {
+        var parameter = FindMappedParameter(instance, type, name);
+        if(parameter?.HasValue != true || parameter.StorageType != StorageType.Double
+            || parameter.Definition.GetDataType() != SpecTypeId.Length) {
+            return null;
+        }
+        double value = parameter.AsDouble();
+        return double.IsNaN(value) || double.IsInfinity(value) ? null
+            : UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters);
+    }
+
+    /// <inheritdoc />
+    public int? ReadInteger(Element instance, Element type, string name) {
+        var parameter = FindMappedParameter(instance, type, name);
+        return parameter?.HasValue == true && parameter.StorageType == StorageType.Integer
+            ? parameter.AsInteger() : null;
+    }
+
+    /// <inheritdoc />
+    public bool? ReadFixation(Element instance, string name) {
+        var parameter = FindMappedParameter(instance, null, name);
+        if(parameter?.HasValue != true || parameter.StorageType != StorageType.Integer
+            || parameter.Definition.GetDataType() != SpecTypeId.Boolean.YesNo) {
+            return null;
+        }
+        return parameter.AsInteger() switch { 0 => false, 1 => true, _ => null };
+    }
+
+    // Неоднозначное имя не разрешается произвольно; тип используется только при отсутствии параметра экземпляра.
+    private static Parameter FindMappedParameter(Element instance, Element type, string name) {
+        if(string.IsNullOrEmpty(name)) {
+            return null;
+        }
+        int instanceMatches = instance.GetParameters(name).Count;
+        if(instanceMatches > 0) {
+            return instanceMatches == 1 ? instance.GetParam(name) : null;
+        }
+        return type?.GetParameters(name).Count == 1 ? type.GetParam(name) : null;
     }
 
     // Создаёт каталог параметров элемента.

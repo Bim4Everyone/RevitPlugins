@@ -51,6 +51,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private bool _isBlocked;
     private bool _isRefreshing;
     private string _contextSummary;
+    private string _readError;
     private ManagerDocumentContext _lastContext;
     private int _processingCount;
     private ManagerScopeViewModel _selectedScope;
@@ -82,7 +83,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
             element => CanEditRows && element.ShowInformation && ContainsElement(element));
         ShowWarningsCommand = commands.Create<ManagerElementViewModel>(
             element => DetailsRequested?.Invoke(new ManagerDetailsViewModel(element, true, _localization)),
-            element => CanEditRows && ContainsElement(element));
+            element => CanEditRows && element.ShowStatus && ContainsElement(element));
     }
 
     public ManagerSessionState State { get; }
@@ -103,7 +104,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public ICommand ViewScopeCommand { get; private set; }
     public ICommand SelectedScopeCommand { get; private set; }
     public bool CanChangeScope => CanEditRows && ProjectScopeCommand is not null;
-    public string ScopeToolTip => ProjectScopeCommand is null
+    public string ScopeToolTip => ProjectScopeCommand is null && LastContext?.Project is null
         ? _localization.GetLocalizedString("Manager.NotImplemented") : ContextSummary;
     public int ProcessingCount => _processingCount;
     public string ProcessText => string.Format(CultureInfo.CurrentCulture,
@@ -111,7 +112,8 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public bool CanEditRows => !IsBlocked && !State.IsClosing && !IsRefreshing;
     public string GeneralMessage => State.IsClosing ? _localization.GetLocalizedString("Manager.Closing")
         : IsBlocked ? _localization.GetLocalizedString("Manager.DocumentChanged")
-        : IsRefreshing ? _localization.GetLocalizedString("Manager.Busy") : null;
+        : IsRefreshing ? _localization.GetLocalizedString("Manager.Busy")
+        : _readError ?? GetProjectMessage();
     public bool HasGeneralMessage => GeneralMessage is not null;
     public ManagerDocumentContext LastContext {
         get => _lastContext;
@@ -263,10 +265,9 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
         RaisePropertyChanged(nameof(ProcessText));
         RaisePropertyChanged(nameof(GeneralMessage));
+        RaisePropertyChanged(nameof(HasGeneralMessage));
         if(LastContext is not null) {
-            ContextSummary = string.Format(CultureInfo.CurrentCulture,
-                _localization.GetLocalizedString("Manager.ContextSummary"), LastContext.DocumentTitle,
-                LastContext.ViewName, LastContext.SelectionUniqueIds.Count);
+            ContextSummary = FormatContextSummary(LastContext);
         } else {
             ContextSummary = _localization.GetLocalizedString("Manager.Refresh");
         }
@@ -395,6 +396,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
             if(!_dispatcher.HasShutdownStarted) {
                 await _dispatcher.InvokeAsync(() => {
                     if(IsCurrentResponse(request.DocumentToken, request.Generation)) {
+                        _readError = exception.Message;
                         ContextSummary = exception.Message;
                     }
                 }).Task.ConfigureAwait(false);
@@ -414,10 +416,56 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         if(!IsCurrentResponse(context.DocumentToken, context.Generation)) {
             return;
         }
+        if(context.Project is not null) {
+            var items = new List<ManagerItemViewModel>(context.Project.Openings.Count + context.Project.Lintels.Count);
+            items.AddRange(context.Project.Openings.Select(opening => CreateProjectRow(context.DocumentToken,
+                opening.Element, true, opening.WidthMm, heightMm: opening.HeightMm)));
+            items.AddRange(context.Project.Lintels.Select(lintel => CreateProjectRow(context.DocumentToken,
+                lintel.Element, false, lintel.OpeningWidthMm, thicknessMm: lintel.WallThicknessMm)));
+            SetItems(items, items.Select(item => item.Snapshot.Key), ManagerScope.Project);
+        }
+        _readError = null;
         LastContext = context;
-        ContextSummary = string.Format(CultureInfo.CurrentCulture,
-            _localization.GetLocalizedString("Manager.ContextSummary"), context.DocumentTitle,
-            context.ViewName, context.SelectionUniqueIds.Count);
+        ContextSummary = FormatContextSummary(context);
+    }
+
+    // Проецирует одиночный экземпляр без вывода о наличии или отсутствии второй части пары.
+    private ManagerItemViewModel CreateProjectRow(Guid documentToken, ManagerFamilySnapshot element,
+        bool isOpening, double? widthMm, double? heightMm = null, double? thicknessMm = null) {
+        const ManagerElementStatus status = ManagerElementStatus.NotAnalyzed;
+        var presentation = new ManagerElementPresentation(element.TypeName, status, element.Information,
+            widthMm: widthMm, heightMm: heightMm, thicknessMm: thicknessMm);
+        var key = new ManagerItemKey(documentToken, isOpening ? element.UniqueId : null,
+            isOpening ? null : element.UniqueId);
+        var group = new ManagerGroupKey(isOpening ? element.TypeUniqueId : null,
+            isOpening ? null : element.TypeUniqueId, status, status, isOpening ? null : element.Information.IsFixed);
+        var snapshot = new ManagerItemSnapshot(key, group, Array.Empty<ManagerDiagnostic>(),
+            new[] { ManagerAction.Skip }, ManagerAction.Skip);
+        return new ManagerItemViewModel(snapshot, isOpening ? presentation : null,
+            isOpening ? null : presentation, _localization);
+    }
+
+    // Сообщает о неполной выборке или о подтверждённом отсутствии подходящих экземпляров.
+    private string GetProjectMessage() {
+        var project = LastContext?.Project;
+        if(project is null) {
+            return null;
+        }
+        if(project.UnreadableCount > 0) {
+            return string.Format(CultureInfo.CurrentCulture, _localization.GetLocalizedString("Manager.ReadPartial"),
+                project.UnreadableCount);
+        }
+        return project.Openings.Count == 0 && project.Lintels.Count == 0
+            ? _localization.GetLocalizedString("Manager.ProjectEmpty") : null;
+    }
+
+    // Сохраняет подпись UI-контекста демонстрации и считает фактические строки проекта.
+    private string FormatContextSummary(ManagerDocumentContext context) {
+        return context.Project is { } project
+            ? string.Format(CultureInfo.CurrentCulture, _localization.GetLocalizedString("Manager.ProjectSummary"),
+                context.DocumentTitle, project.Openings.Count, project.Lintels.Count)
+            : string.Format(CultureInfo.CurrentCulture, _localization.GetLocalizedString("Manager.ContextSummary"),
+                context.DocumentTitle, context.ViewName, context.SelectionUniqueIds.Count);
     }
 
     // Проверяет актуальность успешного ответа и ошибки в момент их применения на UI-потоке.

@@ -22,6 +22,16 @@
             Value="{DynamicResource ManagerSuccessBrush}" />
         <Style.Triggers>
             <DataTrigger
+                Binding="{Binding IsAnalysisPending}"
+                Value="True">
+                <Setter
+                    Property="Symbol"
+                    Value="QuestionCircle24" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource TextFillColorSecondaryBrush}" />
+            </DataTrigger>
+            <DataTrigger
                 Binding="{Binding HasWarnings}"
                 Value="True">
                 <Setter

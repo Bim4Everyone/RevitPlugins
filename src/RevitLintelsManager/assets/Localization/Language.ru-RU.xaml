@@ -115,7 +115,11 @@
     <system:String x:Key="Manager.Refresh">Обновить данные</system:String>
     <system:String x:Key="Manager.ContextSummary">Документ: {0}&#10;Вид: {1}&#10;Выбрано элементов: {2}</system:String>
     <system:String x:Key="Manager.SignalRejected">Не удалось передать запрос в Revit. Повторите обновление.</system:String>
-    <system:String x:Key="Manager.ReadFailed">Не удалось прочитать текущий вид и выделение. Повторите обновление.</system:String>
+    <system:String x:Key="Manager.ReadFailed">Не удалось прочитать данные проекта. Повторите обновление.</system:String>
+    <system:String x:Key="Manager.ReadPartial">Не удалось прочитать часть элементов проекта ({0}).</system:String>
+    <system:String x:Key="Manager.ProjectEmpty">На выбранной стадии нет проёмов и перемычек настроенных семейств.</system:String>
+    <system:String x:Key="Manager.ProjectSummary">Документ: {0}&#10;Проёмы: {1}&#10;Перемычки: {2}</system:String>
+    <system:String x:Key="Manager.Unmatched">—</system:String>
     <system:String x:Key="Manager.ClosePending">Окно ожидает завершения запроса Revit перед освобождением ресурсов.</system:String>
     <system:String x:Key="Manager.Action.Correct">Исправить</system:String>
     <system:String x:Key="Manager.Action.Delete">Удалить</system:String>
@@ -138,6 +142,7 @@
     <system:String x:Key="Manager.Status.Grouped">В группе модели</system:String>
     <system:String x:Key="Manager.Status.Missing">Элемент отсутствует</system:String>
     <system:String x:Key="Manager.Status.Warning">Предупреждение</system:String>
+    <system:String x:Key="Manager.Status.NotAnalyzed">Анализ не выполнен</system:String>
     <system:String x:Key="Manager.Variants">Варианты</system:String>
     <system:String x:Key="Manager.View">Видимые на виде</system:String>
     <system:String x:Key="Manager.ProcessCount">Обработать ({0})</system:String>
@@ -152,6 +157,12 @@
     <system:String x:Key="Manager.Info.Level">Уровень</system:String>
     <system:String x:Key="Manager.Info.Type">Типоразмер</system:String>
     <system:String x:Key="Manager.Info.Workset">Рабочий набор</system:String>
+    <system:String x:Key="Manager.Info.OpeningWidth">Ширина проёма</system:String>
+    <system:String x:Key="Manager.Info.OpeningHeight">Параметр высоты</system:String>
+    <system:String x:Key="Manager.Info.WallThickness">Толщина стены</system:String>
+    <system:String x:Key="Manager.Info.CreatedPhase">Стадия создания</system:String>
+    <system:String x:Key="Manager.Info.DemolishedPhase">Стадия сноса</system:String>
+    <system:String x:Key="Manager.Info.Millimeters">{0:0.###} мм</system:String>
     <system:String x:Key="Manager.No">нет</system:String>
     <system:String x:Key="Manager.NotImplemented">Функция будет доступна на следующем этапе</system:String>
     <system:String x:Key="Manager.NoWarnings">Нет предупреждений</system:String>

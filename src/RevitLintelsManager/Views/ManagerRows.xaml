@@ -139,6 +139,7 @@
                         ToolTip="{Binding InformationToolTip}" />
                 </ui:Button>
                 <ui:Button
+                    x:Name="StatusButton"
                     Grid.Column="2"
                     Padding="0"
                     Style="{StaticResource ManagerIconButtonStyle}"
@@ -155,6 +156,14 @@
             </Grid>
         </Border>
         <DataTemplate.Triggers>
+            <DataTrigger
+                Binding="{Binding ShowStatus}"
+                Value="False">
+                <Setter
+                    TargetName="StatusButton"
+                    Property="Visibility"
+                    Value="Collapsed" />
+            </DataTrigger>
             <DataTrigger
                 Binding="{Binding ShowInformation}"
                 Value="False">
@@ -198,7 +207,7 @@
                         <ColumnDefinition
                             Width="*" />
                         <ColumnDefinition
-                            Width="112" />
+                            Width="144" />
                     </Grid.ColumnDefinitions>
                     <CheckBox
                         Width="24"

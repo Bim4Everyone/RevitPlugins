@@ -115,7 +115,11 @@
     <system:String x:Key="Manager.Refresh">Refresh data</system:String>
     <system:String x:Key="Manager.ContextSummary">Document: {0}&#10;View: {1}&#10;Selected elements: {2}</system:String>
     <system:String x:Key="Manager.SignalRejected">The request could not be sent to Revit. Try refreshing again.</system:String>
-    <system:String x:Key="Manager.ReadFailed">The current view and selection could not be read. Try refreshing again.</system:String>
+    <system:String x:Key="Manager.ReadFailed">Project data could not be read. Try refreshing again.</system:String>
+    <system:String x:Key="Manager.ReadPartial">Some project elements could not be read ({0}).</system:String>
+    <system:String x:Key="Manager.ProjectEmpty">There are no openings or lintels of the configured families in the selected phase.</system:String>
+    <system:String x:Key="Manager.ProjectSummary">Document: {0}&#10;Openings: {1}&#10;Lintels: {2}</system:String>
+    <system:String x:Key="Manager.Unmatched">—</system:String>
     <system:String x:Key="Manager.ClosePending">The window is waiting for the Revit request to finish before releasing resources.</system:String>
     <system:String x:Key="Manager.Action.Correct">Correct</system:String>
     <system:String x:Key="Manager.Action.Delete">Delete</system:String>
@@ -138,6 +142,7 @@
     <system:String x:Key="Manager.Status.Grouped">In model group</system:String>
     <system:String x:Key="Manager.Status.Missing">Element missing</system:String>
     <system:String x:Key="Manager.Status.Warning">Warning</system:String>
+    <system:String x:Key="Manager.Status.NotAnalyzed">Analysis pending</system:String>
     <system:String x:Key="Manager.Variants">Variants</system:String>
     <system:String x:Key="Manager.View">Visible in view</system:String>
     <system:String x:Key="Manager.ProcessCount">Process ({0})</system:String>
@@ -152,6 +157,12 @@
     <system:String x:Key="Manager.Info.Level">Level</system:String>
     <system:String x:Key="Manager.Info.Type">Type</system:String>
     <system:String x:Key="Manager.Info.Workset">Workset</system:String>
+    <system:String x:Key="Manager.Info.OpeningWidth">Opening width</system:String>
+    <system:String x:Key="Manager.Info.OpeningHeight">Height parameter</system:String>
+    <system:String x:Key="Manager.Info.WallThickness">Wall thickness</system:String>
+    <system:String x:Key="Manager.Info.CreatedPhase">Phase created</system:String>
+    <system:String x:Key="Manager.Info.DemolishedPhase">Phase demolished</system:String>
+    <system:String x:Key="Manager.Info.Millimeters">{0:0.###} mm</system:String>
     <system:String x:Key="Manager.No">no</system:String>
     <system:String x:Key="Manager.NotImplemented">This function will be available in a later stage</system:String>
     <system:String x:Key="Manager.NoWarnings">No warnings</system:String>

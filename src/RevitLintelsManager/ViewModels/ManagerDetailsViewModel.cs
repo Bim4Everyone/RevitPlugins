@@ -17,9 +17,10 @@ internal sealed class ManagerDetailsViewModel {
         string family = element.Element?.Information?.FamilyName;
         Subject = string.IsNullOrWhiteSpace(family) ? element.TypeName : $"{family}: {element.TypeName}";
         IsWarnings = warnings;
+        IsAnalysisPending = warnings && element.IsAnalysisPending;
         HasWarnings = element.HasWarnings;
-        Title = localization.GetLocalizedString(!warnings ? "Manager.Information"
-            : HasWarnings ? "Manager.HasWarnings" : "Manager.NoWarnings");
+        Title = IsAnalysisPending ? element.StatusText : localization.GetLocalizedString(!warnings
+            ? "Manager.Information" : HasWarnings ? "Manager.HasWarnings" : "Manager.NoWarnings");
         Status = warnings ? element.StatusText : null;
         var fields = new List<ManagerDetailField>();
         if(!warnings) {
@@ -32,8 +33,7 @@ internal sealed class ManagerDetailsViewModel {
             fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.Level"),
                 Display(info?.LevelName, localization)));
             fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.Group"),
-                info?.GroupName == string.Empty ? localization.GetLocalizedString("Manager.No")
-                    : Display(info?.GroupName, localization)));
+                GroupName(info, localization)));
             fields.Add(new ManagerDetailField(localization.GetLocalizedString(
                 element.IsOpening ? "Manager.Info.FixedOpening" : "Manager.Info.FixedLintel"),
                 info?.IsFixed is bool isFixed
@@ -42,6 +42,9 @@ internal sealed class ManagerDetailsViewModel {
             fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.Id"),
                 info?.DisplayId ?? info?.ElementId?.ToString(CultureInfo.InvariantCulture)
                     ?? localization.GetLocalizedString("Manager.Unavailable")));
+            if(element.IsAnalysisPending && element.Element is not null) {
+                AddProjectFields(fields, element, localization);
+            }
         }
         Fields = fields.AsReadOnly();
         ElementWarnings = warnings ? Format(element.Element?.Diagnostics, localization) : Array.Empty<string>();
@@ -51,17 +54,17 @@ internal sealed class ManagerDetailsViewModel {
             descriptions.Add(element.StatusText);
         }
         Descriptions = descriptions.AsReadOnly();
-        PositiveMessage = warnings && !HasWarnings ? localization.GetLocalizedString(element.IsOpening
+        PositiveMessage = IsStatusOk ? localization.GetLocalizedString(element.IsOpening
             ? "Manager.CorrectOpening" : "Manager.CorrectLintel") : null;
-        EmptyWarningsText = warnings && !HasWarnings
-            ? localization.GetLocalizedString("Manager.NoWarnings") : null;
+        EmptyWarningsText = IsStatusOk ? localization.GetLocalizedString("Manager.NoWarnings") : null;
     }
 
     public string Title { get; }
     public string Subject { get; }
     public bool IsWarnings { get; }
+    public bool IsAnalysisPending { get; }
     public bool HasWarnings { get; }
-    public bool IsStatusOk => IsWarnings && !HasWarnings;
+    public bool IsStatusOk => IsWarnings && !HasWarnings && !IsAnalysisPending;
     public string PositiveMessage { get; }
     public string Status { get; }
     public IReadOnlyList<ManagerDetailField> Fields { get; }
@@ -71,6 +74,43 @@ internal sealed class ManagerDetailsViewModel {
     public bool HasDescriptions => Descriptions.Count > 0;
     public bool HasRowWarnings => RowWarnings.Count > 0;
     public string EmptyWarningsText { get; }
+
+    // Показывает измеренные значения параметров и стадии в существующем списке сведений.
+    private static void AddProjectFields(ICollection<ManagerDetailField> fields, ManagerElementViewModel element,
+        ILocalizationService localization) {
+        var presentation = element.Element;
+        var phases = presentation.Information?.Phases;
+        fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.OpeningWidth"),
+            Length(presentation.WidthMm, localization)));
+        fields.Add(new ManagerDetailField(localization.GetLocalizedString(element.IsOpening
+                ? "Manager.Info.OpeningHeight" : "Manager.Info.WallThickness"),
+            Length(element.IsOpening ? presentation.HeightMm : presentation.ThicknessMm, localization)));
+        fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.CreatedPhase"),
+            DisplayPhase(phases?.CreatedName, localization)));
+        fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.DemolishedPhase"),
+            DisplayPhase(phases?.DemolishedName, localization)));
+    }
+
+    // Сохраняет нулевое значение длины и показывает миллиметры в текущей культуре.
+    private static string Length(double? value, ILocalizationService localization) {
+        return value.HasValue ? string.Format(CultureInfo.CurrentCulture,
+            localization.GetLocalizedString("Manager.Info.Millimeters"), value.Value)
+            : localization.GetLocalizedString("Manager.Unavailable");
+    }
+
+    // Отличает явно неназначенную стадию от недоступной.
+    private static string DisplayPhase(string name, ILocalizationService localization) {
+        return name == string.Empty ? localization.GetLocalizedString("Manager.No") : Display(name, localization);
+    }
+
+    // Показывает принадлежность к группе даже при недоступном имени группы.
+    private static string GroupName(ManagerElementInfo info, ILocalizationService localization) {
+        if(info?.IsInGroup == false || info?.GroupName == string.Empty) {
+            return localization.GetLocalizedString("Manager.No");
+        }
+        return info?.IsInGroup == true && string.IsNullOrWhiteSpace(info.GroupName)
+            ? localization.GetLocalizedString("Manager.Yes") : Display(info?.GroupName, localization);
+    }
 
     // Неизвестные данные не заменяются предполагаемыми значениями.
     private static string Display(string value, ILocalizationService localization) {
