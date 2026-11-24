@@ -20,7 +20,7 @@ using RevitLintelsManager.Services;
 namespace RevitLintelsManager.ViewModels;
 
 internal class PlacementSettingsViewModel : BaseViewModel {
-    private readonly RevitRepository _repository;
+    private readonly ISettingsCatalog _repository;
     private readonly SystemPluginConfig _systemConfig;
     private readonly ILocalizationService _localization;
     private readonly ILintelConfigRuleStorage _storage;
@@ -38,7 +38,7 @@ internal class PlacementSettingsViewModel : BaseViewModel {
     private ObservableCollection<string> _lintelTypes;
     private bool _updating;
 
-    public PlacementSettingsViewModel(RevitRepository repository, SystemPluginConfig systemConfig,
+    public PlacementSettingsViewModel(ISettingsCatalog repository, SystemPluginConfig systemConfig,
         ILocalizationService localization, ILintelConfigRuleStorage storage, ILintelConfigRuleSerializer serializer,
         ILintelConfigRuleResolver resolver, ISettingsDialogService dialogs, IOpenFileDialogService openDialog,
         ISaveFileDialogService saveDialog, IMessageBoxService messages, FamilySettingsViewModel familySettings,
@@ -384,7 +384,7 @@ internal class PlacementSettingsViewModel : BaseViewModel {
     }
 
     private void CopyConfig() {
-        string projectName = _repository.Document.Title;
+        string projectName = _repository.ProjectTitle;
         foreach(char invalid in Path.GetInvalidFileNameChars()) {
             projectName = projectName.Replace(invalid, '_');
         }

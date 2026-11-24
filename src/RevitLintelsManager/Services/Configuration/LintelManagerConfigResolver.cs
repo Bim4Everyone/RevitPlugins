@@ -9,7 +9,7 @@ using RevitLintelsManager.Models.Settings;
 
 namespace RevitLintelsManager.Models.Configs;
 
-internal class LintelManagerConfigResolver(RevitRepository repository,
+internal class LintelManagerConfigResolver(ISettingsCatalog repository,
     ILintelConfigRuleResolver ruleResolver, IParamService paramService, SystemPluginConfig systemConfig)
     : ILintelManagerConfigResolver {
     /// <inheritdoc />
@@ -49,6 +49,7 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
             LintelConfigRule = config,
             LintelFixParam = paramService.GetFixParam(lintelFamily, openingFamilies, settings.LintelFixParamName),
             MinimalHeightAboveOpeningMm = settings.MinimalHeightAboveOpeningMm,
+            MatchLimits = new MatchLimits(settings.MatchAlignmentMm, settings.MatchSearchMm),
             MinimalBearingMm = settings.MinimalBearingMm ?? systemConfig.DefaultMinimalBearingMm,
             ReinforcedConcreteTypes = concrete,
             SteelTypes = steel,
@@ -77,18 +78,18 @@ internal class LintelManagerConfigResolver(RevitRepository repository,
             [nameof(opening.LintelOpeningWidth)] = opening.LintelOpeningWidth.Name,
             [nameof(config.LintelFixParam)] = config.LintelFixParam.Name
         };
-        var phase = repository.Document.GetElement(config.PhaseId);
+        var phase = repository.GetPhaseKey(config.PhaseId);
         return new ManagerConfigSnapshot(
             new ConfigElementKey(family.RevitLintelFamily.Family.UniqueId, family.RevitLintelFamily.Family.Name),
             family.RevitLintelFamily.FamilySymbols.Select(type => new ConfigElementKey(type.UniqueId, type.Name)),
             opening.RevitOpeningFamily.Select(item => new ConfigElementKey(item.Family.UniqueId, item.Family.Name)),
             config.StructureWalls.Select(wall => new ConfigElementKey(wall.WallType.UniqueId, wall.WallType.Name)),
-            new ConfigElementKey(phase.UniqueId, phase.Name), parameters, config.LintelConfigRule.RuleConfigName,
+            phase, parameters, config.LintelConfigRule.RuleConfigName,
             config.LintelConfigRule.LintelPlaceRules.Select(rule => new PlacementRuleSnapshot(
                 rule.LintelPlaceRuleName, (rule.WallTypeNames ?? []).Select(name => wallTypes[name].Single()),
                 rule.LintelRules.Select(range => new LintelRuleSnapshot(range.MinWidth, range.MaxWidth,
                     range.WallSupport, range.LintelType)))), config.MinimalHeightAboveOpeningMm.Value,
-            config.MinimalBearingMm, config.ReinforcedConcreteTypes, config.SteelTypes);
+            config.MinimalBearingMm, config.ReinforcedConcreteTypes, config.SteelTypes, config.MatchLimits);
     }
 
     // Разрешает семейство перемычки и сопоставленные параметры.

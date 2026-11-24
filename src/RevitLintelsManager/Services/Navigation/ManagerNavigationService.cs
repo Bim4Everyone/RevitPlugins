@@ -3,19 +3,57 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
-namespace RevitLintelsManager.Models;
+using RevitLintelsManager.Models;
+using RevitLintelsManager.Models.Configs;
 
-internal partial class RevitRepository {
-    internal string ManagerSectionBoxTransactionName =>
-        localization.GetLocalizedString("Manager.NavigationSectionBoxTransaction");
+using static RevitLintelsManager.Models.RevitElementRead;
+using static RevitLintelsManager.Models.RevitGeometry;
+
+namespace RevitLintelsManager.Services;
+
+/// <summary>Разрешает цели навигации, выделяет их и приближает в собственном виде менеджера.</summary>
+internal sealed class ManagerNavigationService(RevitRepository source, IManagerViewService views,
+    SystemPluginConfig systemPluginConfig, ILocalizationService localization) : IManagerNavigationService {
+    private Document Document => source.Document;
+
+    /// <inheritdoc />
+    public string EnsureView(UIApplication app, ManagerConfigSnapshot config) {
+        try {
+            return views.EnsureManagerView(app, config);
+        } catch(Exception exception) {
+            throw new InvalidOperationException(localization.GetLocalizedString("Manager.ViewPreparationFailed"),
+                exception);
+        }
+    }
+
+    /// <inheritdoc />
+    public ManagerNavigationResult Navigate(UIApplication app, ManagerRequest request, ManagerSessionState state) {
+        var elements = GetNavigationElements(app, request);
+        if(elements is null) {
+            return ManagerNavigationResult.SourceUnavailable;
+        }
+        if(elements.Count == 0) {
+            return ManagerNavigationResult.TargetsUnavailable;
+        }
+
+        using var sectionBox = GetNavigationSectionBox(elements);
+        if(sectionBox is null) {
+            return ManagerNavigationResult.BoundsUnavailable;
+        }
+
+        string viewUniqueId = EnsureView(app, state.Config);
+        return viewUniqueId is not null
+            && ShowNavigationTargets(app, viewUniqueId, elements, sectionBox, request, state)
+                ? ManagerNavigationResult.Completed : ManagerNavigationResult.SourceUnavailable;
+    }
 
     /// <summary>Заново разрешает существующие цели по ключам исходного документа в ExternalEvent.</summary>
-    public IReadOnlyList<Element> GetNavigationElements(UIApplication app, ManagerRequest request) {
+    private IReadOnlyList<Element> GetNavigationElements(UIApplication app, ManagerRequest request) {
         if(GetNavigationDocument(app) is null) {
             return null;
         }
@@ -30,12 +68,12 @@ internal partial class RevitRepository {
     }
 
     /// <summary>Возвращает общий мировой SectionBox или null при недоступных границах хотя бы одной цели.</summary>
-    public BoundingBoxXYZ GetNavigationSectionBox(IReadOnlyList<Element> elements) {
+    private BoundingBoxXYZ GetNavigationSectionBox(IReadOnlyList<Element> elements) {
         XYZ minimum = null;
         XYZ maximum = null;
         foreach(var element in elements) {
             using var bounds = ReadOptional(() => element.GetBoundingBox());
-            if(bounds is null || !bounds.IsSet || !bounds.Enabled || !HasNavigationBounds(bounds.Min, bounds.Max)) {
+            if(bounds is null || !bounds.IsSet || !bounds.Enabled || !HasValidBounds(bounds.Min, bounds.Max)) {
                 return null;
             }
 
@@ -68,22 +106,21 @@ internal partial class RevitRepository {
     }
 
     /// <summary>Сохраняет рамку своего вида, затем активирует вид, выделяет цели и приближает их.</summary>
-    public bool ShowNavigationTargets(UIApplication app, string viewUniqueId, IReadOnlyList<Element> elements,
+    private bool ShowNavigationTargets(UIApplication app, string viewUniqueId, IReadOnlyList<Element> elements,
         BoundingBoxXYZ sectionBox, ManagerRequest request, ManagerSessionState state) {
         var uiDocument = GetNavigationDocument(app);
         if(uiDocument is null || !IsCurrentNavigation(request, state)) {
             return false;
         }
 
-        var schema = Schema.Lookup(_managerViewSchemaId);
-        if(Document.GetElement(viewUniqueId) is not View3D view || schema is null
-            || !IsManagerView(view, schema, app.Application.Username)) {
+        var view = views.GetOwnedView(viewUniqueId, app.Application.Username);
+        if(view is null) {
             throw new InvalidOperationException(localization.GetLocalizedString("Manager.NavigationViewUnavailable"));
         }
         if(elements.Any(element => !element.IsValidObject)) {
             throw new InvalidOperationException(localization.GetLocalizedString("Manager.NavigationTargetsChanged"));
         }
-        SaveManagerSectionBox(view, sectionBox);
+        views.SaveManagerSectionBox(view, sectionBox);
 
         uiDocument = GetNavigationDocument(app);
         if(uiDocument is null || !IsCurrentNavigation(request, state) || !view.IsValidObject) {
@@ -138,50 +175,6 @@ internal partial class RevitRepository {
     private static bool IsCurrentNavigation(ManagerRequest request, ManagerSessionState state) {
         return !state.IsClosing && !state.IsBlocked && request.DocumentToken == state.DocumentToken
             && request.Generation == state.Generation;
-    }
-
-    // Проверяет локальные границы, включая случай плоской геометрии.
-    private static bool HasNavigationBounds(XYZ minimum, XYZ maximum) {
-        return IsFinitePoint(minimum) && IsFinitePoint(maximum)
-            && minimum.X <= maximum.X && minimum.Y <= maximum.Y && minimum.Z <= maximum.Z
-            && (minimum.X < maximum.X || minimum.Y < maximum.Y || minimum.Z < maximum.Z);
-    }
-
-    // Проверяет числовые координаты перед формированием рамки.
-    private static bool IsFinitePoint(XYZ point) {
-        return point is not null && IsFiniteCoordinate(point.X) && IsFiniteCoordinate(point.Y)
-            && IsFiniteCoordinate(point.Z);
-    }
-
-    // Исключает значения, которые не представляют координату модели.
-    private static bool IsFiniteCoordinate(double value) {
-        return !double.IsNaN(value) && !double.IsInfinity(value);
-    }
-
-    // Преобразует все восемь углов, поскольку две диагональные точки могут поменять порядок после поворота.
-    private static IEnumerable<XYZ> GetWorldCorners(BoundingBoxXYZ bounds) {
-        var minimum = bounds.Min;
-        var maximum = bounds.Max;
-        var transform = bounds.Transform;
-        foreach(double x in new[] { minimum.X, maximum.X }) {
-            foreach(double y in new[] { minimum.Y, maximum.Y }) {
-                foreach(double z in new[] { minimum.Z, maximum.Z }) {
-                    yield return transform.OfPoint(new XYZ(x, y, z));
-                }
-            }
-        }
-    }
-
-    // Записывает только рамку служебного вида в отдельной короткой транзакции.
-    private void SaveManagerSectionBox(View3D view, BoundingBoxXYZ sectionBox) {
-        SaveManagerViewChanges(ManagerSectionBoxTransactionName, () => {
-            view.SetSectionBox(sectionBox);
-            view.IsSectionBoxActive = true;
-            if(!view.IsSectionBoxActive) {
-                throw new InvalidOperationException(
-                    localization.GetLocalizedString("Manager.NavigationSectionBoxFailed"));
-            }
-        });
     }
 
     // Передаёт Idling ожидаемый вид и независимые идентификаторы программного выделения.

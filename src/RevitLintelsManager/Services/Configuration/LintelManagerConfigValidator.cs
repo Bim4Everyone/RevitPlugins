@@ -8,7 +8,7 @@ using RevitLintelsManager.Models.Rules;
 
 namespace RevitLintelsManager.Models.Configs;
 
-internal class LintelManagerConfigValidator(RevitRepository repository) : ILintelManagerConfigValidator {
+internal class LintelManagerConfigValidator(ISettingsCatalog repository) : ILintelManagerConfigValidator {
     /// <inheritdoc />
     public IReadOnlyList<string> ValidateDetailed(LintelManagerConfig config) {
         if(config is null) {
@@ -33,6 +33,9 @@ internal class LintelManagerConfigValidator(RevitRepository repository) : ILinte
             || double.IsInfinity(config.MinimalHeightAboveOpeningMm.Value)
             || config.MinimalHeightAboveOpeningMm.Value < 0) {
             errors.Add("Validation.MinimalHeight");
+        }
+        if(!config.MatchLimits.IsValid) {
+            errors.Add("Validation.MatchLimits");
         }
         if(!IsValidMinimalBearing(config.MinimalBearingMm)) {
             errors.Add("Manager.Validation.MinimalBearing");

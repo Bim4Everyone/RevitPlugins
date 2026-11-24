@@ -4,14 +4,22 @@ using System.Linq;
 namespace RevitLintelsManager.Models;
 
 /// <summary>Факты исходного документа; ключ документа и поколение хранятся в ответе на запрос.</summary>
-internal sealed class ManagerProjectSnapshot(IEnumerable<ManagerOpeningSnapshot> openings,
+internal sealed partial class ManagerProjectSnapshot(IEnumerable<ManagerOpeningSnapshot> openings,
     IEnumerable<ManagerLintelSnapshot> lintels, IEnumerable<ManagerWallSnapshot> walls,
-    IEnumerable<ManagerStructureSnapshot> structures, int unreadableCount) {
+    IEnumerable<ManagerStructureSnapshot> structures, int unreadableCount,
+    IEnumerable<OpeningLintelMatch> matches = null) {
     public IReadOnlyList<ManagerOpeningSnapshot> Openings { get; } = openings.ToList().AsReadOnly();
     public IReadOnlyList<ManagerLintelSnapshot> Lintels { get; } = lintels.ToList().AsReadOnly();
     public IReadOnlyList<ManagerWallSnapshot> Walls { get; } = walls.ToList().AsReadOnly();
     public IReadOnlyList<ManagerStructureSnapshot> Structures { get; } = structures.ToList().AsReadOnly();
     public int UnreadableCount { get; } = unreadableCount;
+    public IReadOnlyList<OpeningLintelMatch> Matches { get; } = matches?.ToList().AsReadOnly();
+
+    /// <summary>Для снимков без результатов поиска проецирует исходные одиночные строки.</summary>
+    public IEnumerable<OpeningLintelMatch> GetRows() {
+        return Matches ?? Openings.Select(o => new OpeningLintelMatch(o, null, MatchState.Incomplete, []))
+            .Concat(Lintels.Select(l => new OpeningLintelMatch(null, l, MatchState.Incomplete, [])));
+    }
 }
 
 /// <summary>Общие факты экземпляра семейства; числовой ID хранится в Information.</summary>
@@ -26,7 +34,8 @@ internal sealed class ManagerFamilySnapshot(string uniqueId, string familyUnique
 
 /// <summary>Параметры проёма в мм; значение высоты сохраняет семантику настроенного параметра.</summary>
 internal sealed class ManagerOpeningSnapshot(ManagerFamilySnapshot element, string hostWallUniqueId,
-    double? widthMm, double? heightMm) {
+    double? widthMm, double? heightMm, GeometryFacts geometry = null) {
+    public GeometryFacts Geometry { get; } = geometry;
     public ManagerFamilySnapshot Element { get; } = element;
     public string HostWallUniqueId { get; } = hostWallUniqueId;
     public double? WidthMm { get; } = widthMm;
@@ -36,7 +45,8 @@ internal sealed class ManagerOpeningSnapshot(ManagerFamilySnapshot element, stri
 /// <summary>Значения настроенных параметров перемычки; опирание прочитано из параметров.</summary>
 internal sealed class ManagerLintelSnapshot(ManagerFamilySnapshot element, double? openingWidthMm,
     double? wallThicknessMm, double? leftBearingMm, double? rightBearingMm,
-    int? leftCorner, int? rightCorner, int? leftWelding, int? rightWelding) {
+    int? leftCorner, int? rightCorner, int? leftWelding, int? rightWelding, GeometryFacts geometry = null) {
+    public GeometryFacts Geometry { get; } = geometry;
     public ManagerFamilySnapshot Element { get; } = element;
     public double? OpeningWidthMm { get; } = openingWidthMm;
     public double? WallThicknessMm { get; } = wallThicknessMm;

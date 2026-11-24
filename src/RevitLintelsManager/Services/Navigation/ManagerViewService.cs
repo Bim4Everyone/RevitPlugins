@@ -8,12 +8,16 @@ using Autodesk.Revit.DB.ExtensibleStorage;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
+using RevitLintelsManager.Models;
 using RevitLintelsManager.Models.Configs;
 
-namespace RevitLintelsManager.Models;
+namespace RevitLintelsManager.Services;
 
-internal partial class RevitRepository {
+/// <summary>Подготавливает персональный 3D-вид менеджера и управляет его транзакциями.</summary>
+internal sealed class ManagerViewService(RevitRepository source, SystemPluginConfig systemPluginConfig,
+    ILocalizationService localization) : IManagerViewService {
     // Ошибки создания или настройки вида откатываются без диалога исправления модели.
     private sealed class ManagerViewFailures : IFailuresPreprocessor {
         /// <inheritdoc />
@@ -23,10 +27,26 @@ internal partial class RevitRepository {
         }
     }
 
-    internal const string ManagerViewTransactionName = "Подготовка 3D-вида менеджера перемычек";
+    private const string ManagerViewTransactionName = "Подготовка 3D-вида менеджера перемычек";
     private const string _managerViewOwnerField = "RevitUsername";
     private const string _managerViewIdField = "ViewUniqueId";
     private static readonly Guid _managerViewSchemaId = new("2ad1c331-0d63-452b-9f38-df4082f11b49");
+
+    private Document Document => source.Document;
+    private string ManagerSectionBoxTransactionName =>
+        localization.GetLocalizedString("Manager.NavigationSectionBoxTransaction");
+
+    /// <inheritdoc />
+    public bool IsViewTransaction(string name) =>
+        name == ManagerViewTransactionName || name == ManagerSectionBoxTransactionName;
+
+    /// <inheritdoc />
+    public View3D GetOwnedView(string uniqueId, string username) {
+        var schema = Schema.Lookup(_managerViewSchemaId);
+        return schema is not null && Document.GetElement(uniqueId) is View3D view
+            && IsManagerView(view, schema, username)
+            ? view : null;
+    }
 
     /// <summary>Подготавливает собственный изометрический вид и возвращает его UniqueId в исходном проекте.</summary>
     public string EnsureManagerView(UIApplication app, ManagerConfigSnapshot config) {
@@ -40,7 +60,7 @@ internal partial class RevitRepository {
             throw new InvalidOperationException("Имя пользователя Revit недоступно.");
         }
 
-        var phaseId = GetReadPhaseId(config);
+        var phaseId = source.GetReadPhaseId(config);
         var schema = Schema.Lookup(_managerViewSchemaId);
         var existingView = schema is null ? null : FindManagerView(schema, owner);
         if(existingView is not null
@@ -195,7 +215,8 @@ internal partial class RevitRepository {
 
             changes();
             if(transaction.Commit() != TransactionStatus.Committed) {
-                throw new InvalidOperationException(localization.GetLocalizedString("Manager.ViewTransactionCommitFailed"));
+                throw new InvalidOperationException(
+                    localization.GetLocalizedString("Manager.ViewTransactionCommitFailed"));
             }
         } finally {
             if(transaction.GetStatus() == TransactionStatus.Started) {
@@ -217,5 +238,17 @@ internal partial class RevitRepository {
         if(view.GetParamValueOrDefault<ElementId>(phaseParameter) != phaseId) {
             throw new InvalidOperationException("Revit не назначил выбранную стадию на служебном 3D-виде.");
         }
+    }
+
+    // Записывает только рамку служебного вида в отдельной короткой транзакции.
+    public void SaveManagerSectionBox(View3D view, BoundingBoxXYZ sectionBox) {
+        SaveManagerViewChanges(ManagerSectionBoxTransactionName, () => {
+            view.SetSectionBox(sectionBox);
+            view.IsSectionBoxActive = true;
+            if(!view.IsSectionBoxActive) {
+                throw new InvalidOperationException(
+                    localization.GetLocalizedString("Manager.NavigationSectionBoxFailed"));
+            }
+        });
     }
 }

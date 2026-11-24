@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
@@ -41,6 +41,16 @@ internal class RevitSettings : ProjectSettings {
 
 public class SystemPluginConfig {
     internal const string CustomGroupExpanderPartName = "PART_Expander";
+    internal const double DefaultMatchAlignmentMm = 10;
+    internal const double DefaultMatchSearchMm = 200;
+    internal const double MatchAngleToleranceDegrees = 0.1;
+    // Несколько ULP учитывают вычитание мировых координат и обратное преобразование единиц.
+    internal const double CoordinateRoundoffFactor = 8 * 2.2204460492503131e-16;
+    internal const double MillimetersPerFoot = 304.8;
+
+    // Компенсация округления при сравнении отклонения с включительной границей.
+    internal const double MatchRoundoffMm = 1e-8;
+    internal const double MatchRoundoffDegrees = 1e-10;
 
     // Коллекция категорий допустимых семейств перемычек
     public readonly IEnumerable<BuiltInCategory> DefaultLintelCats = [

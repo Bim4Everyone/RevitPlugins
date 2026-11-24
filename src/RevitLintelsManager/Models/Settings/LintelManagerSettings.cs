@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using pyRevitLabs.Json;
 using pyRevitLabs.Json.Linq;
+
+using RevitLintelsManager.Models.Configs;
 
 namespace RevitLintelsManager.Models.Settings;
 
@@ -13,6 +15,8 @@ public class LintelManagerSettings {
     public string LintelFixParamName { get; set; }
     public double MinimalHeightAboveOpeningMm { get; set; }
     public IEnumerable<string> StructureWallTypeNames { get; set; }
+    public double MatchAlignmentMm { get; set; } = SystemPluginConfig.DefaultMatchAlignmentMm;
+    public double MatchSearchMm { get; set; } = SystemPluginConfig.DefaultMatchSearchMm;
     public string PhaseName { get; set; }
     public IEnumerable<LintelWallSettings> LintelWallSettings { get; set; } = [];
     public IEnumerable<StructureTypeSettings> ReinforcedConcreteTypes { get; set; }

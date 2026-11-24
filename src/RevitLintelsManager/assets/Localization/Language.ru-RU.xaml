@@ -13,6 +13,9 @@
     <system:String x:Key="General.Phase">Стадия</system:String>
     <system:String x:Key="General.MinimalHeight">Минимальная толщина кладки над проёмом, при которой ставится перемычка, мм</system:String>
     <system:String x:Key="General.Millimeters">Миллиметры</system:String>
+    <system:String x:Key="General.MatchAlignment">Допуск совпадения плоскостей, мм</system:String>
+    <system:String x:Key="General.MatchSearch">Максимальное смещение для поиска пары, мм</system:String>
+    <system:String x:Key="Validation.MatchLimits">Введите конечные числа. Допуск совпадения должен быть не меньше нуля, предел поиска — не меньше допуска.</system:String>
     <system:String x:Key="General.MinimalBearing">Минимальное опирание, мм</system:String>
     <system:String x:Key="General.LimitingStructures">Ограничивающие конструкции</system:String>
     <system:String x:Key="General.ReinforcedConcreteTypes">Железобетонные конструкции</system:String>

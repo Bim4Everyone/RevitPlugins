@@ -13,6 +13,9 @@
     <system:String x:Key="General.Phase">Phase</system:String>
     <system:String x:Key="General.MinimalHeight">Minimum masonry height above an opening for placing a lintel, mm</system:String>
     <system:String x:Key="General.Millimeters">Millimeters</system:String>
+    <system:String x:Key="General.MatchAlignment">Plane alignment tolerance, mm</system:String>
+    <system:String x:Key="General.MatchSearch">Maximum offset for pair search, mm</system:String>
+    <system:String x:Key="Validation.MatchLimits">Enter finite numbers. Alignment tolerance must be at least zero and search distance must be at least the tolerance.</system:String>
     <system:String x:Key="General.MinimalBearing">Minimum bearing, mm</system:String>
     <system:String x:Key="General.LimitingStructures">Bounding structures</system:String>
     <system:String x:Key="General.ReinforcedConcreteTypes">Concrete structures</system:String>

@@ -78,6 +78,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <ui:TextBlock
                     Margin="0,8,20,8"
@@ -127,6 +129,32 @@
                     Margin="0,5"
                     AutomationProperties.LabeledBy="{Binding ElementName=_minimalBearingLabel}"
                     Text="{Binding MinimalBearingText, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:TextBlock
+                    x:Name="_matchAlignmentLabel"
+                    Grid.Row="4"
+                    Margin="0,8,20,8"
+                    VerticalAlignment="Center"
+                    TextWrapping="Wrap"
+                    Text="{me:LocalizationSource General.MatchAlignment}" />
+                <ui:TextBox
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    Margin="0,5"
+                    AutomationProperties.LabeledBy="{Binding ElementName=_matchAlignmentLabel}"
+                    Text="{Binding MatchAlignmentText, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:TextBlock
+                    x:Name="_matchSearchLabel"
+                    Grid.Row="5"
+                    Margin="0,8,20,8"
+                    VerticalAlignment="Center"
+                    TextWrapping="Wrap"
+                    Text="{me:LocalizationSource General.MatchSearch}" />
+                <ui:TextBox
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    Margin="0,5"
+                    AutomationProperties.LabeledBy="{Binding ElementName=_matchSearchLabel}"
+                    Text="{Binding MatchSearchText, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </ui:Card>
         <ContentPresenter

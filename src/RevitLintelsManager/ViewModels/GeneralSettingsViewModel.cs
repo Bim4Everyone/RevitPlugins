@@ -25,22 +25,26 @@ internal class GeneralSettingsViewModel : BaseViewModel {
     private ItemViewModel _selectedPhase;
     private string _minimalHeightText;
     private string _minimalBearingText;
+    private string _matchAlignmentText;
+    private string _matchSearchText;
     private string _fixParameterName;
 
     /// <summary>Загружает общие настройки и оба перечня типов для исходного проекта.</summary>
-    public GeneralSettingsViewModel(RevitRepository repository, IParamService paramService,
+    public GeneralSettingsViewModel(ISettingsCatalog repository, IParamService paramService,
         ILocalizationService localizationService, FamilySettingsViewModel familySettings,
         LintelManagerSettings settings, SystemPluginConfig systemConfig) {
         _localizationService = localizationService;
         _paramService = paramService;
         _familySettings = familySettings;
         _fixParameterName = settings.LintelFixParamName;
-        Phases = new ObservableCollection<ItemViewModel>(repository.PhaseIds.Select(id =>
-            new ItemViewModel { Name = repository.Document.GetElement(id).Name }));
+        Phases = new ObservableCollection<ItemViewModel>(repository.PhaseNames.Select(name =>
+            new ItemViewModel { Name = name }));
         SelectedPhase = Phases.FirstOrDefault(phase => phase.Name == settings.PhaseName);
         MinimalHeightText = settings.MinimalHeightAboveOpeningMm.ToString(CultureInfo.CurrentCulture);
         double minimalBearing = settings.MinimalBearingMm ?? systemConfig.DefaultMinimalBearingMm;
         _minimalBearingText = minimalBearing.ToString("R", CultureInfo.CurrentCulture);
+        _matchAlignmentText = settings.MatchAlignmentMm.ToString("R", CultureInfo.CurrentCulture);
+        _matchSearchText = settings.MatchSearchMm.ToString("R", CultureInfo.CurrentCulture);
         var catalog = repository.GetStructureTypes().ToLookup(type => type.Settings.GetKey());
         ReinforcedConcreteTypes = new StructureTypeListViewModel(settings.GetReinforcedConcreteTypes(),
             systemConfig.ReinforcedConcreteCategories, catalog, localizationService);
@@ -85,6 +89,22 @@ internal class GeneralSettingsViewModel : BaseViewModel {
         set => RaiseAndSetIfChanged(ref _minimalHeightText, value);
     }
 
+    public string MatchAlignmentText {
+        get => _matchAlignmentText;
+        set {
+            RaiseAndSetIfChanged(ref _matchAlignmentText, value);
+            CommandManager.InvalidateRequerySuggested();
+        }
+    }
+
+    public string MatchSearchText {
+        get => _matchSearchText;
+        set {
+            RaiseAndSetIfChanged(ref _matchSearchText, value);
+            CommandManager.InvalidateRequerySuggested();
+        }
+    }
+
     public string MinimalBearingText {
         get => _minimalBearingText;
         set {
@@ -112,9 +132,13 @@ internal class GeneralSettingsViewModel : BaseViewModel {
     /// <summary>Подготавливает копию общих настроек с обоими перечнями для сохранения.</summary>
     public LintelManagerSettings BuildSettings(LintelManagerSettings source) {
         double bearing = double.Parse(MinimalBearingText, NumberStyles.Float, CultureInfo.CurrentCulture);
-        return source.WithGeneralSettings(bearing,
+        var updated = source.WithGeneralSettings(bearing,
             ReinforcedConcreteTypes.GetSelectedTypes().Select(type => type.Settings),
             SteelTypes.GetSelectedTypes().Select(type => type.Settings));
+        var limits = ReadMatchLimits();
+        updated.MatchAlignmentMm = limits.AlignmentMm;
+        updated.MatchSearchMm = limits.SearchMm;
+        return updated;
     }
 
     /// <summary>Возвращает первую ошибку общих настроек для окна и команды сохранения.</summary>
@@ -129,7 +153,15 @@ internal class GeneralSettingsViewModel : BaseViewModel {
             || double.IsNaN(height) || double.IsInfinity(height) || height < 0) {
             return _localizationService.GetLocalizedString("Validation.MinimalHeight");
         }
-        return MinimalBearingError;
+        return MinimalBearingError ?? (ReadMatchLimits()?.IsValid == true
+            ? null : _localizationService.GetLocalizedString("Validation.MatchLimits"));
+    }
+
+    // Читает миллиметры в культуре редактора; неполный ввод блокирует сохранение.
+    private MatchLimits ReadMatchLimits() {
+        return double.TryParse(MatchAlignmentText, NumberStyles.Float, CultureInfo.CurrentCulture, out double alignment)
+            && double.TryParse(MatchSearchText, NumberStyles.Float, CultureInfo.CurrentCulture, out double search)
+            ? new MatchLimits(alignment, search) : null;
     }
 
     // Подбирает параметры фиксации, общие для выбранных семейств.

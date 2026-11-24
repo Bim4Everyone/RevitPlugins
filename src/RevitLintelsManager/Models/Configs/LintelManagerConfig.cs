@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
@@ -12,6 +12,7 @@ public class LintelManagerConfig {
     public LintelConfigRule LintelConfigRule { get; set; }
     public RevitParam LintelFixParam { get; set; }
     public double? MinimalHeightAboveOpeningMm { get; set; }
+    internal MatchLimits MatchLimits { get; set; } = MatchLimits.Default;
     public double MinimalBearingMm { get; set; }
     public IReadOnlyList<StructureTypeSelection> ReinforcedConcreteTypes { get; set; } = [];
     public IReadOnlyList<StructureTypeSelection> SteelTypes { get; set; } = [];

@@ -21,7 +21,7 @@ namespace RevitLintelsManager.ViewModels;
 internal class FamilySettingsViewModel : BaseViewModel {
     public event Action SelectionChanged;
 
-    private readonly RevitRepository _revitRepository;
+    private readonly ISettingsCatalog _catalog;
     private readonly SystemPluginConfig _systemPluginConfig;
     private readonly ILocalizationService _localizationService;
     private readonly Dictionary<string, LintelFamilySettings> _familySettings = [];
@@ -47,10 +47,10 @@ internal class FamilySettingsViewModel : BaseViewModel {
     private string _lintelSearchText;
     private string _openingSearchText;
 
-    public FamilySettingsViewModel(RevitRepository revitRepository, SystemPluginConfig systemPluginConfig,
+    public FamilySettingsViewModel(ISettingsCatalog catalog, SystemPluginConfig systemPluginConfig,
         ILocalizationService localizationService, LintelManagerSettings settings, bool hasSavedSettings,
         ISettingsCommandFactory commandFactory) {
-        _revitRepository = revitRepository;
+        _catalog = catalog;
         _systemPluginConfig = systemPluginConfig;
         _localizationService = localizationService;
         SelectLintelFamilyCommand = commandFactory.Create<FamilyViewModel>(
@@ -58,9 +58,9 @@ internal class FamilySettingsViewModel : BaseViewModel {
         SearchLintelFamiliesCommand = commandFactory.Create(ApplySearchLintelFamilies);
         SearchOpeningFamiliesCommand = commandFactory.Create(ApplySearchOpeningFamilies);
         LintelFamilyViewModels = new ObservableCollection<FamilyViewModel>(
-            _revitRepository.LintelFamilies.OrderBy(family => family.Family.Name).Select(CreateFamilyViewModel));
+            _catalog.LintelFamilies.OrderBy(family => family.Family.Name).Select(CreateFamilyViewModel));
         OpeningFamilyViewModels = new ObservableCollection<FamilyViewModel>(
-            _revitRepository.OpeningFamilies.Select(CreateFamilyViewModel));
+            _catalog.OpeningFamilies.Select(CreateFamilyViewModel));
         if(settings.LintelFamilySettings?.LintelFamily is not null) {
             _familySettings[settings.LintelFamilySettings.LintelFamily] = settings.LintelFamilySettings;
         }
@@ -214,13 +214,13 @@ internal class FamilySettingsViewModel : BaseViewModel {
     }
     
     public IEnumerable<RevitFamily> GetSelectedFamilies() {
-        var lintelFamily = _revitRepository.LintelFamilies.FirstOrDefault(
+        var lintelFamily = _catalog.LintelFamilies.FirstOrDefault(
             family => family.Family == SelectedLintelFamilyViewModel?.Family);
         if(lintelFamily is null) {
             return [];
         }
         var names = SelectedOpeningFamilyViewModels.Select(family => family.Name).ToHashSet();
-        return new[] { lintelFamily }.Concat(_revitRepository.OpeningFamilies
+        return new[] { lintelFamily }.Concat(_catalog.OpeningFamilies
             .Where(family => names.Contains(family.Family.Name)));
     }
 

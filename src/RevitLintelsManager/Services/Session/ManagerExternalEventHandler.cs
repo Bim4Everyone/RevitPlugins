@@ -15,6 +15,7 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
     private readonly object _sync = new();
     private readonly Queue<PendingRequest> _queue = new();
     private readonly RevitRepository _repository;
+    private readonly IManagerScopeReader _scopeReader;
     private readonly ManagerSessionState _state;
     private readonly IManagerNavigationService _navigation;
     private readonly ILoggerService _logger;
@@ -29,9 +30,10 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
     private bool _managerViewPrepared;
 
     /// <summary>Создаёт ExternalEvent в исходном API-контексте команды.</summary>
-    public ManagerExternalEventHandler(RevitRepository repository, ManagerSessionState state,
-        IManagerNavigationService navigation, ILoggerService logger, ILocalizationService localization) {
+    public ManagerExternalEventHandler(RevitRepository repository, IManagerScopeReader scopeReader,
+        ManagerSessionState state, IManagerNavigationService navigation, ILoggerService logger, ILocalizationService localization) {
         _repository = repository;
+        _scopeReader = scopeReader;
         _state = state;
         _navigation = navigation;
         _logger = logger;
@@ -239,7 +241,7 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
                 return null;
             }
         }
-        return _repository.ReadDocumentContext(app, request, _state);
+        return _scopeReader.ReadDocumentContext(app, request, _state);
     }
 
     // Отмечает собственные транзакции вида и преобразует ожидаемый отказ в локализованную диагностику.

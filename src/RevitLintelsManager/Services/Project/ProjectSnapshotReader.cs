@@ -8,11 +8,30 @@ using dosymep.Revit;
 
 using RevitLintelsManager.Models.Configs;
 
-using RevitExceptions = Autodesk.Revit.Exceptions;
+using static RevitLintelsManager.Models.RevitElementRead;
+using static RevitLintelsManager.Models.RevitGeometry;
 
 namespace RevitLintelsManager.Models;
 
-internal partial class RevitRepository {
+/// <summary>Собирает независимые снимки элементов и объединяет результаты анализа одного чтения.</summary>
+internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPluginConfig systemPluginConfig,
+    IParamService paramService, Func<IGeometryReadContext> openGeometry, IPlacementGeometryReader placements,
+    IAboveOpeningAnalyzer aboveOpenings, ISideBearingAnalyzer sideBearings) : IProjectSnapshotReader {
+    private Document Document => source.Document;
+
+    /// <inheritdoc />
+    public bool HasMatchingFamilies(FilteredElementCollector collector, ManagerConfigSnapshot config,
+        ElementId phaseId) {
+        return GetMatchingFamilies(collector, config, phaseId).Any();
+    }
+
+    private sealed class StructureCatalog {
+        public List<StructureCandidate> Upper { get; } = [];
+        public List<StructureCandidate> Sides { get; } = [];
+        public bool UpperIncomplete { get; set; }
+        public bool SidesIncomplete { get; set; }
+    }
+
     private sealed class ProjectFamilyType(FamilySymbol symbol, Family family, bool isOpening) {
         public FamilySymbol Symbol { get; } = symbol;
         public string FamilyUniqueId { get; } = family.UniqueId;
@@ -23,33 +42,55 @@ internal partial class RevitRepository {
     }
 
     // Собирает факты экземпляров из переданного диапазона и опорные данные по всему проекту при его выборе.
-    private ManagerProjectSnapshot ReadScopeSnapshot(ManagerConfigSnapshot config, ElementId phaseId,
+    public ManagerProjectSnapshot ReadScopeSnapshot(ManagerConfigSnapshot config, ElementId phaseId,
         ManagerScope scope, FilteredElementCollector collector) {
         var openings = new List<ManagerOpeningSnapshot>();
         var lintels = new List<ManagerLintelSnapshot>();
         var walls = new List<ManagerWallSnapshot>();
         var structures = new List<ManagerStructureSnapshot>();
         var phaseNames = Document.Phases.Cast<Phase>().ToDictionary(item => item.Id, item => item.Name);
-        int unreadableCount = collector is null ? 0
-            : ReadFamilySnapshots(collector, config, phaseId, phaseNames, openings, lintels);
-        if(scope == ManagerScope.Project) {
-            unreadableCount += ReadProjectStructures(config, phaseId, phaseNames, walls, structures);
+        HashSet<long> scopeIds = null;
+        if(scope != ManagerScope.Project) {
+            using var categories = new ElementMulticategoryFilter(
+                systemPluginConfig.DefaultOpeningCats.Union(systemPluginConfig.DefaultLintelCats).ToList());
+            scopeIds = collector is null ? [] : collector.WherePasses(categories).OfClass(typeof(FamilyInstance))
+                .WhereElementIsNotElementType().ToElementIds().Select(id => (long) id.GetIdValue()).ToHashSet();
+            if(scopeIds.Count == 0) {
+                return new ManagerProjectSnapshot(openings, lintels, walls, structures, 0, []);
+            }
         }
-        return new ManagerProjectSnapshot(openings, lintels, walls, structures, unreadableCount);
-    }
-
-    // Получает стадию из неизменяемой конфигурации текущей сессии.
-    private ElementId GetReadPhaseId(ManagerConfigSnapshot config) {
-        if(Document.GetElement(config.Phase.UniqueId) is not Phase phase) {
-            throw new InvalidOperationException("Настроенная стадия удалена из исходного документа.");
+        using var projectCollector = scopeIds is null ? null : new FilteredElementCollector(Document);
+        using var analysis = openGeometry();
+        int unreadableCount = ReadFamilySnapshots(projectCollector ?? collector, config, phaseId, phaseNames,
+            openings, lintels, analysis);
+        var seeds = scopeIds is null ? null : openings.Select(o => o.Element).Concat(lintels.Select(l => l.Element))
+            .Where(element => element.Information.ElementId is long id && scopeIds.Contains(id))
+            .Select(element => element.UniqueId).ToHashSet();
+        var matches = OpeningLintelMatcher.Match(openings, lintels, seeds, config.MatchLimits, LengthEpsilon,
+            unreadableCount > 0, key => ReadOptional(() => analysis.GetBounds(Document.GetElement(key))));
+        if(seeds is not null) {
+            openings.RemoveAll(o => !seeds.Contains(o.Element.UniqueId));
+            lintels.RemoveAll(l => !seeds.Contains(l.Element.UniqueId));
         }
-        return phase.Id;
+        var rowOpenings = matches.Where(row => row.Opening is not null).Select(row => row.Opening).ToList();
+        bool projectScope = scope == ManagerScope.Project;
+        var catalog = new StructureCatalog();
+        if(projectScope || rowOpenings.Any(o => o.Geometry?.Cut is not null)) {
+            unreadableCount += ReadProjectStructures(config, phaseId, phaseNames, walls, structures,
+                projectScope, catalog);
+        }
+        var above = aboveOpenings.ReadAboveOpenings(analysis, rowOpenings, catalog.Upper, catalog.UpperIncomplete,
+            config.MinimalHeightAboveOpeningMm);
+        var sides = sideBearings.ReadSideBearings(analysis, rowOpenings, catalog.Sides,
+            catalog.SidesIncomplete, config);
+        return new ManagerProjectSnapshot(openings, lintels, walls, structures, unreadableCount, matches, above, sides);
     }
 
     // Материализует экземпляры области с переиспользованием справочных данных за одно чтение.
     private int ReadFamilySnapshots(FilteredElementCollector collector, ManagerConfigSnapshot config, ElementId phaseId,
         IReadOnlyDictionary<ElementId, string> phaseNames,
-        ICollection<ManagerOpeningSnapshot> openings, ICollection<ManagerLintelSnapshot> lintels) {
+        ICollection<ManagerOpeningSnapshot> openings, ICollection<ManagerLintelSnapshot> lintels,
+        IGeometryReadContext analysis) {
         var elementNames = new Dictionary<ElementId, string>();
         var worksetNames = new Dictionary<WorksetId, string>();
         using var worksets = Document.GetWorksetTable();
@@ -65,9 +106,9 @@ internal partial class RevitRepository {
                 var element = ReadFamilySnapshot(instance, type, phaseNames, config.Parameters,
                     getElementName, getWorksetName);
                 if(type.IsOpening) {
-                    openings.Add(ReadOpening(instance, type.Symbol, element, config.Parameters));
+                    openings.Add(ReadOpening(instance, type.Symbol, element, config.Parameters, analysis));
                 } else {
-                    lintels.Add(ReadLintel(instance, type.Symbol, element, config.Parameters));
+                    lintels.Add(ReadLintel(instance, type.Symbol, element, config.Parameters, analysis));
                 }
             } catch(Exception exception) when(IsElementReadException(exception)) {
                 unreadableCount++;
@@ -143,18 +184,19 @@ internal partial class RevitRepository {
 
     // Сохраняет фактического хоста-стену и размеры из настроенных параметров проёма.
     private ManagerOpeningSnapshot ReadOpening(FamilyInstance instance, FamilySymbol type,
-        ManagerFamilySnapshot element, IReadOnlyDictionary<string, string> parameters) {
+        ManagerFamilySnapshot element, IReadOnlyDictionary<string, string> parameters, IGeometryReadContext analysis) {
         string wall = ReadOptional(() => (instance.Host as Wall)?.UniqueId);
-        return new ManagerOpeningSnapshot(element, wall,
-            ReadOptional(() => paramService.ReadLengthMm(instance, type,
-                parameters[nameof(OpeningFamilyConfig.LintelOpeningWidth)])),
-            ReadOptional(() => paramService.ReadLengthMm(instance, type,
-                parameters[nameof(OpeningFamilyConfig.LintelOpeningHeight)])));
+        double? width = ReadOptional(() => paramService.ReadLengthMm(instance, type,
+            parameters[nameof(OpeningFamilyConfig.LintelOpeningWidth)]));
+        double? height = ReadOptional(() => paramService.ReadLengthMm(instance, type,
+            parameters[nameof(OpeningFamilyConfig.LintelOpeningHeight)]));
+        var geometry = placements.ReadOpeningGeometry(analysis, instance, width, height);
+        return new ManagerOpeningSnapshot(element, wall, width, height, geometry);
     }
 
     // Читает настроенные параметры перемычки без вычисления опирания и креплений.
     private ManagerLintelSnapshot ReadLintel(FamilyInstance instance, FamilySymbol type, ManagerFamilySnapshot element,
-        IReadOnlyDictionary<string, string> parameters) {
+        IReadOnlyDictionary<string, string> parameters, IGeometryReadContext analysis) {
         double? Length(string key) => ReadOptional(() => paramService.ReadLengthMm(instance, type, parameters[key]));
         int? Integer(string key) => ReadOptional(() => paramService.ReadInteger(instance, type, parameters[key]));
 
@@ -163,26 +205,38 @@ internal partial class RevitRepository {
             Length(nameof(LintelFamilyConfig.LintelLeftOffset)), Length(nameof(LintelFamilyConfig.LintelRightOffset)),
             Integer(nameof(LintelFamilyConfig.LintelLeftCorner)), Integer(nameof(LintelFamilyConfig.LintelRightCorner)),
             Integer(nameof(LintelFamilyConfig.LintelLeftWelding)),
-            Integer(nameof(LintelFamilyConfig.LintelRightWelding)));
+            Integer(nameof(LintelFamilyConfig.LintelRightWelding)), placements.ReadLintelGeometry(analysis, instance));
     }
 
     // Читает стены и экземпляры настроенных конструкций в одном проходе по допустимым категориям.
     private int ReadProjectStructures(ManagerConfigSnapshot config, ElementId phaseId,
         IReadOnlyDictionary<ElementId, string> phaseNames,
-        ICollection<ManagerWallSnapshot> walls, ICollection<ManagerStructureSnapshot> structures) {
+        ICollection<ManagerWallSnapshot> walls, ICollection<ManagerStructureSnapshot> structures, bool projectScope,
+        StructureCatalog catalog) {
         var concrete = new HashSet<string>(config.ReinforcedConcreteTypes.Select(type => type.UniqueId));
+        concrete.Remove(null);
         var steel = new HashSet<string>(config.SteelTypes.Select(type => type.UniqueId));
-        var selectedCategories = new HashSet<string>(config.ReinforcedConcreteTypes.Concat(config.SteelTypes)
-            .Select(type => type.Settings.Category));
+        steel.Remove(null);
+        var concreteCategories = new HashSet<string>(
+            config.ReinforcedConcreteTypes.Select(type => type.Settings.Category));
+        var selectedCategories = new HashSet<string>(concreteCategories);
+        selectedCategories.UnionWith(config.SteelTypes.Select(type => type.Settings.Category));
         var categories = systemPluginConfig.ReinforcedConcreteCategories.Union(systemPluginConfig.SteelCategories)
-            .Where(category => category == BuiltInCategory.OST_Walls
+            .Where(category => category is BuiltInCategory.OST_Floors or BuiltInCategory.OST_StructuralFraming
+                || (projectScope && category == BuiltInCategory.OST_Walls)
                 || selectedCategories.Contains(category.ToString()));
         using var filter = new ElementMulticategoryFilter(categories.ToList());
         using var collector = new FilteredElementCollector(Document);
         var typeKeys = new Dictionary<ElementId, string>();
         int unreadableCount = 0;
         foreach(var element in collector.WherePasses(filter).WhereElementIsNotElementType()) {
+            bool possibleUpper = true;
+            bool possibleSide = selectedCategories.Count > 0;
             try {
+                var category = element.Category.GetBuiltInCategory();
+                bool upperCategory = category is BuiltInCategory.OST_Floors or BuiltInCategory.OST_StructuralFraming;
+                possibleUpper = upperCategory || concreteCategories.Contains(category.ToString());
+                possibleSide = selectedCategories.Contains(category.ToString());
                 var typeId = element.GetTypeId();
                 if(!typeKeys.TryGetValue(typeId, out string typeKey)) {
                     typeKey = typeId == ElementId.InvalidElementId ? null : Document.GetElement(typeId)?.UniqueId;
@@ -190,10 +244,35 @@ internal partial class RevitRepository {
                 }
                 bool isConcrete = concrete.Contains(typeKey);
                 bool isSteel = steel.Contains(typeKey);
-                if((element is Wall || isConcrete || isSteel) && ExistsOnPhase(element, phaseId)) {
+                possibleUpper = upperCategory || isConcrete || (possibleUpper && typeKey is null);
+                possibleSide = isConcrete || isSteel || (possibleSide && typeKey is null);
+                if(!possibleUpper && !possibleSide && !(projectScope && element is Wall)) {
+                    continue;
+                }
+                if(!ExistsOnPhase(element, phaseId)) {
+                    continue;
+                }
+                if(typeKey is null) {
+                    catalog.UpperIncomplete |= possibleUpper;
+                    catalog.SidesIncomplete |= possibleSide;
+                } else if(possibleUpper || possibleSide) {
+                    var candidate = new StructureCandidate(element, element.UniqueId, typeKey, category,
+                        isConcrete, isSteel);
+                    if(possibleUpper) {
+                        catalog.Upper.Add(candidate);
+                    }
+                    if(possibleSide) {
+                        catalog.Sides.Add(candidate);
+                    }
+                }
+                possibleUpper = false;
+                possibleSide = false;
+                if(projectScope && (element is Wall || isConcrete || isSteel)) {
                     AddStructureSnapshot(element, typeKey, isConcrete, isSteel, phaseNames, walls, structures);
                 }
             } catch(Exception exception) when(IsElementReadException(exception)) {
+                catalog.UpperIncomplete |= possibleUpper;
+                catalog.SidesIncomplete |= possibleSide;
                 unreadableCount++;
             }
         }
@@ -231,29 +310,5 @@ internal partial class RevitRepository {
         var demolished = ReadOptional(() => element.DemolishedPhaseId);
         return new ManagerElementPhases(Name(created), Name(demolished),
             created?.GetIdValue(), demolished?.GetIdValue());
-    }
-
-    // Разрешает часто повторяющиеся справочные имена один раз за чтение.
-    private static string GetCachedName<TKey>(TKey id, IDictionary<TKey, string> names, Func<TKey, string> readName) {
-        if(!names.TryGetValue(id, out string name)) {
-            name = readName(id);
-            names.Add(id, name);
-        }
-        return name;
-    }
-
-    // Ошибка отдельного поля не должна скрывать остальную информацию об экземпляре.
-    private static T ReadOptional<T>(Func<T> read) {
-        try {
-            return read();
-        } catch(Exception exception) when(IsElementReadException(exception)) {
-            return default;
-        }
-    }
-
-    // Отделяет ошибки доступа к отдельному объекту от ошибок всего запроса.
-    private static bool IsElementReadException(Exception exception) {
-        return exception is RevitExceptions.InvalidObjectException or RevitExceptions.InvalidOperationException
-            or RevitExceptions.ArgumentException or RevitExceptions.InternalException;
     }
 }

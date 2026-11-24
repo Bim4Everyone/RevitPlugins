@@ -725,11 +725,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
                 _hiddenState.Remove(key);
             }
             _deletionCandidates.Clear();
-            var items = new List<ManagerItemViewModel>(context.Project.Openings.Count + context.Project.Lintels.Count);
-            items.AddRange(context.Project.Openings.Select(opening => CreateProjectRow(context.DocumentToken,
-                opening.Element, true, opening.WidthMm, heightMm: opening.HeightMm)));
-            items.AddRange(context.Project.Lintels.Select(lintel => CreateProjectRow(context.DocumentToken,
-                lintel.Element, false, lintel.OpeningWidthMm, thicknessMm: lintel.WallThicknessMm)));
+            var items = context.Project.GetRows().Select(row => CreateProjectRow(context.DocumentToken, row)).ToList();
             bool retainUnseen = scope != ManagerScope.Project || context.Project.UnreadableCount > 0;
             SetItems(items, scope, retainUnseen);
         }
@@ -739,27 +735,35 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         ContextSummary = FormatContextSummary(context);
     }
 
-    // Проецирует одиночный экземпляр без вывода о наличии или отсутствии второй части пары.
-    private ManagerItemViewModel CreateProjectRow(Guid documentToken, ManagerFamilySnapshot element,
-        bool isOpening, double? widthMm, double? heightMm = null, double? thicknessMm = null) {
+    // Представляет подтверждённую пару одной строкой, сохраняя существующие ключи групп и состояние пользователя.
+    private ManagerItemViewModel CreateProjectRow(Guid documentToken, OpeningLintelMatch row) {
         const ManagerElementStatus status = ManagerElementStatus.NotAnalyzed;
-        var key = new ManagerItemKey(documentToken, isOpening ? element.UniqueId : null,
-            isOpening ? null : element.UniqueId);
-        var group = new ManagerGroupKey(isOpening ? element.TypeUniqueId : null,
-            isOpening ? null : element.TypeUniqueId, status, status, isOpening ? null : element.Information.IsFixed);
-        if(_items.TryGetValue(key, out var previous) && previous.Snapshot.GroupKey.Equals(group)) {
-            var old = isOpening ? previous.Opening.Element : previous.Lintel.Element;
-            if(old.TypeName == element.TypeName && old.WidthMm == widthMm && old.HeightMm == heightMm
-                && old.ThicknessMm == thicknessMm && old.Information.HasSameValues(element.Information)) {
-                return previous;
-            }
+        var opening = row.Opening;
+        var lintel = row.Lintel;
+        var key = new ManagerItemKey(documentToken, opening?.Element.UniqueId, lintel?.Element.UniqueId);
+        var group = new ManagerGroupKey(opening?.Element.TypeUniqueId, lintel?.Element.TypeUniqueId,
+            status, status, lintel?.Element.Information.IsFixed);
+        if(_items.TryGetValue(key, out var previous) && previous.Snapshot.GroupKey.Equals(group)
+            && SamePresentation(previous.Opening.Element, opening?.Element, opening?.WidthMm, opening?.HeightMm, null)
+            && SamePresentation(previous.Lintel.Element, lintel?.Element, lintel?.OpeningWidthMm, null,
+                lintel?.WallThicknessMm)) {
+            return previous;
         }
-        var presentation = new ManagerElementPresentation(element.TypeName, status, element.Information,
-            widthMm: widthMm, heightMm: heightMm, thicknessMm: thicknessMm);
+        var left = opening is null ? null : new ManagerElementPresentation(opening.Element.TypeName, status,
+            opening.Element.Information, widthMm: opening.WidthMm, heightMm: opening.HeightMm);
+        var right = lintel is null ? null : new ManagerElementPresentation(lintel.Element.TypeName, status,
+            lintel.Element.Information, widthMm: lintel.OpeningWidthMm, thicknessMm: lintel.WallThicknessMm);
         var snapshot = new ManagerItemSnapshot(key, group, Array.Empty<ManagerDiagnostic>(),
             new[] { ManagerAction.Skip }, ManagerAction.Skip);
-        return new ManagerItemViewModel(snapshot, isOpening ? presentation : null,
-            isOpening ? null : presentation, _localization);
+        return new ManagerItemViewModel(snapshot, left, right, _localization);
+    }
+
+    // Проверяет обе половины строки перед повторным использованием существующей ViewModel.
+    private static bool SamePresentation(ManagerElementPresentation old, ManagerFamilySnapshot current,
+        double? width, double? height, double? thickness) {
+        return current is null ? old is null
+            : old is not null && old.TypeName == current.TypeName && old.WidthMm == width && old.HeightMm == height
+                && old.ThicknessMm == thickness && old.Information.HasSameValues(current.Information);
     }
 
     // Сообщает о неполной выборке или о подтверждённом отсутствии подходящих экземпляров.

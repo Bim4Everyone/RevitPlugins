@@ -64,13 +64,11 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
                 return;
             }
             var snapshot = resolver.CreateSnapshot(config);
-            var repository = kernel.Get<RevitRepository>();
-            var state = repository.CaptureInitialState(snapshot);
-            repository.ReleaseCatalogs();
+            var state = kernel.Get<IManagerScopeReader>().CaptureInitialState(snapshot);
+            kernel.Get<ISettingsCatalog>().ReleaseCatalogs();
             kernel.Bind<ManagerSessionState>().ToConstant(state);
             kernel.Bind<WindowPlatformEvents>().ToSelf().InSingletonScope();
             kernel.Bind<Dispatcher>().ToConstant(Dispatcher.CurrentDispatcher);
-            kernel.Bind<IManagerNavigationService>().To<ManagerNavigationService>().InSingletonScope();
             kernel.Bind<IManagerRequestDispatcher>().To<ManagerExternalEventHandler>().InSingletonScope();
             kernel.Bind<ManagerDetailsWindow>().ToSelf();
             kernel.Bind<Func<ManagerDetailsWindow>>().ToMethod(context => {
@@ -126,6 +124,18 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
     internal static void ConfigureDependencies(IKernel kernel) {
         SettingsPlatformServices.Configure(kernel);
         kernel.Bind<RevitRepository>().ToSelf().InSingletonScope();
+        kernel.Bind<ISettingsCatalog>().To<SettingsCatalog>().InSingletonScope();
+        kernel.Bind<IManagerScopeReader>().To<ManagerScopeReader>().InSingletonScope();
+        kernel.Bind<IProjectSnapshotReader>().To<ProjectSnapshotReader>().InSingletonScope();
+        kernel.Bind<IPlacementGeometryReader>().To<PlacementGeometryReader>().InSingletonScope();
+        kernel.Bind<IAboveOpeningAnalyzer>().To<AboveOpeningAnalyzer>().InSingletonScope();
+        kernel.Bind<ISideBearingAnalyzer>().To<SideBearingAnalyzer>().InSingletonScope();
+        kernel.Bind<IManagerViewService>().To<ManagerViewService>().InSingletonScope();
+        kernel.Bind<IManagerNavigationService>().To<ManagerNavigationService>().InSingletonScope();
+        kernel.Bind<Func<IGeometryReadContext>>().ToMethod(context => {
+            var source = context.Kernel.Get<RevitRepository>();
+            return () => new GeometryReadContext(source.Document);
+        });
         kernel.Bind<IParamService>().To<ParamService>().InSingletonScope();
         kernel.Bind<PluginConfig>()
             .ToMethod(context => PluginConfig.GetPluginConfig(context.Kernel.Get<IConfigSerializer>()))

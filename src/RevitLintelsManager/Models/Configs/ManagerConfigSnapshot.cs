@@ -11,7 +11,18 @@ internal sealed class ManagerConfigSnapshot(
     ConfigElementKey phase, IEnumerable<KeyValuePair<string, string>> parameters,
     string ruleConfigName, IEnumerable<PlacementRuleSnapshot> rules, double minimalHeightAboveOpeningMm,
     double minimalBearingMm, IEnumerable<StructureTypeSelection> reinforcedConcreteTypes,
-    IEnumerable<StructureTypeSelection> steelTypes) {
+    IEnumerable<StructureTypeSelection> steelTypes, MatchLimits matchLimits) {
+    /// <summary>Создаёт снимок с исходными пределами поиска для вызовов без явных настроек.</summary>
+    public ManagerConfigSnapshot(ConfigElementKey lintelFamily, IEnumerable<ConfigElementKey> lintelTypes,
+        IEnumerable<ConfigElementKey> openingFamilies, IEnumerable<ConfigElementKey> structureWallTypes,
+        ConfigElementKey phase, IEnumerable<KeyValuePair<string, string>> parameters,
+        string ruleConfigName, IEnumerable<PlacementRuleSnapshot> rules, double minimalHeightAboveOpeningMm,
+        double minimalBearingMm, IEnumerable<StructureTypeSelection> reinforcedConcreteTypes,
+        IEnumerable<StructureTypeSelection> steelTypes)
+        : this(lintelFamily, lintelTypes, openingFamilies, structureWallTypes, phase, parameters, ruleConfigName,
+            rules, minimalHeightAboveOpeningMm, minimalBearingMm, reinforcedConcreteTypes, steelTypes,
+            MatchLimits.Default) { }
+
     public ConfigElementKey LintelFamily { get; } = lintelFamily;
     public IReadOnlyList<ConfigElementKey> LintelTypes { get; } = lintelTypes.ToList().AsReadOnly();
     public IReadOnlyList<ConfigElementKey> OpeningFamilies { get; } = openingFamilies.ToList().AsReadOnly();
@@ -22,6 +33,7 @@ internal sealed class ManagerConfigSnapshot(
     public string RuleConfigName { get; } = ruleConfigName;
     public IReadOnlyList<PlacementRuleSnapshot> Rules { get; } = rules.ToList().AsReadOnly();
     public double MinimalHeightAboveOpeningMm { get; } = minimalHeightAboveOpeningMm;
+    public MatchLimits MatchLimits { get; } = matchLimits;
     public double MinimalBearingMm { get; } = minimalBearingMm;
     public IReadOnlyList<StructureTypeSelection> ReinforcedConcreteTypes { get; } =
         reinforcedConcreteTypes.ToList().AsReadOnly();

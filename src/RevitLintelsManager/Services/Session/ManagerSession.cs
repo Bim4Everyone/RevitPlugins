@@ -22,7 +22,8 @@ using RevitLintelsManager.Views;
 namespace RevitLintelsManager.Services;
 
 /// <summary>Владелец окна и контейнера; API доступен только команде и callbacks Revit.</summary>
-internal sealed class ManagerSession(RevitRepository repository, ManagerWindow window,
+internal sealed class ManagerSession(RevitRepository repository, IManagerScopeReader scopeReader,
+    IManagerViewService views, ManagerWindow window,
     ManagerViewModel viewModel, WindowPlatformEvents platformEvents, ILoggerService logger,
     ILocalizationService localization, IManagerRequestDispatcher requests) : IManagerSession {
     private IKernel _kernel;
@@ -186,8 +187,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
         }
         if(requests.IsPreparingManagerView) {
             var transactions = e.GetTransactionNames();
-            if(transactions.SequenceEqual(new[] { RevitRepository.ManagerViewTransactionName })
-                || transactions.SequenceEqual(new[] { repository.ManagerSectionBoxTransactionName })) {
+            if(transactions.Count == 1 && views.IsViewTransaction(transactions.Single())) {
                 return;
             }
         }
@@ -251,7 +251,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             return;
         }
 
-        var currentScope = repository.CaptureScopeStamp(scope);
+        var currentScope = scopeReader.CaptureScopeStamp(scope);
         bool sourceChanged = _observedScope?.Scope == scope && !_observedScope.Matches(currentScope);
         bool ownNavigation = navigation?.Matches(viewModel.State, currentScope) == true;
         _observedScope = currentScope;
