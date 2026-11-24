@@ -113,8 +113,10 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
         double slabTopElevation = frameParams.HostSlab.TopElevation.Value;
         var location = new XYZ(pylonLocation.X, pylonLocation.Y, slabTopElevation);
 
-        double longSideDepth = frameParams.RebarCoverTop;
-        double shortSideDepth = longSideDepth + 2 * frameParams.PlateRebarDiameter - frameParams.StirrupRebarDiameter;
+        double slabBarDiameter = frameParams.PlateRebarDiameter;
+        double stirrupDiameter = frameParams.StirrupRebarDiameter;
+        double shortSideDepth = frameParams.RebarCoverTop + 2 * slabBarDiameter - stirrupDiameter;
+        double longSideDepth = frameParams.RebarCoverTop + slabBarDiameter - stirrupDiameter;
         if(frameParams.SwapFrameElevations) {
             (longSideDepth, shortSideDepth) = (shortSideDepth, longSideDepth);
         }
