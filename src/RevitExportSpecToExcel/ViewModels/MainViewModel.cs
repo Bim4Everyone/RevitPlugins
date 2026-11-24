@@ -92,9 +92,14 @@ internal class MainViewModel : BaseViewModel {
     }
 
     private void LoadView() {
-        Schedules = new(GetSchedulesVM(_localizationService)
-            .ToList());
-        FilteredSchedules = new ObservableCollection<ScheduleViewModel>(Schedules.OrderBy(x => x.OpenStatus));
+        HashSet<ElementId> selectedSchedules = _revitRepository.GetSelectedSchedules();
+        
+        Schedules = [.. GetSchedulesVM()];
+        FilteredSchedules = [.. Schedules.OrderBy(x => x.OpenStatus)];
+
+        foreach(var schedule in Schedules) {
+            schedule.IsChecked = selectedSchedules.Contains(schedule.Schedule.Id) || schedule.IsChecked;
+        }
 
         if(_revitRepository.Document.ActiveView is not ViewSchedule) {
             LoadConfig();
@@ -115,7 +120,7 @@ internal class MainViewModel : BaseViewModel {
         SaveConfig();
     }
 
-    public IList<ScheduleViewModel> GetSchedulesVM(ILocalizationService localizationService) {
+    public IList<ScheduleViewModel> GetSchedulesVM() {
         IList<ViewSchedule> schedulesRevit = _revitRepository.GetSchedules();
         IList<ScheduleViewModel> schedules = [];
 
@@ -125,13 +130,11 @@ internal class MainViewModel : BaseViewModel {
             .Select(x => x.ViewId)
             .ToList();
 
-        ViewStatuses statuses = new(localizationService);
+        ViewStatuses statuses = new(_localizationService);
 
         foreach(var schedule in schedulesRevit) {
             if(schedule.Id == activeViewId) {
-                schedules.Add(new ScheduleViewModel(schedule, statuses.ActiveViewStatus) {
-                    IsChecked = true
-                });
+                schedules.Add(new ScheduleViewModel(schedule, statuses.ActiveViewStatus) { IsChecked = true });
             } else if(openedViewIds.Contains(schedule.Id)) {
                 schedules.Add(new ScheduleViewModel(schedule, statuses.OpenedViewStatus));
             } else {

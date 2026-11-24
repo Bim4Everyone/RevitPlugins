@@ -5,6 +5,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 namespace RevitExportSpecToExcel.Models;
@@ -28,5 +29,12 @@ internal class RevitRepository {
             .OfClass(typeof(ViewSchedule))
             .OfType<ViewSchedule>()
             .ToList();
+    }
+
+    public HashSet<ElementId> GetSelectedSchedules() {
+        return ActiveUIDocument.GetSelectedElements()
+            .OfType<ViewSchedule>()
+            .Select(item => item.Id)
+            .ToHashSet();
     }
 }
