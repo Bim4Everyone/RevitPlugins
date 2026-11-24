@@ -4,7 +4,7 @@ using Autodesk.Revit.UI.Selection;
 namespace RevitPunchingRebar.Models.SelectionFilters;
 
 /// <summary>
-/// Фильтр выбора пилонов в связанных файлах.
+/// Фильтр выбора пилонов и прямоугольных несущих колонн в связанных файлах.
 /// </summary>
 internal class PylonFromLinkFilter : ISelectionFilter {
     private readonly Document _hostDoc;
@@ -22,6 +22,6 @@ internal class PylonFromLinkFilter : ISelectionFilter {
         Document linkedDoc = (_hostDoc.GetElement(reference.ElementId) as RevitLinkInstance)?.GetLinkDocument();
         Element linkedElem = linkedDoc?.GetElement(reference.LinkedElementId);
 
-        return linkedElem != null && PylonFromModelFilter.IsPylon(linkedElem);
+        return PylonFromModelFilter.IsSupportedColumn(linkedElem);
     }
 }
