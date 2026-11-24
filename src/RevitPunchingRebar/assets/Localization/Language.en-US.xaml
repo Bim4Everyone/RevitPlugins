@@ -27,6 +27,9 @@
 
     <system:String x:Key="MainWindow.FrameRebar">Frame reinforcement</system:String>
     <system:String x:Key="MainWindow.FrameGroup">Frame</system:String>
+    <system:String x:Key="MainWindow.FrameDirection">Frame direction</system:String>
+    <system:String x:Key="MainWindow.SwapFrameElevations">Swap direction</system:String>
+    <system:String x:Key="MainWindow.SwapFrameElevationsHint">Swaps the elevations of frames in the two directions.</system:String>
     <system:String x:Key="MainWindow.FamilyName">Family</system:String>
     <system:String x:Key="MainWindow.FamilyType">Type</system:String>
     <system:String x:Key="MainWindow.WidthStep">Width spacing, mm</system:String>

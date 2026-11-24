@@ -640,6 +640,18 @@
                                             Command="{Binding ResetToDefaultCommand}"
                                             CommandParameter="SelectedFamilyType" />
                                     </Grid>
+
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.FrameDirection}" />
+
+                                    <ui:ToggleSwitch
+                                        Margin="7 10"
+                                        HorizontalAlignment="Left"
+                                        OffContent="{me:LocalizationSource MainWindow.SwapFrameElevations}"
+                                        OnContent="{me:LocalizationSource MainWindow.SwapFrameElevations}"
+                                        ToolTip="{me:LocalizationSource MainWindow.SwapFrameElevationsHint}"
+                                        IsChecked="{Binding SwapFrameElevations, Mode=TwoWay}" />
                                 </StackPanel>
                             </Border>
 

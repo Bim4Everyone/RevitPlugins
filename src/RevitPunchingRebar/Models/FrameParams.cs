@@ -30,6 +30,7 @@ internal class FrameParams : IFrameParams {
         ParameterSettings = FrameParameterSettings.CopyWithDefaults(settings.ParameterSettings);
         FrameFamilyName = settings.FamilyName;
         FrameFamilyTypeName = settings.FamilyType;
+        SwapFrameElevations = settings.SwapFrameElevations;
 
         HostSlab = hostSlab;
         _slabThickness = hostSlab.Thickness;
@@ -62,6 +63,7 @@ internal class FrameParams : IFrameParams {
 
     public string FrameFamilyName { get; }
     public string FrameFamilyTypeName { get; }
+    public bool SwapFrameElevations { get; }
 
     public Slab HostSlab { get; }
 

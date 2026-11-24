@@ -55,6 +55,7 @@ internal class MainViewModel : BaseViewModel {
     private string _selectedFamilyName;
     private IList<string> _familyTypes;
     private string _selectedFamilyType;
+    private bool _swapFrameElevations;
     private int _selectedStirrupDiameter;
     private RebarClass _selectedRebarClass;
     private string _stirrupStep;
@@ -301,6 +302,11 @@ internal class MainViewModel : BaseViewModel {
     public string SelectedFamilyType {
         get => _selectedFamilyType;
         set => RaiseAndSetIfChanged(ref _selectedFamilyType, value);
+    }
+
+    public bool SwapFrameElevations {
+        get => _swapFrameElevations;
+        set => RaiseAndSetIfChanged(ref _swapFrameElevations, value);
     }
 
     /// <summary>
@@ -614,6 +620,7 @@ internal class MainViewModel : BaseViewModel {
         SelectedFamilyName = GetAvailableValue(FamilyNames, setting?.FamilyName, DefaultSettings.FrameFamilyName);
         LoadFamilyTypes();
         SelectedFamilyType = GetAvailableValue(FamilyTypes, setting?.FamilyType, DefaultSettings.FrameFamilyTypeName);
+        SwapFrameElevations = setting?.SwapFrameElevations ?? false;
 
         SelectedSlabRebarDiameter = setting?.SlabRebarDiameter ?? DefaultSettings.SlabRebarDiameterMm;
         IsRebarCoverFromUser = setting?.IsRebarCoverFromUser ?? true;
@@ -766,6 +773,7 @@ internal class MainViewModel : BaseViewModel {
 
         setting.FamilyName = SelectedFamilyName;
         setting.FamilyType = SelectedFamilyType;
+        setting.SwapFrameElevations = SwapFrameElevations;
         setting.StirrupDiameter = SelectedStirrupDiameter;
         setting.StirrupRebarClass = SelectedRebarClass;
         setting.StirrupStep = int.Parse(StirrupStep.Trim());

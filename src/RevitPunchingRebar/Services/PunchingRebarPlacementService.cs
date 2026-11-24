@@ -114,6 +114,9 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         double longSideDepth = frameParams.RebarCoverTop;
         double shortSideDepth = longSideDepth + 2 * frameParams.PlateRebarDiameter - frameParams.StirrupRebarDiameter;
+        if(frameParams.SwapFrameElevations) {
+            (longSideDepth, shortSideDepth) = (shortSideDepth, longSideDepth);
+        }
 
         // Продольная ось каркаса перпендикулярна его FacingOrientation.
         CreateFrameRows(pylon, frameSymbol, frameParams, location, slabTopElevation - shortSideDepth,

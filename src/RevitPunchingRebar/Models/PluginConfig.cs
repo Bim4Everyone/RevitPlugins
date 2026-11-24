@@ -51,6 +51,7 @@ internal class RevitSettings : ProjectSettings {
     public int RebarCoverBottom { get; set; }
     public string FamilyName { get; set; }
     public string FamilyType { get; set; }
+    public bool SwapFrameElevations { get; set; }
     public int StirrupDiameter { get; set; }
     public RebarClass? StirrupRebarClass { get; set; }
     public int StirrupStep { get; set; }

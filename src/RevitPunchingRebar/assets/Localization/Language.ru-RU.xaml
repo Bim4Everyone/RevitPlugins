@@ -27,6 +27,9 @@
 
     <system:String x:Key="MainWindow.FrameRebar">Арматура каркасов</system:String>
     <system:String x:Key="MainWindow.FrameGroup">Каркас</system:String>
+    <system:String x:Key="MainWindow.FrameDirection">Направление каркаса</system:String>
+    <system:String x:Key="MainWindow.SwapFrameElevations">Поменять направление</system:String>
+    <system:String x:Key="MainWindow.SwapFrameElevationsHint">Меняет местами отметки каркасов двух направлений.</system:String>
     <system:String x:Key="MainWindow.FamilyName">Семейство</system:String>
     <system:String x:Key="MainWindow.FamilyType">Тип</system:String>
     <system:String x:Key="MainWindow.WidthStep">Шаг по ширине, мм</system:String>
