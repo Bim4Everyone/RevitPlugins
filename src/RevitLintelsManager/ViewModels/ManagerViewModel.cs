@@ -56,6 +56,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private bool _isBlocked;
     private bool _isRefreshing;
     private bool _isNavigating;
+    private bool _disposed;
     private bool _firstRead = true;
     private bool _modelIsDirty;
     private bool _updatingResults;
@@ -144,7 +145,8 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public int ProcessingCount => _processingCount;
     public string ProcessText => string.Format(CultureInfo.CurrentCulture,
         _localization.GetLocalizedString("Manager.ProcessCount"), ProcessingCount);
-    public bool CanEditRows => !IsBlocked && !State.IsClosing && !IsRefreshing && !_isNavigating;
+    public bool CanEditRows => !_disposed && !IsBlocked && !State.IsClosing && !IsBusy;
+    internal bool IsBusy => IsRefreshing || _isNavigating;
     public string GeneralMessage => State.IsClosing ? _localization.GetLocalizedString("Manager.Closing")
         : IsBlocked ? _localization.GetLocalizedString("Manager.DocumentChanged")
         : IsRefreshing ? _localization.GetLocalizedString("Manager.Busy")
@@ -312,6 +314,12 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
 
     /// <summary>Снимает подписки менеджера и групп при освобождении контейнера сессии.</summary>
     public void Dispose() {
+        if(_disposed) {
+            return;
+        }
+        _disposed = true;
+        _isRefreshing = false;
+        _isNavigating = false;
         DetailsDismissRequested?.Invoke();
         foreach(var group in _groups) {
             group.StateChanged -= OnGroupStateChanged;
@@ -622,18 +630,20 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private async Task NavigateAsync(ManagerRowViewModel row) {
         var request = new ManagerRequest(State.DocumentToken, State.Generation, navigationItems: GetNavigationKeys(row));
         SetNavigationState(true, null);
-        string error = null;
+        Exception failure = null;
         try {
             await _requests.Enqueue(request).ConfigureAwait(false);
         } catch(Exception exception) when(exception is InvalidOperationException or OperationCanceledException) {
-            error = exception is InvalidOperationException ? exception.Message
-                : _localization.GetLocalizedString("Manager.NavigationFailed");
+            failure = exception;
         } finally {
-            if(!_dispatcher.HasShutdownStarted) {
-                await _dispatcher.InvokeAsync(() => SetNavigationState(false,
-                    IsCurrentResponse(request.DocumentToken, request.Generation) ? error : null)).Task
-                    .ConfigureAwait(false);
-            }
+            await PublishRequestOutcomeAsync(() => {
+                string error = null;
+                if(failure is not null && IsCurrentResponse(request.DocumentToken, request.Generation)) {
+                    error = failure is OperationCanceledException
+                        ? _localization.GetLocalizedString("Manager.NavigationFailed") : failure.Message;
+                }
+                SetNavigationState(false, error);
+            }).ConfigureAwait(false);
         }
     }
 
@@ -655,33 +665,53 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         var request = new ManagerRequest(State.DocumentToken, State.AdvanceGeneration(), scope,
             _firstRead && scope == State.InitialScope, _deletionCandidates);
         _firstRead = false;
+        ManagerDocumentContext context = null;
+        Exception failure = null;
         try {
-            var context = await _requests.Enqueue(request).ConfigureAwait(false);
-            if(!_dispatcher.HasShutdownStarted) {
-                await _dispatcher.InvokeAsync(() => ApplyContext(context, scope)).Task.ConfigureAwait(false);
-            }
+            context = await _requests.Enqueue(request).ConfigureAwait(false);
         } catch(Exception exception) when(exception is InvalidOperationException or OperationCanceledException) {
-            if(!_dispatcher.HasShutdownStarted) {
-                await _dispatcher.InvokeAsync(() => {
-                    if(IsCurrentResponse(request.DocumentToken, request.Generation)) {
-                        DetailsDismissRequested?.Invoke();
-                        if(_projectionScope != scope) {
-                            SetItems(Array.Empty<ManagerItemViewModel>(), scope, retainUnseen: true);
-                        }
-                        _readError = exception is OperationCanceledException
-                            ? _localization.GetLocalizedString("Manager.ReadFailed") : exception.Message;
-                        ContextSummary = GetReadErrorMessage();
-                    }
-                }).Task.ConfigureAwait(false);
-            }
+            failure = exception;
         } finally {
-            if(!_dispatcher.HasShutdownStarted) {
-                await _dispatcher.InvokeAsync(() => {
+            await PublishRequestOutcomeAsync(() => {
+                try {
+                    if(context is not null) {
+                        ApplyContext(context, scope);
+                    } else if(failure is not null && IsCurrentResponse(request.DocumentToken, request.Generation)) {
+                        ApplyReadError(failure, scope);
+                    }
+                } finally {
                     IsRefreshing = false;
                     CommandManager.InvalidateRequerySuggested();
-                }).Task.ConfigureAwait(false);
-            }
+                }
+            }).ConfigureAwait(false);
         }
+    }
+
+    // Завершает запрос на UI-потоке, пока окно и его сервисы принадлежат живой сессии.
+    private async Task PublishRequestOutcomeAsync(Action publish) {
+        if(_dispatcher.HasShutdownStarted) {
+            return;
+        }
+        try {
+            await _dispatcher.InvokeAsync(() => {
+                if(!_disposed && !State.IsClosing) {
+                    publish();
+                }
+            }).Task.ConfigureAwait(false);
+        } catch(OperationCanceledException) when(_dispatcher.HasShutdownStarted) {
+            // Dispatcher уже завершает работу.
+        }
+    }
+
+    // Показывает ошибку актуального запроса и сохраняет старые данные только для того же диапазона.
+    private void ApplyReadError(Exception failure, ManagerScope scope) {
+        DetailsDismissRequested?.Invoke();
+        if(_projectionScope != scope) {
+            SetItems(Array.Empty<ManagerItemViewModel>(), scope, retainUnseen: true);
+        }
+        _readError = failure is OperationCanceledException
+            ? _localization.GetLocalizedString("Manager.ReadFailed") : failure.Message;
+        ContextSummary = GetReadErrorMessage();
     }
 
     // Отбрасывает результат, устаревший между завершением API и исполнением UI continuation.

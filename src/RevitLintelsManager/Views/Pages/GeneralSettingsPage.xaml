@@ -55,8 +55,9 @@
                     <Style TargetType="{x:Type RowDefinition}">
                         <Setter Property="Height" Value="*" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsExpanded, ElementName=_limitingStructuresGroup}"
-                                         Value="False">
+                            <DataTrigger
+                                Binding="{Binding Content.IsExpanded, ElementName=_limitingStructuresSection}"
+                                Value="False">
                                 <Setter Property="Height" Value="Auto" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -128,61 +129,65 @@
                     Text="{Binding MinimalBearingText, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </ui:Card>
-        <edits:CustomGroupEditControl
-            x:Name="_limitingStructuresGroup"
-            Grid.Row="1"
-            VerticalAlignment="Stretch"
-            Header="{me:LocalizationSource General.LimitingStructures}"
-            Icon="{ui:SymbolIcon Building24}">
-            <edits:CustomGroupEditControl.EditControl>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <DockPanel
-                        Margin="8,8,10,8"
-                        DataContext="{Binding ReinforcedConcreteTypes}">
-                        <ui:TextBlock
-                            DockPanel.Dock="Top"
-                            Margin="0,0,0,8"
-                            FontTypography="BodyStrong"
-                            TextWrapping="Wrap"
-                            Text="{me:LocalizationSource General.ReinforcedConcreteTypes}" />
-                        <ui:AutoSuggestBox
-                            DockPanel.Dock="Top"
-                            Margin="0,0,0,12"
-                            Icon="{ui:SymbolIcon Search24}"
-                            PlaceholderText="{me:LocalizationSource Search.StructureType}"
-                            AutomationProperties.Name="{me:LocalizationSource Search.StructureType}"
-                            Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <ListBox
-                            Style="{StaticResource StructureTypeListStyle}"
-                            AutomationProperties.Name="{me:LocalizationSource General.ReinforcedConcreteTypes}" />
-                    </DockPanel>
-                    <DockPanel
-                        Grid.Column="1"
-                        Margin="10,8,8,8"
-                        DataContext="{Binding SteelTypes}">
-                        <ui:TextBlock
-                            DockPanel.Dock="Top"
-                            Margin="0,0,0,8"
-                            FontTypography="BodyStrong"
-                            TextWrapping="Wrap"
-                            Text="{me:LocalizationSource General.SteelTypes}" />
-                        <ui:AutoSuggestBox
-                            DockPanel.Dock="Top"
-                            Margin="0,0,0,12"
-                            Icon="{ui:SymbolIcon Search24}"
-                            PlaceholderText="{me:LocalizationSource Search.StructureType}"
-                            AutomationProperties.Name="{me:LocalizationSource Search.StructureType}"
-                            Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <ListBox
-                            Style="{StaticResource StructureTypeListStyle}"
-                            AutomationProperties.Name="{me:LocalizationSource General.SteelTypes}" />
-                    </DockPanel>
-                </Grid>
-            </edits:CustomGroupEditControl.EditControl>
-        </edits:CustomGroupEditControl>
+        <ContentPresenter
+            x:Name="_limitingStructuresSection"
+            Grid.Row="1">
+            <ContentPresenter.Content>
+                <edits:CustomGroupEditControl
+                    VerticalAlignment="Stretch"
+                    Header="{me:LocalizationSource General.LimitingStructures}"
+                    Icon="{ui:SymbolIcon Building24}">
+                    <edits:CustomGroupEditControl.EditControl>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <DockPanel
+                                Margin="8,8,10,8"
+                                DataContext="{Binding ReinforcedConcreteTypes}">
+                                <ui:TextBlock
+                                    DockPanel.Dock="Top"
+                                    Margin="0,0,0,8"
+                                    FontTypography="BodyStrong"
+                                    TextWrapping="Wrap"
+                                    Text="{me:LocalizationSource General.ReinforcedConcreteTypes}" />
+                                <ui:AutoSuggestBox
+                                    DockPanel.Dock="Top"
+                                    Margin="0,0,0,12"
+                                    Icon="{ui:SymbolIcon Search24}"
+                                    PlaceholderText="{me:LocalizationSource Search.StructureType}"
+                                    AutomationProperties.Name="{me:LocalizationSource Search.StructureType}"
+                                    Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <ListBox
+                                    Style="{StaticResource StructureTypeListStyle}"
+                                    AutomationProperties.Name="{me:LocalizationSource General.ReinforcedConcreteTypes}" />
+                            </DockPanel>
+                            <DockPanel
+                                Grid.Column="1"
+                                Margin="10,8,8,8"
+                                DataContext="{Binding SteelTypes}">
+                                <ui:TextBlock
+                                    DockPanel.Dock="Top"
+                                    Margin="0,0,0,8"
+                                    FontTypography="BodyStrong"
+                                    TextWrapping="Wrap"
+                                    Text="{me:LocalizationSource General.SteelTypes}" />
+                                <ui:AutoSuggestBox
+                                    DockPanel.Dock="Top"
+                                    Margin="0,0,0,12"
+                                    Icon="{ui:SymbolIcon Search24}"
+                                    PlaceholderText="{me:LocalizationSource Search.StructureType}"
+                                    AutomationProperties.Name="{me:LocalizationSource Search.StructureType}"
+                                    Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <ListBox
+                                    Style="{StaticResource StructureTypeListStyle}"
+                                    AutomationProperties.Name="{me:LocalizationSource General.SteelTypes}" />
+                            </DockPanel>
+                        </Grid>
+                    </edits:CustomGroupEditControl.EditControl>
+                </edits:CustomGroupEditControl>
+            </ContentPresenter.Content>
+        </ContentPresenter>
     </Grid>
 </core:WpfUIPlatformPage>

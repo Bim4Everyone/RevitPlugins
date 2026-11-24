@@ -1,20 +1,16 @@
 ﻿using System.Windows;
 
+using System.Windows.Controls;
+
 namespace RevitLintelsManager.Views.Edits;
 
-public partial class ItemControl {
+public class ItemControl : Control {
 
     public static readonly DependencyProperty ItemNameProperty = DependencyProperty.Register(
         nameof(ItemName), typeof(string), typeof(ItemControl), new PropertyMetadata(default(string)));
 
     public static readonly DependencyProperty IsCheckedProperty = DependencyProperty.Register(
         nameof(IsChecked), typeof(bool), typeof(ItemControl), new PropertyMetadata(true));
-
-
-    public ItemControl() {
-        InitializeComponent();
-    }
-
     public string ItemName {
         get => (string) GetValue(ItemNameProperty);
         set => SetValue(ItemNameProperty, value);

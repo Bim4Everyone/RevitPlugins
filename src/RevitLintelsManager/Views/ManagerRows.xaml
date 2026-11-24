@@ -9,6 +9,8 @@
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
+            Source="Edits/CustomGroupEditControl.xaml" />
+        <ResourceDictionary
             Source="ManagerStatusStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <system:Double x:Key="ManagerRowFieldHeight">36</system:Double>
@@ -83,6 +85,7 @@
     </Style>
     <Style
         x:Key="ManagerGroupControlStyle"
+        BasedOn="{StaticResource {x:Type edits:CustomGroupEditControl}}"
         TargetType="edits:CustomGroupEditControl">
         <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
         <Style.Triggers>

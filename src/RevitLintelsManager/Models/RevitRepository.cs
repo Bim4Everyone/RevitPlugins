@@ -26,6 +26,12 @@ internal partial class RevitRepository(UIApplication uiApplication, SystemPlugin
     public UIDocument ActiveUIDocument => UIApplication.ActiveUIDocument;
     public Application Application => UIApplication.Application;
     public Document Document { get; } = uiApplication.ActiveUIDocument.Document;
+
+    /// <summary>Проверяет идентичность открытого исходного проекта по экземпляру документа Revit.</summary>
+    public bool IsSourceDocumentActive(UIApplication app) {
+        return Document.IsValidObject && app.ActiveUIDocument?.Document is { IsValidObject: true } activeDocument
+            && Document.Equals(activeDocument);
+    }
     
     
     public IEnumerable<RevitFamily> LintelFamilies => _lintelFamilies ??= GetLintelFamilies();

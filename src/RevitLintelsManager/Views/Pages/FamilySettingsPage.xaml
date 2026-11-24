@@ -30,7 +30,9 @@
                     <Style TargetType="{x:Type RowDefinition}">
                         <Setter Property="Height" Value="*" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsExpanded, ElementName=_openingFamiliesGroup}" Value="False">
+                            <DataTrigger
+                                Binding="{Binding Content.IsExpanded, ElementName=_openingFamiliesSection}"
+                                Value="False">
                                 <Setter Property="Height" Value="Auto" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -113,129 +115,133 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </DockPanel>
-                    
+
                     <StackPanel Grid.Column="1">
                         <edits:ComboBoxControl
                             WidthTextBlock="250"
-                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelWidthParamLabel}" 
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelWidthParamLabel}"
                             ItemsSource="{Binding LintelParametersDouble}"
                             SelectedValue="{Binding SelectedLintelWidthParam}"/>
-                        
+
                         <edits:ComboBoxControl
                             WidthTextBlock="250"
-                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelThicknessParamLabel}" 
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelThicknessParamLabel}"
                             ItemsSource="{Binding LintelParametersDouble}"
                             SelectedValue="{Binding SelectedLintelThicknessParam}"/>
-                        
+
                         <edits:ComboBoxControl
                             WidthTextBlock="250"
-                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelRightOffsetParamLabel}" 
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelRightOffsetParamLabel}"
                             ItemsSource="{Binding LintelParametersDouble}"
                             SelectedValue="{Binding SelectedLintelRightOffsetParam}"/>
-                        
+
                         <edits:ComboBoxControl
                             WidthTextBlock="250"
-                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelLeftOffsetParamLabel}" 
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelLeftOffsetParamLabel}"
                             ItemsSource="{Binding LintelParametersDouble}"
                             SelectedValue="{Binding SelectedLintelLeftOffsetParam}"/>
-                        
+
                         <edits:ComboBoxControl
                             WidthTextBlock="250"
-                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelRightCornerParamLabel}" 
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelRightCornerParamLabel}"
                             ItemsSource="{Binding LintelParametersInteger}"
                             SelectedValue="{Binding SelectedLintelRightCornerParam}"/>
-                        
+
                         <edits:ComboBoxControl
                             WidthTextBlock="250"
-                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelLeftCornerParamLabel}" 
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelLeftCornerParamLabel}"
                             ItemsSource="{Binding LintelParametersInteger}"
                             SelectedValue="{Binding SelectedLintelLeftCornerParam}"/>
-                        
+
                         <edits:ComboBoxControl
                             WidthTextBlock="250"
                             TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelRightWeldingParamLabel}"
                             ItemsSource="{Binding LintelParametersInteger}"
                             SelectedValue="{Binding SelectedLintelRightWeldingParam}"/>
-                        
+
                         <edits:ComboBoxControl
                             WidthTextBlock="250"
-                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelLeftWeldingParamLabel}" 
+                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.LintelLeftWeldingParamLabel}"
                             ItemsSource="{Binding LintelParametersInteger}"
                             SelectedValue="{Binding SelectedLintelLeftWeldingParam}"/>
                     </StackPanel>
                 </Grid>
-                
+
             </edits:CustomGroupEditControl.EditControl>
         </edits:CustomGroupEditControl>
-        
-        <edits:CustomGroupEditControl
-            x:Name="_openingFamiliesGroup"
-            Grid.Row="1"
-            VerticalAlignment="Stretch"
-            Icon="{ui:SymbolIcon scanText24}"
-            Header="{me:LocalizationSource FamilySettingsPage.OpeningFamilies}">
-                
-            <edits:CustomGroupEditControl.EditControl>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition
-                            Width="*"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <DockPanel 
-                        Grid.Column="0" 
-                        Margin="0,0,12,0">
-                        
-                        <ui:AutoSuggestBox
-                            Icon="{ui:SymbolIcon Search24}"
-                            DockPanel.Dock="Top"
-                            Margin="10,0,10,8"
-                            PlaceholderText="{me:LocalizationSource Search.Family}"
-                            Text="{Binding OpeningSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="TextChanged">
-                                    <i:InvokeCommandAction Command="{Binding SearchOpeningFamiliesCommand}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ui:AutoSuggestBox>
-                        
-                        <ListBox
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Style="{StaticResource SettingsListStyle}"
-                            ItemContainerStyle="{StaticResource SettingsCheckListItemStyle}"
-                            ItemsSource="{Binding FilteredOpeningFamilies}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate
-                                    DataType="{x:Type vms:FamilyViewModel}">
-                                    <edits:ItemControl
-                                        ItemName="{Binding Name}"
-                                        IsChecked="{Binding IsChecked, Mode=TwoWay}" />
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </DockPanel>
-                    
-                    <ScrollViewer
-                        Grid.Column="1"
-                        VerticalScrollBarVisibility="Auto"
-                        HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel>
-                        <edits:ComboBoxControl
-                            WidthTextBlock="250"
-                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.OpeningHeightParamLabel}" 
-                            ItemsSource="{Binding OpeningParameters}"
-                            SelectedValue="{Binding SelectedOpeningHeightParam}"/>
-                        
-                        <edits:ComboBoxControl
-                            WidthTextBlock="250"
-                            TextTextBlock="{me:LocalizationSource FamilySettingsPage.OpeningWidthParamLabel}" 
-                            ItemsSource="{Binding OpeningParameters}"
-                            SelectedValue="{Binding SelectedOpeningWidthParam}"/>
-                    </StackPanel>
-                    </ScrollViewer>
-                </Grid>
-            </edits:CustomGroupEditControl.EditControl>
-        </edits:CustomGroupEditControl>
+
+        <ContentPresenter
+            x:Name="_openingFamiliesSection"
+            Grid.Row="1">
+            <ContentPresenter.Content>
+                <edits:CustomGroupEditControl
+                    VerticalAlignment="Stretch"
+                    Icon="{ui:SymbolIcon scanText24}"
+                    Header="{me:LocalizationSource FamilySettingsPage.OpeningFamilies}">
+
+                    <edits:CustomGroupEditControl.EditControl>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="*"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <DockPanel
+                                Grid.Column="0"
+                                Margin="0,0,12,0">
+
+                                <ui:AutoSuggestBox
+                                    Icon="{ui:SymbolIcon Search24}"
+                                    DockPanel.Dock="Top"
+                                    Margin="10,0,10,8"
+                                    PlaceholderText="{me:LocalizationSource Search.Family}"
+                                    Text="{Binding OpeningSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="TextChanged">
+                                            <i:InvokeCommandAction Command="{Binding SearchOpeningFamiliesCommand}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ui:AutoSuggestBox>
+
+                                <ListBox
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Style="{StaticResource SettingsListStyle}"
+                                    ItemContainerStyle="{StaticResource SettingsCheckListItemStyle}"
+                                    ItemsSource="{Binding FilteredOpeningFamilies}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate
+                                            DataType="{x:Type vms:FamilyViewModel}">
+                                            <edits:ItemControl
+                                                ItemName="{Binding Name}"
+                                                IsChecked="{Binding IsChecked, Mode=TwoWay}" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </DockPanel>
+
+                            <ScrollViewer
+                                Grid.Column="1"
+                                VerticalScrollBarVisibility="Auto"
+                                HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel>
+                                <edits:ComboBoxControl
+                                    WidthTextBlock="250"
+                                    TextTextBlock="{me:LocalizationSource FamilySettingsPage.OpeningHeightParamLabel}"
+                                    ItemsSource="{Binding OpeningParameters}"
+                                    SelectedValue="{Binding SelectedOpeningHeightParam}"/>
+
+                                <edits:ComboBoxControl
+                                    WidthTextBlock="250"
+                                    TextTextBlock="{me:LocalizationSource FamilySettingsPage.OpeningWidthParamLabel}"
+                                    ItemsSource="{Binding OpeningParameters}"
+                                    SelectedValue="{Binding SelectedOpeningWidthParam}"/>
+                            </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </edits:CustomGroupEditControl.EditControl>
+                </edits:CustomGroupEditControl>
+            </ContentPresenter.Content>
+        </ContentPresenter>
     </Grid>
 </core:WpfUIPlatformPage>

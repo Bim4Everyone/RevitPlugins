@@ -6,6 +6,12 @@
     xmlns:controls="clr-namespace:Wpf.Ui.Controls;assembly=Wpf.Ui">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary
+            Source="Edits/CustomGroupEditControl.xaml" />
+        <ResourceDictionary
+            Source="Edits/ComboBoxControl.xaml" />
+        <ResourceDictionary
+            Source="Edits/ItemControl.xaml" />
+        <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/CheckBox/CheckBox.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/Wpf.Ui;component/Controls/ToggleSwitch/ToggleSwitch.xaml" />

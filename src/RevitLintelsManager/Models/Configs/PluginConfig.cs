@@ -40,6 +40,8 @@ internal class RevitSettings : ProjectSettings {
 }
 
 public class SystemPluginConfig {
+    internal const string CustomGroupExpanderPartName = "PART_Expander";
+
     // Коллекция категорий допустимых семейств перемычек
     public readonly IEnumerable<BuiltInCategory> DefaultLintelCats = [
         BuiltInCategory.OST_GenericModel

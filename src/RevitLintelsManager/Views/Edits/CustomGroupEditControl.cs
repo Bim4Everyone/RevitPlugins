@@ -5,13 +5,16 @@ using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media;
 
+using RevitLintelsManager.Models.Configs;
+
 using Wpf.Ui.Controls;
 
 namespace RevitLintelsManager.Views.Edits;
 
 [DefaultProperty(nameof(EditControl))]
 [ContentProperty(nameof(EditControl))]
-public partial class CustomGroupEditControl {
+[TemplatePart(Name = SystemPluginConfig.CustomGroupExpanderPartName, Type = typeof(CardExpander))]
+public class CustomGroupEditControl : Control {
     public static readonly DependencyProperty IconProperty = DependencyProperty.Register(
         nameof(Icon), typeof(IconElement), typeof(CustomGroupEditControl), new PropertyMetadata(default(IconElement)));
 
@@ -24,17 +27,14 @@ public partial class CustomGroupEditControl {
     public static readonly DependencyProperty ContentPaddingProperty = DependencyProperty.Register(
         nameof(ContentPadding), typeof(Thickness), typeof(CustomGroupEditControl),
         new PropertyMetadata(CardExpander.ContentPaddingProperty.DefaultMetadata.DefaultValue));
-    
+
     public static readonly DependencyProperty EditControlProperty = DependencyProperty.Register(
         nameof(EditControl), typeof(object), typeof(CustomGroupEditControl), new PropertyMetadata(default(object)));
 
     public static readonly DependencyProperty IsExpandedProperty = DependencyProperty.Register(
         nameof(IsExpanded), typeof(bool), typeof(CustomGroupEditControl), new PropertyMetadata(true));
 
-    /// <summary>Создаёт общий раскрывающийся блок настроек или строк менеджера.</summary>
-    public CustomGroupEditControl() {
-        InitializeComponent();
-    }
+    private CardExpander _expander;
 
     public IconElement Icon {
         get => (IconElement) GetValue(IconProperty);
@@ -64,6 +64,18 @@ public partial class CustomGroupEditControl {
     public bool IsExpanded {
         get => (bool) GetValue(IsExpandedProperty);
         set => SetValue(IsExpandedProperty, value);
+    }
+
+    /// <summary>Подключает раскрывающуюся карточку из шаблона общего блока.</summary>
+    public override void OnApplyTemplate() {
+        if(_expander is not null) {
+            _expander.Loaded -= OnCardExpanderLoaded;
+        }
+        base.OnApplyTemplate();
+        _expander = GetTemplateChild(SystemPluginConfig.CustomGroupExpanderPartName) as CardExpander;
+        if(_expander is not null) {
+            _expander.Loaded += OnCardExpanderLoaded;
+        }
     }
 
     // Оставляет строку содержимого для настроек и скрывает её у заголовка плоского списка.

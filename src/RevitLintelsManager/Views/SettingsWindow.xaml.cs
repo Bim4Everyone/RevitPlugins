@@ -34,6 +34,10 @@ public partial class SettingsWindow {
 
         DataContextChanged += OnDataContextChanged;
         
+        // Берёт типы страниц из сборки открытого окна при нескольких загрузках DLL.
+        _familySettingsItem.TargetPageType = typeof(FamilySettingsPage);
+        _placementSettingsItem.TargetPageType = typeof(PlacementSettingsPage);
+        _generalSettingsItem.TargetPageType = typeof(GeneralSettingsPage);
         _rootNavigationView.SetPageProviderService(navigationViewPageProvider);
 
         Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () => {

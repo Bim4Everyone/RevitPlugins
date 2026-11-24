@@ -240,12 +240,19 @@ public partial class ManagerWindow {
 
     // Переиспользует существующее событие языка платформы, не создавая второй системы локализации.
     private void OnLanguageChanged(CultureInfo language) {
-        Dispatcher.BeginInvoke(new Action(() => _viewModel?.RefreshLocalization()));
+        Dispatcher.BeginInvoke(new Action(() => {
+            if(_viewModel is { State.IsClosing: false } viewModel) {
+                viewModel.RefreshLocalization();
+            }
+        }));
     }
 
     // После обновления темы владельца инвалидирует общий словарь в уже открытом мини-окне.
     private void OnThemeChanged(UIThemes theme) {
         Dispatcher.BeginInvoke(new Action(() => {
+            if(_viewModel is null || _viewModel.State.IsClosing) {
+                return;
+            }
             SetResourceReference(BackgroundProperty, "ApplicationBackgroundBrush");
             SetResourceReference(ForegroundProperty, "TextFillColorPrimaryBrush");
             if(_detailsWindow is not null) {

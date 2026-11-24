@@ -24,14 +24,15 @@ namespace RevitLintelsManager.Services;
 /// <summary>Владелец окна и контейнера; API доступен только команде и callbacks Revit.</summary>
 internal sealed class ManagerSession(RevitRepository repository, ManagerWindow window,
     ManagerViewModel viewModel, WindowPlatformEvents platformEvents, ILoggerService logger,
-    IManagerRequestDispatcher requests) : IManagerSession {
+    ILocalizationService localization, IManagerRequestDispatcher requests) : IManagerSession {
     private IKernel _kernel;
     private bool _subscribed;
     private bool _windowClosed;
-    private bool _documentClosing;
+    private int? _closingDocumentId;
     private bool _releaseScheduled;
     private bool _started;
     private bool _refreshAfterReturn;
+    private long? _returnRefreshGeneration;
     private long? _observedGeneration;
     private ManagerScopeStamp _observedScope;
 
@@ -61,16 +62,17 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             window.Dispatcher.InvokeAsync(() => ShowWindowAsync(reportStartupFailure));
         } catch {
             _kernel = null;
-            requests.BeginClose();
-            requests.TryDisposeInApiContext();
-            Unsubscribe();
-            platformEvents.Dispose();
             try {
-                if(!_windowClosed) {
-                    window.Close();
-                }
+                requests.BeginClose();
+                requests.TryDisposeInApiContext();
+                Unsubscribe();
+                ReleaseWindow();
             } finally {
-                AppDomain.CurrentDomain.AssemblyResolve -= ResolveSessionAssembly;
+                try {
+                    platformEvents.Dispose();
+                } finally {
+                    AppDomain.CurrentDomain.AssemblyResolve -= ResolveSessionAssembly;
+                }
             }
             throw;
         }
@@ -94,11 +96,12 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
 
     /// <inheritdoc />
     public void RequestClose() {
-        if(!viewModel.State.IsClosing) {
-            viewModel.State.IsClosing = true;
-            viewModel.State.NavigationStamp = null;
-            viewModel.State.AdvanceGeneration();
+        if(viewModel.State.IsClosing) {
+            return;
         }
+        viewModel.State.IsClosing = true;
+        viewModel.State.NavigationStamp = null;
+        viewModel.State.AdvanceGeneration();
         requests.BeginClose();
         viewModel.SetBlocked(true);
     }
@@ -114,6 +117,9 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
                 window.Show();
             }
         } catch(Exception exception) {
+            if(viewModel.State.IsClosing) {
+                return;
+            }
             try {
                 reportStartupFailure(exception);
             } finally {
@@ -138,10 +144,12 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
     private void OnIdling(object sender, IdlingEventArgs e) {
         if(viewModel.State.IsClosing || !repository.Document.IsValidObject) {
             FinishInApiContext();
+            if(!_releaseScheduled) {
+                e.SetRaiseWithoutDelay();
+            }
             return;
         }
-        _documentClosing = false;
-        UpdateDocumentState();
+        UpdateDocumentState(resume: true);
         requests.PumpInApiContext();
         RefreshChangedScope();
     }
@@ -153,15 +161,19 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
 
     // Блокирует сессию до подтверждения закрытия исходного документа.
     private void OnDocumentClosing(object sender, DocumentClosingEventArgs e) {
-        if(repository.Document.IsValidObject && repository.Document.Equals(e.Document)) {
-            _documentClosing = true;
+        if(!viewModel.State.IsClosing && repository.Document.IsValidObject && repository.Document.Equals(e.Document)) {
+            _closingDocumentId = e.DocumentId;
             SetDocumentBlocked(true);
         }
     }
 
-    // Не читает свойства уже закрытого документа; отменённое закрытие сверяется на Idling.
+    // Сверяет парное событие по ID закрытия. При отмене исходный документ сверяется на Idling.
     private void OnDocumentClosed(object sender, DocumentClosedEventArgs e) {
-        if(!repository.Document.IsValidObject) {
+        if(e.DocumentId != _closingDocumentId) {
+            return;
+        }
+        _closingDocumentId = null;
+        if(e.Status == RevitAPIEventStatus.Succeeded) {
             FinishInApiContext();
         }
     }
@@ -184,6 +196,10 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             // Позволяет Idling снова заметить смену источника, если её запрос ещё не применён.
             _observedScope = acceptedScope;
         }
+        if(viewModel.IsRefreshing && _returnRefreshGeneration == viewModel.State.Generation
+            && viewModel.LastContext?.Generation != _returnRefreshGeneration) {
+            _refreshAfterReturn = true;
+        }
         viewModel.State.AdvanceGeneration();
         requests.InvalidateRequests();
         viewModel.InvalidateModel(e.GetDeletedElementIds().Select(id => (long) id.GetIdValue()));
@@ -191,16 +207,19 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
 
     // Завершает сессию при выходе из приложения.
     private void OnApplicationClosing(object sender, ApplicationClosingEventArgs e) {
-        FinishInApiContext();
+        FinishInApiContext(releaseImmediately: true);
     }
 
-    // Передаёт в GUI только результат проверки идентичности исходного документа.
-    private void UpdateDocumentState() {
-        var activeDocument = repository.UIApplication.ActiveUIDocument?.Document;
-        bool isSourceDocument = repository.Document.IsValidObject
-            && activeDocument?.IsValidObject == true
-            && repository.Document.Equals(activeDocument);
-        SetDocumentBlocked(_documentClosing || !isSourceDocument);
+    // Блокирует сразу, а возобновляет запросы на Idling после завершения отменённого UI-запроса.
+    private void UpdateDocumentState(bool resume = false) {
+        if(viewModel.State.IsClosing || _closingDocumentId.HasValue) {
+            return;
+        }
+        if(!repository.IsSourceDocumentActive(repository.UIApplication)) {
+            SetDocumentBlocked(true);
+        } else if(resume && !viewModel.IsBusy) {
+            SetDocumentBlocked(false);
+        }
     }
 
     // Смена доступности документа инвалидирует задачи и ещё не опубликованные UI-ответы.
@@ -210,6 +229,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             viewModel.State.AdvanceGeneration();
             requests.InvalidateRequests();
             _refreshAfterReturn = !isBlocked;
+            _returnRefreshGeneration = null;
         }
         viewModel.SetBlocked(isBlocked);
     }
@@ -236,14 +256,19 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
         bool ownNavigation = navigation?.Matches(viewModel.State, currentScope) == true;
         _observedScope = currentScope;
         if(_refreshAfterReturn || (sourceChanged && !ownNavigation)) {
+            bool isReturnRefresh = _refreshAfterReturn;
             _refreshAfterReturn = false;
             viewModel.RefreshCommand.Execute(null);
+            _returnRefreshGeneration = isReturnRefresh ? viewModel.State.Generation : null;
         }
     }
 
     // Снимает API-подписки до выхода из callback, а контейнер освобождает после его возврата.
-    private void FinishInApiContext() {
+    private void FinishInApiContext(bool releaseImmediately = false) {
         if(_releaseScheduled) {
+            if(releaseImmediately) {
+                ReleaseResources();
+            }
             return;
         }
         RequestClose();
@@ -251,8 +276,15 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             return;
         }
         _releaseScheduled = true;
-        Unsubscribe();
-        window.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(ReleaseResources));
+        try {
+            Unsubscribe();
+        } finally {
+            if(releaseImmediately || window.Dispatcher.HasShutdownStarted) {
+                ReleaseResources();
+            } else {
+                window.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(ReleaseResources));
+            }
+        }
     }
 
     // Удаляет подписки, созданные в исходном API-контексте.
@@ -274,26 +306,48 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
 
     // Освобождает только WPF и управляемые ресурсы, без чтения Document.
     private void ReleaseResources() {
+        var kernel = _kernel;
+        if(kernel is null) {
+            return;
+        }
+        _kernel = null;
+        try {
+            ReleaseResource(ReleaseWindow, "Manager.WindowReleaseFailed");
+        } finally {
+            try {
+                ReleaseResource(platformEvents.Dispose, "Manager.PlatformEventsReleaseFailed");
+            } finally {
+                try {
+                    ReleaseResource(kernel.Dispose, "Manager.ContainerReleaseFailed");
+                } finally {
+                    AppDomain.CurrentDomain.AssemblyResolve -= ResolveSessionAssembly;
+                    var released = Released;
+                    Released = null;
+                    released?.Invoke();
+                }
+            }
+        }
+    }
+
+    // Отсоединяет данные окна даже при ошибке его закрытия.
+    private void ReleaseWindow() {
         try {
             if(!_windowClosed) {
                 window.Close();
                 _windowClosed = true;
             }
-        } catch(Exception exception) {
-            logger.Warning(exception, "Ошибка закрытия менеджера перемычек.");
         } finally {
-            platformEvents.Dispose();
             window.DataContext = null;
-            try {
-                _kernel?.Dispose();
-            } catch(Exception exception) {
-                logger.Warning(exception, "Ошибка освобождения контейнера менеджера перемычек.");
-            } finally {
-                _kernel = null;
-                AppDomain.CurrentDomain.AssemblyResolve -= ResolveSessionAssembly;
-                Released?.Invoke();
-                Released = null;
-            }
+        }
+    }
+
+    // Записывает ошибку конкретного ресурса, оставляя остальной порядок освобождения действующим.
+    private void ReleaseResource(Action release, string errorKey) {
+        string message = localization.GetLocalizedString(errorKey);
+        try {
+            release();
+        } catch(Exception exception) {
+            logger.Warning(exception, message);
         }
     }
 

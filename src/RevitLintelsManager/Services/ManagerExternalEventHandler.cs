@@ -60,6 +60,9 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
                 pending.Completion.TrySetCanceled();
                 return pending.Completion.Task;
             }
+            while(_queue.Count > 0 && !IsCurrent(_queue.Peek().Request)) {
+                _queue.Dequeue().Completion.TrySetCanceled();
+            }
             _queue.Enqueue(pending);
             if(!_executing && !_signalPending) {
                 Signal();
@@ -176,13 +179,14 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
             _signalPending = result is ExternalEventRequest.Accepted or ExternalEventRequest.Pending;
             if(!_signalPending) {
                 FailResults(new InvalidOperationException(_localization.GetLocalizedString("Manager.SignalRejected")));
-                _logger.Warning(new InvalidOperationException(result.ToString()), "Revit отклонил запрос менеджера.");
+                _logger.Warning(new InvalidOperationException(result.ToString()),
+                    _localization.GetLocalizedString("Manager.SignalRejected"));
             }
         } catch(Exception exception) {
             _signalPending = false;
             FailResults(new InvalidOperationException(
                 _localization.GetLocalizedString("Manager.SignalRejected"), exception));
-            _logger.Warning(exception, "Ошибка передачи запроса менеджера в Revit.");
+            _logger.Warning(exception, _localization.GetLocalizedString("Manager.SignalRejected"));
         }
     }
 
@@ -190,11 +194,14 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
     private void ExecuteRequest(UIApplication app, PendingRequest pending) {
         bool isNavigation = pending.Request.NavigationItems is not null;
         try {
+            if(!_repository.IsSourceDocumentActive(app)) {
+                pending.Completion.TrySetCanceled();
+                return;
+            }
             ManagerDocumentContext context = null;
             bool completed = isNavigation
                 ? NavigateInApiContext(app, pending.Request)
-                : PrepareManagerView(app)
-                    && (context = _repository.ReadDocumentContext(app, pending.Request, _state)) is not null;
+                : (context = ReadInApiContext(app, pending.Request)) is not null;
             lock(_sync) {
                 if(!completed || !IsCurrent(pending.Request)) {
                     pending.Completion.TrySetCanceled();
@@ -212,14 +219,27 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
                             exception) : exception);
                 }
             }
-            _logger.Warning(exception, isNavigation ? _localization.GetLocalizedString("Manager.NavigationFailed")
-                : _managerViewPrepared ? "Ошибка чтения контекста менеджера перемычек."
-                : "Ошибка подготовки 3D-вида менеджера перемычек.");
+            string errorKey = isNavigation ? "Manager.NavigationFailed"
+                : _managerViewPrepared ? "Manager.ReadFailed" : "Manager.ViewPreparationFailed";
+            _logger.Warning(exception, _localization.GetLocalizedString(errorKey));
         } finally {
             lock(_sync) {
                 _activeRequest = null;
             }
         }
+    }
+
+    // Повторно проверяет запрос после подготовки вида, которая может вызвать события документа.
+    private ManagerDocumentContext ReadInApiContext(UIApplication app, ManagerRequest request) {
+        if(!PrepareManagerView(app)) {
+            return null;
+        }
+        lock(_sync) {
+            if(!IsCurrent(request)) {
+                return null;
+            }
+        }
+        return _repository.ReadDocumentContext(app, request, _state);
     }
 
     // Отмечает собственные транзакции вида и преобразует ожидаемый отказ в локализованную диагностику.

@@ -122,6 +122,11 @@
     <system:String x:Key="Manager.ViewAppearanceFailed">
         Revit не применил настройки графики персонального 3D-вида.
     </system:String>
+    <system:String x:Key="Manager.WindowReleaseFailed">Ошибка при закрытии окна менеджера.</system:String>
+    <system:String x:Key="Manager.PlatformEventsReleaseFailed">
+        Ошибка при отключении событий языка и темы менеджера.
+    </system:String>
+    <system:String x:Key="Manager.ContainerReleaseFailed">Ошибка при освобождении контейнера менеджера.</system:String>
     <system:String x:Key="Manager.ViewTransactionStartFailed">
         Не удалось начать транзакцию подготовки персонального 3D-вида.
     </system:String>

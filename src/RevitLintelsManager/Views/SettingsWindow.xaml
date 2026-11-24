@@ -6,7 +6,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:core="clr-namespace:dosymep.WpfUI.Core"
-    xmlns:pages="clr-namespace:RevitLintelsManager.Views.Pages"
     xmlns:vms="clr-namespace:RevitLintelsManager.ViewModels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:me="clr-namespace:dosymep.WpfCore.MarkupExtensions;assembly=dosymep.WpfCore"
@@ -57,8 +56,8 @@
                     Height="50"
                     FontSize="20"
                     HorizontalAlignment="Stretch"
-                    Content="{me:LocalizationSource MainWindow.FamilySettings}"
-                    TargetPageType="{x:Type pages:FamilySettingsPage}">
+                    x:Name="_familySettingsItem"
+                    Content="{me:LocalizationSource MainWindow.FamilySettings}">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="Settings24" FontSize="25"/>
                     </ui:NavigationViewItem.Icon>
@@ -73,8 +72,8 @@
                     Height="50"
                     FontSize="20"
                     HorizontalAlignment="Stretch"
-                    Content="{me:LocalizationSource MainWindow.PlacementSettings}"
-                    TargetPageType="{x:Type pages:PlacementSettingsPage}">
+                    x:Name="_placementSettingsItem"
+                    Content="{me:LocalizationSource MainWindow.PlacementSettings}">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="slideSettings24" FontSize="25"/>
                     </ui:NavigationViewItem.Icon>
@@ -89,8 +88,8 @@
                     Height="50"
                     FontSize="20"
                     HorizontalAlignment="Stretch"
-                    Content="{me:LocalizationSource MainWindow.GeneralSettings}"
-                    TargetPageType="{x:Type pages:GeneralSettingsPage}">
+                    x:Name="_generalSettingsItem"
+                    Content="{me:LocalizationSource MainWindow.GeneralSettings}">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="Options24" FontSize="25"/>
                     </ui:NavigationViewItem.Icon>

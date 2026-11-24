@@ -122,6 +122,11 @@
     <system:String x:Key="Manager.ViewAppearanceFailed">
         Revit did not apply the graphics settings to the personal 3D view.
     </system:String>
+    <system:String x:Key="Manager.WindowReleaseFailed">Could not close the manager window.</system:String>
+    <system:String x:Key="Manager.PlatformEventsReleaseFailed">
+        Could not unsubscribe the manager from language and theme events.
+    </system:String>
+    <system:String x:Key="Manager.ContainerReleaseFailed">Could not dispose of the manager container.</system:String>
     <system:String x:Key="Manager.ViewTransactionStartFailed">
         Could not start the transaction to prepare the personal 3D view.
     </system:String>
