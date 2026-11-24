@@ -888,19 +888,24 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock
+            <ScrollViewer
                 Grid.Column="0"
+                MaxHeight="120"
                 Margin="10 5 10 15"
-                Foreground="Orange"
                 VerticalAlignment="Center"
-                TextAlignment="Right"
-                TextWrapping="Wrap"
-                Text="{Binding ErrorText}" />
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
+                <TextBlock
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    TextWrapping="Wrap"
+                    Text="{Binding ErrorText}" />
+            </ScrollViewer>
 
             <ui:Button
                 Grid.Column="1"
                 Margin="10 5 10 15"
                 MinWidth="150"
+                VerticalAlignment="Center"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
@@ -910,6 +915,7 @@
                 Grid.Column="2"
                 Margin="10 5 15 15"
                 MinWidth="150"
+                VerticalAlignment="Center"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />

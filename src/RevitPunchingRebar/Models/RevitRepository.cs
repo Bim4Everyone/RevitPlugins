@@ -171,15 +171,31 @@ internal class RevitRepository {
             slab.Id, placementType, hostId?.ToString() ?? "—", freeHost ?? "—"));
     }
 
+    public bool HasSlabTopFaceAt(Floor slab, XYZ location) {
+        return FindSlabTopFace(slab, location, out _) is not null;
+    }
+
     private FamilyInstance CreateFrameOnTopFace(FamilySymbol symbol, Floor slab, XYZ location) {
+        Reference reference = FindSlabTopFace(slab, location, out XYZ projectedPoint);
+        if(reference is null) {
+            throw new InvalidOperationException(_localizationService.GetLocalizedString("Report.ErrorSlabFaceAtPylon"));
+        }
+
+        return Document.Create.NewFamilyInstance(reference, projectedPoint, XYZ.BasisX, symbol);
+    }
+
+    private static Reference FindSlabTopFace(Floor slab, XYZ location, out XYZ projectedPoint) {
         foreach(Reference reference in HostObjectUtils.GetTopFaces(slab)) {
             if(slab.GetGeometryObjectFromReference(reference) is PlanarFace face
-               && face.Project(location) is IntersectionResult projection) {
-                return Document.Create.NewFamilyInstance(reference, projection.XYZPoint, XYZ.BasisX, symbol);
+               && face.Project(location) is IntersectionResult projection
+               && face.IsInside(projection.UVPoint)) {
+                projectedPoint = projection.XYZPoint;
+                return reference;
             }
         }
 
-        throw new InvalidOperationException(_localizationService.GetLocalizedString("Report.ErrorSlabFaceAtPylon"));
+        projectedPoint = null;
+        return null;
     }
 
     /// <summary>

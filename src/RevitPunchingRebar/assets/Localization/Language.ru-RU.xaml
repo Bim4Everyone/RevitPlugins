@@ -76,7 +76,8 @@
     <system:String x:Key="Report.FrameHost.Create">Создание каркаса</system:String>
     <system:String x:Key="Report.FrameHost.Move">Перемещение каркаса</system:String>
     <system:String x:Key="Report.FrameHost.Copy">Копирование каркаса</system:String>
-    <system:String x:Key="Report.FrameHost.Mirror">Отражение каркаса</system:String>
+    <system:String x:Key="Report.ErrorNoFrameLocationsOnSlab">Под расчётными точками размещения каркасов нет выбранной плиты.</system:String>
+    <system:String x:Key="Report.ErrorFramePosition">Revit не смог переместить каркас в расчётную точку на плите.</system:String>
     <system:String x:Key="Report.ErrorSlabLevel">Не удалось определить уровень выбранной плиты для создания каркаса.</system:String>
     <system:String x:Key="Report.ErrorSlabFaceAtPylon">В точке вставки у пилона нет верхней грани выбранной плиты.</system:String>
     <system:String x:Key="Report.ErrorFrameElevation">Revit не установил каркас на расчётную отметку относительно верха выбранной плиты.</system:String>

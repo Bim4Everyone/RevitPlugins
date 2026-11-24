@@ -76,7 +76,8 @@
     <system:String x:Key="Report.FrameHost.Create">Creating the frame</system:String>
     <system:String x:Key="Report.FrameHost.Move">Moving the frame</system:String>
     <system:String x:Key="Report.FrameHost.Copy">Copying the frame</system:String>
-    <system:String x:Key="Report.FrameHost.Mirror">Mirroring the frame</system:String>
+    <system:String x:Key="Report.ErrorNoFrameLocationsOnSlab">The selected slab does not cover any of the calculated frame locations.</system:String>
+    <system:String x:Key="Report.ErrorFramePosition">Revit could not move the frame to its calculated position on the slab.</system:String>
     <system:String x:Key="Report.ErrorSlabLevel">Could not determine the level of the selected slab for frame placement.</system:String>
     <system:String x:Key="Report.ErrorSlabFaceAtPylon">The insertion point at the pylon is outside the top face of the selected slab.</system:String>
     <system:String x:Key="Report.ErrorFrameElevation">Revit could not set the calculated frame elevation relative to the top of the selected slab.</system:String>
