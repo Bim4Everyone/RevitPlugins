@@ -15,7 +15,11 @@ internal class CommercialParamsVM : ParametersViewModel {
     private Parameter _selectedRoomsHeightParam;
     private Parameter _selectedParkingSpaceClass;
     private Parameter _selectedParkingInfo;
+    private Parameter _selectedParkingInfoMainNumberParam;
+    private Parameter _selectedGroupNameMainNumberParam;
     private Parameter _selectedPositionType;
+    private string _parkingInfoKeyword = CommercialSettings.DefaultParkingKeyword;
+    private string _groupNameKeyword = CommercialSettings.DefaultParkingKeyword;
 
     public CommercialParamsVM(RevitRepository revitRepository, MainViewModel mainViewModel)
         : base(revitRepository, mainViewModel) {
@@ -51,6 +55,24 @@ internal class CommercialParamsVM : ParametersViewModel {
         set => RaiseAndSetIfChanged(ref _selectedPositionType, value);
     }
 
+    public Parameter SelectedParkingInfoMainNumberParam {
+        get => _selectedParkingInfoMainNumberParam;
+        set => RaiseAndSetIfChanged(ref _selectedParkingInfoMainNumberParam, value);
+    }
+    public Parameter SelectedGroupNameMainNumberParam {
+        get => _selectedGroupNameMainNumberParam;
+        set => RaiseAndSetIfChanged(ref _selectedGroupNameMainNumberParam, value);
+    }
+
+    public string ParkingInfoKeyword {
+        get => _parkingInfoKeyword;
+        set => RaiseAndSetIfChanged(ref _parkingInfoKeyword, value);
+    }
+    public string GroupNameKeyword {
+        get => _groupNameKeyword;
+        set => RaiseAndSetIfChanged(ref _groupNameKeyword, value);
+    }
+
     public override List<Parameter> AllSelectedParameters {
         get {
             var parameters = new List<Parameter> {
@@ -81,6 +103,13 @@ internal class CommercialParamsVM : ParametersViewModel {
                 parameters.Add(SelectedApartNumParam);
             }
 
+            if(SelectedParkingInfoMainNumberParam != null) {
+                parameters.Add(SelectedParkingInfoMainNumberParam);
+            }
+            if(SelectedGroupNameMainNumberParam != null) {
+                parameters.Add(SelectedGroupNameMainNumberParam);
+            }
+
             return parameters;
         }
     }
@@ -109,7 +138,6 @@ internal class CommercialParamsVM : ParametersViewModel {
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.GroupingByGroupParam);
         SelectedMultiStoreyParam = TextParameters
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.MultiStoreyParam);
-
         SelectedDepartmentParam = TextParameters
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.DepartmentParam);
         SelectedLevelParam = TextParameters
@@ -132,10 +160,15 @@ internal class CommercialParamsVM : ParametersViewModel {
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.ParkingSpaceClass);
         SelectedParkingInfo = TextParameters
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.ParkingInfo);
+        SelectedParkingInfoMainNumberParam = TextParameters
+            .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.ParkingInfoMainNumberParam);
+        SelectedGroupNameMainNumberParam = TextParameters
+            .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.GroupNameMainNumberParam);
+        ParkingInfoKeyword = commercialConfigSettings.ParkingInfoKeyword ?? CommercialSettings.DefaultParkingKeyword;
+        GroupNameKeyword = commercialConfigSettings.GroupNameKeyword ?? CommercialSettings.DefaultParkingKeyword;
         SelectedPositionType = TextParameters
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.PositionType);
         ProjectName = commercialConfigSettings.ProjectNameID;
-
         SelectedRoomNumberParam = TextParameters
             .FirstOrDefault(x => x.Definition.Name == commercialConfigSettings.RoomNumberParam);
         SelectedRoomNameParam = TextParameters
