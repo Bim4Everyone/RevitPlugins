@@ -71,6 +71,7 @@
     <system:String x:Key="Report.SkippedPylons">Skipped pylons:</system:String>
     <system:String x:Key="Report.PylonName">{0}, Id {1}</system:String>
     <system:String x:Key="Report.ErrorPylonSize">pylon length or width is not set</system:String>
+    <system:String x:Key="Report.ErrorFrameClearance">There is insufficient room for frames along the long faces with a clearance of at least one stirrup spacing from the longitudinal bar ends.</system:String>
     <system:String x:Key="Report.ErrorFrameHost">{0}: the selected slab (Id {1}) could not be confirmed as the host. Placement type: {2}. Host Id: {3}. Host field: {4}.</system:String>
     <system:String x:Key="Report.FrameHost.Create">Creating the frame</system:String>
     <system:String x:Key="Report.FrameHost.Move">Moving the frame</system:String>

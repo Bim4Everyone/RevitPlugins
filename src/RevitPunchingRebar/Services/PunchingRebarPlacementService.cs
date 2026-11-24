@@ -23,8 +23,8 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     // Допуск при сравнении углов, радианы
     private const double _angleTolerance = 1e-6;
 
-    // Допуск при сравнении отметок, футы.
-    private const double _elevationTolerance = 1e-6;
+    // Допуск при сравнении координат, футы.
+    private const double _positionTolerance = 1e-6;
 
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
@@ -158,12 +158,12 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     private void SetFrameElevation(Frame frame, double targetElevation) {
         var location = (LocationPoint) frame.FrameInstance.Location;
         double elevationChange = targetElevation - location.Point.Z;
-        if(Math.Abs(elevationChange) <= _elevationTolerance) {
+        if(Math.Abs(elevationChange) <= _positionTolerance) {
             return;
         }
 
         if(!location.Move(XYZ.BasisZ * elevationChange)
-           || Math.Abs(((LocationPoint) frame.FrameInstance.Location).Point.Z - targetElevation) > _elevationTolerance) {
+           || Math.Abs(((LocationPoint) frame.FrameInstance.Location).Point.Z - targetElevation) > _positionTolerance) {
             throw new InvalidOperationException(_localizationService.GetLocalizedString("Report.ErrorFrameElevation"));
         }
     }
@@ -255,19 +255,30 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     }
 
     /// <summary>
-    /// Возращает количество каркасов в указанном направлении
+    /// Возвращает количество каркасов в ряду у заданной грани пилона.
     /// </summary>
     private int GetFramesCount(IPylon pylon, Frame frame, IFrameParams frameParams) {
+        double frameWidth = frameParams.FrameWidth;
         double angle = GetAngleBetweenInstances(pylon, frame);
         if(angle == _crossAngle) {
             double punchingZone = frameParams.GetPunchingZone();
             double punchingLength = pylon.Width + 2 * punchingZone;
-            return Convert.ToInt32(Math.Ceiling((punchingLength / frameParams.FrameWidth + 1) / 2));
+            return (int) Math.Ceiling((punchingLength / frameWidth + 1) / 2);
         }
 
-        double afterColumnDistance = frameParams.GetAfterPylonDistance();
-        double length = pylon.Length + 2 * afterColumnDistance;
-        return Convert.ToInt32(Math.Ceiling((length / frameParams.FrameWidth - 1) / 2));
+        double firstEndStirrupOffset = pylon.Length / 2 + frameParams.GetAfterPylonDistance();
+        double endBarTipOffset = firstEndStirrupOffset - frameParams.LongRebarAnchorageLength;
+        double halfWidthAcrossLongitudinalBars = (frameParams.WidthStep + frameParams.LongRebarDiameter) / 2;
+        double cornerClearance = frameParams.StirrupStep;
+        double maxCenterOffset = endBarTipOffset - cornerClearance - halfWidthAcrossLongitudinalBars;
+        if(maxCenterOffset < -_positionTolerance) {
+            throw new InvalidOperationException(_localizationService.GetLocalizedString("Report.ErrorFrameClearance"));
+        }
+
+        // При шаге 2 * FrameWidth крайний центр симметричного ряда отстоит от середины на (число - 1) * FrameWidth.
+        int maxCount = (int) Math.Floor((maxCenterOffset + _positionTolerance) / frameWidth) + 1;
+        int nominalCount = Math.Max(1, (int) Math.Ceiling(firstEndStirrupOffset / frameWidth - 0.5));
+        return Math.Min(nominalCount, maxCount);
     }
 
     private void CopyFrame(IPylon pylon, Frame frame, IFrameParams frameParams, XYZ direction) {
