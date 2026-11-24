@@ -10,6 +10,8 @@ namespace RevitLintelsManager.ViewModels;
 
 /// <summary>Общие поля строки без предметного расчёта допустимости действий.</summary>
 internal abstract class ManagerRowViewModel : BaseViewModel {
+    private readonly IReadOnlyList<ManagerActionViewModel> _actions;
+
     /// <summary>Материализует только данные представления и локализованные подписи действий.</summary>
     protected ManagerRowViewModel(ManagerElementPresentation opening, ManagerElementPresentation lintel,
         IEnumerable<ManagerAction> actions,
@@ -18,13 +20,13 @@ internal abstract class ManagerRowViewModel : BaseViewModel {
             || lintel?.Status == ManagerElementStatus.NotAnalyzed;
         Opening = new ManagerElementViewModel(opening, true, localization, showInformation, analysisPending);
         Lintel = new ManagerElementViewModel(lintel, false, localization, showInformation, analysisPending);
-        Actions = actions.Distinct().Select(value => new ManagerActionViewModel(value,
+        _actions = actions.Distinct().Select(value => new ManagerActionViewModel(value,
             localization.GetLocalizedString("Manager.Action." + value))).ToList().AsReadOnly();
     }
 
     public ManagerElementViewModel Opening { get; }
     public ManagerElementViewModel Lintel { get; }
-    public IReadOnlyList<ManagerActionViewModel> Actions { get; }
+    public virtual IReadOnlyList<ManagerActionViewModel> Actions => _actions;
     public abstract ManagerActionViewModel SelectedAction { get; set; }
     public virtual string MixedActionsText => null;
     public abstract bool? IsChecked { get; set; }
@@ -34,7 +36,7 @@ internal abstract class ManagerRowViewModel : BaseViewModel {
     public virtual void RefreshLocalization(ILocalizationService localization) {
         Opening.RefreshLocalization();
         Lintel.RefreshLocalization();
-        foreach(var action in Actions) {
+        foreach(var action in _actions) {
             action.RefreshLocalization(localization);
         }
     }

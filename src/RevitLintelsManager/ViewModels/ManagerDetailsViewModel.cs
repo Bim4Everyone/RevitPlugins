@@ -25,31 +25,7 @@ internal sealed class ManagerDetailsViewModel {
         Title = IsAnalysisPending ? element.StatusText : localization.GetLocalizedString(!warnings
             ? "Manager.Information" : HasWarnings ? "Manager.HasWarnings" : "Manager.NoWarnings");
         Status = warnings ? element.StatusText : null;
-        var fields = new List<ManagerDetailField>();
-        if(!warnings) {
-            var info = element.Element?.Information;
-            fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.Family"),
-                Display(info?.FamilyName, localization)));
-            fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.Type"), element.TypeName));
-            fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.Workset"),
-                Display(info?.WorksetName, localization)));
-            fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.Level"),
-                Display(info?.LevelName, localization)));
-            fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.Group"),
-                GroupName(info, localization)));
-            fields.Add(new ManagerDetailField(localization.GetLocalizedString(
-                element.IsOpening ? "Manager.Info.FixedOpening" : "Manager.Info.FixedLintel"),
-                info?.IsFixed is bool isFixed
-                    ? localization.GetLocalizedString(isFixed ? "Manager.Yes" : "Manager.No")
-                    : localization.GetLocalizedString("Manager.Unavailable")));
-            fields.Add(new ManagerDetailField(localization.GetLocalizedString("Manager.Info.Id"),
-                info?.DisplayId ?? info?.ElementId?.ToString(CultureInfo.InvariantCulture)
-                    ?? localization.GetLocalizedString("Manager.Unavailable")));
-            if(element.IsAnalysisPending && element.Element is not null) {
-                AddProjectFields(fields, element, localization);
-            }
-        }
-        Fields = fields.AsReadOnly();
+        Fields = warnings ? Array.Empty<ManagerDetailField>() : GetInformationFields(element, localization);
         ElementWarnings = warnings ? Format(element.Element?.Diagnostics, localization) : Array.Empty<string>();
         RowWarnings = warnings ? Format(element.RowDiagnostics, localization) : Array.Empty<string>();
         var descriptions = ElementWarnings.Concat(RowWarnings).Distinct().ToList();
@@ -80,6 +56,52 @@ internal sealed class ManagerDetailsViewModel {
     public bool HasDescriptions => Descriptions.Count > 0;
     public bool HasRowWarnings => RowWarnings.Count > 0;
     public string EmptyWarningsText { get; }
+
+    /// <summary>Возвращает локализованные значения сведений и диагностики для поиска без открытия мини-окна.</summary>
+    public static IEnumerable<string> GetSearchValues(ManagerElementViewModel element,
+        ILocalizationService localization) {
+        if(element.ShowInformation) {
+            foreach(var field in GetInformationFields(element, localization)) {
+                yield return field.Label + " " + field.Value;
+            }
+        }
+        if(element.ShowStatus) {
+            yield return element.TypeName;
+            yield return element.StatusText;
+            if(!element.IsAnalysisPending && !element.HasWarnings) {
+                yield return localization.GetLocalizedString(element.IsOpening
+                    ? "Manager.CorrectOpening" : "Manager.CorrectLintel");
+            }
+            foreach(string message in Format(element.Element?.Diagnostics, localization)
+                .Concat(Format(element.RowDiagnostics, localization))) {
+                yield return message;
+            }
+        }
+    }
+
+    // Собирает те же поля для мини-окна и поиска по данным экземпляра.
+    private static IReadOnlyList<ManagerDetailField> GetInformationFields(ManagerElementViewModel element,
+        ILocalizationService localization) {
+        var info = element.Element?.Information;
+        var fields = new List<ManagerDetailField> {
+            new(localization.GetLocalizedString("Manager.Info.Family"), Display(info?.FamilyName, localization)),
+            new(localization.GetLocalizedString("Manager.Info.Type"), element.TypeName),
+            new(localization.GetLocalizedString("Manager.Info.Workset"), Display(info?.WorksetName, localization)),
+            new(localization.GetLocalizedString("Manager.Info.Level"), Display(info?.LevelName, localization)),
+            new(localization.GetLocalizedString("Manager.Info.Group"), GroupName(info, localization)),
+            new(localization.GetLocalizedString(element.IsOpening ? "Manager.Info.FixedOpening"
+                : "Manager.Info.FixedLintel"), info?.IsFixed is bool isFixed
+                    ? localization.GetLocalizedString(isFixed ? "Manager.Yes" : "Manager.No")
+                    : localization.GetLocalizedString("Manager.Unavailable")),
+            new(localization.GetLocalizedString("Manager.Info.Id"),
+                info?.DisplayId ?? info?.ElementId?.ToString(CultureInfo.InvariantCulture)
+                    ?? localization.GetLocalizedString("Manager.Unavailable"))
+        };
+        if(element.IsAnalysisPending && element.Element is not null) {
+            AddProjectFields(fields, element, localization);
+        }
+        return fields.AsReadOnly();
+    }
 
     // Показывает измеренные значения параметров и стадии в существующем списке сведений.
     private static void AddProjectFields(ICollection<ManagerDetailField> fields, ManagerElementViewModel element,

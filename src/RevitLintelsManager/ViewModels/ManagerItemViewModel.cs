@@ -20,6 +20,7 @@ internal readonly struct ManagerItemState(ManagerGroupKey groupKey, bool isCheck
 /// <summary>Индивидуальная строка на независимом снимке без операций модели.</summary>
 internal sealed class ManagerItemViewModel : ManagerRowViewModel {
     public event Action<ManagerItemViewModel, bool, ManagerAction> StateChanged;
+    private ManagerElementStatus _groupStatus = ManagerElementStatus.NotAnalyzed;
     private bool _isChecked = true;
     private bool _isLastInGroup;
     private ManagerAction? _manualAction;
@@ -38,6 +39,12 @@ internal sealed class ManagerItemViewModel : ManagerRowViewModel {
     }
 
     public ManagerItemSnapshot Snapshot { get; }
+    public ManagerElementStatus ResultStatus => Opening.IsAnalysisPending ? ManagerElementStatus.NotAnalyzed
+        : Opening.HasWarnings || Lintel.HasWarnings ? ManagerElementStatus.Warning : ManagerElementStatus.Correct;
+    public ManagerElementStatus GroupStatus {
+        get => _groupStatus;
+        internal set => RaiseAndSetIfChanged(ref _groupStatus, value);
+    }
     public bool IsLastInGroup {
         get => _isLastInGroup;
         set => RaiseAndSetIfChanged(ref _isLastInGroup, value);

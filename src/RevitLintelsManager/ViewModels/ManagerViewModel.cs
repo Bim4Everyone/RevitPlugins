@@ -17,6 +17,8 @@ using RevitLintelsManager.Services;
 
 namespace RevitLintelsManager.ViewModels;
 
+internal enum ManagerResultFilter { All, Warning, Correct }
+
 internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private sealed class VisibleRowCollection : ObservableCollection<ManagerRowViewModel> {
         /// <summary>Выполняет массовое обновление одним поддерживаемым WPF событием.</summary>
@@ -48,19 +50,28 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private readonly HashSet<ManagerGroupKey> _expandedGroups = new();
     private readonly Dictionary<ManagerItemKey, ManagerItemState> _hiddenState = new();
     private readonly HashSet<ManagerItemKey> _deletionCandidates = new();
+    private readonly Dictionary<ManagerItemViewModel, string[]> _searchValues = new();
     private Dictionary<ManagerItemKey, ManagerItemViewModel> _items = new();
     private HashSet<ManagerElementViewModel> _elements = new();
     private bool _isBlocked;
     private bool _isRefreshing;
     private bool _firstRead = true;
     private bool _modelIsDirty;
+    private bool _updatingResults;
     private string _contextSummary;
     private string _readError;
+    private string _searchText;
     private ManagerDocumentContext _lastContext;
     private int _processingCount;
+    private int _filteredCount;
+    private int _selectedCount;
+    private int _warningCount;
+    private int _correctCount;
+    private ManagerResultFilter _resultFilter;
     private ManagerScopeViewModel _selectedScope;
     private ManagerScope _projectionScope;
     private IReadOnlyList<ManagerGroupViewModel> _groups = Array.Empty<ManagerGroupViewModel>();
+    private IReadOnlyList<ManagerGroupViewModel> _filteredGroups = Array.Empty<ManagerGroupViewModel>();
 
     /// <summary>Создаёт команды окна без непосредственных зависимостей от Revit API.</summary>
     public ManagerViewModel(ManagerSessionState state, ISettingsCommandFactory commands,
@@ -79,6 +90,8 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
             () => !IsBlocked && !State.IsClosing && !IsRefreshing);
         CloseCommand = commands.Create(() => CloseRequested?.Invoke());
         SelectScopeCommand = commands.Create<ManagerScopeViewModel>(SelectScope, _ => CanChangeScope);
+        SelectResultFilterCommand = commands.Create<ManagerResultFilter>(SelectResultFilter, _ => CanEditRows);
+        ToggleAllRowsCommand = commands.Create(ToggleAllRows, () => CanEditRows && _filteredCount > 0);
         ToggleGroupCommand = commands.Create<ManagerGroupViewModel>(
             group => SetExpanded(group, !group.IsExpanded),
             group => !IsBlocked && !State.IsClosing && !IsRefreshing && _groups.Contains(group));
@@ -100,11 +113,30 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     }
     public ICommand CloseCommand { get; }
     public ICommand SelectScopeCommand { get; }
+    public ICommand SelectResultFilterCommand { get; }
+    public ICommand ToggleAllRowsCommand { get; }
     public ICommand RefreshCommand { get; }
     public ICommand ToggleGroupCommand { get; }
     public ICommand ShowInformationCommand { get; }
     public ICommand ShowWarningsCommand { get; }
     public bool CanChangeScope => CanEditRows;
+    public string SearchText {
+        get => _searchText;
+        set {
+            if(string.Equals(_searchText, value, StringComparison.Ordinal)) {
+                return;
+            }
+            RaiseAndSetIfChanged(ref _searchText, value);
+            RefreshFilteredRows();
+        }
+    }
+    public bool IsAllResultsFilter => _resultFilter == ManagerResultFilter.All;
+    public bool IsWarningResultsFilter => _resultFilter == ManagerResultFilter.Warning;
+    public bool IsCorrectResultsFilter => _resultFilter == ManagerResultFilter.Correct;
+    public string AllResultsText => FormatResultCount("Manager.FilterAll", _items.Count);
+    public string WarningResultsText => FormatResultCount("Manager.FilterWarning", _warningCount);
+    public string CorrectResultsText => FormatResultCount("Manager.FilterCorrect", _correctCount);
+    public bool? AreAllRowsChecked => _selectedCount == 0 ? false : _selectedCount == _filteredCount ? true : null;
     public int ProcessingCount => _processingCount;
     public string ProcessText => string.Format(CultureInfo.CurrentCulture,
         _localization.GetLocalizedString("Manager.ProcessCount"), ProcessingCount);
@@ -113,7 +145,9 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         : IsBlocked ? _localization.GetLocalizedString("Manager.DocumentChanged")
         : IsRefreshing ? _localization.GetLocalizedString("Manager.Busy")
         : _readError is not null ? GetReadErrorMessage()
-        : _modelIsDirty ? _localization.GetLocalizedString("Manager.DataOutdated") : GetProjectMessage();
+        : _modelIsDirty ? _localization.GetLocalizedString("Manager.DataOutdated")
+        : _filteredCount == 0 && _groups.Count > 0 ? _localization.GetLocalizedString("Manager.FilterEmpty")
+        : GetProjectMessage();
     public bool HasGeneralMessage => GeneralMessage is not null;
     public ManagerDocumentContext LastContext {
         get => _lastContext;
@@ -169,9 +203,6 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
                 groups.Add(previous);
                 continue;
             }
-            for(int index = 0; index < children.Count; index++) {
-                children[index].IsLastInGroup = index == children.Count - 1;
-            }
             var first = children[0];
             var created = new ManagerGroupViewModel(group.Key, first.Opening.Element, first.Lintel.Element,
                 children, _localization) { IsExpanded = _expandedGroups.Contains(group.Key) };
@@ -193,12 +224,13 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
         _projectionScope = scope;
         _groups = groups.AsReadOnly();
+        _searchValues.Clear();
         _elements = new HashSet<ManagerElementViewModel>(_groups.SelectMany(group =>
             new[] { group.Opening, group.Lintel }.Concat(
                 group.Items.SelectMany(item => new[] { item.Opening, item.Lintel }))));
         RaisePropertyChanged(nameof(Groups));
-        SetProcessingCount(_groups.Sum(group => group.ProcessingCount));
-        UpdateVisibleRows(CreateVisibleRows());
+        UpdateResultCounts();
+        ApplyResultFilters();
         ProjectionChanged?.Invoke(scope);
     }
 
@@ -281,6 +313,8 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
             group.Dispose();
         }
         _groups = Array.Empty<ManagerGroupViewModel>();
+        _filteredGroups = Array.Empty<ManagerGroupViewModel>();
+        _searchValues.Clear();
         _items.Clear();
         _hiddenState.Clear();
         _deletionCandidates.Clear();
@@ -307,6 +341,11 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         foreach(var item in _items.Values) {
             item.RefreshLocalization(_localization);
         }
+        _searchValues.Clear();
+        if(!string.IsNullOrWhiteSpace(_searchText)) {
+            RefreshFilteredRows();
+        }
+        NotifyResultCounts();
         RaisePropertyChanged(nameof(ProcessText));
         RaisePropertyChanged(nameof(GeneralMessage));
         RaisePropertyChanged(nameof(HasGeneralMessage));
@@ -327,14 +366,18 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         } else {
             _expandedGroups.Remove(group.Key);
         }
+        int groupIndex = _visibleRows.IndexOf(group);
+        if(groupIndex < 0) {
+            return;
+        }
         if(group.Count > _maximumIncrementalChanges) {
             ProjectionChanging?.Invoke(_projectionScope);
             _visibleRows.ReplaceRows(CreateVisibleRows());
             ProjectionChanged?.Invoke(_projectionScope);
             return;
         }
-        int index = _visibleRows.IndexOf(group) + 1;
-        foreach(var item in group.Items) {
+        int index = groupIndex + 1;
+        foreach(var item in group.FilteredItems) {
             if(group.IsExpanded) {
                 _visibleRows.Insert(index++, item);
             } else {
@@ -371,10 +414,10 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     /// <summary>Находит видимую строку для восстановления выбора и мини-окна.</summary>
     public ManagerRowViewModel FindVisibleRow(ManagerItemKey? itemKey, ManagerGroupKey? groupKey) {
         if(itemKey is ManagerItemKey item && _items.TryGetValue(item, out var row)) {
-            return _expandedGroups.Contains(row.Snapshot.GroupKey) ? row : null;
+            return _visibleRows.Contains(row) ? row : null;
         }
         return groupKey is ManagerGroupKey group
-            ? _groups.FirstOrDefault(current => current.Key.Equals(group)) : null;
+            ? _filteredGroups.FirstOrDefault(current => current.Key.Equals(group)) : null;
     }
 
     // Повторное нажатие выбранного диапазона также запускает чтение.
@@ -396,9 +439,121 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
     }
 
-    // Обновляет итог на величину изменения одной группы, независимо от раскрытия.
-    private void OnGroupStateChanged(ManagerGroupViewModel group, int previousCount) {
-        SetProcessingCount(_processingCount + group.ProcessingCount - previousCount);
+    // Учитывает изменение отметок и операций только для строк результата.
+    private void OnGroupStateChanged(ManagerGroupViewModel group, int previousSelected, int previousProcessing) {
+        if(_updatingResults) {
+            return;
+        }
+        _selectedCount += group.SelectedCount - previousSelected;
+        SetProcessingCount(_processingCount + group.ProcessingCount - previousProcessing);
+        RaisePropertyChanged(nameof(AreAllRowsChecked));
+    }
+
+    // Считает исходную выборку диапазона до применения статуса и поиска.
+    private void UpdateResultCounts() {
+        _warningCount = _items.Values.Count(item => item.ResultStatus == ManagerElementStatus.Warning);
+        _correctCount = _items.Values.Count(item => item.ResultStatus == ManagerElementStatus.Correct);
+        NotifyResultCounts();
+    }
+
+    // Обновляет тексты кнопок при смене диапазона или языка.
+    private void NotifyResultCounts() {
+        RaisePropertyChanged(nameof(AllResultsText));
+        RaisePropertyChanged(nameof(WarningResultsText));
+        RaisePropertyChanged(nameof(CorrectResultsText));
+    }
+
+    // Форматирует подпись кнопки вместе с числом строк диапазона.
+    private string FormatResultCount(string resource, int count) {
+        return string.Format(CultureInfo.CurrentCulture, _localization.GetLocalizedString(resource), count);
+    }
+
+    // Переключает фильтр готовых строк без вызова обновления модели.
+    private void SelectResultFilter(ManagerResultFilter filter) {
+        if(filter == _resultFilter) {
+            return;
+        }
+        _resultFilter = filter;
+        RaisePropertyChanged(nameof(IsAllResultsFilter));
+        RaisePropertyChanged(nameof(IsWarningResultsFilter));
+        RaisePropertyChanged(nameof(IsCorrectResultsFilter));
+        RefreshFilteredRows();
+    }
+
+    // Сохраняет текущую позицию окна перед перепубликацией проекции поиска.
+    private void RefreshFilteredRows() {
+        ProjectionChanging?.Invoke(_projectionScope);
+        ApplyResultFilters();
+        ProjectionChanged?.Invoke(_projectionScope);
+    }
+
+    // Применяет статус до текстового фильтра и оставляет только группы с совпавшими строками.
+    private void ApplyResultFilters() {
+        string query = _searchText?.Trim();
+        var groups = new List<ManagerGroupViewModel>(_groups.Count);
+        _updatingResults = true;
+        try {
+            foreach(var group in _groups) {
+                var matching = IsAllResultsFilter && string.IsNullOrEmpty(query) ? group.Items
+                    : group.Items.Where(item => MatchesResultFilter(item) && MatchesSearch(item, query)).ToList();
+                group.SetFilteredItems(matching);
+                if(group.Count > 0) {
+                    groups.Add(group);
+                }
+            }
+        } finally {
+            _updatingResults = false;
+        }
+        _filteredGroups = groups.AsReadOnly();
+        _filteredCount = groups.Sum(group => group.Count);
+        UpdateSelectionSummary();
+        UpdateVisibleRows(CreateVisibleRows());
+        RaisePropertyChanged(nameof(GeneralMessage));
+        RaisePropertyChanged(nameof(HasGeneralMessage));
+        CommandManager.InvalidateRequerySuggested();
+    }
+
+    // Сопоставляет готовый статус строки с активной кнопкой.
+    private bool MatchesResultFilter(ManagerItemViewModel item) {
+        return _resultFilter switch {
+            ManagerResultFilter.Warning => item.ResultStatus == ManagerElementStatus.Warning,
+            ManagerResultFilter.Correct => item.ResultStatus == ManagerElementStatus.Correct,
+            _ => true
+        };
+    }
+
+    // Ищет подстроку в тех же локализованных сведениях, которые показывают мини-окна.
+    private bool MatchesSearch(ManagerItemViewModel item, string query) {
+        if(string.IsNullOrEmpty(query)) {
+            return true;
+        }
+        if(!_searchValues.TryGetValue(item, out var values)) {
+            values = ManagerDetailsViewModel.GetSearchValues(item.Opening, _localization)
+                .Concat(ManagerDetailsViewModel.GetSearchValues(item.Lintel, _localization)).ToArray();
+            _searchValues.Add(item, values);
+        }
+        return values.Any(value => value?.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0);
+    }
+
+    // Одним действием меняет отметки результатов, включая детей свёрнутых групп.
+    private void ToggleAllRows() {
+        bool isChecked = AreAllRowsChecked != true;
+        _updatingResults = true;
+        try {
+            foreach(var group in _filteredGroups) {
+                group.IsChecked = isChecked;
+            }
+        } finally {
+            _updatingResults = false;
+            UpdateSelectionSummary();
+        }
+    }
+
+    // Публикует один общий итог после фильтрации или массового выбора.
+    private void UpdateSelectionSummary() {
+        _selectedCount = _filteredGroups.Sum(group => group.SelectedCount);
+        SetProcessingCount(_filteredGroups.Sum(group => group.ProcessingCount));
+        RaisePropertyChanged(nameof(AreAllRowsChecked));
     }
 
     // Оповещает кнопку только после изменения агрегированного количества.
@@ -414,10 +569,10 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     // Собирает заголовки и только видимых детей в порядке текущего диапазона.
     private List<ManagerRowViewModel> CreateVisibleRows() {
         var rows = new List<ManagerRowViewModel>();
-        foreach(var group in _groups) {
+        foreach(var group in _filteredGroups) {
             rows.Add(group);
             if(group.IsExpanded) {
-                rows.AddRange(group.Items);
+                rows.AddRange(group.FilteredItems);
             }
         }
         return rows;
