@@ -55,11 +55,13 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private HashSet<ManagerElementViewModel> _elements = new();
     private bool _isBlocked;
     private bool _isRefreshing;
+    private bool _isNavigating;
     private bool _firstRead = true;
     private bool _modelIsDirty;
     private bool _updatingResults;
     private string _contextSummary;
     private string _readError;
+    private string _navigationError;
     private string _searchText;
     private ManagerDocumentContext _lastContext;
     private int _processingCount;
@@ -86,15 +88,16 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         _projectionScope = state.InitialScope;
         VisibleRows = new ReadOnlyObservableCollection<ManagerRowViewModel>(_visibleRows);
         ContextSummary = localization.GetLocalizedString("Manager.Refresh");
-        RefreshCommand = commands.CreateAsync(RefreshContextAsync,
-            () => !IsBlocked && !State.IsClosing && !IsRefreshing);
+        RefreshCommand = commands.CreateAsync(RefreshContextAsync, () => CanEditRows);
+        NavigateCommand = commands.CreateAsync<ManagerRowViewModel>(NavigateAsync,
+            row => CanEditRows && row is not null && _visibleRows.Contains(row) && GetNavigationKeys(row).Any());
         CloseCommand = commands.Create(() => CloseRequested?.Invoke());
         SelectScopeCommand = commands.Create<ManagerScopeViewModel>(SelectScope, _ => CanChangeScope);
         SelectResultFilterCommand = commands.Create<ManagerResultFilter>(SelectResultFilter, _ => CanEditRows);
         ToggleAllRowsCommand = commands.Create(ToggleAllRows, () => CanEditRows && _filteredCount > 0);
         ToggleGroupCommand = commands.Create<ManagerGroupViewModel>(
             group => SetExpanded(group, !group.IsExpanded),
-            group => !IsBlocked && !State.IsClosing && !IsRefreshing && _groups.Contains(group));
+            group => CanEditRows && _groups.Contains(group));
         ShowInformationCommand = commands.Create<ManagerElementViewModel>(
             element => ShowDetails(element, false),
             element => CanEditRows && element.ShowInformation && ContainsElement(element));
@@ -116,6 +119,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public ICommand SelectResultFilterCommand { get; }
     public ICommand ToggleAllRowsCommand { get; }
     public ICommand RefreshCommand { get; }
+    public ICommand NavigateCommand { get; }
     public ICommand ToggleGroupCommand { get; }
     public ICommand ShowInformationCommand { get; }
     public ICommand ShowWarningsCommand { get; }
@@ -140,10 +144,12 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public int ProcessingCount => _processingCount;
     public string ProcessText => string.Format(CultureInfo.CurrentCulture,
         _localization.GetLocalizedString("Manager.ProcessCount"), ProcessingCount);
-    public bool CanEditRows => !IsBlocked && !State.IsClosing && !IsRefreshing;
+    public bool CanEditRows => !IsBlocked && !State.IsClosing && !IsRefreshing && !_isNavigating;
     public string GeneralMessage => State.IsClosing ? _localization.GetLocalizedString("Manager.Closing")
         : IsBlocked ? _localization.GetLocalizedString("Manager.DocumentChanged")
         : IsRefreshing ? _localization.GetLocalizedString("Manager.Busy")
+        : _isNavigating ? _localization.GetLocalizedString("Manager.Navigating")
+        : _navigationError is not null ? _navigationError
         : _readError is not null ? GetReadErrorMessage()
         : _modelIsDirty ? _localization.GetLocalizedString("Manager.DataOutdated")
         : _filteredCount == 0 && _groups.Count > 0 ? _localization.GetLocalizedString("Manager.FilterEmpty")
@@ -605,8 +611,44 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
     }
 
+    // Лупа группы использует все ключи группы текущего диапазона.
+    private static IEnumerable<ManagerItemKey> GetNavigationKeys(ManagerRowViewModel row) {
+        var items = row is ManagerGroupViewModel group ? group.Items : new[] { (ManagerItemViewModel) row };
+        return items.Select(item => item.Snapshot.Key)
+            .Where(key => !string.IsNullOrEmpty(key.OpeningUniqueId) || !string.IsNullOrEmpty(key.LintelUniqueId));
+    }
+
+    // Передаёт только ключи снимков и сохраняет текущую проекцию после ответа Revit.
+    private async Task NavigateAsync(ManagerRowViewModel row) {
+        var request = new ManagerRequest(State.DocumentToken, State.Generation, navigationItems: GetNavigationKeys(row));
+        SetNavigationState(true, null);
+        string error = null;
+        try {
+            await _requests.Enqueue(request).ConfigureAwait(false);
+        } catch(Exception exception) when(exception is InvalidOperationException or OperationCanceledException) {
+            error = exception is InvalidOperationException ? exception.Message
+                : _localization.GetLocalizedString("Manager.NavigationFailed");
+        } finally {
+            if(!_dispatcher.HasShutdownStarted) {
+                await _dispatcher.InvokeAsync(() => SetNavigationState(false,
+                    IsCurrentResponse(request.DocumentToken, request.Generation) ? error : null)).Task
+                    .ConfigureAwait(false);
+            }
+        }
+    }
+
+    // Обновляет доступность команд и сообщение без изменения строк.
+    private void SetNavigationState(bool isNavigating, string error) {
+        _isNavigating = isNavigating;
+        _navigationError = error;
+        RaisePropertyChanged(nameof(CanEditRows));
+        NotifyPresentationState();
+        CommandManager.InvalidateRequerySuggested();
+    }
+
     // Передаёт в очередь диапазон и идентичность запроса, публикует независимый ответ на UI Dispatcher.
     private async Task RefreshContextAsync() {
+        _navigationError = null;
         IsRefreshing = true;
         CommandManager.InvalidateRequerySuggested();
         var scope = SelectedScope?.Scope ?? State.InitialScope;

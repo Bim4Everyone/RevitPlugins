@@ -341,7 +341,9 @@
                     <ui:Button
                         Grid.Column="1"
                         Style="{StaticResource ManagerNavigateButtonStyle}"
-                        IsEnabled="False"
+                        Command="{Binding DataContext.NavigateCommand,
+                            RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding}"
                         ToolTip="{me:LocalizationSource Manager.Navigate}">
                         <ui:SymbolIcon
                             Symbol="Search24"
@@ -443,7 +445,9 @@
                 <ui:Button
                     Grid.Column="1"
                     Style="{StaticResource ManagerNavigateButtonStyle}"
-                    IsEnabled="False"
+                    Command="{Binding DataContext.NavigateCommand,
+                        RelativeSource={RelativeSource AncestorType=Window}}"
+                    CommandParameter="{Binding}"
                     ToolTip="{me:LocalizationSource Manager.Navigate}">
                     <ui:SymbolIcon
                         Symbol="Search24"

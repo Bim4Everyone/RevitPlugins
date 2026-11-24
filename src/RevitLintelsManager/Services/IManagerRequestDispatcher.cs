@@ -5,7 +5,7 @@ using RevitLintelsManager.Models;
 
 namespace RevitLintelsManager.Services;
 
-/// <summary>Контракт очереди запуска, чтения и безопасного освобождения ExternalEvent.</summary>
+/// <summary>Контракт очереди чтения и навигации и безопасного освобождения ExternalEvent.</summary>
 /// <remarks>Kernel вызывает Dispose после TryDisposeInApiContext; при ошибке до старта — в API-контексте команды.</remarks>
 internal interface IManagerRequestDispatcher : IDisposable {
     /// <summary>Признак собственного изменения вида во время API-вызова.</summary>
@@ -14,11 +14,11 @@ internal interface IManagerRequestDispatcher : IDisposable {
     /// <summary>Разрешает первый запрос и последующие обновления сессии.</summary>
     void StartAcceptingRequests();
 
-    /// <summary>Ставит чтение контекста в очередь ExternalEvent без обращения к модели из GUI.</summary>
-    /// <param name="request">Token исходного документа и поколение запроса.</param>
-    /// <returns>Независимые значения; отменённая задача при устаревании/закрытии/блокировке.</returns>
+    /// <summary>Ставит чтение или навигацию в очередь ExternalEvent из GUI.</summary>
+    /// <param name="request">Идентификатор документа, поколение и данные операции.</param>
+    /// <returns>Снимок чтения или null после перехода. Отмена при устаревании, блокировке или закрытии.</returns>
     /// <exception cref="ArgumentNullException">Запрос не задан.</exception>
-    /// <exception cref="InvalidOperationException">Сигнал, подготовка вида или чтение завершились ошибкой.</exception>
+    /// <exception cref="InvalidOperationException">Сигнал, чтение или навигация завершились ошибкой.</exception>
     Task<ManagerDocumentContext> Enqueue(ManagerRequest request);
 
     /// <summary>Отменяет ожидающие результаты, сохраняя возможность следующих запросов.</summary>

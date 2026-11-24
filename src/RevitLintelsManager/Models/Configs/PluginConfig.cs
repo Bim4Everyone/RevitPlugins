@@ -94,6 +94,12 @@ public class SystemPluginConfig {
     public double DefaultMinWidthMm => 400;
     public double DefaultMaxWidthMm => 900;
     public double DefaultWallSupportMm => 250;
+    public double NavigationSectionBoxMarginMm => 300;
+    public bool ManagerViewHideAnnotations => true;
+    public BuiltInCategory ManagerViewWallCategory => BuiltInCategory.OST_Walls;
+    public int ManagerViewWallTransparency => 40;
+    public DisplayStyle ManagerViewDisplayStyle => DisplayStyle.Shading;
+    public ViewDetailLevel ManagerViewDetailLevel => ViewDetailLevel.Fine;
     public string DefaultLintelType => String.Empty;
 
     

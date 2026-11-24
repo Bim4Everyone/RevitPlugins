@@ -115,7 +115,19 @@
     <system:String x:Key="Manager.Refresh">Refresh data</system:String>
     <system:String x:Key="Manager.SignalRejected">The request could not be sent to Revit. Try refreshing again.</system:String>
     <system:String x:Key="Manager.ReadFailed">Project data could not be read. Try refreshing again.</system:String>
-    <system:String x:Key="Manager.ViewPreparationFailed">The personal 3D view could not be prepared. Check the 3D view type, phase, and model editing permissions, then refresh. See the log for details.</system:String>
+    <system:String x:Key="Manager.ViewPreparationFailed">
+        The personal 3D view could not be prepared. Check the view type, phase, view template restrictions,
+        and project editing permissions, then refresh. See the log for details.
+    </system:String>
+    <system:String x:Key="Manager.ViewAppearanceFailed">
+        Revit did not apply the graphics settings to the personal 3D view.
+    </system:String>
+    <system:String x:Key="Manager.ViewTransactionStartFailed">
+        Could not start the transaction to prepare the personal 3D view.
+    </system:String>
+    <system:String x:Key="Manager.ViewTransactionCommitFailed">
+        Revit did not save the changes to the personal 3D view.
+    </system:String>
     <system:String x:Key="Manager.DataOutdated">The model has changed. Refresh the data for the current range.</system:String>
     <system:String x:Key="Manager.PreviousData">Showing data from the previous read.</system:String>
     <system:String x:Key="Manager.ReadPartial">Some project elements could not be read ({0}).</system:String>
@@ -134,6 +146,37 @@
     <system:String x:Key="Manager.Expand">Expand / collapse group</system:String>
     <system:String x:Key="Manager.Information">Information</system:String>
     <system:String x:Key="Manager.Navigate">Show elements</system:String>
+    <system:String x:Key="Manager.Navigating">Showing elements in Revit…</system:String>
+    <system:String x:Key="Manager.NavigationFailed">
+        Revit could not show the elements in the personal 3D view.
+    </system:String>
+    <system:String x:Key="Manager.NavigationTargetsUnavailable">
+        The selected elements are no longer available in the project.
+    </system:String>
+    <system:String x:Key="Manager.NavigationBoundsUnavailable">
+        Could not determine the spatial bounds of all selected elements.
+    </system:String>
+    <system:String x:Key="Manager.NavigationSectionBoxTransaction">
+        Lintel Manager 3D view section box
+    </system:String>
+    <system:String x:Key="Manager.NavigationViewUnavailable">
+        The personal 3D view is unavailable.
+    </system:String>
+    <system:String x:Key="Manager.NavigationTargetsChanged">
+        The target elements changed during the transition to the 3D view.
+    </system:String>
+    <system:String x:Key="Manager.NavigationSelectionFailed">
+        Revit did not select all targets in the personal 3D view.
+    </system:String>
+    <system:String x:Key="Manager.NavigationSourceUnavailable">
+        The source project is unavailable for navigation.
+    </system:String>
+    <system:String x:Key="Manager.NavigationSectionBoxFailed">
+        Revit did not activate the section box in the personal 3D view.
+    </system:String>
+    <system:String x:Key="Manager.NavigationViewportUnavailable">
+        The personal 3D view window is unavailable for zooming.
+    </system:String>
     <system:String x:Key="Manager.NoLintel">&lt; No lintel &gt;</system:String>
     <system:String x:Key="Manager.NoOpening">&lt; No opening &gt;</system:String>
     <system:String x:Key="Manager.Process">Process (0)</system:String>

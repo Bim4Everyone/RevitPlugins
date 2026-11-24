@@ -115,7 +115,19 @@
     <system:String x:Key="Manager.Refresh">Обновить данные</system:String>
     <system:String x:Key="Manager.SignalRejected">Не удалось передать запрос в Revit. Повторите обновление.</system:String>
     <system:String x:Key="Manager.ReadFailed">Не удалось прочитать данные проекта. Повторите обновление.</system:String>
-    <system:String x:Key="Manager.ViewPreparationFailed">Не удалось подготовить персональный 3D-вид. Проверьте наличие типа 3D-вида, стадию и права на изменение модели, затем повторите обновление. Подробности записаны в журнал.</system:String>
+    <system:String x:Key="Manager.ViewPreparationFailed">
+        Не удалось подготовить персональный 3D-вид. Проверьте тип вида, стадию, ограничения шаблона
+        и права на изменение проекта, затем повторите обновление. Подробности записаны в журнал.
+    </system:String>
+    <system:String x:Key="Manager.ViewAppearanceFailed">
+        Revit не применил настройки графики персонального 3D-вида.
+    </system:String>
+    <system:String x:Key="Manager.ViewTransactionStartFailed">
+        Не удалось начать транзакцию подготовки персонального 3D-вида.
+    </system:String>
+    <system:String x:Key="Manager.ViewTransactionCommitFailed">
+        Revit не сохранил изменения персонального 3D-вида.
+    </system:String>
     <system:String x:Key="Manager.DataOutdated">Модель изменилась. Обновите данные текущего диапазона.</system:String>
     <system:String x:Key="Manager.PreviousData">Показаны данные предыдущего чтения.</system:String>
     <system:String x:Key="Manager.ReadPartial">Не удалось прочитать часть элементов проекта ({0}).</system:String>
@@ -134,6 +146,37 @@
     <system:String x:Key="Manager.Expand">Раскрыть / свернуть группу</system:String>
     <system:String x:Key="Manager.Information">Информация</system:String>
     <system:String x:Key="Manager.Navigate">Показать элементы</system:String>
+    <system:String x:Key="Manager.Navigating">Показываем элементы в Revit…</system:String>
+    <system:String x:Key="Manager.NavigationFailed">
+        Revit не смог показать элементы на персональном 3D-виде.
+    </system:String>
+    <system:String x:Key="Manager.NavigationTargetsUnavailable">
+        Выбранные элементы больше недоступны в проекте.
+    </system:String>
+    <system:String x:Key="Manager.NavigationBoundsUnavailable">
+        Не удалось определить пространственные границы всех выбранных элементов.
+    </system:String>
+    <system:String x:Key="Manager.NavigationSectionBoxTransaction">
+        Рамка 3D-вида менеджера перемычек
+    </system:String>
+    <system:String x:Key="Manager.NavigationViewUnavailable">
+        Персональный 3D-вид недоступен.
+    </system:String>
+    <system:String x:Key="Manager.NavigationTargetsChanged">
+        Цели навигации изменились при переходе в 3D-вид.
+    </system:String>
+    <system:String x:Key="Manager.NavigationSelectionFailed">
+        Revit не выделил все цели на персональном 3D-виде.
+    </system:String>
+    <system:String x:Key="Manager.NavigationSourceUnavailable">
+        Исходный проект недоступен для навигации.
+    </system:String>
+    <system:String x:Key="Manager.NavigationSectionBoxFailed">
+        Revit не активировал рамку служебного вида.
+    </system:String>
+    <system:String x:Key="Manager.NavigationViewportUnavailable">
+        Окно персонального 3D-вида недоступно для приближения.
+    </system:String>
     <system:String x:Key="Manager.NoLintel">&lt; Нет перемычки &gt;</system:String>
     <system:String x:Key="Manager.NoOpening">&lt; Нет проёма &gt;</system:String>
     <system:String x:Key="Manager.Process">Обработать (0)</system:String>

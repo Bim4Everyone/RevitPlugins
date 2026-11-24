@@ -10,7 +10,7 @@ using RevitLintelsManager.Models;
 
 namespace RevitLintelsManager.Services;
 
-/// <summary>Сериализует подготовку вида и чтение контекста, владеет ExternalEvent до закрытия.</summary>
+/// <summary>Сериализует чтение и навигацию, владеет ExternalEvent до закрытия.</summary>
 internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, IExternalEventHandler {
     private readonly object _sync = new();
     private readonly Queue<PendingRequest> _queue = new();
@@ -147,7 +147,7 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
                     }
                     _activeRequest = pending;
                 }
-                ReadContext(app, pending);
+                ExecuteRequest(app, pending);
             }
         } finally {
             lock(_sync) {
@@ -186,13 +186,17 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
         }
     }
 
-    // Подготавливает вид перед первым чтением и проверяет поколение перед публикацией результата.
-    private void ReadContext(UIApplication app, PendingRequest pending) {
+    // Выполняет один запрос и проверяет его поколение перед публикацией результата.
+    private void ExecuteRequest(UIApplication app, PendingRequest pending) {
+        bool isNavigation = pending.Request.NavigationItems is not null;
         try {
-            var context = PrepareManagerView(app) ? _repository.ReadDocumentContext(app, pending.Request, _state)
-                : null;
+            ManagerDocumentContext context = null;
+            bool completed = isNavigation
+                ? NavigateInApiContext(app, pending.Request)
+                : PrepareManagerView(app)
+                    && (context = _repository.ReadDocumentContext(app, pending.Request, _state)) is not null;
             lock(_sync) {
-                if(context is null || !IsCurrent(pending.Request)) {
+                if(!completed || !IsCurrent(pending.Request)) {
                     pending.Completion.TrySetCanceled();
                 } else {
                     pending.Completion.TrySetResult(context);
@@ -203,17 +207,42 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
                 if(!IsCurrent(pending.Request)) {
                     pending.Completion.TrySetCanceled();
                 } else {
-                    pending.Completion.TrySetException(_managerViewPrepared ? new InvalidOperationException(
-                        _localization.GetLocalizedString("Manager.ReadFailed"), exception) : exception);
+                    pending.Completion.TrySetException(!isNavigation && _managerViewPrepared
+                        ? new InvalidOperationException(_localization.GetLocalizedString("Manager.ReadFailed"),
+                            exception) : exception);
                 }
             }
-            _logger.Warning(exception, _managerViewPrepared ? "Ошибка чтения контекста менеджера перемычек."
+            _logger.Warning(exception, isNavigation ? _localization.GetLocalizedString("Manager.NavigationFailed")
+                : _managerViewPrepared ? "Ошибка чтения контекста менеджера перемычек."
                 : "Ошибка подготовки 3D-вида менеджера перемычек.");
         } finally {
             lock(_sync) {
                 _activeRequest = null;
             }
         }
+    }
+
+    // Отмечает собственные транзакции вида и преобразует ожидаемый отказ в локализованную диагностику.
+    private bool NavigateInApiContext(UIApplication app, ManagerRequest request) {
+        ManagerNavigationResult result;
+        IsPreparingManagerView = true;
+        try {
+            result = _navigation.Navigate(app, request, _state);
+        } catch(Exception exception) {
+            throw new InvalidOperationException(_localization.GetLocalizedString("Manager.NavigationFailed"),
+                exception);
+        } finally {
+            IsPreparingManagerView = false;
+        }
+
+        return result switch {
+            ManagerNavigationResult.Completed => true,
+            ManagerNavigationResult.SourceUnavailable => false,
+            ManagerNavigationResult.TargetsUnavailable => throw new InvalidOperationException(
+                _localization.GetLocalizedString("Manager.NavigationTargetsUnavailable")),
+            _ => throw new InvalidOperationException(
+                _localization.GetLocalizedString("Manager.NavigationBoundsUnavailable"))
+        };
     }
 
     // Повторяет неудачную подготовку при обновлении, успешную выполняет один раз за запуск.

@@ -44,7 +44,8 @@ internal partial class RevitRepository {
         var schema = Schema.Lookup(_managerViewSchemaId);
         var existingView = schema is null ? null : FindManagerView(schema, owner);
         if(existingView is not null
-            && existingView.GetParamValueOrDefault<ElementId>(BuiltInParameter.VIEW_PHASE) == phaseId) {
+            && existingView.GetParamValueOrDefault<ElementId>(BuiltInParameter.VIEW_PHASE) == phaseId
+            && HasManagerViewAppearance(existingView)) {
             return existingView.UniqueId;
         }
 
@@ -130,11 +131,59 @@ internal partial class RevitRepository {
         return view;
     }
 
-    // Сохраняет создание или изменение стадии собственного вида одной короткой транзакцией.
+    // Сохраняет создание, стадию и графику собственного вида одной короткой транзакцией.
     private string SaveManagerView(Func<View3D> getView, ElementId phaseId) {
-        using var transaction = new Transaction(Document, ManagerViewTransactionName);
+        string viewUniqueId = null;
+        SaveManagerViewChanges(ManagerViewTransactionName, () => {
+            var view = getView();
+            SetManagerViewPhase(view, phaseId);
+            SetManagerViewAppearance(view);
+            viewUniqueId = view.UniqueId;
+        });
+        return viewUniqueId;
+    }
+
+    // Сверяет графику, чтобы повторная подготовка настроенного вида не открывала транзакцию.
+    private bool HasManagerViewAppearance(View3D view) {
+        if(view.AreAnnotationCategoriesHidden != systemPluginConfig.ManagerViewHideAnnotations
+            || view.DisplayStyle != systemPluginConfig.ManagerViewDisplayStyle
+            || view.DetailLevel != systemPluginConfig.ManagerViewDetailLevel) {
+            return false;
+        }
+
+        var wallCategoryId = new ElementId(systemPluginConfig.ManagerViewWallCategory);
+        using var overrides = view.GetCategoryOverrides(wallCategoryId);
+        return overrides.Transparency == systemPluginConfig.ManagerViewWallTransparency;
+    }
+
+    // Настраивает только требуемые свойства и сохраняет остальные переопределения категории стен.
+    private void SetManagerViewAppearance(View3D view) {
+        if(view.AreAnnotationCategoriesHidden != systemPluginConfig.ManagerViewHideAnnotations) {
+            view.AreAnnotationCategoriesHidden = systemPluginConfig.ManagerViewHideAnnotations;
+        }
+        if(view.DisplayStyle != systemPluginConfig.ManagerViewDisplayStyle) {
+            view.DisplayStyle = systemPluginConfig.ManagerViewDisplayStyle;
+        }
+        if(view.DetailLevel != systemPluginConfig.ManagerViewDetailLevel) {
+            view.DetailLevel = systemPluginConfig.ManagerViewDetailLevel;
+        }
+
+        var wallCategoryId = new ElementId(systemPluginConfig.ManagerViewWallCategory);
+        using var overrides = view.GetCategoryOverrides(wallCategoryId);
+        if(overrides.Transparency != systemPluginConfig.ManagerViewWallTransparency) {
+            overrides.SetSurfaceTransparency(systemPluginConfig.ManagerViewWallTransparency);
+            view.SetCategoryOverrides(wallCategoryId, overrides);
+        }
+        if(!HasManagerViewAppearance(view)) {
+            throw new InvalidOperationException(localization.GetLocalizedString("Manager.ViewAppearanceFailed"));
+        }
+    }
+
+    // Обеспечивает синхронное завершение записи любых настроек служебного вида.
+    private void SaveManagerViewChanges(string transactionName, Action changes) {
+        using var transaction = new Transaction(Document, transactionName);
         if(transaction.Start() != TransactionStatus.Started) {
-            throw new InvalidOperationException("Не удалось начать подготовку 3D-вида.");
+            throw new InvalidOperationException(localization.GetLocalizedString("Manager.ViewTransactionStartFailed"));
         }
 
         try {
@@ -144,13 +193,10 @@ internal partial class RevitRepository {
                 .SetForcedModalHandling(true);
             transaction.SetFailureHandlingOptions(options);
 
-            var view = getView();
-            SetManagerViewPhase(view, phaseId);
-            string viewUniqueId = view.UniqueId;
+            changes();
             if(transaction.Commit() != TransactionStatus.Committed) {
-                throw new InvalidOperationException("Revit не сохранил подготовленный 3D-вид.");
+                throw new InvalidOperationException(localization.GetLocalizedString("Manager.ViewTransactionCommitFailed"));
             }
-            return viewUniqueId;
         } finally {
             if(transaction.GetStatus() == TransactionStatus.Started) {
                 transaction.RollBack();

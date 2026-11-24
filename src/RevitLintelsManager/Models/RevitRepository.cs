@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Revit;
+using dosymep.SimpleServices;
 
 using RevitLintelsManager.Models.Configs;
 using RevitLintelsManager.Models.Settings;
@@ -14,7 +15,7 @@ using RevitLintelsManager.Models.Settings;
 namespace RevitLintelsManager.Models;
 
 internal partial class RevitRepository(UIApplication uiApplication, SystemPluginConfig systemPluginConfig,
-    IParamService paramService) {
+    IParamService paramService, ILocalizationService localization) {
     private IEnumerable<RevitFamily> _lintelFamilies;
     private IEnumerable<RevitFamily> _openingFamilies;
     private IEnumerable<ElementId> _phaseIds;

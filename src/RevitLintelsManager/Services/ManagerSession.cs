@@ -96,6 +96,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
     public void RequestClose() {
         if(!viewModel.State.IsClosing) {
             viewModel.State.IsClosing = true;
+            viewModel.State.NavigationStamp = null;
             viewModel.State.AdvanceGeneration();
         }
         requests.BeginClose();
@@ -171,10 +172,12 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             || !repository.Document.Equals(e.GetDocument())) {
             return;
         }
-        if(requests.IsPreparingManagerView
-            && e.GetTransactionNames().SequenceEqual(new[] { RevitRepository.ManagerViewTransactionName })) {
-            // Снимок первого чтения формируется после подготовки вида.
-            return;
+        if(requests.IsPreparingManagerView) {
+            var transactions = e.GetTransactionNames();
+            if(transactions.SequenceEqual(new[] { RevitRepository.ManagerViewTransactionName })
+                || transactions.SequenceEqual(new[] { repository.ManagerSectionBoxTransactionName })) {
+                return;
+            }
         }
         if(viewModel.IsRefreshing && viewModel.LastContext?.ScopeStamp is { } acceptedScope
             && _observedScope?.Scope == acceptedScope.Scope) {
@@ -203,6 +206,7 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
     // Смена доступности документа инвалидирует задачи и ещё не опубликованные UI-ответы.
     private void SetDocumentBlocked(bool isBlocked) {
         if(viewModel.State.IsBlocked != isBlocked) {
+            viewModel.State.NavigationStamp = null;
             viewModel.State.AdvanceGeneration();
             requests.InvalidateRequests();
             _refreshAfterReturn = !isBlocked;
@@ -221,14 +225,17 @@ internal sealed class ManagerSession(RevitRepository repository, ManagerWindow w
             _observedScope = context.ScopeStamp;
         }
         var scope = viewModel.SelectedScope?.Scope ?? viewModel.State.InitialScope;
+        var navigation = viewModel.State.NavigationStamp;
+        viewModel.State.NavigationStamp = null;
         if(!_refreshAfterReturn && (_observedScope is null || scope == ManagerScope.Project)) {
             return;
         }
 
         var currentScope = repository.CaptureScopeStamp(scope);
         bool sourceChanged = _observedScope?.Scope == scope && !_observedScope.Matches(currentScope);
+        bool ownNavigation = navigation?.Matches(viewModel.State, currentScope) == true;
         _observedScope = currentScope;
-        if(_refreshAfterReturn || sourceChanged) {
+        if(_refreshAfterReturn || (sourceChanged && !ownNavigation)) {
             _refreshAfterReturn = false;
             viewModel.RefreshCommand.Execute(null);
         }

@@ -20,6 +20,7 @@ internal sealed class ManagerSessionState(ManagerConfigSnapshot config, string d
     public ManagerScope InitialScope { get; } = initialScope;
     public bool IsBlocked { get; internal set; }
     public bool IsClosing { get; internal set; }
+    public ManagerNavigationStamp NavigationStamp { get; internal set; }
     public long Generation => Interlocked.Read(ref _generation);
 
     /// <summary>Инвалидирует прежние запросы и возвращает следующее поколение данных.</summary>
