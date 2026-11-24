@@ -16,7 +16,7 @@ internal static class DefaultSettings {
     /// <summary>
     /// Защитный слой сверху, мм.
     /// </summary>
-    public const int RebarCoverTopMm = 20;
+    public const int RebarCoverTopMm = 30;
 
     /// <summary>
     /// Защитный слой снизу, мм.
@@ -46,17 +46,17 @@ internal static class DefaultSettings {
     /// <summary>
     /// Шаг хомутов, мм.
     /// </summary>
-    public const int StirrupStepMm = 200;
+    public const int StirrupStepMm = 100;
 
     /// <summary>
     /// Шаг продольных стержней по ширине, мм.
     /// </summary>
-    public const int WidthStepMm = 180;
+    public const int WidthStepMm = 45;
 
     /// <summary>
     /// Длина отгибов хомутов, мм.
     /// </summary>
-    public const int StirrupBendLengthMm = 90;
+    public const int StirrupBendLengthMm = 75;
 
     /// <summary>
     /// Диаметр продольных стержней каркаса, мм.
@@ -66,5 +66,5 @@ internal static class DefaultSettings {
     /// <summary>
     /// Длина выпуска продольных стержней за крайние хомуты, мм.
     /// </summary>
-    public const int LongRebarAnchorageLengthMm = 50;
+    public const int LongRebarAnchorageLengthMm = 30;
 }
