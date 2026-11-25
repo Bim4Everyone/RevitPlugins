@@ -5,6 +5,7 @@ internal interface IFrameParams {
 
     string FrameFamilyName { get; }
     string FrameFamilyTypeName { get; }
+    bool SwapFrameElevations { get; }
 
     Slab HostSlab { get; }
     double RebarCoverTop { get; }
@@ -14,6 +15,7 @@ internal interface IFrameParams {
     double StirrupRebarDiameter { get; }
     double StirrupStep { get; }
 
+    double WidthStep { get; }
     double FrameWidth { get; }
 
     /// <summary>

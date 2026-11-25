@@ -14,18 +14,11 @@ using Frame = RevitPunchingRebar.Models.Frame;
 namespace RevitPunchingRebar.Services;
 
 internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
-    // Диаметр оправки загиба хомута в долях диаметра хомута для классов А240 и А500С
-    private const double _stirrupBendFactorA240 = 2.5;
-    private const double _stirrupBendFactorA500C = 5;
-
-    // Угол между каркасом и пилоном, при котором каркас стоит у коротких граней пилона, градусы
-    private const double _crossAngle = 90;
-
-    // Расстояние до вспомогательных точек при построении плоскости отражения
-    private const double _planePointOffset = 10;
-
     // Допуск при сравнении углов, радианы
     private const double _angleTolerance = 1e-6;
+
+    // Допуск при сравнении координат, футы.
+    private const double _positionTolerance = 1e-6;
 
     private readonly RevitRepository _revitRepository;
     private readonly ILocalizationService _localizationService;
@@ -71,6 +64,13 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
             subTransaction.Start();
             try {
                 CreateFrames(pylon, frameSymbol, frameParams);
+                if(_createdFramesCount == createdFramesBefore) {
+                    subTransaction.RollBack();
+                    result.SkippedPylons.Add(FormatSkippedPylon(
+                        pylon, _localizationService.GetLocalizedString("Report.ErrorNoFrameLocationsOnSlab")));
+                    continue;
+                }
+
                 subTransaction.Commit();
                 result.ProcessedPylonsCount++;
             } catch(Exception ex) when(ex is Autodesk.Revit.Exceptions.ApplicationException
@@ -110,57 +110,123 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
 
         // Плановое положение определяется пилоном, а отметка — выбранной плитой.
         // Для нижней и верхней плиты используется ее фактический верх, независимо от высоты пилона.
-        var location = new XYZ(pylonLocation.X, pylonLocation.Y, frameParams.HostSlab.TopElevation.Value);
+        double slabTopElevation = frameParams.HostSlab.TopElevation.Value;
+        var location = new XYZ(pylonLocation.X, pylonLocation.Y, slabTopElevation);
 
-        CreateFrameRows(pylon, frameSymbol, frameParams, location, 0, -pylon.FacingOrientation);
+        double slabBarDiameter = frameParams.PlateRebarDiameter;
+        double stirrupDiameter = frameParams.StirrupRebarDiameter;
+        double shortSideDepth = frameParams.RebarCoverTop + 2 * slabBarDiameter - stirrupDiameter;
+        double longSideDepth = frameParams.RebarCoverTop + slabBarDiameter - stirrupDiameter;
+        if(frameParams.SwapFrameElevations) {
+            (longSideDepth, shortSideDepth) = (shortSideDepth, longSideDepth);
+        }
 
-        var copyOrientation = new XYZ(
-            -pylon.FacingOrientation.Y,
-            pylon.FacingOrientation.X,
-            pylon.FacingOrientation.Z);
-        CreateFrameRows(pylon, frameSymbol, frameParams, location, Math.PI / 2, -copyOrientation);
+        CreateFrameRows(pylon, frameSymbol, frameParams, location, slabTopElevation - shortSideDepth, false);
+        CreateFrameRows(pylon, frameSymbol, frameParams, location, slabTopElevation - longSideDepth, true);
     }
 
     /// <summary>
-    /// Создает ряд каркасов в заданном направлении и его зеркальный ряд относительно пилона.
+    /// Расставляет два ряда, перпендикулярных паре противоположных граней пилона.
     /// </summary>
     private void CreateFrameRows(
-        IPylon pylon, FamilySymbol frameSymbol, IFrameParams frameParams,
-        XYZ location, double rotationOffset, XYZ copyDirection) {
-        var frame = _revitRepository.CreateFrame(frameSymbol, frameParams, location);
-        _createdFramesCount++;
+        IPylon pylon, FamilySymbol frameSymbol, IFrameParams frameParams, XYZ location,
+        double targetElevation, bool atShortFace) {
+        XYZ direction = pylon.FacingOrientation;
+        var alongPylon = new XYZ(direction.X, direction.Y, 0);
+        var acrossPylon = new XYZ(-direction.Y, direction.X, 0);
+        XYZ alongRow = atShortFace ? acrossPylon : alongPylon;
+        XYZ outward = atShortFace ? alongPylon : acrossPylon;
+        double pylonSize = atShortFace ? pylon.Length : pylon.Width;
 
-        MoveFrameDown(frame, frameParams);
-        double angle = GetAlignAngle(frame.FrameInstance.FacingOrientation, pylon.FacingOrientation);
-        RotateFrame(frame, angle + rotationOffset);
-        MoveFrameCrossColumn(pylon, frame, frameParams);
-        MoveFrameAlongColumn(pylon, frame, frameParams);
-        CopyFrame(pylon, frame, frameParams, copyDirection);
+        int count = GetFramesCount(pylon, frameParams, atShortFace);
+        XYZ step = alongRow * (2 * frameParams.FrameWidth);
+        double distanceFromCenter = (pylonSize + frameParams.GetFrameLength()) / 2
+            + frameParams.GetAfterPylonDistance();
+        XYZ offset = outward * distanceFromCenter;
+        XYZ firstCenter = location + step * ((count - 1) / 2.0);
+        double rotationOffset = atShortFace ? Math.PI / 2 : 0;
 
-        var mirroredFrame = MirrorFrame(pylon, frame, frameParams);
-        CopyFrame(pylon, mirroredFrame, frameParams, copyDirection);
+        CreateFrameRow(frameSymbol, frameParams, firstCenter + offset, step, count,
+            alongPylon, rotationOffset, targetElevation, null);
+        CreateFrameRow(frameSymbol, frameParams, firstCenter - offset, step, count,
+            alongPylon, rotationOffset, targetElevation, outward);
+    }
+
+    private void CreateFrameRow(
+        FamilySymbol frameSymbol, IFrameParams frameParams, XYZ firstCenter, XYZ step, int count,
+        XYZ pylonDirection, double rotationOffset, double targetElevation, XYZ mirrorNormal) {
+        Floor slab = frameParams.HostSlab.SlabInstance;
+        bool isFaceBased = frameSymbol.Family.FamilyPlacementType == FamilyPlacementType.WorkPlaneBased;
+        Frame sourceFrame = null;
+        for(int i = 0; i < count; i++) {
+            XYZ center = firstCenter - step * i;
+            if(!_revitRepository.HasSlabTopFaceAt(slab, center)) {
+                continue;
+            }
+
+            // Каркас на рабочей плоскости создаём отдельно, чтобы привязать его к грани в точке размещения.
+            if(sourceFrame is null || isFaceBased) {
+                sourceFrame = TryPlaceFrame(
+                    frameSymbol, frameParams, center, pylonDirection, rotationOffset, targetElevation, mirrorNormal);
+                if(sourceFrame is null) {
+                    continue;
+                }
+            } else if(!TryCopyFrame(sourceFrame, slab, center)) {
+                continue;
+            }
+
+            _createdFramesCount++;
+        }
+    }
+
+    private Frame TryPlaceFrame(
+        FamilySymbol frameSymbol, IFrameParams frameParams, XYZ center, XYZ pylonDirection,
+        double rotationOffset, double targetElevation, XYZ mirrorNormal) {
+        Floor slab = frameParams.HostSlab.SlabInstance;
+        var frame = _revitRepository.CreateFrame(frameSymbol, frameParams, center);
+        FamilyInstance instance = frame.FrameInstance;
+        XYZ insertion = ((LocationPoint) instance.Location).Point;
+        double angle = GetAlignAngle(instance.FacingOrientation, pylonDirection) + rotationOffset;
+        if(Math.Abs(angle) > _angleTolerance) {
+            instance.Location.Rotate(Line.CreateBound(insertion, insertion + XYZ.BasisZ), angle);
+        }
+
+        if(mirrorNormal is not null) {
+            var plane = Plane.CreateByNormalAndOrigin(mirrorNormal, insertion);
+            ElementTransformUtils.MirrorElements(instance.Document, new[] { instance.Id }, plane, false);
+        }
+
+        XYZ frameCenter = frame.GetLocation();
+        var translation = new XYZ(center.X - frameCenter.X, center.Y - frameCenter.Y, 0);
+        XYZ actualInsertion = ((LocationPoint) instance.Location).Point;
+        if(!_revitRepository.HasSlabTopFaceAt(slab, actualInsertion + translation)) {
+            instance.Document.Delete(instance.Id);
+            return null;
+        }
+
+        if(translation.GetLength() > _positionTolerance && !instance.Location.Move(translation)) {
+            throw new InvalidOperationException(_localizationService.GetLocalizedString("Report.ErrorFramePosition"));
+        }
+
+        SetFrameElevation(frame, targetElevation);
+        _revitRepository.EnsureFrameHost(instance, frameSymbol, slab, "Report.FrameHost.Move");
+        return frame;
     }
 
     /// <summary>
-    /// Перемещает семейство из верхней точки вставки вниз на необходимую с учетом фоновой арматуры
+    /// Устанавливает расчётную отметку точки вставки каркаса.
     /// </summary>
-    private void MoveFrameDown(Frame frame, IFrameParams frameParams) {
-        XYZ startPoint = frame.GetLocation();
-        double bendFactor = GetStirrupBendFactor(frameParams.StirrupRebarClass);
-        double stirrupOffset = frameParams.StirrupRebarDiameter
-            + 0.5 * bendFactor * frameParams.StirrupRebarDiameter;
-        double verticalOffset = stirrupOffset - 0.5 * frameParams.LongRebarDiameter
-            - frameParams.RebarCoverTop - frameParams.PlateRebarDiameter;
+    private void SetFrameElevation(Frame frame, double targetElevation) {
+        var location = (LocationPoint) frame.FrameInstance.Location;
+        double elevationChange = targetElevation - location.Point.Z;
+        if(Math.Abs(elevationChange) <= _positionTolerance) {
+            return;
+        }
 
-        var endPoint = new XYZ(startPoint.X, startPoint.Y, startPoint.Z + verticalOffset);
-        frame.FrameInstance.Location.Move(endPoint - startPoint);
-    }
-
-    /// <summary>
-    /// Возвращает диаметр оправки загиба хомута в долях диаметра хомута
-    /// </summary>
-    private double GetStirrupBendFactor(RebarClass rebarClass) {
-        return rebarClass == RebarClass.A240 ? _stirrupBendFactorA240 : _stirrupBendFactorA500C;
+        if(!location.Move(XYZ.BasisZ * elevationChange)
+           || Math.Abs(((LocationPoint) frame.FrameInstance.Location).Point.Z - targetElevation) > _positionTolerance) {
+            throw new InvalidOperationException(_localizationService.GetLocalizedString("Report.ErrorFrameElevation"));
+        }
     }
 
     /// <summary>
@@ -185,147 +251,51 @@ internal class PunchingRebarPlacementService : IPunchingRebarPlacementService {
     }
 
     /// <summary>
-    /// Поворачивает семейство на заданный угол вокруг своей оси
+    /// Возвращает количество каркасов в ряду у заданной грани пилона.
     /// </summary>
-    private void RotateFrame(Frame frame, double angle) {
-        XYZ location = frame.GetLocation();
-        Line axeLine = Line.CreateBound(location, new XYZ(location.X, location.Y, location.Z + 1));
-
-        frame.FrameInstance.Location.Rotate(axeLine, angle);
-    }
-
-    /// <summary>
-    /// Перемещает каркас перпендикулярно длинной стороне пилона на необходимое расстояние от грани пилона
-    /// </summary>
-    private void MoveFrameCrossColumn(IPylon pylon, Frame frame, IFrameParams frameParams) {
-        XYZ startPoint = frame.GetLocation();
-        XYZ pylonLocation = pylon.GetLocation();
-        XYZ direction = pylon.FacingOrientation;
-        double angle = GetAngleBetweenInstances(pylon, frame);
-        double offset;
-
-        if(angle == _crossAngle) {
-            int frameCount = GetFramesCount(pylon, frame, frameParams);
-            double frameWidth = frameParams.FrameWidth;
-            offset = (frameCount * (2 * frameWidth) - frameWidth) / 2 - 0.5 * frameWidth;
-        } else {
-            double afterPylonDistance = frameParams.GetAfterPylonDistance();
-            double frameLength = frameParams.GetFrameLength();
-            offset = frameLength / 2 + pylon.Width / 2 + afterPylonDistance;
-        }
-
-        var endPoint = new XYZ(
-            pylonLocation.X - direction.Y * offset,
-            pylonLocation.Y + direction.X * offset,
-            startPoint.Z);
-
-        frame.FrameInstance.Location.Move(endPoint - startPoint);
-    }
-
-    /// <summary>
-    /// Перемещает каркас вдоль длинной стороны пилона в исходную точку для копирования
-    /// </summary>
-    private void MoveFrameAlongColumn(IPylon pylon, Frame frame, IFrameParams frameParams) {
-        XYZ startPoint = frame.GetLocation();
-        XYZ direction = pylon.FacingOrientation;
-        double angle = GetAngleBetweenInstances(pylon, frame);
-        int frameCount = GetFramesCount(pylon, frame, frameParams);
-        double offset;
-
-        if(angle == _crossAngle) {
-            double frameLength = frameParams.GetFrameLength();
-            double afterPylonDistance = frameParams.GetAfterPylonDistance();
-            offset = 0.5 * frameLength + 0.5 * pylon.Length + afterPylonDistance;
-        } else {
-            double frameWidth = frameParams.FrameWidth;
-            offset = 0.5 * (frameCount * (2 * frameWidth) - 2 * frameWidth);
-        }
-
-        var endPoint = new XYZ(
-            startPoint.X + direction.X * offset,
-            startPoint.Y + direction.Y * offset,
-            startPoint.Z);
-
-        frame.FrameInstance.Location.Move(endPoint - startPoint);
-    }
-
-    /// <summary>
-    /// Возращает количество каркасов в указанном направлении
-    /// </summary>
-    private int GetFramesCount(IPylon pylon, Frame frame, IFrameParams frameParams) {
-        double angle = GetAngleBetweenInstances(pylon, frame);
-        if(angle == _crossAngle) {
+    private int GetFramesCount(IPylon pylon, IFrameParams frameParams, bool atShortFace) {
+        double frameWidth = frameParams.FrameWidth;
+        if(atShortFace) {
             double punchingZone = frameParams.GetPunchingZone();
             double punchingLength = pylon.Width + 2 * punchingZone;
-            return Convert.ToInt32(Math.Ceiling((punchingLength / frameParams.FrameWidth + 1) / 2));
+            return (int) Math.Ceiling((punchingLength / frameWidth + 1) / 2);
         }
 
-        double afterColumnDistance = frameParams.GetAfterPylonDistance();
-        double length = pylon.Length + 2 * afterColumnDistance;
-        return Convert.ToInt32(Math.Ceiling((length / frameParams.FrameWidth - 1) / 2));
-    }
-
-    private void CopyFrame(IPylon pylon, Frame frame, IFrameParams frameParams, XYZ direction) {
-        XYZ startPoint = frame.GetLocation();
-        int frameCount = GetFramesCount(pylon, frame, frameParams);
-        double step = frameParams.FrameWidth * 2;
-
-        for(int i = 1; i < frameCount; i++) {
-            var endPoint = new XYZ(
-                startPoint.X + direction.X * step * i,
-                startPoint.Y + direction.Y * step * i,
-                startPoint.Z);
-
-            ElementTransformUtils.CopyElement(
-                frame.FrameInstance.Document, frame.FrameInstance.Id, endPoint - startPoint);
-            _createdFramesCount++;
-
-            startPoint = endPoint;
-        }
-    }
-
-    private Frame MirrorFrame(IPylon pylon, Frame frame, IFrameParams frameParams) {
-        XYZ pylonLocation = pylon.GetLocation();
-        XYZ direction = pylon.FacingOrientation;
-        double angle = GetAngleBetweenInstances(pylon, frame);
-        XYZ planeDirectionPoint;
-
-        if(angle == _crossAngle) {
-            planeDirectionPoint = new XYZ(
-                pylonLocation.X - _planePointOffset * direction.Y,
-                pylonLocation.Y + _planePointOffset * direction.X,
-                pylonLocation.Z);
-        } else {
-            planeDirectionPoint = new XYZ(
-                pylonLocation.X + _planePointOffset * direction.X,
-                pylonLocation.Y + _planePointOffset * direction.Y,
-                pylonLocation.Z);
+        double firstEndStirrupOffset = pylon.Length / 2 + frameParams.GetAfterPylonDistance();
+        double endBarTipOffset = firstEndStirrupOffset - frameParams.LongRebarAnchorageLength;
+        double halfWidthAcrossLongitudinalBars = (frameParams.WidthStep + frameParams.LongRebarDiameter) / 2;
+        double cornerClearance = frameParams.StirrupStep;
+        double maxCenterOffset = endBarTipOffset - cornerClearance - halfWidthAcrossLongitudinalBars;
+        if(maxCenterOffset < -_positionTolerance) {
+            throw new InvalidOperationException(_localizationService.GetLocalizedString("Report.ErrorFrameClearance"));
         }
 
-        var planeVerticalPoint = new XYZ(
-            pylonLocation.X,
-            pylonLocation.Y,
-            pylonLocation.Z + _planePointOffset);
-        Plane plane = Plane.CreateByThreePoints(pylonLocation, planeDirectionPoint, planeVerticalPoint);
-
-        IList<ElementId> mirrorElements = ElementTransformUtils.MirrorElements(
-            frame.FrameInstance.Document,
-            new List<ElementId>() { frame.FrameInstance.Id },
-            plane,
-            true);
-
-        Element element = frame.FrameInstance.Document.GetElement(mirrorElements.FirstOrDefault());
-        var mirroredFrame = new Frame((FamilyInstance) element, frameParams, _localizationService);
-
-        _createdFramesCount++;
-
-        return mirroredFrame;
+        // При шаге 2 * FrameWidth крайний центр симметричного ряда отстоит от середины на (число - 1) * FrameWidth.
+        int maxCount = (int) Math.Floor((maxCenterOffset + _positionTolerance) / frameWidth) + 1;
+        int nominalCount = Math.Max(1, (int) Math.Ceiling(firstEndStirrupOffset / frameWidth - 0.5));
+        return Math.Min(nominalCount, maxCount);
     }
 
-    private double GetAngleBetweenInstances(IPylon pylon, Frame frame) {
-        double angle = Math.Round(
-            Math.Abs(pylon.FacingOrientation.AngleTo(frame.FrameInstance.FacingOrientation)) * 180 / Math.PI);
+    private bool TryCopyFrame(Frame sourceFrame, Floor slab, XYZ center) {
+        FamilyInstance source = sourceFrame.FrameInstance;
+        XYZ sourceCenter = sourceFrame.GetLocation();
+        var translation = new XYZ(center.X - sourceCenter.X, center.Y - sourceCenter.Y, 0);
+        XYZ insertion = ((LocationPoint) source.Location).Point;
+        if(!_revitRepository.HasSlabTopFaceAt(slab, insertion + translation)) {
+            return false;
+        }
 
-        return angle;
+        ICollection<ElementId> ids = ElementTransformUtils.CopyElement(source.Document, source.Id, translation);
+        EnsureCopiedFrameHost(ids, source, slab);
+        return true;
+    }
+
+    private void EnsureCopiedFrameHost(IEnumerable<ElementId> ids, FamilyInstance original, Floor slab) {
+        // Revit может вернуть вместе с каркасом идентификаторы его зависимых элементов.
+        ElementId typeId = original.GetTypeId();
+        FamilyInstance instance = ids.Select(id => original.Document.GetElement(id))
+            .OfType<FamilyInstance>()
+            .FirstOrDefault(candidate => candidate.GetTypeId() == typeId && candidate.SuperComponent is null);
+        _revitRepository.EnsureFrameHost(instance, original.Symbol, slab, "Report.FrameHost.Copy");
     }
 }

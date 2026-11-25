@@ -17,7 +17,7 @@ internal static class FrameParameterCatalog {
         new(FrameParameterRole.AnchorageTop2, "мод_ПР_Анкеровка_Верх_2", false),
         new(FrameParameterRole.AnchorageBottom1, "мод_ПР_Анкеровка_Низ_1", false),
         new(FrameParameterRole.AnchorageBottom2, "мод_ПР_Анкеровка_Низ_2", false),
-        new(FrameParameterRole.StirrupChangeBinding, "мод_Х_Изменить привязку", false),
+        new(FrameParameterRole.StirrupChangeBinding, "мод_Х_Изменить привязку", false, defaultYesNoValue: false),
         new(FrameParameterRole.StirrupDiameter, "мод_Х_Диаметр", false),
         new(FrameParameterRole.StirrupBendLength, "мод_Х_Длина отгибов", false),
         new(FrameParameterRole.StirrupStep, "мод_Х_Шаг", false),

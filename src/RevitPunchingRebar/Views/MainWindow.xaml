@@ -643,31 +643,15 @@
 
                                     <ui:TextBlock
                                         Style="{StaticResource FieldLabel}"
-                                        Text="{me:LocalizationSource MainWindow.FrameWidth}" />
+                                        Text="{me:LocalizationSource MainWindow.FrameDirection}" />
 
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <ui:TextBox
-                                            Grid.Column="0"
-                                            Margin="5"
-                                            ClearButtonEnabled="False"
-                                            Text="{Binding FrameWidth, UpdateSourceTrigger=PropertyChanged}" />
-
-                                        <ui:Button
-                                            Grid.Column="1"
-                                            Margin="0 5 5 5"
-                                            Padding="8"
-                                            VerticalAlignment="Stretch"
-                                            ToolTipService.ShowOnDisabled="True"
-                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
-                                            ToolTip="{Binding DefaultValueHints[FrameWidth]}"
-                                            Command="{Binding ResetToDefaultCommand}"
-                                            CommandParameter="FrameWidth" />
-                                    </Grid>
+                                    <ui:ToggleSwitch
+                                        Margin="7 10"
+                                        HorizontalAlignment="Left"
+                                        OffContent="{me:LocalizationSource MainWindow.SwapFrameElevations}"
+                                        OnContent="{me:LocalizationSource MainWindow.SwapFrameElevations}"
+                                        ToolTip="{me:LocalizationSource MainWindow.SwapFrameElevationsHint}"
+                                        IsChecked="{Binding SwapFrameElevations, Mode=TwoWay}" />
                                 </StackPanel>
                             </Border>
 
@@ -829,6 +813,34 @@
 
                                     <ui:TextBlock
                                         Style="{StaticResource FieldLabel}"
+                                        Text="{me:LocalizationSource MainWindow.WidthStep}" />
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <ui:TextBox
+                                            Grid.Column="0"
+                                            Margin="5"
+                                            ClearButtonEnabled="False"
+                                            Text="{Binding WidthStep, UpdateSourceTrigger=PropertyChanged}" />
+
+                                        <ui:Button
+                                            Grid.Column="1"
+                                            Margin="0 5 5 5"
+                                            Padding="8"
+                                            VerticalAlignment="Stretch"
+                                            ToolTipService.ShowOnDisabled="True"
+                                            Icon="{ui:SymbolIcon ArrowCounterclockwise20}"
+                                            ToolTip="{Binding DefaultValueHints[WidthStep]}"
+                                            Command="{Binding ResetToDefaultCommand}"
+                                            CommandParameter="WidthStep" />
+                                    </Grid>
+
+                                    <ui:TextBlock
+                                        Style="{StaticResource FieldLabel}"
                                         Text="{me:LocalizationSource MainWindow.LongRebarAnchorageLength}" />
 
                                     <Grid>
@@ -876,19 +888,24 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock
+            <ScrollViewer
                 Grid.Column="0"
+                MaxHeight="120"
                 Margin="10 5 10 15"
-                Foreground="Orange"
                 VerticalAlignment="Center"
-                TextAlignment="Right"
-                TextWrapping="Wrap"
-                Text="{Binding ErrorText}" />
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
+                <TextBlock
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    TextWrapping="Wrap"
+                    Text="{Binding ErrorText}" />
+            </ScrollViewer>
 
             <ui:Button
                 Grid.Column="1"
                 Margin="10 5 10 15"
                 MinWidth="150"
+                VerticalAlignment="Center"
                 Appearance="Info"
                 Content="{me:LocalizationSource MainWindow.ButtonOk}"
                 Click="ButtonOk_Click"
@@ -898,6 +915,7 @@
                 Grid.Column="2"
                 Margin="10 5 15 15"
                 MinWidth="150"
+                VerticalAlignment="Center"
                 Content="{me:LocalizationSource MainWindow.ButtonCancel}"
                 IsCancel="True"
                 Click="ButtonCancel_Click" />

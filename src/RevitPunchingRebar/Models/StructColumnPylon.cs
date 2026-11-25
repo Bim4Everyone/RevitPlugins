@@ -1,4 +1,7 @@
+using System;
+
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Structure.StructuralSections;
 
 using dosymep.Bim4Everyone;
 using dosymep.Bim4Everyone.SharedParams;
@@ -30,13 +33,10 @@ internal class StructColumnPylon : IPylon {
     public StructColumnPylon(Element element, Transform transform) {
         _transform = transform;
 
-        PylonInstance = element;
-        FacingOrientation = _transform.OfVector(((FamilyInstance) element).FacingOrientation);
-
-        Element elementType = element.GetElementType();
-
-        Length = elementType.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeLength, 0);
-        Width = elementType.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeWidth, 0);
+        var instance = (FamilyInstance) element;
+        PylonInstance = instance;
+        FacingOrientation = _transform.OfVector(instance.FacingOrientation);
+        (Length, Width) = GetSectionDimensions(instance.Symbol);
     }
 
     public Element PylonInstance { get; }
@@ -48,6 +48,40 @@ internal class StructColumnPylon : IPylon {
 
     public double Length { get; }
     public double Width { get; }
+
+    public static (double Length, double Width) GetSectionDimensions(FamilySymbol symbol) {
+        if(symbol is null) {
+            return default;
+        }
+
+        double length = symbol.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeLength, 0);
+        double width = symbol.GetParamValueOrDefault<double>(SharedParamsConfig.Instance.SizeWidth, 0);
+        bool hasSharedDimensions = length > 0 && width > 0;
+        if(hasSharedDimensions && (ContainsNamePart(symbol, "пилон") || ContainsNamePart(symbol, "pylon"))) {
+            return (length, width);
+        }
+
+        using StructuralSection section = symbol.GetStructuralSection();
+        bool isRectangular = section is StructuralSectionConcreteRectangle or StructuralSectionRectangleParameterized
+            || (section is null or StructuralSectionUserDefined
+                && (ContainsNamePart(symbol, "прямоугольн") || ContainsNamePart(symbol, "rectangular")));
+        if(!isRectangular) {
+            return default;
+        }
+
+        if(hasSharedDimensions) {
+            return (length, width);
+        }
+
+        // Встроенные размеры сечения h и b в осях семейства колонны.
+        return section switch {
+            StructuralSectionConcreteRectangle rectangle => (rectangle.Height, rectangle.Width),
+            StructuralSectionRectangleParameterized rectangle => (rectangle.Height, rectangle.Width),
+            _ => (
+                symbol.GetParamValueOrDefault<double>(BuiltInParameter.STRUCTURAL_SECTION_COMMON_HEIGHT, 0),
+                symbol.GetParamValueOrDefault<double>(BuiltInParameter.STRUCTURAL_SECTION_COMMON_WIDTH, 0))
+        };
+    }
 
     /// <summary>
     /// Возвращает нижнюю центральную точку в координатах текущего проекта
@@ -72,5 +106,10 @@ internal class StructColumnPylon : IPylon {
         } else {
             return null;
         }
+    }
+
+    private static bool ContainsNamePart(FamilySymbol symbol, string namePart) {
+        return symbol.FamilyName.IndexOf(namePart, StringComparison.OrdinalIgnoreCase) >= 0
+            || symbol.Name.IndexOf(namePart, StringComparison.OrdinalIgnoreCase) >= 0;
     }
 }

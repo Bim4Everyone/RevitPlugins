@@ -22,7 +22,8 @@ internal sealed class FrameParameterSettings {
             FrameParameterBinding binding = null;
             source?.Bindings?.TryGetValue(definition.Role.ToString(), out binding);
             result.Bindings[definition.Role.ToString()] = new FrameParameterBinding {
-                TargetName = binding?.TargetName ?? definition.DefaultName
+                TargetName = binding?.TargetName ?? definition.DefaultName,
+                YesNoValue = binding?.YesNoValue ?? definition.DefaultYesNoValue
             };
         }
 
