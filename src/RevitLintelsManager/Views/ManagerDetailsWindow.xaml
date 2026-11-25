@@ -88,6 +88,9 @@
                                         Property="Foreground"
                                         Value="{DynamicResource TextFillColorPrimaryBrush}" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding IsFixed}" Value="True">
+                                    <Setter Property="Foreground" Value="{DynamicResource ManagerFixedBrush}" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </ui:SymbolIcon.Style>
@@ -132,6 +135,9 @@
                                     <Setter
                                         Property="Foreground"
                                         Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsFixed}" Value="True">
+                                    <Setter Property="Foreground" Value="{DynamicResource ManagerFixedBrush}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -194,7 +200,24 @@
                             Margin="0,0,0,20"
                             TextWrapping="Wrap"
                             Text="{Binding Subject}"
-                            FontSize="16" />
+                            FontSize="16">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsLintelMissing}" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource ManagerWarningBrush}" />
+                                        </DataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsLintelMissing}" Value="True" />
+                                                <Condition Binding="{Binding IsFixed}" Value="True" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Foreground" Value="{DynamicResource ManagerFixedBrush}" />
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                     </StackPanel>
                     <ItemsControl
                         ItemsSource="{Binding Fields}">
@@ -236,6 +259,7 @@
                                             Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <ui:SymbolIcon
+                                        x:Name="DiagnosticIcon"
                                         Width="28"
                                         Height="28"
                                         Margin="0,0,8,0"
@@ -244,6 +268,7 @@
                                         Symbol="ErrorCircle24"
                                         Foreground="{DynamicResource ManagerWarningBrush}" />
                                     <TextBlock
+                                        x:Name="DiagnosticText"
                                         Grid.Column="1"
                                         VerticalAlignment="Center"
                                         Foreground="{DynamicResource ManagerWarningBrush}"
@@ -251,6 +276,16 @@
                                         Text="{Binding}"
                                         FontSize="16" />
                                 </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger
+                                        Binding="{Binding DataContext.IsFixed, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Value="True">
+                                        <Setter TargetName="DiagnosticIcon" Property="Foreground"
+                                            Value="{DynamicResource ManagerFixedBrush}" />
+                                        <Setter TargetName="DiagnosticText" Property="Foreground"
+                                            Value="{DynamicResource ManagerFixedBrush}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

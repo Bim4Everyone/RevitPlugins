@@ -10,25 +10,30 @@ namespace RevitLintelsManager.ViewModels;
 
 /// <summary>Отображает сведения элемента, не обращаясь к модели Revit.</summary>
 internal sealed class ManagerElementViewModel(ManagerElementPresentation element, bool isOpening,
-    ILocalizationService localization, bool showInformation = true, bool analysisPending = false) : BaseViewModel {
+    ILocalizationService localization, bool showInformation = true, bool analysisPending = false,
+    bool counterpartUnconfirmed = false, bool rowIsFixed = false) : BaseViewModel {
     public ManagerElementPresentation Element => element;
     public bool IsOpening => isOpening;
     public IReadOnlyList<ManagerDiagnostic> RowDiagnostics { get; private set; } =
         new List<ManagerDiagnostic>().AsReadOnly();
-    public bool IsMissing => element is null && !IsAnalysisPending;
+    public bool IsLintelMissing => !isOpening && element is null;
+    public bool IsMissing => IsLintelMissing || (element is null && !IsAnalysisPending && !counterpartUnconfirmed);
+    public bool IsFixed => rowIsFixed;
     public bool IsAnalysisPending => analysisPending;
     public bool ShowInformation => showInformation && element is not null;
     public bool ShowStatus => element is not null || !IsAnalysisPending;
     public string TypeName => element is null
-        ? localization.GetLocalizedString(IsAnalysisPending ? "Manager.Unmatched"
-            : isOpening ? "Manager.NoOpening" : "Manager.NoLintel")
+        ? localization.GetLocalizedString(!isOpening ? "Manager.NoLintel"
+            : IsAnalysisPending || counterpartUnconfirmed ? "Manager.Unmatched" : "Manager.NoOpening")
         : string.IsNullOrWhiteSpace(element.TypeName)
             ? localization.GetLocalizedString("Manager.Unavailable") : element.TypeName;
-    public ManagerElementStatus Status => element?.Status
-        ?? (IsAnalysisPending ? ManagerElementStatus.NotAnalyzed : ManagerElementStatus.Missing);
-    public string StatusText => localization.GetLocalizedString("Manager.Status." + Status);
+    public ManagerElementStatus Status => IsFixed ? ManagerElementStatus.Fixed : element?.Status
+        ?? (IsAnalysisPending ? ManagerElementStatus.NotAnalyzed
+            : counterpartUnconfirmed ? ManagerElementStatus.Warning : ManagerElementStatus.Missing);
+    public string StatusText => IsLintelMissing && !IsAnalysisPending && !IsFixed ? TypeName
+        : localization.GetLocalizedString("Manager.Status." + Status);
     public string InformationToolTip => localization.GetLocalizedString("Manager.Information");
-    public string StatusToolTip => IsAnalysisPending ? StatusText : localization.GetLocalizedString(
+    public string StatusToolTip => IsAnalysisPending || IsFixed ? StatusText : localization.GetLocalizedString(
         HasWarnings ? "Manager.HasWarnings" : "Manager.NoWarnings");
     public bool HasWarnings => !IsAnalysisPending && (Status != ManagerElementStatus.Correct
         || element?.Diagnostics.Count > 0 || RowDiagnostics.Count > 0);

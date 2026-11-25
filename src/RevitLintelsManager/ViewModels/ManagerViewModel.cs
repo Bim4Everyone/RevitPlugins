@@ -17,7 +17,7 @@ using RevitLintelsManager.Services;
 
 namespace RevitLintelsManager.ViewModels;
 
-internal enum ManagerResultFilter { All, Warning, Correct }
+internal enum ManagerResultFilter { All, Fixed, Warning, Correct }
 
 internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private sealed class VisibleRowCollection : ObservableCollection<ManagerRowViewModel> {
@@ -68,6 +68,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private int _processingCount;
     private int _filteredCount;
     private int _selectedCount;
+    private int _fixedCount;
     private int _warningCount;
     private int _correctCount;
     private ManagerResultFilter _resultFilter;
@@ -136,9 +137,11 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
     }
     public bool IsAllResultsFilter => _resultFilter == ManagerResultFilter.All;
+    public bool IsFixedResultsFilter => _resultFilter == ManagerResultFilter.Fixed;
     public bool IsWarningResultsFilter => _resultFilter == ManagerResultFilter.Warning;
     public bool IsCorrectResultsFilter => _resultFilter == ManagerResultFilter.Correct;
     public string AllResultsText => FormatResultCount("Manager.FilterAll", _items.Count);
+    public string FixedResultsText => FormatResultCount("Manager.FilterFixed", _fixedCount);
     public string WarningResultsText => FormatResultCount("Manager.FilterWarning", _warningCount);
     public string CorrectResultsText => FormatResultCount("Manager.FilterCorrect", _correctCount);
     public bool? AreAllRowsChecked => _selectedCount == 0 ? false : _selectedCount == _filteredCount ? true : null;
@@ -465,6 +468,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
 
     // Считает исходную выборку диапазона до применения статуса и поиска.
     private void UpdateResultCounts() {
+        _fixedCount = _items.Values.Count(item => item.ResultStatus == ManagerElementStatus.Fixed);
         _warningCount = _items.Values.Count(item => item.ResultStatus == ManagerElementStatus.Warning);
         _correctCount = _items.Values.Count(item => item.ResultStatus == ManagerElementStatus.Correct);
         NotifyResultCounts();
@@ -473,6 +477,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     // Обновляет тексты кнопок при смене диапазона или языка.
     private void NotifyResultCounts() {
         RaisePropertyChanged(nameof(AllResultsText));
+        RaisePropertyChanged(nameof(FixedResultsText));
         RaisePropertyChanged(nameof(WarningResultsText));
         RaisePropertyChanged(nameof(CorrectResultsText));
     }
@@ -489,6 +494,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
         _resultFilter = filter;
         RaisePropertyChanged(nameof(IsAllResultsFilter));
+        RaisePropertyChanged(nameof(IsFixedResultsFilter));
         RaisePropertyChanged(nameof(IsWarningResultsFilter));
         RaisePropertyChanged(nameof(IsCorrectResultsFilter));
         RefreshFilteredRows();
@@ -530,6 +536,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     // Сопоставляет готовый статус строки с активной кнопкой.
     private bool MatchesResultFilter(ManagerItemViewModel item) {
         return _resultFilter switch {
+            ManagerResultFilter.Fixed => item.ResultStatus == ManagerElementStatus.Fixed,
             ManagerResultFilter.Warning => item.ResultStatus == ManagerElementStatus.Warning,
             ManagerResultFilter.Correct => item.ResultStatus == ManagerElementStatus.Correct,
             _ => true
@@ -725,9 +732,10 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
                 _hiddenState.Remove(key);
             }
             _deletionCandidates.Clear();
-            var items = context.Project.GetRows().Select(row => CreateProjectRow(context.DocumentToken, row)).ToList();
+            var items = context.AnalyzedRows?.Select(CreateAnalyzedRow)
+                ?? context.Project.GetRows().Select(row => CreatePendingRow(context.DocumentToken, row));
             bool retainUnseen = scope != ManagerScope.Project || context.Project.UnreadableCount > 0;
-            SetItems(items, scope, retainUnseen);
+            SetItems(items.ToList(), scope, retainUnseen);
         }
         _readError = null;
         _modelIsDirty = false;
@@ -735,35 +743,61 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         ContextSummary = FormatContextSummary(context);
     }
 
-    // Представляет подтверждённую пару одной строкой, сохраняя существующие ключи групп и состояние пользователя.
-    private ManagerItemViewModel CreateProjectRow(Guid documentToken, OpeningLintelMatch row) {
+    // Представляет данные контекста, для которого анализ ещё не был выполнен.
+    private ManagerItemViewModel CreatePendingRow(Guid documentToken, OpeningLintelMatch row) {
         const ManagerElementStatus status = ManagerElementStatus.NotAnalyzed;
         var opening = row.Opening;
         var lintel = row.Lintel;
         var key = new ManagerItemKey(documentToken, opening?.Element.UniqueId, lintel?.Element.UniqueId);
         var group = new ManagerGroupKey(opening?.Element.TypeUniqueId, lintel?.Element.TypeUniqueId,
             status, status, lintel?.Element.Information.IsFixed);
-        if(_items.TryGetValue(key, out var previous) && previous.Snapshot.GroupKey.Equals(group)
-            && SamePresentation(previous.Opening.Element, opening?.Element, opening?.WidthMm, opening?.HeightMm, null)
-            && SamePresentation(previous.Lintel.Element, lintel?.Element, lintel?.OpeningWidthMm, null,
-                lintel?.WallThicknessMm)) {
-            return previous;
-        }
         var left = opening is null ? null : new ManagerElementPresentation(opening.Element.TypeName, status,
             opening.Element.Information, widthMm: opening.WidthMm, heightMm: opening.HeightMm);
         var right = lintel is null ? null : new ManagerElementPresentation(lintel.Element.TypeName, status,
             lintel.Element.Information, widthMm: lintel.OpeningWidthMm, thicknessMm: lintel.WallThicknessMm);
         var snapshot = new ManagerItemSnapshot(key, group, Array.Empty<ManagerDiagnostic>(),
             new[] { ManagerAction.Skip }, ManagerAction.Skip);
-        return new ManagerItemViewModel(snapshot, left, right, _localization);
+        return CreateAnalyzedRow(new ManagerAnalyzedRow(snapshot, left, right));
     }
 
-    // Проверяет обе половины строки перед повторным использованием существующей ViewModel.
-    private static bool SamePresentation(ManagerElementPresentation old, ManagerFamilySnapshot current,
-        double? width, double? height, double? thickness) {
-        return current is null ? old is null
-            : old is not null && old.TypeName == current.TypeName && old.WidthMm == width && old.HeightMm == height
-                && old.ThicknessMm == thickness && old.Information.HasSameValues(current.Information);
+    // Повторно использует представление, если диагностика, действия и сведения остались теми же.
+    private ManagerItemViewModel CreateAnalyzedRow(ManagerAnalyzedRow row) {
+        var snapshot = row.Snapshot;
+        if(_items.TryGetValue(snapshot.Key, out var previous) && previous.Snapshot.GroupKey.Equals(snapshot.GroupKey)
+            && previous.Snapshot.DefaultAction == snapshot.DefaultAction
+            && previous.Snapshot.Corrections == snapshot.Corrections
+            && previous.Snapshot.AllowedActions.SequenceEqual(snapshot.AllowedActions)
+            && SameDiagnostics(previous.Snapshot.Diagnostics, snapshot.Diagnostics)
+            && SamePresentation(previous.Opening.Element, row.Opening)
+            && SamePresentation(previous.Lintel.Element, row.Lintel)) {
+            return previous;
+        }
+        return new ManagerItemViewModel(snapshot, row.Opening, row.Lintel, _localization);
+    }
+
+    // Сравнивает отображаемые поля и причины по текущим снимкам обеих сторон.
+    private static bool SamePresentation(ManagerElementPresentation previous, ManagerElementPresentation current) {
+        return current is null ? previous is null
+            : previous is not null && previous.TypeName == current.TypeName && previous.Status == current.Status
+                && previous.WidthMm == current.WidthMm && previous.HeightMm == current.HeightMm
+                && previous.ThicknessMm == current.ThicknessMm
+                && (previous.Information?.HasSameValues(current.Information) ?? current.Information is null)
+                && SameDiagnostics(previous.Diagnostics, current.Diagnostics);
+    }
+
+    // Проверяет локализуемую диагностику по ключам и значениям аргументов.
+    private static bool SameDiagnostics(IReadOnlyList<ManagerDiagnostic> previous,
+        IReadOnlyList<ManagerDiagnostic> current) {
+        if(previous.Count != current.Count) {
+            return false;
+        }
+        for(int i = 0; i < previous.Count; i++) {
+            if(previous[i].LocalizationKey != current[i].LocalizationKey
+                || !previous[i].Arguments.SequenceEqual(current[i].Arguments)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // Сообщает о неполной выборке или о подтверждённом отсутствии подходящих экземпляров.

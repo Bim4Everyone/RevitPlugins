@@ -17,19 +17,23 @@ internal sealed class ManagerDetailsViewModel {
         ItemKey = itemKey;
         GroupKey = groupKey;
         IsOpening = element.IsOpening;
+        IsLintelMissing = element.IsLintelMissing;
         string family = element.Element?.Information?.FamilyName;
         Subject = string.IsNullOrWhiteSpace(family) ? element.TypeName : $"{family}: {element.TypeName}";
         IsWarnings = warnings;
+        IsFixed = element.IsFixed;
         IsAnalysisPending = warnings && element.IsAnalysisPending;
         HasWarnings = element.HasWarnings;
         Title = IsAnalysisPending ? element.StatusText : localization.GetLocalizedString(!warnings
-            ? "Manager.Information" : HasWarnings ? "Manager.HasWarnings" : "Manager.NoWarnings");
+            ? "Manager.Information" : IsFixed ? "Manager.Status.Fixed"
+                : HasWarnings ? "Manager.HasWarnings" : "Manager.NoWarnings");
         Status = warnings ? element.StatusText : null;
         Fields = warnings ? Array.Empty<ManagerDetailField>() : GetInformationFields(element, localization);
         ElementWarnings = warnings ? Format(element.Element?.Diagnostics, localization) : Array.Empty<string>();
         RowWarnings = warnings ? Format(element.RowDiagnostics, localization) : Array.Empty<string>();
-        var descriptions = ElementWarnings.Concat(RowWarnings).Distinct().ToList();
-        if(warnings && HasWarnings && descriptions.Count == 0) {
+        var descriptions = ElementWarnings.Concat(RowWarnings)
+            .Where(description => !IsLintelMissing || description != Subject).Distinct().ToList();
+        if(warnings && HasWarnings && !IsLintelMissing && descriptions.Count == 0) {
             descriptions.Add(element.StatusText);
         }
         Descriptions = descriptions.AsReadOnly();
@@ -42,8 +46,10 @@ internal sealed class ManagerDetailsViewModel {
     public ManagerItemKey? ItemKey { get; }
     public ManagerGroupKey? GroupKey { get; }
     public bool IsOpening { get; }
+    public bool IsLintelMissing { get; }
     public string Subject { get; }
     public bool IsWarnings { get; }
+    public bool IsFixed { get; }
     public bool IsAnalysisPending { get; }
     public bool HasWarnings { get; }
     public bool IsStatusOk => IsWarnings && !HasWarnings && !IsAnalysisPending;
@@ -97,7 +103,8 @@ internal sealed class ManagerDetailsViewModel {
                 info?.DisplayId ?? info?.ElementId?.ToString(CultureInfo.InvariantCulture)
                     ?? localization.GetLocalizedString("Manager.Unavailable"))
         };
-        if(element.IsAnalysisPending && element.Element is not null) {
+        if(element.Element is { } presentation && (info?.Phases is not null || presentation.WidthMm.HasValue
+            || presentation.HeightMm.HasValue || presentation.ThicknessMm.HasValue)) {
             AddProjectFields(fields, element, localization);
         }
         return fields.AsReadOnly();

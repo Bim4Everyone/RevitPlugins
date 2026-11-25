@@ -11,4 +11,5 @@ internal sealed class StructureCandidate(Element element, string uniqueId, strin
     public BuiltInCategory Category { get; } = category;
     public bool Concrete { get; } = concrete;
     public bool Steel { get; } = steel;
+    public bool Masonry => Category == BuiltInCategory.OST_Walls && !Concrete && !Steel;
 }

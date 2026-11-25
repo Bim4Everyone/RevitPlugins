@@ -34,7 +34,9 @@ internal sealed class SideBearingFacts {
         Start = start;
         Direction = direction;
         WallIntervals = masonry.Intervals;
+        AvailableFeet = masonry.LengthFeet;
         AvailableMm = masonry.LengthMm;
+        RoundoffFeet = roundoffFeet;
         MinimumMm = masonry.MinimumMm;
         RuleMm = ruleMm;
         Intersections = intersections.ToList().AsReadOnly();
@@ -52,9 +54,11 @@ internal sealed class SideBearingFacts {
                 Limitation = "Не удалось проверить геометрию всех возможных примыканий.";
                 return;
             }
-            double end = AvailableMm.Value / SystemPluginConfig.MillimetersPerFoot;
+            double end = AvailableFeet.Value;
+            // Стык тел сопоставляется в пределах точности пересечения. Тело должно продолжаться за кладкой.
             var contacts = intersections.Where(hit => hit.Intervals.Any(interval =>
-                interval.Start <= end + roundoffFeet && interval.End > end + roundoffFeet)).ToList();
+                interval.Start <= end + SystemPluginConfig.GeometryLengthEpsilonFeet
+                && interval.End > end + roundoffFeet)).ToList();
             bool concrete = contacts.Any(hit => hit.Concrete);
             bool steel = contacts.Any(hit => hit.Steel);
             if(concrete && steel) {
@@ -75,6 +79,8 @@ internal sealed class SideBearingFacts {
     public GeometryPoint? Direction { get; }
     public double MinimumMm { get; }
     public double? AvailableMm { get; }
+    public double? AvailableFeet { get; }
+    public double RoundoffFeet { get; }
     public double? RuleMm { get; }
     public double? BearingMm { get; }
     public bool? MeetsMinimum { get; }

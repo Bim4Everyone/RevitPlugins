@@ -14,6 +14,7 @@ internal sealed class OpeningLintelGraph {
         public int NearestCount { get; set; }
         public int ClaimCount { get; set; }
         public string Limitation { get; set; }
+        public bool HasConflictingCut { get; set; }
     }
 
     private readonly Dictionary<string, Vertex> _vertices;
@@ -35,8 +36,10 @@ internal sealed class OpeningLintelGraph {
     }
 
     /// <summary>Сохраняет первую установленную причину неполноты поиска.</summary>
-    public void MarkIncomplete(string id, string reason) {
-        _vertices[id].Limitation ??= reason;
+    public void MarkIncomplete(string id, string reason, bool hasConflictingCut = false) {
+        var vertex = _vertices[id];
+        vertex.Limitation ??= reason;
+        vertex.HasConflictingCut |= hasConflictingCut;
     }
 
     /// <summary>Строит строки диапазона с обоими участниками подтверждённых и смещённых пар.</summary>
@@ -56,14 +59,14 @@ internal sealed class OpeningLintelGraph {
             if((scope is not null && !scope.Contains(vertex.Id)) || !emitted.Add(vertex.Id)) {
                 continue;
             }
-            var state = Classify(vertex, catalogIncomplete, out string reason);
+            var state = Classify(vertex, catalogIncomplete, out string reason, out var conflict);
             if(state is MatchState.Confirmed or MatchState.Shifted) {
                 var partner = Other(vertex, vertex.Best);
                 emitted.Add(partner.Id);
                 rows.Add(new OpeningLintelMatch(vertex.Opening ?? partner.Opening, vertex.Lintel ?? partner.Lintel,
                     state, vertex.Contacts.Union(partner.Contacts)));
             } else {
-                rows.Add(new OpeningLintelMatch(vertex.Opening, vertex.Lintel, state, vertex.Contacts, reason));
+                rows.Add(new OpeningLintelMatch(vertex.Opening, vertex.Lintel, state, vertex.Contacts, reason, conflict));
             }
         }
         return rows.AsReadOnly();
@@ -85,10 +88,14 @@ internal sealed class OpeningLintelGraph {
     }
 
     // Проверяет взаимность и число претендентов до объединения элементов в одну строку.
-    private MatchState Classify(Vertex source, bool catalogIncomplete, out string reason) {
+    private MatchState Classify(Vertex source, bool catalogIncomplete, out string reason, out OpeningConflict conflict) {
         reason = source.Limitation;
+        conflict = OpeningConflict.None;
         if(catalogIncomplete || reason is not null) {
             reason ??= "Каталог экземпляров прочитан частично.";
+            if(source.HasConflictingCut) {
+                conflict = OpeningConflict.IntersectingCuts;
+            }
             return MatchState.Incomplete;
         }
         if(source.Best is null) {
@@ -96,10 +103,17 @@ internal sealed class OpeningLintelGraph {
         }
         var partner = Other(source, source.Best);
         if(source.NearestCount > 1 || source.ClaimCount > 1 || partner.NearestCount > 1 || partner.ClaimCount > 1) {
+            var lintel = source.Lintel is not null ? source : partner;
+            if(lintel.NearestCount > 1 || lintel.ClaimCount > 1) {
+                conflict = OpeningConflict.CompetingOpenings;
+            }
             return MatchState.Ambiguous;
         }
         if(partner.Limitation is not null) {
             reason = partner.Limitation;
+            if(partner.HasConflictingCut) {
+                conflict = OpeningConflict.IntersectingCuts;
+            }
             return MatchState.Incomplete;
         }
         if(partner.Best != source.Best) {

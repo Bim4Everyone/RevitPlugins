@@ -15,13 +15,19 @@ internal abstract class ManagerRowViewModel : BaseViewModel {
     /// <summary>Материализует только данные представления и локализованные подписи действий.</summary>
     protected ManagerRowViewModel(ManagerElementPresentation opening, ManagerElementPresentation lintel,
         IEnumerable<ManagerAction> actions,
-        ILocalizationService localization, bool showInformation = true) {
+        ILocalizationService localization, ManagerGroupKey groupKey, bool showInformation = true,
+        string correctionTitleKey = null) {
         bool analysisPending = opening?.Status == ManagerElementStatus.NotAnalyzed
             || lintel?.Status == ManagerElementStatus.NotAnalyzed;
-        Opening = new ManagerElementViewModel(opening, true, localization, showInformation, analysisPending);
-        Lintel = new ManagerElementViewModel(lintel, false, localization, showInformation, analysisPending);
-        _actions = actions.Distinct().Select(value => new ManagerActionViewModel(value,
-            localization.GetLocalizedString("Manager.Action." + value))).ToList().AsReadOnly();
+        Opening = new ManagerElementViewModel(opening, true, localization, showInformation, analysisPending,
+            counterpartUnconfirmed: groupKey.OpeningStatus == ManagerElementStatus.Warning, rowIsFixed: groupKey.IsFixed);
+        Lintel = new ManagerElementViewModel(lintel, false, localization, showInformation, analysisPending,
+            counterpartUnconfirmed: groupKey.LintelStatus == ManagerElementStatus.Warning, rowIsFixed: groupKey.IsFixed);
+        _actions = actions.Distinct().Select(value => {
+            string key = value == ManagerAction.Correct && correctionTitleKey is not null
+                ? correctionTitleKey : "Manager.Action." + value;
+            return new ManagerActionViewModel(value, key, localization);
+        }).ToList().AsReadOnly();
     }
 
     public ManagerElementViewModel Opening { get; }
@@ -43,14 +49,15 @@ internal abstract class ManagerRowViewModel : BaseViewModel {
 }
 
 /// <summary>Подпись операции; «Варианты» не входит в список операций.</summary>
-internal sealed class ManagerActionViewModel(ManagerAction action, string title) : BaseViewModel {
-    private string _title = title;
+internal sealed class ManagerActionViewModel(ManagerAction action, string titleKey, ILocalizationService localization)
+    : BaseViewModel {
+    private string _title = localization.GetLocalizedString(titleKey);
     public ManagerAction Action { get; } = action;
     public string Title => _title;
 
     /// <summary>Обновляет только подпись операции.</summary>
     /// <param name="localization">Существующий сервис локализации.</param>
     public void RefreshLocalization(ILocalizationService localization) {
-        RaiseAndSetIfChanged(ref _title, localization.GetLocalizedString("Manager.Action." + Action), nameof(Title));
+        RaiseAndSetIfChanged(ref _title, localization.GetLocalizedString(titleKey), nameof(Title));
     }
 }

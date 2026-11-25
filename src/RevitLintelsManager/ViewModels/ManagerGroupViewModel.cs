@@ -33,7 +33,8 @@ internal sealed class ManagerGroupViewModel : ManagerRowViewModel, IDisposable {
         ManagerElementPresentation lintel, IReadOnlyList<ManagerItemViewModel> items,
         ILocalizationService localization)
         : base(CreateHeaderElement(opening), CreateHeaderElement(lintel),
-            items.SelectMany(item => item.Actions.Select(action => action.Action)), localization, false) {
+            items.SelectMany(item => item.Actions.Select(action => action.Action)), localization, key,
+            showInformation: false, correctionTitleKey: "Manager.Action.Correct.Group") {
         Key = key;
         _localization = localization;
         Items = items.ToList().AsReadOnly();
@@ -166,8 +167,8 @@ internal sealed class ManagerGroupViewModel : ManagerRowViewModel, IDisposable {
 
     // Обновляет общую рамку, нижнюю границу и диагностику заголовка после смены состава.
     private void UpdatePresentation() {
-        var status = _filteredItems.Any(item => item.ResultStatus == ManagerElementStatus.Warning)
-            ? ManagerElementStatus.Warning
+        var status = Count > 0 && Key.IsFixed ? ManagerElementStatus.Fixed
+            : _filteredItems.Any(item => item.ResultStatus == ManagerElementStatus.Warning) ? ManagerElementStatus.Warning
             : Count > 0 && _filteredItems.All(item => item.ResultStatus == ManagerElementStatus.Correct)
                 ? ManagerElementStatus.Correct : ManagerElementStatus.NotAnalyzed;
         RaiseAndSetIfChanged(ref _groupStatus, status, nameof(GroupStatus));

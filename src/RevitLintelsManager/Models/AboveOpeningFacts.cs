@@ -27,11 +27,13 @@ internal sealed class CentralMasonry(IReadOnlyList<MaterialInterval> intervals, 
 
 /// <summary>Первый вход и все проверенные интервалы внутри конкретной верхней конструкции.</summary>
 internal sealed class UpperStructureHit(string elementId, string typeId, string category,
-    IReadOnlyList<MaterialInterval> intervals) {
+    IReadOnlyList<MaterialInterval> intervals, bool isSlab = false, bool isLinked = false) {
     public string UniqueId { get; } = elementId;
     public string TypeUniqueId { get; } = typeId;
     public string Category { get; } = category;
     public IReadOnlyList<MaterialInterval> Intervals { get; } = intervals;
+    public bool IsSlab { get; } = isSlab;
+    public bool IsLinked { get; } = isLinked;
     public double DistanceFeet => Intervals[0].Start;
 }
 

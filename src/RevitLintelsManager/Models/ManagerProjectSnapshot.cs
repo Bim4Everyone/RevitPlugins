@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace RevitLintelsManager.Models;
@@ -14,6 +15,19 @@ internal sealed partial class ManagerProjectSnapshot(IEnumerable<ManagerOpeningS
     public IReadOnlyList<ManagerStructureSnapshot> Structures { get; } = structures.ToList().AsReadOnly();
     public int UnreadableCount { get; } = unreadableCount;
     public IReadOnlyList<OpeningLintelMatch> Matches { get; } = matches?.ToList().AsReadOnly();
+    public IReadOnlyDictionary<string, LintelCalculation> Calculations { get; } =
+        new ReadOnlyDictionary<string, LintelCalculation>(new Dictionary<string, LintelCalculation>());
+
+    /// <summary>Добавляет расчёты проёмов в то же поколение снимка, что и факты геометрии.</summary>
+    public ManagerProjectSnapshot(IEnumerable<ManagerOpeningSnapshot> openings,
+        IEnumerable<ManagerLintelSnapshot> lintels, IEnumerable<ManagerWallSnapshot> walls,
+        IEnumerable<ManagerStructureSnapshot> structures, int unreadableCount,
+        IEnumerable<OpeningLintelMatch> matches, IEnumerable<AboveOpeningFacts> above,
+        IEnumerable<OpeningBearingFacts> sides, IDictionary<string, LintelCalculation> calculations)
+        : this(openings, lintels, walls, structures, unreadableCount, matches, above, sides) {
+        Calculations = new ReadOnlyDictionary<string, LintelCalculation>(
+            new Dictionary<string, LintelCalculation>(calculations));
+    }
 
     /// <summary>Для снимков без результатов поиска проецирует исходные одиночные строки.</summary>
     public IEnumerable<OpeningLintelMatch> GetRows() {
@@ -35,9 +49,25 @@ internal sealed class ManagerFamilySnapshot(string uniqueId, string familyUnique
 /// <summary>Параметры проёма в мм; значение высоты сохраняет семантику настроенного параметра.</summary>
 internal sealed class ManagerOpeningSnapshot(ManagerFamilySnapshot element, string hostWallUniqueId,
     double? widthMm, double? heightMm, GeometryFacts geometry = null) {
+    /// <summary>Добавляет идентификатор уровня исходного проёма.</summary>
+    public ManagerOpeningSnapshot(ManagerFamilySnapshot element, string hostWallUniqueId, double? widthMm,
+        double? heightMm, GeometryFacts geometry, string levelUniqueId)
+        : this(element, hostWallUniqueId, widthMm, heightMm, geometry) {
+        LevelUniqueId = levelUniqueId;
+    }
+
+    /// <summary>Сохраняет отдельно стену, в которой подтверждён вырез, и хост экземпляра Revit.</summary>
+    public ManagerOpeningSnapshot(ManagerFamilySnapshot element, string hostWallUniqueId, double? widthMm,
+        double? heightMm, GeometryFacts geometry, string levelUniqueId, string cutWallUniqueId)
+        : this(element, hostWallUniqueId, widthMm, heightMm, geometry, levelUniqueId) {
+        CutWallUniqueId = cutWallUniqueId ?? hostWallUniqueId;
+    }
+
+    public string LevelUniqueId { get; }
     public GeometryFacts Geometry { get; } = geometry;
     public ManagerFamilySnapshot Element { get; } = element;
     public string HostWallUniqueId { get; } = hostWallUniqueId;
+    public string CutWallUniqueId { get; } = hostWallUniqueId;
     public double? WidthMm { get; } = widthMm;
     public double? HeightMm { get; } = heightMm;
 }
@@ -46,6 +76,18 @@ internal sealed class ManagerOpeningSnapshot(ManagerFamilySnapshot element, stri
 internal sealed class ManagerLintelSnapshot(ManagerFamilySnapshot element, double? openingWidthMm,
     double? wallThicknessMm, double? leftBearingMm, double? rightBearingMm,
     int? leftCorner, int? rightCorner, int? leftWelding, int? rightWelding, GeometryFacts geometry = null) {
+    /// <summary>Сохраняет идентичность уровня и стадии создания для сравнения расчёта.</summary>
+    public ManagerLintelSnapshot(ManagerFamilySnapshot element, double? openingWidthMm, double? wallThicknessMm,
+        double? leftBearingMm, double? rightBearingMm, int? leftCorner, int? rightCorner, int? leftWelding,
+        int? rightWelding, GeometryFacts geometry, string levelUniqueId, string createdPhaseUniqueId)
+        : this(element, openingWidthMm, wallThicknessMm, leftBearingMm, rightBearingMm, leftCorner, rightCorner,
+            leftWelding, rightWelding, geometry) {
+        LevelUniqueId = levelUniqueId;
+        CreatedPhaseUniqueId = createdPhaseUniqueId;
+    }
+
+    public string LevelUniqueId { get; }
+    public string CreatedPhaseUniqueId { get; }
     public GeometryFacts Geometry { get; } = geometry;
     public ManagerFamilySnapshot Element { get; } = element;
     public double? OpeningWidthMm { get; } = openingWidthMm;

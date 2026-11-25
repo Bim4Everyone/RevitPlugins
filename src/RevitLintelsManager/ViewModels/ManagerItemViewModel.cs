@@ -29,7 +29,8 @@ internal sealed class ManagerItemViewModel : ManagerRowViewModel {
     /// <summary>Создаёт отмеченную строку с допустимым действием по умолчанию.</summary>
     public ManagerItemViewModel(ManagerItemSnapshot snapshot, ManagerElementPresentation opening,
         ManagerElementPresentation lintel, ILocalizationService localization)
-        : base(opening, lintel, snapshot.AllowedActions, localization) {
+        : base(opening, lintel, snapshot.AllowedActions, localization, snapshot.GroupKey,
+            correctionTitleKey: GetCorrectionTitleKey(snapshot.Corrections)) {
         Snapshot = snapshot;
         Opening.SetRowDiagnostics(snapshot.Diagnostics);
         Lintel.SetRowDiagnostics(snapshot.Diagnostics);
@@ -40,6 +41,7 @@ internal sealed class ManagerItemViewModel : ManagerRowViewModel {
 
     public ManagerItemSnapshot Snapshot { get; }
     public ManagerElementStatus ResultStatus => Opening.IsAnalysisPending ? ManagerElementStatus.NotAnalyzed
+        : Snapshot.GroupKey.IsFixed ? ManagerElementStatus.Fixed
         : Opening.HasWarnings || Lintel.HasWarnings ? ManagerElementStatus.Warning : ManagerElementStatus.Correct;
     public ManagerElementStatus GroupStatus {
         get => _groupStatus;
@@ -103,5 +105,28 @@ internal sealed class ManagerItemViewModel : ManagerRowViewModel {
             _manualAction = null;
             _selectedAction = Actions.First(option => option.Action == Snapshot.DefaultAction);
         }
+    }
+
+    // Уточняет подпись по составу исправления, сохраняя общее действие для смешанных работ.
+    private static string GetCorrectionTitleKey(ManagerCorrection corrections) {
+        if((corrections & ManagerCorrection.Dimensions) != ManagerCorrection.None
+            && corrections is not (ManagerCorrection.Width or ManagerCorrection.Thickness or ManagerCorrection.Bearing)) {
+            corrections |= ManagerCorrection.Dimensions;
+        }
+        return corrections switch {
+            ManagerCorrection.Width => "Manager.Action.Correct.Width",
+            ManagerCorrection.Thickness => "Manager.Action.Correct.Thickness",
+            ManagerCorrection.Bearing => "Manager.Action.Correct.Bearing",
+            ManagerCorrection.Attachments => "Manager.Action.Correct.Attachments",
+            ManagerCorrection.Position => "Manager.Action.Correct.Position",
+            ManagerCorrection.Dimensions => "Manager.Action.Correct.Dimensions",
+            ManagerCorrection.Position | ManagerCorrection.Dimensions =>
+                "Manager.Action.Correct.PositionAndDimensions",
+            ManagerCorrection.Position | ManagerCorrection.Attachments =>
+                "Manager.Action.Correct.PositionAndAttachments",
+            ManagerCorrection.Dimensions | ManagerCorrection.Attachments =>
+                "Manager.Action.Correct.DimensionsAndAttachments",
+            _ => "Manager.Action.Correct"
+        };
     }
 }

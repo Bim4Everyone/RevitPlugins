@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Threading;
 
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 using dosymep.Bim4Everyone;
@@ -127,15 +128,16 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
         kernel.Bind<ISettingsCatalog>().To<SettingsCatalog>().InSingletonScope();
         kernel.Bind<IManagerScopeReader>().To<ManagerScopeReader>().InSingletonScope();
         kernel.Bind<IProjectSnapshotReader>().To<ProjectSnapshotReader>().InSingletonScope();
+        kernel.Bind<ILintelFamilyFactsReader>().To<LintelFamilyFactsReader>().InSingletonScope();
+        kernel.Bind<ILintelLockReader>().To<LintelLockReader>().InSingletonScope();
         kernel.Bind<IPlacementGeometryReader>().To<PlacementGeometryReader>().InSingletonScope();
         kernel.Bind<IAboveOpeningAnalyzer>().To<AboveOpeningAnalyzer>().InSingletonScope();
         kernel.Bind<ISideBearingAnalyzer>().To<SideBearingAnalyzer>().InSingletonScope();
+        kernel.Bind<ILintelCalculationService>().To<LintelCalculationService>().InSingletonScope();
+        kernel.Bind<IManagerAnalysisService>().To<ManagerAnalysisService>().InSingletonScope();
         kernel.Bind<IManagerViewService>().To<ManagerViewService>().InSingletonScope();
         kernel.Bind<IManagerNavigationService>().To<ManagerNavigationService>().InSingletonScope();
-        kernel.Bind<Func<IGeometryReadContext>>().ToMethod(context => {
-            var source = context.Kernel.Get<RevitRepository>();
-            return () => new GeometryReadContext(source.Document);
-        });
+        kernel.Bind<Func<Document, IGeometryReadContext>>().ToMethod(_ => document => new GeometryReadContext(document));
         kernel.Bind<IParamService>().To<ParamService>().InSingletonScope();
         kernel.Bind<PluginConfig>()
             .ToMethod(context => PluginConfig.GetPluginConfig(context.Kernel.Get<IConfigSerializer>()))

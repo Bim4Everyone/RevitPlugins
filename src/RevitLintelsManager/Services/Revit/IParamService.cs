@@ -60,4 +60,14 @@ internal interface IParamService {
     /// <param name="name">Имя настроенного параметра фиксации.</param>
     /// <returns>Значение фиксации или null при отсутствии доступного значения.</returns>
     bool? ReadFixation(Element instance, string name);
+
+    /// <summary>Проверяет доступность сопоставлений для будущей записи в экземпляр перемычки.</summary>
+    /// <param name="project">Исходная модель для проверки проектных привязок.</param>
+    /// <param name="familyDocument">Открытое определение выбранного семейства.</param>
+    /// <param name="family">Выбранное семейство из исходной модели.</param>
+    /// <param name="sample">Необязательный экземпляр для проверки проектных параметров.</param>
+    /// <param name="mappings">Неизменяемые сопоставления сессии.</param>
+    /// <returns>Доступность параметров по ролям.</returns>
+    IReadOnlyDictionary<string, LintelParameterFact> ReadLintelParameterFacts(Document project,
+        Document familyDocument, Family family, FamilyInstance sample, IReadOnlyDictionary<string, string> mappings);
 }

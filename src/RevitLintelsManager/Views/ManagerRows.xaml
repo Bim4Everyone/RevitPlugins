@@ -14,6 +14,7 @@
             Source="ManagerStatusStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <system:Double x:Key="ManagerRowFieldHeight">36</system:Double>
+    <system:Double x:Key="ManagerActionColumnMinWidth">250</system:Double>
     <Style
         x:Key="ManagerColumnHeaderStyle"
         TargetType="TextBlock">
@@ -27,6 +28,7 @@
         <Setter Property="FontSize" Value="15" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style
         x:Key="ManagerFilterButtonStyle"
@@ -75,6 +77,9 @@
         TargetType="Border">
         <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
         <Style.Triggers>
+            <DataTrigger Binding="{Binding GroupStatus}" Value="{x:Static models:ManagerElementStatus.Fixed}">
+                <Setter Property="BorderBrush" Value="{DynamicResource ManagerFixedBrush}" />
+            </DataTrigger>
             <DataTrigger Binding="{Binding GroupStatus}" Value="{x:Static models:ManagerElementStatus.Warning}">
                 <Setter Property="BorderBrush" Value="{DynamicResource ManagerWarningBrush}" />
             </DataTrigger>
@@ -89,6 +94,9 @@
         TargetType="edits:CustomGroupEditControl">
         <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
         <Style.Triggers>
+            <DataTrigger Binding="{Binding GroupStatus}" Value="{x:Static models:ManagerElementStatus.Fixed}">
+                <Setter Property="BorderBrush" Value="{DynamicResource ManagerFixedBrush}" />
+            </DataTrigger>
             <DataTrigger Binding="{Binding GroupStatus}" Value="{x:Static models:ManagerElementStatus.Warning}">
                 <Setter Property="BorderBrush" Value="{DynamicResource ManagerWarningBrush}" />
             </DataTrigger>
@@ -244,8 +252,13 @@
                     x:Name="ElementName"
                     VerticalAlignment="Center"
                     Text="{Binding TypeName}"
-                    TextTrimming="CharacterEllipsis"
-                    ToolTip="{Binding TypeName}" />
+                    TextTrimming="CharacterEllipsis">
+                    <TextBlock.ToolTip>
+                        <ToolTip
+                            Content="{Binding PlacementTarget.DataContext.TypeName, RelativeSource={RelativeSource Self}}"
+                            Foreground="{Binding PlacementTarget.Foreground, RelativeSource={RelativeSource Self}}" />
+                    </TextBlock.ToolTip>
+                </TextBlock>
                 <ui:Button
                     x:Name="InformationButton"
                     Grid.Column="1"
@@ -257,6 +270,7 @@
                     CommandParameter="{Binding}"
                     ToolTip="{Binding InformationToolTip}">
                     <ui:SymbolIcon
+                        x:Name="InformationIcon"
                         Symbol="Info24"
                         FontSize="20"
                         ToolTip="{Binding InformationToolTip}" />
@@ -307,12 +321,22 @@
                     Property="Visibility"
                     Value="Collapsed" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding IsFixed}" Value="True">
+                <Setter TargetName="InformationIcon" Property="Foreground" Value="{DynamicResource ManagerFixedBrush}" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsMissing}" Value="True" />
+                    <Condition Binding="{Binding IsFixed}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="ElementName" Property="Foreground" Value="{DynamicResource ManagerFixedBrush}" />
+            </MultiDataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
     <DataTemplate
         DataType="{x:Type vm:ManagerGroupViewModel}">
         <edits:CustomGroupEditControl
-            Margin="0,8,0,0"
+            Margin="10,8,10,0"
             Style="{StaticResource ManagerGroupControlStyle}"
             ContentPadding="0"
             IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
@@ -329,6 +353,7 @@
                         <ColumnDefinition
                             Width="*" />
                         <ColumnDefinition
+                            MinWidth="{StaticResource ManagerActionColumnMinWidth}"
                             Width="*" />
                         <ColumnDefinition
                             Width="144" />
@@ -433,6 +458,7 @@
                     <ColumnDefinition
                         Width="*" />
                     <ColumnDefinition
+                        MinWidth="{StaticResource ManagerActionColumnMinWidth}"
                         Width="*" />
                     <ColumnDefinition
                         Width="112" />

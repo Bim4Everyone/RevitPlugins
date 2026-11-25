@@ -44,9 +44,12 @@ public class SystemPluginConfig {
     internal const double DefaultMatchAlignmentMm = 10;
     internal const double DefaultMatchSearchMm = 200;
     internal const double MatchAngleToleranceDegrees = 0.1;
+    internal const double CalculationPositionToleranceMm = 1;
+    internal const double CalculationLengthToleranceMm = 1;
     // Несколько ULP учитывают вычитание мировых координат и обратное преобразование единиц.
     internal const double CoordinateRoundoffFactor = 8 * 2.2204460492503131e-16;
     internal const double MillimetersPerFoot = 304.8;
+    internal const double GeometryLengthEpsilonFeet = 0.001 / MillimetersPerFoot;
 
     // Компенсация округления при сравнении отклонения с включительной границей.
     internal const double MatchRoundoffMm = 1e-8;

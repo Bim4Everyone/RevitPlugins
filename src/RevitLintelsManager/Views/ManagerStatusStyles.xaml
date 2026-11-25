@@ -8,6 +8,9 @@
     <SolidColorBrush
         x:Key="ManagerSuccessBrush"
         Color="#279B70" />
+    <SolidColorBrush
+        x:Key="ManagerFixedBrush"
+        Color="#A3653D" />
     <Style
         x:Key="ManagerStatusIconStyle"
         TargetType="ui:SymbolIcon">
@@ -40,6 +43,16 @@
                 <Setter
                     Property="Foreground"
                     Value="{DynamicResource ManagerWarningBrush}" />
+            </DataTrigger>
+            <DataTrigger
+                Binding="{Binding IsFixed}"
+                Value="True">
+                <Setter
+                    Property="Symbol"
+                    Value="LockClosed24" />
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource ManagerFixedBrush}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

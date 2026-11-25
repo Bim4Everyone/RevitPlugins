@@ -37,6 +37,11 @@ internal interface IGeometryReadContext : IDisposable {
     /// <returns>Имена трёх плоскостей или null при неопределённой привязке.</returns>
     (string X, string Y, string Z)? GetOriginPlanes(Family family);
 
+    /// <summary>Читает имя плоскости начала с нормалью по оси ширины семейства.</summary>
+    /// <param name="family">Определение семейства.</param>
+    /// <returns>Имя подтверждённой плоскости или null.</returns>
+    string GetWidthOriginPlane(Family family);
+
     /// <summary>Индексирует грани вырезов хоста по породившим их вставкам.</summary>
     /// <param name="wall">Стена-хост проёма.</param>
     /// <returns>Грани по идентификатору вставки или null при недоступном теле стены.</returns>

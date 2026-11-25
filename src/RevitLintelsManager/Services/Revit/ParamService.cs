@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 using Autodesk.Revit.DB;
@@ -107,6 +108,86 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
             return null;
         }
         return parameter.AsInteger() switch { 0 => false, 1 => true, _ => null };
+    }
+
+    /// <inheritdoc />
+    public IReadOnlyDictionary<string, LintelParameterFact> ReadLintelParameterFacts(Document project,
+        Document familyDocument, Family family, FamilyInstance sample, IReadOnlyDictionary<string, string> mappings) {
+        var familyParameters = familyDocument.FamilyManager.GetParameters().ToLookup(p => p.Definition.Name);
+        var bindings = new List<(InternalDefinition Definition, bool Instance)>();
+        using var iterator = project.ParameterBindings.ForwardIterator();
+        while(iterator.MoveNext()) {
+            if(iterator.Key is InternalDefinition definition && iterator.Current is ElementBinding binding
+                && binding.Categories.Contains(family.FamilyCategory)) {
+                bindings.Add((definition, binding is InstanceBinding));
+            }
+        }
+        var byName = bindings.ToLookup(item => item.Definition.Name);
+        return new ReadOnlyDictionary<string, LintelParameterFact>(LintelParameterSpec.All.ToDictionary(
+            spec => spec.Key, spec => {
+                mappings.TryGetValue(spec.Key, out string name);
+                var candidates = familyParameters[name].Take(2).ToArray();
+                var projectParameters = byName[name].Take(2).ToArray();
+                var state = InspectParameter(project, sample, spec, name, candidates, projectParameters);
+                return new LintelParameterFact(name, state);
+            }));
+    }
+
+    // Учитывает параметры определения и отдельные проектные привязки с тем же именем.
+    private static LintelParameterState InspectParameter(Document project, FamilyInstance sample,
+        LintelParameterSpec spec, string name, FamilyParameter[] familyParameters,
+        (InternalDefinition Definition, bool Instance)[] projectParameters) {
+        if(familyParameters.Length > 1 || projectParameters.Length > 1) {
+            return LintelParameterState.Ambiguous;
+        }
+        var parameter = familyParameters.SingleOrDefault();
+        if(projectParameters.Length == 1) {
+            var (definition, instance) = projectParameters[0];
+            if(parameter is null) {
+                return instance ? InspectProjectInstance(sample, spec, name) : LintelParameterState.Type;
+            }
+            if(!parameter.IsShared || project.GetElement(definition.Id) is not SharedParameterElement shared
+                || shared.GuidValue != parameter.GUID || instance != parameter.IsInstance) {
+                return LintelParameterState.Ambiguous;
+            }
+        }
+        if(parameter is null) {
+            return LintelParameterState.Missing;
+        }
+        if(!parameter.IsInstance) {
+            return LintelParameterState.Type;
+        }
+        if(!HasExpectedType(parameter.Definition, parameter.StorageType, spec.Kind)) {
+            return LintelParameterState.Incompatible;
+        }
+        return parameter.IsReadOnly || parameter.IsReporting || parameter.IsDeterminedByFormula
+            ? LintelParameterState.ReadOnly : LintelParameterState.Writable;
+    }
+
+    // У проектной привязки доступность записи для экземпляра проверяется только на фактическом образце.
+    private static LintelParameterState InspectProjectInstance(FamilyInstance sample, LintelParameterSpec spec,
+        string name) {
+        if(sample is null) {
+            return LintelParameterState.Unavailable;
+        }
+        if(sample.GetParameters(name).Count > 1) {
+            return LintelParameterState.Ambiguous;
+        }
+        var parameter = FindMappedParameter(sample, null, name);
+        if(parameter is null) {
+            return LintelParameterState.Missing;
+        }
+        if(!HasExpectedType(parameter.Definition, parameter.StorageType, spec.Kind)) {
+            return LintelParameterState.Incompatible;
+        }
+        return parameter.IsReadOnly ? LintelParameterState.ReadOnly : LintelParameterState.Writable;
+    }
+
+    // Для линейного параметра требуется Length, для флага — именно Yes/No, а не произвольное целое.
+    private static bool HasExpectedType(Definition definition, StorageType storage, LintelParameterKind kind) {
+        return kind == LintelParameterKind.LengthMm
+            ? storage == StorageType.Double && definition.GetDataType() == SpecTypeId.Length
+            : storage == StorageType.Integer && definition.GetDataType() == SpecTypeId.Boolean.YesNo;
     }
 
     // Неоднозначное имя не разрешается произвольно; тип используется только при отсутствии параметра экземпляра.

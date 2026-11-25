@@ -53,12 +53,20 @@ internal enum CutHeightMatch { Unavailable, Neither, CutHeight, HeadAboveLevel, 
 /// <summary>Положение начала семейства и фактические направления с уже применёнными отражениями.</summary>
 internal sealed class InstancePlacement(GeometryPoint origin, GeometryPoint hand, GeometryPoint facing,
     bool mirrored, bool handFlipped, bool facingFlipped) {
+    /// <summary>Добавляет фактические оси Transform отдельно от направлений Hand и Facing.</summary>
+    public InstancePlacement(GeometryPoint origin, GeometryPoint hand, GeometryPoint facing,
+        bool mirrored, bool handFlipped, bool facingFlipped, AlignmentPlanes transformAxes)
+        : this(origin, hand, facing, mirrored, handFlipped, facingFlipped) {
+        TransformAxes = transformAxes;
+    }
+
     public GeometryPoint Origin { get; } = origin;
     public GeometryPoint Hand { get; } = hand;
     public GeometryPoint Facing { get; } = facing;
     public bool Mirrored { get; } = mirrored;
     public bool HandFlipped { get; } = handFlipped;
     public bool FacingFlipped { get; } = facingFlipped;
+    public AlignmentPlanes TransformAxes { get; }
 }
 
 /// <summary>Прямоугольный вырез хоста в футах и числовая сверка сопоставленных параметров.</summary>
@@ -91,11 +99,36 @@ internal sealed class AlignmentPlanes(GeometryPoint center, GeometryPoint center
 /// <summary>Факты экземпляра и техническая причина недоступности привязки для последующего анализа.</summary>
 internal sealed class GeometryFacts(InstancePlacement placement, WallFrame wall, OpeningCut cut,
     AlignmentPlanes anchor, string limitation) {
+    private readonly GeometryPoint? _searchTopCenter;
+
+    /// <summary>Добавляет координаты открытого выреза или отдельную привязку верха для поиска.</summary>
+    public GeometryFacts(InstancePlacement placement, WallFrame wall, string limitation,
+        (GeometryPoint Center, double Width, double JambHeight)? openTop, GeometryPoint? searchTopCenter = null)
+        : this(placement, wall, null, null, limitation) {
+        OpenTop = openTop;
+        _searchTopCenter = searchTopCenter;
+    }
+
+    /// <summary>Добавляет подтверждённый конфликт геометрии вырезов к неполному контуру.</summary>
+    public GeometryFacts(InstancePlacement placement, WallFrame wall, string limitation,
+        (GeometryPoint Center, double Width, double JambHeight)? openTop, GeometryPoint? searchTopCenter,
+        bool hasConflictingCut)
+        : this(placement, wall, limitation, openTop, searchTopCenter) {
+        HasConflictingCut = hasConflictingCut;
+    }
+
     public InstancePlacement Placement { get; } = placement;
     public WallFrame Wall { get; } = wall;
     public OpeningCut Cut { get; } = cut;
+    public (GeometryPoint Center, double Width, double JambHeight)? OpenTop { get; }
+    public GeometryPoint? TopCenter => Cut?.TopCenter ?? OpenTop?.Center;
+
+    /// <summary>Локализует конкурирующий проём без подтверждения плоскостей пары.</summary>
+    public GeometryPoint? SearchTopCenter => TopCenter ?? _searchTopCenter;
+
     public AlignmentPlanes Anchor { get; } = anchor;
     public string Limitation { get; } = limitation;
+    public bool HasConflictingCut { get; }
 }
 
 /// <summary>Дистанции от начала направленного конечного отрезка во внутренних единицах Revit.</summary>
@@ -136,6 +169,7 @@ internal class ContinuousMaterial {
             }
             length = Math.Max(length, interval.End);
         }
+        LengthFeet = length;
         LengthMm = length * SystemPluginConfig.MillimetersPerFoot;
         HasMaterial = length > 0;
         MeetsMinimum = HasMaterial.Value
@@ -143,6 +177,7 @@ internal class ContinuousMaterial {
     }
 
     public double MinimumMm { get; }
+    public double? LengthFeet { get; }
     public double? LengthMm { get; }
     public bool? HasMaterial { get; }
     public bool? MeetsMinimum { get; }

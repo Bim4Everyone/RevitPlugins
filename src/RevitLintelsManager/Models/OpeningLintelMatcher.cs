@@ -27,9 +27,11 @@ internal static class OpeningLintelMatcher {
         }
         foreach(var opening in openings) {
             string id = opening.Element.UniqueId;
-            var target = opening.Geometry?.Cut?.TargetPlanes;
+            var geometry = opening.Geometry;
+            var target = geometry?.Cut?.TargetPlanes;
             if(target is null) {
-                graph.MarkIncomplete(id, opening.Geometry?.Limitation ?? "Недоступны плоскости выреза стены.");
+                graph.MarkIncomplete(id, geometry?.Limitation ?? "Недоступны плоскости выреза стены.",
+                    geometry?.HasConflictingCut == true);
                 continue;
             }
             if(unknownAnchor) {
@@ -47,16 +49,33 @@ internal static class OpeningLintelMatcher {
             }
         }
 
-        // У неизвестного выреза исключаем только те перемычки, чья привязка заведомо вне рамки его стены.
-        foreach(var group in openings.Where(o => o.Geometry?.Cut is null).GroupBy(o => o.HostWallUniqueId)) {
-            var bounds = group.Key is null ? null : hostBounds(group.Key);
-            var possible = bounds is null ? lintels : index.Within(bounds, margin)
-                .Where(l => l.Geometry.Anchor.Center.Z >= bounds.Min.Z - margin
-                    && l.Geometry.Anchor.Center.Z <= bounds.Max.Z + margin);
+        foreach(var opening in openings.Where(o => o.Geometry?.Cut is null)) {
+            var possible = FindPotentialLintels(opening, lintels, index, limits, margin, hostBounds);
+            bool hasLocalizedConflict = opening.Geometry is { HasConflictingCut: true, SearchTopCenter: not null,
+                Wall: not null };
             foreach(var lintel in possible) {
-                graph.MarkIncomplete(lintel.Element.UniqueId, "Не удалось исключить проём с неподтверждённым вырезом.");
+                graph.MarkIncomplete(lintel.Element.UniqueId, "Не удалось исключить проём с неподтверждённым вырезом.",
+                    hasLocalizedConflict);
             }
         }
         return graph.Resolve(scope, false);
+    }
+
+    // Учитывает установленную точку верха. Пока она неизвестна, использует габариты стены-хоста.
+    private static IEnumerable<ManagerLintelSnapshot> FindPotentialLintels(ManagerOpeningSnapshot opening,
+        IReadOnlyList<ManagerLintelSnapshot> lintels, MatchColumns<ManagerLintelSnapshot> index, MatchLimits limits,
+        double margin, Func<string, GeometryBounds> hostBounds) {
+        var geometry = opening.Geometry;
+        if(geometry?.SearchTopCenter is { } center && geometry.Wall is { } frame) {
+            var target = new AlignmentPlanes(center, frame.Along, frame.Normal, new GeometryPoint(0, 0, 1));
+            return index.Within(new GeometryBounds(center, center), margin)
+                .Where(lintel => new PlaneDeviation(target, lintel.Geometry.Anchor, limits).InRange);
+        }
+
+        var bounds = opening.CutWallUniqueId is { } host ? hostBounds(host) : null;
+        return bounds is null ? lintels : index.Within(bounds, margin).Where(lintel => {
+            var location = lintel.Geometry.Anchor.Center;
+            return bounds.Overlaps(location, location, margin);
+        });
     }
 }

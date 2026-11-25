@@ -2,12 +2,14 @@ using System.Collections.Generic;
 
 using Autodesk.Revit.DB;
 
+using RevitLintelsManager.Models.Configs;
+
 namespace RevitLintelsManager.Models;
 
 /// <summary>Числовая точность, координаты и мировые границы Revit.</summary>
 internal static class RevitGeometry {
     // Техническая точность в футах (0,001 мм), отдельно от ShortCurveTolerance и инженерных допусков.
-    internal const double LengthEpsilon = 0.001 / 304.8;
+    internal const double LengthEpsilon = SystemPluginConfig.GeometryLengthEpsilonFeet;
     internal const double DirectionEpsilon = 1e-9;
 
     // Проверяет локальные границы, включая случай плоской геометрии.

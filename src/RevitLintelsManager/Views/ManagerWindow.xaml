@@ -44,7 +44,7 @@
             Title="{me:LocalizationSource Manager.Title}" />
         <UniformGrid
             Grid.Row="1"
-            Columns="3"
+            Columns="4"
             Margin="20,12,8,0"
             IsEnabled="{Binding CanEditRows}">
             <RadioButton
@@ -62,6 +62,25 @@
                     <TextBlock
                         Style="{StaticResource ManagerFilterLabelStyle}"
                         Text="{Binding AllResultsText}" />
+                </DockPanel>
+            </RadioButton>
+            <RadioButton
+                GroupName="ManagerResultFilter"
+                Style="{StaticResource ManagerFilterButtonStyle}"
+                BorderBrush="{DynamicResource ManagerFixedBrush}"
+                Foreground="{DynamicResource ManagerFixedBrush}"
+                IsChecked="{Binding IsFixedResultsFilter, Mode=OneWay}"
+                Command="{Binding SelectResultFilterCommand}"
+                CommandParameter="{x:Static vm:ManagerResultFilter.Fixed}">
+                <DockPanel>
+                    <ui:SymbolIcon
+                        Symbol="LockClosed24"
+                        FontSize="24"
+                        Margin="0,0,10,0"
+                        Foreground="{DynamicResource ManagerFixedBrush}" />
+                    <TextBlock
+                        Style="{StaticResource ManagerFilterLabelStyle}"
+                        Text="{Binding FixedResultsText}" />
                 </DockPanel>
             </RadioButton>
             <RadioButton
@@ -170,7 +189,9 @@
                         <ColumnDefinition Width="48" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition
+                            MinWidth="{StaticResource ManagerActionColumnMinWidth}"
+                            Width="*" />
                         <ColumnDefinition Width="144" />
                     </Grid.ColumnDefinitions>
                     <CheckBox

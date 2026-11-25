@@ -8,13 +8,15 @@ using Autodesk.Revit.UI;
 using dosymep.Revit;
 
 using RevitLintelsManager.Models.Configs;
+using RevitLintelsManager.Services;
 
 using static RevitLintelsManager.Models.RevitElementRead;
 
 namespace RevitLintelsManager.Models;
 
 /// <summary>Захватывает диапазон сессии и читает его снимок в допустимом контексте Revit.</summary>
-internal sealed class ManagerScopeReader(RevitRepository source, IProjectSnapshotReader snapshots) : IManagerScopeReader {
+internal sealed class ManagerScopeReader(RevitRepository source, IProjectSnapshotReader snapshots,
+    IManagerAnalysisService analysis) : IManagerScopeReader {
     private Document Document => source.Document;
 
     /// <summary>Запоминает исходные вид и выделение и определяет диапазон по подходящим экземплярам.</summary>
@@ -59,10 +61,17 @@ internal sealed class ManagerScopeReader(RevitRepository source, IProjectSnapsho
         var selection = GetScopeSelection(activeDocument, request, state);
         using var collector = CreateScopeCollector(request.Scope, view, selection);
         var project = snapshots.ReadScopeSnapshot(state.Config, phaseId, request.Scope, collector);
+        var rows = project.GetRows().Select(row => {
+            LintelCalculation calculation = null;
+            if(row.Opening is not null) {
+                project.Calculations.TryGetValue(row.Opening.Element.UniqueId, out calculation);
+            }
+            return analysis.Analyze(request.DocumentToken, row, calculation, state.Config);
+        });
         string viewUniqueId = view?.UniqueId;
         return new ManagerDocumentContext(request.DocumentToken, request.Generation, Document.Title,
             viewUniqueId, view?.Name, GetSelectionUniqueIds(selection), project,
-            CreateScopeStamp(request.Scope, viewUniqueId, selection), GetRemovedKeys(request));
+            CreateScopeStamp(request.Scope, viewUniqueId, selection), GetRemovedKeys(request), rows);
     }
 
     // Уточняет исчезновение по UniqueId, чтобы сохранить состояние после Undo до обновления.
