@@ -121,8 +121,12 @@ internal class NavisXmlClashesLoader : BaseClashesLoader, IClashesLoader {
 
         var xmlDoc = XDocument.Load(FilePath);
 
-        return xmlDoc.Descendants("clashtest")
-            .Select(ct => new ReportModel((string) ct.Attribute("name"), GetClashModels(ct)));
+        try {
+            return xmlDoc.Descendants("clashtest")
+                .Select(ct => new ReportModel((string) ct.Attribute("name"), GetClashModels(ct)));
+        } catch(NullReferenceException) {
+            throw new InvalidOperationException("Неверный формат файла xml.");
+        }
     }
 
     public bool IsValid() {
@@ -165,6 +169,10 @@ internal class NavisXmlClashesLoader : BaseClashesLoader, IClashesLoader {
             t => t.Element("name").Value.ToLower(),
             t => t.Element("value").Value);
         string file = tags.TryGetValue("элемент файл источника", out string fileName) ? fileName : null;
+        if(file is null) {
+            throw new InvalidOperationException(
+                " Неверный формат xml: в xml объекте элемента нет тэга 'элемент файл источника'.");
+        }
         const string rvtEnd = ".rvt";
         if(file.EndsWith(rvtEnd)) {
             file = file.Substring(0, file.Length - rvtEnd.Length);
