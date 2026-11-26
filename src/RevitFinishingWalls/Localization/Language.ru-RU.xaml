@@ -107,6 +107,8 @@
         x:Key="Exceptions.MapingLinesInvalidSize">Можно замапить только список уменьшенных линий</system:String>
     <system:String
         x:Key="Exceptions.CannotMapLines">Не удалось замапить список линий</system:String>
+    <system:String
+        x:Key="Exceptions.BoundaryGap">В контуре помещения разрыв {0:0.##} мм между этими элементами. Исправьте их сопряжение</system:String>
 
     <system:String
         x:Key="Errors.CannotCreateWallLines">Не удалось построить оси отделочных стен в помещении</system:String>

@@ -12,6 +12,7 @@ using dosymep.Revit;
 using dosymep.Revit.Geometry;
 using dosymep.SimpleServices;
 
+using RevitFinishingWalls.Exceptions;
 using RevitFinishingWalls.Models.Enums;
 using RevitFinishingWalls.Services;
 using RevitFinishingWalls.Services.Selection;
@@ -29,6 +30,16 @@ namespace RevitFinishingWalls.Models {
         /// </summary>
         private readonly double _minLineLength;
 
+        /// <summary>
+        /// Допуск совпадения точек в ревите
+        /// </summary>
+        private readonly double _vertexTolerance;
+
+        /// <summary>
+        /// Максимальный разрыв между сегментами границы помещения, который устраняется
+        /// </summary>
+        private readonly double _maxHealableGap;
+
         public RevitRepository(UIApplication uiApplication,
             RevitEventHandler revitEventHandler,
             ILocalizationService localizationService) {
@@ -43,6 +54,8 @@ namespace RevitFinishingWalls.Models {
             _defaultView3D = GetDefaultView3D();
             _wallTypesWidthById = new Dictionary<ElementId, double>();
             _minLineLength = uiApplication.Application.ShortCurveTolerance;
+            _vertexTolerance = uiApplication.Application.VertexTolerance;
+            _maxHealableGap = 2 * _minLineLength;
         }
 
         public UIApplication UIApplication { get; }
@@ -180,6 +193,8 @@ namespace RevitFinishingWalls.Models {
         /// и элемент(ы), который(ые) образует эту границу</returns>
         /// <exception cref="InvalidOperationException">
         /// Исключение, если не удалось построить оси отделочных стен</exception>
+        /// <exception cref="CannotCreateWallException">
+        /// Исключение, если в контуре есть разрыв, который нельзя устранить автоматически</exception>
         public IList<CurveSegmentElement> GetCurveSegmentsElements(
             IList<BoundarySegment> segmentsLoop,
             ElementId finishingWallTypeId,
@@ -192,8 +207,14 @@ namespace RevitFinishingWalls.Models {
             CurveLoop segmentsCurveLoop;
             try {
                 segmentsCurveLoop = CurveLoop.Create(segmentsLoop.Select(s => s.GetCurve()).ToArray());
-            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
-                throw new InvalidOperationException(error);
+            } catch(Autodesk.Revit.Exceptions.ArgumentException) {
+                try {
+                    // в контуре помещений могут быть разрывы из-за неточностей геометрии,
+                    // в этом случае плагин попытается скорректировать контур 
+                    segmentsCurveLoop = CurveLoop.Create(HealLoop(segmentsLoop));
+                } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                    throw new InvalidOperationException(error);
+                }
             }
             // получение линий осей отделочных стен,
             // смещенной влево на 1/2 толщины отделочной стены относительно исходной границы помещения,
@@ -298,8 +319,8 @@ namespace RevitFinishingWalls.Models {
         /// </summary>
         /// <param name="first">Первая линия</param>
         /// <param name="second">Вторая линия</param>
-        /// <returns>Вторая линия является продолжением первой только если обе линии - отрезки 
-        /// и если начало второго отрезка - это конец первого отрезка или наоборот</returns>
+        /// <returns>Вторая линия является продолжением первой только если обе линии - сонаправленные отрезки
+        /// и если начало второго отрезка - это конец первого отрезка</returns>
         /// <exception cref="ArgumentNullException"></exception>
         public bool IsContinuation(Curve first, Curve second) {
             if(first is null) { throw new ArgumentNullException(nameof(first)); }
@@ -307,8 +328,7 @@ namespace RevitFinishingWalls.Models {
 
             if((first is Line firstLine) && (second is Line secondLine)) {
                 return firstLine.Direction.IsAlmostEqualTo(secondLine.Direction)
-                    && (firstLine.GetEndPoint(0).IsAlmostEqualTo(secondLine.GetEndPoint(1))
-                    || firstLine.GetEndPoint(1).IsAlmostEqualTo(secondLine.GetEndPoint(0)));
+                       && firstLine.GetEndPoint(1).IsAlmostEqualTo(secondLine.GetEndPoint(0));
             } else {
                 return false;
             }
@@ -400,6 +420,117 @@ namespace RevitFinishingWalls.Models {
                 throw new InvalidOperationException(
                     _localizationService.GetLocalizedString("Exceptions.CannotMapLines"));
             }
+        }
+
+        /// <summary>
+        /// Возвращает линии контура границы помещения, в котором концы соседних линий совпадают.
+        /// Небольшие разрывы устраняются переносом концов линий в общую точку.
+        /// </summary>
+        /// <param name="segmentsLoop">Замкнутый контур границы помещения</param>
+        /// <exception cref="CannotCreateWallException">
+        /// Исключение, если разрыв слишком большой или его не удалось устранить</exception>
+        private Curve[] HealLoop(IList<BoundarySegment> segmentsLoop) {
+            Curve[] curves = segmentsLoop.Select(s => s.GetCurve()).ToArray();
+            if(curves.Length < 2) {
+                return curves;
+            }
+
+            for(int current = 0; current < curves.Length; current++) {
+                int next = (current + 1) % curves.Length;
+                double gap = curves[current].GetEndPoint(1).DistanceTo(curves[next].GetEndPoint(0));
+                if(gap <= _vertexTolerance) {
+                    continue;
+                }
+
+                if(gap > _maxHealableGap
+                   || !TryJoin(curves[current], curves[next], out Curve joinedCurrent, out Curve joinedNext)) {
+                    throw new CannotCreateWallException(
+                        string.Format(
+                            _localizationService.GetLocalizedString("Exceptions.BoundaryGap"),
+                            ConvertFeetToMm(gap)),
+                        [segmentsLoop[current].ElementId, segmentsLoop[next].ElementId]);
+                }
+
+                curves[current] = joinedCurrent;
+                curves[next] = joinedNext;
+            }
+
+            return curves;
+        }
+
+        /// <summary>
+        /// Перестраивает линии так, чтобы конец первой совпадал с началом второй
+        /// </summary>
+        private bool TryJoin(Curve first, Curve second, out Curve joinedFirst, out Curve joinedSecond) {
+            joinedFirst = null;
+            joinedSecond = null;
+            bool canRebuildFirst = first is Line || first is Arc;
+            bool canRebuildSecond = second is Line || second is Arc;
+            XYZ joint;
+            if(canRebuildFirst && canRebuildSecond) {
+                joint = GetJoint(first, second);
+            } else if(canRebuildFirst) {
+                joint = second.GetEndPoint(0);
+            } else if(canRebuildSecond) {
+                joint = first.GetEndPoint(1);
+            } else {
+                return false;
+            }
+
+            try {
+                joinedFirst = canRebuildFirst ? WithEndPoint(first, 1, joint) : first;
+                joinedSecond = canRebuildSecond ? WithEndPoint(second, 0, joint) : second;
+                return true;
+            } catch(Autodesk.Revit.Exceptions.ApplicationException) {
+                // перестроенная линия получилась слишком короткой
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Возвращает общую точку для конца первой линии и начала второй:
+        /// угол пересечения для непараллельных отрезков, иначе середину разрыва
+        /// </summary>
+        private XYZ GetJoint(Curve first, Curve second) {
+            XYZ end = first.GetEndPoint(1);
+            XYZ start = second.GetEndPoint(0);
+            XYZ middle = (end + start) / 2;
+            if(first is Line firstLine
+               && second is Line secondLine) {
+                Line firstUnbound = Line.CreateUnbound(end, firstLine.Direction);
+                Line secondUnbound = Line.CreateUnbound(start, secondLine.Direction);
+                if(firstUnbound.Intersect(secondUnbound, out IntersectionResultArray results)
+                   == SetComparisonResult.Overlap
+                   && results.Size == 1) {
+                    XYZ corner = results.get_Item(0).XYZPoint;
+                    // почти параллельные отрезки пересекаются далеко от разрыва
+                    if(corner.DistanceTo(middle) <= _maxHealableGap) {
+                        return corner;
+                    }
+                }
+            }
+
+            return middle;
+        }
+
+        /// <summary>
+        /// Создает копию отрезка или дуги с перенесенной конечной точкой
+        /// </summary>
+        /// <param name="curve">Отрезок или дуга</param>
+        /// <param name="index">0 - начало, 1 - конец</param>
+        /// <param name="point">Новое положение конечной точки</param>
+        private Curve WithEndPoint(Curve curve, int index, XYZ point) {
+            XYZ start = index == 0 ? point : curve.GetEndPoint(0);
+            XYZ end = index == 1 ? point : curve.GetEndPoint(1);
+            return curve switch {
+                Line => Line.CreateBound(start, end),
+                Arc arc => Arc.Create(start, end, arc.Evaluate(0.5, true)),
+                _ => throw new ArgumentException(nameof(curve))
+            };
+        }
+
+        private double ConvertFeetToMm(double feet) {
+            return UnitUtils.ConvertFromInternalUnits(feet, UnitTypeId.Millimeters);
         }
 
         private BoundingBoxXYZ GetBoundingBox(IEnumerable<ElementId> dependentElements) {

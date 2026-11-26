@@ -30,12 +30,12 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
             if(settings is null) { throw new ArgumentNullException(nameof(settings)); }
 
             List<WallCreationData> wallCreationData = [];
-            WallCreationData lastWallCreationData = null;
             double wallTopElevation = GetWallTopElevation(room, settings);
             double wallBaseOffset = _revitRepository.ConvertMmToFeet(settings.WallBaseOffsetMm);
             double wallSideOffset = _revitRepository.ConvertMmToFeet(settings.WallSideOffsetMm);
 
             foreach(IList<BoundarySegment> loop in _revitRepository.GetBoundarySegments(room)) {
+                WallCreationData lastWallCreationData = null;
                 try {
                     IList<CurveSegmentElement> segments
                         = _revitRepository.GetCurveSegmentsElements(loop, settings.WallTypeId, -wallSideOffset);
@@ -62,6 +62,8 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                         }
                     }
                 } catch(InvalidOperationException e) {
+                    throw new CannotCreateWallException(e.Message);
+                } catch(Autodesk.Revit.Exceptions.ApplicationException e) {
                     throw new CannotCreateWallException(e.Message);
                 }
             }

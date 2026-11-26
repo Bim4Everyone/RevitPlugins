@@ -109,6 +109,8 @@ Important: Connection to elements from linked files will not be performed!
         x:Key="Exceptions.MapingLinesInvalidSize">Only a reduced list of lines can be mapped</system:String>
     <system:String
         x:Key="Exceptions.CannotMapLines">Failed to map the list of lines</system:String>
+    <system:String
+        x:Key="Exceptions.BoundaryGap">The room boundary has a {0:0.##} mm gap between these elements. Fix their joint</system:String>
 
     <system:String
         x:Key="Errors.CannotCreateWallLines">Failed to build axes of finishing walls in the room</system:String>
