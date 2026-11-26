@@ -55,12 +55,7 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
             ?? throw new InvalidOperationException(localization.GetLocalizedString("Processing.InstallType"));
         Document.Regenerate();
         using var pose = instance.GetTransform();
-        var direction = AsXyz(target.CenterNormal);
-        double angle = Math.Atan2(pose.BasisX.CrossProduct(direction).Z, pose.BasisX.DotProduct(direction));
-        if(Math.Abs(angle) > DirectionEpsilon) {
-            using var axis = Line.CreateUnbound(pose.Origin, XYZ.BasisZ);
-            ElementTransformUtils.RotateElement(Document, instance.Id, axis, angle);
-        }
+        RotateLintel(instance, pose, AsXyz(target.CenterNormal));
         var displacement = center - pose.Origin;
         if(displacement.GetLength() > LengthEpsilon) {
             ElementTransformUtils.MoveElement(Document, instance.Id, displacement);
@@ -68,12 +63,23 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
         return instance;
     }
 
+    // Поворачивает вокруг точки вставки и возвращает фактически заданный угол для проверки базиса.
+    internal static double RotateLintel(FamilyInstance instance, Transform pose, XYZ direction) {
+        double angle = Math.Atan2(pose.BasisX.CrossProduct(direction).Z, pose.BasisX.DotProduct(direction));
+        if(Math.Abs(angle) <= DirectionEpsilon) {
+            return 0;
+        }
+        using var axis = Line.CreateUnbound(pose.Origin, XYZ.BasisZ);
+        ElementTransformUtils.RotateElement(instance.Document, instance.Id, axis, angle);
+        return angle;
+    }
+
     // Сверяет полный результат Delete с владельцами геометрии и единственным центральным замком исходной пары.
-    internal void DeleteForReplacement(IGeometryReadContext geometry, FamilyInstance lintel, FamilyInstance opening,
+    internal void DeleteLintel(IGeometryReadContext geometry, FamilyInstance lintel, FamilyInstance opening,
         LintelLockFacts lockFacts, ILocalizationService localization) {
         var oldId = lintel.Id;
         var allowed = geometry.GetGeometryOwners(lintel).OfType<FamilyInstance>().Select(owner => owner.Id).ToHashSet();
-        if(lockFacts is { State: LintelLockState.Confirmed, DependencyIds.Count: 1 }
+        if(opening is not null && lockFacts is { State: LintelLockState.Confirmed, DependencyIds.Count: 1 }
             && Document.GetElement(lockFacts.DependencyIds[0]) is Dimension { IsLocked: true } dimension
             && dimension.Category?.Id.GetIdValue() == (long) BuiltInCategory.OST_Constraints) {
             var references = dimension.References.Cast<Reference>().Select(reference => reference.ElementId).ToList();
@@ -81,12 +87,14 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
                 allowed.Add(dimension.Id);
             }
         }
-        allowed.Remove(opening.Id);
-        allowed.Remove(opening.Host.Id);
+        if(opening is not null) {
+            allowed.Remove(opening.Id);
+            allowed.Remove(opening.Host?.Id);
+        }
         var deleted = Document.Delete(oldId);
         var unexpected = deleted.Except(allowed).Select(id => id.GetIdValue()).OrderBy(id => id).ToArray();
         if(!deleted.Contains(oldId) || unexpected.Length > 0) {
-            throw new InvalidOperationException(localization.GetLocalizedString("Processing.ReplaceCascade",
+            throw new InvalidOperationException(localization.GetLocalizedString("Processing.DeleteCascade",
                 oldId.GetIdValue(), string.Join(", ", unexpected)));
         }
     }

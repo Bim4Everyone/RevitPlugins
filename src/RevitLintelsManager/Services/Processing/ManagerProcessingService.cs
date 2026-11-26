@@ -18,7 +18,8 @@ namespace RevitLintelsManager.Services;
 internal sealed class ManagerProcessingService(RevitRepository source, ManagerSessionState state,
     IProjectSnapshotReader snapshots, IManagerAnalysisService analysis, IProcessingConfirmation confirmation,
     ILocalizationService localization, ILoggerService logger, Func<Document, IGeometryReadContext> openGeometry,
-    ILintelLockReader lockReader, ILintelInstallationService installation) : IManagerProcessingService {
+    ILintelLockReader lockReader, ILintelInstallationService installation, ILintelCorrectionService correction)
+    : IManagerProcessingService {
     private volatile ApprovedProcessingPlan _approved;
     private volatile bool _faulted;
     private ProcessingTransaction _pending;
@@ -31,6 +32,9 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
             ManagerAction.Lock => new ProcessingAction(ManagerAction.Lock, ApplyLock, VerifyLock),
             ManagerAction.Install => new ProcessingAction(ManagerAction.Install, ApplyInstall, installation.Verify),
             ManagerAction.Replace => new ProcessingAction(ManagerAction.Replace, ApplyReplace, VerifyReplace),
+            ManagerAction.Delete => new ProcessingAction(ManagerAction.Delete, ApplyDelete, VerifyDelete),
+            ManagerAction.Correct => new ProcessingAction(ManagerAction.Correct,
+                (target, ct) => correction.Apply(target, state.Config, ct), target => correction.Verify(target, state.Config)),
             _ => null
         };
         return Execute(approved, index, action, token);
@@ -41,20 +45,33 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
         installation.Install(target, state.Config, token);
     }
 
+    // Общая часть удаления и замены проверяет весь нативный каскад в транзакции строки.
+    private void ApplyDelete(ProcessingTarget target, CancellationToken token) {
+        source.DeleteLintel(target.LockGeometry, target.Lintel, target.Opening, target.Match.LockFacts, localization);
+    }
+
     // Обе части замены выполняются до единственного Commit, включая отказ сразу после удаления.
     private void ApplyReplace(ProcessingTarget target, CancellationToken token) {
-        source.DeleteForReplacement(target.LockGeometry, target.Lintel, target.Opening, target.Match.LockFacts, localization);
+        ApplyDelete(target, token);
         token.ThrowIfCancellationRequested();
         installation.Install(target, state.Config, token);
     }
 
-    // Проверяет сохранённый проём и его хост, смену экземпляра и все постусловия установки.
-    private void VerifyReplace(ProcessingTarget target) {
+    // Проверяет отсутствие исходного экземпляра и сохранность проёма, его хоста и стены выреза.
+    private void VerifyDelete(ProcessingTarget target) {
         var original = target.Match;
-        if(target.Document.GetElement(original.Lintel.Element.UniqueId) is not null || !target.Opening.IsValidObject
-            || target.Opening.UniqueId != original.Opening.Element.UniqueId
-            || target.Opening.Host?.UniqueId != original.Opening.HostWallUniqueId
-            || target.InstalledLintel.Id.GetIdValue() == original.Lintel.Element.Information.ElementId) {
+        bool openingPreserved = original.Opening is not { } opening || (target.Opening is { IsValidObject: true }
+            && target.Opening.UniqueId == opening.Element.UniqueId && target.Opening.Host?.UniqueId == opening.HostWallUniqueId
+            && (opening.CutWallUniqueId is null || target.Document.GetElement(opening.CutWallUniqueId) is Wall));
+        if(target.Lintel.IsValidObject || target.Document.GetElement(original.Lintel.Element.UniqueId) is not null || !openingPreserved) {
+            throw new System.InvalidOperationException(Text("DeletePair"));
+        }
+    }
+
+    // Дополнительно проверяет смену экземпляра и все постусловия установки.
+    private void VerifyReplace(ProcessingTarget target) {
+        VerifyDelete(target);
+        if(target.InstalledLintel.Id.GetIdValue() == target.Match.Lintel.Element.Information.ElementId) {
             throw new System.InvalidOperationException(Text("ReplacePair"));
         }
         installation.Verify(target);
@@ -134,15 +151,14 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
                 result = new ProcessingResult(operation, ProcessingStatus.Skipped, [Text("ActionUnavailable")]);
             } else {
                 var target = Revalidate(operation);
-                using var geometry = operation.Action is ManagerAction.Lock or ManagerAction.Install or ManagerAction.Replace
-                    ? openGeometry(source.Document) : null;
-                if(geometry is not null) {
+                using var geometry = openGeometry(source.Document);
+                target.LockGeometry = geometry;
+                if(operation.Action != ManagerAction.Delete) {
                     // EditFamily допускается только перед открытием изменяющей транзакции.
                     geometry.GetWidthOriginPlane(target.Opening.Symbol.Family);
-                    var family = operation.Action == ManagerAction.Lock ? target.Lintel.Symbol.Family
+                    var family = operation.Action is ManagerAction.Lock or ManagerAction.Correct ? target.Lintel.Symbol.Family
                         : source.Document.GetElement(target.Calculation.Family.UniqueId) as Family;
                     geometry.GetOriginPlanes(family);
-                    target.LockGeometry = geometry;
                 }
                 token.ThrowIfCancellationRequested();
                 var tx = new ProcessingTransaction(operation, new Transaction(source.Document, Text("Transaction")), localization);
@@ -241,7 +257,7 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
                 }
             }
         }
-        return new ProcessingTarget(document, opening, lintel, match, calculation);
+        return new ProcessingTarget(document, opening, lintel, match, calculation) { Comparison = comparison };
     }
 
     // Разрешает идентификатор только в исходном документе.

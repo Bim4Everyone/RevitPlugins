@@ -330,7 +330,8 @@
     <system:String x:Key="Processing.LockView">No suitable floor plan exists for the opening level.</system:String>
     <system:String x:Key="Processing.LockReference">Could not resolve the center reference of element {0}.</system:String>
     <system:String x:Key="Processing.LockFailed">Could not confirm the new center alignment.</system:String>
-    <system:String x:Key="Processing.ReplaceCascade">Replacement of lintel {0} failed the deleted-element check. Unexpected IDs [{1}].</system:String>
+    <system:String x:Key="Processing.DeleteCascade">Deletion of lintel {0} failed the cascade check. Unexpected IDs [{1}].</system:String>
+    <system:String x:Key="Processing.DeletePair">Could not verify removal of the original lintel and preservation of the opening and wall.</system:String>
     <system:String x:Key="Processing.ReplacePair">Could not verify replacement of the original lintel and preservation of the opening and its wall.</system:String>
     <system:String x:Key="Processing.LockParametersChanged">Creating the alignment changed the parameters of an instance.</system:String>
     <system:String x:Key="Processing.InstallType">The lintel type or level is unavailable for level-based placement.</system:String>
@@ -338,4 +339,6 @@
     <system:String x:Key="Processing.InstallValues">The calculation does not contain all required instance values.</system:String>
     <system:String x:Key="Processing.InstallAttributes">The installed lintel type, level, workset or phases differ from the calculation.</system:String>
     <system:String x:Key="Processing.InstallValue">The installed value of parameter “{0}” differs from the calculation.</system:String>
+    <system:String x:Key="Processing.CorrectIncomplete">The final comparison could not verify the lintel position and calculated instance parameters.</system:String>
+    <system:String x:Key="Processing.CorrectDependencies">The original pair attributes and constraints could not be verified.</system:String>
 </ResourceDictionary>

@@ -18,6 +18,8 @@ internal sealed class ProcessingTarget(Document document, FamilyInstance opening
     public OpeningLintelMatch InstalledPair { get; internal set; }
     public FamilyInstance InstalledLintel { get; internal set; }
     public LintelCalculation Calculation { get; } = calculation;
+    public LintelComparison Comparison { get; internal set; }
+    public CorrectionSnapshot BeforeCorrection { get; internal set; }
     public IGeometryReadContext LockGeometry { get; internal set; }
     public string CreatedLockId { get; internal set; }
     public IReadOnlyList<(long Owner, long Parameter, bool HasValue, object Value)> OriginalLockParameters { get; internal set; }

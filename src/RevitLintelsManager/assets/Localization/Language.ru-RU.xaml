@@ -330,7 +330,8 @@
     <system:String x:Key="Processing.LockView">Для уровня проёма не найден подходящий план этажа.</system:String>
     <system:String x:Key="Processing.LockReference">Не удалось определить центральную ссылку элемента {0}.</system:String>
     <system:String x:Key="Processing.LockFailed">Не удалось подтвердить созданный центральный замок.</system:String>
-    <system:String x:Key="Processing.ReplaceCascade">Замена перемычки {0} отклонена при проверке удалённых элементов. Посторонние ID [{1}].</system:String>
+    <system:String x:Key="Processing.DeleteCascade">Удаление перемычки {0} отклонено при проверке каскада. Посторонние ID [{1}].</system:String>
+    <system:String x:Key="Processing.DeletePair">Не удалось подтвердить удаление исходной перемычки и сохранность проёма и стены.</system:String>
     <system:String x:Key="Processing.ReplacePair">Не удалось подтвердить замену исходной перемычки и сохранность проёма со стеной.</system:String>
     <system:String x:Key="Processing.LockParametersChanged">При создании замка изменились параметры одного из экземпляров.</system:String>
     <system:String x:Key="Processing.InstallType">Тип перемычки или уровень недоступен для одноуровневой установки.</system:String>
@@ -338,4 +339,6 @@
     <system:String x:Key="Processing.InstallValues">Расчёт не содержит полного набора значений для экземпляра.</system:String>
     <system:String x:Key="Processing.InstallAttributes">Тип, уровень, рабочий набор или стадии установленной перемычки отличаются от расчёта.</system:String>
     <system:String x:Key="Processing.InstallValue">После установки значение параметра «{0}» отличается от расчёта.</system:String>
+    <system:String x:Key="Processing.CorrectIncomplete">Повторное сравнение не подтвердило исправление положения и расчётных параметров перемычки.</system:String>
+    <system:String x:Key="Processing.CorrectDependencies">Не удалось подтвердить сохранение исходных данных и зависимостей пары.</system:String>
 </ResourceDictionary>
