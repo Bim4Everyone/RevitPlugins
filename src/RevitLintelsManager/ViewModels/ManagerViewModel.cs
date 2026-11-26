@@ -38,6 +38,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     }
 
     public event Action CloseRequested;
+    public event Func<ProcessingPlan, Task<ProcessingBatchResult>> ProcessingRequested;
     public event Action<ManagerDetailsViewModel> DetailsRequested;
     public event Action DetailsDismissRequested;
     public event Action<ManagerScope> ProjectionChanging;
@@ -49,6 +50,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private readonly VisibleRowCollection _visibleRows = new();
     private readonly HashSet<ManagerGroupKey> _expandedGroups = new();
     private readonly Dictionary<ManagerItemKey, ManagerItemState> _hiddenState = new();
+    private readonly Dictionary<string, ManagerDiagnostic> _processingIssues = new();
     private readonly HashSet<ManagerItemKey> _deletionCandidates = new();
     private readonly Dictionary<ManagerItemViewModel, string[]> _searchValues = new();
     private Dictionary<ManagerItemKey, ManagerItemViewModel> _items = new();
@@ -56,6 +58,8 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     private bool _isBlocked;
     private bool _isRefreshing;
     private bool _isNavigating;
+    private bool _isProcessing;
+    private bool _processingStopped;
     private bool _disposed;
     private bool _firstRead = true;
     private bool _modelIsDirty;
@@ -91,9 +95,11 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         VisibleRows = new ReadOnlyObservableCollection<ManagerRowViewModel>(_visibleRows);
         ContextSummary = localization.GetLocalizedString("Manager.Refresh");
         RefreshCommand = commands.CreateAsync(RefreshContextAsync, () => CanEditRows);
+        ProcessCommand = commands.CreateAsync(ProcessRowsAsync, () => ProcessingRequested is not null
+            && ProcessingCount > 0 && HasCurrentAnalysis());
         NavigateCommand = commands.CreateAsync<ManagerRowViewModel>(NavigateAsync,
             row => CanEditRows && row is not null && _visibleRows.Contains(row) && GetNavigationKeys(row).Any());
-        CloseCommand = commands.Create(() => CloseRequested?.Invoke());
+        CloseCommand = commands.Create(() => CloseRequested?.Invoke(), () => !_isProcessing);
         SelectScopeCommand = commands.Create<ManagerScopeViewModel>(SelectScope, _ => CanChangeScope);
         SelectResultFilterCommand = commands.Create<ManagerResultFilter>(SelectResultFilter, _ => CanEditRows);
         ToggleAllRowsCommand = commands.Create(ToggleAllRows, () => CanEditRows && _filteredCount > 0);
@@ -121,6 +127,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public ICommand SelectResultFilterCommand { get; }
     public ICommand ToggleAllRowsCommand { get; }
     public ICommand RefreshCommand { get; }
+    public ICommand ProcessCommand { get; }
     public ICommand NavigateCommand { get; }
     public ICommand ToggleGroupCommand { get; }
     public ICommand ShowInformationCommand { get; }
@@ -149,9 +156,11 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     public string ProcessText => string.Format(CultureInfo.CurrentCulture,
         _localization.GetLocalizedString("Manager.ProcessCount"), ProcessingCount);
     public bool CanEditRows => !_disposed && !IsBlocked && !State.IsClosing && !IsBusy;
-    internal bool IsBusy => IsRefreshing || _isNavigating;
+    internal bool IsBusy => IsRefreshing || _isNavigating || _isProcessing;
     public string GeneralMessage => State.IsClosing ? _localization.GetLocalizedString("Manager.Closing")
         : IsBlocked ? _localization.GetLocalizedString("Manager.DocumentChanged")
+        : _isProcessing ? _localization.GetLocalizedString("Processing.Batch")
+        : _processingStopped ? _localization.GetLocalizedString("Processing.BatchAborted")
         : IsRefreshing ? _localization.GetLocalizedString("Manager.Busy")
         : _isNavigating ? _localization.GetLocalizedString("Manager.Navigating")
         : _navigationError is not null ? _navigationError
@@ -186,11 +195,21 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         return RefreshCommand.CanExecute(null) ? RefreshContextAsync() : Task.CompletedTask;
     }
 
+    /// <summary>Блокирует конфликтующие команды до публикации окончательного исхода пакета.</summary>
+    public void SetProcessing(bool processing) {
+        _isProcessing = processing;
+        if(processing) {
+            DetailsDismissRequested?.Invoke();
+        }
+        RaisePropertyChanged(nameof(CanEditRows));
+        NotifyPresentationState();
+        CommandManager.InvalidateRequerySuggested();
+    }
+
     /// <summary>Фиксирует отмеченных детей действующих фильтров независимо от раскрытия групп.</summary>
     public ProcessingPlan CreateProcessingPlan() {
         var context = LastContext;
-        if(!CanEditRows || _modelIsDirty || context?.AnalyzedRows is null
-            || !IsCurrentResponse(context.DocumentToken, context.Generation)) {
+        if(!HasCurrentAnalysis()) {
             return null;
         }
         var operations = _filteredGroups.SelectMany(group => group.FilteredItems)
@@ -206,6 +225,67 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         return ProcessingPlan.Create(context.DocumentToken, context.Generation, operations);
     }
 
+    private bool HasCurrentAnalysis() => CanEditRows && !_processingStopped && !_modelIsDirty
+        && LastContext?.AnalyzedRows is not null && IsCurrentResponse(LastContext.DocumentToken, LastContext.Generation);
+
+    // После одного подтверждённого плана заново читает актуальные данные того же диапазона.
+    private async Task ProcessRowsAsync() {
+        var plan = CreateProcessingPlan();
+        var process = ProcessingRequested;
+        if(process is null || plan is null || plan.Operations.Count == 0) {
+            return;
+        }
+        var result = await process(plan);
+        if(result is null || _disposed || State.IsClosing) {
+            return;
+        }
+        foreach(var row in result.Operations) {
+            RecordResult(row);
+        }
+        InvalidateModel([]);
+        _processingStopped |= result.Status is ProcessingStatus.Fatal or ProcessingStatus.Pending;
+        if(_processingStopped || State.IsBlocked) {
+            if(_processingStopped && LastContext?.AnalyzedRows is { } lastRows) {
+                SetItems(lastRows.Select(CreateAnalyzedRow).ToList(), _projectionScope, retainUnseen: true);
+            }
+            NotifyPresentationState();
+            CommandManager.InvalidateRequerySuggested();
+            return;
+        }
+        await RefreshContextAsync();
+    }
+
+    // Успехи получают новый DefaultAction. При отказе сообщение остаётся доступным по обеим сторонам пары.
+    private void RecordResult(ProcessingResult result) {
+        var key = result.Operation.Key;
+        if(result.Status == ProcessingStatus.Succeeded) {
+            ForgetCompleted(key);
+            if(result.InstalledPairKey is { } installed) {
+                ForgetCompleted(installed);
+            }
+        } else if(result.Status is ProcessingStatus.Failed or ProcessingStatus.Fatal or ProcessingStatus.Skipped) {
+            var issue = new ManagerDiagnostic("Processing.RowFailed", [result.UserMessage
+                ?? _localization.GetLocalizedString("Manager.DiagnosticUnavailable")]);
+            if(key.OpeningUniqueId is string opening) {
+                _processingIssues[opening] = issue;
+            }
+            if(key.LintelUniqueId is string lintel) {
+                _processingIssues[lintel] = issue;
+            }
+        }
+    }
+
+    private void ForgetCompleted(ManagerItemKey key) {
+        _items.Remove(key);
+        _hiddenState.Remove(key);
+        if(key.OpeningUniqueId is string opening) {
+            _processingIssues.Remove(opening);
+        }
+        if(key.LintelUniqueId is string lintel) {
+            _processingIssues.Remove(lintel);
+        }
+    }
+
     /// <summary>Помечает отображаемые данные устаревшими и запоминает кандидатов на удаление.</summary>
     public void InvalidateModel(IEnumerable<long> deletedIds) {
         var deleted = new HashSet<long>(deletedIds);
@@ -214,6 +294,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
         if(!_firstRead && !_modelIsDirty) {
             _modelIsDirty = true;
+            CommandManager.InvalidateRequerySuggested();
             RaisePropertyChanged(nameof(GeneralMessage));
             RaisePropertyChanged(nameof(HasGeneralMessage));
         }
@@ -354,6 +435,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         _searchValues.Clear();
         _items.Clear();
         _hiddenState.Clear();
+        _processingIssues.Clear();
         _deletionCandidates.Clear();
         _elements.Clear();
         _expandedGroups.Clear();
@@ -605,6 +687,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         _processingCount = count;
         RaisePropertyChanged(nameof(ProcessingCount));
         RaisePropertyChanged(nameof(ProcessText));
+        CommandManager.InvalidateRequerySuggested();
     }
 
     // Собирает заголовки и только видимых детей в порядке текущего диапазона.
@@ -783,6 +866,15 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
     // Повторно использует представление, если диагностика, действия и сведения остались теми же.
     private ManagerItemViewModel CreateAnalyzedRow(ManagerAnalyzedRow row) {
         var snapshot = row.Snapshot;
+        if(_processingIssues.Count > 0) {
+            var issues = new[] { snapshot.Key.OpeningUniqueId, snapshot.Key.LintelUniqueId }
+                .Where(id => id is not null && _processingIssues.ContainsKey(id))
+                .Select(id => _processingIssues[id]).Distinct().ToList();
+            if(issues.Count > 0) {
+                snapshot = new ManagerItemSnapshot(snapshot.Key, snapshot.GroupKey, snapshot.Diagnostics.Concat(issues),
+                    snapshot.AllowedActions, snapshot.DefaultAction, snapshot.Corrections);
+            }
+        }
         if(_items.TryGetValue(snapshot.Key, out var previous) && previous.Snapshot.GroupKey.Equals(snapshot.GroupKey)
             && previous.Snapshot.DefaultAction == snapshot.DefaultAction
             && previous.Snapshot.Corrections == snapshot.Corrections

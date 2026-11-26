@@ -21,7 +21,12 @@ internal sealed class ProcessingConfirmation(IUIThemeService theme, ILanguageSer
     public bool Show(int deleteCount, int replaceCount) {
         var context = new SettingsDialogContext(theme, language, updater, new ButtonLocalization(localization));
         var dialog = new WpfUIMessageBoxService(context, context) { AllowAttach = false };
-        return dialog.Show(localization.GetLocalizedString("Processing.Confirm", deleteCount, replaceCount),
+        string message = (deleteCount, replaceCount) switch {
+            (0, _) => localization.GetLocalizedString("Processing.ConfirmReplace", replaceCount),
+            (_, 0) => localization.GetLocalizedString("Processing.ConfirmDelete", deleteCount),
+            _ => localization.GetLocalizedString("Processing.Confirm", deleteCount, replaceCount)
+        };
+        return dialog.Show(message,
             localization.GetLocalizedString("Manager.Title"), MessageBoxButton.OKCancel, MessageBoxImage.Warning,
             MessageBoxResult.Cancel) == MessageBoxResult.OK;
     }

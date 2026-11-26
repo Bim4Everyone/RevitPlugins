@@ -19,6 +19,7 @@ internal sealed class ProcessingTarget(Document document, FamilyInstance opening
     public FamilyInstance InstalledLintel { get; internal set; }
     public LintelCalculation Calculation { get; } = calculation;
     public LintelComparison Comparison { get; internal set; }
+    public IReadOnlyList<StructureCandidate> EndWalls { get; internal set; }
     public CorrectionSnapshot BeforeCorrection { get; internal set; }
     public IGeometryReadContext LockGeometry { get; internal set; }
     public string CreatedLockId { get; internal set; }
@@ -34,6 +35,9 @@ internal sealed class ProcessingAction(ManagerAction action, Action<ProcessingTa
 }
 
 internal interface IManagerProcessingService {
+    /// <summary>В одном Execute обрабатывает подтверждённые назначения и объединяет сохранённые изменения.</summary>
+    ProcessingBatchResult ExecuteBatch(ApprovedProcessingPlan approved, CancellationToken token, IProgress<int> progress);
+
     /// <summary>Исполняет зарегистрированное действие строки подтверждённого плана.</summary>
     /// <param name="approved">Разрешение текущей сессии.</param>
     /// <param name="index">Индекс строки плана.</param>

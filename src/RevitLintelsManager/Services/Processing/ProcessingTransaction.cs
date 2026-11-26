@@ -18,6 +18,9 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
     private bool _rollbackRequested;
     private string _installedLintelUniqueId;
 
+    /// <summary>Откладывает закрытие внешней группы до окончания failure processing.</summary>
+    public void AfterFinalization(Action finish) => _failures.AfterFinalization(finish);
+
     /// <summary>Выполняет изменение, регенерацию и проверку до единственного Commit.</summary>
     public ProcessingResult Run(ProcessingTarget target, ProcessingAction action, CancellationToken token,
         Func<bool> isCurrent) {
@@ -38,6 +41,9 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
                 if(!isCurrent()) {
                     throw new System.OperationCanceledException(localization.GetLocalizedString("Processing.StaleOrCanceled"));
                 }
+                if(target.Lintel is { Pinned: true } lintel) {
+                    lintel.Pinned = false;
+                }
                 action.Apply(target, token);
                 token.ThrowIfCancellationRequested();
                 target.Document.Regenerate();
@@ -53,6 +59,7 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
                 System.OperationCanceledException or Autodesk.Revit.Exceptions.OperationCanceledException => ProcessingStatus.Canceled,
                 _ => ProcessingStatus.Failed
             };
+            _failures.UserMessage ??= error.Message;
             result = Abort(status, error.ToString());
         }
         return Release(result);
@@ -67,7 +74,7 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
             return Release(End(_failures.FinalStatus.Value, _rollbackStatus));
         } catch(Exception error) {
             _failures.Diagnostics.Add(error.ToString());
-            return Release(new ProcessingResult(operation, ProcessingStatus.Fatal, _failures.Diagnostics));
+            return Release(new ProcessingResult(operation, ProcessingStatus.Fatal, _failures.Diagnostics, userMessage: error.Message));
         }
     }
 
@@ -78,7 +85,7 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
                 transaction.Dispose();
             } catch(Exception error) {
                 _failures.Diagnostics.Add(error.ToString());
-                return new ProcessingResult(operation, ProcessingStatus.Fatal, _failures.Diagnostics);
+                return new ProcessingResult(operation, ProcessingStatus.Fatal, _failures.Diagnostics, userMessage: error.Message);
             }
         }
         return result;
@@ -99,7 +106,7 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
             return End(current, status);
         } catch(Exception rollbackError) {
             _failures.Diagnostics.Add(rollbackError.ToString());
-            return new ProcessingResult(operation, ProcessingStatus.Fatal, _failures.Diagnostics);
+            return new ProcessingResult(operation, ProcessingStatus.Fatal, _failures.Diagnostics, userMessage: rollbackError.Message);
         }
     }
 
@@ -124,6 +131,6 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
             _failures.Diagnostics.Add(localization.GetLocalizedString("Processing.TransactionStatus", reported, actual));
         }
         return new ProcessingResult(operation, status, _failures.Diagnostics,
-            status == ProcessingStatus.Succeeded ? _installedLintelUniqueId : null);
+            status == ProcessingStatus.Succeeded ? _installedLintelUniqueId : null, _failures.UserMessage);
     }
 }

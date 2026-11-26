@@ -11,8 +11,6 @@ namespace RevitLintelsManager.Services;
 /// <summary>Исходные данные, которые Correct обязан сохранить до фиксации транзакции.</summary>
 internal sealed class CorrectionSnapshot {
     private readonly Dictionary<ElementId, (bool HasValue, object Value)> _parameters;
-    private readonly List<(string Id, bool Locked, string Reference)> _constraints;
-    private readonly IReadOnlyList<string> _centralLocks;
     private readonly Transform _openingPose;
     private readonly Dictionary<ElementId, (bool HasValue, object Value)> _openingParameters;
     private readonly WorksetId _workset;
@@ -24,8 +22,6 @@ internal sealed class CorrectionSnapshot {
     internal CorrectionSnapshot(ProcessingTarget target) {
         var lintel = target.Lintel;
         _parameters = ReadUserValues(lintel);
-        _centralLocks = target.Match.LockFacts is { State: LintelLockState.Confirmed } facts ? facts.DependencyIds : [];
-        _constraints = ReadOtherConstraints(lintel);
         _openingPose = target.Opening.GetTransform();
         _openingParameters = ReadUserValues(target.Opening);
         ExpectedPose = lintel.GetTransform();
@@ -39,7 +35,7 @@ internal sealed class CorrectionSnapshot {
     internal HashSet<ElementId> WrittenParameters { get; } = [];
     internal Transform ExpectedPose { get; set; }
 
-    // Сверяет ключи пары, трансформацию проёма, зависимости и все остальные редактируемые значения.
+    // Сверяет ключи пары, трансформацию проёма и остальные редактируемые значения.
     internal bool IsPreserved(ProcessingTarget target) {
         var lintel = target.Lintel;
         var initial = target.Match.Lintel;
@@ -57,7 +53,6 @@ internal sealed class CorrectionSnapshot {
             && target.Opening.Host?.UniqueId == target.Match.Opening.HostWallUniqueId && pose.AlmostEqual(_openingPose)
             && lintelPose.AlmostEqual(ExpectedPose) && _openingParameters.Count == openingParameters.Count
             && _openingParameters.All(entry => openingParameters.TryGetValue(entry.Key, out var value) && entry.Value.Equals(value))
-            && _constraints.SequenceEqual(ReadOtherConstraints(lintel))
             && current.Count == _parameters.Count && _parameters.All(entry => current.TryGetValue(entry.Key, out var actual)
                 && (WrittenParameters.Contains(entry.Key) || IsHeightOffset(entry.Key) || entry.Value.Equals(actual)));
     }
@@ -70,15 +65,4 @@ internal sealed class CorrectionSnapshot {
     private static Dictionary<ElementId, (bool, object)> ReadUserValues(FamilyInstance lintel) =>
         lintel.Parameters.Cast<Parameter>().Where(parameter => !parameter.IsReadOnly).ToDictionary(
             parameter => parameter.Id, parameter => (parameter.HasValue, parameter.HasValue ? parameter.AsObject() : null));
-
-    // Центральные замки отдельно перепроверяет LintelLockReader по актуальным плоскостям обоих семейств.
-    // Revit может изменить внутренний ID поверхности именованной плоскости при регенерации семейства.
-    private List<(string, bool, string)> ReadOtherConstraints(FamilyInstance lintel) {
-        using var filter = new ElementClassFilter(typeof(Dimension));
-        var document = lintel.Document;
-        return lintel.GetDependentElements(filter).Select(id => (Dimension) document.GetElement(id))
-            .Where(dim => !_centralLocks.Contains(dim.UniqueId)).OrderBy(dim => dim.UniqueId)
-            .SelectMany(dim => dim.References.Cast<Reference>()
-                .Select(reference => (dim.UniqueId, dim.IsLocked, reference.ConvertToStableRepresentation(document)))).ToList();
-    }
 }

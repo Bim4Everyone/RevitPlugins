@@ -40,6 +40,16 @@ internal class RevitSettings : ProjectSettings {
 }
 
 public class SystemPluginConfig {
+    internal const string BatchHostResource = nameof(RevitLintelsManager) + ".UI.exe";
+    internal const string BatchCancelButton = "_cancelButton";
+    internal const string BatchProgressProvider = "dosymep.Xpf.Core.SimpleServices.XtraProgressDialogService, dosymep.Xpf.Core";
+    internal const string BatchProgressThemeProperty = "UIThemeService";
+    internal const string BatchReady = "Ready";
+    internal const string BatchCancel = "Cancel";
+    internal const int BatchReleaseOffset = sizeof(int);
+    internal const int BatchChannelSize = BatchReleaseOffset + sizeof(int);
+    internal const int BatchRefreshMilliseconds = 40;
+    internal const int BatchStartupTimeoutSeconds = 30;
     internal const string CustomGroupExpanderPartName = "PART_Expander";
     internal const double DefaultMatchAlignmentMm = 10;
     internal const double DefaultMatchSearchMm = 200;
@@ -112,7 +122,7 @@ public class SystemPluginConfig {
     public double DefaultMaxWidthMm => 900;
     public double DefaultWallSupportMm => 250;
     public double NavigationSectionBoxMarginMm => 300;
-    public bool ManagerViewHideAnnotations => true;
+    public BuiltInCategory ManagerViewSectionBoxCategory => BuiltInCategory.OST_SectionBox;
     public BuiltInCategory ManagerViewWallCategory => BuiltInCategory.OST_Walls;
     public int ManagerViewWallTransparency => 40;
     public DisplayStyle ManagerViewDisplayStyle => DisplayStyle.Shading;

@@ -29,6 +29,28 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
             && Document.Equals(activeDocument);
     }
 
+    // Сохраняет идентификаторы выбранного диапазона на время одного Execute.
+    public string[] CaptureSelectedElements() => ActiveUIDocument.Selection.GetElementIds()
+        .Select(id => Document.GetElement(id)?.UniqueId).Where(id => id is not null).ToArray();
+
+    // Revit может очистить выделение при откате. Возвращает уцелевшие элементы и новые экземпляры замен.
+    public void RestoreBatchSelection(IEnumerable<string> original, ProcessingBatchResult batch) {
+        if(!IsSourceDocumentActive(UIApplication)) {
+            return;
+        }
+        var replacements = batch.Operations.Where(row => row.Status == ProcessingStatus.Succeeded
+            && row.Operation.Action is ManagerAction.Replace or ManagerAction.Delete)
+            .ToDictionary(row => row.Operation.Key.LintelUniqueId,
+                row => row.InstalledLintelUniqueId ?? row.Operation.Key.OpeningUniqueId);
+        var ids = original.Select(id => replacements.TryGetValue(id, out string replacement) ? replacement : id)
+            .Where(id => id is not null).Select(id => Document.GetElement(id)?.Id)
+            .Where(id => id is not null).ToHashSet();
+        var selection = ActiveUIDocument.Selection;
+        if(!ids.SetEquals(selection.GetElementIds())) {
+            selection.SetElementIds(ids);
+        }
+    }
+
     // Получает стадию из неизменяемой конфигурации текущей сессии.
     public ElementId GetReadPhaseId(ManagerConfigSnapshot config) {
         if(Document.GetElement(config.Phase.UniqueId) is not Phase phase) {
@@ -38,7 +60,8 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
     }
 
     // Привязывает одноуровневое семейство к уровню проёма и ориентирует по физической оси стены.
-    internal FamilyInstance PlaceLintel(LintelCalculation calculation, ILocalizationService localization) {
+    internal FamilyInstance PlaceLintel(LintelCalculation calculation, FamilyInstance opening, IGeometryReadContext geometry,
+        ILocalizationService localization) {
         if(!calculation.IsApplicable || Document.GetElement(calculation.Type.UniqueId) is not FamilySymbol symbol
             || symbol.Family.UniqueId != calculation.Family.UniqueId
             || symbol.Family.FamilyPlacementType != FamilyPlacementType.OneLevelBased
@@ -50,17 +73,34 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
             Document.Regenerate();
         }
         var target = calculation.Target.Planes;
-        var center = AsXyz(target.Center);
+        var direction = AsXyz(target.CenterNormal);
+        var center = GetAlignedCenter(geometry, opening, symbol.Family, target, direction);
         var instance = Document.Create.NewFamilyInstance(center, symbol, level, StructuralType.NonStructural)
             ?? throw new InvalidOperationException(localization.GetLocalizedString("Processing.InstallType"));
         Document.Regenerate();
         using var pose = instance.GetTransform();
-        RotateLintel(instance, pose, AsXyz(target.CenterNormal));
+        RotateLintel(instance, pose, direction);
         var displacement = center - pose.Origin;
         if(displacement.GetLength() > LengthEpsilon) {
             ElementTransformUtils.MoveElement(Document, instance.Id, displacement);
         }
         return instance;
+    }
+
+    // В пределах точности измерения выреза берёт продольную координату из опорной плоскости семейства.
+    internal static XYZ GetAlignedCenter(IGeometryReadContext geometry, FamilyInstance opening, Family lintelFamily,
+        AlignmentPlanes planes, XYZ lintelDirection) {
+        var center = AsXyz(planes.Center);
+        if(geometry.GetWidthOriginOffset(opening.Symbol.Family) is not double openingOffset
+            || geometry.GetWidthOriginOffset(lintelFamily) is not double lintelOffset) {
+            return center;
+        }
+        using var pose = opening.GetTransform();
+        var normal = pose.BasisX.Normalize();
+        var openingPlane = pose.OfPoint(new XYZ(openingOffset, 0, 0));
+        var lintelPlane = center + lintelDirection * lintelOffset;
+        double gap = (openingPlane - lintelPlane).DotProduct(normal);
+        return Math.Abs(gap) <= LengthEpsilon ? center + normal * gap : center;
     }
 
     // Поворачивает вокруг точки вставки и возвращает фактически заданный угол для проверки базиса.
@@ -74,26 +114,62 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
         return angle;
     }
 
-    // Сверяет полный результат Delete с владельцами геометрии и единственным центральным замком исходной пары.
+    // Сначала удаляет марки и размеры, включая замки, затем старую перемычку в той же транзакции.
     internal void DeleteLintel(IGeometryReadContext geometry, FamilyInstance lintel, FamilyInstance opening,
-        LintelLockFacts lockFacts, ILocalizationService localization) {
+        ILocalizationService localization) {
         var oldId = lintel.Id;
-        var allowed = geometry.GetGeometryOwners(lintel).OfType<FamilyInstance>().Select(owner => owner.Id).ToHashSet();
-        if(opening is not null && lockFacts is { State: LintelLockState.Confirmed, DependencyIds.Count: 1 }
-            && Document.GetElement(lockFacts.DependencyIds[0]) is Dimension { IsLocked: true } dimension
-            && dimension.Category?.Id.GetIdValue() == (long) BuiltInCategory.OST_Constraints) {
-            var references = dimension.References.Cast<Reference>().Select(reference => reference.ElementId).ToList();
-            if(references.Count == 2 && references.Contains(oldId) && references.Contains(opening.Id)) {
-                allowed.Add(dimension.Id);
+        var owners = PrepareLintelForChange(geometry, lintel, opening, localization);
+        var deleted = Document.Delete(oldId);
+        CheckCascade(deleted, owners, oldId, localization);
+        if(!deleted.Contains(oldId)) {
+            throw new InvalidOperationException(localization.GetLocalizedString("Processing.DeletePair"));
+        }
+    }
+
+    // Удаляет относящиеся к перемычке размеры, геометрические замки и марки.
+    internal HashSet<ElementId> PrepareLintelForChange(IGeometryReadContext geometry, FamilyInstance lintel,
+        FamilyInstance opening, ILocalizationService localization) {
+        var owners = geometry.GetGeometryOwners(lintel).OfType<FamilyInstance>().Select(owner => owner.Id).ToHashSet();
+        if(opening is not null) {
+            owners.Remove(opening.Id);
+            owners.Remove(opening.Host?.Id);
+        }
+        var annotations = FindLintelAnnotations(owners);
+        if(annotations.Count > 0) {
+            var deleted = Document.Delete(annotations);
+            CheckCascade(deleted, annotations, lintel.Id, localization);
+            if(!annotations.SetEquals(deleted)) {
+                throw new InvalidOperationException(localization.GetLocalizedString("Processing.AnnotationRemoval", lintel.Id.GetIdValue()));
             }
         }
-        if(opening is not null) {
-            allowed.Remove(opening.Id);
-            allowed.Remove(opening.Host?.Id);
+        return owners;
+    }
+
+    // Учитывает зависимые аннотации и ссылки с любых видов, включая марки нескольких элементов и цепочки размеров.
+    private HashSet<ElementId> FindLintelAnnotations(HashSet<ElementId> owners) {
+        using var dimensions = new ElementClassFilter(typeof(Dimension));
+        using var tags = new ElementClassFilter(typeof(IndependentTag));
+        using var filter = new LogicalOrFilter(dimensions, tags);
+        var result = owners.SelectMany(id => Document.GetElement(id).GetDependentElements(filter)).ToHashSet();
+        using var collector = new FilteredElementCollector(Document);
+        foreach(var item in collector.WherePasses(filter).WhereElementIsNotElementType()) {
+            if(!result.Contains(item.Id) && RevitElementRead.ReadOptional(() => item switch {
+                    IndependentTag tag => owners.Overlaps(tag.GetTaggedLocalElementIds()),
+                    Dimension dimension => dimension.References?.Cast<Reference>()
+                        .Any(reference => reference is not null && owners.Contains(reference.ElementId)) == true,
+                    _ => false
+                })) {
+                result.Add(item.Id);
+            }
         }
-        var deleted = Document.Delete(oldId);
+        return result;
+    }
+
+    // Любой удалённый Revit элемент за пределами согласованного набора вызывает откат строки.
+    private static void CheckCascade(ICollection<ElementId> deleted, HashSet<ElementId> allowed, ElementId oldId,
+        ILocalizationService localization) {
         var unexpected = deleted.Except(allowed).Select(id => id.GetIdValue()).OrderBy(id => id).ToArray();
-        if(!deleted.Contains(oldId) || unexpected.Length > 0) {
+        if(unexpected.Length > 0) {
             throw new InvalidOperationException(localization.GetLocalizedString("Processing.DeleteCascade",
                 oldId.GetIdValue(), string.Join(", ", unexpected)));
         }

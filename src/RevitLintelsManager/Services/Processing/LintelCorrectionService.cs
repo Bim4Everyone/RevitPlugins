@@ -15,76 +15,77 @@ namespace RevitLintelsManager.Services;
 
 /// <summary>Исправляет только различия экземпляра, подтверждённые сравнением существующей пары.</summary>
 internal sealed class LintelCorrectionService(IProjectSnapshotReader snapshots, IParamService parameters,
-    ILintelCalculationService calculations, ILintelLockReader locks, ILocalizationService localization)
+    ILintelCalculationService calculations, ISideBearingAnalyzer sideBearings, ILintelLockReader lockReader,
+    RevitRepository source, ILocalizationService localization)
     : ILintelCorrectionService {
     /// <inheritdoc />
     public void Apply(ProcessingTarget target, ManagerConfigSnapshot config, CancellationToken token) {
+        source.PrepareLintelForChange(target.LockGeometry, target.Lintel, target.Opening, localization);
         target.BeforeCorrection = new CorrectionSnapshot(target);
-        var differences = target.Comparison.Differences.Select(diff => diff.Code).ToHashSet();
-        if(target.Match.LockFacts?.IsLocked is null) {
-            throw new InvalidOperationException(localization.GetLocalizedString("Processing.CorrectDependencies"));
-        }
-        if(target.Comparison.RequiresPositionCorrection) {
-            CorrectPosition(target, differences);
-            target.Document.Regenerate();
-        }
+        CorrectPosition(target);
+        target.Document.Regenerate();
         var pair = ReadPair(target, config);
         var comparison = calculations.Compare(pair, target.Calculation, config);
-        WriteDifferences(target, pair, comparison, token);
-        // При несовпадении ширины Compare откладывает оценку опираний до восстановления пролёта.
-        if(comparison.Differences.Any(diff => diff.Code == LintelDifferenceCode.Width)) {
+        // Изменение пролёта смещает оба конца. Опирания и крепления определяются по новой геометрии.
+        var width = comparison.Differences.FirstOrDefault(diff => diff.Code == LintelDifferenceCode.Width);
+        if(width is not null) {
+            WriteDifferences(target, pair, [width], token);
             target.Document.Regenerate();
             pair = ReadPair(target, config);
-            WriteDifferences(target, pair, calculations.Compare(pair, target.Calculation, config), token);
+            comparison = calculations.Compare(pair, target.Calculation, config);
         }
+        WriteDifferences(target, pair, comparison.Differences, token);
+        token.ThrowIfCancellationRequested();
+        target.CreatedLockId = source.CreateCentralLock(target.LockGeometry, target.Opening, target.Lintel,
+            pair, localization);
     }
 
     /// <inheritdoc />
     public void Verify(ProcessingTarget target, ManagerConfigSnapshot config) {
         var pair = ReadPair(target, config);
+        if(!lockReader.ConfirmsCreatedLock(target.LockGeometry, pair, target.CreatedLockId)) {
+            throw new InvalidOperationException(localization.GetLocalizedString("Processing.LockFailed"));
+        }
         var comparison = calculations.Compare(pair, target.Calculation, config);
         if(comparison.RequiresCorrection || !comparison.PositionKnown
             || comparison.Differences.Any(diff => diff.Code is LintelDifferenceCode.ParameterUnavailable
                 or LintelDifferenceCode.SideParametersUnavailable)) {
             throw new InvalidOperationException(localization.GetLocalizedString("Processing.CorrectIncomplete"));
         }
-        var current = locks.ReadLocks(target.LockGeometry, [pair]).Single().LockFacts;
-        var original = target.Match.LockFacts;
-        if(current?.State != original.State || !current.DependencyIds.SequenceEqual(original.DependencyIds)
-            || !target.BeforeCorrection.IsPreserved(target)) {
+        if(!target.BeforeCorrection.IsPreserved(target)) {
             throw new InvalidOperationException(localization.GetLocalizedString("Processing.CorrectDependencies"));
         }
     }
 
-    // Поворачивает к ближайшей соосной ориентации и переносит лишь вышедшие за допуск проекции.
-    private static void CorrectPosition(ProcessingTarget target, ISet<LintelDifferenceCode> differences) {
+    // Для замка совмещает центральные плоскости точно. Поперечное смещение и высоту исправляет по допускам.
+    private static void CorrectPosition(ProcessingTarget target) {
         var instance = target.Lintel;
         var planes = target.Calculation.Target.Planes;
         var along = AsXyz(planes.CenterNormal);
         var across = AsXyz(planes.LongitudinalNormal);
         var height = AsXyz(planes.HeightNormal);
         using var pose = instance.GetTransform();
-        if(differences.Contains(LintelDifferenceCode.Orientation)) {
-            var direction = pose.BasisX.DotProduct(along) < 0 ? -along : along;
-            double angle = RevitRepository.RotateLintel(instance, pose, direction);
-            target.BeforeCorrection.ExpectedPose = Transform.CreateRotationAtPoint(XYZ.BasisZ, angle, pose.Origin)
-                .Multiply(pose);
+        var direction = pose.BasisX.DotProduct(along) < 0 ? -along : along;
+        double angle = RevitRepository.RotateLintel(instance, pose, direction);
+        target.BeforeCorrection.ExpectedPose = Transform.CreateRotationAtPoint(XYZ.BasisZ, angle, pose.Origin)
+            .Multiply(pose);
+        var center = RevitRepository.GetAlignedCenter(target.LockGeometry, target.Opening, instance.Symbol.Family,
+            planes, direction);
+        var delta = center - pose.Origin;
+        var move = along * delta.DotProduct(along);
+        if(target.Comparison.Differences.Any(diff => diff.Code == LintelDifferenceCode.Across)) {
+            move += across * delta.DotProduct(across);
         }
-        var delta = AsXyz(planes.Center) - pose.Origin;
-        var move = XYZ.Zero;
-        foreach(var (code, axis) in new[] { (LintelDifferenceCode.Along, along),
-                (LintelDifferenceCode.Across, across), (LintelDifferenceCode.Height, height) }) {
-            if(differences.Contains(code)) {
-                move += axis * delta.DotProduct(axis);
-            }
+        if(target.Comparison.Differences.Any(diff => diff.Code == LintelDifferenceCode.Height)) {
+            move += height * delta.DotProduct(height);
         }
-        if(move.GetLength() > LengthEpsilon) {
+        if(move.GetLength() > SystemPluginConfig.LockCoincidenceToleranceFeet) {
             ElementTransformUtils.MoveElement(target.Document, instance.Id, move);
             target.BeforeCorrection.ExpectedPose = Transform.CreateTranslation(move).Multiply(target.BeforeCorrection.ExpectedPose);
         }
     }
 
-    // Сохраняет признаки защищённых концов исходной пары и использует фактический базис после движения.
+    // Проверяет оба фактических конца по стенам той же стадии после регенерации.
     private OpeningLintelMatch ReadPair(ProcessingTarget target, ManagerConfigSnapshot config) {
         var lintel = snapshots.ReadInstalledLintel(target.Lintel, target.LockGeometry, config);
         var anchor = lintel.Geometry?.Anchor;
@@ -94,15 +95,16 @@ internal sealed class LintelCorrectionService(IProjectSnapshotReader snapshots, 
         var deviation = new PlaneDeviation(target.Calculation.Target.Planes, anchor, config.MatchLimits);
         var contact = new MatchContact(target.Opening.UniqueId, target.Lintel.UniqueId, deviation);
         var pair = new OpeningLintelMatch(target.Match.Opening, lintel, target.Match.State, [contact]);
-        return new OpeningLintelMatch(pair, target.Match.RetainedEnds);
+        return sideBearings.ReadRetainedEnds(target.LockGeometry, [pair], target.EndWalls,
+            config.LintelFamily.UniqueId, target.Calculation.Target.FamilyLeftSign)[0];
     }
 
     // Пишет только конкретные параметры, для которых Compare установил расхождение.
-    private void WriteDifferences(ProcessingTarget target, OpeningLintelMatch pair, LintelComparison comparison,
+    private void WriteDifferences(ProcessingTarget target, OpeningLintelMatch pair, IEnumerable<LintelDifference> differences,
         CancellationToken token) {
         var values = target.Calculation.GetComparableParameters(pair.Lintel.Geometry.Placement)
             .ToDictionary(value => value.Name, StringComparer.Ordinal);
-        foreach(var diff in comparison.Differences.Where(item => item.Correction != ManagerCorrection.None
+        foreach(var diff in differences.Where(item => item.Correction != ManagerCorrection.None
                 && item.Parameter is not null)) {
             token.ThrowIfCancellationRequested();
             var mapped = target.Lintel.GetParameters(diff.Parameter);

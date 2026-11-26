@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Autodesk.Revit.UI;
@@ -21,6 +23,8 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
     private readonly ILoggerService _logger;
     private readonly ILocalizationService _localization;
     private readonly ExternalEvent _externalEvent;
+    private readonly IManagerProcessingService _processing;
+    private PendingBatch _batch;
     private PendingRequest _activeRequest;
     private bool _accepting;
     private bool _closing;
@@ -31,13 +35,15 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
 
     /// <summary>Создаёт ExternalEvent в исходном API-контексте команды.</summary>
     public ManagerExternalEventHandler(RevitRepository repository, IManagerScopeReader scopeReader,
-        ManagerSessionState state, IManagerNavigationService navigation, ILoggerService logger, ILocalizationService localization) {
+        ManagerSessionState state, IManagerNavigationService navigation, ILoggerService logger,
+        ILocalizationService localization, IManagerProcessingService processing) {
         _repository = repository;
         _scopeReader = scopeReader;
         _state = state;
         _navigation = navigation;
         _logger = logger;
         _localization = localization;
+        _processing = processing;
         _externalEvent = ExternalEvent.Create(this);
     }
 
@@ -58,7 +64,7 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
         }
         var pending = new PendingRequest(request);
         lock(_sync) {
-            if(!_accepting || !IsCurrent(request)) {
+            if(!_accepting || _batch is not null || !IsCurrent(request)) {
                 pending.Completion.TrySetCanceled();
                 return pending.Completion.Task;
             }
@@ -74,6 +80,22 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
     }
 
     /// <inheritdoc />
+    public Task<ProcessingBatchResult> EnqueueBatch(ApprovedProcessingPlan approved, ManagerScope scope,
+        CancellationToken token, IProgress<int> progress) {
+        lock(_sync) {
+            if(approved is null || !_accepting || _disposed || _closing || _executing || _queue.Count != 0
+                || _batch is not null || _state.IsClosing || _state.IsBlocked || approved.IsStopped
+                || approved.Plan.DocumentToken != _state.DocumentToken || approved.Generation != _state.Generation) {
+                throw new InvalidOperationException(_localization.GetLocalizedString("Processing.RequestUnavailable"));
+            }
+            var batch = new PendingBatch(approved, scope, progress, token);
+            _batch = batch;
+            Signal();
+            return batch.Completion.Task;
+        }
+    }
+
+    /// <inheritdoc />
     public void InvalidateRequests() {
         lock(_sync) {
             CancelResults();
@@ -85,6 +107,7 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
         lock(_sync) {
             _closing = true;
             _accepting = false;
+            _batch?.Cancellation.Cancel();
             CancelResults();
         }
     }
@@ -97,7 +120,12 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
             }
             // Pending может относиться к уже завершающемуся Execute, а не к будущему вызову.
             _signalPending = _externalEvent.IsPending;
-            if(!_closing && !_signalPending && _queue.Count > 0) {
+            if(_closing && !_signalPending && _batch is { Returned: false } canceled) {
+                canceled.Result = new ProcessingBatchResult(ProcessingStatus.Canceled, []);
+                canceled.Returned = true;
+            }
+            CompleteBatch();
+            if(!_closing && !_signalPending && (_queue.Count > 0 || _batch is { Returned: false })) {
                 Signal();
             }
         }
@@ -111,6 +139,10 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
                 return true;
             }
             if(_executing || _externalEvent.IsPending) {
+                return false;
+            }
+            CompleteBatch();
+            if(_batch is not null) {
                 return false;
             }
             _externalEvent.Dispose();
@@ -129,6 +161,7 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
     /// <inheritdoc />
     public void Execute(UIApplication app) {
         int count;
+        PendingBatch batch;
         lock(_sync) {
             if(_disposed || _executing) {
                 return;
@@ -136,8 +169,29 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
             _executing = true;
             _signalPending = false;
             count = _queue.Count;
+            batch = _batch;
         }
         try {
+            if(batch is { Returned: false }) {
+                try {
+                    var selection = batch.Scope == ManagerScope.Selected && _repository.IsSourceDocumentActive(app)
+                        ? _repository.CaptureSelectedElements() : null;
+                    batch.Result = _processing.ExecuteBatch(batch.Approved, batch.Cancellation.Token, batch.Progress);
+                    if(selection is { Length: > 0 } && batch.Result.Status is not (ProcessingStatus.Fatal or ProcessingStatus.Pending)) {
+                        try {
+                            _repository.RestoreBatchSelection(selection, batch.Result);
+                        } catch(Exception error) {
+                            _logger.Warning(error, _localization.GetLocalizedString("Manager.ReadFailed"));
+                        }
+                    }
+                } catch(Exception error) {
+                    batch.Error = error;
+                    _logger.Warning(error, _localization.GetLocalizedString("Processing.Batch"));
+                } finally {
+                    batch.Returned = true;
+                }
+                return;
+            }
             // Новые запросы оставляем следующему callback, чтобы непрерывная очередь не удерживала Revit.
             for(int index = 0; index < count; index++) {
                 PendingRequest pending;
@@ -291,9 +345,53 @@ internal sealed class ManagerExternalEventHandler : IManagerRequestDispatcher, I
 
     // Завершает очередь исключением, если native-сигнал не был принят.
     private void FailResults(Exception exception) {
+        if(_batch is { Returned: false } batch) {
+            batch.Error = exception;
+            batch.Returned = true;
+            CompleteBatch();
+        }
         while(_queue.Count > 0) {
             _queue.Dequeue().Completion.TrySetException(exception);
         }
+    }
+
+    // Выполняется в Idling после Execute, в том числе когда закрытие уже запретило новые запросы.
+    private void CompleteBatch() {
+        if(_batch is not { Returned: true } batch || _executing) {
+            return;
+        }
+        if(batch.Result?.Status == ProcessingStatus.Pending) {
+            var final = _processing.FinishPending();
+            if(final?.Status == ProcessingStatus.Pending) {
+                return;
+            }
+            string reason = _localization.GetLocalizedString("Processing.BatchAborted");
+            var rows = batch.Result.Operations.Select(row => row.Status == ProcessingStatus.Pending
+                ? new ProcessingResult(row.Operation, ProcessingStatus.Fatal,
+                    row.Diagnostics.Concat(final?.Diagnostics ?? []).Concat([reason]), userMessage: reason) : row);
+            batch.Result = new ProcessingBatchResult(ProcessingStatus.Fatal, rows, reason);
+        }
+        _batch = null;
+        batch.Cancellation.Dispose();
+        if(batch.Error is null) {
+            batch.Completion.TrySetResult(batch.Result);
+        } else {
+            batch.Completion.TrySetException(batch.Error);
+        }
+    }
+
+    /// <summary>Пакет остаётся у очереди до выхода из обработчика и завершения pending failures.</summary>
+    private sealed class PendingBatch(ApprovedProcessingPlan approved, ManagerScope scope,
+        IProgress<int> progress, CancellationToken token) {
+        public ApprovedProcessingPlan Approved { get; } = approved;
+        public ManagerScope Scope { get; } = scope;
+        public IProgress<int> Progress { get; } = progress;
+        public CancellationTokenSource Cancellation { get; } = CancellationTokenSource.CreateLinkedTokenSource(token);
+        public TaskCompletionSource<ProcessingBatchResult> Completion { get; } =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public ProcessingBatchResult Result { get; set; }
+        public Exception Error { get; set; }
+        public bool Returned { get; set; }
     }
 
     /// <summary>Запрос и однократно завершаемый результат.</summary>

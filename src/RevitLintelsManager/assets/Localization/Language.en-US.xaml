@@ -310,7 +310,9 @@
     <system:String x:Key="Manager.Diagnostic.Calculation.NoEligibleAttachment.Right">No eligible attachment was verified on the right.</system:String>
     <system:String x:Key="Manager.Diagnostic.Calculation.ContactAmbiguous.Right">The contact on the right is ambiguous.</system:String>
     <system:String x:Key="Manager.Diagnostic.Calculation.SideGeometryUnavailable.Right">The bearing geometry on the right could not be verified.</system:String>
-    <system:String x:Key="Processing.Confirm">Lintels to delete: {0}. Lintels to replace: {1}. Continue processing?</system:String>
+    <system:String x:Key="Processing.ConfirmReplace" xml:space="preserve">Lintels to replace: {0}. Continue?&#10;&#10;Replacing a lintel will delete its instance parameter values!</system:String>
+    <system:String x:Key="Processing.ConfirmDelete">Lintels to delete: {0}. Continue processing?</system:String>
+    <system:String x:Key="Processing.Confirm" xml:space="preserve">Lintels to delete: {0}. Lintels to replace: {1}. Continue?&#10;&#10;Replacing a lintel will delete its instance parameter values!</system:String>
     <system:String x:Key="Processing.Continue">Continue</system:String>
     <system:String x:Key="Processing.DocumentReadOnly">The document cannot be modified in this transaction.</system:String>
     <system:String x:Key="Processing.ValidationFailed">Could not validate the assigned manager action.</system:String>
@@ -320,17 +322,22 @@
     <system:String x:Key="Processing.StaleOrCanceled">The document or analysis is no longer current, or processing was canceled.</system:String>
     <system:String x:Key="Processing.ActionUnavailable">The assigned action is unavailable.</system:String>
     <system:String x:Key="Processing.Transaction">Process lintel manager row</system:String>
+    <system:String x:Key="Processing.Batch">Process lintels</system:String>
+    <system:String x:Key="Processing.RowFailed">Could not complete the assigned action. {0}</system:String>
+    <system:String x:Key="Processing.BatchAborted">The batch was interrupted during failure processing. Reopen the manager before processing further changes.</system:String>
+    <system:String x:Key="Processing.BatchStatus">The transaction group ended with status {0}.</system:String>
+    <system:String x:Key="Processing.Progress">Processed {0} of {1}</system:String>
+    <system:String x:Key="Processing.ProgressUnavailable">The processing window could not be opened.</system:String>
     <system:String x:Key="Processing.TransactionAlreadyOpen">Revalidation requires a document with no open transaction.</system:String>
     <system:String x:Key="Processing.PairChanged">The pair or element type has changed. Refresh the analysis.</system:String>
     <system:String x:Key="Processing.Parameter">Parameter '{0}' is unavailable for writing.</system:String>
     <system:String x:Key="Processing.Missing">Element {0} is missing from the source document.</system:String>
-    <system:String x:Key="Processing.Pinned">Element {0} is pinned.</system:String>
     <system:String x:Key="Processing.Ownership">Element {0} is owned by another user or requires an update from central.</system:String>
     <system:String x:Key="Processing.LockPlanes">The center reference planes are misaligned.</system:String>
     <system:String x:Key="Processing.LockView">No suitable floor plan exists for the opening level.</system:String>
     <system:String x:Key="Processing.LockReference">Could not resolve the center reference of element {0}.</system:String>
     <system:String x:Key="Processing.LockFailed">Could not confirm the new center alignment.</system:String>
-    <system:String x:Key="Processing.DeleteCascade">Deletion of lintel {0} failed the cascade check. Unexpected IDs [{1}].</system:String>
+    <system:String x:Key="Processing.DeleteCascade">Processing lintel {0} would also delete unrelated elements [{1}].</system:String>
     <system:String x:Key="Processing.DeletePair">Could not verify removal of the original lintel and preservation of the opening and wall.</system:String>
     <system:String x:Key="Processing.ReplacePair">Could not verify replacement of the original lintel and preservation of the opening and its wall.</system:String>
     <system:String x:Key="Processing.LockParametersChanged">Creating the alignment changed the parameters of an instance.</system:String>
@@ -340,5 +347,6 @@
     <system:String x:Key="Processing.InstallAttributes">The installed lintel type, level, workset or phases differ from the calculation.</system:String>
     <system:String x:Key="Processing.InstallValue">The installed value of parameter “{0}” differs from the calculation.</system:String>
     <system:String x:Key="Processing.CorrectIncomplete">The final comparison could not verify the lintel position and calculated instance parameters.</system:String>
-    <system:String x:Key="Processing.CorrectDependencies">The original pair attributes and constraints could not be verified.</system:String>
+    <system:String x:Key="Processing.CorrectDependencies">Could not verify the original opening and lintel attributes after correction.</system:String>
+    <system:String x:Key="Processing.AnnotationRemoval">Could not remove all dimensions and tags associated with lintel {0}.</system:String>
 </ResourceDictionary>

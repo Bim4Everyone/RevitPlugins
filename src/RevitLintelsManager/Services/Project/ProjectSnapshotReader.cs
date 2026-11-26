@@ -58,7 +58,9 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
 
     /// <inheritdoc />
     public ManagerProjectSnapshot ReadScopeSnapshot(ManagerConfigSnapshot config, ElementId phaseId,
-        ManagerScope scope, FilteredElementCollector collector) {
+        ManagerScope scope, FilteredElementCollector collector, out IReadOnlyList<StructureCandidate> endWalls) {
+        var catalog = new StructureCatalog();
+        endWalls = catalog.EndWalls;
         var openings = new List<ManagerOpeningSnapshot>();
         var lintels = new List<ManagerLintelSnapshot>();
         var walls = new List<ManagerWallSnapshot>();
@@ -90,7 +92,6 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
         }
         var rowOpenings = matches.Where(row => row.Opening is not null).Select(row => row.Opening).ToList();
         bool projectScope = scope == ManagerScope.Project;
-        var catalog = new StructureCatalog();
         if(projectScope || rowOpenings.Any(o => o.Geometry?.TopCenter is not null)) {
             unreadableCount += ReadProjectStructures(config, phaseId, phaseNames, walls, structures,
                 projectScope, catalog);
@@ -100,7 +101,7 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
         var sides = sideBearings.ReadSideBearings(analysis, rowOpenings, catalog.Sides,
             catalog.SidesIncomplete, config);
         var family = rowOpenings.Count == 0 ? null : lintelFamilyFacts.ReadLintelFamilyFacts(config, sampleLintelId);
-        var checkedEnds = sideBearings.ReadRetainedEnds(analysis, matches, catalog.EndWalls, family);
+        var checkedEnds = sideBearings.ReadRetainedEnds(analysis, matches, endWalls, family?.FamilyId, family?.FamilyLeftSign);
         var calculations = ReadCalculations(matches, above, sides, walls, phaseNames, config, family);
         var rows = lockReader.ReadLocks(analysis, checkedEnds);
         return new ManagerProjectSnapshot(openings, lintels, walls, structures, unreadableCount, rows, above, sides,

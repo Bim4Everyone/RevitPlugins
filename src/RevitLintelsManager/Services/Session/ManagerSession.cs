@@ -25,7 +25,7 @@ namespace RevitLintelsManager.Services;
 internal sealed class ManagerSession(RevitRepository repository, IManagerScopeReader scopeReader,
     IManagerViewService views, ManagerWindow window,
     ManagerViewModel viewModel, WindowPlatformEvents platformEvents, ILoggerService logger,
-    ILocalizationService localization, IManagerRequestDispatcher requests) : IManagerSession {
+    ILocalizationService localization, IManagerRequestDispatcher requests, IManagerProcessingService processing) : IManagerSession {
     private IKernel _kernel;
     private bool _subscribed;
     private bool _windowClosed;
@@ -36,6 +36,7 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
     private long? _returnRefreshGeneration;
     private long? _observedGeneration;
     private ManagerScopeStamp _observedScope;
+    private BatchWindowConnection _batchWindow;
 
     public event Action Released;
 
@@ -57,6 +58,7 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
             window.Closed += OnWindowClosed;
             window.Closing += OnWindowClosing;
             viewModel.CloseRequested += RequestClose;
+            viewModel.ProcessingRequested += ProcessAsync;
             UpdateDocumentState();
             requests.StartAcceptingRequests();
             _kernel = kernel;
@@ -86,7 +88,7 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
             return;
         }
         UpdateDocumentState();
-        if(!window.IsVisible) {
+        if(!window.IsVisible || _batchWindow is not null) {
             return;
         }
         if(window.WindowState == WindowState.Minimized) {
@@ -96,7 +98,51 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
     }
 
     /// <inheritdoc />
+    public async Task<ProcessingBatchResult> ProcessAsync(ProcessingPlan plan) {
+        if(plan is null || plan.Operations.Count == 0 || !viewModel.CanEditRows || _batchWindow is not null) {
+            return null;
+        }
+        using var connection = new BatchWindowConnection(logger);
+        _batchWindow = connection;
+        bool locked = false;
+        try {
+            viewModel.SetProcessing(true);
+            var approved = processing.Confirm(plan);
+            if(approved is null || viewModel.State.IsClosing || viewModel.State.IsBlocked) {
+                return null;
+            }
+            var scope = viewModel.LastContext?.ScopeStamp?.Scope ?? viewModel.State.InitialScope;
+            var progress = new BatchProgressOptions {
+                Count = plan.Operations.Count,
+                Language = platformEvents.HostLanguage.Name,
+                Theme = platformEvents.HostTheme,
+                ProgressFormat = localization.GetLocalizedString("Processing.Progress"),
+                CancelText = localization.GetLocalizedString("MainWindow.ButtonCancel")
+            };
+            locked = window.IsEnabled;
+            if(locked) {
+                window.SetBatchInputEnabled(false);
+            }
+            await connection.StartAsync(progress, localization);
+            if(connection.Token.IsCancellationRequested || viewModel.State.IsBlocked || viewModel.State.IsClosing
+                || plan.Generation != viewModel.State.Generation) {
+                return new ProcessingBatchResult(ProcessingStatus.Canceled, []);
+            }
+            return await requests.EnqueueBatch(approved, scope, connection.Token, connection);
+        } catch(OperationCanceledException) when(connection.Token.IsCancellationRequested) {
+            return new ProcessingBatchResult(ProcessingStatus.Canceled, []);
+        } finally {
+            _batchWindow = null;
+            viewModel.SetProcessing(false);
+            if(locked && !viewModel.State.IsClosing) {
+                window.SetBatchInputEnabled(true);
+            }
+        }
+    }
+
+    /// <inheritdoc />
     public void RequestClose() {
+        _batchWindow?.Cancel();
         if(viewModel.State.IsClosing) {
             return;
         }
@@ -132,7 +178,9 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
     // Оставляет окно живым до безопасного возврата pending/active обработчика.
     private void OnWindowClosing(object sender, CancelEventArgs e) {
         e.Cancel = true;
-        RequestClose();
+        if(_batchWindow is null) {
+            RequestClose();
+        }
     }
 
     // Запоминает закрытие без обращения к Revit API из WPF.
@@ -225,6 +273,9 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
     // Смена доступности документа инвалидирует задачи и ещё не опубликованные UI-ответы.
     private void SetDocumentBlocked(bool isBlocked) {
         if(viewModel.State.IsBlocked != isBlocked) {
+            if(isBlocked) {
+                _batchWindow?.Cancel();
+            }
             viewModel.State.NavigationStamp = null;
             viewModel.State.AdvanceGeneration();
             requests.InvalidateRequests();
@@ -272,6 +323,10 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
             return;
         }
         RequestClose();
+        if(_batchWindow is not null) {
+            requests.PumpInApiContext();
+            return;
+        }
         if(!requests.TryDisposeInApiContext()) {
             return;
         }
@@ -302,6 +357,7 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
         window.Closed -= OnWindowClosed;
         window.Closing -= OnWindowClosing;
         viewModel.CloseRequested -= RequestClose;
+        viewModel.ProcessingRequested -= ProcessAsync;
     }
 
     // Освобождает только WPF и управляемые ресурсы, без чтения Document.

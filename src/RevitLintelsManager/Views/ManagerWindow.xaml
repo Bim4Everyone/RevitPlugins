@@ -269,10 +269,8 @@
                 MinWidth="130"
                 Margin="0,0,16,0"
                 Appearance="Primary"
-                IsEnabled="False"
-                Content="{Binding ProcessText}"
-                ToolTip="{me:LocalizationSource Manager.NotImplemented}"
-                ToolTipService.ShowOnDisabled="True" />
+                Command="{Binding ProcessCommand}"
+                Content="{Binding ProcessText}" />
             <ui:Button
                 Grid.Column="2"
                 MinWidth="130"

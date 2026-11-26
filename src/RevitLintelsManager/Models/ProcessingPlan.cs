@@ -50,6 +50,7 @@ internal sealed class ApprovedProcessingPlan(ProcessingPlan plan) {
     public ProcessingPlan Plan { get; } = plan;
     public long Generation { get; internal set; } = plan.Generation;
     public bool IsStopped { get; internal set; }
+    internal bool HasStarted => _started.Count != 0;
 
     /// <summary>Резервирует конкретное назначение, в том числе при повторной доставке запроса.</summary>
     internal bool TryStart(int index) => !IsStopped && _started.Add(index);

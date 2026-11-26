@@ -23,12 +23,21 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
     private volatile ApprovedProcessingPlan _approved;
     private volatile bool _faulted;
     private ProcessingTransaction _pending;
+    private bool _pendingBatch;
     private readonly ConditionalWeakTable<ProcessingPlan, ApprovedProcessingPlan> _receipts = new();
     private int _busy;
 
     /// <inheritdoc />
     public ProcessingResult ExecuteAssigned(ApprovedProcessingPlan approved, int index, CancellationToken token) {
-        var action = approved?.Plan.Operations[index].Action switch {
+        if(approved is null || index < 0 || index >= approved.Plan.Operations.Count) {
+            throw new System.ArgumentOutOfRangeException(nameof(index));
+        }
+        return Execute(approved, index, GetAction(approved.Plan.Operations[index].Action), token);
+    }
+
+    // И пакет, и отдельная операция используют одни и те же изменения и проверки постусловий.
+    private ProcessingAction GetAction(ManagerAction assigned) =>
+        assigned switch {
             ManagerAction.Lock => new ProcessingAction(ManagerAction.Lock, ApplyLock, VerifyLock),
             ManagerAction.Install => new ProcessingAction(ManagerAction.Install, ApplyInstall, installation.Verify),
             ManagerAction.Replace => new ProcessingAction(ManagerAction.Replace, ApplyReplace, VerifyReplace),
@@ -37,7 +46,43 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
                 (target, ct) => correction.Apply(target, state.Config, ct), target => correction.Verify(target, state.Config)),
             _ => null
         };
-        return Execute(approved, index, action, token);
+
+    /// <inheritdoc />
+    public ProcessingBatchResult ExecuteBatch(ApprovedProcessingPlan approved, CancellationToken token, IProgress<int> progress) {
+        if(approved is null || Interlocked.CompareExchange(ref _busy, 1, 0) != 0) {
+            return new ProcessingBatchResult(ProcessingStatus.Skipped, [], Text("RequestUnavailable"));
+        }
+        bool ownsPlan = ReferenceEquals(_approved, approved);
+        try {
+            if(_faulted || approved.HasStarted || approved.IsStopped || !ownsPlan) {
+                return new ProcessingBatchResult(ProcessingStatus.Skipped, [], Text("RequestUnavailable"));
+            }
+            if(token.IsCancellationRequested || !CanExecute(approved)) {
+                return new ProcessingBatchResult(ProcessingStatus.Canceled, [], Text("StaleOrCanceled"));
+            }
+            if(approved.Plan.Operations.Count == 0) {
+                return new ProcessingBatchResult(ProcessingStatus.Skipped, []);
+            }
+            var batch = new ProcessingBatch(source.Document, localization, logger);
+            var result = batch.Run(approved.Plan.Operations, (index, op) =>
+                ExecuteOperation(approved, index, op, GetAction(op.Action), token), token, progress,
+                rollback => _pending.AfterFinalization(rollback));
+            _faulted |= result.Status is ProcessingStatus.Fatal or ProcessingStatus.Pending;
+            _pendingBatch = result.Status == ProcessingStatus.Pending;
+            foreach(var row in result.Operations) {
+                Report(row);
+            }
+            return result;
+        } catch(Exception error) {
+            _faulted = true;
+            logger.Warning(error, Text("Batch"));
+            return new ProcessingBatchResult(ProcessingStatus.Fatal, [], error.Message);
+        } finally {
+            if(ownsPlan) {
+                approved.IsStopped = true;
+            }
+            Volatile.Write(ref _busy, 0);
+        }
     }
 
     // Установка и создание зависимости используют ту же открытую транзакцию строки.
@@ -47,7 +92,7 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
 
     // Общая часть удаления и замены проверяет весь нативный каскад в транзакции строки.
     private void ApplyDelete(ProcessingTarget target, CancellationToken token) {
-        source.DeleteLintel(target.LockGeometry, target.Lintel, target.Opening, target.Match.LockFacts, localization);
+        source.DeleteLintel(target.LockGeometry, target.Lintel, target.Opening, localization);
     }
 
     // Обе части замены выполняются до единственного Commit, включая отказ сразу после удаления.
@@ -131,7 +176,7 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
             return Report(new ProcessingResult(operation, ProcessingStatus.Skipped, [Text("RequestUnavailable")]));
         }
         try {
-            return ExecuteOperation(approved, index, operation, action, token);
+            return Report(ExecuteOperation(approved, index, operation, action, token));
         } finally {
             Volatile.Write(ref _busy, 0);
         }
@@ -141,7 +186,7 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
     private ProcessingResult ExecuteOperation(ApprovedProcessingPlan approved, int index, ProcessingOperation operation,
         ProcessingAction action, CancellationToken token) {
         if(_faulted || _pending is not null || !ReferenceEquals(_approved, approved) || !approved.TryStart(index)) {
-            return Report(new ProcessingResult(operation, ProcessingStatus.Skipped, [Text("RequestUnavailable")]));
+            return new ProcessingResult(operation, ProcessingStatus.Skipped, [Text("RequestUnavailable")]);
         }
         ProcessingResult result;
         try {
@@ -182,7 +227,7 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
         }
         approved.IsStopped |= result.MustStop;
         _faulted |= result.Status is ProcessingStatus.Fatal or ProcessingStatus.Pending;
-        return Report(result);
+        return result;
     }
 
     /// <inheritdoc />
@@ -193,7 +238,12 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
         var result = _pending.FinishPending();
         if(result.Status != ProcessingStatus.Pending) {
             _pending = null;
-            _faulted = result.Status == ProcessingStatus.Fatal;
+            _faulted = _pendingBatch || result.Status == ProcessingStatus.Fatal;
+            if(_pendingBatch) {
+                result = new ProcessingResult(result.Operation, ProcessingStatus.Fatal,
+                    result.Diagnostics.Concat([Text("BatchAborted")]));
+                _pendingBatch = false;
+            }
         }
         return Report(result);
     }
@@ -225,7 +275,7 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
         }
         using var collector = new FilteredElementCollector(document, ids);
         var project = snapshots.ReadScopeSnapshot(state.Config, source.GetReadPhaseId(state.Config),
-            ManagerScope.Selected, collector);
+            ManagerScope.Selected, collector, out var endWalls);
         var match = project.GetRows().SingleOrDefault(row => row.Opening?.Element.UniqueId == operation.Key.OpeningUniqueId
             && row.Lintel?.Element.UniqueId == operation.Key.LintelUniqueId);
         if(match is null || match.Opening?.Element.TypeUniqueId != operation.OpeningTypeId
@@ -248,16 +298,10 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
         }
         EnsureWritable(opening);
         EnsureWritable(lintel);
-        if(operation.Action == ManagerAction.Correct) {
-            foreach(string name in comparison.Differences.Where(diff => diff.Correction != ManagerCorrection.None
-                    && diff.Parameter is not null).Select(diff => diff.Parameter).Distinct()) {
-                var parameters = lintel.GetParameters(name);
-                if(parameters.Count != 1 || parameters[0].IsReadOnly) {
-                    throw new System.InvalidOperationException(localization.GetLocalizedString("Processing.Parameter", name));
-                }
-            }
-        }
-        return new ProcessingTarget(document, opening, lintel, match, calculation) { Comparison = comparison };
+        return new ProcessingTarget(document, opening, lintel, match, calculation) {
+            Comparison = comparison,
+            EndWalls = endWalls
+        };
     }
 
     // Разрешает идентификатор только в исходном документе.
@@ -276,9 +320,6 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
     private void EnsureWritable(FamilyInstance instance) {
         if(instance is null) {
             return;
-        }
-        if(instance.Pinned) {
-            throw new System.InvalidOperationException(localization.GetLocalizedString("Processing.Pinned", instance.UniqueId));
         }
         var document = source.Document;
         if(document.IsWorkshared && (WorksharingUtils.GetCheckoutStatus(document, instance.Id) == CheckoutStatus.OwnedByOtherUser

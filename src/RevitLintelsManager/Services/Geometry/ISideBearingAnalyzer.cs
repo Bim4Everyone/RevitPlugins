@@ -21,8 +21,9 @@ internal interface ISideBearingAnalyzer {
     /// <param name="geometry">Общие геометрические ресурсы текущего чтения.</param>
     /// <param name="matches">Сопоставленные строки со снимками существующих перемычек.</param>
     /// <param name="walls">Соседние стены выбранной стадии с признаками перечня ЖБ.</param>
-    /// <param name="family">Подтверждённое направление левого конца семейства.</param>
+    /// <param name="familyId">Идентификатор настроенного семейства перемычек.</param>
+    /// <param name="leftSign">Подтверждённое направление левого конца семейства.</param>
     /// <returns>Строки с признаками сохранения фактического конца.</returns>
     IReadOnlyList<OpeningLintelMatch> ReadRetainedEnds(IGeometryReadContext geometry,
-        IReadOnlyList<OpeningLintelMatch> matches, IReadOnlyList<StructureCandidate> walls, LintelFamilyFacts family);
+        IReadOnlyList<OpeningLintelMatch> matches, IReadOnlyList<StructureCandidate> walls, string familyId, int? leftSign);
 }

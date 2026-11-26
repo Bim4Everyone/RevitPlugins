@@ -24,7 +24,7 @@ internal sealed class LintelInstallationService(RevitRepository source, IParamSe
     public void Install(ProcessingTarget target, ManagerConfigSnapshot config, CancellationToken token) {
         var calculation = target.Calculation;
         var document = target.Document;
-        var instance = source.PlaceLintel(calculation, localization);
+        var instance = source.PlaceLintel(calculation, target.Opening, target.LockGeometry, localization);
         target.InstalledLintel = instance;
         var context = calculation.Context;
         var phase = (Phase) document.GetElement(context.CreatedPhaseId);

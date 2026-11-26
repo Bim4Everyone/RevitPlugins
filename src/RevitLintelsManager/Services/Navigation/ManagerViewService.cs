@@ -165,9 +165,11 @@ internal sealed class ManagerViewService(RevitRepository source, SystemPluginCon
 
     // Сверяет графику, чтобы повторная подготовка настроенного вида не открывала транзакцию.
     private bool HasManagerViewAppearance(View3D view) {
-        if(view.AreAnnotationCategoriesHidden != systemPluginConfig.ManagerViewHideAnnotations
+        if(view.AreAnnotationCategoriesHidden
             || view.DisplayStyle != systemPluginConfig.ManagerViewDisplayStyle
-            || view.DetailLevel != systemPluginConfig.ManagerViewDetailLevel) {
+            || view.DetailLevel != systemPluginConfig.ManagerViewDetailLevel
+            || GetAnnotationVisibilityChanges(view).Any()
+            || GetHiddenSectionBoxIds(view).Count > 0) {
             return false;
         }
 
@@ -178,9 +180,13 @@ internal sealed class ManagerViewService(RevitRepository source, SystemPluginCon
 
     // Настраивает только требуемые свойства и сохраняет остальные переопределения категории стен.
     private void SetManagerViewAppearance(View3D view) {
-        if(view.AreAnnotationCategoriesHidden != systemPluginConfig.ManagerViewHideAnnotations) {
-            view.AreAnnotationCategoriesHidden = systemPluginConfig.ManagerViewHideAnnotations;
+        if(view.AreAnnotationCategoriesHidden) {
+            view.AreAnnotationCategoriesHidden = false;
         }
+        foreach(var (categoryId, hidden) in GetAnnotationVisibilityChanges(view).ToArray()) {
+            view.SetCategoryHidden(categoryId, hidden);
+        }
+        ShowHiddenSectionBox(view);
         if(view.DisplayStyle != systemPluginConfig.ManagerViewDisplayStyle) {
             view.DisplayStyle = systemPluginConfig.ManagerViewDisplayStyle;
         }
@@ -196,6 +202,37 @@ internal sealed class ManagerViewService(RevitRepository source, SystemPluginCon
         }
         if(!HasManagerViewAppearance(view)) {
             throw new InvalidOperationException(localization.GetLocalizedString("Manager.ViewAppearanceFailed"));
+        }
+    }
+
+    // Возвращает только категории, видимость которых нужно изменить на персональном виде.
+    private IEnumerable<(ElementId Id, bool Hidden)> GetAnnotationVisibilityChanges(View3D view) {
+        var sectionBoxId = new ElementId(systemPluginConfig.ManagerViewSectionBoxCategory);
+        if(view.GetCategoryHidden(sectionBoxId)) {
+            yield return (sectionBoxId, false);
+        }
+        foreach(Category category in Document.Settings.Categories) {
+            if(category.CategoryType == CategoryType.Annotation && category.Id != sectionBoxId
+                && view.CanCategoryBeHidden(category.Id) && !view.GetCategoryHidden(category.Id)) {
+                yield return (category.Id, true);
+            }
+        }
+    }
+
+    // На ранее созданном виде сама рамка также может быть скрыта командой «Скрыть элемент».
+    private List<ElementId> GetHiddenSectionBoxIds(View3D view) {
+        if(!view.IsSectionBoxActive) {
+            return [];
+        }
+        using var filter = new ElementCategoryFilter(systemPluginConfig.ManagerViewSectionBoxCategory);
+        return view.GetDependentElements(filter).Where(id => Document.GetElement(id).IsHidden(view)).ToList();
+    }
+
+    // Восстанавливает видимость рамки, если она скрыта как отдельный элемент вида.
+    private void ShowHiddenSectionBox(View3D view) {
+        var ids = GetHiddenSectionBoxIds(view);
+        if(ids.Count > 0) {
+            view.UnhideElements(ids);
         }
     }
 
@@ -245,6 +282,7 @@ internal sealed class ManagerViewService(RevitRepository source, SystemPluginCon
         SaveManagerViewChanges(ManagerSectionBoxTransactionName, () => {
             view.SetSectionBox(sectionBox);
             view.IsSectionBoxActive = true;
+            ShowHiddenSectionBox(view);
             if(!view.IsSectionBoxActive) {
                 throw new InvalidOperationException(
                     localization.GetLocalizedString("Manager.NavigationSectionBoxFailed"));

@@ -118,11 +118,11 @@ internal sealed class SideBearingAnalyzer : ISideBearingAnalyzer {
 
     /// <inheritdoc />
     public IReadOnlyList<OpeningLintelMatch> ReadRetainedEnds(IGeometryReadContext geometry,
-        IReadOnlyList<OpeningLintelMatch> matches, IReadOnlyList<StructureCandidate> walls, LintelFamilyFacts family) {
-        if(family?.FamilyLeftSign is not (-1 or 1) || walls.Count == 0) {
+        IReadOnlyList<OpeningLintelMatch> matches, IReadOnlyList<StructureCandidate> walls, string familyId, int? leftSign) {
+        if(leftSign is not (-1 or 1) || walls.Count == 0) {
             return matches;
         }
-        var probes = matches.SelectMany(match => GetFreeEndProbes(geometry, match, family)).ToList();
+        var probes = matches.SelectMany(match => GetFreeEndProbes(geometry, match, familyId, leftSign.Value)).ToList();
         if(probes.Count == 0) {
             return matches;
         }
@@ -157,16 +157,15 @@ internal sealed class SideBearingAnalyzer : ISideBearingAnalyzer {
 
     // Строит отрезки от фактических кромок пролёта до концов, выходящих за торец стены-хоста.
     private IEnumerable<EndProbe> GetFreeEndProbes(IGeometryReadContext geometry, OpeningLintelMatch match,
-        LintelFamilyFacts family) {
+        string familyId, int leftSign) {
         var lintel = match.Lintel;
         if(match.State is not (MatchState.Confirmed or MatchState.Shifted)
-            || lintel?.Element.FamilyUniqueId != family.FamilyId
+            || lintel?.Element.FamilyUniqueId != familyId
             || lintel.Geometry?.Anchor is not { } anchor
             || match.Opening?.Geometry?.Cut?.TargetPlanes is not { } planes
             || lintel.OpeningWidthMm is not double width || !CalculationNumbers.IsFinite(width) || width <= 0) {
             yield break;
         }
-        int leftSign = family.FamilyLeftSign.Value;
         var target = new LintelTarget(planes, leftSign);
         if(target.GetPhysicalLeft(lintel.Geometry.Placement) is null) {
             yield break;

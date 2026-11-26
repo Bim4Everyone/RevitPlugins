@@ -3,9 +3,18 @@
         <UseWpfUI>true</UseWpfUI>
         <UseDevExpress>false</UseDevExpress>
         <LangVersion>12</LangVersion>
+        <BatchWindowHostPath>$(BaseIntermediateOutputPath)BatchWindowHost\$(RevitVersion)\RevitLintelsManager.UI.exe</BatchWindowHostPath>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Remove="Views\BatchWindowBootstrap.cs" />
+        <EmbeddedResource Include="$(BatchWindowHostPath)" LogicalName="RevitLintelsManager.UI.exe" WithCulture="false" />
         <Reference Remove="dosymep.Xpf.Core" />
         <Reference Remove="dosymep.Xpf.Core.Ninject" />
     </ItemGroup>
+    <Target Name="BuildBatchWindowHost" BeforeTargets="PrepareResources" DependsOnTargets="ResolveAssemblyReferences"
+            Inputs="Views\BatchWindowBootstrap.cs;$(MSBuildProjectFullPath)" Outputs="$(BatchWindowHostPath)">
+        <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(BatchWindowHostPath)'))" />
+        <Csc Sources="Views\BatchWindowBootstrap.cs" References="@(ReferencePath)" LangVersion="$(LangVersion)"
+             TargetType="winexe" Platform="x64" OutputAssembly="$(BatchWindowHostPath)" />
+    </Target>
 </Project>

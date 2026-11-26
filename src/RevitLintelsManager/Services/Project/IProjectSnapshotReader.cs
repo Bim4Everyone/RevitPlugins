@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Autodesk.Revit.DB;
 
 using RevitLintelsManager.Models.Configs;
@@ -26,7 +28,8 @@ internal interface IProjectSnapshotReader {
     /// <param name="phaseId">Выбранная стадия исходного документа.</param>
     /// <param name="scope">Диапазон анализа.</param>
     /// <param name="collector">Коллектор элементов диапазона, подготовленный вызывающей стороной.</param>
+    /// <param name="endWalls">Стены выбранной стадии для повторного измерения концов в текущем API-вызове.</param>
     /// <returns>Материализованный снимок выбранного диапазона.</returns>
     ManagerProjectSnapshot ReadScopeSnapshot(ManagerConfigSnapshot config, ElementId phaseId,
-        ManagerScope scope, FilteredElementCollector collector);
+        ManagerScope scope, FilteredElementCollector collector, out IReadOnlyList<StructureCandidate> endWalls);
 }

@@ -60,7 +60,7 @@ internal sealed class ManagerScopeReader(RevitRepository source, IProjectSnapsho
         }
         var selection = GetScopeSelection(activeDocument, request, state);
         using var collector = CreateScopeCollector(request.Scope, view, selection);
-        var project = snapshots.ReadScopeSnapshot(state.Config, phaseId, request.Scope, collector);
+        var project = snapshots.ReadScopeSnapshot(state.Config, phaseId, request.Scope, collector, out _);
         var rows = project.GetRows().Select(row => {
             LintelCalculation calculation = null;
             if(row.Opening is not null) {

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using RevitLintelsManager.Models;
@@ -20,6 +21,10 @@ internal interface IManagerRequestDispatcher : IDisposable {
     /// <exception cref="ArgumentNullException">Запрос не задан.</exception>
     /// <exception cref="InvalidOperationException">Сигнал, чтение или навигация завершились ошибкой.</exception>
     Task<ManagerDocumentContext> Enqueue(ManagerRequest request);
+
+    /// <summary>Передаёт утверждённый пакет одному Execute. Задача завершается после возврата callback.</summary>
+    Task<ProcessingBatchResult> EnqueueBatch(ApprovedProcessingPlan approved, ManagerScope scope,
+        CancellationToken token, IProgress<int> progress);
 
     /// <summary>Отменяет ожидающие результаты, сохраняя возможность следующих запросов.</summary>
     void InvalidateRequests();

@@ -310,7 +310,9 @@
     <system:String x:Key="Manager.Diagnostic.Calculation.NoEligibleAttachment.Right">Не подтверждено допустимое крепление справа.</system:String>
     <system:String x:Key="Manager.Diagnostic.Calculation.ContactAmbiguous.Right">Примыкание справа неоднозначно.</system:String>
     <system:String x:Key="Manager.Diagnostic.Calculation.SideGeometryUnavailable.Right">Не удалось подтвердить геометрию опирания справа.</system:String>
-    <system:String x:Key="Processing.Confirm">Будут удалены перемычки: {0}. Будут заменены перемычки: {1}. Продолжить обработку?</system:String>
+    <system:String x:Key="Processing.ConfirmReplace" xml:space="preserve">Будут заменены перемычки: {0}. Продолжить работу?&#10;&#10;При замене значения параметров экземпляра будут удалены!</system:String>
+    <system:String x:Key="Processing.ConfirmDelete">Будут удалены перемычки: {0}. Продолжить обработку?</system:String>
+    <system:String x:Key="Processing.Confirm" xml:space="preserve">Будут удалены перемычки: {0}. Будут заменены перемычки: {1}. Продолжить работу?&#10;&#10;При замене значения параметров экземпляра будут удалены!</system:String>
     <system:String x:Key="Processing.Continue">Продолжить</system:String>
     <system:String x:Key="Processing.DocumentReadOnly">Документ недоступен для записи в текущей транзакции.</system:String>
     <system:String x:Key="Processing.ValidationFailed">Ошибка проверки назначения менеджера.</system:String>
@@ -320,17 +322,22 @@
     <system:String x:Key="Processing.StaleOrCanceled">Документ или анализ больше не актуален либо обработка отменена.</system:String>
     <system:String x:Key="Processing.ActionUnavailable">Назначенное действие недоступно.</system:String>
     <system:String x:Key="Processing.Transaction">Обработка строки менеджера перемычек</system:String>
+    <system:String x:Key="Processing.Batch">Обработка перемычек</system:String>
+    <system:String x:Key="Processing.RowFailed">Не удалось выполнить назначенное действие. {0}</system:String>
+    <system:String x:Key="Processing.BatchAborted">Пакет прерван при обработке сбоя Revit. Для следующих изменений откройте менеджер повторно.</system:String>
+    <system:String x:Key="Processing.BatchStatus">Статус группы транзакций при завершении — {0}.</system:String>
+    <system:String x:Key="Processing.Progress">Обработано {0} из {1}</system:String>
+    <system:String x:Key="Processing.ProgressUnavailable">Не удалось открыть окно обработки.</system:String>
     <system:String x:Key="Processing.TransactionAlreadyOpen">Повторная проверка требует документа без открытой транзакции.</system:String>
     <system:String x:Key="Processing.PairChanged">Изменились состав пары или тип элемента. Обновите анализ.</system:String>
     <system:String x:Key="Processing.Parameter">Параметр «{0}» недоступен для записи.</system:String>
     <system:String x:Key="Processing.Missing">Элемент {0} отсутствует в исходном документе.</system:String>
-    <system:String x:Key="Processing.Pinned">Элемент {0} закреплён.</system:String>
     <system:String x:Key="Processing.Ownership">Элемент {0} занят другим пользователем или требует обновления из хранилища.</system:String>
     <system:String x:Key="Processing.LockPlanes">Центральные плоскости не совмещены.</system:String>
     <system:String x:Key="Processing.LockView">Для уровня проёма не найден подходящий план этажа.</system:String>
     <system:String x:Key="Processing.LockReference">Не удалось определить центральную ссылку элемента {0}.</system:String>
     <system:String x:Key="Processing.LockFailed">Не удалось подтвердить созданный центральный замок.</system:String>
-    <system:String x:Key="Processing.DeleteCascade">Удаление перемычки {0} отклонено при проверке каскада. Посторонние ID [{1}].</system:String>
+    <system:String x:Key="Processing.DeleteCascade">При обработке перемычки {0} Revit также удаляет посторонние элементы [{1}].</system:String>
     <system:String x:Key="Processing.DeletePair">Не удалось подтвердить удаление исходной перемычки и сохранность проёма и стены.</system:String>
     <system:String x:Key="Processing.ReplacePair">Не удалось подтвердить замену исходной перемычки и сохранность проёма со стеной.</system:String>
     <system:String x:Key="Processing.LockParametersChanged">При создании замка изменились параметры одного из экземпляров.</system:String>
@@ -340,5 +347,6 @@
     <system:String x:Key="Processing.InstallAttributes">Тип, уровень, рабочий набор или стадии установленной перемычки отличаются от расчёта.</system:String>
     <system:String x:Key="Processing.InstallValue">После установки значение параметра «{0}» отличается от расчёта.</system:String>
     <system:String x:Key="Processing.CorrectIncomplete">Повторное сравнение не подтвердило исправление положения и расчётных параметров перемычки.</system:String>
-    <system:String x:Key="Processing.CorrectDependencies">Не удалось подтвердить сохранение исходных данных и зависимостей пары.</system:String>
+    <system:String x:Key="Processing.CorrectDependencies">Не удалось подтвердить сохранение исходных свойств проёма и перемычки.</system:String>
+    <system:String x:Key="Processing.AnnotationRemoval">Не удалось удалить все связанные размеры и марки перемычки {0}.</system:String>
 </ResourceDictionary>

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -51,6 +53,19 @@ public partial class ManagerWindow {
 
     public override string PluginName => nameof(RevitLintelsManager);
     public override string ProjectConfigName => nameof(ManagerWindow) + "Layout2";
+
+    // Блокирует в том числе системный крестик, пока поток Revit выполняет пакет.
+    [DllImport("user32.dll", ExactSpelling = true)]
+    private static extern bool EnableWindow(IntPtr windowHandle, bool enable);
+
+    /// <summary>Блокирует или возвращает ввод в исходное окно вместе с его системной рамкой.</summary>
+    internal void SetBatchInputEnabled(bool enabled) {
+        var handle = new WindowInteropHelper(this).Handle;
+        if(handle != IntPtr.Zero) {
+            EnableWindow(handle, enabled);
+        }
+        SetCurrentValue(IsEnabledProperty, enabled);
+    }
 
     // Подключает запросы представления к текущей VM и отсоединяет предыдущую.
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {

@@ -14,6 +14,7 @@ using dosymep.Bim4Everyone.ProjectConfigs;
 using dosymep.Bim4Everyone.SimpleServices;
 using dosymep.SimpleServices;
 using dosymep.WpfCore.Ninject;
+using dosymep.WpfUI.Core.Ninject;
 using dosymep.WpfUI.Core.SimpleServices;
 
 using Ninject;
@@ -67,17 +68,7 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
             var snapshot = resolver.CreateSnapshot(config);
             var state = kernel.Get<IManagerScopeReader>().CaptureInitialState(snapshot);
             kernel.Get<ISettingsCatalog>().ReleaseCatalogs();
-            kernel.Bind<ManagerSessionState>().ToConstant(state);
-            kernel.Bind<WindowPlatformEvents>().ToSelf().InSingletonScope();
-            kernel.Bind<Dispatcher>().ToConstant(Dispatcher.CurrentDispatcher);
-            kernel.Bind<IManagerRequestDispatcher>().To<ManagerExternalEventHandler>().InSingletonScope();
-            kernel.Bind<ManagerDetailsWindow>().ToSelf();
-            kernel.Bind<Func<ManagerDetailsWindow>>().ToMethod(context => {
-                var owner = context.Kernel;
-                return () => owner.Get<ManagerDetailsWindow>();
-            });
-            kernel.BindMainWindow<ManagerViewModel, ManagerWindow>();
-            kernel.Bind<IManagerSession>().To<ManagerSession>().InSingletonScope();
+            ConfigureSessionDependencies(kernel, state);
             var session = kernel.Get<IManagerSession>();
             var logger = kernel.Get<ILoggerService>();
             session.Released += registration.Dispose;
@@ -157,6 +148,27 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
         string assemblyName = Assembly.GetExecutingAssembly().GetName().Name;
         kernel.UseWpfLocalization($"/{assemblyName};component/assets/Localization/Language.xaml",
             CultureInfo.GetCultureInfo("ru-RU"));
+    }
+
+    // Регистрирует единый контур окна и API-очереди для неизменяемой конфигурации запуска.
+    internal static void ConfigureSessionDependencies(IKernel kernel, ManagerSessionState state) {
+        kernel.Bind<ManagerSessionState>().ToConstant(state);
+        kernel.Bind<WindowPlatformEvents>().ToSelf().InSingletonScope();
+        kernel.Bind<Dispatcher>().ToConstant(Dispatcher.CurrentDispatcher);
+        kernel.Bind<IManagerRequestDispatcher>().To<ManagerExternalEventHandler>().InSingletonScope();
+        kernel.Bind<ManagerDetailsWindow>().ToSelf();
+        kernel.Bind<Func<ManagerDetailsWindow>>().ToMethod(context => {
+            var owner = context.Kernel;
+            return () => owner.Get<ManagerDetailsWindow>();
+        });
+        kernel.BindMainWindow<ManagerViewModel, ManagerWindow>();
+        kernel.Bind<IManagerSession>().To<ManagerSession>().InSingletonScope();
+    }
+
+    // В отдельном процессе нужен только диалог прогресса в теме исходного окна.
+    internal static void ConfigureBatchWindowDependencies(IKernel kernel, IUIThemeService theme) {
+        kernel.Bind<IProgressDialogService>().To(Type.GetType(SystemPluginConfig.BatchProgressProvider, true))
+            .WithPropertyValue(SystemPluginConfig.BatchProgressThemeProperty, theme);
     }
 
     // Регистрирует модальные настройки с единственной загрузкой исходных данных.

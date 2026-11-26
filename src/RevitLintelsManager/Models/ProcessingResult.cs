@@ -5,9 +5,17 @@ namespace RevitLintelsManager.Models;
 
 internal enum ProcessingStatus { Succeeded, Skipped, Failed, Canceled, Pending, Fatal }
 
+/// <summary>Результаты начатых операций после проверки исхода всей группы.</summary>
+internal sealed class ProcessingBatchResult(ProcessingStatus status, IEnumerable<ProcessingResult> operations,
+    string diagnostic = null) {
+    public ProcessingStatus Status { get; } = status;
+    public IReadOnlyList<ProcessingResult> Operations { get; } = operations.ToList().AsReadOnly();
+    public string Diagnostic { get; } = diagnostic;
+}
+
 /// <summary>Фактический исход локальной операции и сообщения, пригодные после выхода из Revit.</summary>
 internal sealed class ProcessingResult(ProcessingOperation operation, ProcessingStatus status,
-    IEnumerable<string> diagnostics, string installedLintelUniqueId = null) {
+    IEnumerable<string> diagnostics, string installedLintelUniqueId = null, string userMessage = null) {
     public ProcessingOperation Operation { get; } = operation;
     public ProcessingStatus Status { get; } = status;
     public string InstalledLintelUniqueId { get; } = installedLintelUniqueId;
@@ -15,5 +23,6 @@ internal sealed class ProcessingResult(ProcessingOperation operation, Processing
     public ManagerItemKey? InstalledPairKey => InstalledLintelUniqueId is null ? null
         : new ManagerItemKey(Operation.Key.DocumentToken, Operation.Key.OpeningUniqueId, InstalledLintelUniqueId);
     public IReadOnlyList<string> Diagnostics { get; } = diagnostics.ToList().AsReadOnly();
+    public string UserMessage => userMessage ?? Diagnostics.FirstOrDefault();
     public bool MustStop => Status is ProcessingStatus.Pending or ProcessingStatus.Fatal or ProcessingStatus.Canceled;
 }
