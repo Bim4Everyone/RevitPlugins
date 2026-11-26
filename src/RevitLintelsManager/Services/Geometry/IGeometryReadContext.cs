@@ -42,6 +42,11 @@ internal interface IGeometryReadContext : IDisposable {
     /// <returns>Имя подтверждённой плоскости или null.</returns>
     string GetWidthOriginPlane(Family family);
 
+    /// <summary>Читает координату плоскости начала по локальной оси ширины семейства.</summary>
+    /// <param name="family">Определение семейства.</param>
+    /// <returns>Координата в футах или null при неподтверждённой плоскости.</returns>
+    double? GetWidthOriginOffset(Family family);
+
     /// <summary>Индексирует грани вырезов хоста по породившим их вставкам.</summary>
     /// <param name="wall">Стена-хост проёма.</param>
     /// <returns>Грани по идентификатору вставки или null при недоступном теле стены.</returns>

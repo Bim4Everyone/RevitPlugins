@@ -14,7 +14,8 @@ namespace RevitLintelsManager.Models;
 /// <summary>Владеет геометрией и кэшами исходного документа до конца одного чтения.</summary>
 internal sealed class GeometryReadContext(Document document) : IGeometryReadContext {
     private readonly Dictionary<ElementId, ILookup<ElementId, Face>> _reveals = [];
-    private readonly Dictionary<ElementId, ((string X, string Y, string Z)? Full, string Width)> _originFamilies = [];
+    private readonly Dictionary<ElementId, ((string X, string Y, string Z)? Full, (string Name, double Offset)? Width)>
+        _originFamilies = [];
 
     private readonly Dictionary<ElementId, List<Solid>> _solids = [];
     private readonly Dictionary<ElementId, WallFrame> _wallFrames = [];
@@ -336,11 +337,16 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
 
     /// <inheritdoc />
     public string GetWidthOriginPlane(Family family) {
-        return GetOriginFacts(family).Width;
+        return GetOriginFacts(family).Width?.Name;
+    }
+
+    /// <inheritdoc />
+    public double? GetWidthOriginOffset(Family family) {
+        return GetOriginFacts(family).Width?.Offset;
     }
 
     // Семейство открывается не более одного раза за обновление, включая недоступную привязку.
-    private ((string X, string Y, string Z)? Full, string Width) GetOriginFacts(Family family) {
+    private ((string X, string Y, string Z)? Full, (string Name, double Offset)? Width) GetOriginFacts(Family family) {
         if(!_originFamilies.TryGetValue(family.Id, out var origin)) {
             origin = ReadOptional(() => ReadOriginPlanes(family));
             _originFamilies.Add(family.Id, origin);
@@ -349,7 +355,8 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
     }
 
     // Читает только плоскости Defines Origin из загруженного определения семейства один раз за поколение.
-    private ((string X, string Y, string Z)? Full, string Width) ReadOriginPlanes(Family family) {
+    private ((string X, string Y, string Z)? Full, (string Name, double Offset)? Width) ReadOriginPlanes(
+        Family family) {
         if(!family.IsEditable || family.IsInPlace) {
             return default;
         }
@@ -366,10 +373,11 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
         return ReadFamilyOriginFacts(definition).Full;
     }
 
-    // Плоскость ширины может быть подтверждена независимо от других двух координатных плоскостей.
-    private static ((string X, string Y, string Z)? Full, string Width) ReadFamilyOriginFacts(Document definition) {
+    // Для проверки замка сохраняет подписанное смещение плоскости ширины в локальных координатах.
+    private static ((string X, string Y, string Z)? Full, (string Name, double Offset)? Width) ReadFamilyOriginFacts(
+        Document definition) {
         using var collector = new FilteredElementCollector(definition);
-        var names = new Dictionary<int, string>();
+        var origins = new Dictionary<int, (string Name, double Offset)>();
         var axes = new[] { XYZ.BasisX, XYZ.BasisY, XYZ.BasisZ };
         bool complete = true;
         bool widthValid = true;
@@ -380,17 +388,19 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
             }
             using var plane = datum.GetPlane();
             int axis = Array.FindIndex(axes, v => plane.Normal.CrossProduct(v).GetLength() <= DirectionEpsilon);
-            if(axis < 0 || names.ContainsKey(axis) || string.IsNullOrEmpty(datum.Name)
-                || Math.Abs(plane.Origin.DotProduct(axes[axis])) > LengthEpsilon) {
+            if(axis < 0 || origins.ContainsKey(axis) || string.IsNullOrEmpty(datum.Name)
+                || !IsFinitePoint(plane.Origin)) {
                 complete = false;
                 widthValid &= axis != 0;
                 continue;
             }
-            names.Add(axis, datum.Name);
+            double offset = plane.Origin.DotProduct(axes[axis]);
+            origins.Add(axis, (datum.Name, offset));
+            complete &= Math.Abs(offset) <= LengthEpsilon;
         }
-        string width = widthValid && names.TryGetValue(0, out string name)
-            && planes.Count(plane => plane.Name == name) == 1 ? name : null;
-        return (complete && names.Count == 3 ? (names[0], names[1], names[2]) : null, width);
+        (string Name, double Offset)? width = widthValid && origins.TryGetValue(0, out var x)
+            && planes.Count(plane => plane.Name == x.Name) == 1 ? x : null;
+        return (complete && origins.Count == 3 ? (origins[0].Name, origins[1].Name, origins[2].Name) : null, width);
     }
 
     // Кеширует числовые оси и повторяемый отказ для одного хоста в пределах текущего запроса.

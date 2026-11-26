@@ -102,16 +102,19 @@ internal sealed class LintelLockReader(RevitRepository source) : ILintelLockRead
     // Сохраняет только разные устойчивые представления подтверждённой плоскости актуального экземпляра.
     private static string[] ReadCenterIdentities(IGeometryReadContext geometry, FamilyInstance instance,
         AlignmentPlanes expected) {
-        if(expected is null || geometry.GetWidthOriginPlane(instance.Symbol.Family) is not string planeName) {
+        var family = instance.Symbol.Family;
+        if(expected is null || geometry.GetWidthOriginPlane(family) is not string planeName
+            || geometry.GetWidthOriginOffset(family) is not double offset) {
             return [];
         }
         using var pose = instance.GetTransform();
         var normal = pose.BasisX.Normalize();
+        var planePoint = pose.OfPoint(new XYZ(offset, 0, 0));
         var center = AsXyz(expected.Center);
         var expectedNormal = AsXyz(expected.CenterNormal);
         if(!pose.IsConformal || !IsFinitePoint(center) || !IsFinitePoint(expectedNormal)
             || expectedNormal.IsZeroLength() || normal.CrossProduct(expectedNormal).GetLength() > DirectionEpsilon
-            || Math.Abs((center - pose.Origin).DotProduct(normal)) > LengthEpsilon) {
+            || Math.Abs((center - planePoint).DotProduct(normal)) > LengthEpsilon) {
             return [];
         }
         var candidates = instance.GetReferences(FamilyInstanceReferenceType.CenterLeftRight) ?? [];
