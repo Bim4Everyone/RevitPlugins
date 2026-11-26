@@ -171,7 +171,7 @@ internal class NavisXmlClashesLoader : BaseClashesLoader, IClashesLoader {
         string file = tags.TryGetValue("элемент файл источника", out string fileName) ? fileName : null;
         if(file is null) {
             throw new InvalidOperationException(
-                " Неверный формат xml: в xml объекте элемента нет тэга 'элемент файл источника'.");
+                "Неверный формат xml: в xml объекте элемента нет тэга 'элемент файл источника'.");
         }
         const string rvtEnd = ".rvt";
         if(file.EndsWith(rvtEnd)) {
