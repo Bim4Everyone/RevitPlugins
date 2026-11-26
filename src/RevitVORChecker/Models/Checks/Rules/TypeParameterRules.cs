@@ -32,6 +32,7 @@ internal static class TypeParameterRules {
     public static void Check(ModelCheckContext context, FindingCollection findings) {
         CheckMaterialType(context, findings);
         CheckSize(context, findings);
+        CheckHeight(context, findings);
     }
 
     private static void CheckMaterialType(ModelCheckContext context, FindingCollection findings) {
@@ -126,7 +127,7 @@ internal static class TypeParameterRules {
                 continue;
             }
 
-            string value = element.GetParameterOrEmpty(ModelCheckContext.SizeParameter).Trim();
+            string value = element.GetParameterOrEmpty(ModelCheckContext.HeightParameter).Trim();
             if(value.Length == 0) {
                 problems.Add("ФОП_РАЗМ_Толщина_ДЕ не заполнен.", null, element);
                 continue;
