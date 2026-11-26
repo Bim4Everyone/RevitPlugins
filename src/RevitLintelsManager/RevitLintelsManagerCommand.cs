@@ -136,6 +136,7 @@ public class RevitLintelsManagerCommand : BasePluginCommand {
         kernel.Bind<ILintelCalculationService>().To<LintelCalculationService>().InSingletonScope();
         kernel.Bind<IManagerAnalysisService>().To<ManagerAnalysisService>().InSingletonScope();
         kernel.Bind<IManagerProcessingService>().To<ManagerProcessingService>().InSingletonScope();
+        kernel.Bind<ILintelInstallationService>().To<LintelInstallationService>().InSingletonScope();
         kernel.Bind<IProcessingConfirmation>().To<ProcessingConfirmation>().InSingletonScope();
         kernel.Bind<IManagerViewService>().To<ManagerViewService>().InSingletonScope();
         kernel.Bind<IManagerNavigationService>().To<ManagerNavigationService>().InSingletonScope();

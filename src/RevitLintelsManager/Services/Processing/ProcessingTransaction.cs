@@ -16,6 +16,7 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
     private readonly ManagerFailuresPreprocessor _failures = new();
     private ProcessingStatus _rollbackStatus = ProcessingStatus.Failed;
     private bool _rollbackRequested;
+    private string _installedLintelUniqueId;
 
     /// <summary>Выполняет изменение, регенерацию и проверку до единственного Commit.</summary>
     public ProcessingResult Run(ProcessingTarget target, ProcessingAction action, CancellationToken token,
@@ -41,6 +42,7 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
                 token.ThrowIfCancellationRequested();
                 target.Document.Regenerate();
                 action.Verify(target);
+                _installedLintelUniqueId = target.InstalledLintel?.UniqueId;
                 token.ThrowIfCancellationRequested();
                 result = isCurrent() ? End(transaction.Commit(), ProcessingStatus.Failed)
                     : Abort(ProcessingStatus.Canceled, localization.GetLocalizedString("Processing.StaleOrCanceled"));
@@ -121,6 +123,7 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
         if(status != ProcessingStatus.Succeeded) {
             _failures.Diagnostics.Add(localization.GetLocalizedString("Processing.TransactionStatus", reported, actual));
         }
-        return new ProcessingResult(operation, status, _failures.Diagnostics);
+        return new ProcessingResult(operation, status, _failures.Diagnostics,
+            status == ProcessingStatus.Succeeded ? _installedLintelUniqueId : null);
     }
 }

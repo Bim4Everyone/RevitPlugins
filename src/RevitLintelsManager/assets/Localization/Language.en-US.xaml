@@ -326,4 +326,16 @@
     <system:String x:Key="Processing.Missing">Element {0} is missing from the source document.</system:String>
     <system:String x:Key="Processing.Pinned">Element {0} is pinned.</system:String>
     <system:String x:Key="Processing.Ownership">Element {0} is owned by another user or requires an update from central.</system:String>
+    <system:String x:Key="Processing.LockPlanes">The center reference planes are misaligned.</system:String>
+    <system:String x:Key="Processing.LockView">No suitable floor plan exists for the opening level.</system:String>
+    <system:String x:Key="Processing.LockReference">Could not resolve the center reference of element {0}.</system:String>
+    <system:String x:Key="Processing.LockFailed">Could not confirm the new center alignment.</system:String>
+    <system:String x:Key="Processing.ReplaceCascade">Replacement of lintel {0} failed the deleted-element check. Unexpected IDs [{1}].</system:String>
+    <system:String x:Key="Processing.ReplacePair">Could not verify replacement of the original lintel and preservation of the opening and its wall.</system:String>
+    <system:String x:Key="Processing.LockParametersChanged">Creating the alignment changed the parameters of an instance.</system:String>
+    <system:String x:Key="Processing.InstallType">The lintel type or level is unavailable for level-based placement.</system:String>
+    <system:String x:Key="Processing.InstallPosition">The installed lintel center, elevation or orientation could not be confirmed.</system:String>
+    <system:String x:Key="Processing.InstallValues">The calculation does not contain all required instance values.</system:String>
+    <system:String x:Key="Processing.InstallAttributes">The installed lintel type, level, workset or phases differ from the calculation.</system:String>
+    <system:String x:Key="Processing.InstallValue">The installed value of parameter “{0}” differs from the calculation.</system:String>
 </ResourceDictionary>

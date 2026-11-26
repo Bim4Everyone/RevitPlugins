@@ -20,6 +20,11 @@ internal interface IGeometryReadContext : IDisposable {
     /// <returns>Охватывающие границы или null при неполных данных.</returns>
     GeometryBounds GetOwnerEnvelope(Element element);
 
+    /// <summary>Перечисляет сам элемент и дерево его собственных вложенных экземпляров.</summary>
+    /// <param name="root">Корневой элемент в текущем документе.</param>
+    /// <returns>Владельцы геометрии, включая null при недоступном вложенном элементе.</returns>
+    IEnumerable<Element> GetGeometryOwners(Element root);
+
     /// <summary>Пересекает конечный отрезок с внутренностью тел элемента.</summary>
     /// <param name="candidate">Элемент исходного документа.</param>
     /// <param name="start">Начало отрезка.</param>

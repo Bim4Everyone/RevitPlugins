@@ -50,6 +50,8 @@ public class SystemPluginConfig {
     internal const double CoordinateRoundoffFactor = 8 * 2.2204460492503131e-16;
     internal const double MillimetersPerFoot = 304.8;
     internal const double GeometryLengthEpsilonFeet = 0.001 / MillimetersPerFoot;
+    // Предельный зазор совпадающих центральных плоскостей перед NewAlignment (в футах).
+    internal const double LockCoincidenceToleranceFeet = 1e-9;
 
     // Компенсация округления при сравнении отклонения с включительной границей.
     internal const double MatchRoundoffMm = 1e-8;

@@ -6,6 +6,14 @@ namespace RevitLintelsManager.Models;
 
 /// <summary>Применяет фильтры семейств и стадии, собирает снимок для анализа менеджером.</summary>
 internal interface IProjectSnapshotReader {
+    /// <summary>Читает экземпляр после размещения и регенерации в текущей транзакции.</summary>
+    /// <param name="instance">Созданная перемычка.</param>
+    /// <param name="geometry">Контекст с заранее прочитанными определениями семейств.</param>
+    /// <param name="config">Настройки сессии.</param>
+    /// <returns>Текущие геометрия, параметры и идентификаторы перемычки.</returns>
+    ManagerLintelSnapshot ReadInstalledLintel(FamilyInstance instance, IGeometryReadContext geometry,
+        ManagerConfigSnapshot config);
+
     /// <summary>Проверяет наличие подходящих экземпляров по фильтрам полного чтения.</summary>
     /// <param name="collector">Коллектор элементов диапазона, подготовленный вызывающей стороной.</param>
     /// <param name="config">Неизменяемые настройки сессии.</param>

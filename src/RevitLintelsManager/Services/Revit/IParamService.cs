@@ -7,6 +7,12 @@ namespace RevitLintelsManager.Models;
 
 /// <summary>Контракт ParamService.</summary>
 internal interface IParamService {
+    /// <summary>Записывает расчётное значение в однозначный параметр экземпляра.</summary>
+    /// <param name="instance">Новая перемычка.</param>
+    /// <param name="value">Сопоставленная роль, тип и значение.</param>
+    /// <returns>Возможность записи параметра данного экземпляра.</returns>
+    bool WriteInstanceValue(FamilyInstance instance, LintelParameterValue value);
+
 
     /// <summary>Создаёт каталог параметров семейства в контексте API.</summary>
     /// <param name="document">Исходный документ.</param>

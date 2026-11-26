@@ -40,6 +40,17 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
     private Document Document => source.Document;
 
     /// <inheritdoc />
+    public ManagerLintelSnapshot ReadInstalledLintel(FamilyInstance instance, IGeometryReadContext geometry,
+        ManagerConfigSnapshot config) {
+        using var worksets = Document.GetWorksetTable();
+        var phases = Document.Phases.Cast<Phase>().ToDictionary(phase => phase.Id, phase => phase.Name);
+        var type = new ProjectFamilyType(instance.Symbol, instance.Symbol.Family, false);
+        var element = ReadFamilySnapshot(instance, type, phases, config.Parameters,
+            id => Document.GetElement(id)?.Name, id => worksets.GetWorkset(id)?.Name);
+        return ReadLintel(instance, element, config.Parameters, geometry, id => Document.GetElement(id)?.UniqueId);
+    }
+
+    /// <inheritdoc />
     public bool HasMatchingFamilies(FilteredElementCollector collector, ManagerConfigSnapshot config,
         ElementId phaseId) {
         return GetMatchingFamilies(collector, config, phaseId).Any();

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 using Autodesk.Revit.DB;
@@ -14,10 +15,15 @@ internal sealed class ProcessingTarget(Document document, FamilyInstance opening
     public FamilyInstance Opening { get; } = opening;
     public FamilyInstance Lintel { get; } = lintel;
     public OpeningLintelMatch Match { get; } = match;
+    public OpeningLintelMatch InstalledPair { get; internal set; }
+    public FamilyInstance InstalledLintel { get; internal set; }
     public LintelCalculation Calculation { get; } = calculation;
+    public IGeometryReadContext LockGeometry { get; internal set; }
+    public string CreatedLockId { get; internal set; }
+    public IReadOnlyList<(long Owner, long Parameter, bool HasValue, object Value)> OriginalLockParameters { get; internal set; }
 }
 
-/// <summary>Будущая реализация ровно одного действия с обязательной проверкой после регенерации.</summary>
+/// <summary>Изменение одной строки и проверка результата после регенерации.</summary>
 internal sealed class ProcessingAction(ManagerAction action, Action<ProcessingTarget, CancellationToken> apply,
     Action<ProcessingTarget> verify) {
     public ManagerAction Action { get; } = action;
@@ -26,6 +32,13 @@ internal sealed class ProcessingAction(ManagerAction action, Action<ProcessingTa
 }
 
 internal interface IManagerProcessingService {
+    /// <summary>Исполняет зарегистрированное действие строки подтверждённого плана.</summary>
+    /// <param name="approved">Разрешение текущей сессии.</param>
+    /// <param name="index">Индекс строки плана.</param>
+    /// <param name="token">Отмена текущей операции.</param>
+    /// <returns>Фактический исход операции.</returns>
+    ProcessingResult ExecuteAssigned(ApprovedProcessingPlan approved, int index, CancellationToken token);
+
     /// <summary>Подтверждает неизменяемый план до входа в изменяющий API-вызов.</summary>
     /// <param name="plan">Назначения текущего поколения менеджера.</param>
     /// <returns>Разрешение на этот план либо null при отказе, смене поколения или занятом сервисе.</returns>

@@ -14,6 +14,13 @@ namespace RevitLintelsManager.Models;
 /// <summary>Читает центральные связи актуальных экземпляров в пределах исходного документа.</summary>
 internal sealed class LintelLockReader(RevitRepository source) : ILintelLockReader {
     /// <inheritdoc />
+    public bool ConfirmsCreatedLock(IGeometryReadContext geometry, OpeningLintelMatch pair, string dependencyId) {
+        var facts = ReadLocks(geometry, [pair]).Single().LockFacts;
+        return facts?.State == LintelLockState.Confirmed && facts.DependencyIds.Count == 1
+            && facts.DependencyIds[0] == dependencyId;
+    }
+
+    /// <inheritdoc />
     public IReadOnlyList<OpeningLintelMatch> ReadLocks(IGeometryReadContext geometry,
         IReadOnlyList<OpeningLintelMatch> matches) {
         if(!matches.Any(IsPair)) {
@@ -100,7 +107,7 @@ internal sealed class LintelLockReader(RevitRepository source) : ILintelLockRead
     }
 
     // Сохраняет только разные устойчивые представления подтверждённой плоскости актуального экземпляра.
-    private static string[] ReadCenterIdentities(IGeometryReadContext geometry, FamilyInstance instance,
+    internal static string[] ReadCenterIdentities(IGeometryReadContext geometry, FamilyInstance instance,
         AlignmentPlanes expected) {
         var family = instance.Symbol.Family;
         if(expected is null || geometry.GetWidthOriginPlane(family) is not string planeName

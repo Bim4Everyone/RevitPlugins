@@ -326,4 +326,16 @@
     <system:String x:Key="Processing.Missing">Элемент {0} отсутствует в исходном документе.</system:String>
     <system:String x:Key="Processing.Pinned">Элемент {0} закреплён.</system:String>
     <system:String x:Key="Processing.Ownership">Элемент {0} занят другим пользователем или требует обновления из хранилища.</system:String>
+    <system:String x:Key="Processing.LockPlanes">Центральные плоскости не совмещены.</system:String>
+    <system:String x:Key="Processing.LockView">Для уровня проёма не найден подходящий план этажа.</system:String>
+    <system:String x:Key="Processing.LockReference">Не удалось определить центральную ссылку элемента {0}.</system:String>
+    <system:String x:Key="Processing.LockFailed">Не удалось подтвердить созданный центральный замок.</system:String>
+    <system:String x:Key="Processing.ReplaceCascade">Замена перемычки {0} отклонена при проверке удалённых элементов. Посторонние ID [{1}].</system:String>
+    <system:String x:Key="Processing.ReplacePair">Не удалось подтвердить замену исходной перемычки и сохранность проёма со стеной.</system:String>
+    <system:String x:Key="Processing.LockParametersChanged">При создании замка изменились параметры одного из экземпляров.</system:String>
+    <system:String x:Key="Processing.InstallType">Тип перемычки или уровень недоступен для одноуровневой установки.</system:String>
+    <system:String x:Key="Processing.InstallPosition">Не подтверждены центр, отметка или ориентация установленной перемычки.</system:String>
+    <system:String x:Key="Processing.InstallValues">Расчёт не содержит полного набора значений для экземпляра.</system:String>
+    <system:String x:Key="Processing.InstallAttributes">Тип, уровень, рабочий набор или стадии установленной перемычки отличаются от расчёта.</system:String>
+    <system:String x:Key="Processing.InstallValue">После установки значение параметра «{0}» отличается от расчёта.</system:String>
 </ResourceDictionary>

@@ -127,8 +127,8 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
         return solids;
     }
 
-    // Общие вложенные семейства являются отдельными элементами уже в координатах того же документа.
-    private IEnumerable<Element> GetGeometryOwners(Element root) {
+    /// <inheritdoc />
+    public IEnumerable<Element> GetGeometryOwners(Element root) {
         var visited = new HashSet<ElementId>();
         var remaining = new Stack<Element>();
         remaining.Push(root);

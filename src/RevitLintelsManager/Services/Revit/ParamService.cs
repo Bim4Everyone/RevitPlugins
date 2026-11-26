@@ -17,6 +17,23 @@ namespace RevitLintelsManager.Models;
 
 internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService loggerService) : IParamService {
     /// <inheritdoc />
+    public bool WriteInstanceValue(FamilyInstance instance, LintelParameterValue value) {
+        var parameter = FindMappedParameter(instance, null, value.Name);
+        if(parameter is null || parameter.Element.Id != instance.Id || parameter.IsReadOnly
+            || !HasExpectedType(parameter.Definition, parameter.StorageType, value.Kind)) {
+            return false;
+        }
+        if(value.Kind == LintelParameterKind.LengthMm && value.LengthMm is double length) {
+            instance.SetParamValue(value.Name, UnitUtils.ConvertToInternalUnits(length, UnitTypeId.Millimeters));
+        } else if(value.Kind == LintelParameterKind.YesNo && value.YesNo is bool flag) {
+            instance.SetParamValue(value.Name, flag ? 1 : 0);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    /// <inheritdoc />
     public (IList<RevitParam> Parameters, IList<RevitParam> InstanceParameters) CreateRevitParams(
         Document document, FamilySymbol symbol, FamilyInstance instance) {
         var typeParams = CreateRevitParams(document, symbol).ToArray();

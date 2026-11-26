@@ -7,6 +7,7 @@ using System.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.Exceptions;
 
+using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitLintelsManager.Models;
@@ -16,12 +17,66 @@ namespace RevitLintelsManager.Services;
 /// <summary>Связывает утверждённые назначения с исходным документом и одной локальной транзакцией.</summary>
 internal sealed class ManagerProcessingService(RevitRepository source, ManagerSessionState state,
     IProjectSnapshotReader snapshots, IManagerAnalysisService analysis, IProcessingConfirmation confirmation,
-    ILocalizationService localization, ILoggerService logger) : IManagerProcessingService {
+    ILocalizationService localization, ILoggerService logger, Func<Document, IGeometryReadContext> openGeometry,
+    ILintelLockReader lockReader, ILintelInstallationService installation) : IManagerProcessingService {
     private volatile ApprovedProcessingPlan _approved;
     private volatile bool _faulted;
     private ProcessingTransaction _pending;
     private readonly ConditionalWeakTable<ProcessingPlan, ApprovedProcessingPlan> _receipts = new();
     private int _busy;
+
+    /// <inheritdoc />
+    public ProcessingResult ExecuteAssigned(ApprovedProcessingPlan approved, int index, CancellationToken token) {
+        var action = approved?.Plan.Operations[index].Action switch {
+            ManagerAction.Lock => new ProcessingAction(ManagerAction.Lock, ApplyLock, VerifyLock),
+            ManagerAction.Install => new ProcessingAction(ManagerAction.Install, ApplyInstall, installation.Verify),
+            ManagerAction.Replace => new ProcessingAction(ManagerAction.Replace, ApplyReplace, VerifyReplace),
+            _ => null
+        };
+        return Execute(approved, index, action, token);
+    }
+
+    // Установка и создание зависимости используют ту же открытую транзакцию строки.
+    private void ApplyInstall(ProcessingTarget target, CancellationToken token) {
+        installation.Install(target, state.Config, token);
+    }
+
+    // Обе части замены выполняются до единственного Commit, включая отказ сразу после удаления.
+    private void ApplyReplace(ProcessingTarget target, CancellationToken token) {
+        source.DeleteForReplacement(target.LockGeometry, target.Lintel, target.Opening, target.Match.LockFacts, localization);
+        token.ThrowIfCancellationRequested();
+        installation.Install(target, state.Config, token);
+    }
+
+    // Проверяет сохранённый проём и его хост, смену экземпляра и все постусловия установки.
+    private void VerifyReplace(ProcessingTarget target) {
+        var original = target.Match;
+        if(target.Document.GetElement(original.Lintel.Element.UniqueId) is not null || !target.Opening.IsValidObject
+            || target.Opening.UniqueId != original.Opening.Element.UniqueId
+            || target.Opening.Host?.UniqueId != original.Opening.HostWallUniqueId
+            || target.InstalledLintel.Id.GetIdValue() == original.Lintel.Element.Information.ElementId) {
+            throw new System.InvalidOperationException(Text("ReplacePair"));
+        }
+        installation.Verify(target);
+    }
+
+    // Перепроверка назначения уже установила допустимость ручного Lock, в том числе при блокирующем подборе.
+    private void ApplyLock(ProcessingTarget target, CancellationToken token) {
+        target.OriginalLockParameters = RevitRepository.ReadLockParameters(target.Opening, target.Lintel);
+        target.CreatedLockId = source.CreateCentralLock(target.LockGeometry, target.Opening, target.Lintel,
+            target.Match, localization);
+    }
+
+    // Читает фактические ссылки после регенерации и сверяет единственный замок с созданной зависимостью.
+    private void VerifyLock(ProcessingTarget target) {
+        if(!lockReader.ConfirmsCreatedLock(target.LockGeometry, target.Match, target.CreatedLockId)) {
+            throw new System.InvalidOperationException(Text("LockFailed"));
+        }
+        if(target.OriginalLockParameters is not null && !target.OriginalLockParameters.SequenceEqual(
+                RevitRepository.ReadLockParameters(target.Opening, target.Lintel))) {
+            throw new System.InvalidOperationException(Text("LockParametersChanged"));
+        }
+    }
 
     /// <inheritdoc />
     public ApprovedProcessingPlan Confirm(ProcessingPlan plan) {
@@ -79,6 +134,16 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
                 result = new ProcessingResult(operation, ProcessingStatus.Skipped, [Text("ActionUnavailable")]);
             } else {
                 var target = Revalidate(operation);
+                using var geometry = operation.Action is ManagerAction.Lock or ManagerAction.Install or ManagerAction.Replace
+                    ? openGeometry(source.Document) : null;
+                if(geometry is not null) {
+                    // EditFamily допускается только перед открытием изменяющей транзакции.
+                    geometry.GetWidthOriginPlane(target.Opening.Symbol.Family);
+                    var family = operation.Action == ManagerAction.Lock ? target.Lintel.Symbol.Family
+                        : source.Document.GetElement(target.Calculation.Family.UniqueId) as Family;
+                    geometry.GetOriginPlanes(family);
+                    target.LockGeometry = geometry;
+                }
                 token.ThrowIfCancellationRequested();
                 var tx = new ProcessingTransaction(operation, new Transaction(source.Document, Text("Transaction")), localization);
                 result = tx.Run(target, action, token, () => CanExecute(approved));
