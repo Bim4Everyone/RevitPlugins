@@ -310,4 +310,20 @@
     <system:String x:Key="Manager.Diagnostic.Calculation.NoEligibleAttachment.Right">No eligible attachment was verified on the right.</system:String>
     <system:String x:Key="Manager.Diagnostic.Calculation.ContactAmbiguous.Right">The contact on the right is ambiguous.</system:String>
     <system:String x:Key="Manager.Diagnostic.Calculation.SideGeometryUnavailable.Right">The bearing geometry on the right could not be verified.</system:String>
+    <system:String x:Key="Processing.Confirm">Lintels to delete: {0}. Lintels to replace: {1}. Continue processing?</system:String>
+    <system:String x:Key="Processing.Continue">Continue</system:String>
+    <system:String x:Key="Processing.DocumentReadOnly">The document cannot be modified in this transaction.</system:String>
+    <system:String x:Key="Processing.ValidationFailed">Could not validate the assigned manager action.</system:String>
+    <system:String x:Key="Processing.OperationLog">Action {0}, opening {1}, lintel {2}. Result {3}. {4}</system:String>
+    <system:String x:Key="Processing.TransactionStatus">Transaction returned {0}. The observed status was {1}.</system:String>
+    <system:String x:Key="Processing.RequestUnavailable">This operation has already been used or is no longer authorized.</system:String>
+    <system:String x:Key="Processing.StaleOrCanceled">The document or analysis is no longer current, or processing was canceled.</system:String>
+    <system:String x:Key="Processing.ActionUnavailable">The assigned action is unavailable.</system:String>
+    <system:String x:Key="Processing.Transaction">Process lintel manager row</system:String>
+    <system:String x:Key="Processing.TransactionAlreadyOpen">Revalidation requires a document with no open transaction.</system:String>
+    <system:String x:Key="Processing.PairChanged">The pair or element type has changed. Refresh the analysis.</system:String>
+    <system:String x:Key="Processing.Parameter">Parameter '{0}' is unavailable for writing.</system:String>
+    <system:String x:Key="Processing.Missing">Element {0} is missing from the source document.</system:String>
+    <system:String x:Key="Processing.Pinned">Element {0} is pinned.</system:String>
+    <system:String x:Key="Processing.Ownership">Element {0} is owned by another user or requires an update from central.</system:String>
 </ResourceDictionary>

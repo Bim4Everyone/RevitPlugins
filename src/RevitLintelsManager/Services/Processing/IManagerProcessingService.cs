@@ -1,0 +1,45 @@
+using System;
+using System.Threading;
+
+using Autodesk.Revit.DB;
+
+using RevitLintelsManager.Models;
+
+namespace RevitLintelsManager.Services;
+
+/// <summary>Краткоживущие данные проверенной пары только для синхронного вызова в API-контексте.</summary>
+internal sealed class ProcessingTarget(Document document, FamilyInstance opening, FamilyInstance lintel,
+    OpeningLintelMatch match, LintelCalculation calculation) {
+    public Document Document { get; } = document;
+    public FamilyInstance Opening { get; } = opening;
+    public FamilyInstance Lintel { get; } = lintel;
+    public OpeningLintelMatch Match { get; } = match;
+    public LintelCalculation Calculation { get; } = calculation;
+}
+
+/// <summary>Будущая реализация ровно одного действия с обязательной проверкой после регенерации.</summary>
+internal sealed class ProcessingAction(ManagerAction action, Action<ProcessingTarget, CancellationToken> apply,
+    Action<ProcessingTarget> verify) {
+    public ManagerAction Action { get; } = action;
+    public Action<ProcessingTarget, CancellationToken> Apply { get; } = apply ?? throw new ArgumentNullException(nameof(apply));
+    public Action<ProcessingTarget> Verify { get; } = verify ?? throw new ArgumentNullException(nameof(verify));
+}
+
+internal interface IManagerProcessingService {
+    /// <summary>Подтверждает неизменяемый план до входа в изменяющий API-вызов.</summary>
+    /// <param name="plan">Назначения текущего поколения менеджера.</param>
+    /// <returns>Разрешение на этот план либо null при отказе, смене поколения или занятом сервисе.</returns>
+    ApprovedProcessingPlan Confirm(ProcessingPlan plan);
+
+    /// <summary>Перепроверяет и выполняет одно назначение в синхронном API-контексте исходного документа.</summary>
+    /// <param name="approved">Разрешение этой сессии.</param>
+    /// <param name="index">Индекс строки в подтверждённом плане.</param>
+    /// <param name="action">Обработчик назначенного действия с проверкой результата.</param>
+    /// <param name="token">Запрос отмены текущего запуска.</param>
+    /// <returns>Исход и диагностика проверенной строки.</returns>
+    ProcessingResult Execute(ApprovedProcessingPlan approved, int index, ProcessingAction action, CancellationToken token);
+
+    /// <summary>В разрешённом API-контексте освобождает транзакцию после её нативного finalizer.</summary>
+    /// <returns>Текущий исход ожидающей операции либо null, если такой операции нет.</returns>
+    ProcessingResult FinishPending();
+}

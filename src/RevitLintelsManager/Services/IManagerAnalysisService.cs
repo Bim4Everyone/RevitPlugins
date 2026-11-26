@@ -15,4 +15,14 @@ internal interface IManagerAnalysisService {
     /// <returns>Данные строки с ключом, предупреждениями и допустимыми действиями.</returns>
     ManagerAnalyzedRow Analyze(Guid documentToken, OpeningLintelMatch match, LintelCalculation calculation,
         ManagerConfigSnapshot config);
+
+    /// <summary>Возвращает также сравнение, определившее доступные исправления проверенной пары.</summary>
+    /// <param name="documentToken">Идентификатор исходного документа сессии.</param>
+    /// <param name="match">Актуальное сопоставление в исходном документе.</param>
+    /// <param name="calculation">Единый расчёт проёма, если он присутствует.</param>
+    /// <param name="config">Настройки открытой сессии.</param>
+    /// <param name="comparison">Отличия пары, которые определили состав исправления.</param>
+    /// <returns>Та же проанализированная строка, которую получает менеджер.</returns>
+    ManagerAnalyzedRow AnalyzeForProcessing(Guid documentToken, OpeningLintelMatch match, LintelCalculation calculation,
+        ManagerConfigSnapshot config, out LintelComparison comparison);
 }

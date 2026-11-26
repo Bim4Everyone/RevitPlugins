@@ -310,4 +310,20 @@
     <system:String x:Key="Manager.Diagnostic.Calculation.NoEligibleAttachment.Right">Не подтверждено допустимое крепление справа.</system:String>
     <system:String x:Key="Manager.Diagnostic.Calculation.ContactAmbiguous.Right">Примыкание справа неоднозначно.</system:String>
     <system:String x:Key="Manager.Diagnostic.Calculation.SideGeometryUnavailable.Right">Не удалось подтвердить геометрию опирания справа.</system:String>
+    <system:String x:Key="Processing.Confirm">Будут удалены перемычки: {0}. Будут заменены перемычки: {1}. Продолжить обработку?</system:String>
+    <system:String x:Key="Processing.Continue">Продолжить</system:String>
+    <system:String x:Key="Processing.DocumentReadOnly">Документ недоступен для записи в текущей транзакции.</system:String>
+    <system:String x:Key="Processing.ValidationFailed">Ошибка проверки назначения менеджера.</system:String>
+    <system:String x:Key="Processing.OperationLog">Действие {0}, проём {1}, перемычка {2}. Результат {3}. {4}</system:String>
+    <system:String x:Key="Processing.TransactionStatus">Статус транзакции при завершении {0}, при проверке {1}.</system:String>
+    <system:String x:Key="Processing.RequestUnavailable">Назначение уже использовано либо больше не разрешено.</system:String>
+    <system:String x:Key="Processing.StaleOrCanceled">Документ или анализ больше не актуален либо обработка отменена.</system:String>
+    <system:String x:Key="Processing.ActionUnavailable">Назначенное действие недоступно.</system:String>
+    <system:String x:Key="Processing.Transaction">Обработка строки менеджера перемычек</system:String>
+    <system:String x:Key="Processing.TransactionAlreadyOpen">Повторная проверка требует документа без открытой транзакции.</system:String>
+    <system:String x:Key="Processing.PairChanged">Изменились состав пары или тип элемента. Обновите анализ.</system:String>
+    <system:String x:Key="Processing.Parameter">Параметр «{0}» недоступен для записи.</system:String>
+    <system:String x:Key="Processing.Missing">Элемент {0} отсутствует в исходном документе.</system:String>
+    <system:String x:Key="Processing.Pinned">Элемент {0} закреплён.</system:String>
+    <system:String x:Key="Processing.Ownership">Элемент {0} занят другим пользователем или требует обновления из хранилища.</system:String>
 </ResourceDictionary>

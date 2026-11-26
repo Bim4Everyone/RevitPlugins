@@ -186,6 +186,26 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         return RefreshCommand.CanExecute(null) ? RefreshContextAsync() : Task.CompletedTask;
     }
 
+    /// <summary>Фиксирует отмеченных детей действующих фильтров независимо от раскрытия групп.</summary>
+    public ProcessingPlan CreateProcessingPlan() {
+        var context = LastContext;
+        if(!CanEditRows || _modelIsDirty || context?.AnalyzedRows is null
+            || !IsCurrentResponse(context.DocumentToken, context.Generation)) {
+            return null;
+        }
+        var operations = _filteredGroups.SelectMany(group => group.FilteredItems)
+            .Where(item => item.IsProcessingSelected).Select(item => {
+                var snapshot = item.Snapshot;
+                LintelCalculation calculation = null;
+                if(snapshot.Key.OpeningUniqueId is string openingId) {
+                    context.Project.Calculations.TryGetValue(openingId, out calculation);
+                }
+                return new ProcessingOperation(snapshot.Key, item.CurrentAction, snapshot.GroupKey.OpeningTypeUniqueId,
+                    snapshot.GroupKey.LintelTypeUniqueId, calculation?.Type?.UniqueId, snapshot.Corrections);
+            });
+        return ProcessingPlan.Create(context.DocumentToken, context.Generation, operations);
+    }
+
     /// <summary>Помечает отображаемые данные устаревшими и запоминает кандидатов на удаление.</summary>
     public void InvalidateModel(IEnumerable<long> deletedIds) {
         var deleted = new HashSet<long>(deletedIds);

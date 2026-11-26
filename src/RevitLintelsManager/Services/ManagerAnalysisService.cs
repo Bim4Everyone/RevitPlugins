@@ -11,7 +11,11 @@ namespace RevitLintelsManager.Services;
 internal sealed class ManagerAnalysisService(ILintelCalculationService calculationService) : IManagerAnalysisService {
     /// <inheritdoc />
     public ManagerAnalyzedRow Analyze(Guid documentToken, OpeningLintelMatch match, LintelCalculation calculation,
-        ManagerConfigSnapshot config) {
+        ManagerConfigSnapshot config) => AnalyzeForProcessing(documentToken, match, calculation, config, out _);
+
+    /// <inheritdoc />
+    public ManagerAnalyzedRow AnalyzeForProcessing(Guid documentToken, OpeningLintelMatch match, LintelCalculation calculation,
+        ManagerConfigSnapshot config, out LintelComparison comparison) {
         var opening = match.Opening;
         var lintel = match.Lintel;
         var openingInfo = opening?.Element.Information;
@@ -25,7 +29,7 @@ internal sealed class ManagerAnalysisService(ILintelCalculationService calculati
         AddCalculationDiagnostics(opening, calculation is not null, issues, openingDiagnostics);
         bool hasOpeningContext = lintel is null && AddOpeningContext(calculation, rowDiagnostics);
         AddMatchDiagnostic(match, hasOpeningContext, rowDiagnostics);
-        var comparison = IsPair(match) ? calculationService.Compare(match, calculation, config) : null;
+        comparison = IsPair(match) ? calculationService.Compare(match, calculation, config) : null;
         if(comparison is not null) {
             lintelDiagnostics.AddRange(comparison.Differences
                 .Select(difference => Diagnostic($"Compare.{difference.Code}", difference.Parameter)));
