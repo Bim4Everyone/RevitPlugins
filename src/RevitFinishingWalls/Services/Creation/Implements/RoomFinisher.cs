@@ -64,7 +64,7 @@ namespace RevitFinishingWalls.Services.Creation.Implements {
                             new ErrorViewModel(
                                 _localizationService.GetLocalizedString("ErrorsWindow.ErrorTitles.RoomBoundaries"),
                                 ex.Message,
-                                room.Id));
+                                ex.ElementIds.Count > 0 ? [.. ex.ElementIds] : [room.Id]));
                         errors.Add(roomErrors);
                         continue;
                     }
