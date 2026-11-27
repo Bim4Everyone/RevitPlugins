@@ -29,7 +29,8 @@ internal class ContourDimensionPlanner {
     // Укорочение размерной линии с концов при проверке "внутри помещения", футы (~5 мм)
     private const double _insideTrim = 5.0 / 304.8;
 
-    public List<VirtualDimension> Plan(RoomContour contour, PlanningOptions options, List<string> log) {
+    public List<VirtualDimension> Plan(
+        RoomContour contour, PlanningOptions options, List<string> log, bool countTextIssues = true) {
         contour.ThrowIfNull();
         options.ThrowIfNull();
         log.ThrowIfNull();
@@ -72,7 +73,9 @@ internal class ContourDimensionPlanner {
         ChainLayoutRefiner.Refine(
             dimensions, shape.ContainsShape, shape.Segments,
             (chain, position) => IsLocalChainPositionValid(shape, chain, position, dimensions, options), options, log);
-        TextConflictCounter.Count(dimensions, options, log);
+        if(countTextIssues) {
+            TextConflictCounter.Count(dimensions, options, log);
+        }
         return dimensions;
     }
 
@@ -398,7 +401,7 @@ internal class ContourDimensionPlanner {
     /// Допустимое положение при локальном переносе: линия и ее отступ внутри помещения,
     /// шаг яруса и порядок относительно параллельных линий сохранены.
     /// </summary>
-    private static bool IsLocalChainPositionValid(
+    internal static bool IsLocalChainPositionValid(
         RoomShape shape,
         VirtualDimension chain,
         double position,
@@ -515,7 +518,7 @@ internal class ContourDimensionPlanner {
     /// <summary>
     /// Геометрия помещения на плане для проверки, лежит ли размерная линия внутри помещения.
     /// </summary>
-    private class RoomShape {
+    internal class RoomShape {
         private readonly List<Point2D> _outerPolygon;
         private readonly List<List<Point2D>> _innerPolygons;
 

@@ -120,7 +120,8 @@ internal static class TextConflictCounter {
         VirtualDimension dimension,
         double position,
         IEnumerable<VirtualDimension> others,
-        PlanningOptions options) {
+        PlanningOptions options,
+        Func<VirtualDimension, PlanningOptions> getOtherOptions = null) {
         dimension.ThrowIfNull();
         others.ThrowIfNull();
         options.ThrowIfNull();
@@ -129,12 +130,13 @@ internal static class TextConflictCounter {
         var line = GetDimensionLine(dimension, position);
         var witnesses = GetWitnessLines(dimension, position, options).Select(w => w.Line).ToList();
         foreach(var other in others.Where(d => d != dimension)) {
-            var otherTexts = GetTextBoxes(other, other.LinePosition, options).ToList();
+            var otherOptions = getOtherOptions?.Invoke(other) ?? options;
+            var otherTexts = GetTextBoxes(other, other.LinePosition, otherOptions).ToList();
             if(texts.Any(t => otherTexts.Any(o => Intersects(t.Corners, o.Corners)))) {
                 return $"{TextText} с размером {Names(other)}";
             }
             var otherLine = GetDimensionLine(other, other.LinePosition);
-            var otherWitnesses = GetWitnessLines(other, other.LinePosition, options).Select(w => w.Line).ToList();
+            var otherWitnesses = GetWitnessLines(other, other.LinePosition, otherOptions).Select(w => w.Line).ToList();
             if(texts.Any(t => Intersects(t.Corners, otherLine))
                || otherTexts.Any(o => Intersects(o.Corners, line))) {
                 return $"{TextLine} с размером {Names(other)}";
@@ -254,8 +256,7 @@ internal static class TextConflictCounter {
         double cost = 0;
         foreach(var dimension in dimensions) {
             foreach(var text in GetTextBoxes(dimension, dimension.LinePosition, options, -GetTouchTolerance(options))) {
-                bool wider = text.Offset is null && text.Width > text.Value + options.CoordinateTolerance;
-                if(wider || FindCandidateConflict(text, dimensions, fitsRoom, options) != null) {
+                if(HasLayoutProblem(text, dimensions, fitsRoom, options)) {
                     problems++;
                 }
                 if(text.Offset != null) {
@@ -270,6 +271,25 @@ internal static class TextConflictCounter {
         return (problems, cost);
     }
 
+    internal static HashSet<(VirtualDimension Dimension, int Segment)> GetLayoutProblems(
+        List<VirtualDimension> dimensions,
+        Func<IReadOnlyList<Point2D>, bool> fitsRoom,
+        PlanningOptions options) {
+        var problems = dimensions.SelectMany(d => GetTextBoxes(d, d.LinePosition, options, -GetTouchTolerance(options)))
+            .Where(t => HasLayoutProblem(t, dimensions, fitsRoom, options))
+            .Select(t => (t.Dimension, t.Segment));
+        return new HashSet<(VirtualDimension, int)>(problems);
+    }
+
+    private static bool HasLayoutProblem(
+        TextBox text,
+        List<VirtualDimension> dimensions,
+        Func<IReadOnlyList<Point2D>, bool> fitsRoom,
+        PlanningOptions options) {
+        return (text.Offset is null && text.Width > text.Value + options.CoordinateTolerance)
+               || FindCandidateConflict(text, dimensions, fitsRoom, options) != null;
+    }
+
     /// <summary>
     /// Цепочки с оставшимся неразмещенным текстом. Успешные помещения новый этап не затрагивает.
     /// </summary>
@@ -279,8 +299,7 @@ internal static class TextConflictCounter {
         PlanningOptions options) {
         return dimensions.Where(d => d.Kind == "Chain" && GetTextBoxes(
                 d, d.LinePosition, options, -GetTouchTolerance(options)).Any(t =>
-                (t.Offset is null && t.Width > t.Value + options.CoordinateTolerance)
-                || FindCandidateConflict(t, dimensions, fitsRoom, options) != null))
+                HasLayoutProblem(t, dimensions, fitsRoom, options)))
             .ToList();
     }
 

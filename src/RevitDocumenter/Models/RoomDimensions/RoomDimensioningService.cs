@@ -102,6 +102,7 @@ internal class RoomDimensioningService {
                 result.Areas.AddRange(new DimensioningAreaBuilder(_revitRepository.Document, _contourBuilder)
                     .Build(result.Rooms, settings.Areas, result.AreaDiagnostics));
             }
+            var plans = new List<(RoomRunResult Result, DimensionType Type)>();
             foreach(var roomResult in result.PlanningResults) {
                 var contour = roomResult.Contour;
                 var roomType = contour.RoomType;
@@ -137,10 +138,15 @@ internal class RoomDimensioningService {
                     roomResult.PlanningOptions = options;
                     roomResult.PlanningLog.Add($"Дверные полотна для текста: {options.DoorLeaves.Count}; "
                                               + $"дуг открывания: {options.DoorOpeningArcs.Count}");
-                    roomResult.Dimensions = _planner.Plan(contour, options, roomResult.PlanningLog);
-                    foreach(var dimension in roomResult.Dimensions) {
-                        _dimensionBuilder.Create(dimension, dimensionType);
-                    }
+                    roomResult.Dimensions = _planner.Plan(contour, options, roomResult.PlanningLog, countTextIssues: false);
+                    plans.Add((roomResult, dimensionType));
+                }
+            }
+            NeighborDimensionAligner.Align(plans.Select(p => p.Result));
+            foreach(var (roomResult, dimensionType) in plans) {
+                TextConflictCounter.Count(roomResult.Dimensions, roomResult.PlanningOptions, roomResult.PlanningLog);
+                foreach(var dimension in roomResult.Dimensions) {
+                    _dimensionBuilder.Create(dimension, dimensionType);
                 }
             }
 
