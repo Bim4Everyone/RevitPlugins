@@ -9,6 +9,8 @@ namespace RevitLintelsManager.Models;
 /// <summary>Геометрические ресурсы одного чтения в API-контексте исходного документа.</summary>
 internal interface IGeometryReadContext : IDisposable {
     Document Document { get; }
+    ProcessingReadData ProcessingData { get; set; }
+    ProjectReadCache SessionCache { get; set; }
 
     /// <summary>Получает мировые границы элемента в текущем поколении.</summary>
     /// <param name="owner">Владелец геометрии.</param>
@@ -42,10 +44,14 @@ internal interface IGeometryReadContext : IDisposable {
     /// <returns>Имена трёх плоскостей или null при неопределённой привязке.</returns>
     (string X, string Y, string Z)? GetOriginPlanes(Family family);
 
-    /// <summary>Читает имя плоскости начала с нормалью по оси ширины семейства.</summary>
-    /// <param name="family">Определение семейства.</param>
-    /// <returns>Имя подтверждённой плоскости или null.</returns>
-    string GetWidthOriginPlane(Family family);
+    /// <summary>Подготавливает центральные плоскости размещённых проёмов до чтения геометрии модели.</summary>
+    /// <param name="openings">Экземпляры проёмов, прошедшие фильтры расчёта.</param>
+    void ReadOpeningPlanes(IEnumerable<FamilyInstance> openings);
+
+    /// <summary>Получает центральную плоскость проёма или перемычки из снимка расчёта.</summary>
+    /// <param name="instance">Экземпляр исходного документа.</param>
+    /// <returns>Имя и подписанная локальная координата по ширине, если плоскость подтверждена.</returns>
+    (string Name, double Offset)? GetWidthPlane(FamilyInstance instance);
 
     /// <summary>Читает координату плоскости начала по локальной оси ширины семейства.</summary>
     /// <param name="family">Определение семейства.</param>

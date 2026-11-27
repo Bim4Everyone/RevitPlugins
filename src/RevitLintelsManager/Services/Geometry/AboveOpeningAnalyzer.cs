@@ -4,6 +4,8 @@ using System.Linq;
 
 using Autodesk.Revit.DB;
 
+using dosymep.Revit;
+
 using RevitLintelsManager.Models.Configs;
 
 using static RevitLintelsManager.Models.RevitElementRead;
@@ -21,6 +23,10 @@ internal sealed class AboveOpeningAnalyzer(Func<Document, IGeometryReadContext> 
         public BuiltInCategory Category { get; } = category;
         public IGeometryReadContext Geometry { get; } = geometry;
         public Transform FromProject { get; } = fromProject;
+
+        /// <summary>Измеряет интервалы вдоль отрезка в координатах проекта, включая размещение связи.</summary>
+        public IReadOnlyList<MaterialInterval> Intersect(XYZ start, XYZ end) =>
+            Geometry.Intersect(Element, FromProject?.OfPoint(start) ?? start, FromProject?.OfPoint(end) ?? end);
     }
 
     private sealed class Column(ManagerOpeningSnapshot opening, GeometryPoint origin) {
@@ -36,13 +42,11 @@ internal sealed class AboveOpeningAnalyzer(Func<Document, IGeometryReadContext> 
         var results = new List<AboveOpeningFacts>(openings.Count);
         var columns = new List<Column>();
         foreach(var opening in openings) {
-            if(opening.Geometry?.TopCenter is { } origin) {
+            var center = opening.Geometry?.SearchTopCenter ?? ReadOptional(() => ReadSlabProbeCenter(geometry, opening));
+            if(center is { } origin) {
                 columns.Add(new Column(opening, origin));
             } else {
-                string reason = opening.Geometry?.Limitation ?? "Не определён верхний центр выреза.";
-                results.Add(new AboveOpeningFacts(opening.Element.UniqueId, null,
-                    new CentralMasonry(null, minimumMm, 0, reason),
-                    new UpperStructureResult([], LengthEpsilon, 0, reason)));
+                results.Add(UnknownTop(opening, minimumMm));
             }
         }
         if(columns.Count == 0) {
@@ -61,9 +65,20 @@ internal sealed class AboveOpeningAnalyzer(Func<Document, IGeometryReadContext> 
         try {
             bool linksComplete = AddLinkedSlabs(geometry.Document, phaseId, index, unlocated, linkResources);
             foreach(var column in columns) {
-                bool incomplete = catalogIncomplete || !linksComplete || unlocated.Count > 1
-                    || (unlocated.Count == 1 && !unlocated.Contains(column.Opening.CutWallUniqueId));
-                results.Add(MeasureColumn(geometry, column, minimumMm, incomplete));
+                var slabs = ReadSlabsAtHead(column, geometry.Document.Application.ShortCurveTolerance);
+                if(slabs.Count > 0) {
+                    results.Add(new AboveOpeningFacts(column.Opening.Element.UniqueId, column.Origin,
+                        new UpperStructureResult(slabs, LengthEpsilon, null, null)));
+                    continue;
+                }
+                if(column.Opening.Geometry is { TopCenter: null, HasConflictingCut: true }) {
+                    results.Add(UnknownTop(column.Opening, minimumMm));
+                    continue;
+                }
+                bool incomplete = catalogIncomplete || !linksComplete || unlocated.Any(id => !column.Opening.IsCutWall(id));
+                var measured = MeasureColumn(geometry, column, minimumMm, incomplete);
+                results.Add(column.Opening.Geometry.TopCenter.HasValue || measured.LimitingStructure is not null
+                    ? measured : UnknownTop(column.Opening, minimumMm));
             }
         } finally {
             foreach(var resource in linkResources) {
@@ -71,6 +86,55 @@ internal sealed class AboveOpeningAnalyzer(Func<Document, IGeometryReadContext> 
             }
         }
         return results.AsReadOnly();
+    }
+
+    // Проецирует центральную плоскость экземпляра на середину стены и берёт отметку верха относительно уровня.
+    private static GeometryPoint? ReadSlabProbeCenter(IGeometryReadContext geometry, ManagerOpeningSnapshot opening) {
+        if(opening.Geometry?.Wall is not { } wall
+            || geometry.Document.GetElement(opening.Element.UniqueId) is not FamilyInstance instance
+            || geometry.Document.GetElement(instance.LevelId) is not Level level
+            || geometry.GetWidthPlane(instance) is not { } width
+            || !instance.IsExistsParam(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM)
+            || instance.GetParam(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM) is not { HasValue: true } head) {
+            return null;
+        }
+        using var pose = instance.GetTransform();
+        if(pose.BasisX.Normalize().CrossProduct(AsXyz(wall.Along)).GetLength() > DirectionEpsilon) {
+            return null;
+        }
+        var center = wall.ToLocal(AsPoint(pose.OfPoint(new XYZ(width.Offset, 0, 0))));
+        return wall.ToWorld(center.X, 0, level.ProjectElevation + head.AsDouble() - wall.Origin.Z);
+    }
+
+    // Пересекает плиту снизу вверх, чтобы отличить её нижнюю поверхность от точки внутри тела или в отверстии.
+    private static List<UpperStructureHit> ReadSlabsAtHead(Column column, double reach) {
+        var hits = new List<UpperStructureHit>();
+        var head = AsXyz(column.Origin);
+        var start = head - XYZ.BasisZ * reach;
+        foreach(var (candidate, bounds) in column.Candidates) {
+            if(candidate.Category != BuiltInCategory.OST_Floors || bounds.Min.Z > head.Z + LengthEpsilon) {
+                continue;
+            }
+            var end = new XYZ(head.X, head.Y, Math.Max(head.Z + reach, bounds.Max.Z) + LengthEpsilon);
+            var intervals = candidate.Intersect(start, end);
+            if(intervals is null) {
+                continue;
+            }
+            var contact = intervals.SkipWhile(i => i.End <= reach).ToArray();
+            if(contact.Length > 0 && Math.Abs(contact[0].Start - reach) <= LengthEpsilon) {
+                var above = contact.Select(i => new MaterialInterval(Math.Max(0, i.Start - reach), i.End - reach));
+                hits.Add(new UpperStructureHit(candidate.UniqueId, candidate.TypeId, candidate.Category.ToString(),
+                    above.ToArray(), isSlab: true, isLinked: candidate.FromProject is not null));
+            }
+        }
+        return hits;
+    }
+
+    // При неподтверждённом верхе сохраняет неизвестную высоту кладки.
+    private static AboveOpeningFacts UnknownTop(ManagerOpeningSnapshot opening, double minimumMm) {
+        string reason = opening.Geometry?.Limitation ?? "Не определён верхний центр выреза.";
+        return new AboveOpeningFacts(opening.Element.UniqueId, null, new CentralMasonry(null, minimumMm, 0, reason),
+            new UpperStructureResult([], LengthEpsilon, 0, reason));
     }
 
     // Использует фазу связи и её полное преобразование только для геометрии плит над проёмом.
@@ -133,7 +197,7 @@ internal sealed class AboveOpeningAnalyzer(Func<Document, IGeometryReadContext> 
             return;
         }
         foreach(var column in index.Within(bounds, LengthEpsilon)) {
-            if(candidate.UniqueId != column.Opening.CutWallUniqueId && bounds.Max.Z > column.Origin.Z) {
+            if(!column.Opening.IsCutWall(candidate.UniqueId) && bounds.Max.Z > column.Origin.Z) {
                 column.Candidates.Add((candidate, bounds));
             }
         }
@@ -143,17 +207,19 @@ internal sealed class AboveOpeningAnalyzer(Func<Document, IGeometryReadContext> 
     private AboveOpeningFacts MeasureColumn(IGeometryReadContext geometry, Column column,
         double minimumMm, bool incomplete) {
         var start = AsXyz(column.Origin);
-        string hostId = column.Opening.CutWallUniqueId;
-        var host = hostId is null ? null : ReadOptional(() => geometry.Document.GetElement(hostId) as Wall);
-        var hostBounds = geometry.GetBounds(host);
-        double top = Math.Max(start.Z, hostBounds?.Max.Z ?? start.Z);
+        var walls = column.Opening.CutWallIds.Select(id => geometry.Document.GetElement(id) as Wall).ToArray();
+        var boundsByWall = walls.Select(geometry.GetBounds).ToArray();
+        double wallTop = boundsByWall.Max(bounds => bounds?.Max.Z) ?? start.Z;
+        double top = Math.Max(start.Z, wallTop);
         foreach(var candidate in column.Candidates) {
             top = Math.Max(top, candidate.Bounds.Max.Z);
         }
         var end = ProbeEnd(geometry, start, top);
-        var wallIntervals = hostBounds is null ? null
-            : geometry.Intersect(host, start, end ?? ProbeEnd(geometry, start, hostBounds.Max.Z));
-        double heightScale = Math.Max(1, Math.Max(Math.Abs(start.Z), Math.Abs(hostBounds?.Max.Z ?? start.Z)));
+        var sections = walls.Select((wall, i) => boundsByWall[i] is { } bounds
+            ? geometry.Intersect(wall, start, end ?? ProbeEnd(geometry, start, bounds.Max.Z)) : null).ToList();
+        var wallIntervals = sections.Count == 0 || sections.Any(part => part is null) ? null
+            : sections.Count == 1 ? sections[0] : MaterialInterval.Union(sections.SelectMany(part => part));
+        double heightScale = Math.Max(1, Math.Max(Math.Abs(start.Z), Math.Abs(wallTop)));
         double roundoff = Math.Min(LengthEpsilon, SystemPluginConfig.CoordinateRoundoffFactor * heightScale);
         var masonry = new CentralMasonry(wallIntervals, minimumMm, roundoff,
             wallIntervals is null ? "Не удалось измерить интервалы материала стены-хоста." : null);
@@ -163,8 +229,7 @@ internal sealed class AboveOpeningAnalyzer(Func<Document, IGeometryReadContext> 
         string reason = incomplete ? "Часть верхних конструкций не удалось определить или локализовать." : null;
         foreach(var (candidate, bounds) in column.Candidates) {
             var target = end ?? ProbeEnd(geometry, start, bounds.Max.Z);
-            var intervals = target is null ? null : candidate.Geometry.Intersect(candidate.Element,
-                candidate.FromProject?.OfPoint(start) ?? start, candidate.FromProject?.OfPoint(target) ?? target);
+            var intervals = target is null ? null : candidate.Intersect(start, target);
             if(intervals is null) {
                 double lower = Math.Max(0, bounds.Min.Z - start.Z);
                 if(!unknownFrom.HasValue || lower < unknownFrom.Value) {

@@ -16,10 +16,10 @@ internal sealed class ProcessingTarget(Document document, FamilyInstance opening
     public FamilyInstance Lintel { get; } = lintel;
     public OpeningLintelMatch Match { get; } = match;
     public OpeningLintelMatch InstalledPair { get; internal set; }
+    internal ManagerLintelSnapshot CorrectedLintel { get; set; }
     public FamilyInstance InstalledLintel { get; internal set; }
     public LintelCalculation Calculation { get; } = calculation;
     public LintelComparison Comparison { get; internal set; }
-    public IReadOnlyList<StructureCandidate> EndWalls { get; internal set; }
     public CorrectionSnapshot BeforeCorrection { get; internal set; }
     public IGeometryReadContext LockGeometry { get; internal set; }
     public string CreatedLockId { get; internal set; }
@@ -30,6 +30,7 @@ internal sealed class ProcessingTarget(Document document, FamilyInstance opening
 internal sealed class ProcessingAction(ManagerAction action, Action<ProcessingTarget, CancellationToken> apply,
     Action<ProcessingTarget> verify) {
     public ManagerAction Action { get; } = action;
+    public bool ChangesFixation => Action is ManagerAction.SetFixation or ManagerAction.ClearFixation;
     public Action<ProcessingTarget, CancellationToken> Apply { get; } = apply ?? throw new ArgumentNullException(nameof(apply));
     public Action<ProcessingTarget> Verify { get; } = verify ?? throw new ArgumentNullException(nameof(verify));
 }

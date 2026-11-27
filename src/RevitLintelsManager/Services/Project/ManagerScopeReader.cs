@@ -60,7 +60,7 @@ internal sealed class ManagerScopeReader(RevitRepository source, IProjectSnapsho
         }
         var selection = GetScopeSelection(activeDocument, request, state);
         using var collector = CreateScopeCollector(request.Scope, view, selection);
-        var project = snapshots.ReadScopeSnapshot(state.Config, phaseId, request.Scope, collector, out _);
+        var project = snapshots.ReadScopeSnapshot(state.Config, phaseId, request.Scope, collector);
         var rows = project.GetRows().Select(row => {
             LintelCalculation calculation = null;
             if(row.Opening is not null) {
@@ -69,9 +69,13 @@ internal sealed class ManagerScopeReader(RevitRepository source, IProjectSnapsho
             return analysis.Analyze(request.DocumentToken, row, calculation, state.Config);
         });
         string viewUniqueId = view?.UniqueId;
-        return new ManagerDocumentContext(request.DocumentToken, request.Generation, Document.Title,
+        var context = new ManagerDocumentContext(request.DocumentToken, request.Generation, Document.Title,
             viewUniqueId, view?.Name, GetSelectionUniqueIds(selection), project,
             CreateScopeStamp(request.Scope, viewUniqueId, selection), GetRemovedKeys(request), rows);
+        if(request.Generation == state.Generation && request.DocumentToken == state.DocumentToken) {
+            state.AnalysisContext = context;
+        }
+        return context;
     }
 
     // Уточняет исчезновение по UniqueId, чтобы сохранить состояние после Undo до обновления.

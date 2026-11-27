@@ -91,13 +91,13 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
     internal static XYZ GetAlignedCenter(IGeometryReadContext geometry, FamilyInstance opening, Family lintelFamily,
         AlignmentPlanes planes, XYZ lintelDirection) {
         var center = AsXyz(planes.Center);
-        if(geometry.GetWidthOriginOffset(opening.Symbol.Family) is not double openingOffset
+        if(geometry.GetWidthPlane(opening) is not { } openingPlaneFacts
             || geometry.GetWidthOriginOffset(lintelFamily) is not double lintelOffset) {
             return center;
         }
         using var pose = opening.GetTransform();
         var normal = pose.BasisX.Normalize();
-        var openingPlane = pose.OfPoint(new XYZ(openingOffset, 0, 0));
+        var openingPlane = pose.OfPoint(new XYZ(openingPlaneFacts.Offset, 0, 0));
         var lintelPlane = center + lintelDirection * lintelOffset;
         double gap = (openingPlane - lintelPlane).DotProduct(normal);
         return Math.Abs(gap) <= LengthEpsilon ? center + normal * gap : center;
@@ -134,7 +134,7 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
             owners.Remove(opening.Id);
             owners.Remove(opening.Host?.Id);
         }
-        var annotations = FindLintelAnnotations(owners);
+        var annotations = FindLintelAnnotations(owners, geometry.ProcessingData.Annotations);
         if(annotations.Count > 0) {
             var deleted = Document.Delete(annotations);
             CheckCascade(deleted, annotations, lintel.Id, localization);
@@ -146,19 +146,16 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
     }
 
     // Учитывает зависимые аннотации и ссылки с любых видов, включая марки нескольких элементов и цепочки размеров.
-    private HashSet<ElementId> FindLintelAnnotations(HashSet<ElementId> owners) {
+    private HashSet<ElementId> FindLintelAnnotations(HashSet<ElementId> owners, LintelAnnotationIndex index) {
         using var dimensions = new ElementClassFilter(typeof(Dimension));
         using var tags = new ElementClassFilter(typeof(IndependentTag));
         using var filter = new LogicalOrFilter(dimensions, tags);
         var result = owners.SelectMany(id => Document.GetElement(id).GetDependentElements(filter)).ToHashSet();
-        using var collector = new FilteredElementCollector(Document);
-        foreach(var item in collector.WherePasses(filter).WhereElementIsNotElementType()) {
-            if(!result.Contains(item.Id) && RevitElementRead.ReadOptional(() => item switch {
-                    IndependentTag tag => owners.Overlaps(tag.GetTaggedLocalElementIds()),
-                    Dimension dimension => dimension.References?.Cast<Reference>()
-                        .Any(reference => reference is not null && owners.Contains(reference.ElementId)) == true,
-                    _ => false
-                })) {
+        var ownerIds = owners.Select(id => (long) id.GetIdValue()).ToHashSet();
+        index ??= LintelAnnotationIndex.Read(Document, ownerIds);
+        foreach(var item in index.GetElements(Document, ownerIds, false)) {
+            if(!result.Contains(item.Id)
+                && LintelAnnotationIndex.ReadOwners(item)?.OfType<long>().Any(ownerIds.Contains) == true) {
                 result.Add(item.Id);
             }
         }
@@ -195,23 +192,31 @@ internal sealed class RevitRepository(UIApplication uiApplication) {
                 > SystemPluginConfig.LockCoincidenceToleranceFeet) {
             throw new InvalidOperationException(localization.GetLocalizedString("Processing.LockPlanes"));
         }
-        using var views = new FilteredElementCollector(Document);
-        var plan = views.OfClass(typeof(ViewPlan)).Cast<ViewPlan>().FirstOrDefault(view =>
-            !view.IsTemplate && view.ViewType == ViewType.FloorPlan && view.GenLevel?.Id == opening.LevelId
-            && Math.Abs(view.ViewDirection.DotProduct(first.Normal)) <= DirectionEpsilon)
+        var plans = geometry.ProcessingData.FloorPlans ?? ReadFloorPlans();
+        var plan = plans[opening.LevelId.GetIdValue()].Select(id => Document.GetElement(id)).OfType<ViewPlan>()
+            .FirstOrDefault(view => !view.IsTemplate && view.ViewType == ViewType.FloorPlan
+                && view.GenLevel?.Id == opening.LevelId && Math.Abs(view.ViewDirection.DotProduct(first.Normal)) <= DirectionEpsilon)
             ?? throw new InvalidOperationException(localization.GetLocalizedString("Processing.LockView"));
         var dimension = Document.Create.NewAlignment(plan, first.Reference, second.Reference);
         return dimension?.UniqueId ?? throw new InvalidOperationException(localization.GetLocalizedString("Processing.LockFailed"));
 
-        // Получает ссылки заново после регенерации, используя только факты определения семейства из кеша.
+        // Получает ссылки заново после регенерации и берёт локальное смещение из снимка.
         (Reference Reference, XYZ Origin, XYZ Normal) ResolveCenter(FamilyInstance instance, AlignmentPlanes expected) {
             var ids = LintelLockReader.ReadCenterIdentities(geometry, instance, expected);
-            if(ids.Length != 1 || geometry.GetWidthOriginOffset(instance.Symbol.Family) is not double offset) {
+            if(ids.Length != 1 || geometry.GetWidthPlane(instance) is not { } width) {
                 throw new InvalidOperationException(localization.GetLocalizedString("Processing.LockReference", instance.UniqueId));
             }
             using var pose = instance.GetTransform();
             return (Reference.ParseFromStableRepresentation(Document, ids[0]),
-                pose.OfPoint(new XYZ(offset, 0, 0)), pose.BasisX.Normalize());
+                pose.OfPoint(new XYZ(width.Offset, 0, 0)), pose.BasisX.Normalize());
         }
+    }
+
+    /// <summary>Запоминает планы этажей по уровню для создания замков всего диапазона.</summary>
+    internal ILookup<long, string> ReadFloorPlans() {
+        using var views = new FilteredElementCollector(Document);
+        return views.OfClass(typeof(ViewPlan)).Cast<ViewPlan>()
+            .Where(view => !view.IsTemplate && view.ViewType == ViewType.FloorPlan && view.GenLevel is not null)
+            .ToLookup(view => (long) view.GenLevel.Id.GetIdValue(), view => view.UniqueId);
     }
 }

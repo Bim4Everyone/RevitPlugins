@@ -30,6 +30,9 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
             if(start != TransactionStatus.Started) {
                 result = End(start, ProcessingStatus.Fatal);
             } else {
+                if(action.ChangesFixation) {
+                    _failures.FixationGroupMessage = localization.GetLocalizedString("Processing.FixationGroup");
+                }
                 var options = transaction.GetFailureHandlingOptions();
                 options.SetClearAfterRollback(true).SetForcedModalHandling(true)
                     .SetFailuresPreprocessor(_failures).SetTransactionFinalizer(_failures);
@@ -41,7 +44,7 @@ internal sealed class ProcessingTransaction(ProcessingOperation operation, Trans
                 if(!isCurrent()) {
                     throw new System.OperationCanceledException(localization.GetLocalizedString("Processing.StaleOrCanceled"));
                 }
-                if(target.Lintel is { Pinned: true } lintel) {
+                if(!action.ChangesFixation && target.Lintel is { Pinned: true } lintel) {
                     lintel.Pinned = false;
                 }
                 action.Apply(target, token);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -35,10 +36,27 @@ internal sealed class LintelParameterFact(string name, LintelParameterState stat
     public LintelParameterState State { get; } = state;
 }
 
+/// <summary>Свойства параметра внутри семейства для сверки с текущими привязками проекта.</summary>
+internal readonly struct LintelDefinitionParameter(LintelParameterState state, bool instance, Guid? sharedId) {
+    internal LintelParameterState State { get; } = state;
+    internal bool Instance { get; } = instance;
+    internal Guid? SharedId { get; } = sharedId;
+}
+
+/// <summary>Сведения из редактора семейства, зависящие от сопоставлений параметров сессии.</summary>
+internal sealed class LintelDefinitionFacts(int? left, IReadOnlyDictionary<string, LintelDefinitionParameter> parameters,
+    bool complete, FamilyOriginFacts origin = default) {
+    internal FamilyOriginFacts Origin { get; } = origin;
+    internal int? Left { get; } = left;
+    internal IReadOnlyDictionary<string, LintelDefinitionParameter> Parameters { get; } = parameters;
+    internal bool Complete { get; } = complete;
+}
+
 /// <summary>Числовые факты загруженного семейства и контекст будущего размещения.</summary>
 internal sealed class LintelFamilyFacts(string familyId, IEnumerable<string> typeIds, int? familyLeftSign,
     IReadOnlyDictionary<string, LintelParameterFact> parameters, long? activeWorksetId) {
     public string FamilyId { get; } = familyId;
+    internal FamilyOriginFacts Origin { get; set; }
     public IReadOnlyList<string> TypeIds { get; } = typeIds.ToList().AsReadOnly();
     public int? FamilyLeftSign { get; } = familyLeftSign;
     public IReadOnlyDictionary<string, LintelParameterFact> Parameters { get; } =

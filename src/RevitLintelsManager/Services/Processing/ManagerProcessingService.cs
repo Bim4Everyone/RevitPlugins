@@ -11,14 +11,16 @@ using dosymep.Revit;
 using dosymep.SimpleServices;
 
 using RevitLintelsManager.Models;
+using RevitLintelsManager.Models.Configs;
 
 namespace RevitLintelsManager.Services;
 
 /// <summary>Связывает утверждённые назначения с исходным документом и одной локальной транзакцией.</summary>
 internal sealed class ManagerProcessingService(RevitRepository source, ManagerSessionState state,
-    IProjectSnapshotReader snapshots, IManagerAnalysisService analysis, IProcessingConfirmation confirmation,
+    IProcessingConfirmation confirmation,
     ILocalizationService localization, ILoggerService logger, Func<Document, IGeometryReadContext> openGeometry,
-    ILintelLockReader lockReader, ILintelInstallationService installation, ILintelCorrectionService correction)
+    ILintelLockReader lockReader, ILintelInstallationService installation, ILintelCorrectionService correction,
+    IParamService parameters)
     : IManagerProcessingService {
     private volatile ApprovedProcessingPlan _approved;
     private volatile bool _faulted;
@@ -42,10 +44,62 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
             ManagerAction.Install => new ProcessingAction(ManagerAction.Install, ApplyInstall, installation.Verify),
             ManagerAction.Replace => new ProcessingAction(ManagerAction.Replace, ApplyReplace, VerifyReplace),
             ManagerAction.Delete => new ProcessingAction(ManagerAction.Delete, ApplyDelete, VerifyDelete),
+            ManagerAction.SetFixation or ManagerAction.ClearFixation => CreateFixationAction(assigned),
             ManagerAction.Correct => new ProcessingAction(ManagerAction.Correct,
                 (target, ct) => correction.Apply(target, state.Config, ct), target => correction.Verify(target, state.Config)),
             _ => null
         };
+
+    // Меняет признак фиксации у участников строки и проверяет их после регенерации.
+    private ProcessingAction CreateFixationAction(ManagerAction action) {
+        string key = nameof(LintelManagerConfig.LintelFixParam);
+        string name = state.Config.Parameters[key];
+        bool isFixed = action == ManagerAction.SetFixation;
+        var value = new LintelParameterValue(key, name, LintelParameterKind.YesNo, null, isFixed);
+        return new ProcessingAction(action, (target, token) => {
+            var instances = GetActionInstances(target, action).ToArray();
+            if(instances.Length == 0) {
+                throw new System.InvalidOperationException(localization.GetLocalizedString("Processing.Parameter", name));
+            }
+            foreach(var instance in instances) {
+                token.ThrowIfCancellationRequested();
+                if(parameters.ReadFixation(instance, name) == isFixed) {
+                    continue;
+                }
+                try {
+                    if(parameters.WriteInstanceValue(instance, value)) {
+                        continue;
+                    }
+                } catch(Exception error) when(instance.GroupId != ElementId.InvalidElementId && error is
+                    Autodesk.Revit.Exceptions.InvalidOperationException or System.InvalidOperationException
+                    or Autodesk.Revit.Exceptions.ArgumentException) {
+                    throw new System.InvalidOperationException(Text("FixationGroup"), error);
+                }
+                throw new System.InvalidOperationException(instance.GroupId != ElementId.InvalidElementId
+                    ? Text("FixationGroup") : localization.GetLocalizedString("Processing.Parameter", name));
+            }
+        }, target => {
+            foreach(var instance in GetActionInstances(target, action)) {
+                if(parameters.ReadFixation(instance, name) != isFixed) {
+                    throw new System.InvalidOperationException(Text(instance.GroupId != ElementId.InvalidElementId
+                        ? "FixationGroup" : "FixationFailed"));
+                }
+            }
+        });
+    }
+
+    // При изменении фиксации обрабатывает существующие элементы строки с подтверждённым параметром.
+    private static IEnumerable<FamilyInstance> GetActionInstances(ProcessingTarget target, ManagerAction action) {
+        bool changesFixation = action is ManagerAction.SetFixation or ManagerAction.ClearFixation;
+        if(target.Opening is { } opening
+            && (!changesFixation || target.Match.Opening.Element.Information.IsFixed.HasValue)) {
+            yield return opening;
+        }
+        if(target.Lintel is { } lintel
+            && (!changesFixation || target.Match.Lintel.Element.Information.IsFixed.HasValue)) {
+            yield return lintel;
+        }
+    }
 
     /// <inheritdoc />
     public ProcessingBatchResult ExecuteBatch(ApprovedProcessingPlan approved, CancellationToken token, IProgress<int> progress) {
@@ -107,7 +161,7 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
         var original = target.Match;
         bool openingPreserved = original.Opening is not { } opening || (target.Opening is { IsValidObject: true }
             && target.Opening.UniqueId == opening.Element.UniqueId && target.Opening.Host?.UniqueId == opening.HostWallUniqueId
-            && (opening.CutWallUniqueId is null || target.Document.GetElement(opening.CutWallUniqueId) is Wall));
+            && opening.CutWallIds.All(id => target.Document.GetElement(id) is Wall));
         if(target.Lintel.IsValidObject || target.Document.GetElement(original.Lintel.Element.UniqueId) is not null || !openingPreserved) {
             throw new System.InvalidOperationException(Text("DeletePair"));
         }
@@ -195,19 +249,20 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
             } else if(operation.Action == ManagerAction.Skip || action?.Action != operation.Action) {
                 result = new ProcessingResult(operation, ProcessingStatus.Skipped, [Text("ActionUnavailable")]);
             } else {
-                var target = Revalidate(operation);
-                using var geometry = openGeometry(source.Document);
+                var target = Revalidate(approved, operation);
+                using var geometry = action.ChangesFixation ? null : openGeometry(source.Document);
                 target.LockGeometry = geometry;
-                if(operation.Action != ManagerAction.Delete) {
-                    // EditFamily допускается только перед открытием изменяющей транзакции.
-                    geometry.GetWidthOriginPlane(target.Opening.Symbol.Family);
-                    var family = operation.Action is ManagerAction.Lock or ManagerAction.Correct ? target.Lintel.Symbol.Family
-                        : source.Document.GetElement(target.Calculation.Family.UniqueId) as Family;
-                    geometry.GetOriginPlanes(family);
+                if(geometry is not null) {
+                    geometry.ProcessingData = state.AnalysisContext.Project.ProcessingData;
                 }
                 token.ThrowIfCancellationRequested();
                 var tx = new ProcessingTransaction(operation, new Transaction(source.Document, Text("Transaction")), localization);
                 result = tx.Run(target, action, token, () => CanExecute(approved));
+                if(result.Status == ProcessingStatus.Succeeded
+                    && operation.Action is ManagerAction.Install or ManagerAction.Replace or ManagerAction.Delete or ManagerAction.Correct) {
+                    approved.MatchChanges.Record(geometry.ProcessingData, target.Match.Lintel,
+                        target.InstalledPair?.Lintel ?? target.CorrectedLintel, state.Config.MatchLimits);
+                }
                 if(result.Status == ProcessingStatus.Pending) {
                     _pending = tx;
                 }
@@ -258,35 +313,35 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
     private bool IsCurrent(Guid token, long generation) =>
         token == state.DocumentToken && generation == state.Generation && !state.IsClosing && !state.IsBlocked;
 
-    // Читает пару по всему проекту с ограничением выдачи по ID. EditFamily выполняется до Transaction.Start.
-    private ProcessingTarget Revalidate(ProcessingOperation operation) {
+    // Берёт расчёт подтверждённого диапазона и проверяет только действующих владельцев строки.
+    private ProcessingTarget Revalidate(ApprovedProcessingPlan approved, ProcessingOperation operation) {
         var document = source.Document;
         if(document.IsModifiable) {
             throw new System.InvalidOperationException(Text("TransactionAlreadyOpen"));
         }
-        var opening = Resolve(operation.Key.OpeningUniqueId);
-        var lintel = Resolve(operation.Key.LintelUniqueId);
-        var ids = new List<ElementId>();
-        if(opening is not null) {
-            ids.Add(opening.Id);
+        var context = state.AnalysisContext;
+        if(context is null || context.Generation != approved.Plan.Generation
+            || !context.RowsByKey.TryGetValue(operation.Key, out var current)) {
+            throw new System.InvalidOperationException(Text("PairChanged"));
         }
-        if(lintel is not null) {
-            ids.Add(lintel.Id);
-        }
-        using var collector = new FilteredElementCollector(document, ids);
-        var project = snapshots.ReadScopeSnapshot(state.Config, source.GetReadPhaseId(state.Config),
-            ManagerScope.Selected, collector, out var endWalls);
-        var match = project.GetRows().SingleOrDefault(row => row.Opening?.Element.UniqueId == operation.Key.OpeningUniqueId
-            && row.Lintel?.Element.UniqueId == operation.Key.LintelUniqueId);
-        if(match is null || match.Opening?.Element.TypeUniqueId != operation.OpeningTypeId
-            || match.Lintel?.Element.TypeUniqueId != operation.LintelTypeId) {
+        var match = current.Match;
+        var opening = Resolve(match.Opening?.Element, match.Opening?.Geometry);
+        var lintel = Resolve(match.Lintel?.Element, match.Lintel?.Geometry);
+        if(opening?.Symbol.UniqueId != operation.OpeningTypeId || lintel?.Symbol.UniqueId != operation.LintelTypeId
+            || (opening is not null && !OpeningIsCurrent(opening, match.Opening))
+            || !approved.MatchChanges.PreservesPair(context.Project.ProcessingData, match, state.Config.MatchLimits)) {
             throw new System.InvalidOperationException(Text("PairChanged"));
         }
         LintelCalculation calculation = null;
         if(opening is not null) {
-            project.Calculations.TryGetValue(opening.UniqueId, out calculation);
+            context.Project.Calculations.TryGetValue(opening.UniqueId, out calculation);
         }
-        var current = analysis.AnalyzeForProcessing(state.DocumentToken, match, calculation, state.Config, out var comparison);
+        if(operation.Action is ManagerAction.Install or ManagerAction.Replace && document.IsWorkshared) {
+            using var worksets = document.GetWorksetTable();
+            if(calculation?.Context?.ActiveWorksetId != worksets.GetActiveWorksetId().IntegerValue) {
+                throw new System.InvalidOperationException(Text("PairChanged"));
+            }
+        }
         if(!current.Snapshot.AllowedActions.Contains(operation.Action)
             || (operation.Action is ManagerAction.Install or ManagerAction.Replace
                 && (calculation?.Type is null || calculation.Type.UniqueId != operation.TargetTypeId))
@@ -296,22 +351,44 @@ internal sealed class ManagerProcessingService(RevitRepository source, ManagerSe
                     localization.GetLocalizedString(issue.LocalizationKey, issue.Arguments.Cast<object>().ToArray()));
             throw new System.InvalidOperationException(string.Join(" ", new[] { Text("ActionUnavailable") }.Concat(issues)));
         }
-        EnsureWritable(opening);
-        EnsureWritable(lintel);
-        return new ProcessingTarget(document, opening, lintel, match, calculation) {
-            Comparison = comparison,
-            EndWalls = endWalls
+        var target = new ProcessingTarget(document, opening, lintel, match, calculation) {
+            Comparison = current.Comparison
         };
+        foreach(var instance in GetActionInstances(target, operation.Action)) {
+            EnsureWritable(instance);
+        }
+        return target;
+    }
+
+    // Проверяет хост, стену выреза, уровень и размеры проёма без повторного измерения кладки.
+    private bool OpeningIsCurrent(FamilyInstance opening, ManagerOpeningSnapshot snapshot) {
+        var document = source.Document;
+        var names = state.Config.Parameters;
+        return opening.Host?.UniqueId == snapshot.HostWallUniqueId
+            && snapshot.CutWallIds.All(id => document.GetElement(id) is Wall)
+            && document.GetElement(opening.LevelId)?.UniqueId == snapshot.LevelUniqueId
+            && parameters.ReadLengthMm(opening, opening.Symbol, names[nameof(OpeningFamilyConfig.LintelOpeningWidth)])
+                == snapshot.WidthMm
+            && parameters.ReadLengthMm(opening, opening.Symbol, names[nameof(OpeningFamilyConfig.LintelOpeningHeight)])
+                == snapshot.HeightMm;
     }
 
     // Разрешает идентификатор только в исходном документе.
-    private FamilyInstance Resolve(string uniqueId) {
-        if(uniqueId is null) {
+    private FamilyInstance Resolve(ManagerFamilySnapshot snapshot, GeometryFacts geometry) {
+        if(snapshot is null) {
             return null;
         }
         var document = source.Document;
-        if(document.GetElement(uniqueId) is not FamilyInstance { IsValidObject: true } instance) {
-            throw new System.InvalidOperationException(localization.GetLocalizedString("Processing.Missing", uniqueId));
+        if(document.GetElement(snapshot.UniqueId) is not FamilyInstance { IsValidObject: true } instance) {
+            throw new System.InvalidOperationException(localization.GetLocalizedString("Processing.Missing", snapshot.UniqueId));
+        }
+        var info = snapshot.Information;
+        if(!LintelLockReader.MatchesInstance(instance, snapshot, geometry)
+            || parameters.ReadFixation(instance, state.Config.Parameters[nameof(LintelManagerConfig.LintelFixParam)]) != info.IsFixed
+            || (instance.GroupId != ElementId.InvalidElementId) != info.IsInGroup
+            || instance.CreatedPhaseId.GetIdValue() != info.Phases.CreatedId
+            || instance.DemolishedPhaseId.GetIdValue() != info.Phases.DemolishedId) {
+            throw new System.InvalidOperationException(Text("PairChanged"));
         }
         return instance;
     }

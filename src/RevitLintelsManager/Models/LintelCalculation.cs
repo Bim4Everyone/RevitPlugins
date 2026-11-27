@@ -96,6 +96,15 @@ internal sealed class LintelCalculation(ManagerOpeningSnapshot opening, ManagerW
     AboveOpeningFacts above, OpeningBearingFacts sideFacts, BearingResult left, BearingResult right,
     LintelTarget target, IReadOnlyDictionary<string, string> parameterNames, LintelPlacementContext context,
     IEnumerable<CalculationIssue> issues) {
+    /// <summary>Сохраняет причину отсутствия перемычки, когда подбор для пустого проёма не нужен.</summary>
+    public LintelCalculation(ManagerOpeningSnapshot opening, AboveOpeningFacts above)
+        : this(opening, wall: null, matchedLintelId: null, ruleConfigName: null, group: null, rule: null,
+            family: null, type: null, widthMm: opening.WidthMm, thicknessMm: null, above: above, sideFacts: null,
+            left: null, right: null, target: null, parameterNames: new Dictionary<string, string>(), context: null,
+            issues: []) {
+        LintelNotRequired = true;
+    }
+
     public ManagerOpeningSnapshot Opening { get; } = opening;
     public ManagerWallSnapshot Wall { get; } = wall;
     public string MatchedLintelId { get; } = matchedLintelId;
@@ -115,7 +124,8 @@ internal sealed class LintelCalculation(ManagerOpeningSnapshot opening, ManagerW
         thicknessMm, left, right, target?.FamilyLeftAtTarget);
     public LintelPlacementContext Context { get; } = context;
     public IReadOnlyList<CalculationIssue> Issues { get; } = issues.ToList().AsReadOnly();
-    public bool IsApplicable => Issues.Count == 0;
+    public bool LintelNotRequired { get; } = above?.LimitingStructure is not null;
+    public bool IsApplicable => !LintelNotRequired && Issues.Count == 0;
 
     /// <summary>Проецирует тот же расчёт на стороны подтверждённого положения этого семейства.</summary>
     /// <param name="placement">Положение экземпляра выбранного семейства.</param>

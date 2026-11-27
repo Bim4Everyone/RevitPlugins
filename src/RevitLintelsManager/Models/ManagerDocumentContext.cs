@@ -20,6 +20,7 @@ internal sealed class ManagerDocumentContext(Guid documentToken, long generation
     public IReadOnlyList<ManagerItemKey> RemovedKeys { get; } = removedKeys is null
         ? Array.Empty<ManagerItemKey>() : removedKeys.ToList().AsReadOnly();
     public IReadOnlyList<ManagerAnalyzedRow> AnalyzedRows { get; }
+    internal IReadOnlyDictionary<ManagerItemKey, ManagerAnalyzedRow> RowsByKey { get; }
 
     /// <summary>Добавляет подготовленные строки того же поколения, что и снимок проекта.</summary>
     public ManagerDocumentContext(Guid documentToken, long generation, string documentTitle, string viewUniqueId,
@@ -28,5 +29,6 @@ internal sealed class ManagerDocumentContext(Guid documentToken, long generation
         : this(documentToken, generation, documentTitle, viewUniqueId, viewName, selectionUniqueIds, project,
             scopeStamp, removedKeys) {
         AnalyzedRows = rows.ToList().AsReadOnly();
+        RowsByKey = AnalyzedRows.ToDictionary(row => row.Snapshot.Key);
     }
 }

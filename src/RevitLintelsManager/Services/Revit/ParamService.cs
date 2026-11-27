@@ -118,19 +118,44 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
     }
 
     /// <inheritdoc />
-    public bool? ReadFixation(Element instance, string name) {
+    public bool? ReadYesNo(Element instance, string name, bool? unsetValue = null) {
         var parameter = FindMappedParameter(instance, null, name);
-        if(parameter?.HasValue != true || parameter.StorageType != StorageType.Integer
+        if(parameter is null || parameter.StorageType != StorageType.Integer
             || parameter.Definition.GetDataType() != SpecTypeId.Boolean.YesNo) {
             return null;
+        }
+        if(!parameter.HasValue) {
+            return unsetValue;
         }
         return parameter.AsInteger() switch { 0 => false, 1 => true, _ => null };
     }
 
     /// <inheritdoc />
-    public IReadOnlyDictionary<string, LintelParameterFact> ReadLintelParameterFacts(Document project,
-        Document familyDocument, Family family, FamilyInstance sample, IReadOnlyDictionary<string, string> mappings) {
+    public bool? ReadFixation(Element instance, string name) {
+        return ReadYesNo(instance, name, unsetValue: false);
+    }
+
+    /// <inheritdoc />
+    public IReadOnlyDictionary<string, LintelDefinitionParameter> ReadDefinitionParameters(Document familyDocument,
+        IReadOnlyDictionary<string, string> mappings) {
         var familyParameters = familyDocument.FamilyManager.GetParameters().ToLookup(p => p.Definition.Name);
+        return LintelParameterSpec.All.ToDictionary(spec => spec.Key, spec => {
+            mappings.TryGetValue(spec.Key, out string name);
+            var candidates = familyParameters[name].Take(2).ToArray();
+            if(candidates.Length != 1) {
+                return new LintelDefinitionParameter(candidates.Length == 0 ? LintelParameterState.Missing
+                    : LintelParameterState.Ambiguous, false, null);
+            }
+            var parameter = candidates[0];
+            return new LintelDefinitionParameter(GetDefinitionState(parameter, spec), parameter.IsInstance,
+                parameter.IsShared ? parameter.GUID : null);
+        });
+    }
+
+    /// <inheritdoc />
+    public IReadOnlyDictionary<string, LintelParameterFact> ReadLintelParameterFacts(Document project,
+        IReadOnlyDictionary<string, LintelDefinitionParameter> familyParameters, Family family,
+        FamilyInstance sample, IReadOnlyDictionary<string, string> mappings) {
         var bindings = new List<(InternalDefinition Definition, bool Instance)>();
         using var iterator = project.ParameterBindings.ForwardIterator();
         while(iterator.MoveNext()) {
@@ -143,34 +168,34 @@ internal class ParamService(IRevitParamFactory revitParamFactory, ILoggerService
         return new ReadOnlyDictionary<string, LintelParameterFact>(LintelParameterSpec.All.ToDictionary(
             spec => spec.Key, spec => {
                 mappings.TryGetValue(spec.Key, out string name);
-                var candidates = familyParameters[name].Take(2).ToArray();
                 var projectParameters = byName[name].Take(2).ToArray();
-                var state = InspectParameter(project, sample, spec, name, candidates, projectParameters);
+                var state = InspectParameter(project, sample, spec, name, familyParameters[spec.Key], projectParameters);
                 return new LintelParameterFact(name, state);
             }));
     }
 
     // Учитывает параметры определения и отдельные проектные привязки с тем же именем.
     private static LintelParameterState InspectParameter(Document project, FamilyInstance sample,
-        LintelParameterSpec spec, string name, FamilyParameter[] familyParameters,
+        LintelParameterSpec spec, string name, LintelDefinitionParameter parameter,
         (InternalDefinition Definition, bool Instance)[] projectParameters) {
-        if(familyParameters.Length > 1 || projectParameters.Length > 1) {
+        if(parameter.State == LintelParameterState.Ambiguous || projectParameters.Length > 1) {
             return LintelParameterState.Ambiguous;
         }
-        var parameter = familyParameters.SingleOrDefault();
         if(projectParameters.Length == 1) {
             var (definition, instance) = projectParameters[0];
-            if(parameter is null) {
+            if(parameter.State == LintelParameterState.Missing) {
                 return instance ? InspectProjectInstance(sample, spec, name) : LintelParameterState.Type;
             }
-            if(!parameter.IsShared || project.GetElement(definition.Id) is not SharedParameterElement shared
-                || shared.GuidValue != parameter.GUID || instance != parameter.IsInstance) {
+            if(!parameter.SharedId.HasValue || project.GetElement(definition.Id) is not SharedParameterElement shared
+                || shared.GuidValue != parameter.SharedId || instance != parameter.Instance) {
                 return LintelParameterState.Ambiguous;
             }
         }
-        if(parameter is null) {
-            return LintelParameterState.Missing;
-        }
+        return parameter.State;
+    }
+
+    // У параметров типа, управляемых формулой и отчётных параметров разные причины недоступности.
+    private static LintelParameterState GetDefinitionState(FamilyParameter parameter, LintelParameterSpec spec) {
         if(!parameter.IsInstance) {
             return LintelParameterState.Type;
         }

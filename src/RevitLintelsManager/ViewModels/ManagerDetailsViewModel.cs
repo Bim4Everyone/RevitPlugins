@@ -17,28 +17,28 @@ internal sealed class ManagerDetailsViewModel {
         ItemKey = itemKey;
         GroupKey = groupKey;
         IsOpening = element.IsOpening;
-        IsLintelMissing = element.IsLintelMissing;
+        IsStatusPlaceholder = element.IsStatusPlaceholder;
+        IsLintelNotRequired = element.IsLintelNotRequired;
         string family = element.Element?.Information?.FamilyName;
-        Subject = string.IsNullOrWhiteSpace(family) ? element.TypeName : $"{family}: {element.TypeName}";
+        Subject = element.IsLintelNotRequired ? localization.GetLocalizedString("Manager.Status.LintelNotRequired")
+            : string.IsNullOrWhiteSpace(family) ? element.TypeName : $"{family}: {element.TypeName}";
         IsWarnings = warnings;
-        IsFixed = element.IsFixed;
         IsAnalysisPending = warnings && element.IsAnalysisPending;
         HasWarnings = element.HasWarnings;
+        IsFixed = element.IsFixed;
         Title = IsAnalysisPending ? element.StatusText : localization.GetLocalizedString(!warnings
             ? "Manager.Information" : IsFixed ? "Manager.Status.Fixed"
                 : HasWarnings ? "Manager.HasWarnings" : "Manager.NoWarnings");
         Status = warnings ? element.StatusText : null;
         Fields = warnings ? Array.Empty<ManagerDetailField>() : GetInformationFields(element, localization);
         ElementWarnings = warnings ? Format(element.Element?.Diagnostics, localization) : Array.Empty<string>();
-        RowWarnings = warnings ? Format(element.RowDiagnostics, localization) : Array.Empty<string>();
+        RowWarnings = warnings ? Format(element.RowDiagnostics.Where(item => !item.IsInformational), localization) : [];
         var descriptions = ElementWarnings.Concat(RowWarnings)
-            .Where(description => !IsLintelMissing || description != Subject).Distinct().ToList();
-        if(warnings && HasWarnings && !IsLintelMissing && descriptions.Count == 0) {
+            .Where(description => !element.IsLintelMissing || description != Subject).Distinct().ToList();
+        if(warnings && HasWarnings && !element.IsLintelMissing && descriptions.Count == 0) {
             descriptions.Add(element.StatusText);
         }
-        Descriptions = descriptions.AsReadOnly();
-        PositiveMessage = IsStatusOk ? localization.GetLocalizedString(element.IsOpening
-            ? "Manager.CorrectOpening" : "Manager.CorrectLintel") : null;
+        Descriptions = IsStatusOk ? GetPositiveMessages(element, localization) : descriptions.AsReadOnly();
         EmptyWarningsText = IsStatusOk ? localization.GetLocalizedString("Manager.NoWarnings") : null;
     }
 
@@ -46,14 +46,14 @@ internal sealed class ManagerDetailsViewModel {
     public ManagerItemKey? ItemKey { get; }
     public ManagerGroupKey? GroupKey { get; }
     public bool IsOpening { get; }
-    public bool IsLintelMissing { get; }
+    public bool IsStatusPlaceholder { get; }
+    public bool IsLintelNotRequired { get; }
     public string Subject { get; }
     public bool IsWarnings { get; }
     public bool IsFixed { get; }
     public bool IsAnalysisPending { get; }
     public bool HasWarnings { get; }
     public bool IsStatusOk => IsWarnings && !HasWarnings && !IsAnalysisPending;
-    public string PositiveMessage { get; }
     public string Status { get; }
     public IReadOnlyList<ManagerDetailField> Fields { get; }
     public IReadOnlyList<string> ElementWarnings { get; }
@@ -75,14 +75,23 @@ internal sealed class ManagerDetailsViewModel {
             yield return element.TypeName;
             yield return element.StatusText;
             if(!element.IsAnalysisPending && !element.HasWarnings) {
-                yield return localization.GetLocalizedString(element.IsOpening
-                    ? "Manager.CorrectOpening" : "Manager.CorrectLintel");
+                foreach(string message in GetPositiveMessages(element, localization)) {
+                    yield return message;
+                }
             }
             foreach(string message in Format(element.Element?.Diagnostics, localization)
-                .Concat(Format(element.RowDiagnostics, localization))) {
+                .Concat(Format(element.RowDiagnostics.Where(item => !item.IsInformational), localization))) {
                 yield return message;
             }
         }
+    }
+
+    // Показывает подтверждённую причину пропуска подбора в строке и в заголовке её группы.
+    private static IReadOnlyList<string> GetPositiveMessages(ManagerElementViewModel element,
+        ILocalizationService localization) {
+        var reasons = Format(element.RowDiagnostics.Where(item => item.IsInformational), localization);
+        return reasons.Count > 0 ? reasons : [localization.GetLocalizedString(element.IsOpening
+            ? "Manager.CorrectOpening" : "Manager.CorrectLintel")];
     }
 
     // Собирает те же поля для мини-окна и поиска по данным экземпляра.

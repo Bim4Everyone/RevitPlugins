@@ -25,5 +25,5 @@ internal interface ISideBearingAnalyzer {
     /// <param name="leftSign">Подтверждённое направление левого конца семейства.</param>
     /// <returns>Строки с признаками сохранения фактического конца.</returns>
     IReadOnlyList<OpeningLintelMatch> ReadRetainedEnds(IGeometryReadContext geometry,
-        IReadOnlyList<OpeningLintelMatch> matches, IReadOnlyList<StructureCandidate> walls, string familyId, int? leftSign);
+        IReadOnlyList<OpeningLintelMatch> matches, IReadOnlyList<EndWallSnapshot> walls, string familyId, int? leftSign);
 }

@@ -198,26 +198,10 @@
                             FontSize="16" />
                         <TextBlock
                             Margin="0,0,0,20"
+                            Style="{StaticResource ManagerElementCaptionStyle}"
                             TextWrapping="Wrap"
                             Text="{Binding Subject}"
-                            FontSize="16">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsLintelMissing}" Value="True">
-                                            <Setter Property="Foreground" Value="{DynamicResource ManagerWarningBrush}" />
-                                        </DataTrigger>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding IsLintelMissing}" Value="True" />
-                                                <Condition Binding="{Binding IsFixed}" Value="True" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Foreground" Value="{DynamicResource ManagerFixedBrush}" />
-                                        </MultiDataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                            FontSize="16" />
                     </StackPanel>
                     <ItemsControl
                         ItemsSource="{Binding Fields}">
@@ -278,6 +262,22 @@
                                 </Grid>
                                 <DataTemplate.Triggers>
                                     <DataTrigger
+                                        Binding="{Binding DataContext.IsStatusOk, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Value="True">
+                                        <Setter
+                                            TargetName="DiagnosticIcon"
+                                            Property="Symbol"
+                                            Value="CheckmarkCircle24" />
+                                        <Setter
+                                            TargetName="DiagnosticIcon"
+                                            Property="Foreground"
+                                            Value="{DynamicResource ManagerSuccessBrush}" />
+                                        <Setter
+                                            TargetName="DiagnosticText"
+                                            Property="Foreground"
+                                            Value="{DynamicResource ManagerSuccessBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger
                                         Binding="{Binding DataContext.IsFixed, RelativeSource={RelativeSource AncestorType=Window}}"
                                         Value="True">
                                         <Setter TargetName="DiagnosticIcon" Property="Foreground"
@@ -289,32 +289,6 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    <Grid
-                        Margin="0,6"
-                        MinHeight="36"
-                        Visibility="{Binding IsStatusOk, Converter={StaticResource BoolToVisibility}}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="36" />
-                            <ColumnDefinition
-                                Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <ui:SymbolIcon
-                            Width="28"
-                            Height="28"
-                            Margin="0,0,8,0"
-                            VerticalAlignment="Center"
-                            FontSize="24"
-                            Symbol="CheckmarkCircle24"
-                            Foreground="{DynamicResource ManagerSuccessBrush}" />
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            TextWrapping="Wrap"
-                            Foreground="{DynamicResource ManagerSuccessBrush}"
-                            Text="{Binding PositiveMessage}"
-                            FontSize="16" />
-                    </Grid>
                 </StackPanel>
             </ScrollViewer>
         </Grid>

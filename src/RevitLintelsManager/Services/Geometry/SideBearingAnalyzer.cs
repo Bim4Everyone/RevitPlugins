@@ -25,13 +25,13 @@ internal sealed class SideBearingAnalyzer : ISideBearingAnalyzer {
         public bool InConcreteWall { get; set; }
     }
 
-    private sealed class SideProbe(BearingSide side, string hostId, GeometryPoint? start, GeometryPoint? direction,
+    private sealed class SideProbe(BearingSide side, ManagerOpeningSnapshot opening, GeometryPoint? start, GeometryPoint? direction,
         ContinuousMaterial masonry, double? ruleMm, double roundoffFeet) {
         private readonly List<MaterialInterval> _adjoiningIntervals = [];
         private ContinuousMaterial _masonry = masonry;
         private bool _incomplete;
 
-        public string HostId { get; } = hostId;
+        public ManagerOpeningSnapshot Opening { get; } = opening;
         public GeometryPoint? Start { get; } = start;
         public GeometryPoint? Direction { get; } = direction;
         public bool NeedsContact => _masonry.LengthMm.HasValue && ruleMm.HasValue
@@ -98,7 +98,7 @@ internal sealed class SideBearingAnalyzer : ISideBearingAnalyzer {
                 }
                 foreach(var probe in index.Within(bounds, LengthEpsilon)) {
                     var boundary = probe.Boundary;
-                    if(candidate.UniqueId == probe.HostId
+                    if(probe.Opening.IsCutWall(candidate.UniqueId)
                         || !bounds.Overlaps(boundary, boundary, LengthEpsilon)) {
                         continue;
                     }
@@ -110,15 +110,15 @@ internal sealed class SideBearingAnalyzer : ISideBearingAnalyzer {
             }
         }
 
-        bool Incomplete(string hostId) => catalogIncomplete || unlocated.Count > 1
-            || (unlocated.Count == 1 && !unlocated.Contains(hostId));
-        return rows.Select(row => new OpeningBearingFacts(row.Id, row.Left.Finish(Incomplete(row.Left.HostId)),
-            row.Right.Finish(Incomplete(row.Right.HostId)))).ToList().AsReadOnly();
+        return rows.Select(row => {
+            bool incomplete = catalogIncomplete || unlocated.Any(id => !row.Left.Opening.IsCutWall(id));
+            return new OpeningBearingFacts(row.Id, row.Left.Finish(incomplete), row.Right.Finish(incomplete));
+        }).ToList().AsReadOnly();
     }
 
     /// <inheritdoc />
     public IReadOnlyList<OpeningLintelMatch> ReadRetainedEnds(IGeometryReadContext geometry,
-        IReadOnlyList<OpeningLintelMatch> matches, IReadOnlyList<StructureCandidate> walls, string familyId, int? leftSign) {
+        IReadOnlyList<OpeningLintelMatch> matches, IReadOnlyList<EndWallSnapshot> walls, string familyId, int? leftSign) {
         if(leftSign is not (-1 or 1) || walls.Count == 0) {
             return matches;
         }
@@ -128,17 +128,18 @@ internal sealed class SideBearingAnalyzer : ISideBearingAnalyzer {
         }
         var index = new MatchColumns<EndProbe>(probes, probe => probe.Point);
         foreach(var wall in walls) {
-            var bounds = ReadOptional(() => geometry.GetOwnerEnvelope(wall.Element));
+            var bounds = wall.Bounds;
             if(bounds is null) {
                 continue;
             }
             foreach(var probe in index.Within(bounds, LengthEpsilon)) {
                 var point = probe.Point;
-                if(probe.Match.Opening.CutWallUniqueId == wall.UniqueId || probe.InConcreteWall
+                if(probe.Match.Opening.IsCutWall(wall.UniqueId) || probe.InConcreteWall
                     || (probe.InOrdinaryWall && !wall.Concrete) || !bounds.Overlaps(point, point, LengthEpsilon)) {
                     continue;
                 }
-                var intervals = ReadSideIntervals(geometry, wall.Element, bounds, probe.Start, probe.Direction);
+                var intervals = ReadSideIntervals(geometry, geometry.Document.GetElement(wall.UniqueId), bounds,
+                    probe.Start, probe.Direction);
                 if(intervals?.Any(interval => interval.Start + LengthEpsilon < probe.BearingFeet
                     && interval.End + LengthEpsilon >= probe.BearingFeet) == true) {
                     probe.InConcreteWall = wall.Concrete;
@@ -187,7 +188,7 @@ internal sealed class SideBearingAnalyzer : ISideBearingAnalyzer {
             double length = mm / SystemPluginConfig.MillimetersPerFoot;
             var start = AsPoint(center + axis * (width / (2 * SystemPluginConfig.MillimetersPerFoot)));
             var direction = AsPoint(axis);
-            var hostIntervals = ReadSideIntervals(geometry, host, bounds, start, direction);
+            var hostIntervals = ReadCutWallIntervals(geometry, match.Opening, host, bounds, start, direction);
             if(hostIntervals?.All(interval => interval.End + LengthEpsilon < length) == true) {
                 yield return new EndProbe(match, end, start, direction, length);
             }
@@ -206,7 +207,7 @@ internal sealed class SideBearingAnalyzer : ISideBearingAnalyzer {
                 continue;
             }
             foreach(var probe in index.Within(bounds, margin)) {
-                if(probe.HostId == candidate.UniqueId || !bounds.Overlaps(probe.Start.Value, probe.RuleEnd,
+                if(probe.Opening.IsCutWall(candidate.UniqueId) || !bounds.Overlaps(probe.Start.Value, probe.RuleEnd,
                     LengthEpsilon)) {
                     continue;
                 }
@@ -228,7 +229,7 @@ internal sealed class SideBearingAnalyzer : ISideBearingAnalyzer {
         if((cut is null && !top.HasValue) || frame is null) {
             string reason = opening.Geometry?.Limitation ?? "Не определена кромка выреза или ось стены.";
             var missing = new ContinuousMaterial(null, minimumMm, 0, reason);
-            return new SideProbe(side, opening.CutWallUniqueId, null, null, missing, ruleMm, 0);
+            return new SideProbe(side, opening, null, null, missing, ruleMm, 0);
         }
         var direction = AsXyz(frame.Along) * (side == BearingSide.Left ? -1 : 1);
         double width = cut?.Width ?? top.Value.Width;
@@ -244,11 +245,30 @@ internal sealed class SideBearingAnalyzer : ISideBearingAnalyzer {
                 Math.Max(Math.Abs(bounds.Min.Y), Math.Abs(bounds.Max.Y))));
         }
         double roundoff = Math.Min(LengthEpsilon, SystemPluginConfig.CoordinateRoundoffFactor * scale);
-        var intervals = ReadSideIntervals(geometry, host, bounds, AsPoint(start), AsPoint(direction));
+        var intervals = ReadCutWallIntervals(geometry, opening, host, bounds, AsPoint(start), AsPoint(direction));
         var masonry = new ContinuousMaterial(intervals, minimumMm, roundoff,
             intervals is null ? "Не удалось измерить тело стены от кромки выреза." : null);
-        return new SideProbe(side, opening.CutWallUniqueId, AsPoint(start), AsPoint(direction),
+        return new SideProbe(side, opening, AsPoint(start), AsPoint(direction),
             masonry, ruleMm, roundoff);
+    }
+
+    // Учитывает материал каждой части стены у общей кромки проёма.
+    private IReadOnlyList<MaterialInterval> ReadCutWallIntervals(IGeometryReadContext geometry, ManagerOpeningSnapshot opening,
+        Wall host, GeometryBounds bounds, GeometryPoint start, GeometryPoint direction) {
+        var intervals = ReadSideIntervals(geometry, host, bounds, start, direction);
+        if(intervals is null || opening.Geometry.AdditionalCutWallIds.Count == 0) {
+            return intervals;
+        }
+        var all = new List<MaterialInterval>(intervals);
+        foreach(string id in opening.Geometry.AdditionalCutWallIds) {
+            var wall = geometry.Document.GetElement(id) as Wall;
+            var part = ReadSideIntervals(geometry, wall, geometry.GetBounds(wall), start, direction);
+            if(part is null) {
+                return null;
+            }
+            all.AddRange(part);
+        }
+        return MaterialInterval.Union(all);
     }
 
     // Дальняя проекция рамки ограничивает конечный отрезок. В длину материала входит только внутренность Solid.

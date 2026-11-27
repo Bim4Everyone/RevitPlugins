@@ -4,8 +4,8 @@ using System.Linq;
 
 namespace RevitLintelsManager.Models;
 
-/// <summary>Шесть предметных действий; смешанное состояние группы не является действием.</summary>
-internal enum ManagerAction { Install, Replace, Correct, Lock, Delete, Skip }
+/// <summary>Действия, которые можно назначить строке менеджера.</summary>
+internal enum ManagerAction { Install, Replace, Correct, Lock, Delete, Skip, SetFixation, ClearFixation }
 
 /// <summary>Состав исправления для подписи одного действия.</summary>
 [Flags]
@@ -20,7 +20,9 @@ internal enum ManagerCorrection {
 }
 
 /// <summary>Основной статус элемента; причины представлены отдельными диагностиками.</summary>
-internal enum ManagerElementStatus { Missing, Correct, Warning, Fixed, Grouped, NotAnalyzed }
+internal enum ManagerElementStatus {
+    Missing, Correct, Warning, Fixed, Grouped, NotAnalyzed, LintelNotRequired, MultipleOpenings, OpeningConflict
+}
 
 /// <summary>Составной ключ строки в исходном документе.</summary>
 internal readonly struct ManagerItemKey(Guid documentToken, string openingUniqueId, string lintelUniqueId)
@@ -59,9 +61,11 @@ internal readonly struct ManagerGroupKey(string openingTypeUniqueId, string lint
 }
 
 /// <summary>Локализуемая диагностическая причина без объектов API.</summary>
-internal sealed class ManagerDiagnostic(string localizationKey, IEnumerable<string> arguments) {
+internal sealed class ManagerDiagnostic(string localizationKey, IEnumerable<string> arguments,
+    bool isInformational = false) {
     public string LocalizationKey { get; } = localizationKey;
     public IReadOnlyList<string> Arguments { get; } = arguments.ToList().AsReadOnly();
+    public bool IsInformational { get; } = isInformational;
 }
 
 /// <summary>Контракт независимой строки менеджера.</summary>

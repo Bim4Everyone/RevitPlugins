@@ -120,11 +120,19 @@ internal sealed class GeometryFacts(InstancePlacement placement, WallFrame wall,
     public InstancePlacement Placement { get; } = placement;
     public WallFrame Wall { get; } = wall;
     public OpeningCut Cut { get; } = cut;
+    internal IReadOnlyList<string> AdditionalCutWallIds { get; set; } = [];
     public (GeometryPoint Center, double Width, double JambHeight)? OpenTop { get; }
     public GeometryPoint? TopCenter => Cut?.TopCenter ?? OpenTop?.Center;
 
     /// <summary>Локализует конкурирующий проём без подтверждения плоскостей пары.</summary>
     public GeometryPoint? SearchTopCenter => TopCenter ?? _searchTopCenter;
+
+    /// <summary>Плоскости для проверки существующей связи по локализованному верху выреза.</summary>
+    internal AlignmentPlanes SearchPlanes => Cut?.TargetPlanes ?? (SearchTopCenter is { } center && Wall is not null
+        ? new AlignmentPlanes(center, Wall.Along, Wall.Normal, new GeometryPoint(0, 0, 1)) : null);
+
+    /// <summary>Нижняя граница отметки верха по фактической нижней грани незамкнутого выреза, в футах модели.</summary>
+    internal double? LowestSillElevation { get; set; }
 
     public AlignmentPlanes Anchor { get; } = anchor;
     public string Limitation { get; } = limitation;

@@ -13,16 +13,51 @@ internal enum UpperStructureState { Absent, Found, Ambiguous, Unavailable }
 /// <summary>Факты одного проёма. Координаты O и интервалы от него заданы во внутренних единицах Revit.</summary>
 internal sealed class AboveOpeningFacts(string openingId, GeometryPoint? origin,
     CentralMasonry masonry, UpperStructureResult upper) {
+    /// <summary>Фиксирует прямое примыкание плиты к верху проёма, достаточное для завершения подбора.</summary>
+    internal AboveOpeningFacts(string openingId, GeometryPoint origin, UpperStructureResult touchingSlabs)
+        : this(openingId, origin, null, touchingSlabs) {
+        SlabAtHead = touchingSlabs.Nearest[0];
+    }
+
+    internal UpperStructureHit SlabAtHead { get; }
     public string OpeningId { get; } = openingId;
     public GeometryPoint? Origin { get; } = origin;
     public CentralMasonry Masonry { get; } = masonry;
     public UpperStructureResult Upper { get; } = upper;
+
+    /// <summary>Ближайшая конструкция, до которой от верха проёма подтверждено отсутствие кладки.</summary>
+    public UpperStructureHit LimitingStructure {
+        get {
+            if(SlabAtHead is not null) {
+                return SlabAtHead;
+            }
+            if(Masonry?.HasMaterial != false || Upper?.State != UpperStructureState.Found) {
+                return null;
+            }
+            var nearest = Upper.Nearest[0];
+            return Masonry.Intervals.Count == 0 || Masonry.Intervals[0].Start >= nearest.DistanceFeet ? nearest : null;
+        }
+    }
+
+    /// <summary>Определяет, позволяет ли измеренная геометрия пропустить подбор перемычки.</summary>
+    public bool CanSkipLintelDesign(bool hasExistingLintel, double minimumMm) {
+        return SlabAtHead is not null || (hasExistingLintel ? LimitingStructure is not null
+            : Masonry?.IsAtOrBelowMinimum(minimumMm) == true);
+    }
 }
 
 /// <summary>Материал стены-хоста вдоль центральной вертикали. Неизвестные значения сохраняются как null.</summary>
 internal sealed class CentralMasonry(IReadOnlyList<MaterialInterval> intervals, double minimumMm, double roundoffFeet,
     string limitation = null) : ContinuousMaterial(intervals, minimumMm, roundoffFeet, limitation) {
+    private readonly double _roundoffMm = Math.Max(SystemPluginConfig.MatchRoundoffMm,
+        roundoffFeet * SystemPluginConfig.MillimetersPerFoot);
     public double? HeightMm => LengthMm;
+
+    /// <summary>Проверяет, что измеренная высота кладки не превышает заданного порога установки.</summary>
+    public bool IsAtOrBelowMinimum(double minimum) {
+        return CalculationNumbers.IsFinite(minimum) && minimum >= 0 && HeightMm is double height
+            && height >= 0 && height <= minimum + _roundoffMm;
+    }
 }
 
 /// <summary>Первый вход и все проверенные интервалы внутри конкретной верхней конструкции.</summary>

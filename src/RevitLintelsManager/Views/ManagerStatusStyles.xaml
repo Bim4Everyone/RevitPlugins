@@ -11,6 +11,23 @@
     <SolidColorBrush
         x:Key="ManagerFixedBrush"
         Color="#A3653D" />
+    <Style x:Key="ManagerElementCaptionStyle" TargetType="TextBlock">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsStatusPlaceholder}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource ManagerWarningBrush}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsLintelNotRequired}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource ManagerSuccessBrush}" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsStatusPlaceholder}" Value="True" />
+                    <Condition Binding="{Binding IsFixed}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Foreground" Value="{DynamicResource ManagerFixedBrush}" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style
         x:Key="ManagerStatusIconStyle"
         TargetType="ui:SymbolIcon">

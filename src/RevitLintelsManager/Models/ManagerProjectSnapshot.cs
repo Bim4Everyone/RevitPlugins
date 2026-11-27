@@ -14,6 +14,7 @@ internal sealed partial class ManagerProjectSnapshot(IEnumerable<ManagerOpeningS
     public IReadOnlyList<ManagerWallSnapshot> Walls { get; } = walls.ToList().AsReadOnly();
     public IReadOnlyList<ManagerStructureSnapshot> Structures { get; } = structures.ToList().AsReadOnly();
     public int UnreadableCount { get; } = unreadableCount;
+    internal ProcessingReadData ProcessingData { get; set; }
     public IReadOnlyList<OpeningLintelMatch> Matches { get; } = matches?.ToList().AsReadOnly();
     public IReadOnlyDictionary<string, LintelCalculation> Calculations { get; } =
         new ReadOnlyDictionary<string, LintelCalculation>(new Dictionary<string, LintelCalculation>());
@@ -68,6 +69,9 @@ internal sealed class ManagerOpeningSnapshot(ManagerFamilySnapshot element, stri
     public ManagerFamilySnapshot Element { get; } = element;
     public string HostWallUniqueId { get; } = hostWallUniqueId;
     public string CutWallUniqueId { get; } = hostWallUniqueId;
+    internal IEnumerable<string> CutWallIds => CutWallUniqueId is null ? [] :
+        (Geometry?.AdditionalCutWallIds ?? []).Prepend(CutWallUniqueId);
+    internal bool IsCutWall(string id) => id == CutWallUniqueId || Geometry?.AdditionalCutWallIds.Contains(id) == true;
     public double? WidthMm { get; } = widthMm;
     public double? HeightMm { get; } = heightMm;
 }

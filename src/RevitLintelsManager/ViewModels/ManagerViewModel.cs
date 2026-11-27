@@ -905,6 +905,7 @@ internal sealed class ManagerViewModel : BaseViewModel, IDisposable {
         }
         for(int i = 0; i < previous.Count; i++) {
             if(previous[i].LocalizationKey != current[i].LocalizationKey
+                || previous[i].IsInformational != current[i].IsInformational
                 || !previous[i].Arguments.SequenceEqual(current[i].Arguments)) {
                 return false;
             }

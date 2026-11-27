@@ -10,6 +10,7 @@ internal sealed class ManagerFailuresPreprocessor : IFailuresPreprocessor, ITran
     public List<string> Diagnostics { get; } = [];
     public bool IsFatal { get; private set; }
     public string UserMessage { get; set; }
+    public string FixationGroupMessage { get; set; }
     public TransactionStatus? FinalStatus { get; private set; }
     private Action _afterFinalization;
 
@@ -28,7 +29,9 @@ internal sealed class ManagerFailuresPreprocessor : IFailuresPreprocessor, ITran
         IsFatal |= severity >= FailureSeverity.DocumentCorruption;
         foreach(var failure in accessor.GetFailureMessages()) {
             if(failure.GetSeverity() >= FailureSeverity.Error) {
-                UserMessage ??= failure.GetDescriptionText();
+                bool groupRestriction = FixationGroupMessage is not null && failure.GetFailureDefinitionId().Guid
+                    == BuiltInFailures.GroupFailures.AtomViolationWhenMultiPlacedInstances.Guid;
+                UserMessage ??= groupRestriction ? FixationGroupMessage : failure.GetDescriptionText();
             }
             Diagnostics.Add($"{failure.GetSeverity()} {failure.GetFailureDefinitionId().Guid}: {failure.GetDescriptionText()}");
         }

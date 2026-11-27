@@ -47,6 +47,7 @@ internal sealed class ProcessingPlan {
 /// <summary>Однократное исполнение каждого назначения подтверждённого плана в API-контексте.</summary>
 internal sealed class ApprovedProcessingPlan(ProcessingPlan plan) {
     private readonly HashSet<int> _started = [];
+    internal BatchMatchChanges MatchChanges { get; } = new();
     public ProcessingPlan Plan { get; } = plan;
     public long Generation { get; internal set; } = plan.Generation;
     public bool IsStopped { get; internal set; }

@@ -14,8 +14,6 @@ namespace RevitLintelsManager.Models;
 /// <summary>Владеет геометрией и кэшами исходного документа до конца одного чтения.</summary>
 internal sealed class GeometryReadContext(Document document) : IGeometryReadContext {
     private readonly Dictionary<ElementId, ILookup<ElementId, Face>> _reveals = [];
-    private readonly Dictionary<ElementId, ((string X, string Y, string Z)? Full, (string Name, double Offset)? Width)>
-        _originFamilies = [];
 
     private readonly Dictionary<ElementId, List<Solid>> _solids = [];
     private readonly Dictionary<ElementId, WallFrame> _wallFrames = [];
@@ -24,6 +22,8 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
     private readonly Options _options = new() { DetailLevel = ViewDetailLevel.Fine, ComputeReferences = false };
 
     public Document Document => document;
+    public ProcessingReadData ProcessingData { get; set; } = new();
+    public ProjectReadCache SessionCache { get; set; }
 
     /// <inheritdoc />
     public void Dispose() {
@@ -31,7 +31,6 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
         _wallFrames.Clear();
         _bounds.Clear();
         _reveals.Clear();
-        _originFamilies.Clear();
         for(int index = _geometry.Count - 1; index >= 0; index--) {
             _geometry[index].Dispose();
         }
@@ -192,7 +191,8 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
                     double offset = (point.XYZPoint - start).DotProduct(direction);
                     breaks.Add(offset);
                     double sign = face.ComputeNormal(point.UVPoint).DotProduct(direction);
-                    if(Math.Abs(sign) > DirectionEpsilon && IsInsideFaceTrim(face, point.XYZPoint)) {
+                    if(Math.Abs(sign) > DirectionEpsilon
+                        && ContainsFacePoint(face, point.XYZPoint, includeEdge: false)) {
                         (sign < 0 ? entries : exits).Add(offset);
                     }
                 }
@@ -246,18 +246,38 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
         return points.GetViewBetween(offset - LengthEpsilon, offset + LengthEpsilon).Count > 0;
     }
 
-    // Нормаль задаёт вход/выход только строго внутри обрезанной грани; на ребре знак может быть ложным.
-    private static bool IsInsideFaceTrim(Face face, XYZ point) {
+    // Ядро допускает проекцию за кромкой. У плоского многоугольника проверяем все контуры, включая отверстия.
+    private static bool ContainsFacePoint(Face face, XYZ point, bool includeEdge) {
+        var plane = face as PlanarFace;
+        bool polygon = plane is not null;
+        bool inside = false;
         foreach(EdgeArray loop in face.EdgeLoops) {
             foreach(Edge edge in loop) {
                 using var curve = edge.AsCurve();
                 double? distance = ReadOptional<double?>(() => curve.Distance(point));
                 if(!distance.HasValue || distance.Value <= LengthEpsilon) {
-                    return false;
+                    return includeEdge;
+                }
+                polygon &= curve is Line;
+                if(!polygon) {
+                    continue;
+                }
+                var a = curve.GetEndPoint(0) - point;
+                var b = curve.GetEndPoint(1) - point;
+                double ay = a.DotProduct(plane.YVector);
+                double by = b.DotProduct(plane.YVector);
+                if((ay > 0) == (by > 0)) {
+                    continue;
+                }
+                double ax = a.DotProduct(plane.XVector);
+                double bx = b.DotProduct(plane.XVector);
+                // Луч из проверяемой точки вдоль X меняет чётность при пересечении ребра.
+                if(ax + ay / (ay - by) * (bx - ax) > 0) {
+                    inside = !inside;
                 }
             }
         }
-        return true;
+        return !polygon || inside;
     }
 
     // Добавляет дискретные точки пересечения, возвращённые ядром Revit.
@@ -279,7 +299,8 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
     private static bool IsInterior(Solid solid, XYZ point) {
         foreach(Face face in solid.Faces) {
             using var projection = face.Project(point);
-            if(projection is not null && projection.Distance <= LengthEpsilon) {
+            if(projection is not null && projection.Distance <= LengthEpsilon
+                && ContainsFacePoint(face, projection.XYZPoint, includeEdge: true)) {
                 return false;
             }
         }
@@ -332,50 +353,86 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
 
     /// <inheritdoc />
     public (string X, string Y, string Z)? GetOriginPlanes(Family family) {
-        return GetOriginFacts(family).Full;
+        var lintel = ProcessingData.LintelFamily;
+        return lintel?.FamilyId == family.UniqueId ? lintel.Origin.Full : null;
     }
 
     /// <inheritdoc />
-    public string GetWidthOriginPlane(Family family) {
-        return GetOriginFacts(family).Width?.Name;
+    public (string Name, double Offset)? GetWidthPlane(FamilyInstance instance) {
+        if(ProcessingData.OpeningPlanes.TryGetValue(instance.UniqueId, out var width)) {
+            return width;
+        }
+        var lintel = ProcessingData.LintelFamily;
+        return lintel?.FamilyId == instance.Symbol.Family.UniqueId ? lintel.Origin.Width : null;
     }
 
     /// <inheritdoc />
     public double? GetWidthOriginOffset(Family family) {
-        return GetOriginFacts(family).Width?.Offset;
+        var lintel = ProcessingData.LintelFamily;
+        return lintel?.FamilyId == family.UniqueId ? lintel.Origin.Width?.Offset : null;
     }
 
-    // Семейство открывается не более одного раза за обновление, включая недоступную привязку.
-    private ((string X, string Y, string Z)? Full, (string Name, double Offset)? Width) GetOriginFacts(Family family) {
-        if(!_originFamilies.TryGetValue(family.Id, out var origin)) {
-            origin = ReadOptional(() => ReadOriginPlanes(family));
-            _originFamilies.Add(family.Id, origin);
+    /// <inheritdoc />
+    public void ReadOpeningPlanes(IEnumerable<FamilyInstance> openings) {
+        var missing = new List<FamilyInstance>();
+        foreach(var instance in openings) {
+            if(SessionCache?.GetOpeningPlane(instance) is { } cached) {
+                ProcessingData.OpeningPlanes[instance.UniqueId] = cached;
+            } else {
+                missing.Add(instance);
+            }
         }
-        return origin;
-    }
-
-    // Читает только плоскости Defines Origin из загруженного определения семейства один раз за поколение.
-    private ((string X, string Y, string Z)? Full, (string Name, double Offset)? Width) ReadOriginPlanes(
-        Family family) {
-        if(!family.IsEditable || family.IsInPlace) {
-            return default;
+        if(missing.Count == 0) {
+            return;
         }
-        var definition = document.EditFamily(family);
+        using var transaction = new Transaction(document, "Измерение центральных плоскостей проёмов");
+        if(transaction.Start() != TransactionStatus.Started) {
+            throw new InvalidOperationException("Не удалось начать измерение центральных плоскостей проёмов.");
+        }
         try {
-            return ReadFamilyOriginFacts(definition);
+            foreach(var instance in missing) {
+                if(ReadOptional(() => MeasureWidthPlane(instance)) is { } width) {
+                    ProcessingData.OpeningPlanes[instance.UniqueId] = width;
+                }
+            }
         } finally {
-            definition.Close(false);
+            var status = SessionCache?.RollBackPlaneMeasurement(transaction) ?? transaction.RollBack();
+            if(status != TransactionStatus.RolledBack) {
+                throw new InvalidOperationException("Не удалось откатить измерение центральных плоскостей проёмов.");
+            }
+        }
+        foreach(var instance in missing) {
+            if(ProcessingData.OpeningPlanes.TryGetValue(instance.UniqueId, out var width)) {
+                SessionCache?.StoreOpeningPlane(instance, width);
+            }
         }
     }
 
-    // Проверяет, что три плоскости начала лежат на локальных координатных осях.
-    internal static (string X, string Y, string Z)? ReadFamilyOriginPlanes(Document definition) {
-        return ReadFamilyOriginFacts(definition).Full;
+    // Положение точки начала плоскости произвольно. Проекция на нормаль даёт подписанное
+    // расстояние вдоль локальной оси X, в том числе для повёрнутых и зеркальных экземпляров.
+    private (string Name, double Offset)? MeasureWidthPlane(FamilyInstance instance) {
+        var references = instance.GetReferences(FamilyInstanceReferenceType.CenterLeftRight);
+        if(references?.Count != 1 || references[0] is not { } reference || reference.ElementId != instance.Id
+            || reference.LinkedElementId != ElementId.InvalidElementId) {
+            return null;
+        }
+        string name = instance.GetReferenceName(reference);
+        if(string.IsNullOrEmpty(name)) {
+            return null;
+        }
+        using var sketch = SketchPlane.Create(document, reference);
+        using var plane = sketch.GetPlane();
+        using var pose = instance.GetTransform();
+        var normal = plane.Normal.Normalize();
+        if(!pose.IsConformal || normal.CrossProduct(pose.BasisX.Normalize()).GetLength() > DirectionEpsilon) {
+            return null;
+        }
+        double offset = (plane.Origin - pose.Origin).DotProduct(normal) / pose.BasisX.DotProduct(normal);
+        return IsFiniteCoordinate(offset) ? (name, offset) : null;
     }
 
     // Для проверки замка сохраняет подписанное смещение плоскости ширины в локальных координатах.
-    private static ((string X, string Y, string Z)? Full, (string Name, double Offset)? Width) ReadFamilyOriginFacts(
-        Document definition) {
+    internal static FamilyOriginFacts ReadFamilyOriginFacts(Document definition) {
         using var collector = new FilteredElementCollector(definition);
         var origins = new Dictionary<int, (string Name, double Offset)>();
         var axes = new[] { XYZ.BasisX, XYZ.BasisY, XYZ.BasisZ };
@@ -400,7 +457,8 @@ internal sealed class GeometryReadContext(Document document) : IGeometryReadCont
         }
         (string Name, double Offset)? width = widthValid && origins.TryGetValue(0, out var x)
             && planes.Count(plane => plane.Name == x.Name) == 1 ? x : null;
-        return (complete && origins.Count == 3 ? (origins[0].Name, origins[1].Name, origins[2].Name) : null, width);
+        return new FamilyOriginFacts(complete && origins.Count == 3
+            ? (origins[0].Name, origins[1].Name, origins[2].Name) : null, width);
     }
 
     // Кеширует числовые оси и повторяемый отказ для одного хоста в пределах текущего запроса.

@@ -23,10 +23,11 @@ namespace RevitLintelsManager.Services;
 
 /// <summary>Владелец окна и контейнера; API доступен только команде и callbacks Revit.</summary>
 internal sealed class ManagerSession(RevitRepository repository, IManagerScopeReader scopeReader,
-    IManagerViewService views, ManagerWindow window,
+    IProjectSnapshotReader snapshots, IManagerViewService views, ManagerWindow window,
     ManagerViewModel viewModel, WindowPlatformEvents platformEvents, ILoggerService logger,
     ILocalizationService localization, IManagerRequestDispatcher requests, IManagerProcessingService processing) : IManagerSession {
     private IKernel _kernel;
+    private ProjectReadCache _readTracking;
     private bool _subscribed;
     private bool _windowClosed;
     private int? _closingDocumentId;
@@ -49,6 +50,7 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
         AppDomain.CurrentDomain.AssemblyResolve += ResolveSessionAssembly;
         try {
             _subscribed = true;
+            _readTracking = snapshots.TrackDocumentChanges();
             repository.UIApplication.Idling += OnIdling;
             repository.UIApplication.ViewActivated += OnViewActivated;
             repository.Application.DocumentClosing += OnDocumentClosing;
@@ -230,7 +232,7 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
     // Инвалидирует снимок исходного документа без автоматического чтения после правки или Undo.
     private void OnDocumentChanged(object sender, DocumentChangedEventArgs e) {
         if(viewModel.State.IsClosing || !repository.Document.IsValidObject
-            || !repository.Document.Equals(e.GetDocument())) {
+            || !repository.Document.Equals(e.GetDocument()) || _readTracking?.IsPlaneMeasurementRollback(e) == true) {
             return;
         }
         if(requests.IsPreparingManagerView) {
@@ -348,6 +350,8 @@ internal sealed class ManagerSession(RevitRepository repository, IManagerScopeRe
             return;
         }
         _subscribed = false;
+        _readTracking?.Dispose();
+        _readTracking = null;
         repository.UIApplication.Idling -= OnIdling;
         repository.UIApplication.ViewActivated -= OnViewActivated;
         repository.Application.DocumentClosing -= OnDocumentClosing;

@@ -6,4 +6,6 @@ internal sealed class ManagerAnalyzedRow(ManagerItemSnapshot snapshot, ManagerEl
     public ManagerItemSnapshot Snapshot { get; } = snapshot;
     public ManagerElementPresentation Opening { get; } = opening;
     public ManagerElementPresentation Lintel { get; } = lintel;
+    internal OpeningLintelMatch Match { get; set; }
+    internal LintelComparison Comparison { get; set; }
 }

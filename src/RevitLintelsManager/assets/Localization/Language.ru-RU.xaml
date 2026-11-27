@@ -11,7 +11,7 @@
     <system:String x:Key="Search.WallType">Поиск по имени типоразмера</system:String>
     <system:String x:Key="General.FixParameter">Параметр блокировки для семейств проёмов и перемычек</system:String>
     <system:String x:Key="General.Phase">Стадия</system:String>
-    <system:String x:Key="General.MinimalHeight">Минимальная толщина кладки над проёмом, при которой ставится перемычка, мм</system:String>
+    <system:String x:Key="General.MinimalHeight">Высота кладки над проёмом, при превышении которой требуется перемычка, мм</system:String>
     <system:String x:Key="General.Millimeters">Миллиметры</system:String>
     <system:String x:Key="General.MatchAlignment">Допуск совпадения плоскостей, мм</system:String>
     <system:String x:Key="General.MatchSearch">Максимальное смещение для поиска пары, мм</system:String>
@@ -159,15 +159,15 @@
     <system:String x:Key="Manager.Action.Install">Установить перемычку</system:String>
     <system:String x:Key="Manager.Action.Lock">Поставить замок</system:String>
     <system:String x:Key="Manager.Action.Replace">Заменить</system:String>
+    <system:String x:Key="Manager.Action.SetFixation">Зафиксировать</system:String>
+    <system:String x:Key="Manager.Action.ClearFixation">Снять фиксацию</system:String>
     <system:String x:Key="Manager.Action.Skip">Пропустить</system:String>
     <system:String x:Key="Manager.Count">Количество: {0}</system:String>
     <system:String x:Key="Manager.Expand">Раскрыть / свернуть группу</system:String>
     <system:String x:Key="Manager.Information">Информация</system:String>
     <system:String x:Key="Manager.Navigate">Показать элементы</system:String>
     <system:String x:Key="Manager.Navigating">Показываем элементы в Revit…</system:String>
-    <system:String x:Key="Manager.NavigationFailed">
-        Revit не смог показать элементы на персональном 3D-виде.
-    </system:String>
+    <system:String x:Key="Manager.NavigationFailed">Revit не смог показать элементы на персональном 3D-виде.</system:String>
     <system:String x:Key="Manager.NavigationTargetsUnavailable">
         Выбранные элементы больше недоступны в проекте.
     </system:String>
@@ -196,7 +196,9 @@
         Окно персонального 3D-вида недоступно для приближения.
     </system:String>
     <system:String x:Key="Manager.NoLintel">&lt; Нет перемычки &gt;</system:String>
+    <system:String x:Key="Manager.LintelNotRequired">&lt; Перемычка не требуется &gt;</system:String>
     <system:String x:Key="Manager.NoOpening">&lt; Нет проёма &gt;</system:String>
+    <system:String x:Key="Manager.MultipleOpenings">&lt; Несколько проемов &gt;</system:String>
     <system:String x:Key="Manager.Process">Обработать (0)</system:String>
     <system:String x:Key="Manager.Project">Во всём проекте</system:String>
     <system:String x:Key="Manager.FilterAll">Всего элементов: {0}</system:String>
@@ -216,9 +218,10 @@
     <system:String x:Key="Manager.Status.Fixed">Зафиксирован</system:String>
     <system:String x:Key="Manager.Status.Grouped">В группе модели</system:String>
     <system:String x:Key="Manager.Status.Missing">Элемент отсутствует</system:String>
+    <system:String x:Key="Manager.Status.LintelNotRequired">Перемычка не требуется</system:String>
     <system:String x:Key="Manager.Status.Warning">Предупреждение</system:String>
     <system:String x:Key="Manager.Status.NotAnalyzed">Анализ не выполнен</system:String>
-    <system:String x:Key="Manager.Variants">Варианты</system:String>
+    <system:String x:Key="Manager.Variants">&lt; Варианты &gt;</system:String>
     <system:String x:Key="Manager.View">Видимые на виде</system:String>
     <system:String x:Key="Manager.ProcessCount">Обработать ({0})</system:String>
     <system:String x:Key="Manager.Busy">Обновление данных…</system:String>
@@ -262,9 +265,14 @@
     <system:String x:Key="Manager.Diagnostic.MatchIncomplete">Сопоставление проёма и перемычки не удалось завершить.</system:String>
     <system:String x:Key="Manager.Diagnostic.OpeningCutUnavailable">Не удалось подтвердить геометрию выреза в стене.</system:String>
     <system:String x:Key="Manager.Diagnostic.NoMasonryAbove">Над центром проёма нет кладки стены-хоста.</system:String>
+    <system:String x:Key="Manager.Diagnostic.MasonryBelowInstallationThreshold">Недостаточно кладки для установки перемычки. Над проёмом {0} мм, для установки требуется более {1} мм.</system:String>
     <system:String x:Key="Manager.Diagnostic.NoMasonryOrUpperStructure">Над центром проёма нет кладки стены-хоста, перекрытия и других проверяемых конструкций.</system:String>
     <system:String x:Key="Manager.Diagnostic.SlabAbove">Ближайшая конструкция над проёмом — плита перекрытия.</system:String>
     <system:String x:Key="Manager.Diagnostic.LinkedSlabAbove">Ближайшая конструкция над проёмом — плита перекрытия из связанной модели.</system:String>
+    <system:String x:Key="Manager.Diagnostic.Upper.OST_StructuralFraming">Ближайшая конструкция над проёмом — элемент несущего каркаса.</system:String>
+    <system:String x:Key="Manager.Diagnostic.Upper.OST_Walls">Ближайшая конструкция над проёмом — стена.</system:String>
+    <system:String x:Key="Manager.Diagnostic.Upper.OST_StructuralColumns">Ближайшая конструкция над проёмом — несущая колонна.</system:String>
+    <system:String x:Key="Manager.Diagnostic.Upper.OST_StructuralFoundation">Ближайшая конструкция над проёмом — фундамент.</system:String>
     <system:String x:Key="Manager.Diagnostic.UpperStructureUnavailable">Не удалось проверить все конструкции над проёмом.</system:String>
     <system:String x:Key="Manager.Diagnostic.NoBearing.Left">Слева от проёма нет кладки и подходящего примыкания.</system:String>
     <system:String x:Key="Manager.Diagnostic.NoBearing.Right">Справа от проёма нет кладки и подходящего примыкания.</system:String>
@@ -331,6 +339,8 @@
     <system:String x:Key="Processing.TransactionAlreadyOpen">Повторная проверка требует документа без открытой транзакции.</system:String>
     <system:String x:Key="Processing.PairChanged">Изменились состав пары или тип элемента. Обновите анализ.</system:String>
     <system:String x:Key="Processing.Parameter">Параметр «{0}» недоступен для записи.</system:String>
+    <system:String x:Key="Processing.FixationFailed">Не удалось подтвердить новое значение параметра фиксации.</system:String>
+    <system:String x:Key="Processing.FixationGroup">Элемент входит в группу модели. Не удалось изменить параметр фиксации.</system:String>
     <system:String x:Key="Processing.Missing">Элемент {0} отсутствует в исходном документе.</system:String>
     <system:String x:Key="Processing.Ownership">Элемент {0} занят другим пользователем или требует обновления из хранилища.</system:String>
     <system:String x:Key="Processing.LockPlanes">Центральные плоскости не совмещены.</system:String>

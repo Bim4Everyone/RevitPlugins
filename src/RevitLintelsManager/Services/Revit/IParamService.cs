@@ -7,8 +7,8 @@ namespace RevitLintelsManager.Models;
 
 /// <summary>Контракт ParamService.</summary>
 internal interface IParamService {
-    /// <summary>Записывает расчётное значение в однозначный параметр экземпляра.</summary>
-    /// <param name="instance">Новая перемычка.</param>
+    /// <summary>Записывает заданное значение в однозначно сопоставленный параметр экземпляра.</summary>
+    /// <param name="instance">Экземпляр проёма или перемычки.</param>
     /// <param name="value">Сопоставленная роль, тип и значение.</param>
     /// <returns>Возможность записи параметра данного экземпляра.</returns>
     bool WriteInstanceValue(FamilyInstance instance, LintelParameterValue value);
@@ -61,19 +61,34 @@ internal interface IParamService {
     /// <returns>Целое значение или null при отсутствии доступного значения.</returns>
     int? ReadInteger(Element instance, Element type, string name);
 
-    /// <summary>Читает пользовательский параметр Да/Нет только у экземпляра.</summary>
+    /// <summary>Читает параметр Да/Нет у экземпляра.</summary>
+    /// <param name="instance">Читаемый экземпляр.</param>
+    /// <param name="name">Имя сопоставленного параметра.</param>
+    /// <param name="unsetValue">Результат для существующего параметра без заданного значения.</param>
+    /// <returns>Состояние параметра или null, если определить его не удалось.</returns>
+    bool? ReadYesNo(Element instance, string name, bool? unsetValue = null);
+
+    /// <summary>Читает пользовательскую фиксацию у экземпляра.</summary>
     /// <param name="instance">Читаемый экземпляр.</param>
     /// <param name="name">Имя настроенного параметра фиксации.</param>
-    /// <returns>Значение фиксации или null при отсутствии доступного значения.</returns>
+    /// <returns>Для незаполненного флага возвращает false, для недоступного параметра — null.</returns>
     bool? ReadFixation(Element instance, string name);
+
+    /// <summary>Читает свойства сопоставленных параметров из определения семейства.</summary>
+    /// <param name="familyDocument">Открытое определение выбранного семейства.</param>
+    /// <param name="mappings">Сопоставления параметров сессии.</param>
+    /// <returns>Сведения о параметрах по ролям.</returns>
+    IReadOnlyDictionary<string, LintelDefinitionParameter> ReadDefinitionParameters(Document familyDocument,
+        IReadOnlyDictionary<string, string> mappings);
 
     /// <summary>Проверяет доступность сопоставлений для будущей записи в экземпляр перемычки.</summary>
     /// <param name="project">Исходная модель для проверки проектных привязок.</param>
-    /// <param name="familyDocument">Открытое определение выбранного семейства.</param>
+    /// <param name="familyParameters">Состояния параметров в определении семейства.</param>
     /// <param name="family">Выбранное семейство из исходной модели.</param>
     /// <param name="sample">Необязательный экземпляр для проверки проектных параметров.</param>
     /// <param name="mappings">Неизменяемые сопоставления сессии.</param>
     /// <returns>Доступность параметров по ролям.</returns>
     IReadOnlyDictionary<string, LintelParameterFact> ReadLintelParameterFacts(Document project,
-        Document familyDocument, Family family, FamilyInstance sample, IReadOnlyDictionary<string, string> mappings);
+        IReadOnlyDictionary<string, LintelDefinitionParameter> familyParameters, Family family,
+        FamilyInstance sample, IReadOnlyDictionary<string, string> mappings);
 }

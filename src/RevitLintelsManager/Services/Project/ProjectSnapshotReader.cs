@@ -38,6 +38,17 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
     }
 
     private Document Document => source.Document;
+    private ProjectReadCache _cache;
+
+    /// <inheritdoc />
+    public ProjectReadCache TrackDocumentChanges() {
+        if(_cache is { IsTracking: true }) {
+            throw new InvalidOperationException("Отслеживание изменений документа уже включено.");
+        }
+        _cache = new ProjectReadCache(Document);
+        lintelFamilyFacts.SessionCache = _cache;
+        return _cache;
+    }
 
     /// <inheritdoc />
     public ManagerLintelSnapshot ReadInstalledLintel(FamilyInstance instance, IGeometryReadContext geometry,
@@ -58,9 +69,8 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
 
     /// <inheritdoc />
     public ManagerProjectSnapshot ReadScopeSnapshot(ManagerConfigSnapshot config, ElementId phaseId,
-        ManagerScope scope, FilteredElementCollector collector, out IReadOnlyList<StructureCandidate> endWalls) {
+        ManagerScope scope, FilteredElementCollector collector) {
         var catalog = new StructureCatalog();
-        endWalls = catalog.EndWalls;
         var openings = new List<ManagerOpeningSnapshot>();
         var lintels = new List<ManagerLintelSnapshot>();
         var walls = new List<ManagerWallSnapshot>();
@@ -78,39 +88,100 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
         }
         using var projectCollector = scopeIds is null ? null : new FilteredElementCollector(Document);
         using var analysis = openGeometry(Document);
+        analysis.SessionCache = _cache is { IsTracking: true } ? _cache : null;
         int unreadableCount = ReadFamilySnapshots(projectCollector ?? collector, config, phaseId, phaseNames,
             openings, lintels, analysis);
-        string sampleLintelId = lintels.FirstOrDefault()?.Element.UniqueId;
         var seeds = scopeIds is null ? null : openings.Select(o => o.Element).Concat(lintels.Select(l => l.Element))
             .Where(element => element.Information.ElementId is long id && scopeIds.Contains(id))
             .Select(element => element.UniqueId).ToHashSet();
-        var matches = OpeningLintelMatcher.Match(openings, lintels, seeds, config.MatchLimits, LengthEpsilon,
-            unreadableCount > 0, key => ReadOptional(() => analysis.GetBounds(Document.GetElement(key))));
+        var data = analysis.ProcessingData;
+        data.MatchOpenings = openings.ToArray();
+        data.MatchLintels = lintels.ToArray();
+        data.OpeningCenters = new MatchColumns<ManagerOpeningSnapshot>(openings.Where(o => o.Geometry?.Cut is not null),
+            opening => opening.Geometry.Cut.TargetPlanes.Center);
+        var geometricRows = OpeningLintelMatcher.Match(openings, lintels, null, config.MatchLimits, LengthEpsilon,
+            unreadableCount > 0, key => {
+                if(!data.MatchHostBounds.TryGetValue(key, out var bounds)) {
+                    data.MatchHostBounds[key] = bounds = ReadOptional(() => analysis.GetBounds(Document.GetElement(key)));
+                }
+                return bounds;
+            });
+        var matches = ReadMatchedRows(analysis, geometricRows, seeds, config.MatchLimits, unreadableCount == 0);
         if(seeds is not null) {
             openings.RemoveAll(o => !seeds.Contains(o.Element.UniqueId));
             lintels.RemoveAll(l => !seeds.Contains(l.Element.UniqueId));
         }
         var rowOpenings = matches.Where(row => row.Opening is not null).Select(row => row.Opening).ToList();
         bool projectScope = scope == ManagerScope.Project;
-        if(projectScope || rowOpenings.Any(o => o.Geometry?.TopCenter is not null)) {
+        if(projectScope || rowOpenings.Count > 0) {
             unreadableCount += ReadProjectStructures(config, phaseId, phaseNames, walls, structures,
                 projectScope, catalog);
         }
         var above = aboveOpenings.ReadAboveOpenings(analysis, rowOpenings, catalog.Upper, catalog.UpperIncomplete,
             config.MinimalHeightAboveOpeningMm, phaseId);
-        var sides = sideBearings.ReadSideBearings(analysis, rowOpenings, catalog.Sides,
+        var aboveById = above.ToDictionary(facts => facts.OpeningId);
+        var bearingOpenings = matches.Where(row => row.Opening is not null
+                && (!aboveById.TryGetValue(row.Opening.Element.UniqueId, out var facts)
+                    || !facts.CanSkipLintelDesign(row.Lintel is not null, config.MinimalHeightAboveOpeningMm)))
+            .Select(row => row.Opening).ToList();
+        var sides = sideBearings.ReadSideBearings(analysis, bearingOpenings, catalog.Sides,
             catalog.SidesIncomplete, config);
-        var family = rowOpenings.Count == 0 ? null : lintelFamilyFacts.ReadLintelFamilyFacts(config, sampleLintelId);
-        var checkedEnds = sideBearings.ReadRetainedEnds(analysis, matches, endWalls, family?.FamilyId, family?.FamilyLeftSign);
-        var calculations = ReadCalculations(matches, above, sides, walls, phaseNames, config, family);
-        var rows = lockReader.ReadLocks(analysis, checkedEnds);
-        return new ManagerProjectSnapshot(openings, lintels, walls, structures, unreadableCount, rows, above, sides,
-            calculations);
+        var family = rowOpenings.Count == 0 ? null : data.LintelFamily;
+        if(matches.Any(row => row.Opening is not null && row.Lintel is not null)) {
+            data.EndWalls = catalog.EndWalls.Select(wall => new EndWallSnapshot(wall.UniqueId,
+                ReadOptional(() => analysis.GetOwnerEnvelope(wall.Element)), wall.Concrete)).ToList();
+        }
+        var checkedEnds = sideBearings.ReadRetainedEnds(analysis, matches, data.EndWalls,
+            family?.FamilyId, family?.FamilyLeftSign);
+        var calculations = ReadCalculations(matches, aboveById, sides, walls, phaseNames, config, family);
+        return new ManagerProjectSnapshot(openings, lintels, walls, structures, unreadableCount, checkedEnds, above, sides,
+            calculations) { ProcessingData = data };
+    }
+
+    // Восстанавливает пару при неполном вырезе только по однозначной прямой связи двух центральных ссылок.
+    private IReadOnlyList<OpeningLintelMatch> ReadMatchedRows(IGeometryReadContext geometry,
+        IReadOnlyList<OpeningLintelMatch> rows, ISet<string> scope, MatchLimits limits, bool complete) {
+        var visible = rows.Where(row => scope is null || scope.Contains(row.Opening?.Element.UniqueId)
+            || scope.Contains(row.Lintel?.Element.UniqueId)).ToList();
+        var candidates = complete ? OpeningLintelMatcher.FindLockCandidates(rows, limits, LengthEpsilon).ToList() : [];
+        var inputs = visible.Concat(candidates).ToList();
+        PrepareProcessingData(geometry, inputs);
+        var checkedRows = lockReader.ReadLocks(geometry, inputs);
+        var locked = checkedRows.Skip(visible.Count).Where(row => row.LockFacts is
+            { State: LintelLockState.Confirmed, DependencyIds.Count: 1 }).ToList();
+        var byOpening = locked.ToLookup(row => row.Opening);
+        var byLintel = locked.ToLookup(row => row.Lintel);
+        var partners = new Dictionary<string, OpeningLintelMatch>();
+        foreach(var row in locked.Where(row => byOpening[row.Opening].Count() == 1 && byLintel[row.Lintel].Count() == 1)) {
+            partners.Add(row.Opening.Element.UniqueId, row);
+            partners.Add(row.Lintel.Element.UniqueId, row);
+        }
+        return checkedRows.Take(visible.Count).Select(row => partners.TryGetValue(
+            row.Opening?.Element.UniqueId ?? row.Lintel.Element.UniqueId, out var pair) ? pair : row).Distinct().ToList();
+    }
+
+    // Собирает аннотации всех владельцев, включая вложенные экземпляры.
+    private void PrepareProcessingData(IGeometryReadContext geometry, IReadOnlyList<OpeningLintelMatch> matches) {
+        var owners = new HashSet<long>();
+        foreach(var match in matches) {
+            if(match.Opening is { } opening) {
+                owners.Add(opening.Element.Information.ElementId.Value);
+            }
+            if(match.Lintel is { } lintel) {
+                var instance = Document.GetElement(lintel.Element.UniqueId);
+                foreach(var owner in geometry.GetGeometryOwners(instance).OfType<FamilyInstance>()) {
+                    owners.Add(owner.Id.GetIdValue());
+                }
+            }
+        }
+        geometry.ProcessingData.Annotations = geometry.SessionCache?.ReadAnnotations(owners)
+            ?? LintelAnnotationIndex.Read(Document, owners);
+        geometry.ProcessingData.FloorPlans = source.ReadFloorPlans();
     }
 
     // Собирает хосты видимых строк, включая партнёров за пределами выбранного диапазона.
     private IDictionary<string, LintelCalculation> ReadCalculations(IReadOnlyList<OpeningLintelMatch> matches,
-        IReadOnlyList<AboveOpeningFacts> above, IReadOnlyList<OpeningBearingFacts> sides,
+        IReadOnlyDictionary<string, AboveOpeningFacts> aboveById, IReadOnlyList<OpeningBearingFacts> sides,
         IReadOnlyCollection<ManagerWallSnapshot> walls, IReadOnlyDictionary<ElementId, string> phaseNames,
         ManagerConfigSnapshot config, LintelFamilyFacts family) {
         var byOpening = new Dictionary<string, LintelCalculation>();
@@ -118,7 +189,6 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
             return byOpening;
         }
         var byWall = walls.ToDictionary(wall => wall.UniqueId);
-        var aboveById = above.ToDictionary(facts => facts.OpeningId);
         var sidesById = sides.ToDictionary(facts => facts.OpeningId);
         foreach(var match in matches.Where(row => row.Opening is not null)) {
             var opening = match.Opening;
@@ -164,14 +234,23 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
         Func<WorksetId, string> getWorksetName = id => id is null
             ? null : GetCachedName(id, worksetNames, readWorksetName);
         int unreadableCount = 0;
-        foreach(var (instance, type, hostId, widthMm) in GetMatchingFamilies(
-            collector, config, phaseId, () => unreadableCount++)) {
+        var candidates = GetMatchingFamilies(collector, config, phaseId, () => unreadableCount++).ToList();
+        if(candidates.Count == 0) {
+            return unreadableCount;
+        }
+        var sample = candidates.FirstOrDefault(candidate => !candidate.Type.IsOpening).Instance;
+        analysis.ProcessingData.LintelFamily = lintelFamilyFacts.ReadLintelFamilyFacts(config, sample?.UniqueId);
+        analysis.ReadOpeningPlanes(candidates.Where(candidate => candidate.Type.IsOpening)
+            .Select(candidate => candidate.Instance));
+        var nearbyWalls = IndexNearbyRuleWalls(analysis, candidates.Where(candidate => candidate.Type.IsOpening)
+            .Select(candidate => candidate.Instance), config, phaseId);
+        foreach(var (instance, type, hostId, widthMm) in candidates) {
             try {
                 var element = ReadFamilySnapshot(instance, type, phaseNames, config.Parameters,
                     getElementName, getWorksetName);
                 if(type.IsOpening) {
-                    var opening = ReadOpening(instance, type.Symbol, element, hostId, widthMm, config, phaseId,
-                        analysis);
+                    var opening = ReadOpening(instance, type.Symbol, element, hostId, widthMm, config,
+                        analysis, nearbyWalls[instance.Id]);
                     if(opening is not null) {
                         openings.Add(opening);
                     }
@@ -290,46 +369,45 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
     // Сохраняет хост Revit и подтверждённую стену выреза отдельно.
     private ManagerOpeningSnapshot ReadOpening(FamilyInstance instance, FamilySymbol type,
         ManagerFamilySnapshot element, string hostId, double? widthMm,
-        ManagerConfigSnapshot config, ElementId phaseId, IGeometryReadContext analysis) {
+        ManagerConfigSnapshot config, IGeometryReadContext analysis, IEnumerable<Wall> nearbyWalls) {
         double? height = ReadOptional(() => paramService.ReadLengthMm(instance, type,
             config.Parameters[nameof(OpeningFamilyConfig.LintelOpeningHeight)]));
-        var geometry = placements.ReadOpeningGeometry(analysis, instance, widthMm, height);
-        string cutWallId = hostId;
-        if(geometry is { Cut: null, OpenTop: null }) {
-            var (wall, confirmed) = placements.ReadAdjacentOpeningGeometry(analysis, instance,
-                widthMm, height, ReadNearbyRuleWalls(analysis, instance, config, phaseId));
-            if(wall is not null) {
-                var rule = PlacementRuleLookup.For(config).Resolve(wall.WallType.UniqueId, widthMm);
-                if(rule.Issue == CalculationIssueCode.NoWidthRule) {
-                    return null;
-                }
-                geometry = confirmed;
-                cutWallId = wall.UniqueId;
-            }
+        var (wall, geometry) = placements.ReadAdjacentOpeningGeometry(analysis, instance, widthMm, height, nearbyWalls);
+        string cutWallId = wall?.UniqueId ?? hostId;
+        if(wall is not null && cutWallId != hostId && PlacementRuleLookup.For(config)
+            .Resolve(wall.WallType.UniqueId, widthMm).Issue == CalculationIssueCode.NoWidthRule) {
+            return null;
         }
         string level = ReadOptional(() => (Document.GetElement(instance.LevelId) as Level)?.UniqueId);
         return new ManagerOpeningSnapshot(element, hostId, widthMm, height, geometry, level, cutWallId);
     }
 
-    // Ограничивает поиск стенами исходной модели, пересекающими рамку проёма на выбранной стадии.
-    private IEnumerable<Wall> ReadNearbyRuleWalls(IGeometryReadContext analysis, FamilyInstance instance,
+    // Индексирует пересечения рамок проёмов и стен нужной стадии один раз за расчёт диапазона.
+    private ILookup<ElementId, Wall> IndexNearbyRuleWalls(IGeometryReadContext analysis, IEnumerable<FamilyInstance> instances,
         ManagerConfigSnapshot config, ElementId phaseId) {
-        var bounds = analysis.GetBounds(instance);
-        if(bounds is null) {
-            yield break;
-        }
-        var rules = PlacementRuleLookup.For(config);
-        var concrete = config.ReinforcedConcreteTypes.Select(type => type.UniqueId).ToHashSet();
-        using var outline = new Outline(AsXyz(bounds.Min), AsXyz(bounds.Max));
-        using var filter = new BoundingBoxIntersectsFilter(outline, LengthEpsilon);
-        using var collector = new FilteredElementCollector(Document);
-        foreach(Wall wall in collector.OfClass(typeof(Wall)).WherePasses(filter).WhereElementIsNotElementType()) {
-            string typeId = ReadOptional(() => wall.WallType?.UniqueId);
-            if(rules.HasWallType(typeId) && !concrete.Contains(typeId)
-                && ReadOptional(() => ExistsOnPhase(wall, phaseId))) {
-                yield return wall;
+        var openings = instances.Select(i => (i.Id, Bounds: analysis.GetBounds(i))).Where(i => i.Bounds is not null).ToArray();
+        var pairs = new List<(ElementId Opening, Wall Wall)>();
+        if(openings.Length > 0) {
+            var index = new MatchColumns<(ElementId Id, GeometryBounds Bounds)>(openings, item => item.Bounds.Min);
+            double margin = openings.Max(item => Math.Max(item.Bounds.Max.X - item.Bounds.Min.X,
+                item.Bounds.Max.Y - item.Bounds.Min.Y)) + LengthEpsilon;
+            var rules = PlacementRuleLookup.For(config);
+            var concrete = config.ReinforcedConcreteTypes.Select(type => type.UniqueId).ToHashSet();
+            using var collector = new FilteredElementCollector(Document);
+            foreach(Wall wall in collector.OfClass(typeof(Wall))) {
+                string typeId = ReadOptional(() => wall.WallType?.UniqueId);
+                if(!rules.HasWallType(typeId) || concrete.Contains(typeId) || !ReadOptional(() => ExistsOnPhase(wall, phaseId))
+                    || analysis.GetBounds(wall) is not { } bounds) {
+                    continue;
+                }
+                foreach(var item in index.Within(bounds, margin)) {
+                    if(bounds.Overlaps(item.Bounds.Min, item.Bounds.Max, LengthEpsilon)) {
+                        pairs.Add((item.Id, wall));
+                    }
+                }
             }
         }
+        return pairs.ToLookup(pair => pair.Opening, pair => pair.Wall);
     }
 
     // Читает настроенные параметры перемычки без вычисления опирания и креплений.
@@ -337,7 +415,7 @@ internal sealed class ProjectSnapshotReader(RevitRepository source, SystemPlugin
         IReadOnlyDictionary<string, string> parameters, IGeometryReadContext analysis,
         Func<ElementId, string> getElementKey) {
         double? Length(string key) => ReadOptional(() => paramService.ReadLengthMm(instance, null, parameters[key]));
-        int? Flag(string key) => ReadOptional(() => paramService.ReadFixation(instance, parameters[key])) switch {
+        int? Flag(string key) => ReadOptional(() => paramService.ReadYesNo(instance, parameters[key])) switch {
             true => 1,
             false => 0,
             _ => null

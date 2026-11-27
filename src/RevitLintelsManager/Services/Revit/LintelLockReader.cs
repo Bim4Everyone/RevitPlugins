@@ -15,7 +15,24 @@ namespace RevitLintelsManager.Models;
 internal sealed class LintelLockReader(RevitRepository source) : ILintelLockReader {
     /// <inheritdoc />
     public bool ConfirmsCreatedLock(IGeometryReadContext geometry, OpeningLintelMatch pair, string dependencyId) {
-        var facts = ReadLocks(geometry, [pair]).Single().LockFacts;
+        var document = geometry.Document;
+        if(!source.IsSourceDocumentActive(source.UIApplication) || !document.Equals(source.Document)
+            || dependencyId is null || document.GetElement(dependencyId) is not Dimension created) {
+            return false;
+        }
+        var instances = new[] { document.GetElement(pair.Opening.Element.UniqueId),
+            document.GetElement(pair.Lintel.Element.UniqueId) };
+        if(instances.Any(instance => instance is null)) {
+            return false;
+        }
+        var owners = instances.Select(instance => (long) instance.Id.GetIdValue()).ToHashSet();
+        var annotations = geometry.ProcessingData.Annotations ?? LintelAnnotationIndex.Read(document, owners);
+        using var filter = new ElementClassFilter(typeof(Dimension));
+        var candidates = annotations.GetElements(document, owners, false).Select(item => item.Id)
+            .Concat(instances.SelectMany(instance => instance.GetDependentElements(filter))).Append(created.Id)
+            .Distinct().Select(id => document.GetElement(id));
+        var index = new Lazy<LintelLockIndex>(() => ReadIndex(document, owners, candidates));
+        var facts = ReadPair(geometry, pair, index);
         return facts?.State == LintelLockState.Confirmed && facts.DependencyIds.Count == 1
             && facts.DependencyIds[0] == dependencyId;
     }
@@ -30,11 +47,15 @@ internal sealed class LintelLockReader(RevitRepository source) : ILintelLockRead
             var stale = new LintelLockFacts(LintelLockState.Stale, LintelLockReason.SourceDocumentUnavailable);
             return matches.Select(row => IsPair(row) ? new OpeningLintelMatch(row, stale) : row).ToList().AsReadOnly();
         }
-        var index = new Lazy<LintelLockIndex>(() => ReadIndex(geometry.Document, matches.Where(IsPair)
+        var owners = matches.Where(IsPair)
             .SelectMany(row => new[] {
                 row.Opening.Element.Information?.ElementId, row.Lintel.Element.Information?.ElementId
             })
-            .OfType<long>().ToHashSet()));
+            .OfType<long>().ToHashSet();
+        var index = new Lazy<LintelLockIndex>(() => {
+            var annotations = geometry.ProcessingData.Annotations ?? LintelAnnotationIndex.Read(geometry.Document, owners);
+            return ReadIndex(geometry.Document, owners, annotations.GetElements(geometry.Document, owners, true));
+        });
         return matches.Select(row => IsPair(row) ? new OpeningLintelMatch(row, ReadPair(geometry, row, index)) : row)
             .ToList().AsReadOnly();
     }
@@ -54,7 +75,7 @@ internal sealed class LintelLockReader(RevitRepository source) : ILintelLockRead
                 || opening.Host?.UniqueId != match.Opening.HostWallUniqueId) {
                 return new LintelLockFacts(LintelLockState.Stale, LintelLockReason.PairChanged);
             }
-            var (openingRef, openingIssue) = ReadCenter(geometry, opening, match.Opening.Geometry?.Cut?.TargetPlanes,
+            var (openingRef, openingIssue) = ReadCenter(geometry, opening, match.Opening.Geometry?.SearchPlanes,
                 LintelLockReason.OpeningReferenceUnavailable);
             if(openingIssue is not null) {
                 return openingIssue;
@@ -72,21 +93,27 @@ internal sealed class LintelLockReader(RevitRepository source) : ILintelLockRead
     // Проверяет тип, числовой идентификатор и изменение положения от момента съёмки пары.
     private static FamilyInstance ResolveInstance(Document document, ManagerFamilySnapshot snapshot,
         GeometryFacts geometry) {
-        if(string.IsNullOrEmpty(snapshot.UniqueId) || snapshot.Information?.ElementId is not long id
-            || document.GetElement(snapshot.UniqueId) is not FamilyInstance { IsValidObject: true } instance
-            || instance.Symbol.UniqueId != snapshot.TypeUniqueId
-            || instance.Symbol.Family.UniqueId != snapshot.FamilyUniqueId
-            || instance.Id.GetIdValue() != id) {
+        if(string.IsNullOrEmpty(snapshot.UniqueId)
+            || document.GetElement(snapshot.UniqueId) is not FamilyInstance { IsValidObject: true } instance) {
             return null;
         }
+        return MatchesInstance(instance, snapshot, geometry) ? instance : null;
+    }
+
+    /// <summary>Проверяет тип, владельца и положение экземпляра относительно снимка диапазона.</summary>
+    internal static bool MatchesInstance(FamilyInstance instance, ManagerFamilySnapshot snapshot, GeometryFacts geometry) {
+        if(instance.Id.GetIdValue() != snapshot.Information?.ElementId || instance.Symbol.UniqueId != snapshot.TypeUniqueId
+            || instance.Symbol.Family.UniqueId != snapshot.FamilyUniqueId) {
+            return false;
+        }
         if(geometry?.Placement?.TransformAxes is not { } axes) {
-            return instance;
+            return true;
         }
         using var pose = instance.GetTransform();
         return pose.Origin.DistanceTo(AsXyz(axes.Center)) <= LengthEpsilon
             && pose.BasisX.Normalize().IsAlmostEqualTo(AsXyz(axes.CenterNormal))
             && pose.BasisY.Normalize().IsAlmostEqualTo(AsXyz(axes.LongitudinalNormal))
-            && pose.BasisZ.Normalize().IsAlmostEqualTo(AsXyz(axes.HeightNormal)) ? instance : null;
+            && pose.BasisZ.Normalize().IsAlmostEqualTo(AsXyz(axes.HeightNormal));
     }
 
     // Разрешает имя по определению семейства и проверяет, что плоскость проходит через фактический центр.
@@ -109,14 +136,12 @@ internal sealed class LintelLockReader(RevitRepository source) : ILintelLockRead
     // Сохраняет только разные устойчивые представления подтверждённой плоскости актуального экземпляра.
     internal static string[] ReadCenterIdentities(IGeometryReadContext geometry, FamilyInstance instance,
         AlignmentPlanes expected) {
-        var family = instance.Symbol.Family;
-        if(expected is null || geometry.GetWidthOriginPlane(family) is not string planeName
-            || geometry.GetWidthOriginOffset(family) is not double offset) {
+        if(expected is null || geometry.GetWidthPlane(instance) is not { } width) {
             return [];
         }
         using var pose = instance.GetTransform();
         var normal = pose.BasisX.Normalize();
-        var planePoint = pose.OfPoint(new XYZ(offset, 0, 0));
+        var planePoint = pose.OfPoint(new XYZ(width.Offset, 0, 0));
         var center = AsXyz(expected.Center);
         var expectedNormal = AsXyz(expected.CenterNormal);
         if(!pose.IsConformal || !IsFinitePoint(center) || !IsFinitePoint(expectedNormal)
@@ -128,21 +153,17 @@ internal sealed class LintelLockReader(RevitRepository source) : ILintelLockRead
         return candidates.Where(reference => reference is not null && reference.ElementId == instance.Id
             && reference.LinkedElementId == ElementId.InvalidElementId
             && instance.GetReferenceType(reference) == FamilyInstanceReferenceType.CenterLeftRight
-            && instance.GetReferenceName(reference) == planeName)
+            && instance.GetReferenceName(reference) == width.Name)
             .Select(reference => reference.ConvertToStableRepresentation(geometry.Document))
             .Distinct(StringComparer.Ordinal).Take(2).ToArray();
     }
 
     // Индексирует размеры и категорию ограничений вне зависимости от видимости текущего вида.
-    private static LintelLockIndex ReadIndex(Document document, ISet<long> ownerIds) {
+    private static LintelLockIndex ReadIndex(Document document, ISet<long> ownerIds, IEnumerable<Element> candidates) {
         var items = new List<LintelLockDependency>();
         try {
-            using var byType = new ElementClassFilter(typeof(Dimension));
-            using var byCategory = new ElementCategoryFilter(BuiltInCategory.OST_Constraints);
-            using var filter = new LogicalOrFilter(byType, byCategory);
-            using var collector = new FilteredElementCollector(document);
-            foreach(var element in collector.WherePasses(filter).WhereElementIsNotElementType()) {
-                if(ReadOptional<bool?>(() => element.IsTransient) == true) {
+            foreach(var element in candidates) {
+                if(element is null or IndependentTag || ReadOptional<bool?>(() => element.IsTransient) == true) {
                     continue;
                 }
                 var facts = ReadDependency(document, element, ownerIds);

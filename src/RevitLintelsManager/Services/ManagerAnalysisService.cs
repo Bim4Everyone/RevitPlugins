@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using RevitLintelsManager.Models;
@@ -27,19 +28,33 @@ internal sealed class ManagerAnalysisService(ILintelCalculationService calculati
         var issues = GetVisibleIssues(match, calculation);
         bool blocked = AddRestrictions(opening?.Element, lintel?.Element, openingDiagnostics, lintelDiagnostics);
         AddCalculationDiagnostics(opening, calculation is not null, issues, openingDiagnostics);
-        bool hasOpeningContext = lintel is null && AddOpeningContext(calculation, rowDiagnostics);
-        AddMatchDiagnostic(match, hasOpeningContext, rowDiagnostics);
-        comparison = IsPair(match) ? calculationService.Compare(match, calculation, config) : null;
+        bool lintelNotRequired = calculation?.LintelNotRequired == true && lintel is null
+            && (match.State == MatchState.NoCandidate || (match.State == MatchState.Incomplete
+                && match.Contacts.Count == 0 && calculation.Above.LimitingStructure is not null));
+        if(lintelNotRequired) {
+            rowDiagnostics.Add(GetOmissionReason(calculation.Above, config.MinimalHeightAboveOpeningMm));
+        } else {
+            bool hasOpeningContext = lintel is null && AddOpeningContext(calculation, rowDiagnostics);
+            AddMatchDiagnostic(match, hasOpeningContext, rowDiagnostics);
+        }
+        bool isPair = IsPair(match);
+        comparison = isPair ? calculationService.Compare(match, calculation, config) : null;
         if(comparison is not null) {
             lintelDiagnostics.AddRange(comparison.Differences
                 .Select(difference => Diagnostic($"Compare.{difference.Code}", difference.Parameter)));
         }
 
-        var (allowed, defaultAction) = EvaluateActions(match, calculation, comparison, issues.Count == 0, blocked);
-        bool unresolvedMatch = !IsPair(match) && match.State != MatchState.NoCandidate;
-        var openingStatus = ElementStatus(opening?.Element, openingDiagnostics, unresolvedMatch, isFixed);
-        var lintelStatus = ElementStatus(lintel?.Element, lintelDiagnostics, unresolvedMatch, isFixed,
-            lintelInfo?.IsInGroup);
+        var allowed = new List<ManagerAction>();
+        var defaultAction = AddLintelActions(match, calculation, comparison, issues.Count == 0, blocked, allowed);
+        allowed.Add(isFixed ? ManagerAction.ClearFixation : ManagerAction.SetFixation);
+        allowed.Add(ManagerAction.Skip);
+        bool unresolvedMatch = !lintelNotRequired && !isPair && match.State != MatchState.NoCandidate;
+        var openingStatus = opening is null && match.Conflict != OpeningConflict.None
+            ? ManagerElementStatus.MultipleOpenings
+            : ElementStatus(opening?.Element, openingDiagnostics, unresolvedMatch, isFixed);
+        var lintelStatus = lintelNotRequired ? ManagerElementStatus.LintelNotRequired
+            : lintel is null && match.Conflict != OpeningConflict.None ? ManagerElementStatus.OpeningConflict
+            : ElementStatus(lintel?.Element, lintelDiagnostics, unresolvedMatch, isFixed, lintelInfo?.IsInGroup);
         var left = opening is null ? null : new ManagerElementPresentation(opening.Element.TypeName, openingStatus,
             openingInfo, openingDiagnostics, opening.WidthMm, opening.HeightMm);
         var right = lintel is null ? null : new ManagerElementPresentation(lintel.Element.TypeName, lintelStatus,
@@ -49,7 +64,7 @@ internal sealed class ManagerAnalysisService(ILintelCalculationService calculati
             openingStatus, lintelStatus, lintelInfo?.IsFixed);
         var snapshot = new ManagerItemSnapshot(key, groupKey, rowDiagnostics, allowed, defaultAction,
             comparison?.Corrections ?? ManagerCorrection.None);
-        return new ManagerAnalyzedRow(snapshot, left, right);
+        return new ManagerAnalyzedRow(snapshot, left, right) { Match = match, Comparison = comparison };
     }
 
     // Учитывает только взаимно однозначное сопоставление из анализа всего исходного документа.
@@ -58,7 +73,7 @@ internal sealed class ManagerAnalysisService(ILintelCalculationService calculati
             && match.State is MatchState.Confirmed or MatchState.Shifted;
     }
 
-    // Фиксация или недоступность признака блокирует операции. Группа модели проверяется на перемычке.
+    // Фиксация, недоступность признака и группа модели ограничивают операции с перемычкой.
     private static bool AddRestrictions(ManagerFamilySnapshot opening, ManagerFamilySnapshot lintel,
         ICollection<ManagerDiagnostic> openingDiagnostics, ICollection<ManagerDiagnostic> lintelDiagnostics) {
         bool prohibited = AddFixationDiagnostic(opening, openingDiagnostics);
@@ -118,6 +133,22 @@ internal sealed class ManagerAnalysisService(ILintelCalculationService calculati
         }
     }
 
+    // Объясняет отсутствие перемычки по ближайшей конструкции или по измеренной высоте кладки.
+    private static ManagerDiagnostic GetOmissionReason(AboveOpeningFacts above, double minimumMm) {
+        string code;
+        string[] arguments = [];
+        if(above.LimitingStructure is { } nearest) {
+            code = nearest.IsSlab ? (nearest.IsLinked ? "LinkedSlabAbove" : "SlabAbove") : $"Upper.{nearest.Category}";
+        } else if(above.Masonry.HasMaterial == false) {
+            code = "NoMasonryAbove";
+        } else {
+            code = "MasonryBelowInstallationThreshold";
+            arguments = [above.Masonry.HeightMm.Value.ToString("0.##", CultureInfo.CurrentCulture),
+                minimumMm.ToString("0.##", CultureInfo.CurrentCulture)];
+        }
+        return new ManagerDiagnostic($"Manager.Diagnostic.{code}", arguments, isInformational: true);
+    }
+
     // Показывает подтверждённые причины в предупреждении пустого поля перемычки.
     private static bool AddOpeningContext(LintelCalculation calculation, ICollection<ManagerDiagnostic> diagnostics) {
         if(calculation is null) {
@@ -152,9 +183,6 @@ internal sealed class ManagerAnalysisService(ILintelCalculationService calculati
     // Отличает отсутствие второго элемента от поиска с неподтверждённым вырезом или кандидатами.
     private static void AddMatchDiagnostic(OpeningLintelMatch match, bool hasOpeningContext,
         ICollection<ManagerDiagnostic> diagnostics) {
-        if(IsPair(match)) {
-            return;
-        }
         string conflictCode = match.Conflict switch {
             OpeningConflict.IntersectingCuts => "OpeningCutConflict",
             OpeningConflict.CompetingOpenings => "CompetingOpenings",
@@ -162,6 +190,9 @@ internal sealed class ManagerAnalysisService(ILintelCalculationService calculati
         };
         if(conflictCode is not null) {
             diagnostics.Add(Diagnostic(conflictCode));
+            return;
+        }
+        if(IsPair(match)) {
             return;
         }
         var geometry = match.Opening?.Geometry;
@@ -183,31 +214,35 @@ internal sealed class ManagerAnalysisService(ILintelCalculationService calculati
         diagnostics.Add(Diagnostic(code));
     }
 
-    // Проверяет отдельный замок по существующей паре. Ошибка подбора блокирует остальные действия по Q-05.
-    private static (IReadOnlyList<ManagerAction> Allowed, ManagerAction Default) EvaluateActions(
+    // Добавляет допустимые операции над перемычкой и выбирает действие по умолчанию.
+    private static ManagerAction AddLintelActions(
         OpeningLintelMatch match, LintelCalculation calculation, LintelComparison comparison,
-        bool noVisibleIssues, bool prohibited) {
-        if(prohibited) {
-            return ([ManagerAction.Skip], ManagerAction.Skip);
+        bool noVisibleIssues, bool prohibited, List<ManagerAction> allowed) {
+        if(prohibited || (IsPair(match) && match.Opening.Geometry?.Cut is null)) {
+            return ManagerAction.Skip;
         }
         if(match.State == MatchState.NoCandidate && match.Opening is null && match.Lintel is not null) {
-            return ([ManagerAction.Delete, ManagerAction.Skip], ManagerAction.Delete);
+            allowed.Add(ManagerAction.Delete);
+            return ManagerAction.Delete;
         }
         bool canLock = comparison is { PositionKnown: true, RequiresPositionCorrection: false, LockMissing: true };
         bool canInstall = calculation?.IsApplicable == true;
-        bool canCorrectExisting = calculation is not null && comparison is not null && noVisibleIssues;
+        bool canCorrectExisting = calculation is { LintelNotRequired: false } && comparison is not null
+            && noVisibleIssues;
         if(!canInstall && !canCorrectExisting) {
-            return canLock ? ([ManagerAction.Lock, ManagerAction.Skip], ManagerAction.Skip)
-                : ([ManagerAction.Skip], ManagerAction.Skip);
+            if(canLock) {
+                allowed.Add(ManagerAction.Lock);
+            }
+            return ManagerAction.Skip;
         }
         if(match.State == MatchState.NoCandidate && match.Opening is not null && match.Lintel is null) {
-            return ([ManagerAction.Install, ManagerAction.Skip], ManagerAction.Install);
+            allowed.Add(ManagerAction.Install);
+            return ManagerAction.Install;
         }
         if(comparison?.PositionKnown != true) {
-            return ([ManagerAction.Skip], ManagerAction.Skip);
+            return ManagerAction.Skip;
         }
 
-        var allowed = new List<ManagerAction>();
         if(canInstall) {
             allowed.Add(ManagerAction.Replace);
         }
@@ -218,11 +253,9 @@ internal sealed class ManagerAnalysisService(ILintelCalculationService calculati
             allowed.Add(ManagerAction.Lock);
         }
         allowed.Add(ManagerAction.Delete);
-        allowed.Add(ManagerAction.Skip);
-        var action = comparison.RequiresReplacement ? (canInstall ? ManagerAction.Replace : ManagerAction.Skip)
+        return comparison.RequiresReplacement ? (canInstall ? ManagerAction.Replace : ManagerAction.Skip)
             : comparison.RequiresCorrection ? ManagerAction.Correct
             : canLock ? ManagerAction.Lock : ManagerAction.Skip;
-        return (allowed.AsReadOnly(), action);
     }
 
     // Основной статус учитывает блокировки, сохраняя все дополнительные предупреждения.

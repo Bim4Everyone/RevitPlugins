@@ -20,9 +20,9 @@ internal abstract class ManagerRowViewModel : BaseViewModel {
         bool analysisPending = opening?.Status == ManagerElementStatus.NotAnalyzed
             || lintel?.Status == ManagerElementStatus.NotAnalyzed;
         Opening = new ManagerElementViewModel(opening, true, localization, showInformation, analysisPending,
-            counterpartUnconfirmed: groupKey.OpeningStatus == ManagerElementStatus.Warning, rowIsFixed: groupKey.IsFixed);
+            groupKey.OpeningStatus, rowIsFixed: groupKey.IsFixed);
         Lintel = new ManagerElementViewModel(lintel, false, localization, showInformation, analysisPending,
-            counterpartUnconfirmed: groupKey.LintelStatus == ManagerElementStatus.Warning, rowIsFixed: groupKey.IsFixed);
+            groupKey.LintelStatus, rowIsFixed: groupKey.IsFixed);
         _actions = actions.Distinct().Select(value => {
             string key = value == ManagerAction.Correct && correctionTitleKey is not null
                 ? correctionTitleKey : "Manager.Action." + value;

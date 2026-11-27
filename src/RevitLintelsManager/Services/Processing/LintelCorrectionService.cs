@@ -55,6 +55,7 @@ internal sealed class LintelCorrectionService(IProjectSnapshotReader snapshots, 
         if(!target.BeforeCorrection.IsPreserved(target)) {
             throw new InvalidOperationException(localization.GetLocalizedString("Processing.CorrectDependencies"));
         }
+        target.CorrectedLintel = pair.Lintel;
     }
 
     // Для замка совмещает центральные плоскости точно. Поперечное смещение и высоту исправляет по допускам.
@@ -95,7 +96,7 @@ internal sealed class LintelCorrectionService(IProjectSnapshotReader snapshots, 
         var deviation = new PlaneDeviation(target.Calculation.Target.Planes, anchor, config.MatchLimits);
         var contact = new MatchContact(target.Opening.UniqueId, target.Lintel.UniqueId, deviation);
         var pair = new OpeningLintelMatch(target.Match.Opening, lintel, target.Match.State, [contact]);
-        return sideBearings.ReadRetainedEnds(target.LockGeometry, [pair], target.EndWalls,
+        return sideBearings.ReadRetainedEnds(target.LockGeometry, [pair], target.LockGeometry.ProcessingData.EndWalls,
             config.LintelFamily.UniqueId, target.Calculation.Target.FamilyLeftSign)[0];
     }
 

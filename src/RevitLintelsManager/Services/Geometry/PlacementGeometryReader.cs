@@ -51,35 +51,122 @@ internal sealed class PlacementGeometryReader : IPlacementGeometryReader {
         bool hasConflictingCut = !openTop.HasValue
             && ReadOptional(() => HasConflictingCut(geometry, instance, wall, frame));
         return new GeometryFacts(placement, frame, "Не подтверждён замкнутый сверху вырез стены-хоста.",
-            openTop, searchTop, hasConflictingCut);
+            openTop, searchTop, hasConflictingCut) {
+            LowestSillElevation = openTop.HasValue || searchTop.HasValue ? null
+                : ReadOptional(() => ReadLowestSillElevation(geometry, instance, [wall]))
+        };
     }
 
     /// <inheritdoc />
     public (Wall Wall, GeometryFacts Geometry) ReadAdjacentOpeningGeometry(IGeometryReadContext geometry,
         FamilyInstance instance, double? widthMm, double? heightMm, IEnumerable<Wall> candidates) {
         var host = ReadOptional(() => instance.Host as Wall);
+        var hostFacts = ReadOpeningGeometry(geometry, instance, widthMm, heightMm);
         var hostFaces = host is null ? null : ReadOptional(() => geometry.GetRevealFaces(host));
-        if(hostFaces is null || hostFaces[instance.Id].Any()) {
-            return default;
+        if(hostFaces is null) {
+            return (host, hostFacts);
         }
-
-        var placement = ReadOptional(() => GetPlacement(instance));
-        (Wall Wall, GeometryFacts Geometry) found = default;
-        foreach(var wall in candidates.Where(wall => wall.Id != host.Id)) {
-            var frame = geometry.GetWallFrame(wall);
+        var walls = new List<Wall>();
+        WallFrame frame = null;
+        bool cutsHost = hostFaces[instance.Id].Any();
+        if(cutsHost) {
+            walls.Add(host);
+            frame = hostFacts.Wall;
             if(frame is null) {
-                continue;
+                return (host, hostFacts);
             }
-            var cut = ReadOptional(() => ReadCut(geometry, instance, wall, frame, widthMm, heightMm));
-            if(cut is null) {
-                continue;
-            }
-            if(found.Wall is not null) {
-                return default;
-            }
-            found = (wall, new GeometryFacts(placement, frame, cut, null, null));
         }
-        return found;
+        foreach(var wall in candidates.Where(w => w.Id != host.Id)) {
+            var other = geometry.GetWallFrame(wall);
+            if(other is null || (cutsHost && !SharesCutAxis(frame, other))) {
+                continue;
+            }
+            if(ReadOptional(() => geometry.GetRevealFaces(wall)?[instance.Id].Any()) != true) {
+                continue;
+            }
+            if(frame is not null && !SharesCutAxis(frame, other)) {
+                return (host, hostFacts);
+            }
+            frame ??= other;
+            walls.Add(wall);
+        }
+        if(walls.Count == 0 || (walls.Count == 1 && walls[0].Id == host.Id)) {
+            return (host, hostFacts);
+        }
+        var primary = walls[0];
+        if(walls.Count == 1) {
+            var cut = ReadOptional(() => ReadCut(geometry, instance, primary, frame, widthMm, heightMm));
+            return cut is null ? (host, hostFacts) : (primary, new GeometryFacts(hostFacts.Placement, frame, cut, null, null));
+        }
+        var combined = ReadOptional(() => ReadCombinedOpening(geometry, instance, walls, frame, hostFacts.Placement,
+            widthMm, heightMm));
+        return (primary, combined ?? new GeometryFacts(hostFacts.Placement, frame, null, null,
+            "Грани проёма в нескольких стенах не образуют непрерывный прямоугольный вырез.") {
+            LowestSillElevation = ReadOptional(() => ReadLowestSillElevation(geometry, instance, walls))
+        });
+    }
+
+    // Плоская нижняя грань задаёт отметку даже при разрыве её контура соседним вырезом.
+    private static double? ReadLowestSillElevation(IGeometryReadContext geometry, FamilyInstance opening,
+        IEnumerable<Wall> walls) {
+        return walls.SelectMany(wall => geometry.GetRevealFaces(wall)?[opening.Id] ?? [])
+            .OfType<PlanarFace>()
+            .Where(face => face.FaceNormal.Z > 0
+                && face.FaceNormal.CrossProduct(XYZ.BasisZ).GetLength() <= DirectionEpsilon)
+            .Min(face => (double?)face.Origin.Z);
+    }
+
+    // Отделяет соседний слой стены от продолжения кладки вдоль её оси.
+    private static bool SharesCutAxis(WallFrame frame, WallFrame other) =>
+        AsXyz(frame.Along).CrossProduct(AsXyz(other.Along)).GetLength() <= DirectionEpsilon
+        && Math.Abs(frame.ToLocal(other.Origin).Y) < Math.Min(frame.Thickness, other.Thickness) / 2 - LengthEpsilon;
+
+    // Проецирует фрагменты в одну систему координат, включая стены с обратным направлением оси.
+    private GeometryFacts ReadCombinedOpening(IGeometryReadContext geometry, FamilyInstance instance,
+        List<Wall> walls, WallFrame frame, InstancePlacement placement, double? widthMm, double? heightMm) {
+        var parts = new List<Reveal>();
+        foreach(var wall in walls) {
+            var other = geometry.GetWallFrame(wall);
+            var origin = frame.ToWorld(0, frame.ToLocal(other.Origin).Y, 0);
+            var local = new WallFrame(origin, frame.Along.X, frame.Along.Y, other.Thickness);
+            foreach(var face in geometry.GetRevealFaces(wall)[instance.Id]) {
+                var reveal = ReadReveal(face, local, AsXyz(frame.Along));
+                if(reveal is null) {
+                    return null;
+                }
+                parts.Add(reveal);
+            }
+        }
+        var reveals = parts.GroupBy(r => r.Side).Select(MergeReveals).ToList();
+        if(reveals.Any(r => r is null) || !reveals.Any(r => r.Side == RevealSide.Left)
+            || !reveals.Any(r => r.Side == RevealSide.Right)) {
+            return null;
+        }
+        var cut = ReadCut(geometry, instance, walls[0], frame, widthMm, heightMm, reveals, walls);
+        var openTop = cut is null ? ReadOpenTop(geometry, instance, walls[0], frame, widthMm, heightMm, reveals, walls) : null;
+        if(cut is null && !openTop.HasValue) {
+            return null;
+        }
+        var facts = cut is null ? new GeometryFacts(placement, frame, "Открытый верх выреза в нескольких стенах.", openTop)
+            : new GeometryFacts(placement, frame, cut, null, null);
+        facts.AdditionalCutWallIds = walls.Skip(1).Select(w => w.UniqueId).ToArray();
+        return facts;
+    }
+
+    // Собирает одну сторону контура только из лежащих на одной прямой непрерывных участков.
+    private static Reveal MergeReveals(IGrouping<RevealSide, Reveal> parts) {
+        bool horizontal = parts.Key is RevealSide.Head or RevealSide.Sill;
+        var first = parts.First();
+        double end = horizontal ? parts.Min(r => r.XMin) : parts.Min(r => r.ZMin);
+        foreach(var part in parts.OrderBy(r => horizontal ? r.XMin : r.ZMin)) {
+            if(!Near(horizontal ? part.ZMin : part.XMin, horizontal ? first.ZMin : first.XMin)
+                || (horizontal ? part.XMin : part.ZMin) > end + LengthEpsilon) {
+                return null;
+            }
+            end = Math.Max(end, horizontal ? part.XMax : part.ZMax);
+        }
+        return new Reveal(parts.Key, parts.Min(r => r.XMin), parts.Max(r => r.XMax),
+            parts.Min(r => r.ZMin), parts.Max(r => r.ZMax));
     }
 
     // Проверяет разрыв или укорочение горизонтальной грани по откосам другого выреза этой стены.
@@ -90,18 +177,26 @@ internal sealed class PlacementGeometryReader : IPlacementGeometryReader {
             return false;
         }
         var along = AsXyz(frame.Along);
-        var sections = faces[instance.Id].OfType<PlanarFace>()
-            .Where(face => face.FaceNormal.CrossProduct(XYZ.BasisZ).GetLength() <= DirectionEpsilon)
-            .SelectMany(face => face.EdgeLoops.Cast<EdgeArray>().Select(edges => ReadReveal(face, edges, frame, along)))
-            .OfType<Reveal>().ToList();
-        if(sections.Count < 2) {
+        var sections = HorizontalSections(faces[instance.Id]);
+        if(sections.Count == 0) {
             return false;
         }
+        var extent = ReadSectionExtent(instance, frame, sections);
         foreach(var entry in faces.Where(entry => entry.Key != instance.Id)) {
             var other = geometry.Document.GetElement(entry.Key);
             if(other is not Opening && (other is not FamilyInstance insert
                 || insert.Category?.GetBuiltInCategory() is not (BuiltInCategory.OST_Doors or BuiltInCategory.OST_Windows))) {
                 continue;
+            }
+            if(extent.HasValue && other is FamilyInstance neighbor
+                && ReadSectionExtent(neighbor, frame, HorizontalSections(entry)) is { } otherExtent) {
+                var own = extent.Value;
+                double overlapX = Math.Min(own.Right, otherExtent.Right) - Math.Max(own.Left, otherExtent.Left);
+                double overlapZ = Math.Min(own.Top, otherExtent.Top) - Math.Max(own.Bottom, otherExtent.Bottom);
+                if(overlapX >= -LengthEpsilon && overlapZ >= -LengthEpsilon
+                    && Math.Max(overlapX, overlapZ) > LengthEpsilon) {
+                    return true;
+                }
             }
             var jambs = entry.Select(face => ReadReveal(face, frame, along)).OfType<Reveal>().ToList();
             if(jambs.Where(jamb => jamb.Side == RevealSide.Left).Any(left =>
@@ -113,6 +208,28 @@ internal sealed class PlacementGeometryReader : IPlacementGeometryReader {
             }
         }
         return false;
+
+        List<Reveal> HorizontalSections(IEnumerable<Face> source) => source.OfType<PlanarFace>()
+            .Where(face => face.FaceNormal.CrossProduct(XYZ.BasisZ).GetLength() <= DirectionEpsilon)
+            .SelectMany(face => face.EdgeLoops.Cast<EdgeArray>().Select(edges => ReadReveal(face, edges, frame, along)))
+            .OfType<Reveal>().ToList();
+    }
+
+    // Ограничивает ширину фактическими кромками, лежащими на отметках верха и низа экземпляра.
+    private static (double Left, double Right, double Bottom, double Top)? ReadSectionExtent(FamilyInstance instance,
+        WallFrame frame, IReadOnlyList<Reveal> sections) {
+        if(sections.Count == 0 || instance.Document.GetElement(instance.LevelId) is not Level level
+            || !instance.IsExistsParam(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM)
+            || !instance.IsExistsParam(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM)
+            || instance.GetParam(BuiltInParameter.INSTANCE_HEAD_HEIGHT_PARAM) is not { HasValue: true } head
+            || instance.GetParam(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM) is not { HasValue: true } sill) {
+            return null;
+        }
+        double offset = level.ProjectElevation - frame.Origin.Z;
+        double bottom = offset + sill.AsDouble();
+        double top = offset + head.AsDouble();
+        var edges = sections.Where(s => Near(s.ZMin, s.Side == RevealSide.Head ? top : bottom)).ToList();
+        return top > bottom && edges.Count > 0 ? (edges.Min(s => s.XMin), edges.Max(s => s.XMax), bottom, top) : null;
     }
 
     // Связывает кромки двух фрагментов грани с началом или концом соседних откосов.
@@ -232,15 +349,11 @@ internal sealed class PlacementGeometryReader : IPlacementGeometryReader {
 
     // Сопоставляет откосы вставки, включая вырезы до низа или торца прямой стены.
     private OpeningCut ReadCut(IGeometryReadContext geometry, FamilyInstance instance, Wall wall, WallFrame frame,
-        double? widthMm, double? heightMm) {
-        var faces = geometry.GetRevealFaces(wall)?[instance.Id].ToList();
-        if(faces is null || faces.Count < 2 || faces.Count > 4) {
-            return null;
-        }
-        var xAxis = AsXyz(frame.Along);
-        var reveals = faces.Select(face => ReadReveal(face, frame, xAxis)).ToList();
-        if(reveals.Any(face => face is null)
-            || reveals.Select(face => face.Side).Distinct().Count() != faces.Count) {
+        double? widthMm, double? heightMm, List<Reveal> reveals = null, List<Wall> cutWalls = null) {
+        reveals ??= geometry.GetRevealFaces(wall)?[instance.Id]
+            .Select(face => ReadReveal(face, frame, AsXyz(frame.Along))).ToList();
+        if(reveals is null || reveals.Count is < 2 or > 4 || reveals.Any(face => face is null)
+            || reveals.Select(face => face.Side).Distinct().Count() != reveals.Count) {
             return null;
         }
         var left = reveals.Find(face => face.Side == RevealSide.Left);
@@ -265,7 +378,8 @@ internal sealed class PlacementGeometryReader : IPlacementGeometryReader {
         double z = (head.ZMax + bottom) / 2;
         var front = AsXyz(frame.ToWorld(x, frame.Thickness / 2, z));
         var back = AsXyz(frame.ToWorld(x, -frame.Thickness / 2, z));
-        if(geometry.Intersect(wall, back, front)?.Count != 0) {
+        if(cutWalls is null ? geometry.Intersect(wall, back, front)?.Count != 0
+            : cutWalls.Any(w => geometry.Intersect(w, back, front)?.Count != 0)) {
             return null;
         }
         var top = frame.ToWorld(x, 0, head.ZMax);
@@ -283,40 +397,43 @@ internal sealed class PlacementGeometryReader : IPlacementGeometryReader {
         return new OpeningCut(frame.ToWorld(x, 0, z), target, width, height, widthMatches, match);
     }
 
-    // У выреза до верха стены низ и откосы задают пролёт и подтверждаются сопоставленными размерами.
+    // У открытого сверху выреза пролёт задаёт нижняя грань или два боковых откоса.
     private (GeometryPoint Center, double Width, double JambHeight)? ReadOpenTop(IGeometryReadContext geometry,
-        FamilyInstance instance, Wall wall, WallFrame frame, double? widthMm, double? heightMm) {
-        var faces = geometry.GetRevealFaces(wall)?[instance.Id].ToList();
-        if(faces is null || faces.Count is not (2 or 3)) {
+        FamilyInstance instance, Wall wall, WallFrame frame, double? widthMm, double? heightMm,
+        List<Reveal> reveals = null, List<Wall> cutWalls = null) {
+        reveals ??= geometry.GetRevealFaces(wall)?[instance.Id]
+            .Select(face => ReadReveal(face, frame, AsXyz(frame.Along))).ToList();
+        if(reveals is null || reveals.Count is not (2 or 3) || reveals.Any(r => r is null || r.Side == RevealSide.Head)
+            || reveals.Select(reveal => reveal.Side).Distinct().Count() != reveals.Count) {
             return null;
         }
-        var xAxis = AsXyz(frame.Along);
-        var reveals = faces.Select(face => ReadReveal(face, frame, xAxis)).ToList();
-        var sill = reveals.Find(reveal => reveal?.Side == RevealSide.Sill);
-        var left = reveals.Find(reveal => reveal?.Side == RevealSide.Left);
-        var right = reveals.Find(reveal => reveal?.Side == RevealSide.Right);
+        var sill = reveals.Find(reveal => reveal.Side == RevealSide.Sill);
+        var left = reveals.Find(reveal => reveal.Side == RevealSide.Left);
+        var right = reveals.Find(reveal => reveal.Side == RevealSide.Right);
         var jamb = left ?? right;
-        if(sill is null || jamb is null || (faces.Count == 3 && (left is null || right is null))) {
-            return null;
-        }
+        double xMin = sill?.XMin ?? left.XMin;
+        double xMax = sill?.XMax ?? right.XMax;
+        double bottom = sill?.ZMin ?? jamb.ZMin;
         double top = jamb.ZMax;
-        if(!MatchesJamb(left, sill.XMin, sill.ZMin, top) || !MatchesJamb(right, sill.XMax, sill.ZMin, top)
+        if(!MatchesJamb(left, xMin, bottom, top) || !MatchesJamb(right, xMax, bottom, top)
             || (left is null && !ReachesWallEnd(wall, sill, true))
             || (right is null && !ReachesWallEnd(wall, sill, false))) {
             return null;
         }
-        double width = sill.XMax - sill.XMin;
-        double x = (sill.XMin + sill.XMax) / 2;
+        double width = xMax - xMin;
+        double x = (xMin + xMax) / 2;
         var center = frame.ToWorld(x, 0, top);
         var level = geometry.Document.GetElement(instance.LevelId) as Level;
         if(MatchesLength(widthMm, width) != true || level is null
             || MatchesLength(heightMm, center.Z - level.ProjectElevation) != true) {
             return null;
         }
-        double middle = (sill.ZMin + top) / 2;
+        double middle = (bottom + top) / 2;
         var front = AsXyz(frame.ToWorld(x, frame.Thickness / 2, middle));
         var back = AsXyz(frame.ToWorld(x, -frame.Thickness / 2, middle));
-        return geometry.Intersect(wall, back, front)?.Count == 0 ? (center, width, top - sill.ZMin) : null;
+        bool empty = cutWalls is null ? geometry.Intersect(wall, back, front)?.Count == 0
+            : cutWalls.All(w => geometry.Intersect(w, back, front)?.Count == 0);
+        return empty ? (center, width, top - bottom) : null;
     }
 
     // Проверяет, что грань выреза доходит до торца стены без бокового откоса.

@@ -17,8 +17,9 @@ namespace RevitLintelsManager.Models;
 /// <summary>Читает признаки поддерживаемой схемы семейства из загруженного определения.</summary>
 internal static class LintelFamilyGeometry {
     /// <summary>Подтверждает ось и знак левой стороны по управляемым размерам и связям креплений.</summary>
-    public static int? ReadLeftSign(Document definition, IReadOnlyDictionary<string, string> mappings) {
-        if(GeometryReadContext.ReadFamilyOriginPlanes(definition) is not { } origin) {
+    public static int? ReadLeftSign(Document definition, IReadOnlyDictionary<string, string> mappings,
+        FamilyOriginFacts planes) {
+        if(planes.Full is not { } origin) {
             return null;
         }
         using var dimensions = new FilteredElementCollector(definition).OfClass(typeof(Dimension));

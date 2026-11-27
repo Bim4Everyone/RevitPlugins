@@ -68,7 +68,7 @@ internal sealed class LintelInstallationService(RevitRepository source, IParamSe
             bool matches = value.Kind == LintelParameterKind.LengthMm
                 ? parameters.ReadLengthMm(instance, null, value.Name) is double actual
                     && Math.Abs(actual - value.LengthMm.Value) <= SystemPluginConfig.MatchRoundoffMm
-                : parameters.ReadFixation(instance, value.Name) == value.YesNo;
+                : parameters.ReadYesNo(instance, value.Name) == value.YesNo;
             if(!matches) {
                 throw new InvalidOperationException(localization.GetLocalizedString("Processing.InstallValue", value.Name));
             }

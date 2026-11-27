@@ -15,6 +15,14 @@ internal sealed class LintelCalculationService : ILintelCalculationService {
         string matchedLintelId = null) {
         var issues = new List<CalculationIssue>();
         string id = opening.Element.UniqueId;
+        if(above?.OpeningId != id) {
+            above = null;
+        }
+        bool omitLintel = above?.CanSkipLintelDesign(matchedLintelId is not null, config.MinimalHeightAboveOpeningMm)
+            == true;
+        if(omitLintel && matchedLintelId is null) {
+            return new LintelCalculation(opening, above);
+        }
         if(wall?.UniqueId != opening.CutWallUniqueId) {
             wall = null;
         }
@@ -33,23 +41,22 @@ internal sealed class LintelCalculationService : ILintelCalculationService {
                 detail: nameof(ManagerOpeningSnapshot.HeightMm)));
         }
 
-        if(above?.OpeningId != id) {
-            above = null;
-        }
-        CheckCentralMasonry(above?.Masonry, config.MinimalHeightAboveOpeningMm, issues);
         if(sides?.OpeningId != id) {
             sides = null;
         }
-        double minimum = config.MinimalBearingMm;
-        bool validMinimum = LintelManagerConfigValidator.IsValidMinimalBearing(minimum);
-        if(!validMinimum) {
-            issues.Add(new CalculationIssue(CalculationIssueCode.InvalidConfiguration,
-                detail: nameof(config.MinimalBearingMm)));
+        BearingResult left = null;
+        BearingResult right = null;
+        if(!omitLintel) {
+            CheckCentralMasonry(above?.Masonry, config.MinimalHeightAboveOpeningMm, issues);
+            double minimum = config.MinimalBearingMm;
+            if(!LintelManagerConfigValidator.IsValidMinimalBearing(minimum)) {
+                issues.Add(new CalculationIssue(CalculationIssueCode.InvalidConfiguration,
+                    detail: nameof(config.MinimalBearingMm)));
+            } else if(rule is not null) {
+                left = CalculateBearing(BearingSide.Left, sides?.Left, rule.WallSupport, minimum, issues);
+                right = CalculateBearing(BearingSide.Right, sides?.Right, rule.WallSupport, minimum, issues);
+            }
         }
-        var left = validMinimum && rule is not null
-            ? CalculateBearing(BearingSide.Left, sides?.Left, rule.WallSupport, minimum, issues) : null;
-        var right = validMinimum && rule is not null
-            ? CalculateBearing(BearingSide.Right, sides?.Right, rule.WallSupport, minimum, issues) : null;
 
         bool familyIdentified = family?.FamilyId is not null && family.FamilyId == config.LintelFamily?.UniqueId;
         var type = rule is null ? null : ResolveType(rule, config, familyIdentified ? family : null, issues);
