@@ -42,9 +42,11 @@ internal static class TextConflictCounter {
     private const double _leaderPenaltyRatio = 1.0;
     private const double _otherSidePenaltyRatio = 0.75;
     private const double _leaderCrossPenaltyRatio = 2.0;
-    // Цена единицы длины выноски и недостающего до высоты текста зазора с соседями
+    // Цена единицы длины выноски и недостающего зазора с соседями
     private const double _leaderLengthWeight = 0.5;
     private const double _nearnessWeight = 2.0;
+    // Предпочтительный зазор от текста до чужой размерной линии, в долях высоты текста
+    private const double _dimensionLineClearanceRatio = 1.15;
     // Дальние кандидаты за сегментом и на выноске: число шагов сдвига; уровни подъема выноски
     private const int _farSteps = 6;
     private const int _leaderLevels = 2;
@@ -499,8 +501,8 @@ internal static class TextConflictCounter {
     }
 
     /// <summary>
-    /// Штраф за близость текста к соседям ближе высоты текста (D71): тексты (и свои другие) и их выноски,
-    /// размерные и вспомогательные линии других размеров, контур помещения.
+    /// Штраф за близость текста к соседям (D71). Базовый зазор равен высоте текста.
+    /// Для чужих размерных линий предпочтительный зазор увеличен на 15%.
     /// </summary>
     private static double GetNearnessPenalty(
         TextBox text,
@@ -509,10 +511,11 @@ internal static class TextConflictCounter {
         PlanningOptions options) {
         double clearance = options.TextSize;
         double penalty = 0;
-        void Add(IReadOnlyList<Point2D> neighbor) {
+        void Add(IReadOnlyList<Point2D> neighbor, double clearanceRatio = 1) {
             double distance = Distance(text.Corners, neighbor);
-            if(distance < clearance) {
-                penalty += _nearnessWeight * (clearance - distance);
+            double preferredClearance = clearance * clearanceRatio;
+            if(distance < preferredClearance) {
+                penalty += _nearnessWeight * (preferredClearance - distance);
             }
         }
         foreach(var other in dimensions) {
@@ -527,7 +530,7 @@ internal static class TextConflictCounter {
             if(own) {
                 continue;
             }
-            Add(GetDimensionLine(other, other.LinePosition));
+            Add(GetDimensionLine(other, other.LinePosition), _dimensionLineClearanceRatio);
             foreach(var witness in GetWitnessLines(other, other.LinePosition, options)) {
                 Add(witness.Line);
             }
