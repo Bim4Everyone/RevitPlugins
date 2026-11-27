@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using Autodesk.Revit.DB;
+
 using RevitDocumenter.Models.RoomDimensions.Geometry;
 
 namespace RevitDocumenter.Models.RoomDimensions.Planning;
@@ -9,6 +11,12 @@ namespace RevitDocumenter.Models.RoomDimensions.Planning;
 /// Параметры планирования размеров для одного помещения. Все значения в футах модели.
 /// </summary>
 internal class PlanningOptions {
+    /// <summary>
+    /// Полосы исключённых маячковых стен в этой области.
+    /// </summary>
+    public IReadOnlyDictionary<ElementId, List<Point2D>> IgnoredWallStrips { get; set; }
+        = new Dictionary<ElementId, List<Point2D>>();
+
     /// <summary>
     /// Открытые дверные полотна поблизости от помещения (D77). Дуги открывания сюда не входят.
     /// </summary>

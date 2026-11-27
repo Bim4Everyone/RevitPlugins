@@ -84,7 +84,7 @@ internal class DimensioningAreaBuilder {
             var result = new RoomRunResult(area, members);
             results.Add(result);
             try {
-                var strips = new List<List<Point2D>>();
+                var strips = area.IgnoredWallStrips;
                 var widths = new Dictionary<ElementId, double>();
                 var memberLines = members.SelectMany(c => c.Loops).SelectMany(l => l.Lines).ToList();
                 var retained = memberLines.Where(l => l.SourceId is null || !beaconIds.Contains(l.SourceId)).ToList();
@@ -95,7 +95,7 @@ internal class DimensioningAreaBuilder {
                             $"Игнорируемая стена {faces.Key}: соседнее помещение не найдено на виде");
                     }
                     var polygon = new IgnoredWallStripBuilder().Build(faces.ToList(), retained, out double width);
-                    strips.Add(polygon);
+                    strips.Add(faces.Key, polygon);
                     widths.Add(faces.Key, width);
                     string coordinates = string.Join("; ", polygon.Select(p =>
                         $"{UnitUtilsHelper.ConvertFromInternalValue(p.X):0.#},"
@@ -115,7 +115,7 @@ internal class DimensioningAreaBuilder {
                     }).ToList()).ToList();
                     _contourBuilder.CompleteArea(area, copies);
                 } else {
-                    var loops = new AreaBoundaryUnion().Build(members, strips, beaconIds);
+                    var loops = new AreaBoundaryUnion().Build(members, strips.Values.ToList(), beaconIds);
                     _contourBuilder.CompleteArea(area, loops);
                     result.PlanningLog.Add($"Область: помещений {members.Count}; полос стен {strips.Count}");
                     foreach(var bridge in bridges.Where(b => members.Contains(b.A) && members.Contains(b.B))) {

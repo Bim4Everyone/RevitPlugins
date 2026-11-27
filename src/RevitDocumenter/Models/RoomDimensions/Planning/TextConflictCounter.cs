@@ -21,6 +21,7 @@ namespace RevitDocumenter.Models.RoomDimensions.Planning;
 internal static class TextConflictCounter {
     public const string TextText = "текст/текст";
     public const string TextLine = "текст/размерная линия";
+    public const string TextBeaconWall = "текст/маячковая перегородка";
     public const string TextWitness = "текст/вспомогательная линия";
     public const string WiderThanSegment = "текст шире сегмента";
     public const string TextDoor = "текст/дверное полотно";
@@ -83,6 +84,11 @@ internal static class TextConflictCounter {
         }
 
         foreach(var text in texts) {
+            string wallConflict = FindBeaconWallConflict(text, options);
+            if(wallConflict != null) {
+                text.Dimension.TextIssues.Add(TextBeaconWall);
+                log.Add($"Конфликт {wallConflict}: {Describe(text)}");
+            }
             string doorConflict = FindDoorConflict(text, options);
             if(doorConflict != null) {
                 text.Dimension.TextIssues.Add(doorConflict.StartsWith(TextDoorArc, StringComparison.Ordinal)
@@ -538,6 +544,9 @@ internal static class TextConflictCounter {
         foreach(var segment in contour) {
             Add([segment.Start, segment.End]);
         }
+        foreach(var wall in options.IgnoredWallStrips.Values) {
+            Add(wall);
+        }
         foreach(var door in options.DoorLeaves) {
             Add(door.Corners);
         }
@@ -597,9 +606,9 @@ internal static class TextConflictCounter {
         IEnumerable<VirtualDimension> dimensions,
         bool includeOwn,
         PlanningOptions options) {
-        string doorConflict = FindDoorConflict(text, options);
-        if(doorConflict != null) {
-            return doorConflict;
+        string obstacleConflict = FindBeaconWallConflict(text, options) ?? FindDoorConflict(text, options);
+        if(obstacleConflict != null) {
+            return obstacleConflict;
         }
         foreach(var other in dimensions) {
             bool own = other == text.Dimension;
@@ -624,6 +633,15 @@ internal static class TextConflictCounter {
                 .FirstOrDefault(w => Intersects(text.Corners, w.Line));
             if(witness.Line != null) {
                 return $"{TextWitness} с размером {Names(other)} у {witness.Element}";
+            }
+        }
+        return null;
+    }
+
+    private static string FindBeaconWallConflict(TextBox text, PlanningOptions options) {
+        foreach(var wall in options.IgnoredWallStrips) {
+            if(Intersects(text.Corners, wall.Value)) {
+                return $"{TextBeaconWall} {wall.Key}";
             }
         }
         return null;

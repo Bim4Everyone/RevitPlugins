@@ -128,6 +128,7 @@ internal class RoomDimensioningService {
                         DuplicateMaxDistance = UnitUtilsHelper.ConvertToInternalValue(
                             Math.Max(0, roomType.DuplicateMaxDistanceMm)),
                         PylonDuplicatesAcrossPylons = roomType.PylonDuplicatesAcrossPylons,
+                        IgnoredWallStrips = contour.IgnoredWallStrips,
                         DoorLeaves = GetNearbyDoorObstacles(
                             contour, result.DoorObstacles.Leaves, l => l.Corners, textSize),
                         DoorOpeningArcs = GetNearbyDoorObstacles(

@@ -4,6 +4,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 
+using RevitDocumenter.Models.RoomDimensions.Geometry;
 using RevitDocumenter.Models.RoomDimensions.Settings;
 
 namespace RevitDocumenter.Models.RoomDimensions.Contours;
@@ -25,6 +26,11 @@ internal class RoomContour {
     }
 
     public HashSet<ElementId> IgnoredSourceIds { get; } = [];
+
+    /// <summary>
+    /// Полосы исключённых маячковых стен для проверки положения текста размеров.
+    /// </summary>
+    public Dictionary<ElementId, List<Point2D>> IgnoredWallStrips { get; } = [];
 
     public Room Room { get; }
     public RoomTypeSettings RoomType { get; }
